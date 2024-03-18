@@ -407,6 +407,36 @@ locals {
 
           https = merge(local.weblogic_lb_listeners.https, {
             rules = {
+              dev-nomis-web-a-http-7777 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "dev-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "dev-nomis-web-a.development.nomis.service.justice.gov.uk",
+                      "c-dev.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              qa11g-nomis-web-a-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "qa11g-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "qa11g-nomis-web-a.development.nomis.service.justice.gov.uk",
+                      "c-qa11g.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               qa11r-nomis-web-a-http-7777 = {
                 priority = 300
                 actions = [{
@@ -451,6 +481,14 @@ locals {
           { name = "qa11r-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
         ]
         lb_alias_records = [
+          # dev
+          { name = "dev-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "dev-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "c-dev", type = "A", lbs_map_key = "private" },
+          # qa11g
+          { name = "qa11g-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "qa11g-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "c-qa11g", type = "A", lbs_map_key = "private" },
           # qa11r
           { name = "qa11r-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "qa11r-nomis-web-b", type = "A", lbs_map_key = "private" },
