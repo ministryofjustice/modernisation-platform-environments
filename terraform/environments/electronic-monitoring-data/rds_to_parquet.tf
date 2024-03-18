@@ -212,7 +212,7 @@ data "aws_iam_policy_document" "rds_to_parquet_glue_job" {
 }
 
 resource "aws_iam_role" "rds_to_parquet_job" {
-    name = "rds-to-parquet-glue"
+    name = "rds-to-parquet-glue-job"
     assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
     managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 }
