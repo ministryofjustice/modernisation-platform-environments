@@ -10,7 +10,7 @@ resource "aws_glue_crawler" "rds_to_parquet" {
 
   jdbc_target {
     connection_name = aws_glue_connection.rds_to_parquet.name
-    path            = "test"
+    path            = "%"
   }
 }
 
@@ -130,7 +130,7 @@ data "aws_iam_policy_document" "rds_to_parquet_bucket" {
 resource "aws_s3_bucket_logging" "rds_to_parquet" {
   bucket = aws_s3_bucket.rds_to_parquet.id
 
-  target_bucket = module.ap_transfer_log_bucket.bucket_id
+  target_bucket = module.rds_to_parquet.bucket_id
   target_prefix = "log/"
 
   target_object_key_format {
