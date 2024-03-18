@@ -1,4 +1,71 @@
+resource "aws_s3_bucket" "glue_jobs" {
+    bucket_prefix = "glue-jobs-"
+}
 
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "test_dump" {
+  bucket = aws_s3_bucket.test_dump.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "test_dump" {
+  bucket                  = aws_s3_bucket.test_dump.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "test_dump" {
+  bucket = aws_s3_bucket.test_dump.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_policy" "test_dump" {
+  bucket = aws_s3_bucket.test_dump.id
+  policy = data.aws_iam_policy_document.test_dump.json
+}
+
+data "aws_iam_policy_document" "test_dump" {
+  statement {
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.test_dump.arn,
+      "${aws_s3_bucket.test_dump.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "test_dump" {
+  bucket = aws_s3_bucket.test_dump.id
+
+  target_bucket = module.ap_transfer_log_bucket.bucket_id
+  target_prefix = "log/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
 resource "aws_glue_crawler" "rds_to_parquet" {
   database_name = aws_glue_catalog_database.rds_to_parquet.name
   name          = "rds_to_parquet"
@@ -12,7 +79,7 @@ resource "aws_glue_crawler" "rds_to_parquet" {
 
 resource "aws_glue_connection" "rds_to_parquet" {
   connection_properties = {
-    JDBC_CONNECTION_URL = "jdbc:sqlserver://${aws_db_instance.database_2022.endpoint};databaseName=test"
+    JDBC_CONNECTION_URL = "jdbc:sqlserver://${aws_db_instance.database_2022.endpoint}"
     PASSWORD            =  aws_secretsmanager_secret_version.db_password.secret_string
     USERNAME            = "admin"
   }
