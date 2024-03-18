@@ -1,26 +1,36 @@
-from pyspark.sql import SparkSession
+import sys
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
 
-# Initialize SparkSession
-spark = SparkSession.builder.appName("RDS to S3 Data Transformation").getOrCreate()
+# Get Glue context
+args = getResolvedOptions(sys.argv, ["JOB_NAME"])
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
 
-# Read table names from Glue Data Catalog
-glueContext = GlueContext(spark.sparkContext)
-table_names = glueContext.extract_schema_from_catalog(database="test")
+# Define source and target paths
+source_database = "db_name"
+s3_output_path = f"s3://rds_to_parquet-xzytxuzytuzyt/{source_database}"
 
-# Loop through table names and process each table
-for table_name in table_names:
-    # Load data from RDS into Spark DataFrame
-    jdbc_url = "jdbc:sqlserver://your_rds_host:1433/test"
-    properties = {
-        "user": "admin",
-        "password": secret,
-        "driver": "org.sqlserver.Driver",
-    }
-    df = spark.read.jdbc(url=jdbc_url, table=table_name, properties=properties)
+# Get list of tables in the database
+table_list = glueContext.get_tables(database=source_database)
 
-    # Write transformed data to S3 in Parquet format
-    output_path = f"s3a://output-bucket/output/{table_name}"
-    df.write.mode("overwrite").parquet(output_path)
+for table in table_list:
+    # Read data from the table
+    dynamic_frame = glueContext.create_dynamic_frame.from_catalog(
+        database=table.database_name, table_name=table.name
+    )
 
-# Stop SparkSession
-spark.stop()
+    # Convert DynamicFrame to DataFrame
+    data_frame = dynamic_frame.toDF()
+
+    # Write DataFrame to Parquet in S3
+    output_table_path = f"{s3_output_path}/{table.name}/"
+    data_frame.write.parquet(output_table_path)
+
+    print(f"Table {table.name} processed and saved to {output_table_path}")
+
+# Job completion message
+print("Job completed successfully!")

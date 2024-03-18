@@ -3,69 +3,6 @@ resource "aws_s3_bucket" "glue_jobs" {
 }
 
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "test_dump" {
-  bucket = aws_s3_bucket.test_dump.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "test_dump" {
-  bucket                  = aws_s3_bucket.test_dump.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_versioning" "test_dump" {
-  bucket = aws_s3_bucket.test_dump.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_policy" "test_dump" {
-  bucket = aws_s3_bucket.test_dump.id
-  policy = data.aws_iam_policy_document.test_dump.json
-}
-
-data "aws_iam_policy_document" "test_dump" {
-  statement {
-    sid = "EnforceTLSv12orHigher"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    effect  = "Deny"
-    actions = ["s3:*"]
-    resources = [
-      aws_s3_bucket.test_dump.arn,
-      "${aws_s3_bucket.test_dump.arn}/*"
-    ]
-    condition {
-      test     = "NumericLessThan"
-      variable = "s3:TlsVersion"
-      values   = [1.2]
-    }
-  }
-}
-
-resource "aws_s3_bucket_logging" "test_dump" {
-  bucket = aws_s3_bucket.test_dump.id
-
-  target_bucket = module.ap_transfer_log_bucket.bucket_id
-  target_prefix = "log/"
-
-  target_object_key_format {
-    partitioned_prefix {
-      partition_date_source = "EventTime"
-    }
-  }
-}
 resource "aws_glue_crawler" "rds_to_parquet" {
   database_name = aws_glue_catalog_database.rds_to_parquet.name
   name          = "rds_to_parquet"
@@ -125,4 +62,98 @@ data "aws_iam_policy_document" "rds_to_parquet" {
           identifiers = ["rds.amazonaws.com"]
         }
     }
+}
+
+
+#------------------------------------------------------------------------------
+# S3 bucket for glue job
+#------------------------------------------------------------------------------
+
+resource "aws_s3_bucket" "rds_to_parquet" {
+  bucket_prefix = "rds-to-parquet-"
+
+  tags = local.tags
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "rds_to_parquet" {
+  bucket = aws_s3_bucket.rds_to_parquet.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "rds_to_parquet" {
+  bucket                  = aws_s3_bucket.rds_to_parquet.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "rds_to_parquet" {
+  bucket = aws_s3_bucket.rds_to_parquet.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_policy" "rds_to_parquet" {
+  bucket = aws_s3_bucket.rds_to_parquet.id
+  policy = data.aws_iam_policy_document.rds_to_parquet.json
+}
+
+data "aws_iam_policy_document" "rds_to_parquet" {
+  statement {
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.rds_to_parquet.arn,
+      "${aws_s3_bucket.rds_to_parquet.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "rds_to_parquet" {
+  bucket = aws_s3_bucket.rds_to_parquet.id
+
+  target_bucket = module.ap_transfer_log_bucket.bucket_id
+  target_prefix = "log/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
+#-----------------------------------------------------------------------------
+# Save glue job to s3 bucket
+#------------------------------------------------------------------------------
+
+
+#define variables
+locals {
+  layer_path        = "rds_to_parquet_job"
+  layer_python_name    = "${local.layer_path}.py"
+}
+
+# create zip file from requirements.txt. Triggers only when the file is updated
+resource "null_resource" "rds_to_parquet_job" {
+  triggers = {
+    requirements = filesha1(local.layer_python_name)
+  }
 }
