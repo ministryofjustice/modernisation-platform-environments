@@ -187,10 +187,7 @@ data "aws_iam_policy_document" "rds_to_parquet_glue_job" {
             "ec2:DescribeVpcAttribute",
             "ec2:DescribeVpcs"
             ]
-        # principals {
-        #   type = "Service"
-        #   identifiers = ["rds.amazonaws.com"]
-        # }
+        resources = ["*"]
     }
   statement {
     sid = "AllowPutS3"
