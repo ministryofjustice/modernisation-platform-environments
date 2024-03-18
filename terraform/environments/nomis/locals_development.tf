@@ -297,55 +297,55 @@ locals {
         })
       })
 
-      # dev-nomis-web-a = merge(local.weblogic_ec2, {
-      #   cloudwatch_metric_alarms = {}
-      #   config = merge(local.weblogic_ec2.config, {
-      #     ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
-      #     availability_zone = "${local.region}a"
-      #     instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-      #       "Ec2DevWeblogicPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.weblogic_ec2.instance, {
-      #     instance_type = "t2.large"
-      #   })
-      #   user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
-      #     args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-      #       branch = "main"
-      #     })
-      #   })
-      #   tags = merge(local.weblogic_ec2.tags, {
-      #     nomis-environment    = "dev"
-      #     oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
-      #     oracle-db-hostname-b = "none"
-      #     oracle-db-name       = "dev"
-      #   })
-      # })
+      dev-nomis-web-a = merge(local.weblogic_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2DevWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "dev"
+          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "dev"
+        })
+      })
 
-      # qa11g-nomis-web-a = merge(local.weblogic_ec2, {
-      #   cloudwatch_metric_alarms = {}
-      #   config = merge(local.weblogic_ec2.config, {
-      #     ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
-      #     availability_zone = "${local.region}a"
-      #     instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-      #       "Ec2Qa11GWeblogicPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.weblogic_ec2.instance, {
-      #     instance_type = "t2.large"
-      #   })
-      #   user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
-      #     args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-      #       branch = "main"
-      #     })
-      #   })
-      #   tags = merge(local.weblogic_ec2.tags, {
-      #     nomis-environment    = "qa11g"
-      #     oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
-      #     oracle-db-hostname-b = "none"
-      #     oracle-db-name       = "qa11g"
-      #   })
-      # })
+      qa11g-nomis-web-a = merge(local.weblogic_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "qa11g"
+          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "qa11g"
+        })
+      })
 
       qa11r-nomis-web-a = merge(local.weblogic_ec2, {
         cloudwatch_metric_alarms = {}
