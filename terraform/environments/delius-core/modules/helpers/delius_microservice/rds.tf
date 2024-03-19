@@ -43,6 +43,9 @@ resource "aws_db_instance" "this" {
 
   snapshot_identifier = var.snapshot_identifier != null ? var.snapshot_identifier : null
 
+  allow_major_version_upgrade = var.rds_auto_major_version_upgrade
+  apply_immediately           = var.rds_apply_immediately
+
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name                = var.rds_parameter_group_name
   deletion_protection                 = var.rds_deletion_protection
