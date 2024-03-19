@@ -158,19 +158,19 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 # }
 
 # Finally, create the Auto scaling group for the launch template
-resource "aws_autoscaling_group" "tribunals-all-asg" {
-  #vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
-  vpc_zone_identifier = [data.aws_subnet.private_subnets_a.id]
-  desired_capacity   = 1
-  max_size           = 1
-  min_size           = 1
-  name               = local.app_name
+# resource "aws_autoscaling_group" "tribunals-all-asg" {
+#   #vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
+#   vpc_zone_identifier = [data.aws_subnet.private_subnets_a.id]
+#   desired_capacity   = 1
+#   max_size           = 1
+#   min_size           = 1
+#   name               = local.app_name
 
-  launch_template {
-    id      = "${aws_launch_template.tribunals-all-lt.id}"
-    version = "$Latest"
-  }
-}
+#   launch_template {
+#     id      = "${aws_launch_template.tribunals-all-lt.id}"
+#     version = "$Latest"
+#   }
+# }
 
 ###########################################################################
 
