@@ -2,9 +2,10 @@
 $logFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
 $linkPath = "C:\ProgramData\docker\volumes\tribunals"
 $targetDrive = "D"
-$targetPath = $targetDrive + ":\storage\tribunals"
+$targetPath = $targetDrive + ":\storage\tribunals\"
 $ecsCluster = "tribunals-all-cluster"
 $ebsVolumeTag = "tribunals-all-storage"
+$tribunalNames = "appeals","transport"
 
 
 "Starting userdata execution" > $logFile
@@ -50,9 +51,11 @@ else {
   # This is where container volumes are mapped to
   # Create a symbolic link (if it doesn't exist) for the tribunals storage to
   # a folder on the EBS volume (the D: drive)
-  if (!(Test-Path $targetPath)) {
-    New-Item -ItemType Directory -Path $targetPath
-    "created " + $targetPath >> $logFile
+  for ($i=0; $i -lt $tribunalNames.Length; $i++) {
+    if (!(Test-Path $targetPath + $tribunalNames[$i])) {
+      New-Item -ItemType Directory -Path $targetPath + $tribunalNames[$i]
+      "created " + $targetPath + $tribunalNames[$i] >> $logFile
+    }
   }
 
   if (Test-Path $linkPath) {
