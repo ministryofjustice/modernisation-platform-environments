@@ -57,11 +57,11 @@ module "nextcloud_service" {
   rds_engine_version       = "10.5"
   rds_instance_class       = "db.t3.small"
   rds_allocated_storage    = 20
-  rds_username             = "dbadmin"
+  rds_username             = "misnextcloud"
   rds_port                 = 3306
   rds_parameter_group_name = "default.mariadb10.5"
   rds_license_model        = "general-public-license"
-  snapshot_identifier      = "nextcloud-test"
+  snapshot_identifier      = "	nextcloud-correct"
 
   create_elasticache               = true
   elasticache_engine               = "redis"
