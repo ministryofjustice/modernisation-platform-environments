@@ -140,6 +140,18 @@ variable "rds_auto_major_version_upgrade" {
   default     = false
 }
 
+variable "rds_allow_major_version_upgrade" {
+  description = "RDS allow major version upgrade"
+  type        = bool
+  default     = false
+}
+
+variable "rds_apply_immediately" {
+  description = "RDS apply immediately"
+  type        = bool
+  default     = false
+}
+
 variable "rds_backup_retention_period" {
   description = "RDS backup retention period"
   type        = number

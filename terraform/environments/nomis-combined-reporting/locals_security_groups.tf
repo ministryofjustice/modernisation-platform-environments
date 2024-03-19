@@ -88,6 +88,27 @@ locals {
           protocol    = -1
           self        = true
         }
+        http6411 = {
+          description     = "Allow http6411 ingress"
+          from_port       = 6411
+          to_port         = 6411
+          protocol        = "tcp"
+          security_groups = ["public"]
+        }
+        http6400 = {
+          description     = "Allow http6400 ingress"
+          from_port       = 6400
+          to_port         = 6400
+          protocol        = "tcp"
+          security_groups = ["public"]
+        }
+        http6455 = {
+          description     = "Allow http6455 ingress"
+          from_port       = 6455
+          to_port         = 6455
+          protocol        = "tcp"
+          security_groups = ["public"]
+        }
         http7777 = {
           description     = "Allow http7777 ingress"
           from_port       = 7777
@@ -128,6 +149,36 @@ locals {
         }
       }
     }
+    bip = {
+      description = "Security group for bip"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http7777 = {
+          description     = "Allow http7001 ingress"
+          from_port       = 7777
+          to_port         = 7777
+          protocol        = "tcp"
+          security_groups = ["private"]
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
     data = {
       description = "Security group for data subnet"
       ingress = {
@@ -144,7 +195,7 @@ locals {
           to_port         = "1521"
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.oracle_db
-          security_groups = ["private"]
+          security_groups = ["private", "bip"]
         }
         oracle3872 = {
           description = "Allow oem agent ingress"
@@ -152,52 +203,6 @@ locals {
           to_port     = "3872"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
-    bip = {
-      description = "Security group for bip"
-      ingress = {
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        http7001 = {
-          description     = "Allow http7001 ingress"
-          from_port       = 7001
-          to_port         = 7001
-          protocol        = "tcp"
-          security_groups = []
-          cidr_blocks     = local.security_group_cidrs.http7xxx
-        }
-        http9556 = {
-          description     = "Allow http9556 ingress"
-          from_port       = 9556
-          to_port         = 9556
-          protocol        = "tcp"
-          security_groups = []
-          cidr_blocks     = local.security_group_cidrs.http7xxx
-        }
-        http9704 = {
-          description     = "Allow http9704 ingress"
-          from_port       = 9704
-          to_port         = 9704
-          protocol        = "tcp"
-          security_groups = ["data"]
-          cidr_blocks     = local.security_group_cidrs.http7xxx
         }
       }
       egress = {
