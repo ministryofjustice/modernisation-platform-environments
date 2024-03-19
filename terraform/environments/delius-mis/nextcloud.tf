@@ -1,3 +1,7 @@
+module "nextcloud" {
+  source = "./modules/nextcloud"
+}
+
 # module "nextcloud_service" {
 #   source = "../delius-core/modules/helpers/delius_microservice"
 
