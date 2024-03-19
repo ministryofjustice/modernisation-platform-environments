@@ -3,7 +3,7 @@ resource "aws_alb" "nextcloud" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.nextcloud_alb_sg.id]
-  subnets            = var.account_config.ordered_private_subnet_ids
+  subnets            = var.account_config.public_subnet_ids
   tags               = var.tags
 }
 
