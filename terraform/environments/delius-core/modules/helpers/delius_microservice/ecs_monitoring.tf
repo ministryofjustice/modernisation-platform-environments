@@ -155,7 +155,7 @@ resource "aws_cloudwatch_metric_alarm" "log_error_warning_alarm" {
 
 
 resource "aws_cloudwatch_metric_alarm" "healthy_hosts_fatal_alarm" {
-  alarm_name          = "${var.name}-${var.env_name}-healthy-hosts-cwa--fatal"
+  alarm_name          = "${var.name}-${var.env_name}-healthy-hosts-cwa-fatal"
   alarm_description   = "All `${var.name}` instances stopped responding."
   namespace           = "AWS/ApplicationELB"
   statistic           = "Minimum"
@@ -174,7 +174,7 @@ resource "aws_cloudwatch_metric_alarm" "healthy_hosts_fatal_alarm" {
 
 # Response time alarms
 resource "aws_cloudwatch_metric_alarm" "response_time_critical_alarm" {
-  alarm_name          = "${var.name}-${var.env_name}-response-time-cwa--critical"
+  alarm_name          = "${var.name}-${var.env_name}-response-time-cwa-critical"
   alarm_description   = "Average response time for the `${var.name}` service exceeded 5 seconds."
   namespace           = "AWS/ApplicationELB"
   statistic           = "Average"
@@ -193,7 +193,7 @@ resource "aws_cloudwatch_metric_alarm" "response_time_critical_alarm" {
 
 # Response code alarms
 resource "aws_cloudwatch_metric_alarm" "response_code_5xx_warning_alarm" {
-  alarm_name          = "${var.name}-${var.env_name}-5xx-response-cwa--warning"
+  alarm_name          = "${var.name}-${var.env_name}-5xx-response-cwa-warning"
   alarm_description   = "The `${var.name}` service responded with 5xx errors."
   namespace           = "AWS/ApplicationELB"
   statistic           = "Sum"
@@ -211,7 +211,7 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_warning_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "response_code_5xx_critical_alarm" {
-  alarm_name          = "${var.name}-${var.env_name}-5xx-response-cwa--critical"
+  alarm_name          = "${var.name}-${var.env_name}-5xx-response-cwa-critical"
   alarm_description   = "The `${var.name}` service responded with 5xx errors at an elevated rate (over 10/minute)."
   namespace           = "AWS/ApplicationELB"
   statistic           = "Sum"
