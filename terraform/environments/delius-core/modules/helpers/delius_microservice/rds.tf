@@ -57,7 +57,6 @@ resource "aws_db_instance" "this" {
   storage_type                        = var.rds_storage_type
   maintenance_window                  = var.maintenance_window
   auto_minor_version_upgrade          = true
-  allow_major_version_upgrade         = var.rds_auto_major_version_upgrade
   backup_window                       = var.rds_backup_window
   backup_retention_period             = var.rds_backup_retention_period
   iam_database_authentication_enabled = var.rds_iam_database_authentication_enabled
