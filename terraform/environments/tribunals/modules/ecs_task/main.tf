@@ -8,12 +8,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
 
   volume {
     name = var.task_definition_volume
-    # host_path = "D:/storage/tribunals/${var.app_name}"
-    docker_volume_configuration {
-      driver = "local"
-      scope = "shared"
-      autoprovision = true
-    }
+    host_path = "D:/storage/tribunals/${var.app_name}"
   }
 
   container_definitions = var.container_definition

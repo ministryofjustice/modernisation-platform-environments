@@ -70,11 +70,11 @@ else {
 }
 
 "Set Environment variable to enable awslogs attribute" >> $logFile
-Import-Module ECSTools >> $logFile
+Import-Module ECSTools
 [Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
 
 "Link instance to shared tribunals cluster " + $ecsCluster >> $logFile
-Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]' >> $logFile
+Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
 
 "Finished launch.ps1" >> $logFile
 </powershell>
