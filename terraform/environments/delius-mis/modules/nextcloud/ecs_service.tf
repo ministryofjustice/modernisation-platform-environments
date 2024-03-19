@@ -8,6 +8,8 @@ module "nextcloud_service" {
   certificate_arn           = aws_acm_certificate.nextcloud_external.arn
   cluster_security_group_id = aws_security_group.cluster.id
 
+  ttarget_group_protocol_version = "HTTP1"
+
   container_image = "nextcloud:latest"
   container_port_config = [
     {
@@ -71,8 +73,8 @@ module "nextcloud_service" {
   rds_license_model        = "general-public-license"
   snapshot_identifier      = "nextcloud-correct"
 
-  rds_allow_major_version_upgrade = true
-  rds_apply_immediately           = true
+  rds_allow_major_version_upgrade = false
+  rds_apply_immediately           = false
 
   create_elasticache               = true
   elasticache_engine               = "redis"
