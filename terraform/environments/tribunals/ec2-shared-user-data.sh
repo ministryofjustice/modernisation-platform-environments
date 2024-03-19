@@ -5,7 +5,7 @@ $targetDrive = "D"
 $targetPath = $targetDrive + ":\storage\tribunals\"
 $ecsCluster = "tribunals-all-cluster"
 $ebsVolumeTag = "tribunals-all-storage"
-$tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","ahmlr","lands-tribunal",
+$tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","ahmlr","lands-tribunal"
 
 
 "Starting userdata execution" > $logFile
