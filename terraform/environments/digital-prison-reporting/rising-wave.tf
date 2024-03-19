@@ -2,6 +2,7 @@ module "rising_wave_etcd" {
   source = "./modules/compute_node"
 
   enable_compute_node         = true
+  enable_scaledown            = false
   name                        = "${local.project}-rising-wave-etcd-${local.env}"
   description                 = "Rising Wave etcd dependency"
   vpc                         = data.aws_vpc.shared.id
@@ -21,10 +22,10 @@ module "rising_wave_etcd" {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
   ]
-  region                      = local.account_region
-  account                     = local.account_id
-  env                         = local.env
-  app_key                     = "etcd"
+  region  = local.account_region
+  account = local.account_id
+  env     = local.env
+  app_key = "etcd"
 
   ec2_sec_rules = {
     "ETCD" = {
@@ -60,6 +61,7 @@ module "rising_wave_meta_node" {
   source = "./modules/compute_node"
 
   enable_compute_node         = true
+  enable_scaledown            = false
   name                        = "${local.project}-rising-wave-meta-node-${local.env}"
   description                 = "Rising Wave Meta node"
   vpc                         = data.aws_vpc.shared.id
@@ -79,10 +81,10 @@ module "rising_wave_meta_node" {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
   ]
-  region                      = local.account_region
-  account                     = local.account_id
-  env                         = local.env
-  app_key                     = "rising-wave"
+  region  = local.account_region
+  account = local.account_id
+  env     = local.env
+  app_key = "rising-wave"
 
   ec2_sec_rules = {
     "RISINGWAVE_META" = {
@@ -124,6 +126,7 @@ module "rising_wave_compute_nodes" {
   source = "./modules/compute_node"
 
   enable_compute_node         = true
+  enable_scaledown            = false
   name                        = "${local.project}-rising-wave-compute-node-${local.env}"
   description                 = "Rising Wave Compute Nodes"
   vpc                         = data.aws_vpc.shared.id
@@ -143,10 +146,10 @@ module "rising_wave_compute_nodes" {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
   ]
-  region                      = local.account_region
-  account                     = local.account_id
-  env                         = local.env
-  app_key                     = "rising-wave"
+  region  = local.account_region
+  account = local.account_id
+  env     = local.env
+  app_key = "rising-wave"
 
   ec2_sec_rules = {
     "RISINGWAVE_COMPUTE" = {
@@ -183,6 +186,7 @@ module "rising_wave_compactor_node" {
   source = "./modules/compute_node"
 
   enable_compute_node         = true
+  enable_scaledown            = false
   name                        = "${local.project}-rising-wave-compactor-node-${local.env}"
   description                 = "Rising Wave Compactor Node"
   vpc                         = data.aws_vpc.shared.id
@@ -202,10 +206,10 @@ module "rising_wave_compactor_node" {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
   ]
-  region                      = local.account_region
-  account                     = local.account_id
-  env                         = local.env
-  app_key                     = "rising-wave"
+  region  = local.account_region
+  account = local.account_id
+  env     = local.env
+  app_key = "rising-wave"
 
   ec2_sec_rules = {
     "RISINGWAVE_COMPACTOR" = {
@@ -242,6 +246,7 @@ module "rising_wave_frontend_node" {
   source = "./modules/compute_node"
 
   enable_compute_node         = true
+  enable_scaledown            = false
   name                        = "${local.project}-rising-wave-frontend-node-${local.env}"
   description                 = "Rising Wave Frontend Node"
   vpc                         = data.aws_vpc.shared.id
@@ -261,10 +266,10 @@ module "rising_wave_frontend_node" {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_all_object_actions_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
   ]
-  region                      = local.account_region
-  account                     = local.account_id
-  env                         = local.env
-  app_key                     = "rising-wave"
+  region  = local.account_region
+  account = local.account_id
+  env     = local.env
+  app_key = "rising-wave"
 
   ec2_sec_rules = {
     "RISINGWAVE_FRONTEND" = {

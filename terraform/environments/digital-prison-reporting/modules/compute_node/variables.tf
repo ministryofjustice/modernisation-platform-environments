@@ -90,6 +90,12 @@ variable "enable_compute_node" {
   default     = false
 }
 
+variable "enable_scaledown" {
+  description = "Whether to scaledown the auto scaling group after work hours"
+  type        = bool
+  default     = true
+}
+
 variable "ebs_optimized" {
   description = "If true, the launched EC2 instance will be EBS-optimized"
   type        = bool
