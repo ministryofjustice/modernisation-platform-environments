@@ -20,6 +20,14 @@ module "nextcloud_service" {
   deployment_maximum_percent         = "200"
   deployment_minimum_healthy_percent = "100"
 
+  ecs_service_egress_security_group_ids = [
+    {
+      ip_protocol = "tcp"
+      port        = 2049
+      referenced_security_group_id = module.nextcloud_efs.sg_id
+    },
+  ]
+
 
   efs_volumes = [
     {
@@ -124,6 +132,7 @@ module "nextcloud_service" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+  
 }
 
 resource "aws_secretsmanager_secret" "nextcloud_admin_password" {
