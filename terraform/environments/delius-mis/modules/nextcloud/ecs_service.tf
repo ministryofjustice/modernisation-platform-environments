@@ -61,7 +61,7 @@ module "nextcloud_service" {
   rds_port                 = 3306
   rds_parameter_group_name = "default.mariadb10.6"
   rds_license_model        = "general-public-license"
-  snapshot_identifier      = "nit-1145-snapshot-kms"
+  snapshot_identifier      = "nextcloud-test"
 
   create_elasticache               = true
   elasticache_engine               = "redis"
