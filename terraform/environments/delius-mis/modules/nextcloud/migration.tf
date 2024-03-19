@@ -50,27 +50,27 @@ resource "aws_iam_role_policy_attachment" "mp_migration_role_policy_kms" {
 # S3 Policy  #
 ##############
 
-data "aws_iam_policy_document" "mp_migration_role_policy_s3" {
-  statement {
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket",
-    ]
-    resources = [
-      "arn:aws:s3:::nextcloud-migration-${var.env_name}/*",
-      "arn:aws:s3:::sandbox-mp-migration-${var.env_name}",
-    ]
-  }
-}
+# data "aws_iam_policy_document" "mp_migration_role_policy_s3" {
+#   statement {
+#     actions = [
+#       "s3:GetObject",
+#       "s3:PutObject",
+#       "s3:ListBucket",
+#     ]
+#     resources = [
+#       "arn:aws:s3:::nextcloud-migration-${var.env_name}/*",
+#       "arn:aws:s3:::sandbox-mp-migration-${var.env_name}",
+#     ]
+#   }
+# }
 
-resource "aws_iam_policy" "mp_migration_role_policy_s3" {
-  name        = "mp_migration_role_policy_s3_${var.env_name}"
-  description = "Policy for migration role"
-  policy      = data.aws_iam_policy_document.mp_migration_role_policy_s3.json
-}
+# resource "aws_iam_policy" "mp_migration_role_policy_s3" {
+#   name        = "mp_migration_role_policy_s3_${var.env_name}"
+#   description = "Policy for migration role"
+#   policy      = data.aws_iam_policy_document.mp_migration_role_policy_s3.json
+# }
 
-resource "aws_iam_role_policy_attachment" "mp_migration_role_policy_s3" {
-  role       = aws_iam_role.mp_migration_role.name
-  policy_arn = aws_iam_policy.mp_migration_role_policy_s3.arn
-}
+# resource "aws_iam_role_policy_attachment" "mp_migration_role_policy_s3" {
+#   role       = aws_iam_role.mp_migration_role.name
+#   policy_arn = aws_iam_policy.mp_migration_role_policy_s3.arn
+# }
