@@ -172,3 +172,8 @@ module "cloudwatch_dashboard" {
   source  = "./cloudwatch_dashboard"
   options = local.cloudwatch_monitoring_options
 }
+
+module "cloudwatch" {
+  source = "../../modules/cloudwatch"
+  options = local.cloudwatch_monitoring_options
+}

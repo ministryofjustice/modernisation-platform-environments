@@ -1,4 +1,5 @@
 resource "aws_cloudwatch_dashboard" "cloudwatch_dashboard" {
+  count          = var.options.enable_cloudwatch_dashboard ? 1 : 0
   dashboard_name = "CloudWatch-Default"
   dashboard_body = jsonencode(local.dashboard_body)
 }
