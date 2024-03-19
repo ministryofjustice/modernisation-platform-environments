@@ -5,7 +5,7 @@ $targetDrive = "D"
 $targetPath = $targetDrive + ":\storage\tribunals\"
 $ecsCluster = "tribunals-all-cluster"
 $ebsVolumeTag = "tribunals-all-storage"
-$tribunalNames = "appeals","transport"
+$tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","ahmlr","lands-tribunal",
 
 
 "Starting userdata execution" > $logFile
@@ -53,8 +53,8 @@ else {
   # a folder on the EBS volume (the D: drive)
   for ($i=0; $i -lt $tribunalNames.Length; $i++) {
     if (!(Test-Path ($targetPath + $tribunalNames[$i]))) {
-      New-Item -ItemType Directory -Path $targetPath + $tribunalNames[$i]
-      "created " + $targetPath + $tribunalNames[$i] >> $logFile
+      New-Item -ItemType Directory -Path ($targetPath + $tribunalNames[$i])
+      "created " + ($targetPath + $tribunalNames[$i]) >> $logFile
     }
   }
 
