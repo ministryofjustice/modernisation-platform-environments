@@ -51,7 +51,8 @@ else {
   # This is where container volumes are mapped to
   # Create a symbolic link (if it doesn't exist) for the tribunals storage to
   # a folder on the EBS volume (the D: drive)
-  if (!(Test-Path ($targetPath + $tribunalNames[$i]))) {
+  for ($i=0; $i -lt $tribunalNames.Length; $i++) {
+    if (!(Test-Path ($targetPath + $tribunalNames[$i]))) {
       New-Item -ItemType Directory -Path $targetPath + $tribunalNames[$i]
       "created " + $targetPath + $tribunalNames[$i] >> $logFile
     }
