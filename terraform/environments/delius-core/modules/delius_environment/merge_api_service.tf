@@ -40,18 +40,18 @@ module "merge_api_service" {
   health_check_path       = "/merge/api/actuator/health"
   account_info            = var.account_info
 
-  create_rds            = var.delius_microservice_configs.merge_api.create_rds
-  rds_engine            = var.delius_microservice_configs.merge_api.rds_engine
-  rds_engine_version    = var.delius_microservice_configs.merge_api.rds_engine_version
-  rds_instance_class    = var.delius_microservice_configs.merge_api.rds_instance_class
-  rds_port              = var.delius_microservice_configs.merge_api.rds_port
-  rds_allocated_storage = var.delius_microservice_configs.merge_api.rds_allocated_storage
-  rds_username          = var.delius_microservice_configs.merge_api.rds_username
-  rds_license_model     = var.delius_microservice_configs.merge_api.rds_license_model
+  create_rds              = var.delius_microservice_configs.merge_api.create_rds
+  rds_engine              = var.delius_microservice_configs.merge_api.rds_engine
+  rds_engine_version      = var.delius_microservice_configs.merge_api.rds_engine_version
+  rds_instance_class      = var.delius_microservice_configs.merge_api.rds_instance_class
+  rds_port                = var.delius_microservice_configs.merge_api.rds_port
+  rds_allocated_storage   = var.delius_microservice_configs.merge_api.rds_allocated_storage
+  rds_username            = var.delius_microservice_configs.merge_api.rds_username
+  rds_license_model       = var.delius_microservice_configs.merge_api.rds_license_model
   rds_deletion_protection = var.delius_microservice_configs.merge_api.rds_deletion_protection
   snapshot_identifier     = var.delius_microservice_configs.merge_api.snapshot_identifier
   rds_skip_final_snapshot = var.delius_microservice_configs.merge_api.rds_skip_final_snapshot
-  
+
   container_environment_vars = [
     {
       name  = "SERVER_SERVLET_CONTEXT_PATH"

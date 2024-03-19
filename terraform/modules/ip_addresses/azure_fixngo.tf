@@ -8,7 +8,7 @@ locals {
     pcmcw1012 = "10.40.64.133"
 
     # DevTest Domain Controllers
-    MGMCW0002    = "10.102.0.196"
+    MGMCW0002 = "10.102.0.196"
   }
 
   azure_fixngo_ips = {
@@ -49,7 +49,7 @@ locals {
     noms_prod_domain_controller_pcmcw1011 = "10.40.144.196/32"
     noms_prod_domain_controller_pcmcw1012 = "10.40.64.133/32"
 
-    noms_devtest_domain_controller_MGMCW0002    = "10.102.0.196/32"
+    noms_devtest_domain_controller_MGMCW0002 = "10.102.0.196/32"
   }
 
   noms_live_subnet = {

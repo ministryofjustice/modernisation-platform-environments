@@ -59,25 +59,25 @@ locals {
       }]
     },
     PatchBucketAccessPolicy = {
-    description = "Permissions to upload and download patches"
-    statements = [{
+      description = "Permissions to upload and download patches"
+      statements = [{
         effect = "Allow"
         actions = [
           "s3:ListBucket",
         ]
         resources = ["arn:aws:s3:::hmpps-domain-services-development-patch-logs"]
-      },
-      {
-        effect = "Allow"
-        actions = [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:DeleteObject",
-          "s3:PutObjectAcl"
-        ]
-        resources = ["arn:aws:s3:::hmpps-domain-services-development-patch-logs/*"]
-      }
-   ]}
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:DeleteObject",
+            "s3:PutObjectAcl"
+          ]
+          resources = ["arn:aws:s3:::hmpps-domain-services-development-patch-logs/*"]
+        }
+    ] }
   }
 
   baseline_iam_roles                = {}

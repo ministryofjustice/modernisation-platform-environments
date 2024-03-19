@@ -17,6 +17,7 @@ locals {
     }
   }
 
+
   # baseline config
   development_config = {
 
@@ -53,6 +54,38 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2DevWeblogicPolicy = {
+        description = "Permissions required for dev Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/dev/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/weblogic-*",
+            ]
+          }
+        ]
+      }
+      Ec2Qa11GWeblogicPolicy = {
+        description = "Permissions required for QA11G Weblogic EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/weblogic-*",
+            ]
+          }
+        ]
+      }
       Ec2Qa11RWeblogicPolicy = {
         description = "Permissions required for QA11R Weblogic EC2s"
         statements = [
@@ -72,6 +105,10 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
+      "/oracle/weblogic/dev"   = local.weblogic_secretsmanager_secrets
+      "/oracle/database/dev"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/weblogic/qa11g" = local.weblogic_secretsmanager_secrets
+      "/oracle/database/qa11g" = local.database_nomis_secretsmanager_secrets
       "/oracle/weblogic/qa11r" = local.weblogic_secretsmanager_secrets
       "/oracle/database/qa11r" = local.database_nomis_secretsmanager_secrets
     }
@@ -211,6 +248,12 @@ locals {
         config = merge(local.jumpserver_ec2.config, {
           user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
             ie_compatibility_mode_site_list = join(",", [
+              "dev-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "dev-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "c-dev.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "qa11g-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "qa11g-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "c-qa11g.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
               "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
               "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
               "c-qa11r.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
@@ -220,89 +263,123 @@ locals {
               "*.nomis.service.justice.gov.uk",
             ])
             desktop_shortcuts = join(",", [
+              "DEV NOMIS|https://c-dev.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
+              "QA11G NOMIS|https://c-qa11g.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
               "QA11R NOMIS|https://c-qa11r.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
             ])
           }))
         })
       })
-
-      qa11r-nomis-web-a = merge(local.weblogic_ec2, {
-        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 0
-        })
-        cloudwatch_metric_alarms = {}
-        config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-            "Ec2Qa11RWeblogicPolicy",
-          ])
-        })
-        instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
-        })
-        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
-          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.weblogic_ec2.tags, {
-          nomis-environment    = "qa11r"
-          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
-          oracle-db-hostname-b = "none"
-          oracle-db-name       = "qa11r"
-          deployment           = "blue"
-        })
-      })
-
-      qa11r-nomis-web-b = merge(local.weblogic_ec2, {
-        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 1
-        })
-        cloudwatch_metric_alarms = {}
-        config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-            "Ec2Qa11RWeblogicPolicy",
-          ])
-        })
-        instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
-        })
-        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
-          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.weblogic_ec2.tags, {
-          nomis-environment    = "qa11r"
-          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
-          oracle-db-hostname-b = "none"
-          oracle-db-name       = "qa11r"
-          deployment           = "green"
-        })
-      })
     }
 
     baseline_ec2_instances = {
-      #dev-nomis-db-1-a = merge(local.database_ec2, {
-      #  config = merge(local.database_ec2.config, {
-      #    ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
-      #    availability_zone = "${local.region}a"
-      #  })
-      #  ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-      #    "/dev/sdb" = { label = "app", size = 100 }
-      #    "/dev/sdc" = { label = "app", size = 100 }
-      #  })
-      #  ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-      #    data  = { total_size = 500 }
-      #    flash = { total_size = 50 }
-      #  })
-      #  tags = merge(local.database_ec2.tags, {
-      #    nomis-environment   = "dev"
-      #    description         = "temporary DB to test DB restore"
-      #    oracle-sids         = ""
-      #  })
-      #})
+
+      # SDPDL0001 Standard DS12 v2 (4 vcpus, 28 GiB memory)  [18GiB free] [3 x 512] [r6i.xlarge 4/32]
+      # SDPWL0001 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL6) [t2.large  2/8]
+      # SDPWL0002 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL6) [t2.large]
+      # SDPWL0003 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL6) [t2.large]
+      # SDPNL0001 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL7) [t3.medium]
+
+      dev-nomis-db-1-a = merge(local.database_ec2, {
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2DevWeblogicPolicy",
+            "Ec2Qa11GWeblogicPolicy",
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 500 }
+          flash = { total_size = 50 }
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment   = "dev"
+          description         = "syscon nomis dev and qa databases"
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = ""
+        })
+      })
+
+      dev-nomis-web-a = merge(local.weblogic_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2DevWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          instance-scheduling  = "skip-scheduling"
+          nomis-environment    = "dev"
+          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "dev"
+        })
+      })
+
+      qa11g-nomis-web-a = merge(local.weblogic_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          instance-scheduling  = "skip-scheduling"
+          nomis-environment    = "qa11g"
+          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "qa11g"
+        })
+      })
+
+      qa11r-nomis-web-a = merge(local.weblogic_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          instance-scheduling  = "skip-scheduling"
+          nomis-environment    = "qa11r"
+          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "qa11r"
+        })
+      })
     }
 
     baseline_lbs = {
@@ -315,45 +392,59 @@ locals {
         subnets                  = module.environment.subnets["private"].ids
         security_groups          = ["private-lb"]
 
+        instance_target_groups = {
+          dev-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
+            attachments = [
+              { ec2_instance_name = "dev-nomis-web-a" },
+            ]
+          })
+          qa11g-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
+            attachments = [
+              { ec2_instance_name = "qa11g-nomis-web-a" },
+            ]
+          })
+          qa11r-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
+            attachments = [
+              { ec2_instance_name = "qa11r-nomis-web-a" },
+            ]
+          })
+        }
+
         listeners = {
           http = local.weblogic_lb_listeners.http
 
-          http7777 = merge(local.weblogic_lb_listeners.http7777, {
-            rules = {
-              qa11r-nomis-web-a = {
-                priority = 300
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "qa11r-nomis-web-a-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              qa11r-nomis-web-b = {
-                priority = 400
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "qa11r-nomis-web-b-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk",
-                      "c-qa11r.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          })
-
           https = merge(local.weblogic_lb_listeners.https, {
             rules = {
+              dev-nomis-web-a-http-7777 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "dev-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "dev-nomis-web-a.development.nomis.service.justice.gov.uk",
+                      "c-dev.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              qa11g-nomis-web-a-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "qa11g-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "qa11g-nomis-web-a.development.nomis.service.justice.gov.uk",
+                      "c-qa11g.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               qa11r-nomis-web-a-http-7777 = {
                 priority = 300
                 actions = [{
@@ -364,20 +455,6 @@ locals {
                   host_header = {
                     values = [
                       "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              qa11r-nomis-web-b-http-7777 = {
-                priority = 450
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "qa11r-nomis-web-b-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk",
                       "c-qa11r.development.nomis.service.justice.gov.uk",
                     ]
                   }
@@ -412,6 +489,14 @@ locals {
           { name = "qa11r-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
         ]
         lb_alias_records = [
+          # dev
+          { name = "dev-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "dev-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "c-dev", type = "A", lbs_map_key = "private" },
+          # qa11g
+          { name = "qa11g-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "qa11g-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "c-qa11g", type = "A", lbs_map_key = "private" },
           # qa11r
           { name = "qa11r-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "qa11r-nomis-web-b", type = "A", lbs_map_key = "private" },

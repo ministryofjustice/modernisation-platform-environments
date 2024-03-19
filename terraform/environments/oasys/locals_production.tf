@@ -275,7 +275,7 @@ locals {
           description                             = "practice and training ${local.application_name} database"
           "${local.application_name}-environment" = "ptctrn"
           bip-db-name                             = "TRBIPINF"
-          oracle-sids = "PROASYS TROASYS TRBIPINF"
+          oracle-sids                             = "PROASYS TROASYS TRBIPINF"
         })
       })
 
@@ -294,6 +294,7 @@ locals {
         })
       })
     }
+
 
     baseline_ec2_autoscaling_groups = {
       # "pd-${local.application_name}-web-a" = merge(local.webserver_a, {

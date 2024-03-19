@@ -164,6 +164,7 @@ locals {
       })
     }
 
+
     baseline_ec2_autoscaling_groups = {
       "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(local.webserver_a.config, {

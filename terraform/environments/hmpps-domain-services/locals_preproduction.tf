@@ -33,7 +33,8 @@ locals {
     baseline_ec2_instances = {
       pp-rdgw-1-a = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
-          availability_zone = "eu-west-2a"
+          availability_zone         = "eu-west-2a"
+          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
         })
         tags = merge(local.rds_ec2_instance.tags, {
           description = "Remote Desktop Gateway for azure.hmpp.root domain"
@@ -43,7 +44,7 @@ locals {
         config = merge(local.rds_ec2_instance.config, {
           availability_zone         = "eu-west-2a"
           user_data_raw             = base64encode(file("./templates/user-data-domain-join.yaml"))
-          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy"])
+          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
         })
         tags = merge(local.rds_ec2_instance.tags, {
           description = "Remote Desktop Services for azure.hmpp.root domain"

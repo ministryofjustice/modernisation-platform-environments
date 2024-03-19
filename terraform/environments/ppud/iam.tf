@@ -121,7 +121,7 @@ resource "aws_iam_role_policy_attachment" "maintenance_window_task_policy_attach
 
 ################################
 # IAM Role & Policy for Lambda
-###############################
+################################
 
 resource "aws_iam_role" "lambda_role" {
   count              = local.is-production == true ? 1 : 0
@@ -142,7 +142,6 @@ resource "aws_iam_role" "lambda_role" {
 }
 EOF
 }
-
 
 resource "aws_iam_policy" "iam_policy_for_lambda" {
   count       = local.is-production == true ? 1 : 0
@@ -180,6 +179,77 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_lambda_role" 
   role       = aws_iam_role.lambda_role[0].name
   policy_arn = aws_iam_policy.iam_policy_for_lambda[0].arn
 }
+
+################################################
+# IAM Role & Policy for Lambda Alarm Suppression
+################################################
+
+resource "aws_iam_role" "lambda_role_alarm_suppression" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Alarm_Suppression"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_alarm_suppression"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role alarm suppression"
+  policy      = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+       "logs:CreateLogGroup",
+       "logs:CreateLogStream",
+       "logs:PutLogEvents"
+     ],
+     "Resource": "arn:aws:logs:*:*:*"
+    },
+   {
+     "Effect": "Allow",
+     "Action": [
+        "cloudwatch:DisableAlarmActions",
+        "cloudwatch:EnableAlarmActions"
+      ],
+      "Resource": [
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-014bce95a85aaeede",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-00cbccc46d25e77c6",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-0dba6054c0f5f7a11",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-0b5ef7cb90938fb82",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-04bbb6312b86648be",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-00413756d2dfcf6d2",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-080498c4c9d25e6bd",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-029d2b17679dab982"
+      ]
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_alarm_suppression[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_alarm_suppression[0].arn
+}
+
 
 ###################
 # SNS IAM Policies

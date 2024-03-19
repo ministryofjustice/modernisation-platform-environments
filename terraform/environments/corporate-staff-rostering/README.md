@@ -12,7 +12,7 @@ _If you have any questions surrounding this page please post in the `#dso-intern
 
 ### **Description:**
 
-CSR provides scheduling, annual leave & overtime for around 30,000 Prison Officers and Operational Support Grades. All CSR components are running in Production, with Preproduction hosting training app and web servers. The service is in Modernisation Platform live as of 09/03/2024. 
+CSR provides scheduling, annual leave & overtime for around 30,000 Prison Officers and Operational Support Grades. All CSR components are running in Production, with Preproduction hosting training app and web servers. The service is in Modernisation Platform live as of 09/03/2024.
 
 ### **Service URLs:**
 
@@ -37,14 +37,14 @@ trainb.pp.csr.service.justice.gov.uk
 
 ### **Incident contact details:**  
 
-Email hmpps-nomis-mis-load@moj-digital-tools.pagerduty.com for database issues.   
-Email csr_application_alerts@digital.justice.gov.uk for application issues.  
-Email csr_infrastructure_alerts@digital.justice.gov.uk for infrastructure issues.  
+Email <hmpps-nomis-mis-load@moj-digital-tools.pagerduty.com> for database issues.
+Email <csr_application_alerts@digital.justice.gov.uk> for application issues.  
+Email <csr_infrastructure_alerts@digital.justice.gov.uk> for infrastructure issues.  
 
 ### **Service team contact:**  
 
 ask-digital-studio-ops  
-digital-studio-operations-team@digital.justice.gov.uk  
+<digital-studio-operations-team@digital.justice.gov.uk>  
 
 ### **Hosting environment:**
 

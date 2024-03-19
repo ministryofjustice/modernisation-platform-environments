@@ -38,6 +38,10 @@ module "prometheus_push" {
 module "team" {
   source = "../../grafana/team"
 
+  providers = {
+    aws = aws.sso
+  }
+
   name                 = var.name
   identity_centre_team = var.identity_centre_team
   aws_accounts         = var.aws_accounts

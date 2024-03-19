@@ -9,7 +9,7 @@ resource "aws_cloudwatch_log_group" "dms-instance-log-group" {
     var.tags,
     {
       name = "${var.name}-instance-log-group-${var.env}"
-    })
+  })
 }
 
 ### DMS replication instance
