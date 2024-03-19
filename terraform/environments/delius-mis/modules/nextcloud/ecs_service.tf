@@ -8,7 +8,7 @@ module "nextcloud_service" {
   certificate_arn           = aws_acm_certificate.nextcloud_external.arn
   cluster_security_group_id = aws_security_group.cluster.id
 
-  ttarget_group_protocol_version = "HTTP1"
+  target_group_protocol_version = "HTTP1"
 
   container_image = "nextcloud:latest"
   container_port_config = [
