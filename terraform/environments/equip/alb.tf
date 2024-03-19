@@ -108,14 +108,14 @@ resource "aws_lb_target_group" "lb_tg_analytics" {
   target_type = "ip"
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "8080"
+  port        = "80"
 
   health_check {
     enabled             = true
-    path                = "/spotfire/login.html"
+    path                = "/"
     interval            = 30
     protocol            = "HTTP"
-    port                = 8080
+    port                = 80
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
