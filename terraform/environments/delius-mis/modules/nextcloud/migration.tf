@@ -34,3 +34,8 @@ resource "aws_iam_policy" "mp_migration_role_policy_kms" {
   description = "Policy for migration role"
   policy      = data.aws_iam_policy_document.mp_migration_role_policy_kms.json
 }
+
+resource "aws_iam_role_policy_attachment" "mp_migration_role_policy_kms" {
+  role       = aws_iam_role.mp_migration_role.name
+  policy_arn = aws_iam_policy.mp_migration_role_policy_kms.arn
+}
