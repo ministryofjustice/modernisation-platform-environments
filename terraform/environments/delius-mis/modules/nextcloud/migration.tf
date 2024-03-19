@@ -7,6 +7,13 @@ resource "aws_iam_role" "mp_migration_role" {
 data "aws_iam_policy_document" "mp_migration_role_assume" {
   statement {
     actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "datasync.amazonaws.com",
+      ]
+    }
   }
 }
 
