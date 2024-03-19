@@ -1,7 +1,7 @@
 resource "grafana_team" "this" {
   name = var.name
   team_sync {
-    groups = [var.identity_centre_team]
+    groups = [data.aws_identitystore_group.this.id]
   }
 }
 

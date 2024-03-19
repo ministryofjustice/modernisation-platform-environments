@@ -22,7 +22,7 @@ resource "aws_lb_listener" "PPUD-external-Front-End" {
   load_balancer_arn = aws_lb.PPUD-ALB[0].arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = data.aws_acm_certificate.PPUD_internaltest_cert[0].arn
 
   default_action {
@@ -96,7 +96,7 @@ resource "aws_lb_listener" "WAM-Front-End-DEV" {
   load_balancer_arn = aws_lb.WAM-ALB.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = data.aws_acm_certificate.WAM_internaltest_cert[0].arn
 
   default_action {
@@ -110,7 +110,7 @@ resource "aws_lb_listener" "WAM-Front-End-Preprod" {
   load_balancer_arn = aws_lb.WAM-ALB.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = data.aws_acm_certificate.WAM_UAT_ALB[0].arn
 
   default_action {

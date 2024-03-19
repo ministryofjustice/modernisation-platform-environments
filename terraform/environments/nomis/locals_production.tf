@@ -20,6 +20,7 @@ locals {
     }
   }
 
+
   # baseline config
   production_config = {
 
@@ -149,15 +150,15 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      # NOT-ACTIVE (blue deployment)
+      # ACTIVE (blue deployment)
       prod-nomis-web-a = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 2
           max_size         = 2
         })
-        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_*"
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
           ])
@@ -179,13 +180,13 @@ locals {
         })
       })
 
-      # ACTIVE (green deployment)
+      # NOT-ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 2
+          desired_capacity = 0
           max_size         = 2
         })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
 
@@ -371,8 +372,8 @@ locals {
           https = merge(
             local.weblogic_lb_listeners.https, {
               alarm_target_group_names = [
-                # "prod-nomis-web-a-http-7777",
-                "prod-nomis-web-b-http-7777",
+                "prod-nomis-web-a-http-7777",
+                # "prod-nomis-web-b-http-7777",
               ]
               rules = {
                 prod-nomis-web-a-http-7777 = {
@@ -386,6 +387,9 @@ locals {
                       values = [
                         "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                        "c.production.nomis.az.justice.gov.uk",
+                        "c.nomis.service.justice.gov.uk",
+                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -401,9 +405,6 @@ locals {
                       values = [
                         "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
-                        "c.production.nomis.az.justice.gov.uk",
-                        "c.nomis.service.justice.gov.uk",
-                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]

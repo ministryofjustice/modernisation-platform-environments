@@ -20,6 +20,7 @@
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-jitbit @ministryofjustice/hmpps-delius-jitbit-devs @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-mis @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
+/terraform/environments/delius-nextcloud @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting-non-cleared-team @ministryofjustice/modernisation-platform
 /terraform/environments/electronic-monitoring-data @ministryofjustice/hmpps-electronic-monitoring-data-store @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
@@ -39,7 +40,7 @@
 /terraform/environments/nomis-combined-reporting @ministryofjustice/national-applications-reporting-team @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-data-hub @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/syscon-nomis @ministryofjustice/modernisation-platform
-/terraform/environments/oas @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
+/terraform/environments/oas @ministryofjustice/laa-aws-infrastructure @ministryofjustice/oas-migration @ministryofjustice/modernisation-platform
 /terraform/environments/oasys @ministryofjustice/oasys-operator @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/observability-platform @ministryofjustice/observability-platform @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform

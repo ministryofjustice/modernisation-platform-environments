@@ -53,6 +53,12 @@ variable "step_function_notification_lambda_trigger" {
   default     = ""
 }
 
+variable "lambda_log_retention_in_days" {
+  description = "Lambda log retention in number of days."
+  type        = number
+  default     = 7
+}
+
 variable "lambda_subnet_ids" {
   description = "Lambda Subnet ID's"
   type        = list(string)

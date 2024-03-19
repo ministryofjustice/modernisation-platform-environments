@@ -22,7 +22,8 @@
       "rds_enabled_cloudwatch_logs_exports": ["alert", "audit"],
       "rds_performance_insights_enabled": "false",
       "rds_skip_final_snapshot": "true",
-      "rds_apply_immediately": "true"
+      "rds_apply_immediately": "true",
+      "db_snapshot_identifier": "rds-migration-1145"
     },
     "test": {
       "migration_source_account_id": "728765553488",

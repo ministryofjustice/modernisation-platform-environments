@@ -34,3 +34,8 @@ output "dms_s3_iam_policy_admin_arn" {
   #value       = concat(aws_iam_policy.dms-operator-s3-policy.*.arn, [""])[0]
   value = var.setup_dms_endpoints && var.setup_dms_iam ? join("", aws_iam_policy.dms-operator-s3-policy.*.arn) : ""
 }
+
+output "dms_instance_log_group_arn" {
+  description = "The ARM of the DMS instance log group"
+  value       = var.setup_dms_endpoints && var.setup_dms_instance ? join("", aws_cloudwatch_log_group.dms-instance-log-group.*.arn) : ""
+}

@@ -27,10 +27,10 @@ module "managed_grafana" {
 
   role_associations = {
     "ADMIN" = {
-      "group_ids" = ["16a2d234-1031-70b5-2657-7f744c55e48f"] # observability-platform
+      "group_ids" = [data.aws_identitystore_group.observability_platform.id]
     }
     "EDITOR" = {
-      "group_ids" = local.all_identity_centre_teams
+      "group_ids" = [for team in data.aws_identitystore_group.all_identity_centre_teams : team.id]
     }
   }
 

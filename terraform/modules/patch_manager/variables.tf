@@ -21,5 +21,5 @@ variable "operating_system" {
 }
 
 variable "target_tag" {
-  type = map
+  type = map(any)
 }

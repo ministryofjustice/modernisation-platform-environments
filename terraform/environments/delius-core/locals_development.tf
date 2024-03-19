@@ -83,16 +83,19 @@ locals {
     }
 
     merge_api = {
-      container_port        = 8080
-      image_tag             = "REPLACE"
-      create_rds            = true
-      rds_engine            = "postgres"
-      rds_engine_version    = "15"
-      rds_instance_class    = "db.t3.small"
-      rds_allocated_storage = 20
-      rds_username          = "dbadmin"
-      rds_port              = 5432
-      rds_license_model     = "postgresql-license"
+      container_port          = 8080
+      image_tag               = "REPLACE"
+      create_rds              = true
+      rds_engine              = "postgres"
+      rds_engine_version      = "15"
+      rds_instance_class      = "db.t3.small"
+      rds_allocated_storage   = 30
+      rds_username            = "dbadmin"
+      rds_port                = 5432
+      rds_license_model       = "postgresql-license"
+      rds_deletion_protection = false
+      rds_skip_final_snapshot = true
+      snapshot_identifier     = "rds-migration-1145"
     }
 
     merge_ui = {

@@ -73,7 +73,7 @@ locals {
           },
           {
             test     = "StringLike"
-            values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:ref:refs/heads/main"]
+            values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:*"] # ["repo:ministryofjustice/dso-modernisation-platform-automation:ref:refs/heads/main"]
             variable = "token.actions.githubusercontent.com:sub"
           },
         ]

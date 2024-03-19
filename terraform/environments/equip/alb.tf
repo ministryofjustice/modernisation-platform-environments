@@ -108,14 +108,14 @@ resource "aws_lb_target_group" "lb_tg_analytics" {
   target_type = "ip"
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "8080"
+  port        = "80"
 
   health_check {
     enabled             = true
-    path                = "/spotfire/login.html"
+    path                = "/"
     interval            = 30
     protocol            = "HTTP"
-    port                = 8080
+    port                = 80
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
@@ -142,7 +142,7 @@ resource "aws_lb_target_group_attachment" "lb_tga_portal" {
 
 resource "aws_lb_target_group_attachment" "lb_tga_analytics" {
   target_group_arn = aws_lb_target_group.lb_tg_analytics.arn
-  target_id        = join("", module.win2012_STD_multiple["COR-A-SF01"].private_ip)
+  target_id        = join("", module.win2022_STD_multiple["COR-A-EQP04"].private_ip)
 }
 
 resource "aws_lb_listener" "lb_listener_https" {

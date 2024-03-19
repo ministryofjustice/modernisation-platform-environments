@@ -31,6 +31,36 @@ locals {
         })
       }
     )
+    backup_database = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      {
+        cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2["cpu-utilization-high"], {
+          evaluation_periods  = "480"
+          datapoints_to_alarm = "480"
+          threshold           = "95"
+          alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 8 hours to allow for DB refreshes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326064583"
+        })
+      },
+      {
+        cpu-iowait-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_linux["cpu-iowait-high"], {
+          evaluation_periods  = "480"
+          datapoints_to_alarm = "480"
+          threshold           = "40"
+          alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 8 hours allowing for DB refreshes.  See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
+        })
+      },
+      {
+        instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_linux["instance-or-cloudwatch-agent-stopped"], {
+          threshold           = "0"
+          evaluation_periods  = "5"
+          datapoints_to_alarm = "2"
+          period              = "60"
+          alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 60 and trigger if there are 2 events in 5 minutes."
+        })
+      }
+
+    )
     web = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
@@ -91,7 +121,6 @@ locals {
       disable_api_stop       = false
       vpc_security_group_ids = ["database"]
     })
-    cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.database
     ebs_volumes = {
       "/dev/sdb" = { label = "app" }   # /u01
       "/dev/sdc" = { label = "app" }   # /u02

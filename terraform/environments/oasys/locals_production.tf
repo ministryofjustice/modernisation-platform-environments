@@ -259,13 +259,13 @@ locals {
         }
         ebs_volume_config = {
           data = {
-            iops       = 500
+            iops       = 3000 # min 3000
             type       = "gp3"
             throughput = 125
             total_size = 200
           }
           flash = {
-            iops       = 500
+            iops       = 3000 # min 3000
             type       = "gp3"
             throughput = 125
             total_size = 50
@@ -275,7 +275,7 @@ locals {
           description                             = "practice and training ${local.application_name} database"
           "${local.application_name}-environment" = "ptctrn"
           bip-db-name                             = "TRBIPINF"
-          oracle-sids = "PROASYS TROASYS TRBIPINF"
+          oracle-sids                             = "PROASYS TROASYS TRBIPINF"
         })
       })
 
@@ -286,13 +286,15 @@ locals {
           ])
         })
         tags = merge(local.bip_a.tags, {
-          bip-db-name       = "TRBIPINF"
-          bip-db-hostname   = "ptctrn-oasys-db-a"
-          oasys-db-name     = "TROASYS"
-          oasys-db-hostname = "ptctrn-oasys-db-a"
+          bip-db-name                             = "TRBIPINF"
+          bip-db-hostname                         = "ptctrn-oasys-db-a"
+          oasys-db-name                           = "TROASYS"
+          oasys-db-hostname                       = "ptctrn-oasys-db-a"
+          "${local.application_name}-environment" = "trn"
         })
       })
     }
+
 
     baseline_ec2_autoscaling_groups = {
       # "pd-${local.application_name}-web-a" = merge(local.webserver_a, {
@@ -359,91 +361,127 @@ locals {
     }
 
     baseline_lbs = {
-      # public = {
-      #   internal_lb              = false
-      #   access_logs              = false
-      #   s3_versioning            = false
-      #   force_destroy_bucket     = true
-      #   enable_delete_protection = false
-      #   existing_target_groups   = {}
-      #   idle_timeout             = 3600 # 60 is default
-      #   security_groups          = ["public_lb"]
-      #   subnets                  = module.environment.subnets["public"].ids
-      #   tags                     = local.tags
+      public = {
+        internal_lb              = false
+        access_logs              = false
+        s3_versioning            = false
+        force_destroy_bucket     = true
+        enable_delete_protection = false
+        existing_target_groups   = {}
+        idle_timeout             = 3600 # 60 is default
+        security_groups          = ["public_lb"]
+        subnets                  = module.environment.subnets["public"].ids
+        tags                     = local.tags
 
-      #   listeners = {
-      #     https = {
-      #       port                      = 443
-      #       protocol                  = "HTTPS"
-      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
-      #       certificate_names_or_arns = ["pd_${local.application_name}_cert"]
-      #       default_action = {
-      #         type = "fixed-response"
-      #         fixed_response = {
-      #           content_type = "text/plain"
-      #           message_body = "Use www.oasys.service.justice.gov.uk, or for practice ptc.oasys.service.justice.gov.uk, or for training trn.oasys.service.justice.gov.uk"
-      #           status_code  = "200"
-      #         }
-      #       }
-      #       # default_action = {
-      #       #   type              = "forward"
-      #       #   target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
-      #       # }
-      #       rules = {
-      #         pd-web-http-8080 = {
-      #           priority = 100
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
-      #           }]
-      #           conditions = [
-      #             {
-      #               host_header = {
-      #                 values = [
-      #                   "oasys.service.justice.gov.uk",
-      #                   "bridge-oasys.az.justice.gov.uk",
-      #                   "www.oasys.service.justice.gov.uk",
-      #                 ]
-      #               }
-      #             }
-      #           ]
-      #         }
-      #         pd-web-a-http-8080 = {
-      #           priority = 200
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
-      #           }]
-      #           conditions = [
-      #             {
-      #               host_header = {
-      #                 values = [
-      #                   "a.oasys.service.justice.gov.uk",
-      #                 ]
-      #               }
-      #             }
-      #           ]
-      #         }
-      #         pd-web-b-http-8080 = {
-      #           priority = 200
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "pd-${local.application_name}-web-b-pb-http-8080"
-      #           }]
-      #           conditions = [
-      #             {
-      #               host_header = {
-      #                 values = [
-      #                   "b.oasys.service.justice.gov.uk",
-      #                 ]
-      #               }
-      #             }
-      #           ]
-      #         }
-      #       }
-      #     }
-      #   }
-      # }
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["pd_${local.application_name}_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Use www.oasys.service.justice.gov.uk, or for practice ptc.oasys.service.justice.gov.uk, or for training trn.oasys.service.justice.gov.uk"
+                status_code  = "200"
+              }
+            }
+            # default_action = {
+            #   type              = "forward"
+            #   target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+            # }
+            rules = {
+              # pd-web-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "oasys.service.justice.gov.uk",
+              #           "bridge-oasys.az.justice.gov.uk",
+              #           "www.oasys.service.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
+              ptc-web-http-8080 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "ptc-${local.application_name}-web-a-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "ptc.oasys.service.justice.gov.uk",
+                        "practice.bridge-oasys.az.justice.gov.uk",
+                        "practice.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              trn-web-http-8080 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "trn-${local.application_name}-web-a-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "trn.oasys.service.justice.gov.uk",
+                        "training.bridge-oasys.az.justice.gov.uk",
+                        "training.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              # pd-web-a-http-8080 = {
+              #   priority = 200
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "a.oasys.service.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
+              # pd-web-b-http-8080 = {
+              #   priority = 200
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "pd-${local.application_name}-web-b-pb-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "b.oasys.service.justice.gov.uk",
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
+            }
+          }
+        }
+      }
       private = {
         internal_lb              = true
         access_logs              = true
@@ -493,6 +531,42 @@ locals {
               #     }
               #   ]
               # }
+              ptc-web-http-8080 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "ptc-${local.application_name}-web-a-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "ptc-int.oasys.service.justice.gov.uk",
+                        "practice.oasys.az.justice.gov.uk",
+                        "practice.p-oasys.az.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              trn-web-http-8080 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "ptc-${local.application_name}-web-a-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "trn-int.oasys.service.justice.gov.uk",
+                        "training.oasys.az.justice.gov.uk",
+                        "training.p-oasys.az.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
               # pd-web-a-http-8080 = {
               #   priority = 200
               #   actions = [{

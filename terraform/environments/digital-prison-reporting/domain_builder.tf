@@ -38,6 +38,9 @@ module "domain_builder_backend_Lambda" {
   policies      = local.lambda_dbuilder_policies
   tracing       = local.lambda_dbuilder_tracing
   timeout       = 60
+
+  log_retention_in_days = local.lambda_log_retention_in_days
+
   env_vars = {
     "DOMAIN_API_KEY"       = module.domain_builder_api_key[0].secret
     "DOMAIN_REGISTRY_NAME" = local.domain_registry
@@ -159,6 +162,8 @@ module "domain_builder_flyway_Lambda" {
   timeout            = 60
   lambda_trigger     = true
   trigger_bucket_arn = module.s3_artifacts_store.bucket_arn
+
+  log_retention_in_days = local.lambda_log_retention_in_days
 
   env_vars = {
     "DB_CONNECTION_STRING" = "jdbc:postgresql://${module.domain_builder_backend_db.rds_host}/${local.rds_dbuilder_db_identifier}"
