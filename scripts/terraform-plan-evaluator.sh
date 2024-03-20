@@ -12,6 +12,11 @@ RESOURCES_TO_CHECK_FOR=(
   "aws_iam_user_policy"
   "aws_iam_user_policy_attachment"
   "aws_iam_access_key"
+  "aws_internet_gateway"
+  "aws_internet_gateway_attachment"
+  "aws_nat_gateway"
+  "aws_route_table"
+  "aws_route_table_association"
 )
 
 resourcesFound=false
