@@ -91,7 +91,7 @@ module "scan_lambda" {
         module.s3_definitions_kms.key_arn,
         module.s3_landing_kms.key_arn,
         module.s3_quarantine_kms.key_arn,
-        module.s3_processed_kms.key_arn, # TODO: Review
+        module.s3_processed_kms.key_arn,
       ]
     },
     s3_access = {
@@ -108,7 +108,7 @@ module "scan_lambda" {
         "arn:aws:s3:::${module.definitions_bucket.s3_bucket_id}/*",
         "arn:aws:s3:::${module.landing_bucket.s3_bucket_id}/*",
         "arn:aws:s3:::${module.quarantine_bucket.s3_bucket_id}/*",
-        "arn:aws:s3:::${module.processed_bucket.s3_bucket_id}/*" # TODO: Review
+        "arn:aws:s3:::${module.processed_bucket.s3_bucket_id}/*"
       ]
     }
   }
@@ -181,93 +181,93 @@ module "scan_lambda" {
 #   }
 # }
 
-# module "transfer_lambda" {
-#   #checkov:skip=CKV_TF_1:Module is from Terraform registry
-#   source  = "terraform-aws-modules/lambda/aws"
-#   version = "7.2.1"
+module "transfer_lambda" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "7.2.1"
 
-#   publish        = true
-#   create_package = false
+  publish        = true
+  create_package = false
 
-#   function_name          = "ingestion-transfer"
-#   description            = ""
-#   package_type           = "Image"
-#   memory_size            = 2048
-#   ephemeral_storage_size = 10240
-#   timeout                = 900
-#   image_uri              = "684969100054.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-transfer:14"
+  function_name          = "ingestion-transfer"
+  description            = ""
+  package_type           = "Image"
+  memory_size            = 2048
+  ephemeral_storage_size = 10240
+  timeout                = 900
+  image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-transfer:0.0.1"
 
-#   environment_variables = {
-#     PROCESSED_BUCKET_NAME = module.processed_bucket.s3_bucket_id
-#   }
+  environment_variables = {
+    PROCESSED_BUCKET_NAME = module.processed_bucket.s3_bucket_id
+  }
 
-#   # TODO: Check if KMS key is actually needed below
-#   attach_policy_statements = true
-#   policy_statements = {
-#     kms_access = {
-#       sid    = "AllowKMS"
-#       effect = "Allow"
-#       actions = [
-#         "kms:ReEncrypt*",
-#         "kms:GenerateDataKey*",
-#         "kms:Encrypt",
-#         "kms:DescribeKey",
-#         "kms:Decrypt"
-#       ]
-#       resources = [
-#         module.s3_processed_kms.key_arn,
-#         module.supplier_data_kms.key_arn
-#       ]
-#     },
-#     secretsmanager_access = {
-#       sid       = "AllowSecretsManager"
-#       effect    = "Allow"
-#       actions   = ["secretsmanager:GetSecretValue"]
-#       resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
-#     },
-#     s3_source_object = {
-#       sid    = "AllowSourceObject"
-#       effect = "Allow"
-#       actions = [
-#         "s3:GetObject",
-#         "s3:DeleteObject",
-#         "s3:GetObjectTagging"
-#       ],
-#       resources = ["arn:aws:s3:::${module.processed_bucket.s3_bucket_id}/*"]
-#     },
-#     s3_source_bucket = {
-#       sid    = "AllowSourceBucket"
-#       effect = "Allow"
-#       actions = [
-#         "s3:ListBucket"
-#       ],
-#       resources = ["arn:aws:s3:::${module.processed_bucket.s3_bucket_id}"]
-#     },
-#     s3_destination_object = {
-#       sid    = "AllowDestinationObject"
-#       effect = "Allow"
-#       actions = [
-#         "s3:GetObject",
-#         "s3:PutObject",
-#         "s3:DeleteObject",
-#         "s3:PutObjectTagging"
-#       ]
-#       resources = ["arn:aws:s3:::dev-ingestion-testing/*"]
-#     },
-#     s3_destination_bucket = {
-#       sid    = "AllowDestinationBucket"
-#       effect = "Allow"
-#       actions = [
-#         "s3:ListBucket"
-#       ]
-#       resources = ["arn:aws:s3:::dev-ingestion-testing"]
-#     }
-#   }
+  # TODO: Check if KMS key is actually needed below
+  attach_policy_statements = true
+  policy_statements = {
+    kms_access = {
+      sid    = "AllowKMS"
+      effect = "Allow"
+      actions = [
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Encrypt",
+        "kms:DescribeKey",
+        "kms:Decrypt"
+      ]
+      resources = [
+        module.s3_processed_kms.key_arn,
+        module.supplier_data_kms.key_arn
+      ]
+    },
+    secretsmanager_access = {
+      sid       = "AllowSecretsManager"
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+    },
+    s3_source_object = {
+      sid    = "AllowSourceObject"
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:DeleteObject",
+        "s3:GetObjectTagging"
+      ],
+      resources = ["arn:aws:s3:::${module.processed_bucket.s3_bucket_id}/*"]
+    },
+    s3_source_bucket = {
+      sid    = "AllowSourceBucket"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ],
+      resources = ["arn:aws:s3:::${module.processed_bucket.s3_bucket_id}"]
+    },
+    s3_destination_object = {
+      sid    = "AllowDestinationObject"
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:PutObjectTagging"
+      ]
+      resources = ["arn:aws:s3:::dev-ingestion-testing/*"] # TODO: Update to correct bucket
+    },
+    s3_destination_bucket = {
+      sid    = "AllowDestinationBucket"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ]
+      resources = ["arn:aws:s3:::dev-ingestion-testing"] # TODO: Update to correct bucket
+    }
+  }
 
-#   allowed_triggers = {
-#     "s3" = {
-#       principal  = "s3.amazonaws.com"
-#       source_arn = module.processed_bucket.s3_bucket_arn
-#     }
-#   }
-# }
+  allowed_triggers = {
+    "s3" = {
+      principal  = "s3.amazonaws.com"
+      source_arn = module.processed_bucket.s3_bucket_arn
+    }
+  }
+}
