@@ -2,7 +2,7 @@ module "landing_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
-  bucket = "analytical-platform-landing"
+  bucket = "moj-ap-ingestion-${local.environment}-landing"
   # TODO: Is this needed below?
   force_destroy = true
 
@@ -20,7 +20,7 @@ module "quarantine_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
-  bucket = "analytical-platform-quarantine"
+  bucket = "moj-ap-ingestion-${local.environment}-quarantine"
   # TODO: Is this needed below?
   force_destroy = true
 
@@ -39,7 +39,7 @@ module "definitions_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
-  bucket = "analytical-platform-definitions"
+  bucket = "moj-ap-ingestion-${local.environment}-definitions"
   # TODO: Is this needed below?
   force_destroy = true
 
@@ -59,7 +59,7 @@ module "processed_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
-  bucket = "analytical-platform-processed"
+  bucket = "moj-ap-ingestion-${local.environment}-processed"
   # TODO: Is this needed below?
   force_destroy = true
 
