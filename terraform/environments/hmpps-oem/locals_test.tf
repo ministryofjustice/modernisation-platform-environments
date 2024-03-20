@@ -4,6 +4,7 @@ locals {
   # cloudwatch monitoring config
   test_cloudwatch_monitoring_options = {
     enable_cloudwatch_monitoring_account = true
+    enable_cloudwatch_dashboard = true
   }
 
   # baseline presets config
