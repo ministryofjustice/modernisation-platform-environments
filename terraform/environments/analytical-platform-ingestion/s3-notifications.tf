@@ -1,4 +1,4 @@
-module "ingestion_landing" {
+module "ingestion_landing_bucket_notification" {
   source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
   version = "4.1.0"
 
@@ -13,7 +13,7 @@ module "ingestion_landing" {
   }
 }
 
-module "ingestion_transfer" {
+module "ingestion_transfer_bucket_notification" {
   source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
   version = "4.1.0"
 

@@ -46,7 +46,7 @@ module "definition_upload_lambda" {
   allowed_triggers = {
     "eventbridge" = {
       principal  = "events.amazonaws.com"
-      source_arn = aws_cloudwatch_event_rule.ingestion_scanning_definition_update.arn
+      source_arn = aws_cloudwatch_event_rule.definition_update.arn
     }
   }
 }

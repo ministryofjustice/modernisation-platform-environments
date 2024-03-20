@@ -24,7 +24,7 @@ resource "aws_transfer_server" "this" {
   # Logging role is only required when using Managed workflows.
   # logging_role                = module.transfer_family_service_role.iam_role_arn
 
-  structured_log_destinations = ["${aws_cloudwatch_log_group.transfer_structured_logs.arn}:*"]
+  # structured_log_destinations = ["${aws_cloudwatch_log_group.transfer_structured_logs.arn}:*"]
 }
 
 resource "aws_transfer_tag" "this" {
