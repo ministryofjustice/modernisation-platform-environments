@@ -10,7 +10,7 @@ locals {
 
   rds_env_vars = var.rds_endpoint_environment_variable != "" ? [{
     name  = var.rds_endpoint_environment_variable
-    value = aws_db_instance.this[0].endpoint
+    value = aws_db_instance.this[0].address
   }] : []
 
   rds_secrets = var.rds_password_secret_variable != "" ? [{
