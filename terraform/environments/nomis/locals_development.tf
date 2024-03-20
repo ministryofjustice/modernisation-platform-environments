@@ -224,7 +224,8 @@ locals {
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "base_rhel_6_10*"
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          #ami_name          = "base_rhel_6_10*"
           availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
