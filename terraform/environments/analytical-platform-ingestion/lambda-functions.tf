@@ -129,7 +129,7 @@ module "transfer_lambda" {
   publish        = true
   create_package = false
 
-  function_name          = "ingestion-transfer"
+  function_name          = "transfer"
   description            = ""
   package_type           = "Image"
   memory_size            = 2048
