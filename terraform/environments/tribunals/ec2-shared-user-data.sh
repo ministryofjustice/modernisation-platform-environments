@@ -1,6 +1,6 @@
 <powershell>
 $logFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
-$linkPath = "C:\ProgramData\docker\volumes\tribunals"
+$linkPath = "C:\ProgramData\docker\volumes\tribunals\"
 $targetDrive = "D"
 $targetPath = $targetDrive + ":\storage\tribunals\"
 $ecsCluster = "tribunals-all-cluster"
@@ -51,26 +51,42 @@ else {
   # This is where container volumes are mapped to
   # Create a symbolic link (if it doesn't exist) for the tribunals storage to
   # a folder on the EBS volume (the D: drive)
-  for ($i=0; $i -lt $tribunalNames.Length; $i++) {
-    if (!(Test-Path ($targetPath + $tribunalNames[$i]))) {
-      New-Item -ItemType Directory -Path ($targetPath + $tribunalNames[$i])
-      "created " + ($targetPath + $tribunalNames[$i]) >> $logFile
-    }
-  }
 
-  if (Test-Path $linkPath) {
-    "Link exists for " + $linkPath >> $logFile
-    Get-Item $linkPath >> $logFile
-    if ((Get-Item $linkPath).LinkType -eq "SymbolicLink") {
-      "It is a symbolic link " >> $logFile
-    } else {
-      "It is not a symbolic link" >> $logFile
+  for ($i=0; $i -lt $tribunalNames.Length; $i++) {
+    $subDirPath = ($targetPath + $tribunalNames[$i])
+    if (!(Test-Path $subDirPath)) {
+        New-Item -ItemType Directory -Path $subDirPath
+        "created " + $subDirPath >> $logFile
     }
-  } else {
-    "Linking " + $linkPath + " to " + $targetPath >> $logFile
-    New-Item -Path $linkPath -ItemType SymbolicLink -Value $targetPath
-  }
+    
+    $linkSubDirPath = ($linkPath + $tribunalNames[$i])
+    if (Test-Path $linkSubDirPath) {
+        "Link exists for " + $linkSubDirPath >> $logFile
+        Get-Item $linkSubDirPath >> $logFile
+        if ((Get-Item $linkSubDirPath).LinkType -eq "SymbolicLink") {
+            "It is a symbolic link " >> $logFile
+        } else {
+            "It is not a symbolic link" >> $logFile
+        }
+    } else {
+        "Linking " + $linkSubDirPath + " to " + $subDirPath >> $logFile
+        New-Item -Path $linkSubDirPath -ItemType SymbolicLink -Value $subDirPath
+    }
 }
+
+#   if (Test-Path $linkPath) {
+#     "Link exists for " + $linkPath >> $logFile
+#     Get-Item $linkPath >> $logFile
+#     if ((Get-Item $linkPath).LinkType -eq "SymbolicLink") {
+#       "It is a symbolic link " >> $logFile
+#     } else {
+#       "It is not a symbolic link" >> $logFile
+#     }
+#   } else {
+#     "Linking " + $linkPath + " to " + $targetPath >> $logFile
+#     New-Item -Path $linkPath -ItemType SymbolicLink -Value $targetPath
+#   }
+# }
 
 "Set Environment variable to enable awslogs attribute" >> $logFile
 Import-Module ECSTools
