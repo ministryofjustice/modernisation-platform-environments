@@ -72,6 +72,7 @@ else {
         "Linking " + $linkSubDirPath + " to " + $subDirPath >> $logFile
         New-Item -Path $linkSubDirPath -ItemType SymbolicLink -Value $subDirPath
     }
+  }
 }
 
 #   if (Test-Path $linkPath) {
