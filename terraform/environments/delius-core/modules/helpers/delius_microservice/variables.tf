@@ -134,8 +134,14 @@ variable "maintenance_window" {
   default     = "mon:03:00-mon:04:00"
 }
 
-variable "rds_auto_major_version_upgrade" {
-  description = "RDS auto major version upgrade"
+variable "rds_allow_major_version_upgrade" {
+  description = "RDS allow major version upgrade"
+  type        = bool
+  default     = false
+}
+
+variable "rds_apply_immediately" {
+  description = "RDS apply immediately"
   type        = bool
   default     = false
 }
