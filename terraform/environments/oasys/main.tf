@@ -143,7 +143,8 @@ module "baseline" {
     lookup(local.environment_config, "baseline_ssm_parameters", {}),
   )
 }
-module "cloudwatch_dashboard" {
-  source  = "./cloudwatch_dashboard"
+
+module "cloudwatch" {
+  source = "../../modules/cloudwatch"
   options = local.cloudwatch_monitoring_options
 }
