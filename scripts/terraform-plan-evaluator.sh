@@ -17,6 +17,7 @@ RESOURCES_TO_CHECK_FOR=(
   "aws_nat_gateway"
   "aws_route_table"
   "aws_route_table_association"
+  "aws_route"
 )
 
 resourcesFound=false
