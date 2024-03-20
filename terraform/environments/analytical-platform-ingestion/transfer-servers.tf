@@ -30,5 +30,5 @@ resource "aws_transfer_server" "this" {
 resource "aws_transfer_tag" "this" {
   resource_arn = aws_transfer_server.this.arn
   key          = "aws:transfer:customHostname"
-  value        = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
+  value        = local.environment_configuration.transfer_server_hostname
 }

@@ -18,6 +18,9 @@ locals {
 
       /* Target Buckets */
       target_buckets = ["dev-ingestion-testing"]
+
+      /* Transfer Server */
+      transfer_server_hostname = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
     }
     production = {
       /* VPC */
@@ -36,6 +39,9 @@ locals {
 
       /* Target Buckets */
       target_buckets = ["dev-ingestion-testing"]
+
+      /* Transfer Server */
+      transfer_server_hostname = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
     }
   }
 }
