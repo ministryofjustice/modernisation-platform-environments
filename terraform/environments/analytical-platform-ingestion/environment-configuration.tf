@@ -11,6 +11,16 @@ locals {
 
       /* Observability Platform */
       observability_platform = "development"
+
+      /* Image Versions */
+      scan_image_version = "0.0.4"
+      transfer_image_version = "0.0.1"
+
+      /* Target Buckets */
+      target_buckets = ["dev-ingestion-testing"]
+
+      /* Transfer Server */
+      transfer_server_hostname = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
     }
     production = {
       /* VPC */
@@ -22,6 +32,16 @@ locals {
 
       /* Observability Platform */
       observability_platform = "production"
+
+      /* Image Versions */
+      scan_image_version = "0.0.4"
+      transfer_image_version = "0.0.1"
+
+      /* Target Buckets */
+      target_buckets = ["dev-ingestion-testing"]
+
+      /* Transfer Server */
+      transfer_server_hostname = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
     }
   }
 }
