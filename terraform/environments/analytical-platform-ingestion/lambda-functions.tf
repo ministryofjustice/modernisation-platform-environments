@@ -11,7 +11,7 @@ module "definition_upload_lambda" {
   package_type  = "Image"
   memory_size   = 2048
   timeout       = 900
-  image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-scan:0.0.3"
+  image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-scan:${local.environment_configuration.scan_image_version}"
 
   environment_variables = {
     MODE                         = "definition-upload",
@@ -65,7 +65,7 @@ module "scan_lambda" {
   memory_size            = 2048
   ephemeral_storage_size = 10240
   timeout                = 900
-  image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-scan:0.0.3"
+  image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-scan:${local.environment_configuration.scan_image_version}"
 
   environment_variables = {
     MODE                         = "scan",
@@ -135,7 +135,7 @@ module "transfer_lambda" {
   memory_size            = 2048
   ephemeral_storage_size = 10240
   timeout                = 900
-  image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-transfer:0.0.1"
+  image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-transfer:${local.environment_configuration.transfer_image_version}"
 
   environment_variables = {
     PROCESSED_BUCKET_NAME = module.processed_bucket.s3_bucket_id
@@ -192,7 +192,7 @@ module "transfer_lambda" {
         "s3:DeleteObject",
         "s3:PutObjectTagging"
       ]
-      resources = ["arn:aws:s3:::dev-ingestion-testing/*"] # TODO: Update to correct bucket
+      resources = formatlist("arn:aws:s3:::%s/*", local.environment_configuration.target_buckets)
     },
     s3_destination_bucket = {
       sid    = "AllowDestinationBucket"
@@ -200,7 +200,7 @@ module "transfer_lambda" {
       actions = [
         "s3:ListBucket"
       ]
-      resources = ["arn:aws:s3:::dev-ingestion-testing"] # TODO: Update to correct bucket
+      resources = formatlist("arn:aws:s3:::%s", local.environment_configuration.target_buckets)
     }
   }
 

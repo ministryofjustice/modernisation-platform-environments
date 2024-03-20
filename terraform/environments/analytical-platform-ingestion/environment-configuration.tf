@@ -11,6 +11,13 @@ locals {
 
       /* Observability Platform */
       observability_platform = "development"
+
+      /* Image Versions */
+      scan_image_version = "0.0.4"
+      transfer_image_version = "0.0.1"
+
+      /* Target Buckets */
+      target_buckets = ["dev-ingestion-testing"]
     }
     production = {
       /* VPC */
@@ -22,6 +29,13 @@ locals {
 
       /* Observability Platform */
       observability_platform = "production"
+
+      /* Image Versions */
+      scan_image_version = "0.0.4"
+      transfer_image_version = "0.0.1"
+
+      /* Target Buckets */
+      target_buckets = ["dev-ingestion-testing"]
     }
   }
 }
