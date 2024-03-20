@@ -58,20 +58,6 @@ else {
         New-Item -ItemType Directory -Path $subDirPath
         "created " + $subDirPath >> $logFile
     }
-    
-    $linkSubDirPath = ($linkPath + $tribunalNames[$i])
-    if (Test-Path $linkSubDirPath) {
-        "Link exists for " + $linkSubDirPath >> $logFile
-        Get-Item $linkSubDirPath >> $logFile
-        if ((Get-Item $linkSubDirPath).LinkType -eq "SymbolicLink") {
-            "It is a symbolic link " >> $logFile
-        } else {
-            "It is not a symbolic link" >> $logFile
-        }
-    } else {
-        "Linking " + $linkSubDirPath + " to " + $subDirPath >> $logFile
-        New-Item -Path $linkSubDirPath -ItemType SymbolicLink -Value $subDirPath
-    }
   }
 }
 
