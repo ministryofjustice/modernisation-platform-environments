@@ -107,36 +107,36 @@ module "appeals" {
 }*/
 
 # # module "care_standards" {
-# #   source                = "./modules/care_standards"
-# #   application_name      = "carestandards"
+# #   source                            = "./modules/tribunal"
+# #   app_name      = "care-standards"
 # # }
 
 # # module "cicap" {
-# #   source                = "./tribunals/cicap"
-# #   application_name      = "cicap"
+# #   source                            = "./modules/tribunal"
+# #   app_name      = "cicap"
 # # }
 
 # # module "employment_appeals" {
-# #   source                = "./modules/employment_appeals"
-# #   application_name      = "eat"
+# #   source                            = "./modules/tribunal"
+# #   app_name      = "employment-appeals"
 # # }
 
 # # module "finance_and_tax" {
-# #   source                = "./modules/finance_and_tax"
-# #   application_name      = "ftt"
+# #   source                            = "./modules/tribunal"
+# #   app_name      = "finance-and-tax"
 # # }
 
 # # module "immigartion_services" {
-# #   source                = "./modules/immigartion_services"
-# #   application_name      = "imset"
+# #   source                            = "./modules/tribunal"
+# #   app_name      = "immigration-services"
 # # }
 
 # # module "information_tribunal" {
-# #   source                = "./modules/information_tribunal"
-# #   application_name      = "it"
+# #   source                            = "./modules/tribunal"
+# #   app_name      = "information-tribunal"
 # # }
 
-# # # module "lands_chamber" {
-# # #   source                = "./modules/lands_chamber"
-# # #   application_name      = "lands"
+# # # module "lands_tribunal" {
+# #   source                            = "./modules/tribunal"
+# # #   app_name      = "lands-tribunal"
 # # # }
