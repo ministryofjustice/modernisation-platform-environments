@@ -221,6 +221,7 @@ locals {
       #   })
       # })
 
+
       "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
