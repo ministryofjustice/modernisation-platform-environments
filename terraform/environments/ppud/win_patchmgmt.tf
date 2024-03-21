@@ -13,14 +13,13 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   name             = "WindowsOSAndMicrosoftApps"
   description      = "Patch both Windows and Microsoft apps"
   operating_system = "WINDOWS"
-  approved_patches = ["KB890830"]
 
   approval_rule {
     approve_after_days = 5
 
     patch_filter {
       key    = "PRODUCT"
-      values = ["WindowsServer2016", "WindowsServer2019", "WindowsServer2022"]
+      values = ["WindowsServer2022"]
     }
     patch_filter {
       key = "CLASSIFICATION"
@@ -30,6 +29,10 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     patch_filter {
       key    = "MSRC_SEVERITY"
       values = ["Critical", "Important", "Moderate", "Unspecified"]
+    }
+    patch_filter {
+      key = "PATCH_ID"
+      values = ["KB890830"]
     }
   }
 
