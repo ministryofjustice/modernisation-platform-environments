@@ -138,6 +138,18 @@ locals {
           node                                 = "1"
         })
       })
+      t1-ncr-etl = merge(local.etl_ec2_default, {
+        cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
+        config = merge(local.etl_ec2_default.config, {
+          instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        tags = merge(local.etl_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform ETL installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
     }
     baseline_lbs = {
       private = {
