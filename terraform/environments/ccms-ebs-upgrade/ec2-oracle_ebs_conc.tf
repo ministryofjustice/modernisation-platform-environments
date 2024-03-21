@@ -39,7 +39,7 @@ resource "aws_instance" "ec2_oracle_conc" {
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-ebsconc", local.application_name, local.environment)) },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling-ebsconc },
-    { instance-role = local.application_data.accounts[local.environment].instance_role_ebsapps },
+    { instance-role = local.application_data.accounts[local.environment].instance_role_conc },
     { backup = "true" },
     { OracleDbLTS-ManagedInstance = "true" }
   )
@@ -57,7 +57,7 @@ resource "aws_ebs_volume" "conc_export_home" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "export/home")) },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_conc, "export/home")) },
     { device-name = "/dev/sdh" }
   )
 }
@@ -79,7 +79,7 @@ resource "aws_ebs_volume" "conc_u01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "u01")) },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_conc, "u01")) },
     { device-name = "/dev/sdi" }
   )
 }
@@ -101,7 +101,7 @@ resource "aws_ebs_volume" "conc_u03" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "u03")) },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_conc, "u03")) },
     { device-name = "/dev/sdj" }
   )
 }
@@ -123,7 +123,7 @@ resource "aws_ebs_volume" "conc_home" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "home")) },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_conc, "home")) },
     { device-name = "/dev/sdk" }
   )
 }
@@ -145,7 +145,7 @@ resource "aws_ebs_volume" "conc_stage" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "stage")) },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_conc, "stage")) },
     { device-name = "/dev/sdl" }
   )
 }
@@ -167,7 +167,7 @@ resource "aws_ebs_volume" "conc_temp" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "temp")) },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_conc, "temp")) },
     { device-name = "/dev/sdm" }
   )
 }
