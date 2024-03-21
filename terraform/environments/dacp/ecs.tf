@@ -91,7 +91,7 @@ resource "aws_ecs_service" "dacp_ecs_service" {
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
     security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   load_balancer {
