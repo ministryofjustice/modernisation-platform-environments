@@ -411,6 +411,9 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           instance_type          = "t3.medium"
           vpc_security_group_ids = ["private-web"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
