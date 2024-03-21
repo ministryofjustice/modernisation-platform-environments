@@ -5,7 +5,7 @@
       "dns": "laa-development",
       "ses_domain_identity": "dev.legalservices.gov.uk",
       "instance-scheduling-accessgate": "skip-scheduling",
-      "instance-scheduling-ebsapps": "default",
+      "instance-scheduling-ebsapps": "skip-scheduling",
       "instance-scheduling-ebsconc": "skip-scheduling",
       "instance-scheduling-ebsdb": "skip-scheduling",
       "instance-scheduling-webgate": "skip-scheduling",
