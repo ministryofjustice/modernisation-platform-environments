@@ -71,11 +71,8 @@ locals {
 
   baseline_security_groups = {
     # loadbalancer              = local.security_groups.loadbalancer
-    # web                       = local.security_groups.web
-    # app                       = local.security_groups.app
-    # database                  = local.security_groups.database
-    # domain                    = local.security_groups.domain
-    # jumpserver                = local.security_groups.jumpserver
+    domain     = local.security_groups.domain
+    jumpserver = local.security_groups.jumpserver
   }
 
   baseline_sns_topics     = {}
