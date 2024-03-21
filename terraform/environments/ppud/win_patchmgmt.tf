@@ -13,6 +13,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   name             = "WindowsOSAndMicrosoftApps"
   description      = "Patch both Windows and Microsoft apps"
   operating_system = "WINDOWS"
+  approved_patches = ["KB890830", "KB5034682"]
 
   approval_rule {
     approve_after_days = 5
@@ -29,10 +30,6 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     patch_filter {
       key    = "MSRC_SEVERITY"
       values = ["Critical", "Important", "Moderate", "Unspecified"]
-    }
-    patch_filter {
-      key = "PATCH_ID"
-      values = ["KB890830"]
     }
   }
 
