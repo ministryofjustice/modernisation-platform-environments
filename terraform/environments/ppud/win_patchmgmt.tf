@@ -13,7 +13,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   name             = "WindowsOSAndMicrosoftApps"
   description      = "Patch both Windows and Microsoft apps"
   operating_system = "WINDOWS"
-  approved_patches = ["KB890830", "KB5034682"]
+  approved_patches = ["KB890830", "KB5034682", "KB5035857"]
 
   approval_rule {
     approve_after_days = 5
