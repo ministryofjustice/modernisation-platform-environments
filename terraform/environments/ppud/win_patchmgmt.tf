@@ -27,7 +27,6 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
       #     values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"] - November 2023
       values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups", "DefinitionUpdates"]
     }
-
     patch_filter {
       key    = "MSRC_SEVERITY"
       values = ["Critical", "Important", "Moderate", "Unspecified"]
