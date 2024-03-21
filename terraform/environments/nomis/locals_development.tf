@@ -318,6 +318,7 @@ locals {
         instance = merge(local.weblogic_ec2.instance, {
           instance_type = "t2.large"
         })
+        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
             branch = "main"
@@ -343,6 +344,7 @@ locals {
         instance = merge(local.weblogic_ec2.instance, {
           instance_type = "t2.large"
         })
+        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
             branch = "main"
@@ -368,6 +370,7 @@ locals {
         instance = merge(local.weblogic_ec2.instance, {
           instance_type = "t2.large"
         })
+        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
             branch = "main"
