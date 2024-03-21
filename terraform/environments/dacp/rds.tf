@@ -63,26 +63,26 @@ data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
 
-resource "null_resource" "setup_db" {
-  count = local.is-development ? 1 : 0
+# resource "null_resource" "setup_db" {
+#   count = local.is-development ? 1 : 0
 
-  depends_on = [aws_db_instance.dacp_db]
+#   depends_on = [aws_db_instance.dacp_db]
 
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
-    environment = {
-      DB_HOSTNAME      = aws_db_instance.dacp_db.address
-      DB_NAME          = aws_db_instance.dacp_db.db_name
-      DACP_DB_USERNAME = aws_db_instance.dacp_db.username
-      DACP_DB_PASSWORD = random_password.password.result
-    }
-  }
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
+#     environment = {
+#       DB_HOSTNAME      = aws_db_instance.dacp_db.address
+#       DB_NAME          = aws_db_instance.dacp_db.db_name
+#       DACP_DB_USERNAME = aws_db_instance.dacp_db.username
+#       DACP_DB_PASSWORD = random_password.password.result
+#     }
+#   }
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+# }
 
 resource "aws_cloudwatch_log_group" "rds_logs" {
   name              = "/aws/events/rdsLogs"
