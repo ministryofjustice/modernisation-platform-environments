@@ -244,7 +244,7 @@ locals {
         }
       }
 
-      dev-jumpserver-a = merge(local.jumpserver_ec2, {
+      dev-nomis-client-a = merge(local.jumpserver_ec2, {
         config = merge(local.jumpserver_ec2.config, {
           user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
             ie_compatibility_mode_site_list = join(",", [
@@ -316,6 +316,9 @@ locals {
         })
         instance = merge(local.weblogic_ec2.instance, {
           instance_type = "t2.large"
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
         route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
@@ -342,6 +345,9 @@ locals {
         })
         instance = merge(local.weblogic_ec2.instance, {
           instance_type = "t2.large"
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
         route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
@@ -368,6 +374,9 @@ locals {
         })
         instance = merge(local.weblogic_ec2.instance, {
           instance_type = "t2.large"
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
         route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
