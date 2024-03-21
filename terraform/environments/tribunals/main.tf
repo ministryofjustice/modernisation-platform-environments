@@ -74,11 +74,11 @@ module "appeals" {
   aws_acm_certificate_external      = aws_acm_certificate.external
 }
 
-/*module "ahmlr" {
+module "ahmlr" {
   source                            = "./modules/tribunal"
   app_name                          = "ahmlr"
   app_url                           = "ahmlr"
-  sql_migration_path                = "../scripts/administrative_appeals"
+  sql_migration_path                = "../scripts/ahmlr"
   app_db_name                       = "hmlands"
   app_db_login_name                 = "hmlands-app"
   app_source_db_name                = "hmlands"
@@ -99,12 +99,13 @@ module "appeals" {
   ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
   app_count                         = local.application_data.accounts[local.environment].app_count
-  lb_tg_arn                         = aws_lb_target_group.tribunals_target_group.arn
   server_port                       = local.application_data.accounts[local.environment].server_port_1
-  lb_listener                       = aws_lb_listener.tribunals_lb
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-}*/
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+}
 
 # # module "care_standards" {
 # #   source                            = "./modules/tribunal"
