@@ -321,9 +321,9 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
   threshold           = "0"
   alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
   treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
+  alarm_actions       = [aws_sns_topic.ddos_alarm[0].arn]
   dimensions = {
-    ResourceArn = aws_lb.external.arn
+    ResourceArn = aws_lb.ncas_lb.arn
   }
 }
 
