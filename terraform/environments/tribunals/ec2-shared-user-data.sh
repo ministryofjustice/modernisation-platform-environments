@@ -46,12 +46,6 @@ else {
     Get-Disk | Where PartitionStyle -eq 'raw' | Initialize-Disk -PartitionStyle MBR -PassThru | New-Partition -DriveLetter D -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Tribunals" -Confirm:$false
   }
 
-  # We should now have an online volume mapped to D:
-  # There should also be a folder C:\ProgramData\docker\volumes
-  # This is where container volumes are mapped to
-  # Create a symbolic link (if it doesn't exist) for the tribunals storage to
-  # a folder on the EBS volume (the D: drive)
-
   for ($i=0; $i -lt $tribunalNames.Length; $i++) {
     $subDirPath = ($targetPath + $tribunalNames[$i])
     if (!(Test-Path $subDirPath)) {
