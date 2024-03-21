@@ -26,6 +26,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
       cpu       = 2048
       memory    = 4096
       essential = true
+      readonlyRootFilesystem = true
       portMappings = [
         {
           containerPort = 80
