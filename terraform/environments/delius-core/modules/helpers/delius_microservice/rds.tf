@@ -43,6 +43,8 @@ resource "aws_db_instance" "this" {
 
   snapshot_identifier = var.snapshot_identifier != null ? var.snapshot_identifier : null
 
+  kms_key_id = var.account_config.kms_keys.rds_shared
+
   allow_major_version_upgrade = var.rds_allow_major_version_upgrade
   apply_immediately           = var.rds_apply_immediately
 
