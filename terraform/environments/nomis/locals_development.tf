@@ -392,6 +392,39 @@ locals {
           oracle-db-name       = "qa11r"
         })
       })
+
+      dev-nomis-build-a = {
+        cloudwatch_metric_alarms = {}
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "base_rhel_7_9_2024-03-01T00-00-34.773Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2DevWeblogicPolicy",
+            "Ec2Qa11GWeblogicPolicy",
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { label = "app", size = 100, type = "gp3" } # /u01
+          "/dev/sdc" = { label = "app", size = 100, type = "gp3" } # /u02
+        }
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          instance_type          = "t3.medium"
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "nomis/DSOS-2667/add-build-server"
+          })
+        })
+        tags = {
+          description = "Syscon build and release server"
+          ami         = "base_rhel_7_9"
+          os-type     = "Linux"
+          component   = "build"
+          server-type = "nomis-build"
+        }
+      }
     }
 
     baseline_lbs = {
