@@ -328,8 +328,8 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 }
 
 resource "aws_sns_topic" "ddos_alarm" {
+  count             = local.is-development ? 0 : 1
   name              = "tipstaff_ddos_alarm"
-  kms_master_key_id = data.aws_kms_key.sns.id
 }
 
 resource "aws_sns_topic" "tipstaff_utilisation_alarm" {
