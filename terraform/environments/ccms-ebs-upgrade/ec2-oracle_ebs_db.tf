@@ -58,8 +58,8 @@ resource "aws_ebs_volume" "ebsdb_swap" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "swap")) },
-      { device-name = "/dev/sdb" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "swap")) },
+    { device-name = "/dev/sdb" }
   )
 }
 
@@ -83,8 +83,8 @@ resource "aws_ebs_volume" "export_home" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "export-home")) },
-      { device-name = "/dev/sdh" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "export-home")) },
+    { device-name = "/dev/sdh" }
   )
 }
 
@@ -105,8 +105,8 @@ resource "aws_ebs_volume" "u01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "u01")) },
-      { device-name = "/dev/sdi" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "u01")) },
+    { device-name = "/dev/sdi" }
   )
 }
 
@@ -127,8 +127,8 @@ resource "aws_ebs_volume" "arch" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "arch")) },
-      { device-name = "/dev/sdj" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "arch")) },
+    { device-name = "/dev/sdj" }
   )
 }
 
@@ -149,8 +149,8 @@ resource "aws_ebs_volume" "dbf" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf")) },
-      { device-name = "/dev/sdk" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf")) },
+    { device-name = "/dev/sdk" }
   )
 }
 
@@ -171,8 +171,8 @@ resource "aws_ebs_volume" "dbf01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf01")) },
-      { device-name = "/dev/sde" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf01")) },
+    { device-name = "/dev/sde" }
   )
 }
 
@@ -196,8 +196,8 @@ resource "aws_ebs_volume" "dbf02" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf02")) },
-      { device-name = "/dev/sdf" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf02")) },
+    { device-name = "/dev/sdf" }
   )
 }
 
@@ -221,8 +221,8 @@ resource "aws_ebs_volume" "dbf03" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf03")) },
-      { device-name = "/dev/sdg" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf03")) },
+    { device-name = "/dev/sdg" }
   )
 }
 
@@ -246,8 +246,8 @@ resource "aws_ebs_volume" "redoA" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoA")) },
-      { device-name = "/dev/sdl" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoA")) },
+    { device-name = "/dev/sdl" }
   )
 }
 
@@ -268,8 +268,8 @@ resource "aws_ebs_volume" "techst" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "techst")) },
-      { device-name = "/dev/sdm" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "techst")) },
+    { device-name = "/dev/sdm" }
   )
 }
 
@@ -291,8 +291,8 @@ resource "aws_ebs_volume" "backup" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup")) },
-      { device-name = "/dev/sdn" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup")) },
+    { device-name = "/dev/sdn" }
   )
 }
 
@@ -313,8 +313,8 @@ resource "aws_ebs_volume" "redoB" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoB")) },
-      { device-name = "/dev/sdo" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoB")) },
+    { device-name = "/dev/sdo" }
   )
 }
 
@@ -338,8 +338,8 @@ resource "aws_ebs_volume" "diag" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "diag")) },
-      { device-name = "/dev/sdp" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "diag")) },
+    { device-name = "/dev/sdp" }
   )
 }
 
@@ -364,8 +364,8 @@ resource "aws_ebs_volume" "appshare" {
   encrypted            = true
   kms_key_id           = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "appshare")) },
-      { device-name = "/dev/sdq" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "appshare")) },
+    { device-name = "/dev/sdq" }
   )
 }
 
@@ -389,8 +389,8 @@ resource "aws_ebs_volume" "db_home" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "db-home")) },
-      { device-name = "/dev/sdr" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "db-home")) },
+    { device-name = "/dev/sdr" }
   )
 }
 
@@ -411,8 +411,8 @@ resource "aws_ebs_volume" "db_temp" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "db-temp")) },
-      { device-name = "/dev/sds" }
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "db-temp")) },
+    { device-name = "/dev/sds" }
   )
 }
 

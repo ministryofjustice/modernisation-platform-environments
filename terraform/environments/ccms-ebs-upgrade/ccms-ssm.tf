@@ -23,26 +23,26 @@ resource "aws_ssm_document" "ebs_apps_service_stop" {
 }
 
 resource "aws_ssm_maintenance_window" "ebs_apps_service_status_mw" {
-  name              = "EBS-Apps-Service-Status"
-  schedule          = "cron(*/15 * * * ? *)"
-  duration          = 1
-  cutoff            = 0
+  name                       = "EBS-Apps-Service-Status"
+  schedule                   = "cron(*/15 * * * ? *)"
+  duration                   = 1
+  cutoff                     = 0
   allow_unassociated_targets = false
 }
 
 resource "aws_ssm_maintenance_window" "ebs_apps_service_start_mw" {
-  name              = "EBS-Apps-Service-Start"
-  schedule          = "cron(15 7 * * ? *)" # "cron(15 7 ? * MON-FRI *)"
-  duration          = 1
-  cutoff            = 0
+  name                       = "EBS-Apps-Service-Start"
+  schedule                   = "cron(15 7 * * ? *)" # "cron(15 7 ? * MON-FRI *)"
+  duration                   = 1
+  cutoff                     = 0
   allow_unassociated_targets = false
 }
 
 resource "aws_ssm_maintenance_window" "ebs_apps_service_stop_mw" {
-  name              = "EBS-Apps-Service-Stop"
-  schedule          = "cron(45 17 * * ? *)"
-  duration          = 1
-  cutoff            = 0
+  name                       = "EBS-Apps-Service-Stop"
+  schedule                   = "cron(45 17 * * ? *)"
+  duration                   = 1
+  cutoff                     = 0
   allow_unassociated_targets = false
 }
 
