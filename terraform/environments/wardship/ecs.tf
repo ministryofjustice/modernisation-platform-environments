@@ -522,5 +522,5 @@ resource "aws_route_table_association" "private_subnet_association" {
 }
 
 data "aws_route_table" "private" {
-  id = data.aws_route_table_association.private_subnet_association.route_table_id
+  id = aws_route_table_association.private_subnet_association.route_table_id
 }
