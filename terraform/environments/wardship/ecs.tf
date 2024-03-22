@@ -491,16 +491,6 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_nat_gateway" "nat_gateway" {
-  for_each      = aws_eip.nat
-  allocation_id = each.value.id
-  subnet_id     = each.key
-
-  tags = {
-    Name = "nat-gateway-${each.key}"
-  }
-}
-
-resource "aws_nat_gateway" "nat_gateway" {
   for_each      = { for subnet in data.aws_subnets.shared-private.ids : subnet.id => subnet }
   allocation_id = aws_eip.nat.id
   subnet_id     = each.value.id
