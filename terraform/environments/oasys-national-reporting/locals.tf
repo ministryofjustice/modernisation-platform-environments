@@ -78,11 +78,11 @@ locals {
     # onr_db  = local.security_groups.onr_db
 
     # shared security groups
-    aks        = local.security_groups.aks        # apply to bods & boe servers
-    boe_tools  = local.security_groups.boe_tools  # apply to bods & boe servers
-    domain     = local.security_groups.domain     # apply to all servers
-    jumpserver = local.security_groups.jumpserver # apply to bods & boe servers
-    noms_core  = local.security_groups.noms_core  # apply to bods & boe servers
+    # aks        = local.security_groups.aks        # apply to bods & boe servers
+    # boe_tools  = local.security_groups.boe_tools  # apply to bods & boe servers
+    # domain     = local.security_groups.domain     # apply to all servers
+    # jumpserver = local.security_groups.jumpserver # apply to bods & boe servers
+    # noms_core  = local.security_groups.noms_core  # apply to bods & boe servers
     oasys_db   = local.security_groups.oasys_db   # apply to bods & boe servers
   }
 
