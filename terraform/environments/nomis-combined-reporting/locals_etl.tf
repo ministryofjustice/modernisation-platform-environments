@@ -22,7 +22,7 @@ locals {
   etl_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "ami-013788648c599c3a0"
+      ami_name                  = "base_rhel_8_5_*"
       iam_resource_names_prefix = "ec2-etl"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
