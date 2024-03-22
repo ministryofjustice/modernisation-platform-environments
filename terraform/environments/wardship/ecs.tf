@@ -494,7 +494,7 @@ resource "aws_nat_gateway" "nat_gateway" {
 }
 
 resource "aws_route" "private_route_out" {
-  route_table_id         = data.aws_route_table.private.id
+  route_table_id         = aws_route_table.private.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gateway.id
 }
