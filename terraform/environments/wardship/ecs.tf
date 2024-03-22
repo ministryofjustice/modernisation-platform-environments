@@ -500,7 +500,6 @@ resource "aws_route" "private_route_out" {
 }
 
 data "aws_subnet" "public" {
-  count = 1
   filter {
     name   = "tag:Name"
     values = ["hmcts-development-general-public-*"]
@@ -517,7 +516,9 @@ data "aws_subnet" "private_subnets" {
 }
 
 resource "aws_route_table_association" "private_subnet_association" {
-  subnet_id     = tolist(data.aws_subnet.private_subnets.id)[0]
+  for_each = toset(data.aws_subnet.private_subnets.ids)
+
+  subnet_id      = each.value
   route_table_id = aws_route_table.private.id
 }
 
