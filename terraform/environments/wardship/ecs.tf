@@ -37,7 +37,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.wardship_db.address}"
+          value = "${aws_db_instance.wardship_db[0].address}"
         },
         {
           name  = "RDS_PORT"
@@ -45,15 +45,15 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.wardship_db.username}"
+          value = "${aws_db_instance.wardship_db[0].username}"
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.wardship_db.password}"
+          value = "${aws_db_instance.wardship_db[0].password}"
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.wardship_db.db_name}"
+          value = "${aws_db_instance.wardship_db[0].db_name}"
         },
         {
           name  = "supportEmail"
@@ -107,7 +107,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition_dev" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.wardship_db_dev.address}"
+          value = "${aws_db_instance.wardship_db_dev[0].address}"
         },
         {
           name  = "RDS_PORT"
@@ -115,15 +115,15 @@ resource "aws_ecs_task_definition" "wardship_task_definition_dev" {
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.wardship_db_dev.username}"
+          value = "${aws_db_instance.wardship_db_dev[0].username}"
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.wardship_db_dev.password}"
+          value = "${aws_db_instance.wardship_db_dev[0].password}"
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.wardship_db_dev.db_name}"
+          value = "${aws_db_instance.wardship_db_dev[0].db_name}"
         },
         {
           name  = "supportEmail"
