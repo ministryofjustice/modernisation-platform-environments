@@ -517,8 +517,8 @@ data "aws_subnet" "private_subnets" {
 }
 
 resource "aws_route_table_association" "private_subnet_association" {
-  subnet_id     = tolist(data.aws_subnet.private_subnets.ids)[0]
-  route_table_id = data.aws_route_table.private.id
+  subnet_id     = tolist(data.aws_subnet.private_subnets.id)[0]
+  route_table_id = aws_route_table.private.id
 }
 
 resource "aws_route_table" "private" {
