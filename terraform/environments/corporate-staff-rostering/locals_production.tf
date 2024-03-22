@@ -86,7 +86,7 @@ locals {
             total_size = 1500
           }
           flash = {
-            total_size = 100
+            total_size = 500
           }
         })
 
@@ -129,7 +129,7 @@ locals {
             total_size = 1500
           }
           flash = {
-            total_size = 100
+            total_size = 500
           }
         })
 
