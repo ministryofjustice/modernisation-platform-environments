@@ -167,7 +167,7 @@ resource "aws_ecs_service" "wardship_ecs_service" {
   network_configuration {
     subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   load_balancer {
@@ -482,7 +482,7 @@ module "pagerduty_core_alerts_prod" {
 }
 
 resource "aws_eip" "nat" {
-  for_each = { for subnet in data.aws_subnet.public : subnet.id => subnet }
+  for_each = { for subnet in data.aws_subnets.shared-public.ids : subnet.id => subnet }
   domain = "vpc"
 
   tags = {
