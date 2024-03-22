@@ -516,8 +516,9 @@ data "aws_subnet" "private_subnets" {
   vpc_id = data.aws_vpc.shared.id
 }
 
-data "aws_route_table_association" "private_subnet_association" {
-  subnet_id = tolist(data.aws_subnet.private_subnets.ids)[0]
+resource "aws_route_table_association" "private_subnet_association" {
+  subnet_id     = tolist(data.aws_subnet.private_subnets.ids)[0]
+  route_table_id = data.aws_route_table.private.id
 }
 
 data "aws_route_table" "private" {
