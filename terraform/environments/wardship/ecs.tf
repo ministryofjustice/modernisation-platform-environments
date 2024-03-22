@@ -523,5 +523,4 @@ resource "aws_route_table_association" "private_subnet_association" {
 
 resource "aws_route_table" "private" {
   vpc_id = data.aws_vpc.shared.id
-  id = aws_route_table_association.private_subnet_association.route_table_id
 }
