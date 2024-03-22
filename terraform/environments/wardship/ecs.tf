@@ -81,7 +81,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
 }
 
 //ECS task definition for the development environment:
-resource "aws_ecs_task_definition" "wardship_task_definition" {
+resource "aws_ecs_task_definition" "wardship_task_definition_dev" {
   count                    = local.is-development ? 1 : 0
   family                   = "wardshipFamily"
   requires_compatibilities = ["FARGATE"]
@@ -155,9 +155,41 @@ resource "aws_ecs_service" "wardship_ecs_service" {
     aws_lb_listener.wardship_lb
   ]
 
+  count                             = local.is-development ? 0 : 1
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.wardship_cluster.id
-  task_definition                   = aws_ecs_task_definition.wardship_task_definition.arn
+  task_definition                   = aws_ecs_task_definition.wardship_task_definition[0].arn
+  launch_type                       = "FARGATE"
+  enable_execute_command            = true
+  desired_count                     = 2
+  health_check_grace_period_seconds = 180
+
+  network_configuration {
+    subnets          = data.aws_subnets.shared-public.ids
+    security_groups  = [aws_security_group.ecs_service.id]
+    assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.wardship_target_group.arn
+    container_name   = "wardship-container"
+    container_port   = 80
+  }
+
+  deployment_controller {
+    type = "ECS"
+  }
+}
+
+resource "aws_ecs_service" "wardship_ecs_service_dev" {
+  depends_on = [
+    aws_lb_listener.wardship_lb
+  ]
+
+  count                             = local.is-development ? 1 : 0
+  name                              = var.networking[0].application
+  cluster                           = aws_ecs_cluster.wardship_cluster.id
+  task_definition                   = aws_ecs_task_definition.wardship_task_definition_dev[0].arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2

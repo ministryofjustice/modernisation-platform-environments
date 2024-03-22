@@ -11,7 +11,7 @@ resource "aws_db_instance" "wardship_db" {
   password                    = random_password.password.result
   skip_final_snapshot         = true
   publicly_accessible         = false
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc.id]
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade = true
 }
@@ -67,7 +67,7 @@ resource "aws_db_instance" "wardship_db_dev" {
   password                    = random_password.password.result
   skip_final_snapshot         = true
   publicly_accessible         = true
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev.id]
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade = true
 }
@@ -118,16 +118,16 @@ data "http" "myip" {
 resource "null_resource" "setup_dev_db" {
   count = local.is-development ? 1 : 0
 
-  depends_on = [aws_db_instance.wardship_db]
+  depends_on = [aws_db_instance.wardship_db_dev[0]]
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
     environment = {
-      DB_HOSTNAME          = aws_db_instance.wardship_db.address
-      DB_NAME              = aws_db_instance.wardship_db.db_name
-      WARDSHIP_DB_USERNAME = aws_db_instance.wardship_db.username
+      DB_HOSTNAME          = aws_db_instance.wardship_db_dev[0].address
+      DB_NAME              = aws_db_instance.wardship_db_dev[0].db_name
+      WARDSHIP_DB_USERNAME = aws_db_instance.wardship_db_dev[0].username
       WARDSHIP_DB_PASSWORD = random_password.password.result
     }
   }
