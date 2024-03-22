@@ -491,7 +491,7 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "nat_gateway" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = data.aws_subnets.shared-private.ids[0]
+  subnet_id     = data.aws_subnets.shared-public.ids[0]
 
   tags = {
     Name = "nat-gateway"
@@ -500,7 +500,7 @@ resource "aws_nat_gateway" "nat_gateway" {
 
 resource "aws_route" "private_route_out" {
   for_each               = toset(data.aws_subnets.shared-private.ids)
-  route_table_id         = aws_route_table.private.id
+  route_table_id         = aws_route_table.private[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gateway.id
 }
@@ -508,7 +508,7 @@ resource "aws_route" "private_route_out" {
 resource "aws_route_table_association" "private_subnet_association" {
   for_each = toset(data.aws_subnets.shared-private.ids)
   subnet_id      = each.value
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private[each.key].id
 }
 
 resource "aws_route_table" "private" {
