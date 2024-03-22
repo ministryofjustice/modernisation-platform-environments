@@ -498,20 +498,30 @@ resource "aws_nat_gateway" "nat_gateway" {
   }
 }
 
-resource "aws_route" "private_route_out" {
-  for_each               = toset(data.aws_subnets.shared-private.ids)
-  route_table_id         = aws_route_table.private[each.key].id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.nat_gateway.id
+# resource "aws_route" "private_route_out" {
+#   for_each               = toset(data.aws_subnets.shared-private.ids)
+#   route_table_id         = aws_route_table.private[each.key].id
+#   destination_cidr_block = "0.0.0.0/0"
+#   nat_gateway_id         = aws_nat_gateway.nat_gateway.id
+# }
+
+resource "aws_route" "route" {
+  route_table_id            = data.aws_route_table.private.id
+  destination_cidr_block    = "0.0.0.0/0"
+  nat_gateway_id            = aws_nat_gateway.nat_gateway.id
 }
 
-resource "aws_route_table_association" "private_subnet_association" {
-  for_each = toset(data.aws_subnets.shared-private.ids)
-  subnet_id      = each.value
-  route_table_id = aws_route_table.private[each.key].id
-}
+# resource "aws_route_table_association" "private_subnet_association" {
+#   for_each = toset(data.aws_subnets.shared-private.ids)
+#   subnet_id      = each.value
+#   route_table_id = aws_route_table.private[each.key].id
+# }
 
-resource "aws_route_table" "private" {
-  for_each = toset(data.aws_subnets.shared-private.ids)
-  vpc_id = data.aws_vpc.shared.id
+# resource "aws_route_table" "private" {
+#   for_each = toset(data.aws_subnets.shared-private.ids)
+#   vpc_id = data.aws_vpc.shared.id
+# }
+
+data "aws_route_table" "private" {
+  subnet_id = data.aws_subnets.shared-private.ids[0]
 }
