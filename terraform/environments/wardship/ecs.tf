@@ -165,7 +165,7 @@ resource "aws_ecs_service" "wardship_ecs_service" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = true
   }
@@ -196,7 +196,7 @@ resource "aws_ecs_service" "wardship_ecs_service_dev" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = false
   }
@@ -479,4 +479,47 @@ module "pagerduty_core_alerts_prod" {
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
+}
+
+resource "aws_eip" "nat" {
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "nat_gateway" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = data.aws_subnet.public[0].id
+  tags = {
+    Name = "nat-gateway"
+  }
+}
+
+resource "aws_route" "private_route_out" {
+  route_table_id         = data.aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.nat_gateway.id
+}
+
+data "aws_subnet" "public" {
+  count = 1
+  filter {
+    name   = "tag:Name"
+    values = ["hmcts-development-general-public-*"]
+  }
+  vpc_id = data.aws_vpc.shared.id
+}
+
+data "aws_subnet" "private_subnets" {
+  filter {
+    name   = "tag:Name"
+    values = ["hmcts-development-general-private-*"]
+  }
+  vpc_id = data.aws_vpc.shared.id
+}
+
+data "aws_route_table_association" "private_subnet_association" {
+  subnet_id = tolist(data.aws_subnet.private_subnets.ids)[0]
+}
+
+data "aws_route_table" "private" {
+  id = data.aws_route_table_association.private_subnet_association.route_table_id
 }
