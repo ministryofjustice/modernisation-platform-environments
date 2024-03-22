@@ -165,7 +165,7 @@ resource "aws_ecs_service" "wardship_ecs_service" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-private.ids
+    subnets          = data.aws_subnets.shared-public.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = false
   }
@@ -196,7 +196,7 @@ resource "aws_ecs_service" "wardship_ecs_service_dev" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-private.ids
+    subnets          = data.aws_subnets.shared-public.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = false
   }
@@ -481,47 +481,57 @@ module "pagerduty_core_alerts_prod" {
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
 }
 
-resource "aws_eip" "nat" {
-  domain = "vpc"
+# resource "aws_eip" "nat" {
+#   domain = "vpc"
 
-  tags = {
-    Name = "eip-for-nat-gateway"
-  }
-}
-
-resource "aws_nat_gateway" "nat_gateway" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = data.aws_subnets.shared-public.ids[0]
-
-  tags = {
-    Name = "nat-gateway"
-  }
-}
-
-# resource "aws_route" "private_route_out" {
-#   for_each               = toset(data.aws_subnets.shared-private.ids)
-#   route_table_id         = aws_route_table.private[each.key].id
-#   destination_cidr_block = "0.0.0.0/0"
-#   nat_gateway_id         = aws_nat_gateway.nat_gateway.id
+#   tags = {
+#     Name = "eip-for-nat-gateway"
+#   }
 # }
 
-resource "aws_route" "route" {
-  route_table_id            = data.aws_route_table.private.id
-  destination_cidr_block    = "0.0.0.0/0"
-  nat_gateway_id            = aws_nat_gateway.nat_gateway.id
+# resource "aws_nat_gateway" "nat_gateway" {
+#   allocation_id = aws_eip.nat.id
+#   subnet_id     = data.aws_subnets.shared-public.ids[0]
+
+#   tags = {
+#     Name = "nat-gateway"
+#   }
+# }
+
+# resource "aws_route" "route" {
+#   route_table_id            = data.aws_route_table.private.id
+#   destination_cidr_block    = "0.0.0.0/0"
+#   nat_gateway_id            = aws_nat_gateway.nat_gateway.id
+# }
+
+# data "aws_route_table" "private" {
+#   subnet_id = data.aws_subnets.shared-private.ids[0]
+# }
+
+resource "aws_vpc_endpoint" "ecr_dkr" {
+  vpc_id              = data.aws_vpc.shared.id
+  service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+
+  security_group_ids = [aws_security_group.ecs_service.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
 }
 
-# resource "aws_route_table_association" "private_subnet_association" {
-#   for_each = toset(data.aws_subnets.shared-private.ids)
-#   subnet_id      = each.value
-#   route_table_id = aws_route_table.private[each.key].id
-# }
+resource "aws_vpc_endpoint" "ecr_api" {
+  vpc_id              = data.aws_vpc.shared.id
+  service_name        = "com.amazonaws.eu-west-2.ecr.api"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
 
-# resource "aws_route_table" "private" {
-#   for_each = toset(data.aws_subnets.shared-private.ids)
-#   vpc_id = data.aws_vpc.shared.id
-# }
+  security_group_ids = [aws_security_group.ecs_service.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+}
 
-data "aws_route_table" "private" {
-  subnet_id = data.aws_subnets.shared-private.ids[0]
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = data.aws_vpc.shared.id
+  service_name      = "com.amazonaws.eu-west-2.s3"
+  vpc_endpoint_type = "Gateway"
+
+  route_table_ids = data.aws_subnets.shared-private.ids
 }
