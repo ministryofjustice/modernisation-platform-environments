@@ -108,6 +108,13 @@ locals {
     cidr_ipv6s = local.g4s_cidr_ipv6s
   }
 
+  sftp_account_g4s_atrium_unstructured = {
+    name       = "atrium_unstructured"
+    ssh_keys   = local.g4s_ssh_keys
+    cidr_ipv4s = local.g4s_cidr_ipv4s
+    cidr_ipv6s = local.g4s_cidr_ipv6s
+  }
+
   sftp_account_g4s_atv = {
     name       = "atv"
     ssh_keys   = local.g4s_ssh_keys
