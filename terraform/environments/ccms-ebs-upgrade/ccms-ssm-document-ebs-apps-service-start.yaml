@@ -1,0 +1,20 @@
+# ccms-ssm-document-ebs-apps-service-start.yaml
+---
+schemaVersion: "2.2"
+description: Execute the startAPP.sh script.
+parameters:
+  action:
+    type: String
+    allowedValues:
+    - start
+mainSteps:
+  - name: startAPP
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - start
+    inputs:
+      runCommand:
+        - "/home/applmgr/scripts/startAPP.sh"

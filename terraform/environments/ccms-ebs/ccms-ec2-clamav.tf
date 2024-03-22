@@ -36,7 +36,7 @@ resource "aws_instance" "ec2_clamav" {
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_accessgate, "root")) },
+      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_clamav, "root")) },
       { device-name = "/dev/sda1" }
     )
   }
