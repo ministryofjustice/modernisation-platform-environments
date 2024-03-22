@@ -113,7 +113,7 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-web-a = merge(local.tomcat_admin_ec2_default, {
+      t1-ncr-web = merge(local.tomcat_admin_ec2_default, {
         cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
         config = merge(local.tomcat_admin_ec2_default.config, {
           instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
@@ -138,6 +138,18 @@ locals {
           node                                 = "1"
         })
       })
+      t1-ncr-etl = merge(local.etl_ec2_default, {
+        cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
+        config = merge(local.etl_ec2_default.config, {
+          instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        tags = merge(local.etl_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform ETL installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
     }
     baseline_lbs = {
       private = {
@@ -150,7 +162,7 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          t1-ncr-cms = {
+          t1-ncr-web = {
             port     = 7777
             protocol = "HTTP"
             health_check = {
@@ -168,7 +180,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "t1-ncr-cms" },
+              { ec2_instance_name = "t1-ncr-web" },
             ]
           }
         }
@@ -185,16 +197,16 @@ locals {
               }
             }
             rules = {
-              t1-ncr-cms = {
+              t1-ncr-web = {
                 priority = 4000
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-cms"
+                  target_group_name = "t1-ncr-web"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-cms.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-web.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -215,16 +227,16 @@ locals {
               }
             }
             rules = {
-              t1-ncr-cms = {
+              t1-ncr-web = {
                 priority = 4580
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-cms"
+                  target_group_name = "t1-ncr-web"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-cms.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-web.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
