@@ -208,7 +208,7 @@ locals {
         })
       })
 
-      prod-jumpserver-a = merge(local.jumpserver_ec2, {
+      prod-nomis-client-a = merge(local.jumpserver_ec2, {
         config = merge(local.jumpserver_ec2.config, {
           user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
             ie_compatibility_mode_site_list = join(",", [

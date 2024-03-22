@@ -43,14 +43,17 @@ module "gdpr_api_service" {
   health_check_path = "/gdpr/api/actuator/health"
   account_info      = var.account_info
 
-  create_rds            = var.delius_microservice_configs.gdpr_api.create_rds
-  rds_engine            = var.delius_microservice_configs.gdpr_api.rds_engine
-  rds_engine_version    = var.delius_microservice_configs.gdpr_api.rds_engine_version
-  rds_instance_class    = var.delius_microservice_configs.gdpr_api.rds_instance_class
-  rds_port              = var.delius_microservice_configs.gdpr_api.rds_port
-  rds_allocated_storage = var.delius_microservice_configs.gdpr_api.rds_allocated_storage
-  rds_username          = var.delius_microservice_configs.gdpr_api.rds_username
-  rds_license_model     = var.delius_microservice_configs.gdpr_api.rds_license_model
+  create_rds                  = var.delius_microservice_configs.gdpr_api.create_rds
+  rds_engine                  = var.delius_microservice_configs.gdpr_api.rds_engine
+  rds_engine_version          = var.delius_microservice_configs.gdpr_api.rds_engine_version
+  rds_instance_class          = var.delius_microservice_configs.gdpr_api.rds_instance_class
+  rds_port                    = var.delius_microservice_configs.gdpr_api.rds_port
+  rds_allocated_storage       = var.delius_microservice_configs.gdpr_api.rds_allocated_storage
+  rds_username                = var.delius_microservice_configs.gdpr_api.rds_username
+  rds_license_model           = var.delius_microservice_configs.gdpr_api.rds_license_model
+  maintenance_window          = var.delius_microservice_configs.merge_api.maintenance_window
+  rds_backup_retention_period = var.delius_microservice_configs.merge_api.rds_backup_retention_period
+  rds_backup_window           = var.delius_microservice_configs.merge_api.rds_backup_window
 
   container_environment_vars = [
     {
@@ -159,4 +162,8 @@ module "gdpr_api_service" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+
+  log_error_pattern      = "ERROR"
+  sns_topic_arn          = aws_sns_topic.delius_core_alarms.arn
+  frontend_lb_arn_suffix = aws_lb.delius_core_frontend.arn_suffix
 }

@@ -163,7 +163,7 @@ module "baseline" {
   )
 }
 
-module "cloudwatch_dashboard" {
-  source  = "./modules/cloudwatch_dashboard"
+module "cloudwatch" {
+  source = "../../modules/cloudwatch"
   options = local.cloudwatch_monitoring_options
 }

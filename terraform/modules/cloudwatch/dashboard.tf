@@ -1,4 +1,5 @@
-resource "aws_cloudwatch_dashboard" "hmpps-oem_cloudwatch_dashboard" {
+resource "aws_cloudwatch_dashboard" "cloudwatch_dashboard" {
+  count          = var.options.enable_cloudwatch_dashboard ? 1 : 0
   dashboard_name = "CloudWatch-Default"
   dashboard_body = jsonencode(local.dashboard_body)
 }
@@ -202,9 +203,6 @@ locals {
         rowsPerPage   = 50
         widgetsPerRow = 2
       }
-      labels = [
-        { key : "application", value : "hmpps-oem" }
-      ]
       metrics = [
         {
           "metricName" : "VolumeReadBytes",

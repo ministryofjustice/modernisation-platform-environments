@@ -110,6 +110,10 @@ module "pwm" {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
+
+  log_error_pattern      = "ERROR"
+  sns_topic_arn          = aws_sns_topic.delius_core_alarms.arn
+  frontend_lb_arn_suffix = aws_lb.delius_core_ancillary.arn_suffix
 }
 
 

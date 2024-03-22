@@ -309,6 +309,29 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
   }
 }
 
+resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
+  count               = local.is-development ? 0 : 1
+  alarm_name          = "DDoSDetected"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "DDoSDetected"
+  namespace           = "AWS/DDoSProtection"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "0"
+  alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.ddos_alarm[0].arn]
+  dimensions = {
+    ResourceArn = aws_lb.tipstaff_lb.arn
+  }
+}
+
+resource "aws_sns_topic" "ddos_alarm" {
+  count             = local.is-development ? 0 : 1
+  name              = "tipstaff_ddos_alarm"
+}
+
 resource "aws_sns_topic" "tipstaff_utilisation_alarm" {
   count = local.is-development ? 0 : 1
   name  = "tipstaff_utilisation_alarm"

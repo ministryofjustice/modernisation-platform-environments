@@ -131,7 +131,7 @@ variable "rds_storage_type" {
 variable "maintenance_window" {
   description = "RDS/elasticache maintenance window"
   type        = string
-  default     = "mon:03:00-mon:04:00"
+  default     = "Wed:21:00-Wed:23:00"
 }
 
 variable "rds_allow_major_version_upgrade" {
@@ -149,13 +149,13 @@ variable "rds_apply_immediately" {
 variable "rds_backup_retention_period" {
   description = "RDS backup retention period"
   type        = number
-  default     = 7
+  default     = 1
 }
 
 variable "rds_backup_window" {
   description = "RDS backup window"
   type        = string
-  default     = "00:00-03:00"
+  default     = "19:00-21:00"
 }
 
 variable "rds_iam_database_authentication_enabled" {
@@ -488,4 +488,19 @@ variable "ecs_service_egress_security_group_ids" {
     ip_protocol                  = string
   }))
   default = []
+}
+
+variable "log_error_pattern" {
+  description = "Used by metric filter for error count"
+  type        = string
+}
+
+variable "sns_topic_arn" {
+  description = "Used by alarms"
+  type        = string
+}
+
+variable "frontend_lb_arn_suffix" {
+  description = "Used by alarms"
+  type        = string
 }
