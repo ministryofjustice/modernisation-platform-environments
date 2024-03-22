@@ -119,7 +119,7 @@ locals {
             "Ec2PREPRODReportingPolicy",
           ])
         })
-        instance = concat(local.bip_cms_ec2_default.config.instance, [
+        instance = concat(local.bip_cms_ec2_default.instance, [
           instance_type = "c5.4xlarge",
         ])
         tags = merge(local.bip_cms_ec2_default.tags, {
@@ -135,7 +135,7 @@ locals {
             "Ec2PREPRODReportingPolicy",
           ])
         })
-        instance = concat(local.bip_cms_ec2_default.config.instance, [
+        instance = concat(local.bip_cms_ec2_default.instance, [
           instance_type = "c5.4xlarge",
         ])
         tags = merge(local.bip_cms_ec2_default.tags, {
@@ -151,7 +151,7 @@ locals {
             "Ec2PREPRODReportingPolicy",
           ])
         })
-        instance = concat(local.bip_cms_ec2_default.config.instance, [
+        instance = concat(local.bip_cms_ec2_default.instance, [
           instance_type = "c5.4xlarge",
         ])
         tags = merge(local.bip_cms_ec2_default.tags, {
@@ -167,7 +167,7 @@ locals {
             "Ec2PREPRODReportingPolicy",
           ])
         })
-        instance = concat(local.bip_cms_ec2_default.config.instance, [
+        instance = concat(local.bip_cms_ec2_default.instance, [
           instance_type = "r7g.large",
         ])
         tags = merge(local.tomcat_admin_ec2_default.tags, {
@@ -182,7 +182,7 @@ locals {
             "Ec2PREPRODReportingPolicy",
           ])
         })
-        instance = concat(local.bip_cms_ec2_default.config.instance, [
+        instance = concat(local.bip_cms_ec2_default.instance, [
           instance_type = "r7g.xlarge",
         ])
         tags = merge(local.tomcat_admin_ec2_default.tags, {
@@ -197,7 +197,7 @@ locals {
             "Ec2PREPRODReportingPolicy",
           ])
         })
-        instance = concat(local.bip_cms_ec2_default.config.instance, [
+        instance = concat(local.bip_cms_ec2_default.instance, [
           instance_type = "r7g.xlarge",
         ])
         tags = merge(local.tomcat_admin_ec2_default.tags, {
