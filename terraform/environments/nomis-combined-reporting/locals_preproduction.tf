@@ -116,7 +116,7 @@ locals {
         cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
         config = merge(local.bip_cms_ec2_default.config, {
           instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
+            "Ec2PREPRODReportingPolicy",
           ])
         })
         instance = concat(local.bip_cms_ec2_default.config.instance, [
@@ -132,7 +132,7 @@ locals {
         cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
         config = merge(local.bip_cms_ec2_default.config, {
           instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
+            "Ec2PREPRODReportingPolicy",
           ])
         })
         instance = concat(local.bip_cms_ec2_default.config.instance, [
@@ -148,7 +148,7 @@ locals {
         cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
         config = merge(local.bip_cms_ec2_default.config, {
           instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
+            "Ec2PREPRODReportingPolicy",
           ])
         })
         instance = concat(local.bip_cms_ec2_default.config.instance, [
@@ -164,7 +164,7 @@ locals {
         cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
         config = merge(local.tomcat_admin_ec2_default.config, {
           instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
+            "Ec2PREPRODReportingPolicy",
           ])
         })
         instance = concat(local.bip_cms_ec2_default.config.instance, [
@@ -179,7 +179,7 @@ locals {
         cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
         config = merge(local.tomcat_admin_ec2_default.config, {
           instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
+            "Ec2PREPRODReportingPolicy",
           ])
         })
         instance = concat(local.bip_cms_ec2_default.config.instance, [
@@ -194,7 +194,7 @@ locals {
         cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
         config = merge(local.tomcat_admin_ec2_default.config, {
           instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
+            "Ec2PREPRODReportingPolicy",
           ])
         })
         instance = concat(local.bip_cms_ec2_default.config.instance, [
@@ -230,7 +230,7 @@ locals {
         cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
         config = merge(local.bip_cms_ec2_default.config, {
           instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
+            "Ec2LSASTReportingPolicy",
           ])
         })
         instance = concat(local.bip_cms_ec2_default.config.instance, [
@@ -247,7 +247,7 @@ locals {
         cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
         config = merge(local.tomcat_admin_ec2_default.config, {
           instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
+            "Ec2LSASTReportingPolicy",
           ])
         })
         instance = concat(local.bip_cms_ec2_default.config.instance, [
