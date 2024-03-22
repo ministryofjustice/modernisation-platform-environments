@@ -74,7 +74,7 @@ resource "aws_db_instance" "wardship_db_dev" {
 
 resource "aws_security_group" "postgresql_db_sc_dev" {
   count       = local.is-development ? 1 : 0
-  name        = "postgres_security_group"
+  name        = "postgres_security_group_dev"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
   ingress {
