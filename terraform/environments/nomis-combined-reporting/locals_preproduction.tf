@@ -233,9 +233,9 @@ locals {
             "Ec2LSASTReportingPolicy",
           ])
         })
-        instance = concat(local.bip_cms_ec2_default.config.instance, [
+        instance = merge(local.bip_cms_ec2_default.instance, {
           instance_type = "c5.4xlarge",
-        ])
+        })
         tags = merge(local.bip_cms_ec2_default.tags, {
           description                          = "LSAST SAP BI Platform CMS installation and configurations"
           nomis-combined-reporting-environment = "lsast"
@@ -250,9 +250,9 @@ locals {
             "Ec2LSASTReportingPolicy",
           ])
         })
-        instance = concat(local.bip_cms_ec2_default.config.instance, [
+        instance = merge(local.bip_cms_ec2_default.instance, {
           instance_type = "r7g.xlarge",
-        ])
+        })
         tags = merge(local.tomcat_admin_ec2_default.tags, {
           description                          = "LSAST SAP BI Platform tomcat installation and configurations"
           nomis-combined-reporting-environment = "lsast"
