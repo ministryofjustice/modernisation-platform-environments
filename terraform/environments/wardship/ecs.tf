@@ -482,25 +482,24 @@ module "pagerduty_core_alerts_prod" {
 }
 
 resource "aws_eip" "nat" {
-  for_each = { for subnet in data.aws_subnets.shared-public.ids : subnet.id => subnet }
   domain = "vpc"
 
   tags = {
-    Name = "eip-for-nat-gateway-${each.key}"
+    Name = "eip-for-nat-gateway"
   }
 }
 
 resource "aws_nat_gateway" "nat_gateway" {
-  for_each      = { for subnet in data.aws_subnets.shared-private.ids : subnet.id => subnet }
   allocation_id = aws_eip.nat.id
-  subnet_id     = each.value.id
+  subnet_id     = data.aws_subnets.shared-private.ids[0]
 
   tags = {
-    Name = "nat-gateway-${each.key}"
+    Name = "nat-gateway"
   }
 }
 
 resource "aws_route" "private_route_out" {
+  for_each               = toset(data.aws_subnets.shared-private.ids)
   route_table_id         = aws_route_table.private.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gateway.id
@@ -508,11 +507,11 @@ resource "aws_route" "private_route_out" {
 
 resource "aws_route_table_association" "private_subnet_association" {
   for_each = toset(data.aws_subnets.shared-private.ids)
-
   subnet_id      = each.value
   route_table_id = aws_route_table.private.id
 }
 
 resource "aws_route_table" "private" {
+  for_each = toset(data.aws_subnets.shared-private.ids)
   vpc_id = data.aws_vpc.shared.id
 }
