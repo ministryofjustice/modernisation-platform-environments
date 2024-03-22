@@ -482,14 +482,31 @@ module "pagerduty_core_alerts_prod" {
 }
 
 resource "aws_eip" "nat" {
+  for_each = { for subnet in data.aws_subnet.public : subnet.id => subnet }
   domain = "vpc"
+
+  tags = {
+    Name = "eip-for-nat-gateway-${each.key}"
+  }
 }
 
 resource "aws_nat_gateway" "nat_gateway" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = data.aws_subnet.public[0].id
+  for_each      = aws_eip.nat
+  allocation_id = each.value.id
+  subnet_id     = each.key
+
   tags = {
-    Name = "nat-gateway"
+    Name = "nat-gateway-${each.key}"
+  }
+}
+
+resource "aws_nat_gateway" "nat_gateway" {
+  for_each      = { for subnet in data.aws_subnets.shared-private.ids : subnet.id => subnet }
+  allocation_id = aws_eip.nat.id
+  subnet_id     = each.value.id
+
+  tags = {
+    Name = "nat-gateway-${each.key}"
   }
 }
 
@@ -499,24 +516,8 @@ resource "aws_route" "private_route_out" {
   nat_gateway_id         = aws_nat_gateway.nat_gateway.id
 }
 
-data "aws_subnet" "public" {
-  filter {
-    name   = "tag:Name"
-    values = ["hmcts-development-general-public-*"]
-  }
-  vpc_id = data.aws_vpc.shared.id
-}
-
-data "aws_subnet" "private_subnets" {
-  filter {
-    name   = "tag:Name"
-    values = ["hmcts-development-general-private-*"]
-  }
-  vpc_id = data.aws_vpc.shared.id
-}
-
 resource "aws_route_table_association" "private_subnet_association" {
-  for_each = toset(data.aws_subnet.private_subnets.ids)
+  for_each = toset(data.aws_subnets.shared-private.ids)
 
   subnet_id      = each.value
   route_table_id = aws_route_table.private.id
