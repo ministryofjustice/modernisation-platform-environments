@@ -67,9 +67,9 @@ resource "aws_security_group" "db" {
   tags = local.tags
 }
 
-resource "aws_vpc_security_group_ingress_rule" "db_ipv4" {
+resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mp" {
   security_group_id = aws_security_group.db.id
-  description       = "Default SQL Server port 1433"
+  description       = "Default SQL Server port 1433 access for Matt Price"
   ip_protocol       = "tcp"
   from_port         = 1433
   to_port           = 1433
@@ -78,8 +78,10 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
+  count = local.is-development ? 1 : 0
+
   security_group_id = aws_security_group.db.id
-  description       = "MH ip"
+  description       = "Default SQL Server port 1433 access for Matt Heery"
   ip_protocol       = "tcp"
   from_port         = 1433
   to_port           = 1433
@@ -88,14 +90,29 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
+  count = local.is-development ? 1 : 0
+
   security_group_id = aws_security_group.db.id
-  description       = "LB ip"
+  description       = "Default SQL Server port 1433 access for Lee Broadhurst"
   ip_protocol       = "tcp"
   from_port         = 1433
   to_port           = 1433
 
   cidr_ipv4 = "209.35.83.77/32"
 }
+
+# resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
+#   count = local.is-development ? 1 : 0
+#
+#   security_group_id = aws_security_group.db.id
+#   description       = "Default SQL Server port 1433 access for Madhu Kadiri"
+#   ip_protocol       = "tcp"
+#   from_port         = 1433
+#   to_port           = 1433
+#
+#   cidr_ipv4 = ""
+# }
+
 resource "aws_db_subnet_group" "db" {
   name       = "db-subnet-group"
   subnet_ids = data.aws_subnets.shared-public.ids
