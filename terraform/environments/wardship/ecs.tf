@@ -12,6 +12,7 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
 }
 
 resource "aws_ecs_task_definition" "wardship_task_definition" {
+  count                    = local.is-development ? 0 : 1
   family                   = "wardshipFamily"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -53,6 +54,76 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
         {
           name  = "DB_NAME"
           value = "${aws_db_instance.wardship_db.db_name}"
+        },
+        {
+          name  = "supportEmail"
+          value = "${local.application_data.accounts[local.environment].support_email}"
+        },
+        {
+          name  = "supportTeam"
+          value = "${local.application_data.accounts[local.environment].support_team}"
+        },
+        {
+          name  = "CurServer"
+          value = "${local.application_data.accounts[local.environment].curserver}"
+        },
+        {
+          name  = "ida:ClientId"
+          value = "${local.application_data.accounts[local.environment].client_id}"
+        }
+      ]
+    }
+  ])
+  runtime_platform {
+    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    cpu_architecture        = "X86_64"
+  }
+}
+
+//ECS task definition for the development environment:
+resource "aws_ecs_task_definition" "wardship_task_definition" {
+  count                    = local.is-development ? 1 : 0
+  family                   = "wardshipFamily"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  execution_role_arn       = aws_iam_role.app_execution.arn
+  task_role_arn            = aws_iam_role.app_task.arn
+  cpu                      = 1024
+  memory                   = 2048
+  container_definitions = jsonencode([
+    {
+      name      = "wardship-container"
+      image     = "${aws_ecr_repository.wardship_ecr_repo.repository_url}:latest"
+      cpu       = 1024
+      memory    = 2048
+      essential = true
+      portMappings = [
+        {
+          containerPort = 80
+          protocol      = "tcp"
+          hostPort      = 80
+        }
+      ]
+      environment = [
+        {
+          name  = "RDS_HOSTNAME"
+          value = "${aws_db_instance.wardship_db_dev.address}"
+        },
+        {
+          name  = "RDS_PORT"
+          value = "${local.application_data.accounts[local.environment].rds_port}"
+        },
+        {
+          name  = "RDS_USERNAME"
+          value = "${aws_db_instance.wardship_db_dev.username}"
+        },
+        {
+          name  = "RDS_PASSWORD"
+          value = "${aws_db_instance.wardship_db_dev.password}"
+        },
+        {
+          name  = "DB_NAME"
+          value = "${aws_db_instance.wardship_db_dev.db_name}"
         },
         {
           name  = "supportEmail"
