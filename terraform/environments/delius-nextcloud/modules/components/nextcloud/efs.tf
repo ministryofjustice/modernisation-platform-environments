@@ -1,5 +1,5 @@
 module "nextcloud_efs" {
-  source = "../../../delius-core/modules/helpers/efs"
+  source = "../../../../delius-core/modules/helpers/efs"
 
   name           = "nextcloud"
   env_name       = var.env_name

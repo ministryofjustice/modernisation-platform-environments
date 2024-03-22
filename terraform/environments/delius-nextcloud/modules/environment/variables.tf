@@ -23,22 +23,9 @@ variable "bastion_config" {
   type = any
 }
 
-variable "bcs_config" {
-  type = any
+variable "nextcloud_config" {
+  type = any  
 }
-
-variable "bps_config" {
-  type = any
-}
-
-variable "bws_config" {
-  type = any
-}
-
-variable "dis_config" {
-  type = any
-}
-
 variable "tags" {
   type = any
 }

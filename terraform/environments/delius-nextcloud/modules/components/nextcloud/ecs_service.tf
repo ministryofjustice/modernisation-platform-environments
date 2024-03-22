@@ -1,5 +1,5 @@
 module "nextcloud_service" {
-  source = "../../../delius-core/modules/helpers/delius_microservice"
+  source = "../../../../delius-core/modules/helpers/delius_microservice"
 
   account_config            = var.account_config
   account_info              = var.account_info
@@ -126,6 +126,10 @@ module "nextcloud_service" {
       valueFrom = aws_secretsmanager_secret.nextcloud_admin_password.arn
     }
   ]
+
+  log_error_pattern = "FATAL"
+  sns_topic_arn     = aws_sns_topic.nextcloud_alarms.arn
+  frontend_lb_arn_suffix = aws_alb.nextcloud.arn_suffix
 
   platform_vars = var.platform_vars
   tags          = var.tags

@@ -1,5 +1,5 @@
 module "nextcloud" {
-  source = "../nextcloud"
+  source = "../components/nextcloud"
 
   providers = {
     aws                       = aws

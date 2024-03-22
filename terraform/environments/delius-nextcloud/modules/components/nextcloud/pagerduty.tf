@@ -4,8 +4,8 @@
 #   pagerduty_integration_key  = is-prod ? "delius_core_prod_alarms" : "delius_core_nonprod_alarms"
 # }
 # SNS topic for monitoring to send alarms to
-resource "aws_sns_topic" "delius_core_alarms" {
-  name = var.sns_topic_name
+resource "aws_sns_topic" "nextcloud_alarms" {
+  name = "nextcloud-alarms-${var.env_name}"
 }
 
 # Pager duty integration
@@ -22,14 +22,14 @@ resource "aws_sns_topic" "delius_core_alarms" {
 # }
 
 # link the sns topic to the service
-module "pagerduty_core_alerts" {
-
-  depends_on = [
-    aws_sns_topic.delius_core_alarms
-  ]
-
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.delius_core_alarms.name]
-  pagerduty_integration_key = var.pagerduty_integration_key
-}
-            
+# module "pagerduty_core_alerts" {
+#
+#   depends_on = [
+#     aws_sns_topic.delius_core_alarms
+#   ]
+#
+#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+#   sns_topics                = [aws_sns_topic.delius_core_alarms.name]
+#   pagerduty_integration_key = var.pagerduty_integration_key
+# }
+#

@@ -4,7 +4,7 @@
 ##
 module "environment_dev" {
   # We're in dev account and dev environment, could reference different version
-  source = "./modules/mis_environment"
+  source = "./modules/environment"
   count  = local.is-development ? 1 : 0
 
   providers = {
@@ -22,14 +22,11 @@ module "environment_dev" {
   account_info   = local.account_info
 
   environment_config      = local.environment_config_dev
-  environments_in_account = local.delius_environments_per_account.dev
+  environments_in_account = local.environments_per_account.dev
 
   bastion_config = local.bastion_config_dev
 
-  bcs_config = local.bcs_config_dev
-  bps_config = local.bps_config_dev
-  bws_config = local.bws_config_dev
-  dis_config = local.dis_config_dev
+  nextcloud_config = local.nextcloud_config_dev
 
   tags = local.tags
 }
