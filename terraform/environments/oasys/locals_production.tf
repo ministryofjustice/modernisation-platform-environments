@@ -554,7 +554,7 @@ locals {
                 priority = 300
                 actions = [{
                   type              = "forward"
-                  target_group_name = "ptc-${local.application_name}-web-a-pv-http-8080"
+                  target_group_name = "trn-${local.application_name}-web-a-pv-http-8080"
                 }]
                 conditions = [
                   {
