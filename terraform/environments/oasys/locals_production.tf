@@ -544,6 +544,7 @@ locals {
                         "ptc-int.oasys.service.justice.gov.uk",
                         "practice.oasys.az.justice.gov.uk",
                         "practice.p-oasys.az.justice.gov.uk",
+                        "practice-ukwest.oasys.az.justice.gov.uk",
                       ]
                     }
                   }
@@ -562,6 +563,7 @@ locals {
                         "trn-int.oasys.service.justice.gov.uk",
                         "training.oasys.az.justice.gov.uk",
                         "training.p-oasys.az.justice.gov.uk",
+                        "training-ukwest.oasys.az.justice.gov.uk",
                       ]
                     }
                   }
