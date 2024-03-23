@@ -359,6 +359,15 @@ locals {
             "Ec2T2WebPolicy",
           ])
         })
+        autoscaling_schedules = {
+          "scale_up" = {
+            recurrence = "0 5 * * Mon-Fri"
+          }
+          "scale_down" = {
+            desired_capacity = 0
+            recurrence       = "0 19 * * Mon-Fri"
+          }
+        }
         tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
@@ -401,6 +410,15 @@ locals {
             "Ec2T1WebPolicy",
           ])
         })
+        autoscaling_schedules = {
+          "scale_up" = {
+            recurrence = "0 5 * * Mon-Fri"
+          }
+          "scale_down" = {
+            desired_capacity = 0
+            recurrence       = "0 19 * * Mon-Fri"
+          }
+        }
         tags = merge(local.webserver_a.tags, {
           description                             = "t1 ${local.application_name} web"
           "${local.application_name}-environment" = "t1"
