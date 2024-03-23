@@ -175,6 +175,15 @@ locals {
             "Ec2PreprodWebPolicy",
           ])
         })
+        autoscaling_schedules = {
+          "scale_up" = {
+            recurrence = "0 5 * * Mon-Fri"
+          }
+          "scale_down" = {
+            desired_capacity = 0
+            recurrence       = "0 19 * * Mon-Fri"
+          }
+        }
         tags = merge(local.webserver_a.tags, {
           oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
           oracle-db-sid      = "PPOASYS" # "OASPROD"
