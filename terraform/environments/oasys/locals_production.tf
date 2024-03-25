@@ -207,17 +207,17 @@ locals {
     }
 
     baseline_ec2_instances = {
-      # "pd-${local.application_name}-db-a" = merge(local.database_a, {
-      #   config = merge(local.database_a.config, {
-      #     instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
-      #       "Ec2ProdDatabasePolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.database_a.tags, {
-      #     bip-db-name                             = "PDBIPINF"
-      #     oracle-sids                             = "PDBIPINF PDOASYS"
-      #   })
-      # })
+      "pd-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(local.database_a.config, {
+          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        tags = merge(local.database_a.tags, {
+          bip-db-name                             = "PDBIPINF"
+          oracle-sids                             = "PDBIPINF PDOASYS"
+        })
+      })
 
 
       "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
