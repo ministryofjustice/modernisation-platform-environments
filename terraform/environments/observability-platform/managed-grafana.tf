@@ -60,6 +60,6 @@ resource "grafana_data_source" "github" {
     owner = "ministryofjustice"
   })
   secure_json_data_encoded = jsonencode({
-    accessToken = aws_secretsmanager_secret.github_token.secret_string
+    accessToken = data.aws_secretsmanager_secret_version.github_token.secret_string
   })
 }

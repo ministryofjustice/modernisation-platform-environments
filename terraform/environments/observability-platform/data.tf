@@ -29,3 +29,7 @@ data "aws_identitystore_group" "all_identity_centre_teams" {
     attribute_value = each.value
   }
 }
+
+data "aws_secretsmanager_secret_version" "github_token" {
+  secret_id = aws_secretsmanager_secret.github_token.id
+}
