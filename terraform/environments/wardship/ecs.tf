@@ -325,14 +325,6 @@ resource "aws_security_group" "ecs_service" {
     security_groups = [aws_security_group.wardship_lb_sc.id]
   }
 
-  ingress {
-    from_port       = 8090
-    to_port         = 8090
-    protocol        = "tcp"
-    description     = "Allow traffic on port 8090 from load balancer"
-    security_groups = [aws_security_group.wardship_lb_sc.id]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -488,65 +480,3 @@ module "pagerduty_core_alerts_prod" {
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
 }
-
-# resource "aws_eip" "nat" {
-#   domain = "vpc"
-
-#   tags = {
-#     Name = "eip-for-nat-gateway"
-#   }
-# }
-
-# resource "aws_nat_gateway" "nat_gateway" {
-#   allocation_id = aws_eip.nat.id
-#   subnet_id     = data.aws_subnets.shared-public.ids[0]
-
-#   tags = {
-#     Name = "nat-gateway"
-#   }
-# }
-
-# resource "aws_route" "route" {
-#   route_table_id            = data.aws_route_table.private.id
-#   destination_cidr_block    = "0.0.0.0/0"
-#   nat_gateway_id            = aws_nat_gateway.nat_gateway.id
-# }
-
-# data "aws_route_table" "private" {
-#   subnet_id = data.aws_subnets.shared-private.ids[0]
-# }
-
-//VPC endpoint stuff:
-# data "aws_vpc_endpoint" "ecr_dkr" {
-#   provider     = aws.core-vpc
-#   vpc_id       = data.aws_vpc.shared.id
-#   service_name = "com.amazonaws.eu-west-2.ecr.dkr"
-# }
-
-# resource "aws_vpc_endpoint" "ecr_dkr" {
-#   vpc_id              = data.aws_vpc.default_vpc.id
-#   service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
-#   vpc_endpoint_type   = "Interface"
-#   private_dns_enabled = true
-
-#   security_group_ids = [aws_security_group.ecs_service.id]
-#   subnet_ids         = data.aws_subnets.shared-private.ids
-# }
-
-# resource "aws_vpc_endpoint" "ecr_api" {
-#   vpc_id              = data.aws_vpc.default_vpc.id
-#   service_name        = "com.amazonaws.eu-west-2.ecr.api"
-#   vpc_endpoint_type   = "Interface"
-#   private_dns_enabled = true
-
-#   security_group_ids = [aws_security_group.ecs_service.id]
-#   subnet_ids         = data.aws_subnets.shared-private.ids
-# }
-
-# resource "aws_vpc_endpoint" "s3" {
-#   vpc_id            = data.aws_vpc.default_vpc.id
-#   service_name      = "com.amazonaws.eu-west-2.s3"
-#   vpc_endpoint_type = "Gateway"
-
-#   route_table_ids = [data.aws_route_table.default_rt.id]
-# }
