@@ -68,7 +68,7 @@ resource "aws_lb_target_group" "lb_tg_equip-portal" {
 
   health_check {
     enabled             = true
-    path                = "/"
+    path                = "/nimbus/CtrlWebIsapi.dll"
     interval            = 30
     protocol            = "HTTP"
     port                = 80
@@ -90,7 +90,7 @@ resource "aws_lb_target_group" "lb_tg_portal" {
 
   health_check {
     enabled             = true
-    path                = "/"
+    path                = "/nimbus/CtrlWebIsapi.dll"
     interval            = 30
     protocol            = "HTTP"
     port                = 80
@@ -132,12 +132,12 @@ resource "aws_lb_target_group_attachment" "lb_tga_gateway" {
 
 resource "aws_lb_target_group_attachment" "lb_tga_equip-portal" {
   target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
-  target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
+  target_id        = join("", module.win2022_STD_multiple["COR-A-EQP04"].private_ip)
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_portal" {
   target_group_arn = aws_lb_target_group.lb_tg_portal.arn
-  target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
+  target_id        = join("", module.win2022_STD_multiple["COR-A-EQP04"].private_ip)
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_analytics" {
