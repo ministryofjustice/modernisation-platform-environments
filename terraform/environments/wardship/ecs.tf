@@ -509,38 +509,36 @@ module "pagerduty_core_alerts_prod" {
 # }
 
 //VPC endpoint stuff:
-data "aws_vpc" "default_vpc" {
-  default = true
-}
+# data "aws_vpc_endpoint" "ecr_dkr" {
+#   provider     = aws.core-vpc
+#   vpc_id       = data.aws_vpc.shared.id
+#   service_name = "com.amazonaws.eu-west-2.ecr.dkr"
+# }
 
-data "aws_route_table" "default_rt" {
-  vpc_id = data.aws_vpc.default_vpc.id
-}
+# resource "aws_vpc_endpoint" "ecr_dkr" {
+#   vpc_id              = data.aws_vpc.default_vpc.id
+#   service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
+#   vpc_endpoint_type   = "Interface"
+#   private_dns_enabled = true
 
-resource "aws_vpc_endpoint" "ecr_dkr" {
-  vpc_id              = data.aws_vpc.default_vpc.id
-  service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
+#   security_group_ids = [aws_security_group.ecs_service.id]
+#   subnet_ids         = data.aws_subnets.shared-private.ids
+# }
 
-  security_group_ids = [aws_security_group.ecs_service.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
+# resource "aws_vpc_endpoint" "ecr_api" {
+#   vpc_id              = data.aws_vpc.default_vpc.id
+#   service_name        = "com.amazonaws.eu-west-2.ecr.api"
+#   vpc_endpoint_type   = "Interface"
+#   private_dns_enabled = true
 
-resource "aws_vpc_endpoint" "ecr_api" {
-  vpc_id              = data.aws_vpc.default_vpc.id
-  service_name        = "com.amazonaws.eu-west-2.ecr.api"
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
+#   security_group_ids = [aws_security_group.ecs_service.id]
+#   subnet_ids         = data.aws_subnets.shared-private.ids
+# }
 
-  security_group_ids = [aws_security_group.ecs_service.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
+# resource "aws_vpc_endpoint" "s3" {
+#   vpc_id            = data.aws_vpc.default_vpc.id
+#   service_name      = "com.amazonaws.eu-west-2.s3"
+#   vpc_endpoint_type = "Gateway"
 
-resource "aws_vpc_endpoint" "s3" {
-  vpc_id            = data.aws_vpc.default_vpc.id
-  service_name      = "com.amazonaws.eu-west-2.s3"
-  vpc_endpoint_type = "Gateway"
-
-  route_table_ids = [data.aws_route_table.default_rt.id]
-}
+#   route_table_ids = [data.aws_route_table.default_rt.id]
+# }
