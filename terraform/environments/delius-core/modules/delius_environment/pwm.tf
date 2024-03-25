@@ -13,7 +13,9 @@ module "pwm" {
   ]
 
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
-  container_secrets = [
+
+  # Define secrets here - override them by adding them to the container_secrets list eg var.delius_microservice_configs.pwm.container_secrets
+  container_secrets = distinct(flatten(merge(var.delius_microservice_configs.pwm.container_secrets, [
     {
       name      = "CONFIG_PASSWORD"
       valueFrom = aws_ssm_parameter.delius_core_pwm_config_password.arn
@@ -26,7 +28,7 @@ module "pwm" {
       name      = "SES_JSON"
       valueFrom = aws_ssm_parameter.pwm_ses_smtp_user.arn
     }
-  ]
+  ])))
 
   db_ingress_security_groups = []
 
