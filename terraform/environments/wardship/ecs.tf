@@ -12,6 +12,7 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
 }
 
 resource "aws_ecs_task_definition" "wardship_task_definition" {
+  count                    = local.is-development ? 0 : 1
   family                   = "wardshipFamily"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -36,7 +37,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.wardship_db.address}"
+          value = "${aws_db_instance.wardship_db[0].address}"
         },
         {
           name  = "RDS_PORT"
@@ -44,15 +45,85 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.wardship_db.username}"
+          value = "${aws_db_instance.wardship_db[0].username}"
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.wardship_db.password}"
+          value = "${aws_db_instance.wardship_db[0].password}"
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.wardship_db.db_name}"
+          value = "${aws_db_instance.wardship_db[0].db_name}"
+        },
+        {
+          name  = "supportEmail"
+          value = "${local.application_data.accounts[local.environment].support_email}"
+        },
+        {
+          name  = "supportTeam"
+          value = "${local.application_data.accounts[local.environment].support_team}"
+        },
+        {
+          name  = "CurServer"
+          value = "${local.application_data.accounts[local.environment].curserver}"
+        },
+        {
+          name  = "ida:ClientId"
+          value = "${local.application_data.accounts[local.environment].client_id}"
+        }
+      ]
+    }
+  ])
+  runtime_platform {
+    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    cpu_architecture        = "X86_64"
+  }
+}
+
+//ECS task definition for the development environment:
+resource "aws_ecs_task_definition" "wardship_task_definition_dev" {
+  count                    = local.is-development ? 1 : 0
+  family                   = "wardshipFamily"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  execution_role_arn       = aws_iam_role.app_execution.arn
+  task_role_arn            = aws_iam_role.app_task.arn
+  cpu                      = 1024
+  memory                   = 2048
+  container_definitions = jsonencode([
+    {
+      name      = "wardship-container"
+      image     = "${aws_ecr_repository.wardship_ecr_repo.repository_url}:latest"
+      cpu       = 1024
+      memory    = 2048
+      essential = true
+      portMappings = [
+        {
+          containerPort = 80
+          protocol      = "tcp"
+          hostPort      = 80
+        }
+      ]
+      environment = [
+        {
+          name  = "RDS_HOSTNAME"
+          value = "${aws_db_instance.wardship_db_dev[0].address}"
+        },
+        {
+          name  = "RDS_PORT"
+          value = "${local.application_data.accounts[local.environment].rds_port}"
+        },
+        {
+          name  = "RDS_USERNAME"
+          value = "${aws_db_instance.wardship_db_dev[0].username}"
+        },
+        {
+          name  = "RDS_PASSWORD"
+          value = "${aws_db_instance.wardship_db_dev[0].password}"
+        },
+        {
+          name  = "DB_NAME"
+          value = "${aws_db_instance.wardship_db_dev[0].db_name}"
         },
         {
           name  = "supportEmail"
@@ -84,9 +155,41 @@ resource "aws_ecs_service" "wardship_ecs_service" {
     aws_lb_listener.wardship_lb
   ]
 
+  count                             = local.is-development ? 0 : 1
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.wardship_cluster.id
-  task_definition                   = aws_ecs_task_definition.wardship_task_definition.arn
+  task_definition                   = aws_ecs_task_definition.wardship_task_definition[0].arn
+  launch_type                       = "FARGATE"
+  enable_execute_command            = true
+  desired_count                     = 2
+  health_check_grace_period_seconds = 180
+
+  network_configuration {
+    subnets          = data.aws_subnets.shared-public.ids
+    security_groups  = [aws_security_group.ecs_service.id]
+    assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.wardship_target_group.arn
+    container_name   = "wardship-container"
+    container_port   = 80
+  }
+
+  deployment_controller {
+    type = "ECS"
+  }
+}
+
+resource "aws_ecs_service" "wardship_ecs_service_dev" {
+  depends_on = [
+    aws_lb_listener.wardship_lb
+  ]
+
+  count                             = local.is-development ? 1 : 0
+  name                              = var.networking[0].application
+  cluster                           = aws_ecs_cluster.wardship_cluster.id
+  task_definition                   = aws_ecs_task_definition.wardship_task_definition_dev[0].arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2
@@ -377,3 +480,60 @@ module "pagerduty_core_alerts_prod" {
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
 }
+
+# resource "aws_eip" "nat" {
+#   domain = "vpc"
+
+#   tags = {
+#     Name = "eip-for-nat-gateway"
+#   }
+# }
+
+# resource "aws_nat_gateway" "nat_gateway" {
+#   allocation_id = aws_eip.nat.id
+#   subnet_id     = data.aws_subnets.shared-public.ids[0]
+
+#   tags = {
+#     Name = "nat-gateway"
+#   }
+# }
+
+# resource "aws_route" "route" {
+#   route_table_id            = data.aws_route_table.private.id
+#   destination_cidr_block    = "0.0.0.0/0"
+#   nat_gateway_id            = aws_nat_gateway.nat_gateway.id
+# }
+
+# data "aws_route_table" "private" {
+#   subnet_id = data.aws_subnets.shared-private.ids[0]
+# }
+
+//VPC endpoint stuff:
+
+# resource "aws_vpc_endpoint" "ecr_dkr" {
+#   vpc_id              = data.aws_vpc.shared.id
+#   service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
+#   vpc_endpoint_type   = "Interface"
+#   private_dns_enabled = true
+
+#   security_group_ids = [aws_security_group.ecs_service.id]
+#   subnet_ids         = data.aws_subnets.shared-private.ids
+# }
+
+# resource "aws_vpc_endpoint" "ecr_api" {
+#   vpc_id              = data.aws_vpc.shared.id
+#   service_name        = "com.amazonaws.eu-west-2.ecr.api"
+#   vpc_endpoint_type   = "Interface"
+#   private_dns_enabled = true
+
+#   security_group_ids = [aws_security_group.ecs_service.id]
+#   subnet_ids         = data.aws_subnets.shared-private.ids
+# }
+
+# resource "aws_vpc_endpoint" "s3" {
+#   vpc_id            = data.aws_vpc.shared.id
+#   service_name      = "com.amazonaws.eu-west-2.s3"
+#   vpc_endpoint_type = "Gateway"
+
+#   route_table_ids = data.aws_subnets.shared-private.ids
+# }
