@@ -3,8 +3,10 @@
 cd /tmp
 yum -y install sshpass
 yum -y install jq
+sudo yum -y install xorg-x11-xauth
+sudo yum -y install xclock xterm
 
-hostnamectl set-hostname "${hostname}"
+hostnamectl set-hostname oas.laa-development.modernisation-platform.service.justice.gov.uk
 
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 systemctl start amazon-ssm-agent

@@ -13,16 +13,16 @@ resource "aws_instance" "oas_app_instance" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   user_data_replace_on_change = true
-  # user_data                   = base64encode(data.local_file.userdata.content)
+  user_data                   = base64encode(data.local_file.userdata.content)
   # user_data                   = base64encode(templatefile("./userdata.sh", {
   #   hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
   #   ec2_image_id = "${local.application_data.accounts[local.environment].ec2amiid}"
   #   ec2_instance_type = "${local.application_data.accounts[local.environment].ec2instancetype}"
   #   application_name = "${local.application_name}"
   # }))
-  user_data = base64encode(templatefile("./userdata.sh", {
-    hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
-  }))
+  # user_data = base64encode(templatefile("./userdata.sh", {
+  #   hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
+  # }))
 
   root_block_device {
     delete_on_termination = false
@@ -94,6 +94,13 @@ resource "aws_security_group" "ec2" {
     description = "Access to the managed server from workspace"
     from_port   = 9514
     to_port     = 9514
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
+  }
+  ingress {
+    description = "ssh access to the managed server from workspace"
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
