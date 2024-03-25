@@ -5,6 +5,10 @@ locals {
       tenant_configuration = {
         "observability-platform" = {
           identity_centre_team = "observability-platform"
+          alerting = {
+            pagerduty = ["observability-platform"]
+            slack     = ["observability-platform-alerts"]
+          }
           aws_accounts = {
             "observability-platform-development" = {
               cloudwatch_enabled      = true
