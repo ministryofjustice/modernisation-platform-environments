@@ -18,9 +18,9 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
   role       = aws_iam_role.dms-cloudwatch-logs-role.name
 }
 
-resource "aws_iam_role" "dms-vpc-role" {
+resource "aws_iam_role" "dms-vpc" {
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
-  name               = "dms-vpc-role"
+  name               = "dms-vpc"
 }
 
 resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
