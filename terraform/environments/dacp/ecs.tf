@@ -26,6 +26,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
       cpu       = 2048
       memory    = 4096
       essential = true
+      readonlyRootFilesystem = true
       portMappings = [
         {
           containerPort = 80
@@ -91,7 +92,7 @@ resource "aws_ecs_service" "dacp_ecs_service" {
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
     security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   load_balancer {
