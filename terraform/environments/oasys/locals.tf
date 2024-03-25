@@ -81,9 +81,9 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
     )
-    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
+    user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = {}
-    autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
+    autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
     lb_target_groups = {
       pv-http-8080 = local.target_group_http_8080
       pb-http-8080 = local.target_group_http_8080
