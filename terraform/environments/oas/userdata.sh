@@ -118,9 +118,9 @@ configure_cwagent(){
     {
         "metrics": {
             "append_dimensions": {
-                "ImageId": "${ec2_image_id}",
-                "InstanceId": "${aws:InstanceId}",
-                "InstanceType": "${ec2_instance_type}"
+                "ImageId": "\${ec2_image_id}",
+                "InstanceId": "\${aws:InstanceId}",
+                "InstanceType": "\${ec2_instance_type}"
             },
             "metrics_collected": {
                 "collectd": {
@@ -177,4 +177,65 @@ configure_cwagent(){
                     "measurement": [
                         "net_drop_in",
                         "net_drop_out",
-                        "net_err
+                        "net_err_in",
+                        "net_err_out"
+                    ],
+                    "metrics_collection_interval": 60
+                },
+                "netstat": {
+                    "measurement": [
+                        "tcp_established",
+                        "tcp_time_wait"
+                    ],
+                    "metrics_collection_interval": 60
+                },
+                "statsd": {
+                    "metrics_aggregation_interval": 60,
+                    "metrics_collection_interval": 60,
+                    "service_address": ":8125"
+                },
+                "swap": {
+                    "measurement": [
+                        "swap_used_percent"
+                    ],
+                    "metrics_collection_interval": 60
+                }
+            }
+        },
+        "logs": {
+            "logs_collected": {
+                "files": {
+                    "collect_list": [
+                        {
+                            "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/bi_server1.log",
+                            "log_group_name": "${application_name}-bi_server1"
+                        },
+                        {
+                            "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/bi_server1-diagnostic.log",
+                            "log_group_name": "${application_name}-bi_server1-diagnostic"
+                        },
+                        {
+                            "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/jbips.log",
+                            "log_group_name": "${application_name}-jbips"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+EOL
+}
+
+# Restart CloudWatch Agent
+restart_cwagent(){
+    amazon-cloudwatch-agent-ctl -a stop
+    amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+}
+
+# Call the functions
+get_nvme_device
+mount_volumes
+ntp_config
+enable_ebs_udev
+configure_cwagent
+restart_cwagent
