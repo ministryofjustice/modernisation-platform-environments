@@ -5,3 +5,7 @@ resource "aws_secretsmanager_secret" "grafana_api_key" {
 resource "aws_secretsmanager_secret" "github_token" {
   name = "grafana/data-sources/github-token"
 }
+
+resource "aws_secretsmanager_secret" "slack_token" {
+  name = "grafana/notifications/slack-token"
+}
