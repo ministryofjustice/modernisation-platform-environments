@@ -1,6 +1,3 @@
-data "local_file" "userdata" {
-  filename = "userdata.sh"
-}
 
 resource "aws_instance" "oas_app_instance" {
   ami                         = local.application_data.accounts[local.environment].ec2amiid
@@ -12,7 +9,13 @@ resource "aws_instance" "oas_app_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
-  user_data                   = base64encode(data.local_file.userdata.content)
+  user_data_replace_on_change = true
+  user_data                   = base64encode(templatefile("./userdata.sh", {
+    hostname = "${local.application_name}.${data.aws_route53_zone.external.name}"
+    ec2_image_id = "${local.application_data.accounts[local.environment].ec2amiid}"
+    ec2_instance_type = "${local.application_data.accounts[local.environment].ec2instancetype}"
+    application_name = "${local.application_name}"
+  }))
 
   root_block_device {
     delete_on_termination = false
