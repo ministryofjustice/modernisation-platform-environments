@@ -37,7 +37,7 @@ locals {
       "/oracle/database/TROASYS" = local.secretsmanager_secrets_oasys_db
 
       # "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
+      "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
       # "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
       # "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
       # "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
@@ -209,7 +209,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      #"pd-${local.application_name}-db-a" = merge(local.database_a, {
+      # "pd-${local.application_name}-db-a" = merge(local.database_a, {
       #   config = merge(local.database_a.config, {
       #     instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
       #       "Ec2ProdDatabasePolicy",
@@ -220,6 +220,7 @@ locals {
       #     oracle-sids                             = "PDBIPINF PDOASYS"
       #   })
       # })
+
 
       "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
@@ -272,6 +273,64 @@ locals {
           }
         }
         tags = merge(local.database_a.tags, {
+          description                             = "practice and training ${local.application_name} database"
+          "${local.application_name}-environment" = "ptctrn"
+          bip-db-name                             = "TRBIPINF"
+          oracle-sids                             = "PROASYS TROASYS TRBIPINF"
+        })
+      })
+
+      "ptctrn-${local.application_name}-db-b" = merge(local.database_a, {
+        config = merge(local.database_b.config, {
+          instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
+            "Ec2PtcTrnDatabasePolicy",
+          ])
+        })
+        instance = merge(local.database_b.instance, {
+          instance_type = "r6i.xlarge"
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 300
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 200
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
+        ebs_volume_config = {
+          data = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 200
+          }
+          flash = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 50
+          }
+        }
+        tags = merge(local.database_b.tags, {
           description                             = "practice and training ${local.application_name} database"
           "${local.application_name}-environment" = "ptctrn"
           bip-db-name                             = "TRBIPINF"
