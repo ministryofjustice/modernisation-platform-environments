@@ -37,6 +37,8 @@ module "managed_grafana" {
   tags = local.tags
 }
 
+/* Slack Contact Point */
+
 /* Prometheus Source */
 resource "grafana_data_source" "observability_platform_prometheus" {
   type       = "prometheus"
