@@ -5,6 +5,7 @@ yum -y install sshpass
 yum -y install jq
 sudo yum -y install xorg-x11-xauth
 sudo yum -y install xclock xterm
+sudo yum -y install nvme-cli
 
 hostnamectl set-hostname oas.laa-development.modernisation-platform.service.justice.gov.uk
 
