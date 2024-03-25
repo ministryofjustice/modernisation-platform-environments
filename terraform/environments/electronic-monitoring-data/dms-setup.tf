@@ -32,7 +32,7 @@ resource "aws_dms_replication_instance" "rds_connection" {
     replication_instance_id = "rds-conn"
     replication_instance_class = "dms.t2.micro"
     allocated_storage           = 20
-    engine_version              = "3.1.4"
+    engine_version              = "3.5.2"
     replication_subnet_group_id = aws_dms_replication_subnet_group.rds_subnets.id
     vpc_security_group_ids = [aws_security_group.db.id]
     depends_on = [
