@@ -111,6 +111,15 @@ resource "aws_ecs_task_definition" "wardship_task_definition_dev" {
       cpu       = 1024
       memory    = 2048
       essential = true
+      ReadonlyRootFilesystem = true
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name,
+          "awslogs-region"        = "eu-west-2",
+          "awslogs-stream-prefix" = "wardship-app"
+        }
+      },
       portMappings = [
         {
           containerPort = 80
@@ -179,7 +188,7 @@ resource "aws_ecs_service" "wardship_ecs_service" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = false
   }
