@@ -8,7 +8,10 @@ locals {
   }
 
   # baseline presets config
+
   test_baseline_presets_options = {
+    enable_ec2_delius_dba_secrets_access = true # additional permissions to access delius secrets
+
     sns_topics = {
       pagerduty_integrations = {
         dba_pagerduty = "hmpps_shef_dba_non_prod"
