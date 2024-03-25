@@ -13,7 +13,7 @@ locals {
       observability_platform = "development"
 
       /* Image Versions */
-      scan_image_version = "0.0.4"
+      scan_image_version     = "0.0.4"
       transfer_image_version = "0.0.2"
 
       /* Target Buckets */
@@ -34,7 +34,7 @@ locals {
       observability_platform = "production"
 
       /* Image Versions */
-      scan_image_version = "0.0.4"
+      scan_image_version     = "0.0.4"
       transfer_image_version = "0.0.2"
 
       /* Target Buckets */

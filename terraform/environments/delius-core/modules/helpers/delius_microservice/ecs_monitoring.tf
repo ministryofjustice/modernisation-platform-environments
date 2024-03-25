@@ -89,13 +89,13 @@ resource "aws_cloudwatch_log_metric_filter" "error" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
-  alarm_name         = "${var.name}-${var.env_name}-high-error-count"
-  alarm_description  = "Triggers alarm if there are more than 5 errors in the last 5 minutes"
-  namespace          = "${var.name}Metrics"
-  metric_name        = "ErrorCount"
-  statistic          = "Sum"
-  period             = "300"
-  evaluation_periods = "1"
+  alarm_name          = "${var.name}-${var.env_name}-high-error-count"
+  alarm_description   = "Triggers alarm if there are more than 5 errors in the last 5 minutes"
+  namespace           = "${var.name}Metrics"
+  metric_name         = "ErrorCount"
+  statistic           = "Sum"
+  period              = "300"
+  evaluation_periods  = "1"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   threshold           = "10"

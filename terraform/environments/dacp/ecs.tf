@@ -324,8 +324,8 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 }
 
 resource "aws_sns_topic" "ddos_alarm" {
-  count             = local.is-development ? 0 : 1
-  name              = "dacp_ddos_alarm"
+  count = local.is-development ? 0 : 1
+  name  = "dacp_ddos_alarm"
 }
 
 resource "aws_sns_topic" "dacp_utilisation_alarm" {

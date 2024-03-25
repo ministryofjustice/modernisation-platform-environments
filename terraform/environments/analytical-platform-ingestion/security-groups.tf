@@ -7,6 +7,6 @@ resource "aws_security_group" "vpc_endpoints" {
 
 resource "aws_security_group" "transfer_server" {
   description = "Security Group for Transfer Server"
-  name   = "transfer-server"
-  vpc_id = module.vpc.vpc_id
+  name        = "transfer-server"
+  vpc_id      = module.vpc.vpc_id
 }
