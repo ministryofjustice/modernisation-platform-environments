@@ -3,8 +3,6 @@ cd /tmp
 yum -y install sshpass
 yum -y install jq
 
-hostnamectl set-hostname ${local.application_name}.${local.application_data.accounts[local.environment].hostname}
-
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
@@ -14,6 +12,9 @@ sudo systemctl disable firewalld
 mkfs.ext4 /dev/sdb
 mkdir -p /oracle/software
 echo "/dev/sdb /oracle/software ext4 defaults 0 0" >> /etc/fstab
+mkfs.ext4 /dev/sdc
+mkdir -p /stage
+echo "/dev/sdc /stage ext4 defaults 0 0" >> /etc/fstab
 mount -a
 
 chown oracle:dba /oracle/software

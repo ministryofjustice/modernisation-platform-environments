@@ -124,7 +124,7 @@ resource "aws_db_instance" "appdb1" {
   copy_tags_to_snapshot       = true
   storage_encrypted           = true
   apply_immediately           = true
-  snapshot_identifier         = var.rds_snapshot_arn
+  # snapshot_identifier         = var.rds_snapshot_arn
   kms_key_id                  = var.rds_kms_key_arn
   tags = merge(
     var.tags,
