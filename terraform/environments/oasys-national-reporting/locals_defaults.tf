@@ -1,0 +1,119 @@
+locals {
+
+  ec2_cloudwatch_metric_alarms = {
+    web = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    )
+    boe = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    )
+    bods = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+    )
+    onr_db = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+    )
+  }
+
+  defaults_ec2 = {
+    config = merge(module.baseline_presets.ec2_instance.config.default, {
+      ami_owner                     = "self"
+      ebs_volumes_copy_all_from_ami = false
+    })
+    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      disable_api_termination = false # TODO: change this later when instances are live
+      disable_api_stop        = false # TODO: agree this setting with the nart team
+      monitoring              = false # TODO: change this later when instances are live
+      tags = {
+        backup-plan         = "daily-and-weekly"
+        instance-scheduling = "skip-scheduling"
+      }
+    })
+    # user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ansible
+  }
+
+  defaults_web_ec2 = merge(local.defaults_ec2, {
+    # config = merge(local.defaults_ec2.config, {
+    #   ami_name = "" FIXME: needs adding
+    # })
+    instance = merge(local.defaults_ec2.instance, {
+      vpc_security_group_ids = ["web"]
+    })
+    tags = {
+        os-type   = "Linux"
+        component = "onr_web"
+    }
+    # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.web off for now
+  })
+
+  defaults_boe_ec2 = merge(local.defaults_ec2, {
+    # config = merge(local.defaults_ec2.config, {
+    #   # ami_name = "" FIXME: needs adding
+    # })
+    instance = merge(local.defaults_ec2.instance, {
+      vpc_security_group_ids = ["boe", "oasys_db"]
+    })
+    # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.boe off for now
+    tags = {
+      os-type   = "Linux"
+      component = "onr_boe"
+    }
+  })
+
+  defaults_bods_ec2 = merge(local.defaults_ec2, {
+    config = merge(local.defaults_ec2.config, {
+      ami_name = "hmpps_windows_server_2019_release_*"
+    })
+    instance = merge(local.defaults_ec2.instance, {
+      vpc_security_group_ids = ["bods", "oasys_db"]
+    })
+    # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.bods off for now
+    tags = {
+      os-type   = "Windows"
+      component = "onr_bods"
+    }
+  })
+
+  defaults_onr_db_ec2 = merge(local.defaults_ec2, {
+    # config = merge(local.defaults_ec2.config, {
+    #   ami_name = "" FIXME: needs adding
+    # })
+    instance = merge(local.defaults_ec2.instance, {
+      disable_api_stop       = false
+      vpc_security_group_ids = ["onr_db", "oasys_db_onr_db"]
+    })
+    # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
+    ebs_volumes = {
+      "/dev/sdb" = { label = "app" }   # /u01
+      "/dev/sdc" = { label = "app" }   # /u02
+      "/dev/sde" = { label = "data" }  # DATA01
+      "/dev/sdf" = { label = "data" }  # DATA02
+      "/dev/sdg" = { label = "data" }  # DATA03
+      "/dev/sdh" = { label = "data" }  # DATA04
+      "/dev/sdi" = { label = "data" }  # DATA05
+      "/dev/sdj" = { label = "flash" } # FLASH01
+      "/dev/sdk" = { label = "flash" } # FLASH02
+      "/dev/sds" = { label = "swap" }
+    }
+    ebs_volume_config = {
+      data = {
+        iops       = 5000
+        throughput = 200
+      }
+      flash = {
+        iops       = 5000
+        throughput = 200
+      }
+    }
+    # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.onr_db off for now
+    tags = {
+      os-type   = "Windows"
+      component = "onr_db"
+    }
+    route53_records      = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+  })
+}
