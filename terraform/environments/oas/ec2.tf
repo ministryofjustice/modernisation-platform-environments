@@ -312,7 +312,7 @@ resource "aws_ebs_volume" "EC2ServerVolumeSTAGE" {
 
 resource "aws_volume_attachment" "oas_EC2ServerVolume02" {
   device_name = "/dev/sdc"
-  volume_id   = aws_ebs_volume.EC2ServerVolumeORAHOME.id
+  volume_id   = aws_ebs_volume.EC2ServerVolumeSTAGE.id
   instance_id = aws_instance.oas_app_instance.id
 }
 
