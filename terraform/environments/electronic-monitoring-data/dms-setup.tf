@@ -30,9 +30,9 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
 
 resource "aws_dms_replication_instance" "rds_connection" {
     replication_instance_id = "rds-conn"
-    replication_instance_class = "dms.r5.large"
-    allocated_storage           = 1000
-    engine_version              = "3.4.4"
+    replication_instance_class = "dms.t2.micro"
+    allocated_storage           = 20
+    engine_version              = "3.1.4"
     replication_subnet_group_id = aws_dms_replication_subnet_group.rds_subnets.id
     vpc_security_group_ids = [aws_security_group.db.id]
     depends_on = [
