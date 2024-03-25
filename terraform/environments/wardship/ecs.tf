@@ -167,7 +167,7 @@ resource "aws_ecs_service" "wardship_ecs_service" {
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
     security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -198,7 +198,7 @@ resource "aws_ecs_service" "wardship_ecs_service_dev" {
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
     security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -508,30 +508,32 @@ module "pagerduty_core_alerts_prod" {
 #   subnet_id = data.aws_subnets.shared-private.ids[0]
 # }
 
-resource "aws_vpc_endpoint" "ecr_dkr" {
-  vpc_id              = data.aws_vpc.shared.id
-  service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
+//VPC endpoint stuff:
 
-  security_group_ids = [aws_security_group.ecs_service.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
+# resource "aws_vpc_endpoint" "ecr_dkr" {
+#   vpc_id              = data.aws_vpc.shared.id
+#   service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
+#   vpc_endpoint_type   = "Interface"
+#   private_dns_enabled = true
 
-resource "aws_vpc_endpoint" "ecr_api" {
-  vpc_id              = data.aws_vpc.shared.id
-  service_name        = "com.amazonaws.eu-west-2.ecr.api"
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
+#   security_group_ids = [aws_security_group.ecs_service.id]
+#   subnet_ids         = data.aws_subnets.shared-private.ids
+# }
 
-  security_group_ids = [aws_security_group.ecs_service.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
+# resource "aws_vpc_endpoint" "ecr_api" {
+#   vpc_id              = data.aws_vpc.shared.id
+#   service_name        = "com.amazonaws.eu-west-2.ecr.api"
+#   vpc_endpoint_type   = "Interface"
+#   private_dns_enabled = true
 
-resource "aws_vpc_endpoint" "s3" {
-  vpc_id            = data.aws_vpc.shared.id
-  service_name      = "com.amazonaws.eu-west-2.s3"
-  vpc_endpoint_type = "Gateway"
+#   security_group_ids = [aws_security_group.ecs_service.id]
+#   subnet_ids         = data.aws_subnets.shared-private.ids
+# }
 
-  route_table_ids = data.aws_subnets.shared-private.ids
-}
+# resource "aws_vpc_endpoint" "s3" {
+#   vpc_id            = data.aws_vpc.shared.id
+#   service_name      = "com.amazonaws.eu-west-2.s3"
+#   vpc_endpoint_type = "Gateway"
+
+#   route_table_ids = data.aws_subnets.shared-private.ids
+# }
