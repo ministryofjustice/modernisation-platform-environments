@@ -542,5 +542,5 @@ resource "aws_vpc_endpoint" "s3" {
   service_name      = "com.amazonaws.eu-west-2.s3"
   vpc_endpoint_type = "Gateway"
 
-  route_table_ids = data.aws_route_table.default_rt.id
+  route_table_ids = [data.aws_route_table.default_rt.id]
 }
