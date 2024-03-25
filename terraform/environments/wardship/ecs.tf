@@ -318,10 +318,18 @@ resource "aws_security_group" "ecs_service" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port       = 32768
-    to_port         = 61000
+    from_port       = 80
+    to_port         = 80
     protocol        = "tcp"
-    description     = "Allow traffic from load balancer on a range of ports"
+    description     = "Allow traffic on port 80 from load balancer"
+    security_groups = [aws_security_group.wardship_lb_sc.id]
+  }
+
+  ingress {
+    from_port       = 8090
+    to_port         = 8090
+    protocol        = "tcp"
+    description     = "Allow traffic on port 8090 from load balancer"
     security_groups = [aws_security_group.wardship_lb_sc.id]
   }
 
