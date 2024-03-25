@@ -32,6 +32,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
       cpu       = 1024
       memory    = 2048
       essential = true
+      ReadonlyRootFilesystem = true
       logConfiguration = {
         logDriver = "awslogs",
         options = {
