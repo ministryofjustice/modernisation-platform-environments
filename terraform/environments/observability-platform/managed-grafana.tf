@@ -50,3 +50,16 @@ resource "grafana_data_source" "observability_platform_prometheus" {
     sigV4Region   = "eu-west-2"
   })
 }
+
+/* GitHub Source */
+resource "grafana_data_source" "github" {
+  type = "grafana-github-datasource"
+  name = "ministryofjustice-github"
+  url  = module.managed_prometheus.workspace_prometheus_endpoint
+  json_data_encoded = jsonencode({
+    owner = "ministryofjustice"
+  })
+  secure_json_data_encoded = jsonencode({
+    accessToken = aws_secretsmanager_secret.github_token.secret_string
+  })
+}
