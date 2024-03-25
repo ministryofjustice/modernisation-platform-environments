@@ -11,6 +11,11 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
   retention_in_days = "7"
 }
 
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name              = "wardship-ecs"
+  retention_in_days = "7"
+}
+
 resource "aws_ecs_task_definition" "wardship_task_definition" {
   count                    = local.is-development ? 0 : 1
   family                   = "wardshipFamily"
@@ -27,6 +32,14 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
       cpu       = 1024
       memory    = 2048
       essential = true
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name,
+          "awslogs-region"        = "eu-west-2",
+          "awslogs-stream-prefix" = "wardship-app"
+        }
+      },
       portMappings = [
         {
           containerPort = 80
