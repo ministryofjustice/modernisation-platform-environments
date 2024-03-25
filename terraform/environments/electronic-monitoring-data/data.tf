@@ -21,3 +21,14 @@ data "aws_iam_policy_document" "lambda_assume_role" {
     actions = ["sts:AssumeRole"]
   }
 }
+
+data "aws_iam_policy_document" "dms_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      identifiers = ["dms.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
