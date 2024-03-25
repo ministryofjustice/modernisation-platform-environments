@@ -309,29 +309,29 @@ resource "aws_volume_attachment" "oas_EC2ServerVolume01" {
   instance_id = aws_instance.oas_app_instance.id
 }
 
-resource "aws_ebs_volume" "EC2ServerVolumeSTAGE" {
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].stageesize
-  type              = "gp3"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].stage_snapshot
+# resource "aws_ebs_volume" "EC2ServerVolumeSTAGE" {
+#   availability_zone = "eu-west-2a"
+#   size              = local.application_data.accounts[local.environment].stageesize
+#   type              = "gp3"
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   snapshot_id       = local.application_data.accounts[local.environment].stage_snapshot
 
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
 
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-EC2ServerVolumeSTAGE" },
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-EC2ServerVolumeSTAGE" },
+#   )
+# }
 
-resource "aws_volume_attachment" "oas_EC2ServerVolume02" {
-  device_name = "/dev/sdc"
-  volume_id   = aws_ebs_volume.EC2ServerVolumeSTAGE.id
-  instance_id = aws_instance.oas_app_instance.id
-}
+# resource "aws_volume_attachment" "oas_EC2ServerVolume02" {
+#   device_name = "/dev/sdc"
+#   volume_id   = aws_ebs_volume.EC2ServerVolumeSTAGE.id
+#   instance_id = aws_instance.oas_app_instance.id
+# }
 
 resource "aws_route53_record" "oas-app" {
   provider = aws.core-vpc
