@@ -509,8 +509,16 @@ module "pagerduty_core_alerts_prod" {
 # }
 
 //VPC endpoint stuff:
+data "aws_vpc" "default_vpc" {
+  default = true
+}
+
+data "aws_route_table" "default_rt" {
+  vpc_id = data.aws_vpc.default_vpc.id
+}
+
 resource "aws_vpc_endpoint" "ecr_dkr" {
-  vpc_id              = data.aws_vpc.shared.id
+  vpc_id              = data.aws_vpc.default_vpc.id
   service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
@@ -520,7 +528,7 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
 }
 
 resource "aws_vpc_endpoint" "ecr_api" {
-  vpc_id              = data.aws_vpc.shared.id
+  vpc_id              = data.aws_vpc.default_vpc.id
   service_name        = "com.amazonaws.eu-west-2.ecr.api"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
@@ -530,9 +538,9 @@ resource "aws_vpc_endpoint" "ecr_api" {
 }
 
 resource "aws_vpc_endpoint" "s3" {
-  vpc_id            = data.aws_vpc.shared.id
+  vpc_id            = data.aws_vpc.default_vpc.id
   service_name      = "com.amazonaws.eu-west-2.s3"
   vpc_endpoint_type = "Gateway"
 
-  route_table_ids = data.aws_subnets.shared-private.ids
+  route_table_ids = data.aws_route_table.default_rt.id
 }
