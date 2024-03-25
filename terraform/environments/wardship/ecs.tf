@@ -196,7 +196,7 @@ resource "aws_ecs_service" "wardship_ecs_service_dev" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = false
   }
