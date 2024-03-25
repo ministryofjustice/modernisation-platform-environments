@@ -25,7 +25,7 @@ resource "aws_iam_role" "dms-vpc" {
 
 resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
-  role       = aws_iam_role.dms-vpc-role.name
+  role       = aws_iam_role.dms-vpc.name
 }
 
 resource "aws_dms_replication_instance" "rds_connection" {
