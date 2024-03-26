@@ -274,12 +274,6 @@ locals {
 
     baseline_ec2_instances = {
 
-      # SDPDL0001 Standard DS12 v2 (4 vcpus, 28 GiB memory)  [18GiB free] [3 x 512] [r6i.xlarge 4/32]
-      # SDPWL0001 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL6) [t2.large  2/8]
-      # SDPWL0002 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL6) [t2.large]
-      # SDPWL0003 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL6) [t2.large]
-      # SDPNL0001 Standard D2 v2 (2 vcpus, 7 GiB memory) (RHEL7) [t3.medium]
-
       dev-nomis-db-1-a = merge(local.database_ec2, {
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -364,34 +358,34 @@ locals {
         })
       })
 
-      # qa11r-nomis-web-a = merge(local.weblogic_ec2, {
-      #   cloudwatch_metric_alarms = {}
-      #   config = merge(local.weblogic_ec2.config, {
-      #     availability_zone = "${local.region}a"
-      #     instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-      #       "Ec2Qa11RWeblogicPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.weblogic_ec2.instance, {
-      #     instance_type = "t2.large"
-      #     tags = {
-      #       backup-plan = "daily-and-weekly"
-      #     }
-      #   })
-      #   route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
-      #   user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
-      #     args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-      #       branch = "main"
-      #     })
-      #   })
-      #   tags = merge(local.weblogic_ec2.tags, {
-      #     instance-scheduling  = "skip-scheduling"
-      #     nomis-environment    = "qa11r"
-      #     oracle-db-hostname-a = "dev-nomis-db-1-a"
-      #     oracle-db-hostname-b = "none"
-      #     oracle-db-name       = "qa11r"
-      #   })
-      # })
+      qa11r-nomis-web-a = merge(local.weblogic_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
+        })
+        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          instance-scheduling  = "skip-scheduling"
+          nomis-environment    = "qa11r"
+          oracle-db-hostname-a = "dev-nomis-db-1-a"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "qa11r"
+        })
+      })
 
       dev-nomis-build-a = {
         cloudwatch_metric_alarms = {}
@@ -451,11 +445,11 @@ locals {
               { ec2_instance_name = "qa11g-nomis-web-a" },
             ]
           })
-          # qa11r-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
-          #   attachments = [
-          #     { ec2_instance_name = "qa11r-nomis-web-a" },
-          #   ]
-          # })
+          qa11r-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
+            attachments = [
+              { ec2_instance_name = "qa11r-nomis-web-a" },
+            ]
+          })
         }
 
         listeners = {
@@ -493,21 +487,21 @@ locals {
                   }
                 }]
               }
-              # qa11r-nomis-web-a-http-7777 = {
-              #   priority = 300
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "qa11r-nomis-web-a-http-7777"
-              #   }]
-              #   conditions = [{
-              #     host_header = {
-              #       values = [
-              #         "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
-              #         "c-qa11r.development.nomis.service.justice.gov.uk",
-              #       ]
-              #     }
-              #   }]
-              # }
+              qa11r-nomis-web-a-http-7777 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "qa11r-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
+                      "c-qa11r.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
