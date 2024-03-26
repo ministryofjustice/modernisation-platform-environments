@@ -1,4 +1,5 @@
 resource "aws_db_instance" "pra_db" {
+  count                       = local.is-development ? 0 : 1
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
   db_name                     = local.application_data.accounts[local.environment].db_name
   storage_type                = local.application_data.accounts[local.environment].storage_type
