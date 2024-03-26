@@ -77,8 +77,8 @@ module "pwm" {
   target_group_protocol_version     = "HTTP1"
   health_check_grace_period_seconds = 10
 
-  container_cpu                      = 1024
-  container_memory                   = 2048
+  container_cpu                      = var.delius_microservice_configs.pwm.container_cpu
+  container_memory                   = var.delius_microservice_configs.pwm.container_memory
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
 
