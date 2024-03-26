@@ -144,6 +144,7 @@ resource "aws_cloudwatch_log_group" "rds_logs" {
 
 # AWS EventBridge rule for RDS events
 resource "aws_cloudwatch_event_rule" "rds_events" {
+  count       = local.is-development ? 0 : 1
   name        = "rds-events"
   description = "Capture all RDS events"
 
@@ -151,7 +152,7 @@ resource "aws_cloudwatch_event_rule" "rds_events" {
     "source" : ["aws.rds"],
     "detail" : {
       "eventSource" : ["db-instance"],
-      "resources" : [aws_db_instance.dacp_db.arn]
+      "resources" : [aws_db_instance.dacp_db[0].arn]
     }
   })
 }
@@ -159,7 +160,8 @@ resource "aws_cloudwatch_event_rule" "rds_events" {
 # AWS EventBridge target for RDS events
 resource "aws_cloudwatch_event_target" "rds_logs" {
   depends_on = [aws_cloudwatch_log_group.rds_logs]
-  rule       = aws_cloudwatch_event_rule.rds_events.name
+  count      = local.is-development ? 0 : 1
+  rule       = aws_cloudwatch_event_rule.rds_events[0].name
   target_id  = "send-to-cloudwatch"
   arn        = aws_cloudwatch_log_group.rds_logs.arn
 }
@@ -178,6 +180,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_connections_alarm" {
   alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.dacp_db.identifier
+    DBInstanceIdentifier = aws_db_instance.dacp_db[0].identifier
   }
 }
