@@ -1,3 +1,9 @@
+variable "environment" {
+  # tflint-ignore: terraform_typed_variables
+  # Not defining 'type' as it is defined in the output of the environment module
+  description = "Standard environmental data resources from the environment module"
+}
+
 variable "source_account_ids" {
   type    = list(string)
   default = ["612659970365", "546088120047"] #nomis-test and oasys-test
