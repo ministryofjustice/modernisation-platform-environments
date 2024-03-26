@@ -38,7 +38,7 @@ locals {
 
   defaults_web_ec2 = merge(local.defaults_ec2, {
     config = merge(local.defaults_ec2.config, {
-      ami_name = "base_rhel_7.9_*"
+      ami_name = "base_rhel_7_9_*"
     })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["web"]
@@ -46,6 +46,10 @@ locals {
     tags = {
         os-type   = "Linux"
         component = "onr_web"
+    }
+    # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
+    ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
     }
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.web off for now
   })
@@ -63,6 +67,10 @@ locals {
       os-type   = "Linux"
       component = "onr_boe"
     }
+    # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
+    ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+    }
   })
 
   defaults_bods_ec2 = merge(local.defaults_ec2, {
@@ -77,11 +85,15 @@ locals {
       os-type   = "Windows"
       component = "onr_bods"
     }
+    # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
+    ebs_volumes = {
+      "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+    }
   })
 
   defaults_onr_db_ec2 = merge(local.defaults_ec2, {
     config = merge(local.defaults_ec2.config, {
-      ami_name = "base_rhel_7.9_*"
+      ami_name = "base_rhel_7_9_*"
     })
     instance = merge(local.defaults_ec2.instance, {
       disable_api_stop       = false
@@ -102,11 +114,11 @@ locals {
     }
     ebs_volume_config = {
       data = {
-        iops       = 5000
+        iops       = 5000 # confirmed, by looking at Azure
         throughput = 200
       }
       flash = {
-        iops       = 5000
+        iops       = 5000 # confirmed, by looking at Azure
         throughput = 200
       }
     }
