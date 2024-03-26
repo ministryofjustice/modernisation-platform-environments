@@ -329,7 +329,7 @@ locals {
         tags = merge(local.weblogic_ec2.tags, {
           instance-scheduling  = "skip-scheduling"
           nomis-environment    = "dev"
-          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
+          oracle-db-hostname-a = "dev-nomis-db-1-a"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "dev"
         })
@@ -358,40 +358,40 @@ locals {
         tags = merge(local.weblogic_ec2.tags, {
           instance-scheduling  = "skip-scheduling"
           nomis-environment    = "qa11g"
-          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
+          oracle-db-hostname-a = "dev-nomis-db-1-a"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa11g"
         })
       })
 
-      qa11r-nomis-web-a = merge(local.weblogic_ec2, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.weblogic_ec2.config, {
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-            "Ec2Qa11RWeblogicPolicy",
-          ])
-        })
-        instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
-          tags = {
-            backup-plan = "daily-and-weekly"
-          }
-        })
-        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
-        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
-          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.weblogic_ec2.tags, {
-          instance-scheduling  = "skip-scheduling"
-          nomis-environment    = "qa11r"
-          oracle-db-hostname-a = "SDPDL0001.azure.noms.root"
-          oracle-db-hostname-b = "none"
-          oracle-db-name       = "qa11r"
-        })
-      })
+      # qa11r-nomis-web-a = merge(local.weblogic_ec2, {
+      #   cloudwatch_metric_alarms = {}
+      #   config = merge(local.weblogic_ec2.config, {
+      #     availability_zone = "${local.region}a"
+      #     instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+      #       "Ec2Qa11RWeblogicPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.weblogic_ec2.instance, {
+      #     instance_type = "t2.large"
+      #     tags = {
+      #       backup-plan = "daily-and-weekly"
+      #     }
+      #   })
+      #   route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+      #   user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+      #     args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+      #       branch = "main"
+      #     })
+      #   })
+      #   tags = merge(local.weblogic_ec2.tags, {
+      #     instance-scheduling  = "skip-scheduling"
+      #     nomis-environment    = "qa11r"
+      #     oracle-db-hostname-a = "dev-nomis-db-1-a"
+      #     oracle-db-hostname-b = "none"
+      #     oracle-db-name       = "qa11r"
+      #   })
+      # })
 
       dev-nomis-build-a = {
         cloudwatch_metric_alarms = {}
@@ -451,11 +451,11 @@ locals {
               { ec2_instance_name = "qa11g-nomis-web-a" },
             ]
           })
-          qa11r-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
-            attachments = [
-              { ec2_instance_name = "qa11r-nomis-web-a" },
-            ]
-          })
+          # qa11r-nomis-web-a-http-7777 = merge(local.weblogic_target_group_http_7777, {
+          #   attachments = [
+          #     { ec2_instance_name = "qa11r-nomis-web-a" },
+          #   ]
+          # })
         }
 
         listeners = {
@@ -493,21 +493,21 @@ locals {
                   }
                 }]
               }
-              qa11r-nomis-web-a-http-7777 = {
-                priority = 300
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "qa11r-nomis-web-a-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
-                      "c-qa11r.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              # qa11r-nomis-web-a-http-7777 = {
+              #   priority = 300
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "qa11r-nomis-web-a-http-7777"
+              #   }]
+              #   conditions = [{
+              #     host_header = {
+              #       values = [
+              #         "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk",
+              #         "c-qa11r.development.nomis.service.justice.gov.uk",
+              #       ]
+              #     }
+              #   }]
+              # }
             }
           })
         }
@@ -526,15 +526,9 @@ locals {
       "development.nomis.service.justice.gov.uk" = {
         records = [
           # SYSCON
-          { name = "dev", type = "CNAME", ttl = "300", records = ["dev-a.development.nomis.service.justice.gov.uk"] },
-          { name = "dev-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
-          { name = "dev-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
-          { name = "qa11g", type = "CNAME", ttl = "300", records = ["qa11g-a.development.nomis.service.justice.gov.uk"] },
-          { name = "qa11g-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
-          { name = "qa11g-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
-          { name = "qa11r", type = "CNAME", ttl = "300", records = ["qa11r-a.development.nomis.service.justice.gov.uk"] },
-          { name = "qa11r-a", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
-          { name = "qa11r-b", type = "CNAME", ttl = "300", records = ["SDPDL0001.azure.noms.root"] },
+          { name = "dev", type = "CNAME", ttl = "300", records = ["dev-nomis-db-1-a.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk"] },
+          { name = "qa11g", type = "CNAME", ttl = "300", records = ["dev-nomis-db-1-a.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk"] },
+          { name = "qa11r", type = "CNAME", ttl = "300", records = ["dev-nomis-db-1-a.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           # dev
