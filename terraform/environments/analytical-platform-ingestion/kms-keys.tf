@@ -46,40 +46,31 @@ module "s3_definitions_kms" {
   deletion_window_in_days = 7
 }
 
-data "aws_iam_policy_document" "s3_bold_egress_kms_policy" {
-  statement {
-    sid     = "Default"
-    effect  = "Allow"
-    actions = ["kms:*"]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-  }
-  statement {
-    sid = "AllowAnalyticalPlatformDataEngineeringProduction"
-    actions = [
-      "kms:Decrypt",
-      "kms:GenerateDataKey"
-    ]
-    resources = ["*"]
-    effect    = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::593291632749:role/mojap-data-production-bold-egress-${local.environment}"]
-    }
-  }
-}
-
 module "s3_bold_egress_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
   version = "2.2.1"
 
-  aliases     = ["s3/bold_egress"]
-  description = "Used in the Bold Egress Solution"
-  policy      = data.aws_iam_policy_document.s3_bold_egress_kms_policy.json
-
+  aliases               = ["s3/bold_egress"]
+  description           = "Used in the Bold Egress Solution"
+  enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowAnalyticalPlatformDataEngineeringProduction"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::593291632749:role/mojap-data-production-bold-egress-${local.environment}"]
+        }
+      ]
+    }
+  ]
   deletion_window_in_days = 7
 }
 
