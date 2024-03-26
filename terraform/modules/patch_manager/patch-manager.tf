@@ -72,6 +72,15 @@ resource "aws_ssm_maintenance_window_task" "this" {
         values = ["RebootIfNeeded"]
       }
 
+      dynamic "parameter" {
+        for_each = var.environment == "development" ? [1] : []
+        content {
+          # Extract successful patches after development gets patched
+          name   = "PostInstallHookDocName"
+          values = [aws_ssm_document.extract-upload-patches[0].arn]
+        }
+      }
+
       # All non-development environments pull patch list from development
       dynamic "parameter" {
         for_each = var.environment != "development" && var.operating_system == "WINDOWS" ? [1] : []
