@@ -34,7 +34,6 @@ module "quarantine_bucket" {
   }
 }
 
-
 module "definitions_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
@@ -53,8 +52,6 @@ module "definitions_bucket" {
   }
 }
 
-
-
 module "processed_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
@@ -62,6 +59,25 @@ module "processed_bucket" {
   bucket = "mojap-ingestion-${local.environment}-processed"
   # TODO: Is this needed below?
   force_destroy = true
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.s3_processed_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+}
+
+module "download_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.1.0"
+
+  bucket = "mojap-ingestion-${local.environment}-download"
+  # TODO: Is this needed below?
+  force_destroy = true
+  policy = data.aws_iam_policy_document.s3_download_kms_policy.json
 
   server_side_encryption_configuration = {
     rule = {

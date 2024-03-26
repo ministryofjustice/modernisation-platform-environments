@@ -46,6 +46,18 @@ module "s3_definitions_kms" {
   deletion_window_in_days = 7
 }
 
+module "s3_download_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/kms/aws"
+  version = "2.2.1"
+
+  aliases               = ["s3/download"]
+  description           = "Used in the download S3 object"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
+
 module "sns_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
