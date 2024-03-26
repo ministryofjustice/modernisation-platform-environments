@@ -10,9 +10,9 @@ resource "aws_ssm_default_patch_baseline" "this" {
 }
 
 resource "aws_ssm_maintenance_window" "this" {
-  name        = "${var.application}-${var.environment}-maintenance-window"
+  name        = "${var.application}-${var.environment}-${local.os}-maintenance-window"
   schedule    = var.schedule
-  description = "Maintenance window for ${var.application}-${var.environment}"
+  description = "${var.application}-${var.environment}-${local.os} maintenance window"
   duration    = 3
   cutoff      = 1
 }
@@ -20,7 +20,7 @@ resource "aws_ssm_maintenance_window" "this" {
 resource "aws_ssm_maintenance_window_target" "this" {
   window_id     = aws_ssm_maintenance_window.this.id
   resource_type = "INSTANCE"
-  description   = "${var.application}-${var.environment} target"
+  description   = "${var.application}-${var.environment}-${local.os} target"
 
   targets {
     key    = "tag:${keys(var.target_tag)[0]}"
@@ -29,12 +29,12 @@ resource "aws_ssm_maintenance_window_target" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  name              = "${var.application}-${var.environment}-patch-logs"
+  name              = "${var.application}-${var.environment}-${local.os}-patch-logs"
   retention_in_days = 30
 }
 
 resource "aws_ssm_maintenance_window_task" "this" {
-  description = "Maintenance window task for ${var.application}-${var.environment}"
+  description = "Patching task for ${var.application}-${var.environment}-${local.os}"
   task_type   = "RUN_COMMAND"
   # Only development uses AWS-RunPatchBaselineWithHooks to trigger post patching jobs and you can't use this task
   # when specifying exact patches so the environments will run the standard AWS-RunPatchBaseline task
@@ -72,21 +72,20 @@ resource "aws_ssm_maintenance_window_task" "this" {
         values = ["RebootIfNeeded"]
       }
 
+      # All non-development environments pull patch list from development
       dynamic "parameter" {
-        for_each = var.environment == "development" ? [1] : []
+        for_each = var.environment != "development" && var.operating_system == "WINDOWS" ? [1] : []
         content {
-          # Extract successful patches after development gets patched
-          name   = "PostInstallHookDocName"
-          values = [aws_ssm_document.extract-upload-patches[0].arn]
+          name   = "InstallOverrideList"
+          values = ["s3://${var.application}-development-${local.os}/WindowsServer2022DatacenterPatches.yaml"]
         }
       }
 
       dynamic "parameter" {
-        for_each = var.environment != "development" ? [1] : []
+        for_each = var.environment != "development" && var.operating_system == "REDHAT_ENTERPRISE_LINUX" ? [1] : []
         content {
-          # All non-development environments pull patch list from development
           name   = "InstallOverrideList"
-          values = ["s3://${var.application}-development-patch-logs/windows/WindowsServer2022DatacenterPatches.yaml"]
+          values = ["s3://${var.application}-development-${local.os}/RedHatEnterpriseLinux89OotpaPatches.yaml"]
         }
       }
     }

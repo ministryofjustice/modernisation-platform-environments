@@ -87,6 +87,32 @@ locals {
           component   = "test"
         }
       }
+
+      test-rhel85 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "base_rhel_8_5*"
+          availability_zone         = null
+          instance_profile_policies = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["rds-ec2s"]
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "main"
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description = "RHEL8.5"
+          ami         = "hmpps_rhel_8_5"
+          os-type     = "Linux"
+          component   = "test"
+        }
+      }
     }
 
     baseline_ec2_instances = {
