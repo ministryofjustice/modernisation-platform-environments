@@ -21,7 +21,6 @@ locals {
     enable_ec2_self_provision                    = true
     enable_ec2_oracle_enterprise_managed_server  = true
     enable_ec2_user_keypair                      = true
-    cloudwatch_metric_alarms_default_actions     = ["csr_pagerduty"]
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
