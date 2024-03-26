@@ -85,7 +85,7 @@ data "aws_iam_policy_document" "bold_egress_bucket_policy" {
       "s3:ReplicateTags",
       "s3:ReplicateDelete"
     ]
-    resources = ["${module.bold_egress_bucket.s3_bucket_arn}/*"]
+    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-bold-egress/*"]
   }
 }
 
