@@ -58,7 +58,7 @@ module "s3_bold_egress_kms" {
     {
       sid = "AllowAnalyticalPlatformDataEngineeringProduction"
       actions = [
-        "kms:Decrypt",
+        "kms:Encrypt",
         "kms:GenerateDataKey"
       ]
       resources = ["*"]
