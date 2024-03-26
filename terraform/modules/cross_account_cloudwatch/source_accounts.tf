@@ -1,6 +1,6 @@
 resource "aws_oam_link" "source_account_oam_link" {
   count           = var.options.enable_cloudwatch_cross_account_sharing ? 1 : 0
-  label_template  = "nomis"
+  label_template  = var.environment.application_name
   resource_types  = ["AWS::CloudWatch::Metric"]
   sink_identifier = var.monitoring_account_sink_identifier
 }

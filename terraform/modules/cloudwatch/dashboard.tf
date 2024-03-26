@@ -203,6 +203,9 @@ locals {
         rowsPerPage   = 50
         widgetsPerRow = 2
       }
+      labels = [
+        { key : "application", value : "${var.environment.application_name}" }
+      ]
       metrics = [
         {
           "metricName" : "VolumeReadBytes",
