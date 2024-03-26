@@ -10,7 +10,7 @@ module "development" {
   source                  = "./modules/"
   application             = "hmpps-domain-services"
   environment             = "development"
-  predefined_baseline     = AWS-WindowsPredefinedPatchBaseline-OS-Applications"
+  predefined_baseline     = "AWS-WindowsPredefinedPatchBaseline-OS-Applications"
   operating_system        = "WINDOWS"
   # Second Tuesday of the month at 9pm UTC
   schedule                = "cron(0 21 ? * TUE#2 *)"
