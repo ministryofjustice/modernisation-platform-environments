@@ -70,14 +70,14 @@ module "processed_bucket" {
   }
 }
 
-module "download_bucket" {
+module "bold_egress_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
-  bucket = "mojap-ingestion-${local.environment}-download"
+  bucket = "mojap-ingestion-${local.environment}-bold-egress"
   # TODO: Is this needed below?
   force_destroy = true
-  policy = data.aws_iam_policy_document.s3_download_kms_policy.json
+  policy = data.aws_iam_policy_document.s3_bold_egress_s3_policy.json
 
   server_side_encryption_configuration = {
     rule = {
