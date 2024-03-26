@@ -415,11 +415,12 @@ locals {
           })
         })
         tags = {
-          description = "Syscon build and release server"
-          ami         = "base_rhel_7_9"
-          os-type     = "Linux"
-          component   = "build"
-          server-type = "nomis-build"
+          description         = "Syscon build and release server"
+          ami                 = "base_rhel_7_9"
+          instance-scheduling = "skip-scheduling"
+          os-type             = "Linux"
+          component           = "build"
+          server-type         = "nomis-build"
         }
       }
     }
