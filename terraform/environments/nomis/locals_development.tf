@@ -2,9 +2,7 @@
 locals {
 
   # cloudwatch monitoring config
-  development_cloudwatch_monitoring_options = {
-    enable_hmpps-oem_monitoring = false
-  }
+  development_cloudwatch_monitoring_options = {}
 
   # baseline presets config
   development_baseline_presets_options = {
