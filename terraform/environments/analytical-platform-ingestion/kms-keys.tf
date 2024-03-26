@@ -51,7 +51,7 @@ module "s3_bold_egress_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "2.2.1"
 
-  aliases               = ["s3/bold_egress"]
+  aliases               = ["s3/bold-egress"]
   description           = "Used in the Bold Egress Solution"
   enable_default_policy = true
   key_statements = [
