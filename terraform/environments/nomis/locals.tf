@@ -187,5 +187,11 @@ locals {
     production    = local.production_cloudwatch_monitoring_options
   }
 
-  cloudwatch_monitoring_options = local.environment_cloudwatch_monitoring_options[local.environment]
+  cloudwatch_local_environment_monitoring_options = local.environment_cloudwatch_monitoring_options[local.environment]
+
+  cloudwatch_monitoring_options = {
+    enable_cloudwatch_monitoring_account    = false
+    enable_cloudwatch_cross_account_sharing = false
+    enable_cloudwatch_dashboard             = false
+  }
 }
