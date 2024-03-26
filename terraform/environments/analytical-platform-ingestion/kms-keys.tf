@@ -76,10 +76,9 @@ module "s3_bold_egress_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "2.2.1"
 
-  aliases               = ["s3/bold_egress"]
-  description           = "Used in the Bold Egress Solution"
-  enable_default_policy = true
-  policy                = data.aws_iam_policy_document.s3_bold_egress_kms_policy.json
+  aliases     = ["s3/bold_egress"]
+  description = "Used in the Bold Egress Solution"
+  policy      = data.aws_iam_policy_document.s3_bold_egress_kms_policy.json
 
   deletion_window_in_days = 7
 }
