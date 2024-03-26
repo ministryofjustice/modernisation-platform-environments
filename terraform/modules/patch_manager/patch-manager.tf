@@ -74,7 +74,7 @@ resource "aws_ssm_maintenance_window_task" "this" {
 
       # All non-development environments pull patch list from development
       dynamic "parameter" {
-        for_each = var.environment != "development"&& var.operating_system == "WINDOWS" ? [1] : []
+        for_each = var.environment != "development" && var.operating_system == "WINDOWS" ? [1] : []
         content {
           name   = "InstallOverrideList"
           values = ["s3://${var.application}-development-${local.os}/WindowsServer2022DatacenterPatches.yaml"]
