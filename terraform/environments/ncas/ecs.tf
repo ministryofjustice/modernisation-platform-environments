@@ -11,6 +11,11 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
   retention_in_days = "7"
 }
 
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name              = "ncas-ecs"
+  retention_in_days = "7"
+}
+
 resource "aws_ecs_task_definition" "ncas_task_definition" {
   count                    = local.is-development ? 0 : 1
   family                   = "ncasFamily"
@@ -27,6 +32,15 @@ resource "aws_ecs_task_definition" "ncas_task_definition" {
       cpu       = 1024
       memory    = 2048
       essential = true
+      ReadonlyRootFilesystem = true
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name,
+          "awslogs-region"        = "eu-west-2",
+          "awslogs-stream-prefix" = "ncas-app"
+        }
+      },
       portMappings = [
         {
           containerPort = 80
@@ -93,6 +107,15 @@ resource "aws_ecs_task_definition" "ncas_task_definition_dev" {
       cpu       = 1024
       memory    = 2048
       essential = true
+      ReadonlyRootFilesystem = true
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name,
+          "awslogs-region"        = "eu-west-2",
+          "awslogs-stream-prefix" = "ncas-app"
+        }
+      },
       portMappings = [
         {
           containerPort = 80
@@ -156,7 +179,7 @@ resource "aws_ecs_service" "ncas_ecs_service" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = true
   }
@@ -187,7 +210,7 @@ resource "aws_ecs_service" "ncas_ecs_service_dev" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = true
   }
