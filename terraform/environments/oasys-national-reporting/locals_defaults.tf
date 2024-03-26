@@ -37,9 +37,9 @@ locals {
   }
 
   defaults_web_ec2 = merge(local.defaults_ec2, {
-    # config = merge(local.defaults_ec2.config, {
-    #   ami_name = "" FIXME: needs adding
-    # })
+    config = merge(local.defaults_ec2.config, {
+      ami_name = "base_rhel_7.9_*"
+    })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["web"]
     })
@@ -79,9 +79,9 @@ locals {
   })
 
   defaults_onr_db_ec2 = merge(local.defaults_ec2, {
-    # config = merge(local.defaults_ec2.config, {
-    #   ami_name = "" FIXME: needs adding
-    # })
+    config = merge(local.defaults_ec2.config, {
+      ami_name = "base_rhel_7.9_*"
+    })
     instance = merge(local.defaults_ec2.instance, {
       disable_api_stop       = false
       vpc_security_group_ids = ["onr_db", "oasys_db_onr_db"]
