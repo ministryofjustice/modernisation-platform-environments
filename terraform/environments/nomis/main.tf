@@ -170,10 +170,16 @@ module "baseline" {
 
 module "cross_account_cloudwatch" {
   source  = "../../modules/cross_account_cloudwatch"
-  options = "local.cloudwatch_monitoring_options"
+  options = merge(
+    local.cloudwatch_monitoring_options,
+    local.cloudwatch_local_environment_monitoring_options,
+  )
 }
 
 module "cloudwatch" {
   source  = "../../modules/cloudwatch"
-  options = local.cloudwatch_monitoring_options
+  options = merge(
+    local.cloudwatch_monitoring_options,
+    local.cloudwatch_local_environment_monitoring_options,
+  )
 }
