@@ -50,7 +50,7 @@ module "team" {
 }
 
 module "contact_point_slack" {
-  for_each = [for channel in var.alerting.slack : channel]
+  for_each = toset(var.slack_channels)
 
   source = "../../grafana/contact-point/slack"
 
