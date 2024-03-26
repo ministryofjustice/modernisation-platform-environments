@@ -180,7 +180,7 @@ resource "aws_ecs_service" "ncas_ecs_service_dev" {
   count                             = local.is-development ? 1 : 0
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ncas_cluster.id
-  task_definition                   = aws_ecs_task_definition_dev.ncas_task_definition_dev[0].arn
+  task_definition                   = aws_ecs_task_definition.ncas_task_definition_dev[0].arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2
