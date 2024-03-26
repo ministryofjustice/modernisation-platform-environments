@@ -101,7 +101,8 @@ module "bold_egress_bucket" {
     enabled = true
   }
 
-  policy = data.aws_iam_policy_document.bold_egress_bucket_policy.json
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.bold_egress_bucket_policy.json
 
   server_side_encryption_configuration = {
     rule = {
