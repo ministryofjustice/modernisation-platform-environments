@@ -2,9 +2,7 @@
 locals {
 
   # cloudwatch monitoring config
-  preproduction_cloudwatch_monitoring_options = {
-    enable_hmpps-oem_monitoring = false
-  }
+  preproduction_cloudwatch_monitoring_options = {}
 
   preproduction_baseline_presets_options = {
     sns_topics = {
