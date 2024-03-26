@@ -22,6 +22,15 @@ locals {
     #       instance_type = "t3.large"
     #     })
     #   })
+    #   dev-bods-a = merge(local.defaults_bods_ec2,
+    #   {
+    #     config = merge(local.defaults_bods_ec2.config, {
+    #       availability_zone = "${local.region}a"        
+    #     })
+    #     instance = merge(local.defaults_bods_ec2.instance, {    
+    #       instance_type = "t3.large"  
+    #     })
+    #   })
     # }
   }  
 }
