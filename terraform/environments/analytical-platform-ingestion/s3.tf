@@ -107,7 +107,7 @@ module "bold_egress_bucket" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.s3_processed_kms.key_arn
+        kms_master_key_id = module.s3_bold_egress_kms.key_arn
         sse_algorithm     = "aws:kms"
       }
     }
