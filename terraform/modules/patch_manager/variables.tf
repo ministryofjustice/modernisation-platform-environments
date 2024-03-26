@@ -11,15 +11,35 @@ variable "schedule" {
 }
 
 variable "predefined_baseline" {
-  type    = string
-  default = "AWS-WindowsPredefinedPatchBaseline-OS-Applications"
+  description = "Predefined baseline"
+  type        = string
+  validation {
+    condition = contains([
+      "AWS-WindowsPredefinedPatchBaseline-OS",
+      "AWS-WindowsPredefinedPatchBaseline-OS-Applications",
+      "AWS-RedHatDefaultPatchBaseline"
+    ], var.predefined_baseline)
+    error_message = "Not a valid baseline"
+  }
 }
 
 variable "operating_system" {
-  type    = string
-  default = "WINDOWS"
+  description = "Operating system for baseline"
+  type        = string
+  validation {
+    condition = contains([
+      "WINDOWS",
+      "REDHAT_ENTERPRISE_LINUX"
+    ], var.operating_system)
+    error_message = "Not a valid operating system"
+  }
 }
 
 variable "target_tag" {
-  type = map(any)
+  description = "Instance tag name and value to target for patching"
+  type        = map(any)
+}
+
+locals {
+  os = replace(lower(var.operating_system), "_", "-")
 }
