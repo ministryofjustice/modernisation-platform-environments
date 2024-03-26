@@ -142,7 +142,7 @@ locals {
       image_tag        = "8250538047-1"
       container_port   = 8080
       container_cpu    = 512
-      container_memory = 512
+      container_memory = 1024
     }
 
     pdf_creation = {
