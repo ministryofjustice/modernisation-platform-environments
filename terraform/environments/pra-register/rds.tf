@@ -120,16 +120,16 @@ data "http" "myip" {
 resource "null_resource" "setup_dev_db" {
   count = local.is-development ? 1 : 0
 
-  depends_on = [aws_db_instance.pra_db]
+  depends_on = [aws_db_instance.pra_db_dev[0]]
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
     environment = {
-      DB_HOSTNAME     = aws_db_instance.pra_db.address
-      DB_NAME         = aws_db_instance.pra_db.db_name
-      PRA_DB_USERNAME = aws_db_instance.pra_db.username
+      DB_HOSTNAME     = aws_db_instance.pra_db_dev[0].address
+      DB_NAME         = aws_db_instance.pra_db_dev[0].db_name
+      PRA_DB_USERNAME = aws_db_instance.pra_db_dev[0].username
       PRA_DB_PASSWORD = random_password.password.result
     }
   }
