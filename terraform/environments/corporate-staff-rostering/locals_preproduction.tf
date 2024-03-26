@@ -1196,7 +1196,7 @@ locals {
               target_group_name = "pp-csr-w-34-7771"
             }
             # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb          
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
           }
           http-7780 = {
             alarm_target_group_names = ["pp-csr-w-34-7780"]
