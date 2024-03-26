@@ -97,6 +97,10 @@ module "bold_egress_bucket" {
 
   force_destroy = true
 
+  versioning = {
+    enabled = true
+  }
+
   policy = data.aws_iam_policy_document.bold_egress_bucket_policy.json
 
   server_side_encryption_configuration = {
