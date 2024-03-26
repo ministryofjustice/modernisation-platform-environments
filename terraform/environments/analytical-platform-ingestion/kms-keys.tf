@@ -48,6 +48,15 @@ module "s3_definitions_kms" {
 
 data "aws_iam_policy_document" "s3_bold_egress_kms_policy" {
   statement {
+    sid     = "Default"
+    effect  = "Allow"
+    actions = ["kms:*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+  statement {
     sid = "AllowAnalyticalPlatformDataEngineeringProduction"
     actions = [
       "kms:Decrypt",
