@@ -114,11 +114,6 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
   }
 }
 
-resource "aws_db_subnet_group" "dbsubnetgroup" {
-  name       = "dbsubnetgroup"
-  subnet_ids = data.aws_subnets.shared-public.ids
-}
-
 data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
