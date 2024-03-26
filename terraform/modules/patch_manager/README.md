@@ -3,6 +3,7 @@
 - Use this module to set up a patch schedule for instances.
 - Register instances to patch by giving the `target_tag` map the tag name and value of the instance that requires patching.
 - Successful patches will be picked up from the development environment and referenced by the other environments
+- Instances that require patching require the `PatchBucketAccessPolicy` added to their role. This role also needs to be trusted by the bucket in the module.
 
 ```hcl
 # Development environment will generate a list of patches
