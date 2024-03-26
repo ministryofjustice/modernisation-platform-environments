@@ -126,7 +126,7 @@ resource "aws_ecs_task_definition" "ncas_task_definition_dev" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.ncas_db[0].address}"
+          value = "${aws_db_instance.ncas_db_dev[0].address}"
         },
         {
           name  = "RDS_PORT"
@@ -134,15 +134,15 @@ resource "aws_ecs_task_definition" "ncas_task_definition_dev" {
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.ncas_db[0].username}"
+          value = "${aws_db_instance.ncas_db_dev[0].username}"
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.ncas_db[0].password}"
+          value = "${aws_db_instance.ncas_db_dev[0].password}"
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.ncas_db[0].db_name}"
+          value = "${aws_db_instance.ncas_db_dev[0].db_name}"
         },
         {
           name  = "supportEmail"
