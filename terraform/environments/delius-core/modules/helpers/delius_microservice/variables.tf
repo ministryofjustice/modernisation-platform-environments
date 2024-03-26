@@ -323,19 +323,24 @@ variable "elasticache_parameters" {
   default     = {}
 }
 
-variable "container_environment_vars" {
+variable "container_vars_default" {
   description = "Environment variables to pass to the container"
-  type = list(object({
-    name  = string
-    value = string
-  }))
+  type        = map(any)
 }
-variable "container_secrets" {
+
+variable "container_vars_env_specific" {
+  description = "Environment variables to pass to the container"
+  type        = map(any)
+}
+
+variable "container_secrets_default" {
   description = "Secrets to pass to the container"
-  type = list(object({
-    name      = string
-    valueFrom = string
-  }))
+  type        = map(any)
+}
+
+variable "container_secrets_env_specific" {
+  description = "Secrets to pass to the container"
+  type        = map(any)
 }
 
 variable "alb_security_group_id" {
