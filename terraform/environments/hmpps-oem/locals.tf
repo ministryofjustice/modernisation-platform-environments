@@ -231,5 +231,6 @@ locals {
   cloudwatch_monitoring_options = {
     enable_cloudwatch_monitoring_account    = false
     enable_cloudwatch_cross_account_sharing = false
+    enable_cloudwatch_dashboard             = false
   }
 }
