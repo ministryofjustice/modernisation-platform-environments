@@ -1183,7 +1183,6 @@ locals {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7770"
             }
-            #cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
             cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
 
           }
@@ -1195,7 +1194,6 @@ locals {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7771"
             }
-            # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
             cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
           }
           http-7780 = {
@@ -1206,7 +1204,6 @@ locals {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7780"
             }
-            # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
             cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
 
           }
@@ -1218,7 +1215,6 @@ locals {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7781"
             }
-            # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
             cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
           }
         }
