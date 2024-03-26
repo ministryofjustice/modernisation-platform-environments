@@ -1,4 +1,5 @@
 resource "aws_db_instance" "dacp_db" {
+  count                       = local.is-development ? 0 : 1
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
   db_name                     = local.application_data.accounts[local.environment].db_name
   storage_type                = local.application_data.accounts[local.environment].storage_type
@@ -10,7 +11,7 @@ resource "aws_db_instance" "dacp_db" {
   password                    = random_password.password.result
   skip_final_snapshot         = true
   publicly_accessible         = false
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc.id]
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade = true
 }
@@ -21,7 +22,60 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
 }
 
 resource "aws_security_group" "postgresql_db_sc" {
+  count       = local.is-development ? 0 : 1
   name        = "postgres_security_group"
+  description = "control access to the database"
+  vpc_id      = data.aws_vpc.shared.id
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    description     = "Allows ECS service to access RDS"
+    security_groups = [aws_security_group.ecs_service.id]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    description = "Allow PSQL traffic from bastion"
+    from_port   = 5432
+    to_port     = 5432
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  egress {
+    description = "allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+}
+
+// DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
+resource "aws_db_instance" "dacp_db_dev" {
+  count                       = local.is-development ? 1 : 0
+  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
+  db_name                     = local.application_data.accounts[local.environment].db_name
+  storage_type                = local.application_data.accounts[local.environment].storage_type
+  engine                      = local.application_data.accounts[local.environment].engine
+  identifier                  = local.application_data.accounts[local.environment].identifier
+  engine_version              = local.application_data.accounts[local.environment].engine_version
+  instance_class              = local.application_data.accounts[local.environment].instance_class
+  username                    = local.application_data.accounts[local.environment].db_username
+  password                    = random_password.password.result
+  skip_final_snapshot         = true
+  publicly_accessible         = true
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
+  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
+  allow_major_version_upgrade = true
+}
+
+resource "aws_security_group" "postgresql_db_sc_dev" {
+  count       = local.is-development ? 1 : 0
+  name        = "postgres_security_group_dev"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
   ingress {
@@ -48,7 +102,6 @@ resource "aws_security_group" "postgresql_db_sc" {
       module.bastion_linux.bastion_security_group
     ]
   }
-
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
@@ -66,16 +119,16 @@ data "http" "myip" {
 resource "null_resource" "setup_db" {
   count = local.is-development ? 1 : 0
 
-  depends_on = [aws_db_instance.dacp_db]
+  depends_on = [aws_db_instance.dacp_db_dev[0]]
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
     environment = {
-      DB_HOSTNAME      = aws_db_instance.dacp_db.address
-      DB_NAME          = aws_db_instance.dacp_db.db_name
-      DACP_DB_USERNAME = aws_db_instance.dacp_db.username
+      DB_HOSTNAME      = aws_db_instance.dacp_db_dev[0].address
+      DB_NAME          = aws_db_instance.dacp_db_dev[0].db_name
+      DACP_DB_USERNAME = aws_db_instance.dacp_db_dev[0].username
       DACP_DB_PASSWORD = random_password.password.result
     }
   }
@@ -91,6 +144,7 @@ resource "aws_cloudwatch_log_group" "rds_logs" {
 
 # AWS EventBridge rule for RDS events
 resource "aws_cloudwatch_event_rule" "rds_events" {
+  count       = local.is-development ? 0 : 1
   name        = "rds-events"
   description = "Capture all RDS events"
 
@@ -98,7 +152,7 @@ resource "aws_cloudwatch_event_rule" "rds_events" {
     "source" : ["aws.rds"],
     "detail" : {
       "eventSource" : ["db-instance"],
-      "resources" : [aws_db_instance.dacp_db.arn]
+      "resources" : [aws_db_instance.dacp_db[0].arn]
     }
   })
 }
@@ -106,7 +160,8 @@ resource "aws_cloudwatch_event_rule" "rds_events" {
 # AWS EventBridge target for RDS events
 resource "aws_cloudwatch_event_target" "rds_logs" {
   depends_on = [aws_cloudwatch_log_group.rds_logs]
-  rule       = aws_cloudwatch_event_rule.rds_events.name
+  count      = local.is-development ? 0 : 1
+  rule       = aws_cloudwatch_event_rule.rds_events[0].name
   target_id  = "send-to-cloudwatch"
   arn        = aws_cloudwatch_log_group.rds_logs.arn
 }
@@ -125,6 +180,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_connections_alarm" {
   alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.dacp_db.identifier
+    DBInstanceIdentifier = aws_db_instance.dacp_db[0].identifier
   }
 }
