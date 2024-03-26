@@ -51,9 +51,10 @@ locals {
   })
 
   defaults_boe_ec2 = merge(local.defaults_ec2, {
-    # config = merge(local.defaults_ec2.config, {
-    #   # ami_name = "" FIXME: needs adding
-    # })
+    config = merge(local.defaults_ec2.config, {
+      ami_owner = "374269020027"
+      ami_name = "base_rhel_6_10_2024-03-26*"
+    })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["boe", "oasys_db"]
     })
