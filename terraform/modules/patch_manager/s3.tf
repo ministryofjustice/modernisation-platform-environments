@@ -29,6 +29,7 @@ data "aws_iam_policy_document" "bucket_policy_patch_access" {
         "arn:aws:iam::139351334100:role/ec2-instance-role-dev-win-2022",
         "arn:aws:iam::139351334100:role/ec2-instance-role-dev-rhel85",
         "arn:aws:iam::161282055413:role/ec2-instance-role-test-win-2022",
+        "arn:aws:iam::161282055413:role/ec2-instance-role-test-rhel85",
         "arn:aws:iam::228371063224:role/ec2-instance-role-pp-rdgw-1-a",
         "arn:aws:iam::228371063224:role/ec2-instance-role-pp-rds-1-a",
         "arn:aws:iam::905761223702:role/ec2-instance-role-pd-rdgw-1-a",
