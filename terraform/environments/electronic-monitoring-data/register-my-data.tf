@@ -60,3 +60,114 @@ resource "aws_s3_bucket_logging" "ap_export_bucket" {
     }
   }
 }
+
+data "aws_iam_policy_document" "get_json_files" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+    ]
+    resources = [
+      aws_s3_bucket.ap_export_bucket.arn,
+      "${aws_s3_bucket.ap_export_bucket.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_role" "em_ap_transfer_lambda" {
+  name                = "em-ap-transfer-lambda-iam-role"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+resource "aws_iam_role_policy" "em_ap_transfer_lambda" {
+  name   = "em-ap-transfer-lambda-iam-policy"
+  role   = aws_iam_role.em_ap_transfer_lambda.id
+  policy = data.aws_iam_policy_document.get_json_files.json
+}
+
+data "archive_file" "em_ap_transfer_lambda" {
+  type        = "zip"
+  source_file = "em_ap_transfer_lambda.py"
+  output_path = "em_ap_transfer_lambda.zip"
+}
+
+resource "aws_lambda_function" "em_ap_transfer_lambda" {
+    filename = "em_ap_transfer_lambda.zip"
+    function_name = "em-ap-transfer-lambda"
+    role = aws_iam_role.em_ap_transfer_lambda.arn
+    handler = "em_ap_transfer_lambda.handler"
+    runtime = "python3.12"
+    memory_size = 4096
+    timeout = 900
+}
+
+resource "aws_lambda_permission" "em_ap_transfer_lambda" {
+  statement_id  = "AllowCalculateChecksumExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.em_ap_transfer_lambda.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.ap_export_bucket.arn
+}
+
+#-----------------------------------------------------------------------------
+# Lambda layer for the above lambda
+#------------------------------------------------------------------------------
+
+
+#define variables
+locals {
+  layer_path        = "em-transfer-lambda-layer"
+  layer_zip_name    = "${local.layer_path}.zip"
+  requirements_name = "requirements.txt"
+  requirements_path = "${path.module}/${local.layer_path}/${local.requirements_name}"
+}
+
+# create zip file from requirements.txt. Triggers only when the file is updated
+resource "null_resource" "lambda_layer" {
+  triggers = {
+    requirements = filesha1(local.requirements_path)
+  }
+  # the command to install python and dependencies to the machine and zips
+  provisioner "local-exec" {
+    command = <<EOT
+      cd ${local.layer_path}
+      rm -rf python
+      mkdir python
+      pip install \
+      --platform manylinux2014_x86_64 \
+      --target=python \
+      --implementation cp \
+      --python-version 3.12 \
+      --only-binary=:all: --upgrade \
+      -r ${local.requirements_name}
+      zip -r ${local.layer_zip_name} python/
+    EOT
+  }
+}
+
+# create lambda layer from s3 object
+resource "aws_lambda_layer_version" "em-transfer-lambda-layer" {
+  s3_bucket           = aws_s3_bucket.lambda_layer.id
+  s3_key              = aws_s3_object.lambda_layer_zip.key
+  layer_name          = local.layer_path
+  compatible_runtimes = ["python3.12"]
+  skip_destroy        = true
+  depends_on          = [aws_s3_object.lambda_layer_zip] # triggered only if the zip file is uploaded to the bucket
+}
+
+
+# define existing bucket for storing lambda layers
+resource "aws_s3_bucket" "lambda_layer" {
+  bucket_prefix = "lambda-layers-"
+}
+
+
+# upload zip file to s3
+resource "aws_s3_object" "lambda_layer_zip" {
+  bucket     = aws_s3_bucket.lambda_layer.id
+  key        = "lambda_layers/${local.layer_path}/${local.layer_zip_name}"
+  source     = "${local.layer_path}/${local.layer_zip_name}"
+  depends_on = [null_resource.lambda_layer] # triggered only if the zip file is created
+}
