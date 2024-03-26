@@ -173,5 +173,8 @@ module "cross_account_cloudwatch" {
 
 module "cloudwatch" {
   source  = "../../modules/cloudwatch"
-  options = local.cloudwatch_monitoring_options
+  options = merge(
+    local.cloudwatch_monitoring_options,
+    local.cloudwatch_local_environment_monitoring_options,
+  )
 }
