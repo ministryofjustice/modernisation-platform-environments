@@ -61,6 +61,30 @@ resource "aws_s3_bucket_logging" "ap_export_bucket" {
   }
 }
 
+resource "aws_s3_bucket_notification" "csv_bucket_notification" {
+  bucket = aws_s3_bucket.ap_export_bucket.id
+
+  lambda_function {
+    id                  = "csv_bucket_notification"
+    lambda_function_arn = aws_lambda_function.em_ap_transfer_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".csv"
+  }
+
+  depends_on = [aws_lambda_permission.em_ap_transfer_lambda]
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "ap_export_bucket" {
+  bucket = aws_s3_bucket.ap_export_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "AES256"
+    }
+  }
+}
+
 data "aws_iam_policy_document" "get_json_files" {
   statement {
     effect = "Allow"
@@ -104,24 +128,13 @@ resource "aws_lambda_function" "em_ap_transfer_lambda" {
 }
 
 resource "aws_lambda_permission" "em_ap_transfer_lambda" {
-  statement_id  = "AllowCalculateChecksumExecutionFromS3Bucket"
+  statement_id  = "AllowS3ObjectInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.em_ap_transfer_lambda.arn
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.ap_export_bucket.arn
 }
 
-resource "aws_s3_bucket_notification" "csv_bucket_notification" {
-  bucket = aws_s3_bucket.ap_export_bucket.id
-
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.em_ap_transfer_lambda.arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_suffix       = ".csv"
-  }
-
-  depends_on = [aws_lambda_permission.em_ap_transfer_lambda]
-}
 
 #-----------------------------------------------------------------------------
 # Lambda layer for the above lambda
