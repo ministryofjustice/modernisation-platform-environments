@@ -31,6 +31,14 @@ locals {
           cidr_blocks = ["154.47.111.68/32"]
         }
       }
+      transfer_server_sftp_users_with_egress = {
+        "jacobwoffenden-egress" = {
+          ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN+3qaLVtn6Pd+DasWHhIOBoXEEhF9GZAG+DYfJBeySS Ministry of Justice"
+          cidr_blocks           = ["90.246.52.170/32"]
+          egress_bucket         = module.bold_egress_bucket.s3_bucket_id
+          egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
+        }
+      }
     }
     production = {
       /* VPC */
@@ -60,6 +68,14 @@ locals {
         "garyhenderson" = {
           ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID2lrI7AhZ9Sy/JAVDfPPEkCZawuuVJ7MHg6NNAwYImb"
           cidr_blocks = ["154.47.111.68/32"]
+        }
+      }
+      transfer_server_sftp_users_with_egress = {
+        "jacobwoffenden-egress" = {
+          ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN+3qaLVtn6Pd+DasWHhIOBoXEEhF9GZAG+DYfJBeySS Ministry of Justice"
+          cidr_blocks           = ["90.246.52.170/32"]
+          egress_bucket         = module.bold_egress_bucket.s3_bucket_id
+          egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
       }
     }
