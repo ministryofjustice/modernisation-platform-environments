@@ -1,6 +1,11 @@
 # csr-preproduction environment settings
 locals {
 
+  # cloudwatch monitoring config
+  preproduction_cloudwatch_monitoring_options = {
+    enable_cloudwatch_monitoring_account = false
+  }
+
   # baseline config
   preproduction_config = {
 

@@ -1,6 +1,11 @@
 # csr-development environment settings
 locals {
 
+  # cloudwatch monitoring config
+  development_cloudwatch_monitoring_options = {
+    enable_cloudwatch_monitoring_account = false
+  }
+
   # baseline config
   development_config = {
 
