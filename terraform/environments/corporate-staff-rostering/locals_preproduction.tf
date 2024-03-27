@@ -2,9 +2,7 @@
 locals {
 
   # cloudwatch monitoring config
-  preproduction_cloudwatch_monitoring_options = {
-    enable_cloudwatch_monitoring_account = false
-  }
+  preproduction_cloudwatch_monitoring_options = {}
 
   # baseline config
   preproduction_config = {
