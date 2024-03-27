@@ -5,7 +5,12 @@ module "s3_bucket_oracledb_backups" {
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.kms_keys.general_shared
-
+  bucket_policy       = compact([local.oracle_duplicate_delius_target_environment != "" ? templatefile("${path.module}/policies/oracledb_backup_data.json",
+    {
+      s3bucket_arn                                = module.s3_bucket_oracledb_backups.bucket.arn,
+      oracle_duplicate_delius_target_account_id  = local.oracle_duplicate_delius_target_account_id,
+      oracle_duplicate_delius_target_environment = local.oracle_duplicate_delius_target_environment
+    }) : null])
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
@@ -127,10 +132,23 @@ data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
   }
 }
 
+data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
+
+  statement {
+    sid    = "allowAccessToOracleDb${title(local.oracle_duplicate_delius_source_environment)}Bucket"
+    effect = "Allow"
+    actions = [
+      "s3:*"
+    ]
+    resources = ["arn:aws:s3:::${local.oracle_duplicate_delius_source_environment}-oracle-database-backups"]
+  }
+}
+
 data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     data.aws_iam_policy_document.oracledb_backup_bucket_access.json,
-    local.oracle_statistics_delius_source_environment != "" ? data.aws_iam_policy_document.oracle_remote_statistics_bucket_access.json : null
+    local.oracle_statistics_delius_source_environment != "" ? data.aws_iam_policy_document.oracle_remote_statistics_bucket_access.json: null,
+    local.oracle_duplicate_delius_source_environment != "" ? data.aws_iam_policy_document.oracledb_remote_backup_bucket_access.json: null
   ])
 }
 
@@ -139,14 +157,6 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
   description = "Allow access to Oracle DB Backup Bucket"
   policy      = data.aws_iam_policy_document.combined.json
 }
-
-
-#resource "aws_iam_role_policy" "oracledb_backup_bucket_access_policy" {
-#  name   = "${var.env_name}-oracledb-backup-bucket-access-policy"
-#  role   = aws_iam_role.db_ec2_instance_iam_role.name
-#policy = data.aws_iam_policy_document.oracledb_backup_bucket_access.json
-#}
-
 
 resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
   bucket = "${var.env_name}-oracle-database-backups-inventory"
