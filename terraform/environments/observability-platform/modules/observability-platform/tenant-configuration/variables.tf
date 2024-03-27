@@ -10,10 +10,6 @@ variable "identity_centre_team" {
   type = string
 }
 
-variable "slack_channels" {
-  type = list(string)
-}
-
 variable "aws_accounts" {
   type = map(object({
     cloudwatch_enabled           = optional(bool)
