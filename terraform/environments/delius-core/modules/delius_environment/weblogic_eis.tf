@@ -4,167 +4,55 @@ module "weblogic_eis" {
   account_info          = var.account_info
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   certificate_arn       = aws_acm_certificate.external.arn
-  container_environment_vars = [
-    {
-      name  = "LDAP_PORT"
-      value = var.ldap_config.port
-    },
-    {
-      name  = "LDAP_HOST"
-      value = module.ldap.nlb_dns_name
-    },
-    {
-      name  = "AWS_XRAY_TRACING_NAME"
-      value = "weblogic-eis"
-    },
-    {
-      name  = "COOKIE_SECURE"
-      value = "true"
-    },
-    {
-      name  = "DELIUS_API_URL"
-      value = "todo"
-    },
-    {
-      name  = "DMS_HOST"
-      value = "todo"
-    },
-    {
-      name  = "DMS_OFFICE_URI_HOST"
-      value = "todo"
-    },
-    {
-      name  = "DMS_OFFICE_URI_PORT"
-      value = "443"
-    },
-    {
-      name  = "DMS_PORT"
-      value = "443"
-    },
-    {
-      name  = "DMS_PROTOCOL"
-      value = "https"
-    },
-    {
-      name  = "ELASTICSEARCH_URL"
-      value = "/newTech"
-    },
-    {
-      name  = "GDPR_URL"
-      value = "/gdpr/ui/homepage"
-    },
-    {
-      name  = "JDBC_CONNECTION_POOL_MAX_CAPACITY"
-      value = "100"
-    },
-    {
-      name  = "JDBC_CONNECTION_POOL_MIN_CAPACITY"
-      value = "10"
-    },
-    {
-      name  = "JDBC_DRIVER"
-      value = "oracle.jdbc.OracleDriver"
-    },
-    {
-      name  = "JDBC_INITIAL_CAPACITY"
-      value = "10"
-    },
-    {
-      name  = "JDBC_MAX_CAPACITY"
-      value = "100"
-    },
-    {
-      name  = "JDBC_MIN_CAPACITY"
-      value = "50"
-    },
-    {
-      name  = "JDBC_USERNAME"
-      value = "delius_pool"
-    },
-    {
-      name  = "LOG_LEVEL_NDELIUS"
-      value = "INFO"
-    },
-    {
-      name  = "MERGE_API_URL"
-      value = "todo"
-    },
-    {
-      name  = "MERGE_OAUTH_URL"
-      value = "todo"
-    },
-    {
-      name  = "MERGE_URL"
-      value = "todo"
-    },
-    {
-      name  = "USER_CONTEXT"
-      value = "ou=Users,dc=moj,dc=com"
-    },
-    {
-      name  = "EIS_USER_CONTEXT"
-      value = "cn=EISUsers,ou=Users,dc=moj,dc=com"
-    },
-    {
-      name  = "NDELIUS_CLIENT_ID"
-      value = "NDelius"
-    },
-    {
-      name  = "OTEL_RESOURCE_ATTRIBUTES"
-      value = "service.name=weblogic-eis,service.namespace=${var.app_name}-${var.env_name}"
-    },
-    {
-      name  = "PASSWORD_RESET_URL"
-      value = "todo"
-    },
-    {
-      name  = "TZ"
-      value = "Europe/London"
-    },
-    {
-      name  = "USER_MEM_ARGS"
-      value = "-XX:MaxRAMPercentage=90.0"
-    },
-    {
-      name  = "USERMANAGEMENT_URL"
-      value = "/umt/"
-    }
 
-  ]
-  container_secrets = [
-    {
-      name      = "JDBC_URL"
-      valueFrom = aws_ssm_parameter.jdbc_url.arn
-    },
-    {
-      name      = "JDBC_PASSWORD"
-      valueFrom = aws_ssm_parameter.jdbc_password.arn
-    },
-    {
-      name      = "LDAP_PRINCIPAL"
-      valueFrom = module.ldap.delius_core_ldap_principal_arn
-    },
-    {
-      name      = "LDAP_CREDENTIAL"
-      valueFrom = module.ldap.delius_core_ldap_bind_password_arn
-    },
-    {
-      name      = "MERGE_SECRET"
-      valueFrom = data.aws_ssm_parameter.delius_core_merge_api_client_secret.arn
-    },
-    {
-      name      = "PDFCREATION_SECRET"
-      valueFrom = data.aws_ssm_parameter.pdfcreation_secret.arn
-    },
-    {
-      name      = "USERMANAGEMENT_SECRET"
-      valueFrom = data.aws_ssm_parameter.usermanagement_secret.arn
-    }
-    #    {
-    #      name      = "TOPIC_ARN"
-    #      valueFrom = aws_sns_topic.delius_core_topic.arn
-    #    }
-  ]
+  container_vars_default = {
+    "LDAP_PORT" : var.ldap_config.port,
+    "LDAP_HOST" : module.ldap.nlb_dns_name,
+    "AWS_XRAY_TRACING_NAME" : "weblogic-eis",
+    "COOKIE_SECURE" : "true",
+    "DELIUS_API_URL" : "todo",
+    "DMS_HOST" : "todo",
+    "DMS_OFFICE_URI_HOST" : "todo",
+    "DMS_OFFICE_URI_PORT" : "443",
+    "DMS_PORT" : "443",
+    "DMS_PROTOCOL" : "https",
+    "ELASTICSEARCH_URL" : "/newTech",
+    "GDPR_URL" : "/gdpr/ui/homepage",
+    "JDBC_CONNECTION_POOL_MAX_CAPACITY" : "100",
+    "JDBC_CONNECTION_POOL_MIN_CAPACITY" : "10",
+    "JDBC_DRIVER" : "oracle.jdbc.OracleDriver",
+    "JDBC_INITIAL_CAPACITY" : "10",
+    "JDBC_MAX_CAPACITY" : "100",
+    "JDBC_MIN_CAPACITY" : "50",
+    "JDBC_USERNAME" : "delius_pool",
+    "LOG_LEVEL_NDELIUS" : "INFO",
+    "MERGE_API_URL" : "todo",
+    "MERGE_OAUTH_URL" : "todo",
+    "MERGE_URL" : "todo",
+    "USER_CONTEXT" : "ou=Users,dc=moj,dc=com",
+    "EIS_USER_CONTEXT" : "cn=EISUsers,ou=Users,dc=moj,dc=com",
+    "NDELIUS_CLIENT_ID" : "NDelius",
+    "OTEL_RESOURCE_ATTRIBUTES" : "service.name=weblogic-eis,service.namespace=${var.app_name}-${var.env_name}",
+    "PASSWORD_RESET_URL" : "todo",
+    "TZ" : "Europe/London",
+    "USER_MEM_ARGS" : "-XX:MaxRAMPercentage=90.0",
+    "USERMANAGEMENT_URL" : "/umt/"
+  }
+  container_vars_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_vars_env_specific, {})
+
+  container_secrets_default = {
+    "JDBC_URL" : aws_ssm_parameter.jdbc_url.arn,
+    "JDBC_PASSWORD" : aws_ssm_parameter.jdbc_password.arn,
+    "LDAP_PRINCIPAL" : module.ldap.delius_core_ldap_principal_arn,
+    "LDAP_CREDENTIAL" : module.ldap.delius_core_ldap_bind_password_arn,
+    "MERGE_SECRET" : data.aws_ssm_parameter.delius_core_merge_api_client_secret.arn,
+    "PDFCREATION_SECRET" : data.aws_ssm_parameter.pdfcreation_secret.arn,
+    "USERMANAGEMENT_SECRET" : data.aws_ssm_parameter.usermanagement_secret.arn
+  }
+
+  container_secrets_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_secrets_env_specific, {})
+
+
   container_port_config = [
     {
       containerPort = 8080

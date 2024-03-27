@@ -4,42 +4,18 @@ module "weblogic" {
   account_info          = var.account_info
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   certificate_arn       = aws_acm_certificate.external.arn
-  container_environment_vars = [
-    {
-      name  = "LDAP_PORT"
-      value = var.ldap_config.port
-    },
-    {
-      name  = "LDAP_HOST"
-      value = module.ldap.nlb_dns_name
-    },
-    {
-      name  = "USER_CONTEXT"
-      value = "ou=Users,dc=moj,dc=com"
-    },
-    {
-      name  = "EIS_USER_CONTEXT"
-      value = "cn=EISUsers,ou=Users,dc=moj,dc=com"
-    }
-  ]
-  container_secrets = [
-    {
-      name      = "JDBC_URL"
-      valueFrom = aws_ssm_parameter.jdbc_url.arn
-    },
-    {
-      name      = "JDBC_PASSWORD"
-      valueFrom = aws_ssm_parameter.jdbc_password.arn
-    },
-    {
-      name      = "LDAP_PRINCIPAL"
-      valueFrom = module.ldap.delius_core_ldap_principal_arn
-    },
-    {
-      name      = "LDAP_CREDENTIAL"
-      valueFrom = module.ldap.delius_core_ldap_bind_password_arn
-    }
-  ]
+
+  container_vars_default = {
+    "JDBC_URL" : aws_ssm_parameter.jdbc_url.arn,
+    "JDBC_PASSWORD" : aws_ssm_parameter.jdbc_password.arn,
+    "LDAP_PRINCIPAL" : module.ldap.delius_core_ldap_principal_arn,
+    "LDAP_CREDENTIAL" : module.ldap.delius_core_ldap_bind_password_arn
+  }
+
+  container_secrets_default      = {}
+  container_secrets_env_specific = try(var.delius_microservice_configs.weblogic.container_secrets_env_specific, {})
+  container_vars_env_specific    = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
+
   container_port_config = [
     {
       containerPort = var.delius_microservice_configs.weblogic.container_port

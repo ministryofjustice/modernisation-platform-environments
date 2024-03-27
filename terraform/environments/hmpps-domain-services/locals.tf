@@ -65,7 +65,7 @@ locals {
         actions = [
           "s3:ListBucket",
         ]
-        resources = ["arn:aws:s3:::hmpps-domain-services-development-patch-logs"]
+        resources = ["arn:aws:s3:::hmpps-domain-services-development-*"]
         },
         {
           effect = "Allow"
@@ -75,7 +75,7 @@ locals {
             "s3:DeleteObject",
             "s3:PutObjectAcl"
           ]
-          resources = ["arn:aws:s3:::hmpps-domain-services-development-patch-logs/*"]
+          resources = ["arn:aws:s3:::hmpps-domain-services-development-*/*"]
         }
     ] }
   }

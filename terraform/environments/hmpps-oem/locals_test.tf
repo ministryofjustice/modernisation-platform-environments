@@ -8,7 +8,10 @@ locals {
   }
 
   # baseline presets config
+
   test_baseline_presets_options = {
+    enable_ec2_delius_dba_secrets_access = true # additional permissions to access delius secrets
+
     sns_topics = {
       pagerduty_integrations = {
         dba_pagerduty = "hmpps_shef_dba_non_prod"
@@ -18,6 +21,14 @@ locals {
 
   # baseline config
   test_config = {
+
+    baseline_cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+    )
 
     baseline_secretsmanager_secrets = {
       "/oracle/oem"              = local.oem_secretsmanager_secrets

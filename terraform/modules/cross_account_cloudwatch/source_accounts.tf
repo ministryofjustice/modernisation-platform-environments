@@ -1,6 +1,6 @@
 resource "aws_oam_link" "source_account_oam_link" {
-  count           = var.options.enable_hmpps-oem_monitoring ? 1 : 0
-  label_template  = "oasys"
+  count           = var.options.enable_cloudwatch_cross_account_sharing ? 1 : 0
+  label_template  = var.environment.application_name
   resource_types  = ["AWS::CloudWatch::Metric"]
   sink_identifier = var.monitoring_account_sink_identifier
 }
@@ -32,7 +32,7 @@ data "aws_iam_policy" "policy" {
 }
 
 resource "aws_iam_role" "aws_cloudwatch_metrics_role" {
-  count              = var.options.enable_hmpps-oem_monitoring ? 1 : 0
+  count              = var.options.enable_cloudwatch_cross_account_sharing ? 1 : 0
   name               = "CloudWatch-CrossAccountSharingRole"
   assume_role_policy = jsonencode(local.policy)
 }
@@ -40,7 +40,7 @@ resource "aws_iam_role" "aws_cloudwatch_metrics_role" {
 resource "aws_iam_role_policy_attachment" "policy" {
   for_each = toset([
     for p in local.policy_names : p
-    if var.options.enable_hmpps-oem_monitoring
+    if var.options.enable_cloudwatch_cross_account_sharing
   ])
   policy_arn = data.aws_iam_policy.policy[each.key].arn
   role       = aws_iam_role.aws_cloudwatch_metrics_role[0].name

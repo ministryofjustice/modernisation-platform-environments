@@ -171,6 +171,15 @@ locals {
       local.noms_mgmt_subnet.nomsmgmt_remoteaccess,
     ]
 
+    devtest_oasys_db = [
+      local.noms_test_subnet.t1_oasys_clientaccess,
+      local.noms_test_subnet.t2_oasys_clientaccess,
+    ]
+
+    devtest_tools = [
+      local.noms_mgmt_subnet.nomsmgmt_tools,
+    ]
+
     prod_core = [
       local.noms_live_subnet.noms_live_core,
     ]
@@ -192,6 +201,19 @@ locals {
     prod_jumpservers = [
       local.noms_mgmt_live_subnet.noms_mgmt_live_jumpservers,
       local.noms_mgmt_live_subnet.noms_mgmt_live_remoteaccess,
+    ]
+
+    prod_oasys_db = [
+      local.noms_live_subnet.pd_oasys_db,
+      local.noms_live_subnet.pp_oasys_db,
+      local.noms_live_subnet.pd_oasys_app,
+      local.noms_live_subnet.pp_oasys_app,
+      local.noms_live_subnet.pd_oasys_clientaccess,
+      local.noms_live_subnet.pp_oasys_clientaccess,
+    ]
+
+    prod_tools = [
+      local.noms_mgmt_live_subnet.noms_mgmt_live_tools,
     ]
 
     internet_egress = [

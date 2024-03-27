@@ -3,8 +3,8 @@ locals {
 
   # cloudwatch monitoring config
   test_cloudwatch_monitoring_options = {
-    enable_hmpps-oem_monitoring = true
-    enable_cloudwatch_dashboard = true
+    enable_cloudwatch_cross_account_sharing = true
+    enable_cloudwatch_dashboard             = true
   }
 
   test_baseline_presets_options = {
