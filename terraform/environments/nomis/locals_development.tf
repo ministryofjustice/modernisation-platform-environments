@@ -385,6 +385,31 @@ locals {
         })
       })
 
+      dom-test-web-b = merge(local.weblogic_ec2, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.weblogic_ec2.config, {
+          availability_zone = "${local.region}b"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2Qa11RWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "t2.large"
+        })
+        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "qa11r"
+          oracle-db-hostname-a = "dev-nomis-db-1-a"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "qa11r"
+        })
+      })
+
       dev-nomis-build-a = {
         cloudwatch_metric_alarms = {}
         config = merge(module.baseline_presets.ec2_instance.config.default, {
