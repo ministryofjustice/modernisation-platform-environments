@@ -1,3 +1,15 @@
+module "transfer_logs_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/kms/aws"
+  version = "2.2.1"
+
+  aliases               = ["logs/transfer"]
+  description           = "CloudWatch Logs for the Transfer Server"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
+
 module "s3_landing_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
