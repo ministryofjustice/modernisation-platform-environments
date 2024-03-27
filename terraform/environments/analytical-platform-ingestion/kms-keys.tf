@@ -6,6 +6,33 @@ module "transfer_logs_kms" {
   aliases               = ["logs/transfer"]
   description           = "CloudWatch Logs for the Transfer Server"
   enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowCloudWatchLogs"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "ArnEquals"
+          variable = "kms:EncryptionContext:aws:logs:arn"
+          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/transfer-structured-logs"]
+        }
+      ]
+    }
+  ]
 
   deletion_window_in_days = 7
 }
