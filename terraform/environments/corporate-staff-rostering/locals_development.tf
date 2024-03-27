@@ -2,9 +2,7 @@
 locals {
 
   # cloudwatch monitoring config
-  development_cloudwatch_monitoring_options = {
-    enable_cloudwatch_monitoring_account = false
-  }
+  development_cloudwatch_monitoring_options = {}
 
   # baseline config
   development_config = {
