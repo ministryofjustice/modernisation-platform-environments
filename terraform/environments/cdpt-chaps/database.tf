@@ -44,7 +44,7 @@ resource "aws_security_group" "db" {
     from_port   = 1433
     to_port     = 1433
     protocol    = "tcp"
-    security_groups = [module.bastion_linux.bastion_security_group]
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     from_port   = 0
