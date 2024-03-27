@@ -22,10 +22,10 @@ locals {
       /* Transfer Server */
       transfer_server_hostname = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
       transfer_server_sftp_users = {
-        "jacobwoffenden" = {
-          ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN+3qaLVtn6Pd+DasWHhIOBoXEEhF9GZAG+DYfJBeySS Ministry of Justice"
-          cidr_blocks = ["90.246.52.170/32"]
-        },
+        # "jacobwoffenden" = {
+        #   ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN+3qaLVtn6Pd+DasWHhIOBoXEEhF9GZAG+DYfJBeySS Ministry of Justice"
+        #   cidr_blocks = ["90.246.52.170/32"]
+        # },
         "garyhenderson" = {
           ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID2lrI7AhZ9Sy/JAVDfPPEkCZawuuVJ7MHg6NNAwYImb"
           cidr_blocks = ["154.47.111.68/32"]
