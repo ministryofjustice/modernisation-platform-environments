@@ -111,6 +111,18 @@ resource "aws_lambda_permission" "em_ap_transfer_lambda" {
   source_arn    = aws_s3_bucket.ap_export_bucket.arn
 }
 
+resource "aws_s3_bucket_notification" "csv_bucket_notification" {
+  bucket = aws_s3_bucket.ap_export_bucket.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.em_ap_transfer_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".csv"
+  }
+
+  depends_on = [aws_lambda_permission.em_ap_transfer_lambda]
+}
+
 #-----------------------------------------------------------------------------
 # Lambda layer for the above lambda
 #------------------------------------------------------------------------------
@@ -118,7 +130,7 @@ resource "aws_lambda_permission" "em_ap_transfer_lambda" {
 
 #define variables
 locals {
-  layer_path        = "em-transfer-lambda-layer"
+  layer_path        = "em_transfer_lambda_layer"
   layer_zip_name    = "${local.layer_path}.zip"
   requirements_name = "requirements.txt"
   requirements_path = "${path.module}/${local.layer_path}/${local.requirements_name}"
@@ -149,25 +161,8 @@ resource "null_resource" "lambda_layer" {
 
 # create lambda layer from s3 object
 resource "aws_lambda_layer_version" "em-transfer-lambda-layer" {
-  s3_bucket           = aws_s3_bucket.lambda_layer.id
-  s3_key              = aws_s3_object.lambda_layer_zip.key
+  filename            = "${local.layer_path}/${local.layer_zip_name}"
   layer_name          = local.layer_path
   compatible_runtimes = ["python3.12"]
-  skip_destroy        = true
-  depends_on          = [aws_s3_object.lambda_layer_zip] # triggered only if the zip file is uploaded to the bucket
-}
-
-
-# define existing bucket for storing lambda layers
-resource "aws_s3_bucket" "lambda_layer" {
-  bucket_prefix = "lambda-layers-"
-}
-
-
-# upload zip file to s3
-resource "aws_s3_object" "lambda_layer_zip" {
-  bucket     = aws_s3_bucket.lambda_layer.id
-  key        = "lambda_layers/${local.layer_path}/${local.layer_zip_name}"
-  source     = "${local.layer_path}/${local.layer_zip_name}"
-  depends_on = [null_resource.lambda_layer] # triggered only if the zip file is created
+  depends_on          = [null_resource.lambda_layer]
 }
