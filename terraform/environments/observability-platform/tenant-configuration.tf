@@ -10,6 +10,5 @@ module "tenant_configuration" {
   environment_management = local.environment_management
   name                   = each.key
   identity_centre_team   = each.value.identity_centre_team
-  slack_channels         = try(each.value.slack_channels, [])
   aws_accounts           = each.value.aws_accounts
 }

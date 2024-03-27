@@ -48,12 +48,3 @@ module "team" {
 
   depends_on = [module.xray_source, module.cloudwatch_source]
 }
-
-module "contact_point_slack" {
-  for_each = toset(var.slack_channels)
-
-  source = "../../grafana/contact-point/slack"
-
-  team_name = var.name
-  channel   = each.key
-}

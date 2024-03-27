@@ -5,7 +5,7 @@ locals {
       tenant_configuration = {
         "observability-platform" = {
           identity_centre_team = "observability-platform"
-          # slack_channels       = ["observability-platform-development-alerts"]
+          slack_channels       = ["observability-platform-development-alerts"]
           aws_accounts = {
             "observability-platform-development" = {
               cloudwatch_enabled      = true
@@ -16,6 +16,7 @@ locals {
         },
         "analytical-platform" = {
           identity_centre_team = "analytical-platform"
+          slack_channels       = ["analytical-platform-development-alerts"]
           aws_accounts = {
             "analytical-platform-ingestion-development" = {
               cloudwatch_enabled      = true

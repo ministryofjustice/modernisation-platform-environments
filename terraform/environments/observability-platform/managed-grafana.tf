@@ -38,6 +38,13 @@ module "managed_grafana" {
 }
 
 /* Slack Contact Point */
+module "contact_point_slack" {
+  for_each = toset(local.all_slack_channels)
+
+  source = "./modules/grafana/contact-point/slack"
+
+  channel = each.value
+}
 
 /* Prometheus Source */
 resource "grafana_data_source" "observability_platform_prometheus" {
