@@ -109,6 +109,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectAcl",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -161,6 +162,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectAcl",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -184,6 +186,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectAcl",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -276,6 +279,7 @@ locals {
         actions = [
           "s3:PutObject",
           "s3:GetObject",
+          "s3:GetObjectAcl",
           "s3:PutObjectAcl",
           "s3:ListBucket",
           "s3:DeleteObject"
