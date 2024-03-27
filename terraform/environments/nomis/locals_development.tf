@@ -407,6 +407,7 @@ locals {
             backup-plan = "daily-and-weekly"
           }
         })
+        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
             branch = "main"
