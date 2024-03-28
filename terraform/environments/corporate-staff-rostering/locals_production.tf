@@ -4,7 +4,7 @@ locals {
   # cloudwatch monitoring config
   production_cloudwatch_monitoring_options = {
     enable_cloudwatch_monitoring_account = true
-    enable_cloudwatch_dashboard          = true
+    # enable_cloudwatch_dashboard          = true
   }
 
   # baseline config
