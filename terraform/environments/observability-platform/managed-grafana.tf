@@ -37,6 +37,38 @@ module "managed_grafana" {
   tags = local.tags
 }
 
+/* Slack Contact Points */
+module "contact_point_slack" {
+  for_each = toset(local.all_slack_channels)
+
+  source = "./modules/grafana/contact-point/slack"
+
+  channel = each.value
+}
+
+/* Notification Policy */
+resource "grafana_notification_policy" "root" {
+  contact_point   = "grafana-default-sns"
+  group_by        = ["..."]
+  group_wait      = "30s"
+  group_interval  = "5m"
+  repeat_interval = "4h"
+
+  dynamic "policy" {
+    for_each = toset(local.all_slack_channels)
+    content {
+      matcher {
+        label = "slack-channel"
+        match = "="
+        value = policy.value
+      }
+      contact_point = "${policy.value}-slack"
+    }
+  }
+
+  depends_on = [module.contact_point_slack]
+}
+
 /* Prometheus Source */
 resource "grafana_data_source" "observability_platform_prometheus" {
   type       = "prometheus"
