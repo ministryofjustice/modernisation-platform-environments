@@ -55,6 +55,19 @@ else {
   }
 }
 
+if (Test-Path $linkPath) {
+  "Link exists for " + $linkPath >> $logFile
+  Get-Item $linkPath >> $logFile
+  if ((Get-Item $linkPath).LinkType -eq "SymbolicLink") {
+    "It is a symbolic link " >> $logFile
+  } else {
+    "It is not a symbolic link" >> $logFile
+  }
+} else {
+  "Linking " + $linkPath + " to " + $targetPath >> $logFile
+  New-Item -Path $linkPath -ItemType SymbolicLink -Value $targetPath
+}
+
 "Set Environment variable to enable awslogs attribute" >> $logFile
 Import-Module ECSTools
 [Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
