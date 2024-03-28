@@ -70,6 +70,7 @@ locals {
       tenant_configuration = {
         "observability-platform" = {
           identity_centre_team = "observability-platform"
+          slack_channels       = ["observability-platform-production-alerts"]
           aws_accounts = {
             "observability-platform-production" = {
               cloudwatch_enabled      = true
