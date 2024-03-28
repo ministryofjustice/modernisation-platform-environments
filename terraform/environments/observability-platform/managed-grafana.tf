@@ -58,7 +58,7 @@ resource "grafana_notification_policy" "root" {
     for_each = toset(local.all_slack_channels)
     content {
       matcher {
-        label = "channel"
+        label = "slack-channel"
         match = "="
         value = policy.value
       }
