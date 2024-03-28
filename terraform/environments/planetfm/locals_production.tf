@@ -1,5 +1,11 @@
 locals {
 
+  # cloudwatch monitoring config
+  production_cloudwatch_monitoring_options = {
+    enable_cloudwatch_cross_account_sharing = true
+    # enable_cloudwatch_dashboard             = true
+  }
+
   # baseline config
   production_config = {
 
