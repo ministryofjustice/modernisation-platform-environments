@@ -14,7 +14,7 @@ module "operational_db_server" {
   associate_public_ip_address = false
   ebs_optimized               = true
   monitoring                  = true
-  ebs_size                    = 20
+  ebs_size                    = 300
   ebs_encrypted               = true
   ebs_delete_on_termination   = false
   policies                    = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${local.apigateway_get_policy}", ]
