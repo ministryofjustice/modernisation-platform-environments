@@ -168,6 +168,6 @@ resource "aws_autoscaling_schedule" "bastion_linux_scale_up" {
   min_size               = 1
   max_size               = 1
   desired_capacity       = 1
-  recurrence             = "0 20 * * *" # 5.00 UTC time or 6.00 London time
+  recurrence             = "0 7 * * *"
   autoscaling_group_name = aws_autoscaling_group.bastion_linux_daily[0].name
 }
