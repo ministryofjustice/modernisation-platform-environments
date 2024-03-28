@@ -1,5 +1,8 @@
 locals {
 
+  # cloudwatch monitoring config
+  test_cloudwatch_monitoring_options = {}
+
   # baseline config
   test_config = {
 

@@ -1,5 +1,8 @@
 locals {
 
+  # cloudwatch monitoring config
+  preproduction_cloudwatch_monitoring_options = {}
+
   # baseline config
   preproduction_config = {
     baseline_ec2_instances = {
