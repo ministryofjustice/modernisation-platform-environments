@@ -16,7 +16,6 @@ locals {
         },
         "analytical-platform" = {
           identity_centre_team = "analytical-platform"
-          slack_channels       = ["analytical-platform-development-alerts"]
           aws_accounts = {
             "analytical-platform-ingestion-development" = {
               cloudwatch_enabled      = true
