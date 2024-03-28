@@ -334,6 +334,35 @@ locals {
       },
     ]
 
+    S3DbBackupRead = [
+      {
+        sid    = "S3DbBackupRead"
+        effect = "Allow"
+        actions = [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
+        resources = flatten([
+          var.environment.environment == "production" ? [
+            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*",
+            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*/*",
+            "arn:aws:s3:::prod-${var.environment.application_name}-db-backup-bucket-*",
+            "arn:aws:s3:::prod-${var.environment.application_name}-db-backup-bucket-*/*",
+          ] : [],
+          var.environment.environment == "preproduction" ? [
+            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*",
+            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*/*",
+          ] : [],
+          contains(["development", "test"], var.environment.environment) ? [
+            "arn:aws:s3:::dev-${var.environment.application_name}-db-backup-bucket-*",
+            "arn:aws:s3:::dev-${var.environment.application_name}-db-backup-bucket-*/*",
+            "arn:aws:s3:::devtest-${var.environment.application_name}-db-backup-bucket-*",
+            "arn:aws:s3:::devtest-${var.environment.application_name}-db-backup-bucket-*/*",
+          ] : [],
+        ])
+      }
+    ]
+
   }
 
 }
