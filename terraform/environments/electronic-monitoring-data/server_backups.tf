@@ -88,6 +88,17 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
 
   cidr_ipv4 = "152.37.111.98/32"
 }
+resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
+  security_group_id = aws_security_group.db.id
+  description       = "PF ip"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+
+  cidr_ipv4 = "213.121.161.124/32"
+}
+
+
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
   count = local.is-development ? 1 : 0
