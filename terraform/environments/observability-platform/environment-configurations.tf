@@ -6,6 +6,7 @@ locals {
         "observability-platform" = {
           identity_centre_team = "observability-platform"
           slack_channels       = ["observability-platform-development-alerts"]
+          pagerduty_services   = ["observability-platform"]
           aws_accounts = {
             "observability-platform-development" = {
               cloudwatch_enabled      = true
