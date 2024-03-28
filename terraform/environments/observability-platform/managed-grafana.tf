@@ -75,7 +75,22 @@ resource "grafana_notification_policy" "root" {
     }
   }
 
-  depends_on = [module.contact_point_slack]
+  dynamic "policy" {
+    for_each = toset(local.all_pagerduty_services)
+    content {
+      matcher {
+        label = "pagerduty-integration"
+        match = "="
+        value = policy.value
+      }
+      contact_point = "${policy.value}-pagerduty"
+    }
+  }
+
+  depends_on = [
+    module.contact_point_slack,
+    module.contact_point_pagerduty
+  ]
 }
 
 /* Prometheus Source */
