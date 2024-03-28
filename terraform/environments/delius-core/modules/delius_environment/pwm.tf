@@ -90,9 +90,6 @@ module "pwm" {
 
   container_vars_env_specific = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
 
-  ignore_changes_task_definition = true
-  force_new_deployment           = false
-
   providers = {
     aws          = aws
     aws.core-vpc = aws.core-vpc
