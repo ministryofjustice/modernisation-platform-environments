@@ -75,6 +75,14 @@ resource "aws_s3_bucket_notification" "csv_bucket_notification" {
 }
 
 
+resource "aws_s3_bucket_ownership_controls" "ap_export_bucket" {
+  bucket = aws_s3_bucket.ap_export_bucket.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "ap_export_bucket" {
   bucket = aws_s3_bucket.ap_export_bucket.id
 
@@ -95,6 +103,16 @@ data "aws_iam_policy_document" "get_json_files" {
     resources = [
       aws_s3_bucket.ap_export_bucket.arn,
       "${aws_s3_bucket.ap_export_bucket.arn}/*",
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [
+      "arn:aws:s3:::moj-reg-dev/landing/electronic-monitoring-service/data/*"
     ]
   }
 }
