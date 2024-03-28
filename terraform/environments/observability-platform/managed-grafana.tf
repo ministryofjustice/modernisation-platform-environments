@@ -46,6 +46,15 @@ module "contact_point_slack" {
   channel = each.value
 }
 
+/* PagerDuty Contact Points */
+module "contact_point_pagerduty" {
+  for_each = toset(local.all_pagerduty_services)
+
+  source = "./modules/grafana/contact-point/pagerduty"
+
+  service = each.value
+}
+
 /* Notification Policy */
 resource "grafana_notification_policy" "root" {
   contact_point   = "grafana-default-sns"
@@ -66,7 +75,22 @@ resource "grafana_notification_policy" "root" {
     }
   }
 
-  depends_on = [module.contact_point_slack]
+  dynamic "policy" {
+    for_each = toset(local.all_pagerduty_services)
+    content {
+      matcher {
+        label = "pagerduty-integration"
+        match = "="
+        value = policy.value
+      }
+      contact_point = "${policy.value}-pagerduty"
+    }
+  }
+
+  depends_on = [
+    module.contact_point_slack,
+    module.contact_point_pagerduty
+  ]
 }
 
 /* Prometheus Source */
