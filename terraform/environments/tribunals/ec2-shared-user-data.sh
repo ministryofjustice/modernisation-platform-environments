@@ -1,0 +1,66 @@
+<powershell>
+$logFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
+$linkPath = "C:\ProgramData\docker\volumes\tribunals\"
+$targetDrive = "D"
+$targetPath = $targetDrive + ":\storage\tribunals\"
+$ecsCluster = "tribunals-all-cluster"
+$ebsVolumeTag = "tribunals-all-storage"
+$tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","ahmlr","lands-tribunal"
+
+
+"Starting userdata execution" > $logFile
+
+#Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
+#Install-Module -Name AWS.Tools.EC2
+
+# Get the volumeid based on its tag
+$instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
+"Got instanceid " + $instanceid >> $logFile
+
+$volumeid = Get-EC2Volume -Filter @{ Name="tag:Name"; Values=$ebsVolumeTag } -Select Volumes.VolumeId
+"Got volumeid " + $volumeid >> $logFile
+
+if ([string]::IsNullorEmpty($volumeid)) {
+    "No volume exists with the tag " + $ebsVolumeTag >> $logFile
+}
+else {
+  "Adding volume $volumeid" >> $logFile
+  Add-EC2Volume -VolumeId $volumeid -InstanceId $instanceid -Device /dev/xvdf
+  "result of Adding volume is " + $? >> $logfile
+
+  # Does the attached volume contain a raw disk?
+  $rawdisks = Get-Disk | Where PartitionStyle -eq 'raw'
+
+  "get-disk result is " + $rawdisks >> $logfile
+
+  # If not, put the disk online and assign the drive letter
+  if ([string]::IsNullorEmpty($rawdisks)) {
+    Get-Disk >> $logFile
+    Set-Disk -Number 1 -IsOffline $False -IsReadOnly $False
+    Set-Partition -DiskNumber 1 -PartitionNumber 1 -NewDriveLetter $targetDrive
+  }
+  else {
+    "Formatting volume..." >> $logFile
+
+    # If it does have a raw disk, format it and create the partition and assign
+    Get-Disk | Where PartitionStyle -eq 'raw' | Initialize-Disk -PartitionStyle MBR -PassThru | New-Partition -DriveLetter D -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Tribunals" -Confirm:$false
+  }
+
+  for ($i=0; $i -lt $tribunalNames.Length; $i++) {
+    $subDirPath = ($targetPath + $tribunalNames[$i])
+    if (!(Test-Path $subDirPath)) {
+        New-Item -ItemType Directory -Path $subDirPath
+        "created " + $subDirPath >> $logFile
+    }
+  }
+}
+
+"Set Environment variable to enable awslogs attribute" >> $logFile
+Import-Module ECSTools
+[Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
+
+"Link instance to shared tribunals cluster " + $ecsCluster >> $logFile
+Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
+
+"Finished launch.ps1" >> $logFile
+</powershell>
