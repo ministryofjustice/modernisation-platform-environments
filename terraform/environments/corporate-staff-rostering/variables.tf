@@ -1,9 +1,14 @@
-# variable "monitoring_account_sink_identifier" {
-#   type    = string
-#   default = "arn:aws:oam:eu-west-2:775245656481:sink/7d4f9ba0-e432-49d1-8f34-1fda2d165bf8"
-# } TODO
+#  variable "monitoring_account_sink_identifier" {
+#    type    = string
+#    default = "arn:aws:oam:eu-west-2:${module.environment.account_ids.corporate-staff-rostering-production}:sink/c78e5972-8464-4244-949f-872b726bc563"
+#  }
 
-variable "monitoring_account_id" {
-  type    = string
-  default = "221841889672" # corporate-staff-rostering-production account
-}
+# variable "monitoring_account_id" {
+#   type    = string
+#   default = module.environment.account_ids.corporate-staff-rostering-production
+# }
+
+# variable "source_account_ids" {
+#   type    = list(string)
+#   default = [module.environment.account_ids.planetfm-production]
+# }
