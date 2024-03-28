@@ -81,4 +81,20 @@ locals {
 
   baseline_sns_topics     = {}
   baseline_ssm_parameters = {}
+
+  environment_cloudwatch_monitoring_options = {
+    development   = local.development_cloudwatch_monitoring_options
+    test          = local.test_cloudwatch_monitoring_options
+    preproduction = local.preproduction_cloudwatch_monitoring_options
+    production    = local.production_cloudwatch_monitoring_options
+  }
+
+  cloudwatch_local_environment_monitoring_options = local.environment_cloudwatch_monitoring_options[local.environment]
+
+  cloudwatch_monitoring_options = {
+    enable_cloudwatch_monitoring_account    = false
+    enable_cloudwatch_cross_account_sharing = false
+    # enable_cloudwatch_dashboard             = false
+  }
+
 }
