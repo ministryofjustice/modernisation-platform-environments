@@ -2,7 +2,7 @@ module "grafana_api_key_rotator" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 6.0"
+  version = "~> 7.2"
 
   publish = true
 
