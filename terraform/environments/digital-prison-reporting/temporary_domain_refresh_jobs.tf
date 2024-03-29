@@ -31,7 +31,7 @@ module "glue_temp_refresh_job_establishment_establishment" {
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
-  log_group_retention_in_days = 1
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -87,7 +87,7 @@ module "glue_temp_refresh_job_establishment_living_unit" {
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
-  log_group_retention_in_days = 1
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -144,7 +144,7 @@ module "glue_temp_refresh_job_movements_movements" {
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
-  log_group_retention_in_days = 1
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -200,7 +200,7 @@ module "glue_temp_refresh_job_prisoner_prisoner" {
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
-  log_group_retention_in_days = 1
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
