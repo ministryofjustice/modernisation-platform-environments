@@ -127,8 +127,8 @@ module "nextcloud_service" {
     }
   ]
 
-  log_error_pattern = "FATAL"
-  sns_topic_arn     = aws_sns_topic.nextcloud_alarms.arn
+  log_error_pattern      = "FATAL"
+  sns_topic_arn          = aws_sns_topic.nextcloud_alarms.arn
   frontend_lb_arn_suffix = aws_alb.nextcloud.arn_suffix
 
   platform_vars = var.platform_vars
