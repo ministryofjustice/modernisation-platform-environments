@@ -6,7 +6,7 @@ $targetPath = $targetDrive + ":\storage\tribunals\"
 $ecsCluster = "tribunals-all-cluster"
 $ebsVolumeTag = "tribunals-all-storage"
 $tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","ahmlr","lands-tribunal"
-
+$monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
 "Starting userdata execution" > $logFile
 
@@ -63,4 +63,54 @@ Import-Module ECSTools
 Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
 
 "Finished launch.ps1" >> $logFile
+
+# Configure AWS CLI and EBS backup script
+$scriptContent = @'
+# Check if AWS CLI is installed
+$awsCliInstalled = $null -ne (Get-Command aws -ErrorAction SilentlyContinue)
+
+if (-not $awsCliInstalled) {
+    # Download and install the AWS CLI
+    Write-Host "AWS CLI not found. Installing..."
+    $installerPath = "$env:TEMP\AWSCLIV2.msi"
+    Invoke-WebRequest -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile $installerPath
+    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i", $installerPath, "/quiet", "/qn", "/norestart" -Wait
+    Remove-Item -Path $installerPath
+    Write-Host "AWS CLI installed successfully."
+} else {
+    Write-Host "AWS CLI is already installed."
+}
+
+# Define the path to monitor
+$pathToMonitor = "D:\storage\tribunals\"
+
+# Create a FileSystemWatcher object
+$watcher = New-Object System.IO.FileSystemWatcher
+$watcher.Path = $pathToMonitor
+$watcher.IncludeSubdirectories = $true
+$watcher.EnableRaisingEvents = $true
+
+# Define the action to take when a file is created
+$action = {
+    param($source, $event)
+    $filePath = $event.FullPath
+    Write-Host "A file was created at $filePath. Syncing to S3..."
+    Start-Process -NoNewWindow -FilePath "aws" -ArgumentList "s3 sync D:\storage\tribunals\ s3://ebs_backup"
+}
+
+# Register the event
+Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
+
+# Keep the script running
+while ($true) {
+    Start-Sleep -Seconds 10
+}
+'@
+
+# Output the script to the file
+$scriptContent | Out-File -FilePath $monitorScriptFile
+
+# Execute the monitor script
+Start-Process -FilePath $monitorScriptFile -NoNewWindow
+
 </powershell>
