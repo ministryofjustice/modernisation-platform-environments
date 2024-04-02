@@ -22,10 +22,10 @@ data "aws_iam_policy_document" "quarantine_bucket_policy" {
     effect = "Deny"
     not_principals {
       type        = "AWS"
-      identifiers = [module.scan_lambda.lambda_function_arn]
+      identifiers = ["arn:aws:iam::${local.environment}:role/scan"]
     }
     actions   = ["*"]
-    resources = [module.quarantine_bucket.s3_bucket_arn] # will this introduce a cyclic issue?
+    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-quarantine"]
   }
 }
 
