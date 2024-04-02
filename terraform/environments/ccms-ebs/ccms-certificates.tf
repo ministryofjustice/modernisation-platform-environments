@@ -129,7 +129,7 @@ resource "aws_acm_certificate_validation" "external" {
   ]
 
   certificate_arn         = local.cert_arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.external_validation_core_network : record.fqdn]
 
   timeouts {
     create = "10m"
