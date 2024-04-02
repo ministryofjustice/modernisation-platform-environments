@@ -11,7 +11,6 @@ data "aws_iam_policy_document" "this" {
     ]
     resources = [var.landing_bucket_kms_key]
   }
-  # TODO: review the permissions
   statement {
     sid     = "AllowS3ListBucket"
     effect  = "Allow"
@@ -21,11 +20,10 @@ data "aws_iam_policy_document" "this" {
       "arn:aws:s3:::${var.landing_bucket}/${var.name}/*"
     ]
   }
-  # TODO: review the permissions
   statement {
-    sid       = "AllowS3ObjectActions"
+    sid       = "AllowS3LandingBucketObjectActions"
     effect    = "Allow"
-    actions   = ["s3:*"]
+    actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::${var.landing_bucket}/${var.name}/*"]
   }
 }

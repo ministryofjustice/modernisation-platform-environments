@@ -24,13 +24,16 @@ data "aws_iam_policy_document" "this" {
     ]
   }
   statement {
-    sid     = "AllowS3ObjectActions"
-    effect  = "Allow"
-    actions = ["s3:*"]
-    resources = [
-      "arn:aws:s3:::${var.landing_bucket}/${var.name}/*",
-      "arn:aws:s3:::${var.egress_bucket}/*"
-    ]
+    sid       = "AllowS3LandingBucketObjectActions"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["arn:aws:s3:::${var.landing_bucket}/${var.name}/*"]
+  }
+  statement {
+    sid       = "AllowS3EgressBucketObjectActions"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::${var.egress_bucket}/${var.name}/*"]
   }
 }
 
