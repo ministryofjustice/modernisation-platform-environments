@@ -79,7 +79,9 @@ resource "aws_iam_role_policy" "allow_s3_read" {
         "Effect": "Allow",
         "Resource": [
           "arn:aws:s3:::dpr-working-test",
-          "arn:aws:s3:::dpr-working-test/*"
+          "arn:aws:s3:::dpr-working-test/*",
+          "arn:aws:s3:::dpr-working-development",
+          "arn:aws:s3:::dpr-working-development/*",
         ]
     }]
   })
