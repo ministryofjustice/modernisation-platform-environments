@@ -137,7 +137,7 @@ module "transfer_lambda" {
   create_package = false
 
   function_name          = "transfer"
-  description            = ""
+  description            = "Transfers files from to S3 Buckets"
   package_type           = "Image"
   memory_size            = 2048
   ephemeral_storage_size = 10240

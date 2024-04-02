@@ -10,3 +10,54 @@ resource "aws_security_group" "transfer_server" {
   name        = "transfer-server"
   vpc_id      = module.vpc.vpc_id
 }
+
+module "definition_upload_lambda_security_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 5.0"
+
+  name        = "${local.application_name}-${local.environment}-definition-upload-lambda"
+  description = "Security Group for Definition Upload Lambda"
+
+  vpc_id = module.vpc.vpc_id
+
+  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_rules       = ["all-all"]
+
+  tags = local.tags
+}
+
+module "transfer_lambda_security_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 5.0"
+
+  name        = "${local.application_name}-${local.environment}-definition-upload-lambda"
+  description = "Security Group for Definition Upload Lambda"
+
+  vpc_id = module.vpc.vpc_id
+
+  egress_cidr_blocks = [module.vpc.vpc_cidr_block]
+  egress_rules       = ["all-all"]
+
+  tags = local.tags
+}
+
+module "scan_lambda_security_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 5.0"
+
+  name        = "${local.application_name}-${local.environment}-definition-upload-lambda"
+  description = "Security Group for Definition Upload Lambda"
+
+  vpc_id = module.vpc.vpc_id
+
+  egress_cidr_blocks = [module.vpc.vpc_cidr_block]
+  egress_rules       = ["all-all"]
+
+  tags = local.tags
+}
