@@ -18,14 +18,19 @@ module "landing_bucket" {
 
 data "aws_iam_policy_document" "quarantine_bucket_policy" {
   statement {
-    sid    = "DenyAll"
+    sid    = "DenyAccess"
     effect = "Deny"
-    not_principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/scan"]
+    principals {
+      type        = ["*"]
+      identifiers = ["*"]
     }
-    actions   = ["*"]
-    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-quarantine"]
+    actions   = ["s3:GetObject", "s3:PutObjectTagging"]
+    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-quarantine/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "s3:ExistingObjectTag/scan-result"
+      values   = ["infected"]
+    }
   }
 }
 
