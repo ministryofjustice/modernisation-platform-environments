@@ -9,7 +9,7 @@ s3_client = boto3.client("s3", region_name="eu-west-2")
 
 
 # lambda function to copy file from 1 s3 to another s3
-def lambda_handler(event, context):
+def handler(event, context):
     # Specify source bucket
     source_bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
 
@@ -49,10 +49,10 @@ def lambda_handler(event, context):
         if response_code == 200:
             logger.info(f"{file_name} succesfully transferred to {destination_bucket}")
         else:
-            raise Exception(
+            logger.error(
                 f"An error has occurred writing {destination_key} to {destination_bucket}, with response code: {response_code}"
             )
     except Exception as e:
-        logger.info(f"An exception has occured: {e}")
+        logger.error(f"An exception has occured: {e}")
 
     return {"statusCode": 200, "body": json.dumps("File has been Successfully Copied")}
