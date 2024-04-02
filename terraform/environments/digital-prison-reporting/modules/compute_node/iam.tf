@@ -69,22 +69,18 @@ resource "aws_iam_role_policy" "allow_s3_read" {
   count = var.enable_compute_node ? 1 : 0
   name   = "S3TemporaryReadPolicy"
   role   = aws_iam_role.instance-role[0].name
-  policy = <<EOF
-{
+  policy = jsonencode({
     "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": [
-              "s3:GetObject",
-              "s3:ListBucket",
-            ]
-            "Effect": "Allow",
-            "Resource": [
-              "arn:aws:s3:::dpr-working-test",
-              "arn:aws:s3:::dpr-working-test/*"
-            ]
-        }
-    ]
-}
-EOF
+    "Statement": [{
+        "Action": [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
+        "Effect": "Allow",
+        "Resource": [
+          "arn:aws:s3:::dpr-working-test",
+          "arn:aws:s3:::dpr-working-test/*"
+        ]
+    }]
+  })
 }
