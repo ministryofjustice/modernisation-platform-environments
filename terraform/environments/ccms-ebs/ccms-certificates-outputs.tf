@@ -42,15 +42,15 @@ output "aws_acm_certificate-external-service-status" {
 
 #
 
-output "aws_route53_record-external_validation-fqdn" {
-  description = "aws_route53_record external_validation fqdn"
-  value       = try(aws_route53_record.external_validation[*].fqdn, "None")
-}
+# output "aws_route53_record-external_validation-fqdn" {
+#   description = "aws_route53_record external_validation fqdn"
+#   value       = try(aws_route53_record.external_validation[*].fqdn, "None")
+# }
 
-output "aws_route53_record-external_validation-name" {
-  description = "aws_route53_record external_validation name"
-  value       = try(aws_route53_record.external_validation[*].name, "None")
-}
+# output "aws_route53_record-external_validation-name" {
+#   description = "aws_route53_record external_validation name"
+#   value       = try(aws_route53_record.external_validation[*].name, "None")
+# }
 
 #
 
