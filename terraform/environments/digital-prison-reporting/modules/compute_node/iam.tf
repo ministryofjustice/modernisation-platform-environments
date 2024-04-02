@@ -64,3 +64,26 @@ resource "aws_iam_role_policy_attachment" "this" {
   role       = aws_iam_role.instance-role[0].id
   policy_arn = each.value
 }
+
+resource "aws_iam_role_policy" "allow_s3_read" {
+  name   = "S3TemporaryReadPolicy"
+  role   = aws_iam_role.instance-role.name
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+              "s3:GetObject",
+              "s3:ListBucket",
+            ]
+            "Effect": "Allow",
+            "Resource": [
+              "arn:aws:s3:::dpr-working-test",
+              "arn:aws:s3:::dpr-working-test/*"
+            ]
+        }
+    ]
+}
+EOF
+}
