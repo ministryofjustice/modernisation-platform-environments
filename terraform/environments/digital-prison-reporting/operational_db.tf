@@ -17,16 +17,20 @@ module "operational_db_server" {
   ebs_size                    = 300
   ebs_encrypted               = true
   ebs_delete_on_termination   = false
-  policies                    = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}", "arn:aws:iam::${local.account_id}:policy/${local.apigateway_get_policy}", ]
+  policies                    = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.apigateway_get_policy}",
+  ]
   region                      = local.account_region
   account                     = local.account_id
   env                         = local.env
   app_key                     = "operational-db"
-  ec2_sec_rules = {
+  ec2_sec_rules               = {
     "TCP_5432" = {
       "from_port" = 5432,
       "to_port" : 5432,
-      "protocol" = "TCP"
+      "protocol"  = "TCP"
     },
     "TCP_22" = {
       "from_port" = 22,
