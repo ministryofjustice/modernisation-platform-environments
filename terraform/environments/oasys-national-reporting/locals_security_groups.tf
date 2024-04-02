@@ -7,7 +7,7 @@ locals {
     #   module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers,
     # ])
     # jumpservers = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
-    noms_core   = module.ip_addresses.azure_fixngo_cidrs.devtest_core
+    noms_core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
     oasys_db = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.devtest_oasys_db,
@@ -22,7 +22,7 @@ locals {
     #   # module.ip_addresses.mp_cidrs.ad_fixngo_hmpp_domain_controllers, # hits rule limit, remove azure DCs first
     # ])
     # jumpservers = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
-    noms_core   = module.ip_addresses.azure_fixngo_cidrs.prod_core
+    noms_core = module.ip_addresses.azure_fixngo_cidrs.prod_core
     oasys_db = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.prod_oasys_db,
@@ -140,7 +140,7 @@ locals {
           to_port         = 0
           protocol        = -1
           self            = true
-          security_groups = ["web", "onr_db"] 
+          security_groups = ["web", "onr_db"]
         }
       }
       egress = {
@@ -158,11 +158,11 @@ locals {
       description = "Security group for BODS servers"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
           security_groups = ["onr_db"]
         }
       }
@@ -180,11 +180,11 @@ locals {
       description = "Security group for ONR DB server"
       ingress = {
         all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
           security_groups = ["boe", "bods"]
         }
         onr_db_oem_agent = {

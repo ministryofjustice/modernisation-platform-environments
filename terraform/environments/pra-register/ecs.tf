@@ -27,11 +27,11 @@ resource "aws_ecs_task_definition" "pra_task_definition" {
   memory                   = 4096
   container_definitions = jsonencode([
     {
-      name      = "pra-container"
-      image     = "${aws_ecr_repository.pra_ecr_repo.repository_url}:latest"
-      cpu       = 2048
-      memory    = 4096
-      essential = true
+      name                   = "pra-container"
+      image                  = "${aws_ecr_repository.pra_ecr_repo.repository_url}:latest"
+      cpu                    = 2048
+      memory                 = 4096
+      essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {
         logDriver = "awslogs",
@@ -102,11 +102,11 @@ resource "aws_ecs_task_definition" "pra_task_definition_dev" {
   memory                   = 4096
   container_definitions = jsonencode([
     {
-      name      = "pra-container"
-      image     = "${aws_ecr_repository.pra_ecr_repo.repository_url}:latest"
-      cpu       = 2048
-      memory    = 4096
-      essential = true
+      name                   = "pra-container"
+      image                  = "${aws_ecr_repository.pra_ecr_repo.repository_url}:latest"
+      cpu                    = 2048
+      memory                 = 4096
+      essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {
         logDriver = "awslogs",

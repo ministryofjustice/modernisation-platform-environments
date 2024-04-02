@@ -86,9 +86,9 @@ locals {
 
       dev-rhel85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "base_rhel_8_5*"
-          availability_zone = null
-          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
+          ami_name                  = "base_rhel_8_5*"
+          availability_zone         = null
+          instance_profile_policies = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]

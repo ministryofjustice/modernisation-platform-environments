@@ -24,7 +24,7 @@ variable "bastion_config" {
 }
 
 variable "nextcloud_config" {
-  type = any  
+  type = any
 }
 variable "tags" {
   type = any

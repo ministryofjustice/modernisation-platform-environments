@@ -44,12 +44,12 @@ locals {
       vpc_security_group_ids = ["web"]
     })
     tags = {
-        os-type   = "Linux"
-        component = "onr_web"
+      os-type   = "Linux"
+      component = "onr_web"
     }
     # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
     ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+      "/dev/sda1" = { type = "gp3", size = 128 } # root volume
     }
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.web off for now
   })
@@ -57,7 +57,7 @@ locals {
   defaults_boe_ec2 = merge(local.defaults_ec2, {
     config = merge(local.defaults_ec2.config, {
       ami_owner = "374269020027"
-      ami_name = "base_rhel_6_10_2024-03-26*"
+      ami_name  = "base_rhel_6_10_2024-03-26*"
     })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["boe", "oasys_db"]
@@ -69,7 +69,7 @@ locals {
     }
     # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
     ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+      "/dev/sda1" = { type = "gp3", size = 128 } # root volume
     }
   })
 
@@ -127,6 +127,6 @@ locals {
       os-type   = "Windows"
       component = "onr_db"
     }
-    route53_records      = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
   })
 }

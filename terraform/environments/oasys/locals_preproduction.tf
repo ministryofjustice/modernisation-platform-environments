@@ -178,8 +178,8 @@ locals {
           }
         }
         tags = merge(local.database_b.tags, {
-          bip-db-name                             = "PPBIPINF"
-          oracle-sids                             = "PPBIPINF PPOASYS"
+          bip-db-name = "PPBIPINF"
+          oracle-sids = "PPBIPINF PPOASYS"
         })
       })
 
