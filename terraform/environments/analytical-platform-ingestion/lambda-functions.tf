@@ -2,7 +2,7 @@ module "definition_upload_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.2.1"
+  version = "7.2.5"
 
   publish        = true
   create_package = false
@@ -13,6 +13,10 @@ module "definition_upload_lambda" {
   memory_size   = 2048
   timeout       = 900
   image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-scan:${local.environment_configuration.scan_image_version}"
+
+  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_security_group_ids = [module.vpc.default_security_group_id]
+  attach_network_policy  = true
 
   environment_variables = {
     MODE                         = "definition-upload",
@@ -56,7 +60,7 @@ module "scan_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.2.1"
+  version = "7.2.5"
 
   publish        = true
   create_package = false
@@ -127,7 +131,7 @@ module "transfer_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.2.1"
+  version = "7.2.5"
 
   publish        = true
   create_package = false
