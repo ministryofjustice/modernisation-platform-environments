@@ -64,12 +64,16 @@ locals {
     })
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.boe off for now
     tags = {
-      os-type   = "Linux"
-      component = "onr_boe"
+      ami         = "base_rhel_6_10"
+      os-type     = "Linux"
+      component   = "boe"
+      server-type = "onr-boe"
     }
     # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
     ebs_volumes = {
       "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+      "/dev/sdb"  = { type = "gp3", size = 128 } # /u01
+      "/dev/sdc"  = { type = "gp3", size = 128 } # /u02
     }
   })
 
