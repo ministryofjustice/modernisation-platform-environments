@@ -64,6 +64,6 @@ resource "aws_glue_trigger" "db_crawler" {
     }
 }
 
-resource "aws_glue_catalog_database" "rds_to_parquet" {
-  name = "rds_to_parquet"
+resource "aws_glue_catalog_database" "db_crawler" {
+  name = "all_tables"
 }
