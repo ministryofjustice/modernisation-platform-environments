@@ -39,7 +39,6 @@ resource "aws_db_instance" "database_2022" {
 
   db_subnet_group_name   = aws_db_subnet_group.db.id
   vpc_security_group_ids = [aws_security_group.db.id]
-  publicly_accessible    = true
   port                   = 1433
 
   auto_minor_version_upgrade = true
