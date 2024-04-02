@@ -1,5 +1,6 @@
 module "definition_upload_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
+
   source  = "terraform-aws-modules/lambda/aws"
   version = "7.2.1"
 
@@ -53,6 +54,7 @@ module "definition_upload_lambda" {
 
 module "scan_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
+
   source  = "terraform-aws-modules/lambda/aws"
   version = "7.2.1"
 
@@ -123,6 +125,7 @@ module "scan_lambda" {
 
 module "transfer_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
+
   source  = "terraform-aws-modules/lambda/aws"
   version = "7.2.1"
 
