@@ -72,9 +72,9 @@ resource "aws_route53_record" "external_validation_core_network" {
 resource "aws_route53_record" "external_validation_core_vpc" {
   depends_on = [
     aws_instance.ec2_oracle_ebs,
-    aws.instance.ec2_ebsapps,
-    aws.instance.ec2_webgate,
-    aws.instance.ec2_accessgate
+    aws_instance.ec2_ebsapps,
+    aws_instance.ec2_webgate,
+    aws_instance.ec2_accessgate
   ]
 
   provider = aws.core-vpc
