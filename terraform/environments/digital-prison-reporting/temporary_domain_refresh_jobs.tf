@@ -3,6 +3,8 @@ locals {
   domain_refresh_establishment_living_unit   = "${local.project}-temp-refresh-establishment-lu-${local.env}"
   domain_refresh_movements_movements         = "${local.project}-temp-refresh-movements-m-${local.env}"
   domain_refresh_prisoner_prisoner           = "${local.project}-temp-refresh-prisoner-p-${local.env}"
+
+  artifact_version = local.environment == "production" ? "v1.0.13.rel-all" : "v1.0.13-all"
 }
 
 # Glue Job, Domain Refresh establishment/establishment
@@ -43,7 +45,7 @@ module "glue_temp_refresh_job_establishment_establishment" {
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.13.rel-all.jar"
+    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-${local.artifact_version}.jar"
     "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"             = "delta"
     "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
@@ -99,7 +101,7 @@ module "glue_temp_refresh_job_establishment_living_unit" {
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.13.rel-all.jar"
+    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-${local.artifact_version}.jar"
     "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"             = "delta"
     "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
@@ -156,7 +158,7 @@ module "glue_temp_refresh_job_movements_movements" {
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.13.rel-all.jar"
+    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-${local.artifact_version}.jar"
     "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"             = "delta"
     "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
@@ -212,7 +214,7 @@ module "glue_temp_refresh_job_prisoner_prisoner" {
   )
 
   arguments = {
-    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.13.rel-all.jar"
+    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-${local.artifact_version}.jar"
     "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"             = "delta"
     "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
