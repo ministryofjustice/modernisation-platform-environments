@@ -34,8 +34,8 @@ module "transfer_lambda_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "~> 5.0"
 
-  name        = "${local.application_name}-${local.environment}-definition-upload-lambda"
-  description = "Security Group for Definition Upload Lambda"
+  name        = "${local.application_name}-${local.environment}-transfer-lambda"
+  description = "Security Group for Transfer Lambda"
 
   vpc_id = module.vpc.vpc_id
 
@@ -51,8 +51,8 @@ module "scan_lambda_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "~> 5.0"
 
-  name        = "${local.application_name}-${local.environment}-definition-upload-lambda"
-  description = "Security Group for Definition Upload Lambda"
+  name        = "${local.application_name}-${local.environment}-scan-lambda"
+  description = "Security Group for Scan Lambda"
 
   vpc_id = module.vpc.vpc_id
 
