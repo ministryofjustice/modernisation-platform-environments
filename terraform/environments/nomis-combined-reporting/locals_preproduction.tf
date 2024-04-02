@@ -168,7 +168,7 @@ locals {
           ])
         })
         instance = merge(local.bip_cms_ec2_default.instance, {
-          instance_type = "r7g.large",
+          instance_type = "r7l.large",
         })
         tags = merge(local.tomcat_admin_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform tomcat admin installation and configurations"
@@ -183,7 +183,7 @@ locals {
           ])
         })
         instance = merge(local.bip_cms_ec2_default.instance, {
-          instance_type = "r7g.large",
+          instance_type = "r7l.large",
         })
         tags = merge(local.tomcat_admin_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform tomcat installation and configurations"
@@ -198,7 +198,7 @@ locals {
           ])
         })
         instance = merge(local.bip_cms_ec2_default.instance, {
-          instance_type = "r7g.xlarge",
+          instance_type = "r7l.xlarge",
         })
         tags = merge(local.tomcat_admin_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform tomcat installation and configurations"
@@ -251,7 +251,7 @@ locals {
           ])
         })
         instance = merge(local.bip_cms_ec2_default.instance, {
-          instance_type = "r7g.xlarge",
+          instance_type = "r7l.xlarge",
         })
         tags = merge(local.tomcat_admin_ec2_default.tags, {
           description                          = "LSAST SAP BI Platform tomcat installation and configurations"
