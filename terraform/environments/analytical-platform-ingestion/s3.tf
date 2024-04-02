@@ -5,7 +5,7 @@ module "landing_bucket" {
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-landing"
-  # TODO: Is this needed below?
+
   force_destroy = true
 
   server_side_encryption_configuration = {
@@ -18,6 +18,27 @@ module "landing_bucket" {
   }
 }
 
+data "aws_iam_policy_document" "quarantine_bucket_policy" {
+  statement {
+    sid    = "DenyAccess"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = [
+      "s3:GetObject",
+      "s3:PutObjectTagging"
+    ]
+    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-quarantine/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "s3:ExistingObjectTag/scan-result"
+      values   = ["infected"]
+    }
+  }
+}
+
 module "quarantine_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
@@ -25,8 +46,11 @@ module "quarantine_bucket" {
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-quarantine"
-  # TODO: Is this needed below?
+
   force_destroy = true
+
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.quarantine_bucket_policy.json
 
   server_side_encryption_configuration = {
     rule = {
@@ -45,7 +69,7 @@ module "definitions_bucket" {
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-definitions"
-  # TODO: Is this needed below?
+
   force_destroy = true
 
   server_side_encryption_configuration = {
@@ -65,7 +89,7 @@ module "processed_bucket" {
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-processed"
-  # TODO: Is this needed below?
+
   force_destroy = true
 
   server_side_encryption_configuration = {
