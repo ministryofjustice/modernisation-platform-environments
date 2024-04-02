@@ -50,7 +50,7 @@ resource "aws_glue_crawler" "db_crawler" {
   }
 }
 
-resource "aws_glue_trigger" "s" {
+resource "aws_glue_trigger" "db_crawler" {
     name          = "crawl_all_tables"
     # Change this to CONDITIONAL to automate
     type          = "ON_DEMAND"
@@ -64,6 +64,6 @@ resource "aws_glue_trigger" "s" {
     }
 }
 
-resource "aws_glue_catalog_database" "db_crawler" {
-  name = "all_tables"
+resource "aws_glue_catalog_database" "rds_to_parquet" {
+  name = "rds_to_parquet"
 }
