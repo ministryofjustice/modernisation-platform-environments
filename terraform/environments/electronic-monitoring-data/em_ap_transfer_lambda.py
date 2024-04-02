@@ -6,7 +6,6 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 s3_client = boto3.client("s3", region_name="eu-west-2")
-s3 = boto3.resource("s3")
 
 
 # lambda function to copy file from 1 s3 to another s3
