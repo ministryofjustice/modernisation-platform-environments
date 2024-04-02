@@ -24,7 +24,10 @@ data "aws_iam_policy_document" "quarantine_bucket_policy" {
       type        = "*"
       identifiers = ["*"]
     }
-    actions   = ["s3:GetObject", "s3:PutObjectTagging"]
+    actions = [
+      "s3:GetObject",
+      "s3:PutObjectTagging"
+    ]
     resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-quarantine/*"]
     condition {
       test     = "StringEquals"
