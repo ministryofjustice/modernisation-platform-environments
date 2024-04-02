@@ -25,7 +25,11 @@ locals {
     data.aws_subnet.public_subnets_c.id
   ]
 
-  cert_opts    = local.environment == "production" ? aws_acm_certificate.external-service[0].domain_validation_options : aws_acm_certificate.external[0].domain_validation_options
+  cert_opts = local.environment == "production" ? [
+    {
+      domain_name : "ccms-ebs.service.justice.gov.uk",
+    }
+  ] : aws_acm_certificate.external[0].domain_validation_options
   cert_arn     = local.environment == "production" ? aws_acm_certificate.external-service[0].arn : aws_acm_certificate.external[0].arn
   cert_zone_id = local.environment == "production" ? data.aws_route53_zone.application-zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
