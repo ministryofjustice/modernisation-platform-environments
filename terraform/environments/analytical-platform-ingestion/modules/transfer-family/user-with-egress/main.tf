@@ -30,9 +30,13 @@ data "aws_iam_policy_document" "this" {
     resources = ["arn:aws:s3:::${var.landing_bucket}/${var.name}/*"]
   }
   statement {
-    sid       = "AllowS3EgressBucketObjectActions"
-    effect    = "Allow"
-    actions   = ["s3:GetObject"]
+    sid    = "AllowS3EgressBucketObjectActions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectAcl",
+      "s3:GetObjectVersion"
+    ]
     resources = ["arn:aws:s3:::${var.egress_bucket}/${var.name}/*"]
   }
 }
