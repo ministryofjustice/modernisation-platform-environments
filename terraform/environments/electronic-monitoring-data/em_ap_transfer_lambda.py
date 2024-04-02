@@ -36,8 +36,8 @@ def lambda_handler(event, context):
     object_body = response["Body"].read()
     logger.info("File read succesfully")
 
-    # Put the object into the destination bucket
     try:
+        # Put the object into the destination bucket
         response = s3_client.put_object(
             Body=object_body,
             Key=destination_key,
@@ -46,10 +46,13 @@ def lambda_handler(event, context):
             ACL="bucket-owner-full-control",
             BucketKeyEnabled=True,
         )
-
-        # Print out the parameters used in the put_object call
-        if response["HTTPStatusCode"] == 200:
+        response_code = response["ResponseMetadata"]["HTTPStatusCode"]
+        if response_code == 200:
             logger.info(f"{file_name} succesfully transferred to {destination_bucket}")
+        else:
+            raise Exception(
+                f"An error has occurred writing {destination_key} to {destination_bucket}, with response code: {response_code}"
+            )
     except Exception as e:
         logger.info(f"An exception has occured: {e}")
 
