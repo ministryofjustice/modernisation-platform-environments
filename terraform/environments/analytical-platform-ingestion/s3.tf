@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "quarantine_bucket_policy" {
     sid    = "DenyAccess"
     effect = "Deny"
     principals {
-      type        = ["*"]
+      type        = "*"
       identifiers = ["*"]
     }
     actions   = ["s3:GetObject", "s3:PutObjectTagging"]
