@@ -43,6 +43,8 @@ resource "aws_acm_certificate" "external-service" {
 ## Validation 
 
 resource "aws_route53_record" "external_validation_core_network" {
+  count = local.is-production ? 0 : 1
+
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
@@ -70,6 +72,8 @@ resource "aws_route53_record" "external_validation_core_network" {
 
 
 resource "aws_route53_record" "external_validation_core_vpc" {
+  count = local.is-production ? 0 : 1
+
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
@@ -95,33 +99,34 @@ resource "aws_route53_record" "external_validation_core_vpc" {
   zone_id         = local.cert_zone_id
 }
 
-# resource "aws_route53_record" "external_validation" {
-#   depends_on = [
-#     aws_instance.ec2_oracle_ebs,
-#     aws_instance.ec2_ebsapps,
-#     aws_instance.ec2_webgate,
-#     aws_instance.ec2_accessgate
-#   ]
+resource "aws_route53_record" "external_validation" {
+  count = local.is-production ? 1 : 0
+  depends_on = [
+    aws_instance.ec2_oracle_ebs,
+    aws_instance.ec2_ebsapps,
+    aws_instance.ec2_webgate,
+    aws_instance.ec2_accessgate
+  ]
 
-#   provider = aws.core-network-services
+  provider = aws.core-network-services
 
-#   for_each = {
-#     for dvo in local.cert_opts : dvo.domain_name => {
-#       name   = dvo.resource_record_name
-#       record = dvo.resource_record_value
-#       type   = dvo.resource_record_type
-#     }
-#   }
-#   allow_overwrite = true
-#   name            = each.value.name
-#   records         = [each.value.record]
-#   ttl             = 60
-#   type            = each.value.type
-#   zone_id         = local.cert_zone_id
-# }
+  for_each = {
+    for dvo in local.cert_opts : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = local.cert_zone_id
+}
 
-resource "aws_acm_certificate_validation" "external" {
-  count = local.is-production ? 1 : 1
+resource "aws_acm_certificate_validation" "external_nonprod" {
+  count = local.is-production ? 0 : 1
 
   depends_on = [
     aws_route53_record.external_validation_core_network,
@@ -133,6 +138,21 @@ resource "aws_acm_certificate_validation" "external" {
     [for record in aws_route53_record.external_validation_core_network : record.fqdn],
     [for record in aws_route53_record.external_validation_core_vpc : record.fqdn]
   )
+
+  timeouts {
+    create = "10m"
+  }
+}
+
+resource "aws_acm_certificate_validation" "external" {
+  count = local.is-production ? 1 : 0
+
+  depends_on = [
+    aws_route53_record.external_validation
+  ]
+
+  certificate_arn         = local.cert_arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 
   timeouts {
     create = "10m"
