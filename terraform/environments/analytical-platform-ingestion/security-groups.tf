@@ -22,8 +22,9 @@ module "definition_upload_lambda_security_group" {
 
   vpc_id = module.vpc.vpc_id
 
-  egress_cidr_blocks = ["0.0.0.0/0"]
-  egress_rules       = ["all-all"]
+  egress_cidr_blocks     = ["0.0.0.0/0"]
+  egress_rules           = ["all-all"]
+  egress_prefix_list_ids = [data.aws_vpc_endpoint.s3.id]
 
   tags = local.tags
 }
@@ -39,8 +40,9 @@ module "transfer_lambda_security_group" {
 
   vpc_id = module.vpc.vpc_id
 
-  egress_cidr_blocks = [module.vpc.vpc_cidr_block]
-  egress_rules       = ["all-all"]
+  egress_cidr_blocks     = [module.vpc.vpc_cidr_block]
+  egress_rules           = ["all-all"]
+  egress_prefix_list_ids = [data.aws_vpc_endpoint.s3.id]
 
   tags = local.tags
 }
@@ -56,8 +58,9 @@ module "scan_lambda_security_group" {
 
   vpc_id = module.vpc.vpc_id
 
-  egress_cidr_blocks = [module.vpc.vpc_cidr_block]
-  egress_rules       = ["all-all"]
+  egress_cidr_blocks     = [module.vpc.vpc_cidr_block]
+  egress_rules           = ["all-all"]
+  egress_prefix_list_ids = [data.aws_vpc_endpoint.s3.id]
 
   tags = local.tags
 }
