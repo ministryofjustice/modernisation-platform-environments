@@ -95,7 +95,7 @@ $action = {
     param($source, $event)
     $filePath = $event.FullPath
     Write-Host "A file was created at $filePath. Syncing to S3..."
-    Start-Process -NoNewWindow -FilePath "aws" -ArgumentList "s3 sync D:\storage\tribunals\ s3://ebs-backup"
+    Start-Process -NoNewWindow -FilePath "aws" -ArgumentList "s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup"
 }
 
 # Register the event
