@@ -136,8 +136,8 @@ variable "account" {
 }
 
 variable "scaledown" {
-  type = bool
-  default = false
+  type    = bool
+  default = true
 }
 
 #variable "s3_policy_arn" {
