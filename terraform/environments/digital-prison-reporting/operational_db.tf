@@ -22,6 +22,19 @@ module "operational_db_server" {
   account                     = local.account_id
   env                         = local.env
   app_key                     = "operational-db"
+  ec2_sec_rules = {
+    "TCP_5432" = {
+      "from_port" = 5432,
+      "to_port" : 5432,
+      "protocol" = "TCP"
+    },
+    "TCP_22" = {
+      "from_port" = 22,
+      "to_port"   = 22,
+      "protocol"  = "TCP"
+    }
+  }
+}
 
   env_vars = {
     POSTGRES_PASS     = "postgres" # WEAK, WIP
