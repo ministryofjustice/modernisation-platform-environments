@@ -32,6 +32,7 @@ data "aws_iam_policy_document" "this" {
 
 module "policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.37.1"
 
@@ -57,24 +58,10 @@ module "role" {
 }
 
 resource "aws_transfer_user" "this" {
-  server_id = var.transfer_server
-  user_name = var.name
-  role      = module.role.iam_role_arn
-
-  # This doesn't work unless optimised directory is disabled, and that isn't available in Terraform
-  # home_directory_type = "LOGICAL"
-  # home_directory_mappings {
-  #   entry  = "/upload"
-  #   target = "/${var.landing_bucket}/${var.name}/upload"
-  # }
-
-  # home_directory_mappings {
-  #   entry  = "/download"
-  #   target = "/${var.landing_bucket}/${var.name}/download"
-  # }
-
-  # This works
-  home_directory = "/${var.landing_bucket}/${var.name}" # TODO: do we need an SFTP specific landing bucket?
+  server_id      = var.transfer_server
+  user_name      = var.name
+  role           = module.role.iam_role_arn
+  home_directory = "/${var.landing_bucket}/${var.name}"
 }
 
 resource "aws_transfer_ssh_key" "this" {

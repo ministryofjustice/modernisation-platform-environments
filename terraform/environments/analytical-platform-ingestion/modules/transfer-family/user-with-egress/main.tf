@@ -69,12 +69,12 @@ resource "aws_transfer_user" "this" {
   home_directory_type = "LOGICAL"
   home_directory_mappings {
     entry  = "/upload"
-    target = "/${var.landing_bucket}/${var.name}/upload"
+    target = "/${var.landing_bucket}/${var.name}"
   }
 
   home_directory_mappings {
     entry  = "/download"
-    target = "/${var.egress_bucket}"
+    target = "/${var.egress_bucket}/${var.name}"
   }
 }
 
