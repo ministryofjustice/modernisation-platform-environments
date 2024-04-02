@@ -10,7 +10,9 @@ resource "aws_s3_bucket_policy" "backup_bucket_policy" {
     Statement = [
       {
         Effect    = "Allow",
-        Principal = "*",
+        Principal = {
+          "AWS": "${aws_iam_role.ec2_instance_role.arn}"
+        },
         Action = [
           "s3:GetObject",
           "s3:PutObject",
