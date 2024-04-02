@@ -17,7 +17,10 @@ resource "aws_s3_bucket_policy" "backup_bucket_policy" {
           "s3:DeleteObject",
           "s3:ListBucket"
         ],
-        Resource = "${aws_s3_bucket.ebs_backup.arn}/*"
+        Resource = [
+          "${aws_s3_bucket.ebs_backup.arn}",
+          "${aws_s3_bucket.ebs_backup.arn}/*"
+        ]
       }
     ]
   })
