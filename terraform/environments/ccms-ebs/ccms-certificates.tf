@@ -44,10 +44,10 @@ resource "aws_acm_certificate" "external-service" {
 
 resource "aws_route53_record" "external_validation_core_network" {
   depends_on = [
-    ec2_oracle_ebs,
-    ec2_ebsapps,
-    ec2_webgate,
-    ec2_accessgate
+    aws_instance.ec2_oracle_ebs,
+    aws_instance.ec2_ebsapps,
+    aws_instance.ec2_webgate,
+    aws_instance.ec2_accessgate
   ]
 
   provider = aws.core-network-services
@@ -71,10 +71,10 @@ resource "aws_route53_record" "external_validation_core_network" {
 
 resource "aws_route53_record" "external_validation_core_vpc" {
   depends_on = [
-    ec2_oracle_ebs,
-    ec2_ebsapps,
-    ec2_webgate,
-    ec2_accessgate
+    aws_instance.ec2_oracle_ebs,
+    aws.instance.ec2_ebsapps,
+    aws.instance.ec2_webgate,
+    aws.instance.ec2_accessgate
   ]
 
   provider = aws.core-vpc
