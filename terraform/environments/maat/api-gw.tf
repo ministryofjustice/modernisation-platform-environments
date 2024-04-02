@@ -86,7 +86,8 @@ resource "aws_apigatewayv2_authorizer" "maat_api_authorizer" {
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_ce.id,
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_chs.id,
       aws_cognito_user_pool_client.maat_api_cognito_pool_client_maatos.id,
-      aws_cognito_user_pool_client.maat_api_cognito_pool_client_cvs.id
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_cvs.id,
+      aws_cognito_user_pool_client.maat_api_cognito_pool_client_cccd.id
     ]
     issuer = "https://${aws_cognito_user_pool.maat_api_cognito_user_pool.endpoint}"
   }
