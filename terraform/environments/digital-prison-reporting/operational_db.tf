@@ -22,11 +22,12 @@ module "operational_db_server" {
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.apigateway_get_policy}",
   ]
-  region                      = local.account_region
-  account                     = local.account_id
-  env                         = local.env
-  app_key                     = "operational-db"
-  ec2_sec_rules               = {
+
+  region        = local.account_region
+  account       = local.account_id
+  env           = local.env
+  app_key       = "operational-db"
+  ec2_sec_rules = {
     "TCP_5432" = {
       "from_port" = 5432,
       "to_port" : 5432,
@@ -38,7 +39,6 @@ module "operational_db_server" {
       "protocol"  = "TCP"
     }
   }
-}
 
   env_vars = {
     POSTGRES_PASS     = "postgres" # WEAK, WIP
