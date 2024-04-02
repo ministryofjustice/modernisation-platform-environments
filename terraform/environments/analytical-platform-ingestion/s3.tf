@@ -3,7 +3,7 @@ module "landing_bucket" {
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-landing"
-  # TODO: Is this needed below?
+
   force_destroy = true
 
   server_side_encryption_configuration = {
@@ -16,13 +16,29 @@ module "landing_bucket" {
   }
 }
 
+data "aws_iam_policy_document" "quarantine_bucket_policy" {
+  statement {
+    sid    = "DenyAll"
+    effect = "Deny"
+    not_principals {
+      type        = "AWS"
+      identifiers = [module.scan_lambda.lambda_function_arn]
+    }
+    actions   = ["*"]
+    resources = [module.quarantine_bucket.s3_bucket_arn] # will this introduce a cyclic issue?
+  }
+}
+
 module "quarantine_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-quarantine"
-  # TODO: Is this needed below?
+
   force_destroy = true
+
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.quarantine_bucket_policy.json
 
   server_side_encryption_configuration = {
     rule = {
@@ -39,7 +55,7 @@ module "definitions_bucket" {
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-definitions"
-  # TODO: Is this needed below?
+
   force_destroy = true
 
   server_side_encryption_configuration = {
@@ -57,7 +73,7 @@ module "processed_bucket" {
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-processed"
-  # TODO: Is this needed below?
+
   force_destroy = true
 
   server_side_encryption_configuration = {
