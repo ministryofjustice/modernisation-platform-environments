@@ -197,7 +197,7 @@ locals {
               }
             }
             rules = {
-              t1-ncr-web = {
+              t1-ncr-web-1-a = {
                 priority = 4000
                 actions = [{
                   type              = "forward"
@@ -227,7 +227,7 @@ locals {
               }
             }
             rules = {
-              t1-ncr-web = {
+              t1-ncr-web-1-a = {
                 priority = 4580
                 actions = [{
                   type              = "forward"
