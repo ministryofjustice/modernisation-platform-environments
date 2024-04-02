@@ -66,8 +66,9 @@ resource "aws_iam_role_policy_attachment" "this" {
 }
 
 resource "aws_iam_role_policy" "allow_s3_read" {
+  count = var.enable_compute_node ? 1 : 0
   name   = "S3TemporaryReadPolicy"
-  role   = aws_iam_role.instance-role.name
+  role   = aws_iam_role.instance-role[0].name
   policy = <<EOF
 {
     "Version": "2012-10-17",
