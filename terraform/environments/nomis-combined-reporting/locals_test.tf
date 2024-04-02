@@ -113,7 +113,7 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-web-1-a = merge(local.tomcat_admin_ec2_default, {
+      t1-ncr-web-1 = merge(local.tomcat_admin_ec2_default, {
         cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
         config = merge(local.tomcat_admin_ec2_default.config, {
           instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
@@ -125,7 +125,7 @@ locals {
           nomis-combined-reporting-environment = "t1"
         })
       })
-      t1-ncr-cms-1-a = merge(local.bip_cms_ec2_default, {
+      t1-ncr-cms-1 = merge(local.bip_cms_ec2_default, {
         cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
         config = merge(local.bip_cms_ec2_default.config, {
           instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
@@ -138,7 +138,7 @@ locals {
           node                                 = "1"
         })
       })
-      t1-ncr-etl-1-a = merge(local.etl_ec2_default, {
+      t1-ncr-etl-1 = merge(local.etl_ec2_default, {
         cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
         config = merge(local.etl_ec2_default.config, {
           instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
@@ -162,7 +162,7 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          t1-ncr-web-1-a = {
+          t1-ncr-web-1 = {
             port     = 7777
             protocol = "HTTP"
             health_check = {
@@ -180,7 +180,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "t1-ncr-web-1-a" },
+              { ec2_instance_name = "t1-ncr-web-1" },
             ]
           }
         }
@@ -197,16 +197,16 @@ locals {
               }
             }
             rules = {
-              t1-ncr-web-1-a = {
+              t1-ncr-web-1 = {
                 priority = 4000
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-web-1-a"
+                  target_group_name = "t1-ncr-web-1"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-web-1.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -227,16 +227,16 @@ locals {
               }
             }
             rules = {
-              t1-ncr-web-1-a = {
+              t1-ncr-web-1 = {
                 priority = 4580
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-web-1-a"
+                  target_group_name = "t1-ncr-web-1"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-web-1.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
