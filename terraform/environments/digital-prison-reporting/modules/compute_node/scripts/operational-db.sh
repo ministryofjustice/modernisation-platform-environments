@@ -63,7 +63,6 @@ echo -n "/usr/lib/oracle/12.2/client64/lib/" >/etc/ld.so.conf
 ldconfig
 ## Install latest dev version of oracle_fdw
 mkdir -p /opt/oracle_fdw
-curl https://github.com/laurenz/oracle_fdw/archive/refs/tags/ORACLE_FDW_2_6_0.zip --output /opt/oracle_fdw/ORACLE_FDW_2_6_0.zip
 cd /opt/oracle_fdw && git clone https://github.com/laurenz/oracle_fdw.git
 cd oracle_fdw
 make
