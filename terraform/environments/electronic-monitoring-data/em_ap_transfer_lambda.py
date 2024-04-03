@@ -49,9 +49,9 @@ def handler(event, context):
         if response_code == 200:
             logger.info(f"{file_name} succesfully transferred to {destination_bucket}")
         else:
-            logger.error(
-                f"An error has occurred writing {destination_key} to {destination_bucket}, with response code: {response_code}"
-            )
+            msg = f"An error has occurred writing {destination_key} to {destination_bucket}, with response code: {response_code}"
+            logger.error(msg)
+            raise Exception(msg)
     except Exception as e:
         logger.error(f"An exception has occured: {e}")
 
