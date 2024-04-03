@@ -14,7 +14,7 @@ resource "aws_security_group" "dms_ri_security_group" {
 resource "aws_vpc_security_group_egress_rule" "dms_all_tcp_outbound" {
     security_group_id = aws_security_group.dms_ri_security_group.id
 
-    cidr_ipv4         = data.aws_vpc.shared.cidr_block
+    cidr_ipv4         = "0.0.0.0/0"
     ip_protocol       = "tcp"
     from_port         = 0
     to_port           = 65535

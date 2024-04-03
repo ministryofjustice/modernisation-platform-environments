@@ -21,8 +21,8 @@ resource "aws_iam_policy" "dms-s3-ep-role-policy" {
             "kms:*"
         ],
         "Resource": [
-            "arn:aws:s3:::dms-/*",
-            "arn:aws:s3:::dms-*"
+            "arn:aws:s3::*:dms-*/*",
+            "arn:aws:s3::*:dms-*"
         ]
     }
 ]
