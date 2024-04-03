@@ -8,3 +8,8 @@ resource "aws_secretsmanager_secret" "govuk_notify_templates" {
   name       = "ingestion/govuk-notify/templates"
   kms_key_id = module.govuk_notify_kms.key_arn
 }
+
+resource "aws_secretsmanager_secret" "slack_token" {
+  name       = "ingestion/slack-token"
+  kms_key_id = module.slack_token_kms.key_arn
+}
