@@ -101,7 +101,7 @@ resource "aws_security_group_rule" "this" {
 }
 
 resource "aws_secretsmanager_secret" "this" {
-  for_each = toset(["technical-contact", "data-contact", "target-bucket"])
+  for_each = toset(["technical-contact", "data-contact", "target-bucket", "slack-channel"])
 
   name       = "ingestion/sftp/${var.name}/${each.key}"
   kms_key_id = var.supplier_data_kms_key
