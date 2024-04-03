@@ -341,3 +341,4 @@ resource "aws_route53_record" "oas-app" {
   ttl      = 900
   records  = [aws_instance.oas_app_instance.private_ip]
 }
+
