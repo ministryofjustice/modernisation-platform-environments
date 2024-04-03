@@ -8,7 +8,7 @@ module "operational_db_server" {
   vpc                         = data.aws_vpc.shared.id
   cidr                        = [data.aws_vpc.shared.cidr_block]
   subnet_ids                  = data.aws_subnet.private_subnets_a.id
-  ec2_instance_type           = local.instance_type
+  ec2_instance_type           = "t3.large"
   ami_image_id                = local.image_id
   aws_region                  = local.account_region
   ec2_terminate_behavior      = "terminate"
