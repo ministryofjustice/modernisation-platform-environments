@@ -5,12 +5,12 @@ module "s3_bucket_oracledb_backups" {
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.kms_keys.general_shared
-  bucket_policy       = compact([local.oracle_duplicate_delius_target_environment != "" ? templatefile("${path.module}/policies/oracledb_backup_data.json",
+  bucket_policy = compact([local.oracle_duplicate_delius_target_environment != "" ? templatefile("${path.module}/policies/oracledb_backup_data.json",
     {
-      s3bucket_arn                                = module.s3_bucket_oracledb_backups.bucket.arn,
+      s3bucket_arn                               = module.s3_bucket_oracledb_backups.bucket.arn,
       oracle_duplicate_delius_target_account_id  = local.oracle_duplicate_delius_target_account_id,
       oracle_duplicate_delius_target_environment = local.oracle_duplicate_delius_target_environment
-    }) : null])
+  }) : null])
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
@@ -147,8 +147,8 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
 data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     data.aws_iam_policy_document.oracledb_backup_bucket_access.json,
-    local.oracle_statistics_delius_source_environment != "" ? data.aws_iam_policy_document.oracle_remote_statistics_bucket_access.json: null,
-    local.oracle_duplicate_delius_source_environment != "" ? data.aws_iam_policy_document.oracledb_remote_backup_bucket_access.json: null
+    local.oracle_statistics_delius_source_environment != "" ? data.aws_iam_policy_document.oracle_remote_statistics_bucket_access.json : null,
+    local.oracle_duplicate_delius_source_environment != "" ? data.aws_iam_policy_document.oracledb_remote_backup_bucket_access.json : null
   ])
 }
 

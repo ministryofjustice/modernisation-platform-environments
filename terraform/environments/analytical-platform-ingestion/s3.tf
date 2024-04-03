@@ -1,9 +1,11 @@
 module "landing_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-landing"
-  # TODO: Is this needed below?
+
   force_destroy = true
 
   server_side_encryption_configuration = {
@@ -16,13 +18,39 @@ module "landing_bucket" {
   }
 }
 
+data "aws_iam_policy_document" "quarantine_bucket_policy" {
+  statement {
+    sid    = "DenyAccess"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = [
+      "s3:GetObject",
+      "s3:PutObjectTagging"
+    ]
+    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-quarantine/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "s3:ExistingObjectTag/scan-result"
+      values   = ["infected"]
+    }
+  }
+}
+
 module "quarantine_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-quarantine"
-  # TODO: Is this needed below?
+
   force_destroy = true
+
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.quarantine_bucket_policy.json
 
   server_side_encryption_configuration = {
     rule = {
@@ -35,11 +63,13 @@ module "quarantine_bucket" {
 }
 
 module "definitions_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-definitions"
-  # TODO: Is this needed below?
+
   force_destroy = true
 
   server_side_encryption_configuration = {
@@ -53,11 +83,13 @@ module "definitions_bucket" {
 }
 
 module "processed_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 
   bucket = "mojap-ingestion-${local.environment}-processed"
-  # TODO: Is this needed below?
+
   force_destroy = true
 
   server_side_encryption_configuration = {
@@ -90,6 +122,8 @@ data "aws_iam_policy_document" "bold_egress_bucket_policy" {
 }
 
 module "bold_egress_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.0"
 

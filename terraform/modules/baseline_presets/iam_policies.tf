@@ -54,7 +54,8 @@ locals {
       description = "Default EC2 Policy for a DB in this environment"
       statements = flatten([
         local.iam_policy_statements_in_ec2_default,
-        local.iam_policy_statements_ec2.OracleLicenseTracking
+        local.iam_policy_statements_ec2.OracleLicenseTracking,
+        var.options.db_backup_s3 ? local.iam_policy_statements_ec2.S3DbBackupRead : [],
       ])
     }
 

@@ -25,7 +25,7 @@ locals {
     } } : {},
 
     # If db_backup_s3 enabled, create db_backups in all environments.
-    # The test and production buckets allow read access from development and preproduction resepctively
+    # Dev and Test can both access each other: Preprod can access prod but not vice-versa
     var.options.db_backup_s3 && var.environment.environment == "production" ? { "prod-${var.environment.application_name}-db-backup-bucket-" = {
       bucket_policy_v2 = [
         local.s3_bucket_policies.PreprodReadOnlyAccessBucketPolicy
@@ -39,12 +39,15 @@ locals {
     } } : {},
     var.options.db_backup_s3 && var.environment.environment == "test" ? { "devtest-${var.environment.application_name}-db-backup-bucket-" = {
       bucket_policy_v2 = [
-        local.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
+        local.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy
       ]
       custom_kms_key = var.environment.kms_keys["general"].arn
       iam_policies   = local.requested_s3_iam_policies
     } } : {},
     var.options.db_backup_s3 && var.environment.environment == "development" ? { "dev-${var.environment.application_name}-db-backup-bucket-" = {
+      bucket_policy_v2 = [
+        local.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy
+      ]
       custom_kms_key = var.environment.kms_keys["general"].arn
       iam_policies   = local.requested_s3_iam_policies
     } } : {},

@@ -12,7 +12,7 @@ variable "source_account_ids" {
 variable "options" {
   description = "Map of options controlling what resources to return"
   type = object({
-    enable_cloudwatch_monitoring_account = optional(bool, false)
+    enable_cloudwatch_monitoring_account    = optional(bool, false)
     enable_cloudwatch_cross_account_sharing = optional(bool, false)
   })
 }

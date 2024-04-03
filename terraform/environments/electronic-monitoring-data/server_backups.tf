@@ -39,7 +39,6 @@ resource "aws_db_instance" "database_2022" {
 
   db_subnet_group_name   = aws_db_subnet_group.db.id
   vpc_security_group_ids = [aws_security_group.db.id]
-  publicly_accessible    = true
   port                   = 1433
 
   auto_minor_version_upgrade = true
@@ -88,6 +87,17 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
 
   cidr_ipv4 = "152.37.111.98/32"
 }
+resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
+  security_group_id = aws_security_group.db.id
+  description       = "PF ip"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+
+  cidr_ipv4 = "213.121.161.124/32"
+}
+
+
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
   count = local.is-development ? 1 : 0

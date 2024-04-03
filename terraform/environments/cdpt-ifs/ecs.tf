@@ -126,7 +126,7 @@ resource "aws_ecs_task_definition" "ifs_task_definition" {
           name : "RDS_PASSWORD",
           valueFrom : aws_secretsmanager_secret_version.db_password.arn
         }
-      ]
+      ],
     }
   ])
 }
@@ -260,7 +260,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = "optional"
+    http_tokens   = "required"
   }
 
   iam_instance_profile {

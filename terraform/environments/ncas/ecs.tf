@@ -27,11 +27,11 @@ resource "aws_ecs_task_definition" "ncas_task_definition" {
   memory                   = 2048
   container_definitions = jsonencode([
     {
-      name      = "ncas-container"
-      image     = "${aws_ecr_repository.ncas_ecr_repo.repository_url}:latest"
-      cpu       = 1024
-      memory    = 2048
-      essential = true
+      name                   = "ncas-container"
+      image                  = "${aws_ecr_repository.ncas_ecr_repo.repository_url}:latest"
+      cpu                    = 1024
+      memory                 = 2048
+      essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {
         logDriver = "awslogs",
@@ -102,11 +102,11 @@ resource "aws_ecs_task_definition" "ncas_task_definition_dev" {
   memory                   = 2048
   container_definitions = jsonencode([
     {
-      name      = "ncas-container"
-      image     = "${aws_ecr_repository.ncas_ecr_repo.repository_url}:latest"
-      cpu       = 1024
-      memory    = 2048
-      essential = true
+      name                   = "ncas-container"
+      image                  = "${aws_ecr_repository.ncas_ecr_repo.repository_url}:latest"
+      cpu                    = 1024
+      memory                 = 2048
+      essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {
         logDriver = "awslogs",

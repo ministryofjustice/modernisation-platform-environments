@@ -16,7 +16,7 @@ resource "aws_db_instance" "database" {
   snapshot_identifier       = local.application_data.accounts[local.environment].db_snapshot_identifier
   db_subnet_group_name      = aws_db_subnet_group.db.id
   final_snapshot_identifier = "final-snapshot-${formatdate("YYYYMMDDhhmmss", timestamp())}"
-  publicly_accessible       = true
+  publicly_accessible       = false
 }
 
 resource "aws_db_instance_role_association" "database" {
@@ -44,7 +44,7 @@ resource "aws_security_group" "db" {
     from_port   = 1433
     to_port     = 1433
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+	cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     from_port   = 0
