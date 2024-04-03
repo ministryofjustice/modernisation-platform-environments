@@ -30,16 +30,14 @@ module "nextcloud_service" {
     }
   ]
 
-
   efs_volumes = [
     for efs in module.nextcloud_efs : {
       host_path = null
       name      = efs.name
       efs_volume_configuration = [{
-        file_system_id          = efs.fs_id
-        root_directory          = "/"
-        transit_encryption      = "ENABLED"
-        transit_encryption_port = 2049
+        file_system_id     = efs.fs_id
+        root_directory     = "/var/www/${efs.name}"
+        transit_encryption = "ENABLED"
         authorization_config = [{
           access_point_id = efs.access_point_id
           iam             = "DISABLED"
