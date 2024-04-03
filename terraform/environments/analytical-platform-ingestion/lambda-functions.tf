@@ -279,3 +279,56 @@ module "notify_quarantined_lambda" {
     }
   }
 }
+
+module "notify_transferred_lambda" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "7.2.5"
+
+  publish        = true
+  create_package = false
+
+  function_name          = "notify-transferred"
+  description            = "Transferred notifications"
+  package_type           = "Image"
+  memory_size            = 2048
+  ephemeral_storage_size = 10240
+  timeout                = 900
+  image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-notify:${local.environment_configuration.notify_image_version}"
+
+  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
+  attach_network_policy  = true
+
+  # environment_variables = {}
+
+  # TODO: Check if KMS key is actually needed below
+  attach_policy_statements = true
+  policy_statements = {
+    kms_access = {
+      sid    = "AllowKMS"
+      effect = "Allow"
+      actions = [
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Encrypt",
+        "kms:DescribeKey",
+        "kms:Decrypt"
+      ]
+      resources = [module.quarantined_sns_kms.key_arn]
+    },
+    secretsmanager_access = {
+      sid       = "AllowSecretsManager"
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+    }
+  }
+  allowed_triggers = {
+    "sns" = {
+      principal  = "sns.amazonaws.com"
+      source_arn = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${module.transferred_topic.topic_name}"
+    }
+  }
+}
