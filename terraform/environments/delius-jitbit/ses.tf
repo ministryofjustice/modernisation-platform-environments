@@ -1,3 +1,7 @@
+#############
+# SES
+#############"
+
 resource "aws_ses_domain_identity" "jitbit" {
   domain = "${local.domain}"
 }
