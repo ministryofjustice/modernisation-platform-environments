@@ -37,9 +37,6 @@ EOF
 # Update the IPs of the address to listen from PostgreSQL config
 sed -i "59i listen_addresses = '*'" /var/lib/pgsql/data/postgresql.conf
 
-# Set Password for POSTGRES, Root user
-sudo -Hiu postgres psql -c "ALTER USER postgres WITH PASSWORD '${POSTGRES_PASS}';"
-
 # Start the db service
 systemctl enable postgresql
 systemctl start postgresql
@@ -50,6 +47,9 @@ cd pg_ivm; make install Makefile
 
 # Enable pg_ivm Extension
 sudo -Hiu postgres psql -c "CREATE EXTENSION pg_ivm;"
+
+# Set Password for POSTGRES, Root user
+sudo -Hiu postgres psql -c "ALTER USER postgres WITH PASSWORD '${POSTGRES_PASS}';"
 
 # Install oracle_fdw
 ## Oracle client rpms
