@@ -2,9 +2,10 @@ locals {
 
   mp_ip = {
     # EC2s (azure.hmpp.root and azure.noms.root IPs)
-    ad-hmpp-dc-a   = "10.20.72.5"
-    ad-hmpp-dc-b   = "10.20.74.5"
-    ad-hmpp-rdlic  = "10.20.76.6"
+    # IPs also defined in https://github.com/ministryofjustice/modernisation-platform/tree/main/terraform/environments/core-network-services
+    ad-hmpp-dc-a   = "10.27.136.5"
+    ad-hmpp-dc-b   = "10.27.137.5"
+    ad-hmpp-rdlic  = "10.27.138.6"
     ad-azure-dc-a  = "10.20.104.5"
     ad-azure-dc-b  = "10.20.106.5"
     ad-azure-rdlic = "10.20.108.6"
