@@ -248,7 +248,12 @@ module "notify_quarantined_lambda" {
   vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
   attach_network_policy  = true
 
-  # environment_variables = {}
+  environment_variables = {
+    MODE                          = "quarantined"
+    GOVUK_NOTIFY_API_KEY_SECRET   = resource.aws_secretsmanager_secret.govuk_notify_api_key.secret
+    GOVUK_NOTIFY_TEMPLATES_SECRET = resource.aws_secretsmanager_secret.govuk_notify_templates.secret
+    # Slack to be added
+  }
 
   # TODO: Check if KMS key is actually needed below
   attach_policy_statements = true
@@ -301,7 +306,10 @@ module "notify_transferred_lambda" {
   vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
   attach_network_policy  = true
 
-  # environment_variables = {}
+  environment_variables = {
+    MODE = "transferred"
+    # Slack to be added
+  }
 
   # TODO: Check if KMS key is actually needed below
   attach_policy_statements = true
