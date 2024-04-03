@@ -3,7 +3,7 @@ module "nextcloud_efs" {
 
   source = "../../../../delius-core/modules/helpers/efs"
 
-  name           = "nextcloud"
+  name           = each.key
   env_name       = var.env_name
   creation_token = "${var.env_name}-${each.key}-efs"
 
