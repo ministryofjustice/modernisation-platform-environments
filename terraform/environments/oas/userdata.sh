@@ -1,19 +1,57 @@
 #!/bin/bash
+
 cd /tmp
 yum -y install sshpass
 yum -y install jq
+sudo yum -y install xorg-x11-xauth
+sudo yum -y install xclock xterm
+sudo yum -y install nvme-cli
 
-hostnamectl set-hostname ${local.application_name}.${local.application_data.accounts[local.environment].hostname}
+hostnamectl set-hostname oas.laa-development.modernisation-platform.service.justice.gov.uk
 
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-sudo systemctl start amazon-ssm-agent
-sudo systemctl enable amazon-ssm-agent
-sudo systemctl stop firewalld
-sudo systemctl disable firewalld
+systemctl start amazon-ssm-agent
+systemctl enable amazon-ssm-agent
+systemctl stop firewalld
+systemctl disable firewalld
 
-mkfs.ext4 /dev/sdb
-mkdir -p /oracle/software
-echo "/dev/sdb /oracle/software ext4 defaults 0 0" >> /etc/fstab
+declare -A MOUNTS=(
+    [/dev/sdb]="/oracle/software"
+    [/dev/sdc]="/stage"
+)
+
+EFSTAB="/etc/fstab"
+
+# Assuming ebsnvme-id is a custom script to map NVMe device to EBS volume
+declare -A NVMES=()
+for n in /dev/nvme*n1; do
+    D=$(ebsnvme-id "${n}" | grep -v 'Volume ID')
+    if [[ -n ${D} ]]; then
+        if [[ ${D} =~ /dev ]]; then
+            NVMES[${D}]=${n}
+        else
+            NVMES[/dev/${D}]=${n}
+        fi
+    fi
+done
+
+for M in "${!MOUNTS[@]}"; do
+    L=${MOUNTS[${M}]}
+    N=${NVMES[${M}]}
+    if [[ -n ${N} ]]; then
+        FS_DIR="${L}"
+        if ! mountpoint -q "${FS_DIR}"; then
+            mkfs.ext4 "${M}"
+            mkdir -p "${FS_DIR}"
+            echo "${M} ${FS_DIR} ext4 defaults 0 0" >> "${EFSTAB}"
+            mount "${M}" "${FS_DIR}"
+        else
+            echo "${FS_DIR} is already mounted:"
+            mount | grep "${FS_DIR}"
+        fi
+    fi
+done
+
 mount -a
 
 chown oracle:dba /oracle/software
@@ -27,26 +65,26 @@ swapon /root/myswapfile
 echo "/root/myswapfile swap swap defaults 0 0" >> /etc/fstab
 
 ntp_config(){
-    local RHEL=\$(cat /etc/redhat-release | cut -d. -f1 | awk '{print \$NF}')
+    local RHEL=$(cat /etc/redhat-release | cut -d. -f1 | awk '{print $NF}')
     local SOURCE=169.254.169.123
 
     NtpD(){
         local CONF=/etc/ntp.conf
-        sed -i 's/server \S/#server \S/g' \$CONF && \\
-        sed -i "20i\\server \$SOURCE prefer iburst" \$CONF
-        /etc/init.d/ntpd status >/dev/null 2>&1 \\
+        sed -i 's/server \S/#server \S/g' ${CONF} && \
+        sed -i "20i\server ${SOURCE} prefer iburst" ${CONF}
+        /etc/init.d/ntpd status >/dev/null 2>&1 \
             && /etc/init.d/ntpd restart || /etc/init.d/ntpd start
         ntpq -p
     }
     ChronyD(){
         local CONF=/etc/chrony.conf
-        sed -i 's/server \S/#server \S/g' \$CONF && \\
-        sed -i "7i\\server \$SOURCE prefer iburst" \$CONF
-        systemctl status chronyd >/dev/null 2>&1 \\
+        sed -i 's/server \S/#server \S/g' ${CONF} && \
+        sed -i "7i\server ${SOURCE} prefer iburst" ${CONF}
+        systemctl status chronyd >/dev/null 2>&1 \
             && systemctl restart chronyd || systemctl start chronyd
         chronyc sources
     }
-    case \$RHEL in
+    case ${RHEL} in
         5)
             NtpD
             ;;
@@ -57,11 +95,11 @@ ntp_config(){
 }
 
 # Retrieve instance ID and store it in a file
-aws_instance_id=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-echo -n "\$aws_instance_id" > /tmp/instance_id.txt
+aws_instance_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+echo -n "${aws_instance_id}" > /tmp/instance_id.txt
 
 # Read instance ID from the file
-INSTANCE_ID=\$(cat /tmp/instance_id.txt)
+INSTANCE_ID=$(cat /tmp/instance_id.txt)
 
 enable_ebs_udev(){
     curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/ebsnvme-id > /sbin/ebsnvme-id
@@ -79,14 +117,13 @@ enable_ebs_udev(){
 configure_cwagent(){
     yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     yum install -y collectd
-
     cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json << 'EOL'
     {
         "metrics": {
             "append_dimensions": {
-                "ImageId": "\${local.application_data.accounts[local.environment].ec2amiid}",
-                "InstanceId": "\${INSTANCE_ID}",
-                "InstanceType": "\${local.application_data.accounts[local.environment].ec2instancetype}"
+                "ImageId": "\${ec2_image_id}",
+                "InstanceId": "\${aws:InstanceId}",
+                "InstanceType": "\${ec2_instance_type}"
             },
             "metrics_collected": {
                 "collectd": {
@@ -174,15 +211,15 @@ configure_cwagent(){
                     "collect_list": [
                         {
                             "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/bi_server1.log",
-                            "log_group_name": "${local.application_name}-bi_server1"
+                            "log_group_name": "${application_name}-bi_server1"
                         },
                         {
                             "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/bi_server1-diagnostic.log",
-                            "log_group_name": "${local.application_name}-bi_server1-diagnostic"
+                            "log_group_name": "${application_name}-bi_server1-diagnostic"
                         },
                         {
                             "file_path": "/oracle/software/product/Middleware/oas_home/oas_domain/bi/servers/bi_server1/logs/jbips.log",
-                            "log_group_name": "${local.application_name}-jbips"
+                            "log_group_name": "${application_name}-jbips"
                         }
                     ]
                 }
@@ -199,6 +236,8 @@ restart_cwagent(){
 }
 
 # Call the functions
+get_nvme_device
+mount_volumes
 ntp_config
 enable_ebs_udev
 configure_cwagent
