@@ -51,7 +51,7 @@ module "transferred_topic" {
   subscriptions = {
     lambda = {
       protocol = "lambda"
-      endpoint = module.notify_lambda.lambda_function_arn
+      endpoint = module.transfer_lambda_lambda.lambda_function_arn
     }
   }
 }

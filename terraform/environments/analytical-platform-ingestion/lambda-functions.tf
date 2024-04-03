@@ -275,7 +275,7 @@ module "notify_quarantined_lambda" {
   allowed_triggers = {
     "sns" = {
       principal  = "sns.amazonaws.com"
-      source_arn = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${topic_name}"
+      source_arn = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${module.transferred_topic.name}"
     }
   }
 }
