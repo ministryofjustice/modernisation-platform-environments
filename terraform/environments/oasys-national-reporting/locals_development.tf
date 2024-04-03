@@ -37,7 +37,7 @@ locals {
     #       instance_type = "t3.large"  
     #     })
     #   })
-    # }
+    }
 
     baseline_ec2_autoscaling_groups = {
       dev-web-asg = merge(local.defaults_web_ec2.config, {
@@ -57,8 +57,7 @@ locals {
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
-      dev-boe-asg = merge(local.defaults_boe_ec2, 
-      {
+      dev-boe-asg = merge(local.defaults_boe_ec2, {
         config = merge(local.defaults_boe_ec2.config, {
           availability_zone = "${local.region}a"        
         })
