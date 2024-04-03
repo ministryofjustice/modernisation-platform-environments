@@ -127,7 +127,7 @@ data "archive_file" "calculate_checksum_lambda" {
 }
 
 resource "aws_lambda_function" "calculate_checksum_lambda" {
-  filename      = "calculate_checksum_lambda.zip"
+  filename      = "lambdas/calculate_checksum_lambda.zip"
   function_name = "calculate-checksum-lambda"
   role          = aws_iam_role.calculate_checksum_lambda.arn
   handler       = "calculate_checksum_lambda.handler"
@@ -161,7 +161,6 @@ data "aws_iam_policy_document" "calculate_checksum_lambda" {
       "s3:GetObject",
       "s3:GetObjectVersion",
       "s3:GetObjectTagging",
-      "s3:GetObjectAcl",
       "s3:GetObjectAttributes",
       "s3:GetObjectVersionAttributes",
       "s3:ListBucket"
@@ -195,7 +194,7 @@ data "archive_file" "summarise_zip_lambda" {
 }
 
 resource "aws_lambda_function" "summarise_zip_lambda" {
-  filename      = "summarise_zip_lambda.zip"
+  filename      = "lambdas/summarise_zip_lambda.zip"
   function_name = "summarise-zip-lambda"
   role          = aws_iam_role.summarise_zip_lambda.arn
   handler       = "summarise_zip_lambda.handler"

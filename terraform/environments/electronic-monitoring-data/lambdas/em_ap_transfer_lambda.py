@@ -53,6 +53,8 @@ def handler(event, context):
             logger.error(msg)
             raise Exception(msg)
     except Exception as e:
-        logger.error(f"An exception has occured: {e}")
+        msg = f"An exception has occured: {e}"
+        logger.error(msg)
+        raise Exception(msg)
 
     return {"statusCode": 200, "body": json.dumps("File has been Successfully Copied")}

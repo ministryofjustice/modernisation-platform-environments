@@ -136,7 +136,7 @@ data "archive_file" "em_ap_transfer_lambda" {
 }
 
 resource "aws_lambda_function" "em_ap_transfer_lambda" {
-    filename = "em_ap_transfer_lambda.zip"
+    filename = "lambdas/em_ap_transfer_lambda.zip"
     function_name = "em-ap-transfer-lambda"
     role = aws_iam_role.em_ap_transfer_lambda.arn
     handler = "em_ap_transfer_lambda.handler"
