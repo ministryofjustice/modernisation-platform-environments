@@ -119,14 +119,27 @@ module "s3_bold_egress_kms" {
   deletion_window_in_days = 7
 }
 
-module "sns_kms" {
+module "quarantined_sns_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
   version = "2.2.1"
 
-  aliases               = ["sns/notify"]
-  description           = "Key for SNS notifications"
+  aliases               = ["sns/quarantined"]
+  description           = "Key for quarantined notifications"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
+
+module "transferred_sns_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "2.2.1"
+
+  aliases               = ["sns/transferred"]
+  description           = "Key for transferred notifications"
   enable_default_policy = true
 
   deletion_window_in_days = 7
