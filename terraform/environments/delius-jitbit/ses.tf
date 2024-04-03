@@ -3,11 +3,11 @@
 #############"
 
 resource "aws_ses_domain_identity" "jitbit" {
-  domain = "${local.domain}"
+  domain = "${local.app_url}"
 }
 
 resource "aws_ses_domain_identity_verification" "jitbit" {
-  domain = "${local.domain}"
+  domain = "${local.app_url}"
 }
 
 resource "aws_route53_record" "jitbit_ses_verification_record" {
@@ -43,7 +43,7 @@ resource "aws_route53_record" "jitbit_amazonses_dkim_record" {
   provider = aws.core-vpc
   count    = local.is-production ? 0 : 3
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}._domainkey.${local.domain}"
+  name     = "${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}._domainkey.${local.app_url}"
   type     = "CNAME"
   ttl      = "600"
   records  = ["${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}.dkim.amazonses.com"]
@@ -53,7 +53,7 @@ resource "aws_route53_record" "jitbit_amazonses_dkim_record_prod" {
   provider = aws.core-network-services
   count    = local.is-production ? 3 : 0
   zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
-  name     = "${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}._domainkey.${local.domain}"
+  name     = "${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}._domainkey.${local.app_url}"
   type     = "CNAME"
   ttl      = "600"
   records  = ["${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}.dkim.amazonses.com"]
@@ -63,7 +63,7 @@ resource "aws_route53_record" "jitbit_amazonses_dmarc_record" {
   count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "_dmarc.${local.domain}"
+  name     = "_dmarc.${local.app_url}"
   type     = "TXT"
   ttl      = "600"
   records  = ["v=DMARC1; p=none;"]
@@ -73,7 +73,7 @@ resource "aws_route53_record" "jitbit_amazonses_dmarc_record_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
-  name     = "_dmarc.${local.domain}"
+  name     = "_dmarc.${local.app_url}"
   type     = "TXT"
   ttl      = "600"
   records  = ["v=DMARC1; p=none;"]
