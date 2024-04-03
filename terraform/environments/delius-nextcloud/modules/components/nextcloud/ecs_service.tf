@@ -36,7 +36,6 @@ module "nextcloud_service" {
       name      = efs.name
       efs_volume_configuration = [{
         file_system_id          = efs.fs_id
-        root_directory          = "/var/www/${efs.name}"
         transit_encryption      = "ENABLED"
         transit_encryption_port = null
         authorization_config = [{
@@ -46,9 +45,9 @@ module "nextcloud_service" {
       }]
     }
   ]
-  mount_points = [{
-    sourceVolume  = "nextcloud"
-    containerPath = "/var/www/"
+  mount_points = [for efs in module.nextcloud_efs : {
+    sourceVolume  = efs.name
+    containerPath = "/var/www/${efs.name}"
     readOnly      = false
   }]
 
