@@ -6,7 +6,7 @@ $targetPath = $targetDrive + ":\storage\tribunals\"
 $ecsCluster = "tribunals-all-cluster"
 $ebsVolumeTag = "tribunals-all-storage"
 $tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","ahmlr","lands-tribunal"
-$monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
+$monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 
 "Starting userdata execution" > $logFile
 
@@ -64,9 +64,6 @@ Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["j
 
 "Finished launch.ps1" >> $logFile
 
-# Configure AWS CLI and EBS backup script
-$scriptContent = @'
-$monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 # Check if AWS CLI is installed
 $awsCliInstalled = $null -ne (Get-Command aws -ErrorAction SilentlyContinue)
 
@@ -83,12 +80,9 @@ if (-not $awsCliInstalled) {
     "AWS CLI is already installed." >> $monitorLogFile
 }
 
-# Define the path to monitor
-$pathToMonitor = "D:\storage\tribunals\"
-
 # Create a FileSystemWatcher object
 $watcher = New-Object System.IO.FileSystemWatcher
-$watcher.Path = $pathToMonitor
+$watcher.Path = $targetPath
 $watcher.IncludeSubdirectories = $true
 $watcher.EnableRaisingEvents = $true
 
@@ -102,17 +96,5 @@ $action = {
 
 # Register the event
 Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
-
-# Keep the script running
-while ($true) {
-    Start-Sleep -Seconds 10
-}
-'@
-
-# Output the script to the file
-$scriptContent | Out-File -FilePath $monitorScriptFile
-
-# Execute the monitor script
-Start-Job -Name JudgementFilesMonitor -LiteralPath $monitorScriptFile
 
 </powershell>
