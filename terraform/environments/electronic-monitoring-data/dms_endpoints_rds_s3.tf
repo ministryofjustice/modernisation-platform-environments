@@ -10,7 +10,7 @@ resource "aws_dms_endpoint" "dms-rds-conn-tf" {
     #   kms_key_arn                 = aws_db_instance.database_2022.kms_key_id
     password                    = aws_db_instance.database_2022.password
     port                        = aws_db_instance.database_2022.port
-    server_name                 = aws_db_instance.database_2022.endpoint
+    server_name                 = split(":", aws_db_instance.database_2022.endpoint)[0]
     ssl_mode                    = "require"
     username                    = aws_db_instance.database_2022.username
 
