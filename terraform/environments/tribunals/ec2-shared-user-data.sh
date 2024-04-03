@@ -7,6 +7,7 @@ $ecsCluster = "tribunals-all-cluster"
 $ebsVolumeTag = "tribunals-all-storage"
 $tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","ahmlr","lands-tribunal"
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+$monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
 "Starting userdata execution" > $logFile
 
@@ -80,6 +81,7 @@ if (-not $awsCliInstalled) {
     "AWS CLI is already installed." >> $monitorLogFile
 }
 
+$scriptContent = @'
 # Create a FileSystemWatcher object
 $watcher = New-Object System.IO.FileSystemWatcher
 $watcher.Path = $targetPath
@@ -96,5 +98,17 @@ $action = {
 
 # Register the event
 Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
+
+# Keep the script running
+while ($true) {
+    Start-Sleep -Seconds 10
+}
+'@
+
+# Output the script to the file
+$scriptContent | Out-File -FilePath $monitorScriptFile
+
+# Execute the monitor script
+Start-Job -Name JudgementFilesMonitor -LiteralPath $monitorScriptFile
 
 </powershell>
