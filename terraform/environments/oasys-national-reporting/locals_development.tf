@@ -13,22 +13,21 @@ locals {
     #       instance_type = "t3.large"
     #     })
     #   })
-    # NOTE: Sadly rhel 6 ami's (below) do not support ASGs due to ELB networking constraints
-      dev-boe-a = merge(local.defaults_boe_ec2, 
-      {
-        config = merge(local.defaults_boe_ec2.config, {
-          availability_zone = "${local.region}a"        
-        })
-        instance = merge(local.defaults_boe_ec2.instance, {
-          instance_type = "t3.large"
-        })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "main"
-          })
-        })    
-      })
-    }
+    #   dev-boe-a = merge(local.defaults_boe_ec2, 
+    #   {
+    #     config = merge(local.defaults_boe_ec2.config, {
+    #       availability_zone = "${local.region}a"        
+    #     })
+    #     instance = merge(local.defaults_boe_ec2.instance, {
+    #       instance_type = "t2.large"
+    #     })
+    #     user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+    #       args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+    #         branch = "main"
+    #       })
+    #     })    
+    #   })
+    # }
     #   dev-bods-a = merge(local.defaults_bods_ec2,
     #   {
     #     config = merge(local.defaults_bods_ec2.config, {
@@ -57,6 +56,24 @@ locals {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      })
+      dev-boe-asg = merge(local.defaults_boe_ec2, 
+      {
+        config = merge(local.defaults_boe_ec2.config, {
+          availability_zone = "${local.region}a"        
+        })
+        instance = merge(local.defaults_boe_ec2.instance, {
+          instance_type = "t2.large"
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "main"
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours    
       })
     }
   }
