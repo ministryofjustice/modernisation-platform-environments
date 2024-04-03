@@ -36,6 +36,7 @@ module "nextcloud_service" {
       name      = efs.name
       efs_volume_configuration = [{
         file_system_id          = efs.fs_id
+        root_directory          = "/"
         transit_encryption      = "ENABLED"
         transit_encryption_port = null
         authorization_config = [{
