@@ -205,24 +205,24 @@ locals {
       #     nomis-combined-reporting-environment = "preprod"
       #   })
       # })
-      # preprod-ncr-db-1-a = merge(local.database_ec2_default, {
-      #   cloudwatch_metric_alarms = merge(
-      #     local.database_cloudwatch_metric_alarms.standard,
-      #     local.database_cloudwatch_metric_alarms.db_connected,
-      #     local.database_cloudwatch_metric_alarms.db_backup,
-      #   )
-      #   config = merge(local.database_ec2_default.config, {
-      #     instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PREPRODDatabasePolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.database_ec2_default.tags, {
-      #     description                          = "PREPROD NCR DATABASE"
-      #     nomis-combined-reporting-environment = "preprod"
-      #     oracle-sids                          = "PREPRODBIPSYS PREPRODBIPAUD"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
+      preprod-ncr-db-1-a = merge(local.database_ec2_default, {
+        cloudwatch_metric_alarms = merge(
+          local.database_cloudwatch_metric_alarms.standard,
+          local.database_cloudwatch_metric_alarms.db_connected,
+          local.database_cloudwatch_metric_alarms.db_backup,
+        )
+        config = merge(local.database_ec2_default.config, {
+          instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
+            "Ec2PREPRODDatabasePolicy",
+          ])
+        })
+        tags = merge(local.database_ec2_default.tags, {
+          description                          = "PREPROD NCR DATABASE"
+          nomis-combined-reporting-environment = "preprod"
+          oracle-sids                          = "PREPRODBIPSYS PREPRODBIPAUD"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
 
       ### LSAST
 
