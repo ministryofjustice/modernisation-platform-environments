@@ -39,6 +39,15 @@ module "vpc_endpoints" {
         local.tags,
         { Name = format("%s-s3-vpc-endpoint", local.application_name) }
       )
-    }
+    },
+    secretsmanager = {
+      service             = "secretsmanager"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-secretsmanager-vpc-endpoint", local.application_name) }
+      )
+    },
   }
 }
