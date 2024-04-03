@@ -34,7 +34,7 @@ module "nextcloud_service" {
   efs_volumes = [
     for efs in module.nextcloud_efs : {
       host_path = null
-      name      = "nextcloud"
+      name      = efs.name
       efs_volume_configuration = [{
         file_system_id          = efs.fs_id
         root_directory          = "/"
