@@ -31,9 +31,9 @@ module "quarantined_topic" {
   }
 
   subscriptions = {
-    s3 = {
+    lambda = {
       protocol = "lambda"
-      endpoint = module.transfer_lambda.lambda_function_arn # to be corrected
+      endpoint = module.notify_quarantined_lambda.lambda_function_arn
     }
   }
 }
@@ -51,7 +51,7 @@ module "transferred_topic" {
   subscriptions = {
     lambda = {
       protocol = "lambda"
-      endpoint = module.transfer_lambda.lambda_function_arn
+      endpoint = module.notify_transferred_lambda.lambda_function_arn
     }
   }
 }
