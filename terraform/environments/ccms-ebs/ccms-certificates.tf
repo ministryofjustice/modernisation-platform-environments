@@ -120,8 +120,8 @@ resource "aws_route53_record" "external_validation_core_vpc" {
 #   zone_id         = local.cert_zone_id
 # }
 
-resource "aws_acm_certificate_validation" "external_nonprod" {
-  count = local.is-production ? 0 : 1
+resource "aws_acm_certificate_validation" "external" {
+  count = local.is-production ? 1 : 1
 
   depends_on = [
     aws_route53_record.external_validation_core_network,
@@ -133,21 +133,6 @@ resource "aws_acm_certificate_validation" "external_nonprod" {
     [for record in aws_route53_record.external_validation_core_network : record.fqdn],
     [for record in aws_route53_record.external_validation_core_vpc : record.fqdn]
   )
-
-  timeouts {
-    create = "10m"
-  }
-}
-
-resource "aws_acm_certificate_validation" "external" {
-  count = local.is-production ? 1 : 0
-
-  depends_on = [
-    aws_route53_record.external_validation_core_network
-  ]
-
-  certificate_arn         = local.cert_arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation_core_network : record.fqdn]
 
   timeouts {
     create = "10m"
