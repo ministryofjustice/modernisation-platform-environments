@@ -21,7 +21,6 @@ cat <<EOF >/var/lib/pgsql/data/pg_hba.conf
 # "local" is for Unix domain socket connections only
 local   all             all                                     peer
 # IPv4 local connections:
-                                                                                                                                                                             48,1          82%
 local   all             all                                     peer
 # IPv4 local connections:
 host    all             all             127.0.0.1/32            md5
@@ -57,8 +56,8 @@ sudo -Hiu postgres psql -c "CREATE EXTENSION pg_ivm;"
 mkdir -p /opt/oracle/
 aws s3 cp s3://dpr-working-development/oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm /opt/oracle/
 aws s3 cp s3://dpr-working-development/oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm /opt/oracle/
-sudo yum install -y  /opt/oracle/oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm
-sudo yum install -y /opt/oracle/oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm
+yum install -y  /opt/oracle/oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm
+yum install -y /opt/oracle/oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm
 ## make Oracle client libs available to postgres
 echo -n "/usr/lib/oracle/12.2/client64/lib/" >/etc/ld.so.conf
 ldconfig
