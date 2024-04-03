@@ -47,7 +47,7 @@ locals {
       transfer_image_version = "0.0.2"
 
       /* Target Buckets */
-      target_buckets = ["dev-ingestion-testing"]
+      target_buckets = []
 
       /* Transfer Server */
       transfer_server_hostname               = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
