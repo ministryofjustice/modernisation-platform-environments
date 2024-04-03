@@ -44,8 +44,10 @@ locals {
       vpc_security_group_ids = ["web"]
     })
     tags = {
-      os-type   = "Linux"
-      component = "onr_web"
+      ami         = "base_rhel_7_9"
+      os-type     = "Linux"
+      component   = "web"
+      server-type = "onr-web"
     }
     # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
     ebs_volumes = {
