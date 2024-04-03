@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eux
 # update system packages
 yum update -y
 
