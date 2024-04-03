@@ -66,19 +66,21 @@ Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["j
 
 # Configure AWS CLI and EBS backup script
 $scriptContent = @'
+$monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 # Check if AWS CLI is installed
 $awsCliInstalled = $null -ne (Get-Command aws -ErrorAction SilentlyContinue)
 
 if (-not $awsCliInstalled) {
     # Download and install the AWS CLI
-    Write-Host "AWS CLI not found. Installing..."
+    "AWS CLI not found. Installing..." > $monitorLogFile
     $installerPath = "$env:TEMP\AWSCLIV2.msi"
     Invoke-WebRequest -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile $installerPath
     Start-Process -FilePath "msiexec.exe" -ArgumentList "/i", $installerPath, "/quiet", "/qn", "/norestart" -Wait
     Remove-Item -Path $installerPath
-    Write-Host "AWS CLI installed successfully."
+    $env:Path += ";C:\Program Files\Amazon\AWSCLIV2"
+    "AWS CLI installed successfully." >> $monitorLogFile
 } else {
-    Write-Host "AWS CLI is already installed."
+    "AWS CLI is already installed." >> $monitorLogFile
 }
 
 # Define the path to monitor
@@ -94,8 +96,8 @@ $watcher.EnableRaisingEvents = $true
 $action = {
     param($source, $event)
     $filePath = $event.FullPath
-    Write-Host "A file was created at $filePath. Syncing to S3..."
-    Start-Process -NoNewWindow -FilePath "aws" -ArgumentList "s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup"
+    "A file was created at $filePath. Syncing to S3..." >> $monitorLogFile
+    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup >> $monitorLogFile
 }
 
 # Register the event
@@ -111,6 +113,6 @@ while ($true) {
 $scriptContent | Out-File -FilePath $monitorScriptFile
 
 # Execute the monitor script
-Start-Process -FilePath $monitorScriptFile -NoNewWindow
+Start-Job -Name JudgementFilesMonitor -LiteralPath $monitorScriptFile
 
 </powershell>
