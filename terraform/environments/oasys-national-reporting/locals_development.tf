@@ -27,7 +27,6 @@ locals {
     #       })
     #     })    
     #   })
-    # }
     #   dev-bods-a = merge(local.defaults_bods_ec2,
     #   {
     #     config = merge(local.defaults_bods_ec2.config, {
@@ -73,6 +72,18 @@ locals {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours    
+      })
+      dev-bods-asg = merge(local.defaults_bods_ec2, {
+        config = merge(local.defaults_bods_ec2.config,{
+          availability_zone = "${local.region}a"
+        })
+        instance = merge(local.defaults_bods_ec2.instance, {
+          instance_type = "t3.large"
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
     }
   }
