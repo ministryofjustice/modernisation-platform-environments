@@ -127,7 +127,6 @@ resource "aws_ecs_task_definition" "ifs_task_definition" {
           valueFrom : aws_secretsmanager_secret_version.db_password.arn
         }
       ],
-      readonlyRootFileSystem = true
     }
   ])
 }
