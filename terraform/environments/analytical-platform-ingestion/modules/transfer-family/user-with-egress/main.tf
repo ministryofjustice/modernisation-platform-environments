@@ -9,7 +9,10 @@ data "aws_iam_policy_document" "this" {
       "kms:DescribeKey",
       "kms:Decrypt",
     ]
-    resources = [var.landing_bucket_kms_key]
+    resources = [
+      var.landing_bucket_kms_key,
+      var.egress_bucket_kms_key
+    ]
   }
   statement {
     sid     = "AllowS3ListBucket"
@@ -17,7 +20,7 @@ data "aws_iam_policy_document" "this" {
     actions = ["s3:ListBucket"]
     resources = [
       "arn:aws:s3:::${var.landing_bucket}",
-      "arn:aws:s3:::${var.landing_bucket}/${var.name}/*"
+      "arn:aws:s3:::${var.egress_bucket}"
     ]
   }
   statement {
@@ -25,6 +28,16 @@ data "aws_iam_policy_document" "this" {
     effect    = "Allow"
     actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::${var.landing_bucket}/${var.name}/*"]
+  }
+  statement {
+    sid    = "AllowS3EgressBucketObjectActions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectAcl",
+      "s3:GetObjectVersion"
+    ]
+    resources = ["arn:aws:s3:::${var.egress_bucket}/${var.name}/*"]
   }
 }
 
@@ -56,10 +69,20 @@ module "role" {
 }
 
 resource "aws_transfer_user" "this" {
-  server_id      = var.transfer_server
-  user_name      = var.name
-  role           = module.role.iam_role_arn
-  home_directory = "/${var.landing_bucket}/${var.name}"
+  server_id = var.transfer_server
+  user_name = var.name
+  role      = module.role.iam_role_arn
+
+  home_directory_type = "LOGICAL"
+  home_directory_mappings {
+    entry  = "/upload"
+    target = "/${var.landing_bucket}/${var.name}"
+  }
+
+  home_directory_mappings {
+    entry  = "/download"
+    target = "/${var.egress_bucket}/${var.name}"
+  }
 }
 
 resource "aws_transfer_ssh_key" "this" {

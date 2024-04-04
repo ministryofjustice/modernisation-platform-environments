@@ -1,9 +1,8 @@
 
 resource "aws_transfer_server" "this" {
-  protocols                        = ["SFTP"]
-  identity_provider_type           = "SERVICE_MANAGED"
-  domain                           = "S3"
-  post_authentication_login_banner = "Analytical Platform Ingestion - Development" # This doesn't work, at least on macOS SFTP client
+  protocols              = ["SFTP"]
+  identity_provider_type = "SERVICE_MANAGED"
+  domain                 = "S3"
 
   endpoint_type = "VPC"
   endpoint_details {

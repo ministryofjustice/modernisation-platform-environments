@@ -1,4 +1,6 @@
 module "ingestion_landing_bucket_notification" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
   version = "4.1.0"
 
@@ -14,6 +16,8 @@ module "ingestion_landing_bucket_notification" {
 }
 
 module "ingestion_transfer_bucket_notification" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
   source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
   version = "4.1.0"
 
