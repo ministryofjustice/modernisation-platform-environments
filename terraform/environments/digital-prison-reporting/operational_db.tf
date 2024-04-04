@@ -3,7 +3,7 @@ module "operational_db_server" {
 
   count                       = local.deploy_operational_database ? 1 : 0
   enable_compute_node         = true
-  scaledown                   = false
+  scale_down                  = false
   name                        = "${local.project}-operational-db-server-${local.env}"
   description                 = "Operational DB Instance"
   vpc                         = data.aws_vpc.shared.id
