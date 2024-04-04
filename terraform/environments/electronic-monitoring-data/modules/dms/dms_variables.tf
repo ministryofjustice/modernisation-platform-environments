@@ -52,7 +52,17 @@ variable "rds_db_username" {
   type        = string  
 }
 
-variable "dms_vpc_id" {
-  description = "VPC ID same as that of the existing RDS Database instance"
-  type        = string  
+# variable "dms_vpc_id" {
+#   description = "VPC ID same as that of the existing RDS Database instance"
+#   type        = string  
+# }
+
+variable "ep_service_access_role_arn" {
+  description = "DMS Endpoint Service Access Role-ARN"
+  type        = string    
+}
+
+variable "target_s3_bucket_name" {
+  description = "DMS S3 Target Endpoint Bucket Name"
+  type        = string    
 }

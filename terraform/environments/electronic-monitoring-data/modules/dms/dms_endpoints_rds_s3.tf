@@ -30,8 +30,8 @@ resource "aws_dms_s3_endpoint" "dms-s3-csv-tf" {
   # Minimal Config:
   endpoint_id                      = "s3-${var.database_name}-tf"
   endpoint_type                    = "target"
-  bucket_name                      = data.aws_s3_bucket.existing_dms_bucket.id
-  service_access_role_arn          = aws_iam_role.dms-endpoint-role.arn
+  bucket_name                      = var.target_s3_bucket_name # data.aws_s3_bucket.existing_dms_bucket.id
+  service_access_role_arn          = var.ep_service_access_role_arn # aws_iam_role.dms-endpoint-role.arn
   
   # Extra settings:
   # add_column_name                             = false
