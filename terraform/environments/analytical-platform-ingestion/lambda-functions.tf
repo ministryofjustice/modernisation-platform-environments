@@ -154,6 +154,7 @@ module "transfer_lambda" {
 
   environment_variables = {
     PROCESSED_BUCKET_NAME = module.processed_bucket.s3_bucket_id
+    SNS_TOPIC_ARN         = module.transferred_topic.topic_arn
   }
 
   # TODO: Check if KMS key is actually needed below
