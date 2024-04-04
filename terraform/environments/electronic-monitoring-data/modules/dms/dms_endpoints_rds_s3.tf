@@ -1,5 +1,5 @@
 # Create DMS Endpoint to RDS Source
-resource "aws_dms_endpoint" "dms-rds-conn-tf" {
+resource "aws_dms_endpoint" "dms-rds-source" {
 
     #   certificate_arn             = ""
     database_name               = var.database_name
@@ -25,7 +25,7 @@ resource "aws_dms_endpoint" "dms-rds-conn-tf" {
 # ==========================================================================
 
 # Create DMS Endpoint to S3 Target
-resource "aws_dms_s3_endpoint" "dms-s3-csv-tf" {
+resource "aws_dms_s3_endpoint" "dms-s3-csv-target" {
   
   # Minimal Config:
   endpoint_id                      = "s3-${var.database_name}-tf"

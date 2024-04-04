@@ -66,3 +66,18 @@ variable "target_s3_bucket_name" {
   description = "DMS S3 Target Endpoint Bucket Name"
   type        = string    
 }
+
+variable "rep_task_settings_filepath" {
+  description = "JSON file with DMS relevant migration task settings"
+  type        = string    
+}
+
+variable "rep_task_table_mapping_filepath" {
+  description = "JSON file with DMS table mappings"
+  type        = string    
+}
+
+variable "dms_replication_instance_arn" {
+  description = "Assign the Replication Instance-ARN to be used"
+  type        = string    
+}
