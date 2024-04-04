@@ -42,9 +42,12 @@ module "gdpr_api_service" {
   rds_allocated_storage       = var.delius_microservice_configs.gdpr_api.rds_allocated_storage
   rds_username                = var.delius_microservice_configs.gdpr_api.rds_username
   rds_license_model           = var.delius_microservice_configs.gdpr_api.rds_license_model
-  maintenance_window          = var.delius_microservice_configs.merge_api.maintenance_window
-  rds_backup_retention_period = var.delius_microservice_configs.merge_api.rds_backup_retention_period
-  rds_backup_window           = var.delius_microservice_configs.merge_api.rds_backup_window
+  maintenance_window          = var.delius_microservice_configs.gdpr_api.maintenance_window
+  rds_backup_retention_period = var.delius_microservice_configs.gdpr_api.rds_backup_retention_period
+  rds_backup_window           = var.delius_microservice_configs.gdpr_api.rds_backup_window
+  rds_deletion_protection     = var.delius_microservice_configs.gdpr_api.rds_deletion_protection
+  snapshot_identifier         = var.delius_microservice_configs.gdpr_api.snapshot_identifier
+  rds_skip_final_snapshot     = var.delius_microservice_configs.gdpr_api.rds_skip_final_snapshot
 
   container_vars_default = {
     "SERVER_SERVLET_CONTEXT_PATH" : "/gdpr/api/",
