@@ -58,7 +58,7 @@ resource "aws_route53_record" "external_validation_core_network" {
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
-  } : []  # Empty map if no validation options
+  } : {}  # Empty map if no validation options
 
   allow_overwrite = true
   name            = each.value.name
@@ -85,7 +85,7 @@ resource "aws_route53_record" "external_validation_core_vpc" {
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
-  } : []  # Empty map if no validation options
+  } : {}  # Empty map if no validation options
 
   allow_overwrite = true
   name            = each.value.name
