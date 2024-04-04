@@ -99,16 +99,12 @@ $action = {
 # Register the event
 Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 
-# Keep the script running
-while ($true) {
-    Start-Sleep -Seconds 10
-}
 '@
 
 # Output the script to the file
 $scriptContent | Out-File -FilePath $monitorScriptFile
 
 # Execute the monitor script
-Start-Job -Name JudgementFilesMonitor -LiteralPath $monitorScriptFile
+Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"$monitorScriptFile`""
 
 </powershell>
