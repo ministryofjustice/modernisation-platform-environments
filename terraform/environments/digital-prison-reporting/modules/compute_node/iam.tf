@@ -65,8 +65,9 @@ resource "aws_iam_role_policy_attachment" "this" {
   policy_arn = each.value
 }
 
+# Temporary policy to allow the operational DB to grab Oracle dependencies that aren't available on the public Internet
 resource "aws_iam_role_policy" "allow_s3_read" {
-  count = var.enable_compute_node ? 1 : 0
+  count = (var.enable_compute_node && var.app_key == "operational-db")? 1 : 0
   name   = "S3TemporaryReadPolicy"
   role   = aws_iam_role.instance-role[0].name
   policy = jsonencode({
@@ -78,8 +79,6 @@ resource "aws_iam_role_policy" "allow_s3_read" {
         ]
         "Effect": "Allow",
         "Resource": [
-          "arn:aws:s3:::dpr-working-test",
-          "arn:aws:s3:::dpr-working-test/*",
           "arn:aws:s3:::dpr-working-development",
           "arn:aws:s3:::dpr-working-development/*",
         ]

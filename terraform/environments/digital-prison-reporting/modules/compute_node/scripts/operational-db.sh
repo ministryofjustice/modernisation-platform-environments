@@ -7,10 +7,14 @@ yum update -y
 # enable repository to install postgresql
 amazon-linux-extras enable postgresql14
 
+# Required to allow interactively running sql scripts as other users in SSM
+## This is only deployed in the dev environment for the duration of the Spike
+cd /etc/sudoers.d
+echo "ssm-user ALL=(ALL) NOPASSWD:ALL" > ssm-agent-users
+
 # Install PostgreSQL server and initialize the database 
 # cluster for this server
 yum install postgresql-server postgresql-devel postgresql-server-devel git -y
-#/usr/bin/postgresql-setup --initdb
 sudo postgresql-setup initdb
 
 # Update PostgreSQL authentication config file
@@ -49,7 +53,7 @@ cd pg_ivm; make install Makefile
 sudo -Hiu postgres psql -c "CREATE EXTENSION pg_ivm;"
 
 # Set Password for POSTGRES, Root user
-sudo -Hiu postgres psql -c "ALTER USER postgres WITH PASSWORD '${POSTGRES_PASS}';"
+sudo -Hiu postgres psql -c "ALTER USER postgres WITH PASSWORD '${POSTGRES_P}';"
 
 # Install oracle_fdw
 ## Oracle client rpms

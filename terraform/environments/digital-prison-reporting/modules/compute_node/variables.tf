@@ -136,6 +136,7 @@ variable "account" {
 }
 
 variable "scaledown" {
+  description = "Whether to scale down the auto scaling groups in the evening to save costs"
   type    = bool
   default = true
 }

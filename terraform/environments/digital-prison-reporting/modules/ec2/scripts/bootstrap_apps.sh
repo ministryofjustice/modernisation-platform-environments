@@ -30,9 +30,6 @@ else
   echo "ssm-user does not exist - creating"
   sudo useradd ssm-user --create-home
   echo "ssm-user created"
-
-  cd /etc/sudoers.d 
-  echo "ssm-user ALL=(ALL) NOPASSWD:ALL" > ssm-agent-users
 fi
 
 echo "assumeyes=1" >> /etc/yum.conf

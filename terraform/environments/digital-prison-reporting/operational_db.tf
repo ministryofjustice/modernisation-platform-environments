@@ -1,6 +1,7 @@
 module "operational_db_server" {
   source = "./modules/compute_node"
 
+  count                       = local.deploy_operational_database ? 1 : 0
   enable_compute_node         = true
   scaledown                   = false
   name                        = "${local.project}-operational-db-server-${local.env}"
@@ -29,9 +30,10 @@ module "operational_db_server" {
   env           = local.env
   app_key       = "operational-db"
   ec2_sec_rules = {
+    # Allow access to Postgres only from our
     "TCP_5432" = {
       "from_port" = 5432,
-      "to_port" : 5432,
+      "to_port"   = 5432,
       "protocol"  = "TCP"
     },
     "TCP_22" = {
@@ -42,7 +44,7 @@ module "operational_db_server" {
   }
 
   env_vars = {
-    POSTGRES_PASS     = "postgres" # WEAK, WIP
+    POSTGRES_P     = "postgres" # WEAK - this is just used for dev environment only spike
     ENV               = local.env
   }
 
@@ -52,7 +54,7 @@ module "operational_db_server" {
       Name           = "${local.project}-operational-db-server-${local.env}"
       Resource_Type  = "EC2 Instance"
       Resource_Group = "operational-db"
-      Name           = "${local.project}-operational-db-server-${local.env}"
+      Jira           = "DPR2-509"
     }
   )
 }
