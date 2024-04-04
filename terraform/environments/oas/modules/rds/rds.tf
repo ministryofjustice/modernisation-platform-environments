@@ -205,3 +205,4 @@ resource "aws_security_group" "vpc-secgroup" {
 output "rds_endpoint" {
   value = aws_db_instance.appdb1.address
 }
+
