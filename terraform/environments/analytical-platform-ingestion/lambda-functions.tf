@@ -250,9 +250,9 @@ module "notify_quarantined_lambda" {
 
   environment_variables = {
     MODE                          = "quarantined"
-    GOVUK_NOTIFY_API_KEY_SECRET   = resource.aws_secretsmanager_secret.govuk_notify_api_key,
-    GOVUK_NOTIFY_TEMPLATES_SECRET = resource.aws_secretsmanager_secret.govuk_notify_templates,
-    SLACK_TOKEN                   = resource.aws_secretsmanager_secret.slack_token
+    GOVUK_NOTIFY_API_KEY_SECRET   = "ingestion/govuk-notify/api-key"   # TODO: correct this later
+    GOVUK_NOTIFY_TEMPLATES_SECRET = "ingestion/govuk-notify/templates" # TODO: correct this later
+    SLACK_TOKEN                   = "ingestion/slack-token"            # TODO: correct this later
   }
 
   # TODO: Check if KMS key is actually needed below
@@ -308,7 +308,7 @@ module "notify_transferred_lambda" {
 
   environment_variables = {
     MODE        = "transferred"
-    SLACK_TOKEN = resource.aws_secretsmanager_secret.slack_token
+    SLACK_TOKEN = "ingestion/slack-token" # TODO: correct this later
   }
 
   # TODO: Check if KMS key is actually needed below
