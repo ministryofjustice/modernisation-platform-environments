@@ -63,6 +63,7 @@ locals {
     })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["boe", "oasys_db"]
+      metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
     })
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.boe off for now
     tags = {
