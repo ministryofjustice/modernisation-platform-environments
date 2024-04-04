@@ -19,6 +19,7 @@ resource "aws_security_group" "lambda_generic" {
     {
       Resource_Type = "sg_group"
       Name          = "${local.generic_lambda}-sg"
+      Used_For      = "service_bundle"
     }
   )
 }
