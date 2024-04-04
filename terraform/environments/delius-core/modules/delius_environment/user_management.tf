@@ -11,13 +11,6 @@ module "user_management" {
   container_secrets_default      = {}
   container_secrets_env_specific = try(var.delius_microservice_configs.user_management.container_secrets_env_specific, {})
 
-  create_elasticache = true
-
-  elasticache_parameters = {
-    "notify-keyspace-events" = "eA"
-    "cluster-enabled"        = "yes"
-  }
-
   container_port_config = [
     {
       containerPort = var.delius_microservice_configs.user_management.container_port
@@ -41,6 +34,20 @@ module "user_management" {
   cluster_security_group_id = aws_security_group.cluster.id
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
+
+  create_elasticache               = true
+  elasticache_engine               = "redis"
+  elasticache_engine_version       = var.delius_microservice_configs.user_management.elasticache_version
+  elasticache_node_type            = var.delius_microservice_configs.user_management.elasticache_node_type
+  elasticache_port                 = 6379
+  elasticache_parameter_group_name = var.delius_microservice_configs.user_management.elasticache_parameter_group_name
+  elasticache_subnet_group_name    = "nextcloud-elasticache-subnet-group"
+
+  elasticache_parameters = {
+    "notify-keyspace-events" = "eA"
+    "cluster-enabled"        = "yes"
+  }
+
 
   microservice_lb                    = aws_lb.delius_core_frontend
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
