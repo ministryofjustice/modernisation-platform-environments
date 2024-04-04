@@ -172,7 +172,9 @@ module "transfer_lambda" {
       ]
       resources = [
         module.s3_processed_kms.key_arn,
-        module.supplier_data_kms.key_arn
+        module.supplier_data_kms.key_arn,
+        module.transferred_sns_kms.key_arn,
+        module.quarantined_sns_kms.key_arn
       ]
     },
     secretsmanager_access = {
