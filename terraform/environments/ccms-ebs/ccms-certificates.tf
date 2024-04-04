@@ -54,9 +54,9 @@ resource "aws_route53_record" "external_validation_core_network" {
 
   for_each = {
     for dvo in local.cert_opts : (
+      dvo.domain_name == "*.ccms-ebs.service.justice.gov.uk" ||
       dvo.domain_name == "modernisation-platform.service.justice.gov.uk" ||
-      dvo.domain_name == "ccms-ebs.service.justice.gov.uk" ||
-      dvo.domain_name == "*.ccms-ebs.service.justice.gov.uk"
+      dvo.domain_name == "ccms-ebs.service.justice.gov.uk"
       ) => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
