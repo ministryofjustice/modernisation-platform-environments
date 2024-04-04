@@ -23,33 +23,32 @@ module "nextcloud_service" {
   deployment_minimum_healthy_percent = "100"
 
   ecs_service_egress_security_group_ids = [
-    {
+    for efs in module.nextcloud_efs : {
       ip_protocol                  = "tcp"
       port                         = 2049
-      referenced_security_group_id = module.nextcloud_efs.sg_id
-    },
+      referenced_security_group_id = efs.sg_id
+    }
   ]
 
-
   efs_volumes = [
-    {
+    for efs in module.nextcloud_efs : {
       host_path = null
-      name      = "nextcloud"
+      name      = efs.name
       efs_volume_configuration = [{
-        file_system_id          = module.nextcloud_efs.fs_id
+        file_system_id          = efs.fs_id
         root_directory          = "/"
         transit_encryption      = "ENABLED"
-        transit_encryption_port = 2049
+        transit_encryption_port = null
         authorization_config = [{
-          access_point_id = module.nextcloud_efs.access_point_id
+          access_point_id = efs.access_point_id
           iam             = "DISABLED"
         }]
       }]
     }
   ]
-  mount_points = [{
-    sourceVolume  = "nextcloud"
-    containerPath = "/var/www/"
+  mount_points = [for efs in module.nextcloud_efs : {
+    sourceVolume  = efs.name
+    containerPath = "/var/www/${efs.name}"
     readOnly      = false
   }]
 
@@ -89,43 +88,22 @@ module "nextcloud_service" {
   rds_endpoint_environment_variable         = "MYSQL_HOST"
   elasticache_endpoint_environment_variable = "REDIS_HOST"
 
-  container_environment_vars = [
-    {
-      name  = "MYSQL_DATABASE"
-      value = "nextcloud"
-    },
-    {
-      name  = "MYSQL_USER"
-      value = "dbadmin"
-    },
-    {
-      name  = "MYSQL_PASSWORD"
-      value = "password"
-    },
-    {
-      name  = "REDIS_PORT"
-      value = "6379"
-    },
-    {
-      name  = "REDIS_PASSWORD"
-      value = "password"
-    },
-    {
-      name  = "NEXTCLOUD_ADMIN_USER"
-      value = "admin"
-    },
-    {
-      name  = "NEXTCLOUD_TRUSTED_DOMAINS"
-      value = aws_route53_record.nextcloud_external.fqdn
-    }
-  ]
+  container_vars_default = {
+    MYSQL_DATABASE            = "nextcloud"
+    MYSQL_USER                = "dbadmin"
+    MYSQL_PASSWORD            = "password"
+    REDIS_PORT                = "6379"
+    REDIS_PASSWORD            = "password"
+    NEXTCLOUD_ADMIN_USER      = "admin"
+    NEXTCLOUD_TRUSTED_DOMAINS = aws_route53_record.nextcloud_external.fqdn
+  }
+  container_vars_env_specific = {}
 
-  container_secrets = [
-    {
-      name      = "NEXTCLOUD_ADMIN_PASSWORD"
-      valueFrom = aws_secretsmanager_secret.nextcloud_admin_password.arn
-    }
-  ]
+  container_secrets_env_specific = {}
+
+  container_secrets_default = {
+    NEXTCLOUD_ADMIN_PASSWORD = aws_secretsmanager_secret.nextcloud_admin_password.arn
+  }
 
   log_error_pattern      = "FATAL"
   sns_topic_arn          = aws_sns_topic.nextcloud_alarms.arn
