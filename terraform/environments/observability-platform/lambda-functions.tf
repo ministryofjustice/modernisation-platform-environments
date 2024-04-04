@@ -12,7 +12,7 @@ module "grafana_api_key_rotator" {
   package_type  = "Image"
   memory_size   = 2048
   timeout       = 120
-  image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/observability-platform-grafana-api-key-rotator:1.0.0"
+  image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/observability-platform-grafana-api-key-rotator:${local.environment_configuration.grafana_api_key_rotator_version}"
 
   environment_variables = {
     WORKSPACE_API_KEY_NAME = "observability-platform-automation"
