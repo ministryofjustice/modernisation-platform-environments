@@ -5,3 +5,27 @@ data "aws_prefix_list" "s3" {
 
   depends_on = [module.vpc_endpoints]
 }
+
+data "aws_secretsmanager_secret" "slack_token" {
+  name = "ingestion/slack-token"
+}
+
+data "aws_secretsmanager_secret_version" "slack_token" {
+  secret_id = data.aws_secretsmanager_secret.slack_token.id
+}
+
+data "aws_secretsmanager_secret" "govuk_notify_api_key" {
+  name = "ingestion/govuk-notify/api-key"
+}
+
+data "aws_secretsmanager_secret_version" "govuk_notify_api_key" {
+  secret_id = data.aws_secretsmanager_secret.govuk_notify_api_key.id
+}
+
+data "aws_secretsmanager_secret" "govuk_notify_templates" {
+  name = "ingestion/govuk-notify/templates"
+}
+
+data "aws_secretsmanager_secret_version" "govuk_notify_templates" {
+  secret_id = data.aws_secretsmanager_secret.govuk_notify_templates.id
+}
