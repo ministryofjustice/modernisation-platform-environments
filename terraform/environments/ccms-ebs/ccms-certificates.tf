@@ -53,7 +53,7 @@ resource "aws_route53_record" "external_validation_core_network" {
   provider = aws.core-network-services
 
   for_each = {
-    for dvo in local.cert_opts : dvo.domain_name == "modernisation-platform.service.justice.gov.uk" => {
+    for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name == "modernisation-platform.service.justice.gov.uk" => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -80,7 +80,7 @@ resource "aws_route53_record" "external_validation_core_vpc" {
   provider = aws.core-vpc
 
   for_each = {
-    for dvo in local.cert_opts : dvo.domain_name != "modernisation-platform.service.justice.gov.uk" => {
+    for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name != "modernisation-platform.service.justice.gov.uk" => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -94,31 +94,31 @@ resource "aws_route53_record" "external_validation_core_vpc" {
   type            = each.value.type
   zone_id         = local.cert_zone_id
 }
+resource "aws_route53_record" "external_validation" {
+  depends_on = [
+    aws_instance.ec2_oracle_ebs,
+    aws_instance.ec2_ebsapps,
+    aws_instance.ec2_webgate,
+    aws_instance.ec2_accessgate
+  ]
 
-# resource "aws_route53_record" "external_validation" {
-#   depends_on = [
-#     aws_instance.ec2_oracle_ebs,
-#     aws_instance.ec2_ebsapps,
-#     aws_instance.ec2_webgate,
-#     aws_instance.ec2_accessgate
-#   ]
+  provider = aws.core-network-services
 
-#   provider = aws.core-network-services
+  for_each = {
+    for dvo in aws_acm_certificate.external-service[0].domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = local.cert_zone_id
+}
 
-#   for_each = {
-#     for dvo in local.cert_opts : dvo.domain_name => {
-#       name   = dvo.resource_record_name
-#       record = dvo.resource_record_value
-#       type   = dvo.resource_record_type
-#     }
-#   }
-#   allow_overwrite = true
-#   name            = each.value.name
-#   records         = [each.value.record]
-#   ttl             = 60
-#   type            = each.value.type
-#   zone_id         = local.cert_zone_id
-# }
 
 resource "aws_acm_certificate_validation" "external" {
   count = local.is-production ? 1 : 1
