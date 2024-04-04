@@ -40,11 +40,9 @@ resource "aws_acm_certificate" "external-service" {
   }
 }
 
-## Validation 
+## Validation
 
 resource "aws_route53_record" "external_validation_core_network" {
-  count = local.is-production ? 0 : length(local.cert_opts)
-
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
@@ -54,13 +52,13 @@ resource "aws_route53_record" "external_validation_core_network" {
 
   provider = aws.core-network-services
 
-  for_each = {
-    for dvo in local.cert_opts : dvo.domain_name == "modernisation-platform.service.justice.gov.uk" => {
+  for_each = length(aws_acm_certificate.external[0].domain_validation_options) > 0 ? {
+    for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name == "modernisation-platform.service.justice.gov.uk" => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
-  }
+  } : {}  # Empty map if no validation options
 
   allow_overwrite = true
   name            = each.value.name
@@ -72,8 +70,6 @@ resource "aws_route53_record" "external_validation_core_network" {
 
 
 resource "aws_route53_record" "external_validation_core_vpc" {
-  count = local.is-production ? 0 : length(local.cert_opts)
-  
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
@@ -83,13 +79,13 @@ resource "aws_route53_record" "external_validation_core_vpc" {
 
   provider = aws.core-vpc
 
-  for_each = {
-    for dvo in local.cert_opts : dvo.domain_name != "modernisation-platform.service.justice.gov.uk" => {
+  for_each = length(aws_acm_certificate.external[0].domain_validation_options) > 0 ? {
+    for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name != "modernisation-platform.service.justice.gov.uk" => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
-  }
+  } : {}  # Empty map if no validation options
 
   allow_overwrite = true
   name            = each.value.name
@@ -98,9 +94,8 @@ resource "aws_route53_record" "external_validation_core_vpc" {
   type            = each.value.type
   zone_id         = local.cert_zone_id
 }
-resource "aws_route53_record" "external_validation" {
-  count = local.is-production ? length(local.cert_opts) : 0
 
+resource "aws_route53_record" "external_validation" {
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
@@ -110,13 +105,14 @@ resource "aws_route53_record" "external_validation" {
 
   provider = aws.core-network-services
 
-  for_each = {
-    for dvo in aws_acm_certificate.external-service[0].domain_validation_options : dvo.domain_name => {
+  for_each = length(aws_acm_certificate.external-service[0].domain_validation_options) > 0 ? {
+    for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
-  }
+  } : {}  # Empty map if no validation options
+
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
@@ -125,20 +121,15 @@ resource "aws_route53_record" "external_validation" {
   zone_id         = local.cert_zone_id
 }
 
-
 resource "aws_acm_certificate_validation" "external" {
   count = local.is-production ? 1 : 1
 
   depends_on = [
-    aws_route53_record.external_validation_core_network,
-    aws_route53_record.external_validation_core_vpc
+    aws_route53_record.external_validation
   ]
 
-  certificate_arn = local.cert_arn
-  validation_record_fqdns = concat(
-    [for record in aws_route53_record.external_validation_core_network : record.fqdn],
-    [for record in aws_route53_record.external_validation_core_vpc : record.fqdn]
-  )
+  certificate_arn         = local.cert_arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 
   timeouts {
     create = "10m"
