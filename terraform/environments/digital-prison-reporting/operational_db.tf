@@ -30,7 +30,7 @@ module "operational_db_server" {
   env           = local.env
   app_key       = "operational-db"
   ec2_sec_rules = {
-    # Allow access to Postgres only from our
+    # Allow access to Postgres only from our subnet
     "TCP_5432" = {
       "from_port" = 5432,
       "to_port"   = 5432,
