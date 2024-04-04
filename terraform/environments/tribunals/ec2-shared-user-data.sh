@@ -7,6 +7,7 @@ $ecsCluster = "tribunals-all-cluster"
 $ebsVolumeTag = "tribunals-all-storage"
 $tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","ahmlr","lands-tribunal"
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+# maybe monitorScriptFile should be on the D drive?
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
 "Starting userdata execution" > $logFile
@@ -84,7 +85,7 @@ if (-not $awsCliInstalled) {
 $scriptContent = @'
 # Create a FileSystemWatcher object
 $watcher = New-Object System.IO.FileSystemWatcher
-$watcher.Path = $targetPath
+$watcher.Path = "D:\storage\tribunals\"
 $watcher.IncludeSubdirectories = $true
 $watcher.EnableRaisingEvents = $true
 
@@ -92,8 +93,8 @@ $watcher.EnableRaisingEvents = $true
 $action = {
     param($source, $event)
     $filePath = $event.FullPath
-    "A file was created at $filePath. Syncing to S3..." >> $monitorLogFile
-    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup >> $monitorLogFile
+    "A file was created at $filePath. Syncing to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 }
 
 # Register the event
