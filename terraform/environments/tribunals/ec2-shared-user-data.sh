@@ -113,3 +113,4 @@ $scriptContent | Out-File -FilePath $monitorScriptFile
 Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"$monitorScriptFile`""
 
 </powershell>
+<persist>true</persist>
