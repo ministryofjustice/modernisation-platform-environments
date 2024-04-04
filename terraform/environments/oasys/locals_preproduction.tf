@@ -32,6 +32,8 @@ locals {
       "/oracle/database/PPONRSYS" = local.secretsmanager_secrets_db
       "/oracle/database/PPONRAUD" = local.secretsmanager_secrets_db
       "/oracle/database/PPONRBDS" = local.secretsmanager_secrets_db
+      "/oracle/database/PPMISTN2" = local.secretsmanager_secrets_db
+      "/oracle/database/PPOASRP2" = local.secretsmanager_secrets_db
 
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
