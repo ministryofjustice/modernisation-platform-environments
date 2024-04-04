@@ -14,7 +14,7 @@ locals {
 
       /* Image Versions */
       scan_image_version     = "0.0.4"
-      transfer_image_version = "0.0.2"
+      transfer_image_version = "0.0.3"
       notify_image_version   = "0.0.1"
 
       /* Target Buckets */
