@@ -55,11 +55,14 @@ resource "aws_route53_record" "external_validation_core_network" {
   provider = aws.core-network-services
 
   allow_overwrite = true
-  name            = aws_acm_certificate.external[0].domain_validation_options[0].resource_record_name
-  records         = aws_acm_certificate.external[0].domain_validation_options[0].resource_record_value
-  ttl             = 60
-  type            = aws_acm_certificate.external[0].domain_validation_options[0].resource_record_type
-  zone_id         = local.cert_zone_id
+  name            = lookup(aws_acm_certificate.external[0].domain_validation_options, "domain_name", "modernisation-platform.service.justice.gov.uk").resource_record_name
+  records         = lookup(aws_acm_certificate.external[0].domain_validation_options, "domain_name", "modernisation-platform.service.justice.gov.uk").resource_record_value
+  type            = lookup(aws_acm_certificate.external[0].domain_validation_options, "domain_name", "modernisation-platform.service.justice.gov.uk").resource_record_type
+  # name            = aws_acm_certificate.external[0].domain_validation_options[0].resource_record_name
+  # records         = aws_acm_certificate.external[0].domain_validation_options[0].resource_record_value
+  ttl = 60
+  #  type            = aws_acm_certificate.external[0].domain_validation_options[0].resource_record_type
+  zone_id = local.cert_zone_id
 }
 
 
@@ -75,11 +78,15 @@ resource "aws_route53_record" "external_validation_core_vpc" {
 
   provider = aws.core-vpc
 
-  name            = aws_acm_certificate.external[0].domain_validation_options[1].resource_record_name
-  records         = aws_acm_certificate.external[0].domain_validation_options[1].resource_record_value
-  ttl             = 60
-  type            = aws_acm_certificate.external[0].domain_validation_options[1].resource_record_type
-  zone_id         = local.cert_zone_id
+  name            = lookup(aws_acm_certificate.external[0].domain_validation_options, "domain_name", "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk").resource_record_name
+  records         = lookup(aws_acm_certificate.external[0].domain_validation_options, "domain_name", "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk").resource_record_value
+  type            = lookup(aws_acm_certificate.external[0].domain_validation_options, "domain_name", "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk").resource_record_type
+
+#  name    = aws_acm_certificate.external[0].domain_validation_options[1].resource_record_name
+#  records = aws_acm_certificate.external[0].domain_validation_options[1].resource_record_value
+  ttl     = 60
+#  type    = aws_acm_certificate.external[0].domain_validation_options[1].resource_record_type
+  zone_id = local.cert_zone_id
 }
 
 # resource "aws_route53_record" "external_validation" {
