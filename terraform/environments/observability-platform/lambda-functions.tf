@@ -2,17 +2,17 @@ module "grafana_api_key_rotator" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 6.0"
+  version = "7.2.5"
 
-  publish = true
+  publish        = true
+  create_package = false
 
   function_name = "grafana-api-key-rotator"
   description   = "Rotates the Grafana API key used by Terraform"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.12"
-  timeout       = 300
-
-  source_path = "${path.module}/src/lambda/grafana-api-key-rotator"
+  package_type  = "Image"
+  memory_size   = 2048
+  timeout       = 120
+  image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/observability-platform-grafana-api-key-rotator:1.0.0"
 
   environment_variables = {
     WORKSPACE_API_KEY_NAME = "observability-platform-automation"
