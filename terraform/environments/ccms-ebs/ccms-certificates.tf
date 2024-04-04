@@ -42,23 +42,29 @@ resource "aws_acm_certificate" "external-service" {
 
 ## Validation
 
+resource "null_resource" "empty_validation_options_core_network" {
+  count = length(aws_acm_certificate.external[0].domain_validation_options) == 0 ? 1 : 0
+
+  triggers = {}  # Empty triggers to ensure execution even when options are empty
+}
 resource "aws_route53_record" "external_validation_core_network" {
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
     aws_instance.ec2_webgate,
-    aws_instance.ec2_accessgate
+    aws_instance.ec2_accessgate,
+    null_resource.empty_validation_options_core_network
   ]
 
   provider = aws.core-network-services
 
-  for_each = length(aws_acm_certificate.external[0].domain_validation_options) > 0 ? {
+  for_each = {
     for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name == "modernisation-platform.service.justice.gov.uk" => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
-  } : {}  # Empty map if no validation options
+  }
 
   allow_overwrite = true
   name            = each.value.name
@@ -68,24 +74,29 @@ resource "aws_route53_record" "external_validation_core_network" {
   zone_id         = local.cert_zone_id
 }
 
+resource "null_resource" "empty_validation_options_core_vpc" {
+  count = length(aws_acm_certificate.external[0].domain_validation_options) == 0 ? 1 : 0
 
+  triggers = {}  # Empty triggers to ensure execution even when options are empty
+}
 resource "aws_route53_record" "external_validation_core_vpc" {
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
     aws_instance.ec2_webgate,
-    aws_instance.ec2_accessgate
+    aws_instance.ec2_accessgate,
+    null_resource.empty_validation_options_core_vpc
   ]
 
   provider = aws.core-vpc
 
-  for_each = length(aws_acm_certificate.external[0].domain_validation_options) > 0 ? {
+  for_each = {
     for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name != "modernisation-platform.service.justice.gov.uk" => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
-  } : {}  # Empty map if no validation options
+  }
 
   allow_overwrite = true
   name            = each.value.name
@@ -93,6 +104,12 @@ resource "aws_route53_record" "external_validation_core_vpc" {
   ttl             = 60
   type            = each.value.type
   zone_id         = local.cert_zone_id
+}
+
+resource "null_resource" "empty_validation_options_external_service" {
+  count = length(aws_acm_certificate.external-service[0].domain_validation_options) == 0 ? 1 : 0
+
+  triggers = {}  # Empty triggers to ensure execution even when options are empty
 }
 
 resource "aws_route53_record" "external_validation" {
@@ -100,7 +117,8 @@ resource "aws_route53_record" "external_validation" {
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
     aws_instance.ec2_webgate,
-    aws_instance.ec2_accessgate
+    aws_instance.ec2_accessgate,
+    null_resource.empty_validation_options_external_service
   ]
 
   provider = aws.core-network-services
@@ -112,7 +130,6 @@ resource "aws_route53_record" "external_validation" {
       type   = dvo.resource_record_type
     }
   }
-  
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
