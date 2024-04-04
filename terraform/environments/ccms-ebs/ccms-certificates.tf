@@ -104,7 +104,7 @@ resource "aws_route53_record" "external_validation_core_vpc" {
 #   count = local.is-production ? 1 : 1
 
 #   depends_on = [
-#     aws_route53_record.external_validation
+#     aws_route53_record.external_validation_core_network
 #   ]
 
 #   certificate_arn         = local.cert_arn
@@ -115,7 +115,7 @@ resource "aws_route53_record" "external_validation_core_vpc" {
 #   }
 # }
 
-resource "aws_acm_certificate_validation" "external_core_network" {
+resource "aws_acm_certificate_validation" "external" {
   count = local.is-production ? 1 : 1
 
   depends_on = [
