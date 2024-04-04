@@ -217,6 +217,14 @@ module "transfer_lambda" {
         "s3:ListBucket"
       ]
       resources = formatlist("arn:aws:s3:::%s", local.environment_configuration.target_buckets)
+    },
+    sns = {
+      sid    = "AllowSNS"
+      effect = "Allow"
+      actions = [
+        "sns:Publish"
+      ]
+      resources = [module.transferred_topic.topic_arn]
     }
   }
 
