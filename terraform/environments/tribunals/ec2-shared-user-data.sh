@@ -99,6 +99,10 @@ $action = {
 # Register the event
 Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 
+# Keep the script running
+while ($true) {
+    Start-Sleep -Seconds 10
+}
 '@
 
 # Output the script to the file
