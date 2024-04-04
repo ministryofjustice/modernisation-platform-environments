@@ -105,21 +105,26 @@ resource "aws_route53_record" "external_validation" {
 
   provider = aws.core-network-services
 
-  for_each = length(aws_acm_certificate.external-service[0].domain_validation_options) > 0 ? {
-    for dvo in aws_acm_certificate.external-service[0].domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  } : {}  # Empty map if no validation options
+  for_each = length(aws_acm_certificate.external-service[0].domain_validation_options) > 0 ? aws_acm_certificate.external-service[0].domain_validation_options : {}
 
   allow_overwrite = true
+
+  dynamic "record" {
+    for_each = each.value
+
+    content {
+      name   = record.resource_record_name
+      record = record.resource_record_value
+      type   = record.resource_record_type
+    }
+  }
+
   name            = each.value.name
-  records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
   zone_id         = local.cert_zone_id
 }
+
 
 resource "aws_acm_certificate_validation" "external" {
   count = local.is-production ? 1 : 1
