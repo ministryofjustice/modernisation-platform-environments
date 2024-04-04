@@ -113,13 +113,13 @@ $scriptContent | Out-File -FilePath $monitorScriptFile
 # Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"$monitorScriptFile`""
 
 # Define the action to run the PowerShell script
-$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1`" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \`"C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\monitor-ebs.ps1\`""
 
 # Define the trigger to start at system boot
-$trigger = New-ScheduledTaskTrigger -AtStartup >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+$trigger = New-ScheduledTaskTrigger -AtStartup
 
 # Register the scheduled task
-Register-ScheduledTask -TaskName "MonitorEBSVolume" -Trigger $trigger -Action $action -RunLevel Highest -User "SYSTEM" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+Register-ScheduledTask -TaskName "MonitorEBSVolume" -Trigger $trigger -Action $action -RunLevel Highest -User "SYSTEM"
 
 </powershell>
 <persist>true</persist>
