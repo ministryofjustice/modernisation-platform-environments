@@ -207,17 +207,39 @@ locals {
     }
 
     baseline_ec2_instances = {
-      # "pd-${local.application_name}-db-a" = merge(local.database_a, {
-      #   config = merge(local.database_a.config, {
-      #     instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
-      #       "Ec2ProdDatabasePolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.database_a.tags, {
-      #     bip-db-name = "PDBIPINF"
-      #     oracle-sids = "PDBIPINF PDOASYS"
-      #   })
-      # })
+      "pd-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(local.database_a.config, {
+          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+            branch = "oasys-no-tns"
+          })
+        })
+        tags = merge(local.database_a.tags, {
+          bip-db-name = "PDBIPINF"
+          oracle-sids = "PDBIPINF PDOASYS"
+        })
+      })
+
+      "pd-${local.application_name}-db-b" = merge(local.database_b, {
+        config = merge(local.database_b.config, {
+          instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+            branch = "oasys-no-tns"
+          })
+        })
+        tags = merge(local.database_b.tags, {
+          bip-db-name = "PDBIPINF"
+          oracle-sids = "PDBIPINF PDOASYS"
+        })
+      })
 
 
       "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
