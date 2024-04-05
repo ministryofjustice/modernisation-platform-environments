@@ -55,6 +55,6 @@ for database in databases:
         dataframe = datasource.toDF()
 
         # Write DataFrame to CSV format with size check and splitting
-        dataframe.write.option("header", "true").option("maxPartitionBytes", 5*1024*1024*1024).csv(destination_path, mode="overwrite")
+        dataframe.write.option("header", "true").option("maxPartitionBytes", 5*1024*1024).csv(destination_path, mode="overwrite")
 
 job.commit()
