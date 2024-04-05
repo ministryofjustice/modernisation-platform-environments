@@ -44,8 +44,7 @@ resource "aws_security_group" "db" {
     from_port   = 1433
     to_port     = 1433
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-	  #security_groups = [aws_security_group.ecs_service.id, aws_security_group.cluster_ec2.id, module.bastion_linux.bastion_security_group]
+    cidr_blocks = local.application_data.accounts[local.environment].db_ingress_cidr_blocks
   }
   egress {
     from_port   = 0
