@@ -44,7 +44,7 @@ resource "aws_security_group" "db" {
     from_port   = 1433
     to_port     = 1433
     protocol    = "tcp"
-    cidr_blocks = local.application_data.accounts[local.environment].db_ingress_cidr_blocks
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
   egress {
     from_port   = 0
