@@ -31,7 +31,7 @@ locals {
   }))
 
   maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
-  ga_4_tag_id_secret_name     = "MLRA_GOOGLE_ANALYTICS_4_TAG_ID"
+  ga_4_tag_id_secret_name     = "APP_MLRA_GOOGLE_ANALYTICS_4_TAG_ID"
   task_definition = templatefile("task_definition.json", {
     app_name                  = local.application_name
     ecr_url                   = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
