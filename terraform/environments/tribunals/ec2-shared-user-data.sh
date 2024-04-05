@@ -118,7 +118,9 @@ $scriptPath = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 $scriptContent | Out-File -FilePath $scriptPath
 
 # Create a new scheduled task that runs at startup
-$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-File `"$scriptPath`""
+# $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-File `"$scriptPath`""
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File `\"C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1`\""
+
 $trigger = New-ScheduledTaskTrigger -AtStartup
 Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "RunAtStartup" -Description "Runs PowerShell commands at startup"
 
