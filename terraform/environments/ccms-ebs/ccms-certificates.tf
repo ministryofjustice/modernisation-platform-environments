@@ -42,6 +42,31 @@ resource "aws_acm_certificate" "external-service" {
 
 ## Validation
 
+resource "aws_route53_record" "external_validation_core_vpc" {
+  depends_on = [
+    aws_instance.ec2_oracle_ebs,
+    aws_instance.ec2_ebsapps,
+    aws_instance.ec2_webgate,
+    aws_instance.ec2_accessgate
+  ]
+
+  provider = aws.core-vpc
+
+  for_each = local.is-production ? {} : {
+    for dvo in local.cert_opts : dvo.domain_name == "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = local.cert_zone_id
+}
 resource "aws_route53_record" "external_validation_core_network" {
   depends_on = [
     aws_instance.ec2_oracle_ebs,
@@ -58,33 +83,6 @@ resource "aws_route53_record" "external_validation_core_network" {
       dvo.domain_name == "modernisation-platform.service.justice.gov.uk" ||
       dvo.domain_name == "ccms-ebs.service.justice.gov.uk"
       ) => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = local.cert_zone_id
-}
-
-
-resource "aws_route53_record" "external_validation_core_vpc" {
-  depends_on = [
-    aws_instance.ec2_oracle_ebs,
-    aws_instance.ec2_ebsapps,
-    aws_instance.ec2_webgate,
-    aws_instance.ec2_accessgate
-  ]
-
-  provider = aws.core-vpc
-
-  for_each = local.is-production ? {} : {
-    for dvo in local.cert_opts : dvo.domain_name == "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
