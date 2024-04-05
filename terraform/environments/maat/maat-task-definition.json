@@ -57,8 +57,8 @@
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CCP_CLIENT_SECRET"
       },
       {
-        "name": "APP_GOOGLE_ANALYTICS_4_TAG_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_GOOGLE_ANALYTICS_4_TAG_ID"
+        "name": "APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
       },
       {
         "name": "APP_CMA_CLIENT_ID",
