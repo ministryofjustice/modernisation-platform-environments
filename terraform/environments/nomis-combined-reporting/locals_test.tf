@@ -127,21 +127,21 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      # t1-ncr-cms-1-a = merge(local.bip_cms_ec2_default, {
-      #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-      #   config = merge(local.bip_cms_ec2_default.config, {
-      #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-      #       "Ec2T1ReportingPolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.bip_cms_ec2_default.tags, {
-      #     description                          = "For testing SAP BI Platform CMS installation and configurations"
-      #     nomis-combined-reporting-environment = "t1"
-      #     node                                 = "1"
-      #     type                                 = "management"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
+      t1-ncr-cms-1-a = merge(local.bip_cms_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
+        config = merge(local.bip_cms_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        tags = merge(local.bip_cms_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform CMS installation and configurations"
+          nomis-combined-reporting-environment = "t1"
+          node                                 = "1"
+          type                                 = "management"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
       t1-ncr-etl-1-a = merge(local.etl_ec2_default, {
         cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
         config = merge(local.etl_ec2_default.config, {
