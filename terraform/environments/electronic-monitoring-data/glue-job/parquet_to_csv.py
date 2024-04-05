@@ -19,6 +19,31 @@ destination_bucket = "destination-bucket-name"
 source_path = "s3://{}/".format(source_bucket)
 destination_path = "s3://{}/".format(destination_bucket)
 
+# Maximum size for each CSV file (in bytes)
+max_csv_size = 5 * 1024 * 1024 * 1024  # 5GB
+
+
+# Function to write DataFrame to CSV with size check and splitting
+def write_dataframe_to_csv(dataframe, destination_path):
+    # Check the size of the DataFrame
+    dataframe_size = dataframe.rdd.map(lambda x: len(str(x))).reduce(lambda x, y: x + y)
+
+    # If the size exceeds the maximum CSV size, split it into smaller chunks
+    if dataframe_size > max_csv_size:
+        # Split the DataFrame into smaller chunks
+        num_chunks = dataframe.rdd.getNumPartitions()
+        smaller_dataframes = dataframe.randomSplit([1.0 / num_chunks] * num_chunks)
+
+        # Write each smaller DataFrame to CSV
+        for idx, df_chunk in enumerate(smaller_dataframes):
+            df_chunk.write.option("header", "true").csv(
+                "{}/part_{}".format(destination_path, idx), mode="overwrite"
+            )
+    else:
+        # Write the entire DataFrame to a single CSV file
+        dataframe.write.option("header", "true").csv(destination_path, mode="overwrite")
+
+
 # Get list of databases in the source bucket
 databases = glueContext.list_databases()
 
@@ -49,9 +74,7 @@ for database in databases:
         # Convert Parquet to DataFrame
         dataframe = datasource.toDF()
 
-        # Write DataFrame to CSV format in the destination bucket
-        dataframe.write.option("header", "true").csv(
-            destination_table_path, mode="overwrite"
-        )
+        # Write DataFrame to CSV format with size check and splitting
+        write_dataframe_to_csv(dataframe, destination_table_path)
 
 job.commit()
