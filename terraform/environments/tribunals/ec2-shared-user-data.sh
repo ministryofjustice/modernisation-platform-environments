@@ -105,10 +105,8 @@ while ($true) {
 }
 '@
 
-# Output the script to the file
-$scriptContent | Out-File -FilePath $monitorScriptFile
+# $scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
-# Execute the monitor script
 Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"$monitorScriptFile`""
 
 # Define the action to run the PowerShell script
@@ -120,5 +118,13 @@ Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.e
 # Register the scheduled task
 # Register-ScheduledTask -TaskName "MonitorEBSVolume" -Trigger $trigger -Action $action -RunLevel Highest -User "SYSTEM"
 
+# Save the PowerShell script to a file
+$scriptPath = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
+$scriptContent | Out-File -FilePath $scriptPath
+
+# Create a new scheduled task that runs at startup
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-File `"$scriptPath`""
+$trigger = New-ScheduledTaskTrigger -AtStartup
+Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "RunAtStartup" -Description "Runs PowerShell commands at startup"
+
 </powershell>
-<persist>true</persist>
