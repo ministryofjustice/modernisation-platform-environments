@@ -25,7 +25,7 @@ resource "aws_dms_endpoint" "dms-rds-source" {
 # ==========================================================================
 
 # Create DMS Endpoint to S3 Target
-resource "aws_dms_s3_endpoint" "dms-s3-csv-target" {
+resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
 
   # Minimal Config:
   endpoint_id             = "s3-${var.database_name}-tf"
@@ -48,7 +48,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-csv-target" {
   # csv_no_sup_value                            = "false"
   # csv_null_value                              = "null"
   # csv_row_delimiter                           = "\\n"
-  data_format = "csv"
+  data_format = "parquet"
   # data_page_size                              = 1100000
   # date_partition_delimiter                    = "UNDERSCORE"
   # date_partition_enabled                      = false
@@ -65,7 +65,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-csv-target" {
   # include_op_for_full_load                    = true
   # max_file_size                               = 120000
   # parquet_timestamp_in_millisecond            = false
-  # parquet_version                             = "parquet-2-0"
+  parquet_version = "parquet-2-0"
   # preserve_transactions                       = false
   # rfc_4180                                    = false
   # row_group_length                            = 11000
