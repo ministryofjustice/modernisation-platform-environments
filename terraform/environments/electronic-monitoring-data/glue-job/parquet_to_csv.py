@@ -14,8 +14,8 @@ job = Job(glueContext)
 job.init(args["JOB_NAME"], args)
 
 # Source and destination buckets
-source_bucket = "source-bucket-name"
-destination_bucket = "destination-bucket-name"
+source_bucket = args["source_bucket"]
+destination_bucket = args["destination_bucket"]
 source_path = "s3://{}/".format(source_bucket)
 destination_path = "s3://{}/".format(destination_bucket)
 

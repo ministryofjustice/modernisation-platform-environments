@@ -17,6 +17,10 @@ resource "aws_s3_bucket" "csv-output-bucket" {
 resource "aws_glue_job" "parquet-to-csv" {
     name = "parquet-to-csv"
     role_arn = aws_iam_role.parquet-to-csv.arn
+    default_arguments = {
+        "--destination_bucket" = aws_s3_bucket.csv-output-bucket.id
+        "--source_bucket"      = "dms-em-rds-output"
+    }
 
     command {
         script_location = "s3://${aws_s3_bucket.glue-jobs.id}/parquet_to_csv.py"
