@@ -98,11 +98,6 @@ $action = {
 
 # Register the event
 Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
-
-# Keep the script running
-while ($true) {
-    Start-Sleep -Seconds 10
-}
 '@
 
 # $scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
