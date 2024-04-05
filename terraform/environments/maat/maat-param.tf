@@ -57,7 +57,7 @@ resource "aws_ssm_parameter" "maat_app_ccp_client_secret" {
 }
 
 resource "aws_ssm_parameter" "maat_app_google_analytics_tag_id" {
-  name  = "/maat/APP_GOOGLE_ANALYTICS_4_TAG_ID"
+  name  = "/maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
   type  = "SecureString"
   value = "replace in console"
   lifecycle {
