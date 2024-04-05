@@ -223,3 +223,17 @@ resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_maatos" {
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
 }
 
+resource "aws_cognito_user_pool_client" "maat_api_cognito_pool_client_cccd" {
+  depends_on = [aws_cognito_resource_server.maat_api_cognito_user_pool_server]
+
+  name                                 = "Claim for Crown Court Defence"
+  user_pool_id                         = aws_cognito_user_pool.maat_api_cognito_user_pool.id
+  allowed_oauth_flows_user_pool_client = true
+  generate_secret                      = true
+  supported_identity_providers         = ["COGNITO"]
+  allowed_oauth_flows                  = ["client_credentials"]
+  allowed_oauth_scopes                 = ["${local.application_name}-cd-api/${local.application_data.accounts[local.environment].maat_api_api_scope}"]
+  prevent_user_existence_errors        = "ENABLED"
+  explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
+}
+
