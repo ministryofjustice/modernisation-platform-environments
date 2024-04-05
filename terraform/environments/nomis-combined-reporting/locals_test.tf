@@ -124,6 +124,7 @@ locals {
           description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
           nomis-combined-reporting-environment = "t1"
           type                                 = "processing"
+          instance-scheduling                  = "skip-scheduling"
         })
       })
       t1-ncr-cms-1-a = merge(local.bip_cms_ec2_default, {
@@ -138,6 +139,7 @@ locals {
           nomis-combined-reporting-environment = "t1"
           node                                 = "1"
           type                                 = "management"
+          instance-scheduling                  = "skip-scheduling"
         })
       })
       t1-ncr-etl-1-a = merge(local.etl_ec2_default, {
@@ -150,6 +152,7 @@ locals {
         tags = merge(local.etl_ec2_default.tags, {
           description                          = "For testing SAP BI Platform ETL installation and configurations"
           nomis-combined-reporting-environment = "t1"
+          instance-scheduling                  = "skip-scheduling"
         })
       })
     }
