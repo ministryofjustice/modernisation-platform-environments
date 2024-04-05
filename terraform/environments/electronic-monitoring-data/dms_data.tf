@@ -1,5 +1,5 @@
 data "aws_s3_bucket" "existing_dms_bucket" {
-    bucket = "dms-em-rds-output"
+  bucket = "dms-em-rds-output"
 }
 
 data "aws_iam_policy_document" "dms_assume_role" {

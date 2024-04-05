@@ -3,53 +3,53 @@ variable "database_name" {
   type        = string
 }
 
-variable dms_replication_instance_class {
+variable "dms_replication_instance_class" {
   description = "Name of the replication instance class to be used"
   type        = string
   default     = "dms.t3.micro"
 }
 
-variable dms_availability_zone {
+variable "dms_availability_zone" {
   description = "Replication Instance AZ"
   type        = string
-  default     = "eu-west-2b"  
+  default     = "eu-west-2b"
 }
 
-variable dms_engine_version {
+variable "dms_engine_version" {
   description = "Replication Instance Engine Version"
   type        = string
-  default     = "3.5.1"   
+  default     = "3.5.1"
 }
 
 variable "rds_db_security_group_id" {
   description = "Security Group associated to RDS Database Instance"
-  type        = string 
+  type        = string
 }
 
 variable "rds_db_instance" {
   description = "Name of the RDS Database Instance"
   type        = string
-  default     = "database_2022" 
+  default     = "database_2022"
 }
 
 variable "rds_db_instance_pasword" {
   description = "Password for the RDS Database Instance"
-  type        = string  
+  type        = string
 }
 
 variable "rds_db_instance_port" {
   description = "Logical port number for the RDS Database Instance"
-  type        = number  
+  type        = number
 }
 
 variable "rds_db_server_name" {
   description = "RDS Database Instance endpoint"
-  type        = string  
+  type        = string
 }
 
 variable "rds_db_username" {
   description = "Username to login to RDS Database Instance"
-  type        = string  
+  type        = string
 }
 
 # variable "dms_vpc_id" {
@@ -59,25 +59,25 @@ variable "rds_db_username" {
 
 variable "ep_service_access_role_arn" {
   description = "DMS Endpoint Service Access Role-ARN"
-  type        = string    
+  type        = string
 }
 
 variable "target_s3_bucket_name" {
   description = "DMS S3 Target Endpoint Bucket Name"
-  type        = string    
+  type        = string
 }
 
 variable "rep_task_settings_filepath" {
   description = "JSON file with DMS relevant migration task settings"
-  type        = string    
+  type        = string
 }
 
 variable "rep_task_table_mapping_filepath" {
   description = "JSON file with DMS table mappings"
-  type        = string    
+  type        = string
 }
 
 variable "dms_replication_instance_arn" {
   description = "Assign the Replication Instance-ARN to be used"
-  type        = string    
+  type        = string
 }

@@ -9,10 +9,10 @@ resource "aws_dms_replication_task" "t3micro-dms-replication-task" {
   table_mappings            = var.rep_task_table_mapping_filepath
   target_endpoint_arn       = aws_dms_s3_endpoint.dms-s3-csv-target.endpoint_arn
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Resource_Type = "DMS Replication Task",
-#     }
-#   )
+  #   tags = merge(
+  #     local.tags,
+  #     {
+  #       Resource_Type = "DMS Replication Task",
+  #     }
+  #   )
 }

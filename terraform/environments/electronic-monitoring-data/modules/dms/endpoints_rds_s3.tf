@@ -1,42 +1,42 @@
 # Create DMS Endpoint to RDS Source
 resource "aws_dms_endpoint" "dms-rds-source" {
 
-    #   certificate_arn             = ""
-    database_name               = var.database_name
-    endpoint_id                 = "rds-mssql-${var.database_name}-tf"
-    endpoint_type               = "source"
-    engine_name                 = "sqlserver"
-    #   extra_connection_attributes = ""
-    #   kms_key_arn                 = aws_db_instance.database_2022.kms_key_id
-    password                    = var.rds_db_instance_pasword # aws_db_instance.database_2022.password
-    port                        = var.rds_db_instance_port # aws_db_instance.database_2022.port
-    server_name                 = var.rds_db_server_name # split(":", aws_db_instance.database_2022.endpoint)[0]
-    ssl_mode                    = "require"
-    username                    = var.rds_db_username # aws_db_instance.database_2022.username
+  #   certificate_arn             = ""
+  database_name = var.database_name
+  endpoint_id   = "rds-mssql-${var.database_name}-tf"
+  endpoint_type = "source"
+  engine_name   = "sqlserver"
+  #   extra_connection_attributes = ""
+  #   kms_key_arn                 = aws_db_instance.database_2022.kms_key_id
+  password    = var.rds_db_instance_pasword
+  port        = var.rds_db_instance_port
+  server_name = var.rds_db_server_name
+  ssl_mode    = "require"
+  username    = var.rds_db_username
 
-    # tags = merge(
-    #   local.tags,
-    #   {
-    #     Resource_Type = "DMS Source Endpoint - RDS MSSQL",
-    #   }
-    # )
+  # tags = merge(
+  #   local.tags,
+  #   {
+  #     Resource_Type = "DMS Source Endpoint - RDS MSSQL",
+  #   }
+  # )
 }
 
 # ==========================================================================
 
 # Create DMS Endpoint to S3 Target
 resource "aws_dms_s3_endpoint" "dms-s3-csv-target" {
-  
+
   # Minimal Config:
-  endpoint_id                      = "s3-${var.database_name}-tf"
-  endpoint_type                    = "target"
-  bucket_name                      = var.target_s3_bucket_name # data.aws_s3_bucket.existing_dms_bucket.id
-  service_access_role_arn          = var.ep_service_access_role_arn # aws_iam_role.dms-endpoint-role.arn
-  
+  endpoint_id             = "s3-${var.database_name}-tf"
+  endpoint_type           = "target"
+  bucket_name             = var.target_s3_bucket_name      # data.aws_s3_bucket.existing_dms_bucket.id
+  service_access_role_arn = var.ep_service_access_role_arn # aws_iam_role.dms-endpoint-role.arn
+
   # Extra settings:
   # add_column_name                             = false
   # add_trailing_padding_character              = false
-  bucket_folder                                 = var.database_name
+  bucket_folder = var.database_name
   # canned_acl_for_objects                      = "NONE"
   # cdc_inserts_and_updates                     = false
   # cdc_inserts_only                            = false
@@ -48,7 +48,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-csv-target" {
   # csv_no_sup_value                            = "false"
   # csv_null_value                              = "null"
   # csv_row_delimiter                           = "\\n"
-  data_format                                 = "csv"
+  data_format = "csv"
   # data_page_size                              = 1100000
   # date_partition_delimiter                    = "UNDERSCORE"
   # date_partition_enabled                      = false
@@ -75,7 +75,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-csv-target" {
   # use_task_start_time_for_full_load_timestamp = true
 
   # depends_on = [aws_iam_policy.dms-s3-ep-iam-role-policy]
-  
+
   # tags = merge(
   #   local.tags,
   #   {

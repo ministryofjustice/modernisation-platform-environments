@@ -2,7 +2,7 @@
 
 # Define IAM role for DMS S3 Endpoint
 resource "aws_iam_role" "dms-endpoint-role" {
-  name = "dms-endpoint-access-role-tf"
+  name               = "dms-endpoint-access-role-tf"
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
 }
 
@@ -40,7 +40,7 @@ resource "aws_iam_role_policy_attachment" "dms-endpoint-role" {
 
 # Create DMS VPC EC2 Role
 resource "aws_iam_role" "dms-vpc-role" {
-  name = "dms-vpc-mng-role-tf"
+  name               = "dms-vpc-mng-role-tf"
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
 }
 
