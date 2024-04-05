@@ -53,7 +53,7 @@ resource "aws_route53_record" "external_validation_core_vpc" {
   provider = aws.core-vpc
 
   for_each = local.is-production ? {} : {
-    for dvo in local.cert_opts : dvo.domain_name == "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" => {
+    for dvo in local.cert_opts : dvo.domain_name == "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" ? dvo : null => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
