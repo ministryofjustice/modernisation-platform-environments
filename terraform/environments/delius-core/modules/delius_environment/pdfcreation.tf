@@ -13,8 +13,13 @@ module "pdf_creation" {
     }
   ]
 
+  container_vars_default      = {}
+  container_vars_env_specific = try(var.delius_microservice_configs.pdf_creation.container_vars_env_specific, {})
+
+  container_secrets_default      = {}
+  container_secrets_env_specific = try(var.delius_microservice_configs.pdf_creation.container_secrets_env_specific, {})
+
   ecs_cluster_arn            = module.ecs.ecs_cluster_arn
-  container_secrets          = []
   db_ingress_security_groups = []
   cluster_security_group_id  = aws_security_group.cluster.id
 
@@ -23,13 +28,12 @@ module "pdf_creation" {
   microservice_lb                    = aws_lb.delius_core_frontend
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
-  alb_listener_rule_paths    = ["/pdf/creation", "/pdf/creation/*"]
-  platform_vars              = var.platform_vars
-  container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-pdf-creation-ecr-repo:${var.delius_microservice_configs.pdf_creation.image_tag}"
-  account_config             = var.account_config
-  health_check_path          = "/pdf/creation/"
-  account_info               = var.account_info
-  container_environment_vars = []
+  alb_listener_rule_paths = ["/pdf/creation", "/pdf/creation/*"]
+  platform_vars           = var.platform_vars
+  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-pdf-creation-ecr-repo:${var.delius_microservice_configs.pdf_creation.image_tag}"
+  account_config          = var.account_config
+  health_check_path       = "/pdf/creation/"
+  account_info            = var.account_info
 
   providers = {
     aws          = aws

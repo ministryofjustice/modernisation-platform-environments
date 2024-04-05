@@ -4,10 +4,12 @@ module "user_management" {
   account_info          = var.account_info
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   certificate_arn       = aws_acm_certificate.external.arn
-  container_environment_vars = [
-  ]
-  container_secrets = [
-  ]
+
+  container_vars_default      = {}
+  container_vars_env_specific = try(var.delius_microservice_configs.user_management.container_vars_env_specific, {})
+
+  container_secrets_default      = {}
+  container_secrets_env_specific = try(var.delius_microservice_configs.user_management.container_secrets_env_specific, {})
 
   create_elasticache = true
 

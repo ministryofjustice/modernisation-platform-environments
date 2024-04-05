@@ -1,0 +1,3 @@
+variable "service" {
+  type = string
+}

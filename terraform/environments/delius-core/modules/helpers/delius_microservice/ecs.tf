@@ -7,9 +7,9 @@ module "container_definition" {
   essential                = true
   readonly_root_filesystem = false
 
-  environment = concat(var.container_environment_vars, local.rds_env_vars, local.elasticache_env_vars)
+  environment = local.calculated_container_vars_list
 
-  secrets       = concat(var.container_secrets, local.rds_secrets)
+  secrets       = local.calculated_container_secrets_list
   port_mappings = var.container_port_config
   mount_points  = var.mount_points
   log_configuration = {

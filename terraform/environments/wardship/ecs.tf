@@ -11,6 +11,11 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
   retention_in_days = "7"
 }
 
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name              = "wardship-ecs"
+  retention_in_days = "7"
+}
+
 resource "aws_ecs_task_definition" "wardship_task_definition" {
   count                    = local.is-development ? 0 : 1
   family                   = "wardshipFamily"
@@ -22,11 +27,20 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
   memory                   = 2048
   container_definitions = jsonencode([
     {
-      name      = "wardship-container"
-      image     = "${aws_ecr_repository.wardship_ecr_repo.repository_url}:latest"
-      cpu       = 1024
-      memory    = 2048
-      essential = true
+      name                   = "wardship-container"
+      image                  = "${aws_ecr_repository.wardship_ecr_repo.repository_url}:latest"
+      cpu                    = 1024
+      memory                 = 2048
+      essential              = true
+      ReadonlyRootFilesystem = true
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name,
+          "awslogs-region"        = "eu-west-2",
+          "awslogs-stream-prefix" = "wardship-app"
+        }
+      },
       portMappings = [
         {
           containerPort = 80
@@ -92,11 +106,20 @@ resource "aws_ecs_task_definition" "wardship_task_definition_dev" {
   memory                   = 2048
   container_definitions = jsonencode([
     {
-      name      = "wardship-container"
-      image     = "${aws_ecr_repository.wardship_ecr_repo.repository_url}:latest"
-      cpu       = 1024
-      memory    = 2048
-      essential = true
+      name                   = "wardship-container"
+      image                  = "${aws_ecr_repository.wardship_ecr_repo.repository_url}:latest"
+      cpu                    = 1024
+      memory                 = 2048
+      essential              = true
+      ReadonlyRootFilesystem = true
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name,
+          "awslogs-region"        = "eu-west-2",
+          "awslogs-stream-prefix" = "wardship-app"
+        }
+      },
       portMappings = [
         {
           containerPort = 80
@@ -165,7 +188,7 @@ resource "aws_ecs_service" "wardship_ecs_service" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = false
   }
@@ -196,7 +219,7 @@ resource "aws_ecs_service" "wardship_ecs_service_dev" {
   health_check_grace_period_seconds = 180
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = false
   }
@@ -479,60 +502,4 @@ module "pagerduty_core_alerts_prod" {
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
-}
-
-# resource "aws_eip" "nat" {
-#   domain = "vpc"
-
-#   tags = {
-#     Name = "eip-for-nat-gateway"
-#   }
-# }
-
-# resource "aws_nat_gateway" "nat_gateway" {
-#   allocation_id = aws_eip.nat.id
-#   subnet_id     = data.aws_subnets.shared-public.ids[0]
-
-#   tags = {
-#     Name = "nat-gateway"
-#   }
-# }
-
-# resource "aws_route" "route" {
-#   route_table_id            = data.aws_route_table.private.id
-#   destination_cidr_block    = "0.0.0.0/0"
-#   nat_gateway_id            = aws_nat_gateway.nat_gateway.id
-# }
-
-# data "aws_route_table" "private" {
-#   subnet_id = data.aws_subnets.shared-private.ids[0]
-# }
-
-//VPC endpoint stuff:
-resource "aws_vpc_endpoint" "ecr_dkr" {
-  vpc_id              = data.aws_vpc.shared.id
-  service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
-
-  security_group_ids = [aws_security_group.ecs_service.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
-
-resource "aws_vpc_endpoint" "ecr_api" {
-  vpc_id              = data.aws_vpc.shared.id
-  service_name        = "com.amazonaws.eu-west-2.ecr.api"
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
-
-  security_group_ids = [aws_security_group.ecs_service.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
-
-resource "aws_vpc_endpoint" "s3" {
-  vpc_id            = data.aws_vpc.shared.id
-  service_name      = "com.amazonaws.eu-west-2.s3"
-  vpc_endpoint_type = "Gateway"
-
-  route_table_ids = data.aws_subnets.shared-private.ids
 }

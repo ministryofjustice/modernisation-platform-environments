@@ -37,23 +37,28 @@ locals {
   }
 
   defaults_web_ec2 = merge(local.defaults_ec2, {
-    # config = merge(local.defaults_ec2.config, {
-    #   ami_name = "" FIXME: needs adding
-    # })
+    config = merge(local.defaults_ec2.config, {
+      ami_name = "base_rhel_7_9_*"
+    })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["web"]
     })
     tags = {
-        os-type   = "Linux"
-        component = "onr_web"
+      os-type   = "Linux"
+      component = "onr_web"
+    }
+    # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
+    ebs_volumes = {
+      "/dev/sda1" = { type = "gp3", size = 128 } # root volume
     }
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.web off for now
   })
 
   defaults_boe_ec2 = merge(local.defaults_ec2, {
-    # config = merge(local.defaults_ec2.config, {
-    #   # ami_name = "" FIXME: needs adding
-    # })
+    config = merge(local.defaults_ec2.config, {
+      ami_owner = "374269020027"
+      ami_name  = "base_rhel_6_10_2024-03-26*"
+    })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["boe", "oasys_db"]
     })
@@ -61,6 +66,10 @@ locals {
     tags = {
       os-type   = "Linux"
       component = "onr_boe"
+    }
+    # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
+    ebs_volumes = {
+      "/dev/sda1" = { type = "gp3", size = 128 } # root volume
     }
   })
 
@@ -76,12 +85,16 @@ locals {
       os-type   = "Windows"
       component = "onr_bods"
     }
+    # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
+    ebs_volumes = {
+      "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+    }
   })
 
   defaults_onr_db_ec2 = merge(local.defaults_ec2, {
-    # config = merge(local.defaults_ec2.config, {
-    #   ami_name = "" FIXME: needs adding
-    # })
+    config = merge(local.defaults_ec2.config, {
+      ami_name = "base_rhel_7_9_*"
+    })
     instance = merge(local.defaults_ec2.instance, {
       disable_api_stop       = false
       vpc_security_group_ids = ["onr_db", "oasys_db_onr_db"]
@@ -101,11 +114,11 @@ locals {
     }
     ebs_volume_config = {
       data = {
-        iops       = 5000
+        iops       = 5000 # confirmed, by looking at Azure
         throughput = 200
       }
       flash = {
-        iops       = 5000
+        iops       = 5000 # confirmed, by looking at Azure
         throughput = 200
       }
     }
@@ -114,6 +127,6 @@ locals {
       os-type   = "Windows"
       component = "onr_db"
     }
-    route53_records      = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
   })
 }

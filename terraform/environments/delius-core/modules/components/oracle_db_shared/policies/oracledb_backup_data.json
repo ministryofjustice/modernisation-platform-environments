@@ -1,0 +1,15 @@
+{
+  "Version": "2012-10-17",
+
+  "Statement": [
+    {
+      "Sid": "OracleBackupAccess",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${oracle_duplicate_delius_target_account_id}:role/instance-role-${oracle_duplicate_delius_target_environment}-delius-db-1"
+      },
+      "Action": "s3:*",
+      "Resource": ["${s3bucket_arn}", "${s3bucket_arn}/*"]
+    }
+  ]
+}
