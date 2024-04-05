@@ -57,7 +57,8 @@
       "env_name": "PRODUCTION",
       "db_instance_identifier": "db-ifs-production",
       "s3_bucket_name": "ifs-production-bucket",
-      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:ifs-production-db-02-04-2024"
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:ifs-production-db-02-04-2024",
+      "db_ingress_cidr_blocks": ["10.27.32.0/21"]
     }
   }
 }
