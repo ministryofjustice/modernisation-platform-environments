@@ -34,12 +34,12 @@ locals {
       "/oracle/database/PROASYS" = local.secretsmanager_secrets_oasys_db
       "/oracle/database/TROASYS" = local.secretsmanager_secrets_oasys_db
 
-      # "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
+      "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
       "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
-      # "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
+      "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
+      "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
+      "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
+      "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
 
       "/oracle/database/TRBIPINF" = local.secretsmanager_secrets_bip_db
 
@@ -213,11 +213,11 @@ locals {
             "Ec2ProdDatabasePolicy",
           ])
         })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "oasys-no-tns"
-          })
-        })
+        # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+        #     branch = "oasys-no-tns"
+        #   })
+        # })
         tags = merge(local.database_a.tags, {
           bip-db-name = "PDBIPINF"
           oracle-sids = "PDBIPINF PDOASYS"
@@ -230,14 +230,26 @@ locals {
             "Ec2ProdDatabasePolicy",
           ])
         })
-        user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "oasys-no-tns"
-          })
-        })
+        # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+        #     branch = "oasys-no-tns"
+        #   })
+        # })
         tags = merge(local.database_b.tags, {
           bip-db-name = "PDBIPINF"
           oracle-sids = "PDBIPINF PDOASYS"
+        })
+      })
+
+      "pd-onr-db-a" = merge(local.database_onr_a, {
+        config = merge(local.database_onr_a.config, {
+          instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        tags = merge(local.database_onr_a.tags, {
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PDMISTRN PDONRBDS PDONRSYS PDONRAUD PDOASREP"
         })
       })
 
