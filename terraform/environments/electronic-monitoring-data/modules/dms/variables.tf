@@ -81,3 +81,7 @@ variable "dms_replication_instance_arn" {
   description = "Assign the Replication Instance-ARN to be used"
   type        = string
 }
+
+variable "local_tags" {
+  description = "The predefined local.tags"
+}

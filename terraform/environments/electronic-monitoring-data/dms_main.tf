@@ -20,4 +20,6 @@ module "dms_task" {
   dms_replication_instance_arn    = aws_dms_replication_instance.t3micro_dms_replication_instance.replication_instance_arn
   rep_task_settings_filepath      = trimspace(file("${path.module}/dms_replication_task_settings.json"))
   rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_rep_task_table_mappings.json"))
+
+  local_tags = local.tags
 }

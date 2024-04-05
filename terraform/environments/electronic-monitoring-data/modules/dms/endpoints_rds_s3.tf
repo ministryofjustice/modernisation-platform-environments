@@ -14,12 +14,12 @@ resource "aws_dms_endpoint" "dms-rds-source" {
   ssl_mode    = "require"
   username    = var.rds_db_username
 
-  # tags = merge(
-  #   local.tags,
-  #   {
-  #     Resource_Type = "DMS Source Endpoint - RDS MSSQL",
-  #   }
-  # )
+  tags = merge(
+    var.local_tags,
+    {
+      Resource_Type = "DMS Source Endpoint - RDS MSSQL",
+    },
+  )
 }
 
 # ==========================================================================
@@ -30,8 +30,8 @@ resource "aws_dms_s3_endpoint" "dms-s3-csv-target" {
   # Minimal Config:
   endpoint_id             = "s3-${var.database_name}-tf"
   endpoint_type           = "target"
-  bucket_name             = var.target_s3_bucket_name      # data.aws_s3_bucket.existing_dms_bucket.id
-  service_access_role_arn = var.ep_service_access_role_arn # aws_iam_role.dms-endpoint-role.arn
+  bucket_name             = var.target_s3_bucket_name
+  service_access_role_arn = var.ep_service_access_role_arn
 
   # Extra settings:
   # add_column_name                             = false
@@ -74,13 +74,11 @@ resource "aws_dms_s3_endpoint" "dms-s3-csv-target" {
   # use_csv_no_sup_value                        = false
   # use_task_start_time_for_full_load_timestamp = true
 
-  # depends_on = [aws_iam_policy.dms-s3-ep-iam-role-policy]
-
-  # tags = merge(
-  #   local.tags,
-  #   {
-  #     Resource_Type = "DMS Target Endpoint - S3",
-  #   }
-  # )
+  tags = merge(
+    var.local_tags,
+    {
+      Resource_Type = "DMS Target Endpoint - S3",
+    },
+  )
 
 }
