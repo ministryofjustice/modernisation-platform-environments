@@ -102,7 +102,7 @@ Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 
 # $scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
-Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"$monitorScriptFile`""
+# Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"$monitorScriptFile`""
 
 # Define the action to run the PowerShell script
 # $action = New-ScheduledTaskAction -Execute "PowerShell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \`"C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\monitor-ebs.ps1\`""
@@ -114,14 +114,12 @@ Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.e
 # Register-ScheduledTask -TaskName "MonitorEBSVolume" -Trigger $trigger -Action $action -RunLevel Highest -User "SYSTEM"
 
 # Save the PowerShell script to a file
-$scriptPath = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
-$scriptContent | Out-File -FilePath $scriptPath
+$scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
 # Create a new scheduled task that runs at startup
-# $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-File `"$scriptPath`""
-$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File `\"C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1`\""
-
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe -ExecutionPolicy Bypass -File C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 $trigger = New-ScheduledTaskTrigger -AtStartup
+
 Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "RunAtStartup" -Description "Runs PowerShell commands at startup"
 
 </powershell>
