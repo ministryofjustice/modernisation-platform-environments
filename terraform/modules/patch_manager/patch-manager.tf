@@ -56,7 +56,7 @@ resource "aws_ssm_maintenance_window_task" "this" {
       comment              = "Patch Baseline Install"
       document_version     = "$LATEST"
       timeout_seconds      = 3600
-      output_s3_bucket     = aws_s3_bucket.this.id
+      output_s3_bucket     = aws_s3_bucket.patch_logs.id
       output_s3_key_prefix = "patch-logs"
       cloudwatch_config {
         cloudwatch_log_group_name = aws_cloudwatch_log_group.this.name
@@ -86,7 +86,7 @@ resource "aws_ssm_maintenance_window_task" "this" {
         for_each = var.environment != "development" && var.operating_system == "WINDOWS" ? [1] : []
         content {
           name   = "InstallOverrideList"
-          values = ["s3://${var.application}-development-${local.os}/WindowsServer2022DatacenterPatches.yaml"]
+          values = ["s3://${var.application}-development-${local.os}-patches/WindowsServer2022DatacenterPatches.yaml"]
         }
       }
 
@@ -94,7 +94,7 @@ resource "aws_ssm_maintenance_window_task" "this" {
         for_each = var.environment != "development" && var.operating_system == "REDHAT_ENTERPRISE_LINUX" ? [1] : []
         content {
           name   = "InstallOverrideList"
-          values = ["s3://${var.application}-development-${local.os}/RedHatEnterpriseLinux89OotpaPatches.yaml"]
+          values = ["s3://${var.application}-development-${local.os}-patches/RedHatEnterpriseLinux89OotpaPatches.yaml"]
         }
       }
     }

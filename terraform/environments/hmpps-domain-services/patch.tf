@@ -9,6 +9,17 @@ module "development" {
   target_tag = {
     "environment-name" = "hmpps-domain-services-development"
   }
+  instance_roles = [
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/ec2-instance-role-dev-win-2022",
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/ec2-instance-role-dev-rhel85",
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-win-2022",
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-rhel85",
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-preproduction}:role/ec2-instance-role-pp-rdgw-1-a",
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-preproduction}:role/ec2-instance-role-pp-rds-1-a",
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-production}:role/ec2-instance-role-pd-rdgw-1-a",
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-production}:role/ec2-instance-role-pd-rdgw-1-b",
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-production}:role/ec2-instance-role-pd-rds-1-a"
+  ]
 }
 
 module "test" {
@@ -22,30 +33,34 @@ module "test" {
   target_tag = {
     "environment-name" = "hmpps-domain-services-test"
   }
+  instance_roles = [
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-win-2022",
+    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-rhel85",
+  ]
 }
 
-module "preproduction" {
-  count               = local.is-preproduction == true ? 1 : 0
-  source              = "../../modules/patch_manager"
-  application         = "hmpps-domain-services"
-  environment         = "preproduction"
-  predefined_baseline = "AWS-WindowsPredefinedPatchBaseline-OS-Applications"
-  operating_system    = "WINDOWS"
-  schedule            = "cron(0 21 ? * WED#3 *)" # 3rd Weds @ 9pm
-  target_tag = {
-    "environment-name" = "hmpps-domain-services-preproduction"
-  }
-}
-
-module "production" {
-  count               = local.is-production == true ? 1 : 0
-  source              = "../../modules/patch_manager"
-  application         = "hmpps-domain-services"
-  environment         = "production"
-  predefined_baseline = "AWS-WindowsPredefinedPatchBaseline-OS-Applications"
-  operating_system    = "WINDOWS"
-  schedule            = "cron(0 21 ? * THU#3 *)" # 3rd Thurs @ 9pm
-  target_tag = {
-    "environment-name" = "hmpps-domain-services-production"
-  }
-}
+#module "preproduction" {
+#  count               = local.is-preproduction == true ? 1 : 0
+#  source              = "../../modules/patch_manager"
+#  application         = "hmpps-domain-services"
+#  environment         = "preproduction"
+#  predefined_baseline = "AWS-WindowsPredefinedPatchBaseline-OS-Applications"
+#  operating_system    = "WINDOWS"
+#  schedule            = "cron(0 21 ? * WED#3 *)" # 3rd Weds @ 9pm
+#  target_tag = {
+#    "environment-name" = "hmpps-domain-services-preproduction"
+#  }
+#}
+#
+#module "production" {
+#  count               = local.is-production == true ? 1 : 0
+#  source              = "../../modules/patch_manager"
+#  application         = "hmpps-domain-services"
+#  environment         = "production"
+#  predefined_baseline = "AWS-WindowsPredefinedPatchBaseline-OS-Applications"
+#  operating_system    = "WINDOWS"
+#  schedule            = "cron(0 21 ? * THU#3 *)" # 3rd Thurs @ 9pm
+#  target_tag = {
+#    "environment-name" = "hmpps-domain-services-production"
+#  }
+#}
