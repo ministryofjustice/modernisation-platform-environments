@@ -145,9 +145,9 @@ module "baseline" {
 }
 
 module "cross_account_cloudwatch" {
-  source       = "../../modules/cross_account_cloudwatch"
-  environment  = module.environment
-  options      = merge(
+  source      = "../../modules/cross_account_cloudwatch"
+  environment = module.environment
+  options = merge(
     local.cloudwatch_monitoring_options,
     local.cloudwatch_local_environment_monitoring_options,
   )
