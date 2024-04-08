@@ -206,7 +206,6 @@ resource "aws_route53_record" "accessgate_ec2" {
   records = [aws_instance.ec2_accessgate[count.index].private_ip]
 }
 
-
 # PROD ACCESSGATE INSTANCES
 resource "aws_route53_record" "prod_accessgate_ec2" {
   provider = aws.core-network-services
@@ -242,7 +241,6 @@ resource "aws_route53_record" "prod_accessgate_ec2" {
 
 ## ClamAV
 resource "aws_route53_record" "clamav" {
-
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "clamav.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
@@ -260,4 +258,14 @@ resource "aws_route53_record" "prod_clamav" {
   type     = "A"
   ttl      = 300
   records  = [aws_instance.ec2_clamav.private_ip]
+}
+
+## FTP
+resource "aws_route53_record" "ftp" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "ftp.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+  ttl      = 300
+  records  = [aws_instance.ec2_ftp.private_ip]
 }

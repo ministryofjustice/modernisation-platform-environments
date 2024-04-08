@@ -94,7 +94,7 @@ module "cw-mailrelay-ec2" {
 
 # This should be added only after the initial cutover is done - so EBS will not
 # start send messages without an explicit configuration in its /etc/hosts
-/*
+
 resource "aws_route53_record" "route53_record_mailrelay" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
@@ -108,10 +108,3 @@ output "route53_record_mailrelay" {
   description = "Mailrelay Route53 record"
   value       = aws_route53_record.route53_record_mailrelay.fqdn
 }
-*/
-
-# Moved to ccms-ec2-mailrelay-outputs.tf
-#output "ec2_private_ip_mailrelay" {
-#  description = "Mailrelay Private IP"
-#  value       = aws_instance.ec2_mailrelay.private_ip
-#}
