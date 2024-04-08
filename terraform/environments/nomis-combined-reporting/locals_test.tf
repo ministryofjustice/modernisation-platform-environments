@@ -43,7 +43,7 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/ec2/ncr-bip/t1"      = local.bip_secretsmanager_secrets
+      "/ec2/ncr-bip/t1" = local.bip_secretsmanager_secrets
       "/ec2/ncr-web/t1" = local.web_secretsmanager_secrets
 
       "/oracle/database/T1BIPSYS" = local.database_secretsmanager_secrets
@@ -120,6 +120,9 @@ locals {
             "Ec2T1ReportingPolicy",
           ])
         })
+        instance = merge(local.web_ec2_default.instance, {
+          vpc_security_group_ids = ["web"]
+        })
         tags = merge(local.web_ec2_default.tags, {
           description                          = "For testing SAP BI Platform Web-Tier installation and configurations"
           nomis-combined-reporting-environment = "t1"
@@ -133,6 +136,9 @@ locals {
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2T1ReportingPolicy",
           ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          vpc_security_group_ids = ["bip"]
         })
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "For testing SAP BI Platform Mid-Tier installation and configurations"
@@ -257,6 +263,7 @@ locals {
           { name = "t1-ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.reporting.nomis.service.justice.gov.uk"] },
           { name = "t1-ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1-ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "cmc-t1", type = "CNAME", ttl = "300", records = ["t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           # T1
