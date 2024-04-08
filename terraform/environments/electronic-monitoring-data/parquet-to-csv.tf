@@ -54,4 +54,21 @@ data "aws_iam_policy_document" "parquet-to-csv" {
         ]
         resources = [aws_s3_bucket.csv-output-bucket.id, "${aws_s3_bucket.csv-output-bucket.arn}/*"]
     }
+    statement {
+      effect = "Allow"
+      actions = [
+        "glue:GetConnection",
+        "glue:GetConnections",
+        "glue:GetDatabase",
+        "glue:GetDatabases",
+        "glue:GetJob",
+        "glue:GetJobs",
+        "glue:GetPartition",
+        "glue:GetPartitions",
+        "glue:GetTable",
+        "glue:GetTables",
+
+      ]
+      resources = ["*"]
+    }
 }
