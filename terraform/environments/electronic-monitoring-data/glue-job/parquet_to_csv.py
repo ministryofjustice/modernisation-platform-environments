@@ -5,6 +5,9 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 import boto3
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 # Set up Glue context and job
 args = getResolvedOptions(sys.argv, ["JOB_NAME", "source_bucket", "destination_bucket"])
@@ -20,6 +23,8 @@ source_bucket = args["source_bucket"]
 destination_bucket = args["destination_bucket"]
 source_path = f"s3://{source_bucket}/"
 destination_path = f"s3://{destination_bucket}/"
+
+logger.info(f"Reading from {source_bucket}, writing to {destination_bucket}.")
 
 
 def get_tables_from_s3_path(s3_client, bucket_name="dms-em-rds-output"):
@@ -51,9 +56,11 @@ def get_tables_from_s3_path(s3_client, bucket_name="dms-em-rds-output"):
 
 
 databases = get_tables_from_s3_path(s3)
+
 # Iterate over each database
 for database in databases:
     database_name = database
+    logger.info(f"Reading database: {database_name}.")
 
     # Get list of tables in the current database
     tables = databases[database]
@@ -61,6 +68,7 @@ for database in databases:
     # Iterate over each table in the current database
     for table in tables:
         table_name = table
+        logger.info(f"Reading table: {table_name} in database: {database_name}.")
 
         # Construct source and destination paths for the current table
         source_table_path = f"{source_path}/{database_name}/dbo/{table_name}"
@@ -73,5 +81,6 @@ for database in databases:
         dataframe.write.option("header", "true").option(
             "maxPartitionBytes", 5 * 1024 * 1024
         ).csv(destination_table_path, mode="overwrite")
+        logger.info(f"Written {table_name} in {database_name} to {destination_path}.")
 
 job.commit()
