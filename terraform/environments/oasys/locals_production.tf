@@ -682,7 +682,7 @@ locals {
           # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # for aws
           { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.40.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
+          { name = "db.${local.application_name}",     type = "A",     ttl = "60",   records = ["10.40.6.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
         ]
       }
     }
