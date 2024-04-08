@@ -352,7 +352,7 @@ locals {
         })
         tags = merge(local.webserver_a.tags, {
           oracle-db-sid                           = "OASPROD" # "PDOASYS"
-          oracle-db-hostname                      = "PDODL00011.azure.hmpp.root" # "db.ptc.oasys.hmpps-production.modernisation-platform.internal"
+          oracle-db-hostname                      = "db.oasys.hmpps-production.modernisation-platform.internal"
         })
       })
 
@@ -445,24 +445,24 @@ locals {
             #   target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
             # }
             rules = {
-              # pd-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "oasys.service.justice.gov.uk",
-              #           "bridge-oasys.az.justice.gov.uk",
-              #           "www.oasys.service.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              pd-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "oasys.service.justice.gov.uk",
+                        "bridge-oasys.az.justice.gov.uk",
+                        "www.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
               ptc-web-http-8080 = {
                 priority = 200
                 actions = [{
@@ -565,25 +565,25 @@ locals {
             #   target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
             # }
             rules = {
-              # pd-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "int.oasys.service.justice.gov.uk",
-              #           "oasys-ukwest.oasys.az.justice.gov.uk",
-              #           "oasys.az.justice.gov.uk",
-              #           "p-oasys.az.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              pd-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "int.oasys.service.justice.gov.uk",
+                        "oasys-ukwest.oasys.az.justice.gov.uk",
+                        "oasys.az.justice.gov.uk",
+                        "p-oasys.az.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
               ptc-web-http-8080 = {
                 priority = 200
                 actions = [{
@@ -669,9 +669,6 @@ locals {
           # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-          # { name = "db.trn${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-          # { name = "db.ptc.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
         ]
       }
       #
@@ -685,9 +682,7 @@ locals {
           # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # for aws
           { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.40.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-          # { name = "db.trn.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-          # { name = "db.ptc.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.40.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
         ]
       }
     }
