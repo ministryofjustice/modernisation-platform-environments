@@ -7,7 +7,7 @@ from awsglue.job import Job
 import boto3
 
 # Set up Glue context and job
-args = getResolvedOptions(sys.argv, ["JOB_NAME"])
+args = getResolvedOptions(sys.argv, ["JOB_NAME", "source_bucket", "destination_bucket"])
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
@@ -18,8 +18,8 @@ s3 = boto3.client("s3")
 # Source and destination buckets
 source_bucket = args["source_bucket"]
 destination_bucket = args["destination_bucket"]
-source_path = "s3://{}/".format(source_bucket)
-destination_path = "s3://{}/".format(destination_bucket)
+source_path = f"s3://{source_bucket}/"
+destination_path = f"s3://{destination_bucket}/"
 
 
 def get_tables_from_s3_path(s3_client, bucket_name="dms-em-rds-output"):
@@ -29,9 +29,10 @@ def get_tables_from_s3_path(s3_client, bucket_name="dms-em-rds-output"):
 
     for page in response_iterator:
         keys = [obj["Key"] for obj in page.get("Contents", [])]
+    filered_keys = [key for key in keys if ".parquet" in key]
 
     database_table_pairs = list(
-        set([(key.split("/")[0], key.split("/")[2]) for key in keys])
+        set([(key.split("/")[0], key.split("/")[2]) for key in filered_keys])
     )
 
     result = {}
@@ -62,24 +63,15 @@ for database in databases:
         table_name = table
 
         # Construct source and destination paths for the current table
-        source_table_path = "{}/{}".format(source_path, table_name)
-        destination_table_path = "{}/{}/{}".format(
-            destination_path, database_name, table_name
-        )
-
-        # Read Parquet files from the current table in the source bucket
-        datasource = glueContext.create_dynamic_frame.from_catalog(
-            database=database_name,
-            table_name=table_name,
-            transformation_ctx="datasource",
-        )
+        source_table_path = f"{source_path}/{database_name}/dbo/{table_name}"
+        destination_table_path = f"{destination_path}/{database_name}/{table_name}"
 
         # Convert Parquet to DataFrame
-        dataframe = datasource.toDF()
+        dataframe = spark.read.parquet(source_table_path)
 
         # Write DataFrame to CSV format with size check and splitting
         dataframe.write.option("header", "true").option(
             "maxPartitionBytes", 5 * 1024 * 1024
-        ).csv(destination_path, mode="overwrite")
+        ).csv(destination_table_path, mode="overwrite")
 
 job.commit()
