@@ -11,9 +11,7 @@ module "development" {
   }
   instance_roles = [
     "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/ec2-instance-role-dev-win-2022",
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/ec2-instance-role-dev-rhel85",
     "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-win-2022",
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-rhel85",
     "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-preproduction}:role/ec2-instance-role-pp-rdgw-1-a",
     "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-preproduction}:role/ec2-instance-role-pp-rds-1-a",
     "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-production}:role/ec2-instance-role-pd-rdgw-1-a",
@@ -35,7 +33,6 @@ module "test" {
   }
   instance_roles = [
     "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-win-2022",
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-rhel85",
   ]
 }
 
