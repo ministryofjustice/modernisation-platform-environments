@@ -44,7 +44,7 @@ locals {
       "/oracle/database/TRBIPINF" = local.secretsmanager_secrets_bip_db
 
       # for azure, remove when migrated to aws db
-      # "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
 
       "/oracle/bip/production" = local.secretsmanager_secrets_bip
       "/oracle/bip/trn"        = local.secretsmanager_secrets_bip
@@ -330,11 +330,17 @@ locals {
 
 
     baseline_ec2_autoscaling_groups = {
-      # "pd-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   tags = merge(local.webserver_a.tags, {
-      #     oracle-db-sid                           = "PDOASYS"
-      #   })
-      # })
+      "pd-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(local.webserver_a.config, {
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2ProdWebPolicy",
+          ])
+        })
+        tags = merge(local.webserver_a.tags, {
+          oracle-db-sid                           = "OASPROD" # "PDOASYS"
+          oracle-db-hostname                      = "PDODL00011.azure.hmpp.root" # "db.ptc.oasys.hmpps-production.modernisation-platform.internal"
+        })
+      })
 
       "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(local.webserver_a.config, {
