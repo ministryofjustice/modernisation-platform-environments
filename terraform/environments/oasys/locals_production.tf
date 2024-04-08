@@ -312,6 +312,20 @@ locals {
         })
       })
 
+      "pd-${local.application_name}-bip-a" = merge(local.bip_a, {
+        config = merge(local.bip_a.config, {
+          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+            "Ec2ProdBipPolicy",
+          ])
+        })
+        tags = merge(local.bip_a.tags, {
+          bip-db-name                             = "PDBIPINF"
+          bip-db-hostname                         = "pd-oasys-db-a"
+          oasys-db-name                           = "PDOASYS"
+          oasys-db-hostname                       = "pd-oasys-db-a"
+        })
+      })
+      
       "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
           instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
