@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "db_instance_class": "db.t3.small",
+      "db_instance_class": "db.t3.2xlarge",
       "db_user": "dbadmin",
       "db_allocated_storage": "100",
       "db_name": "chaps-dev",
