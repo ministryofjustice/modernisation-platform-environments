@@ -100,9 +100,20 @@ $action = {
 Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 '@
 
-# Save the PowerShell script to a file
-$scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
+# Save the script to a file on the EC2 instance
+$scriptPath = "C:\monitor-ebs.ps1"
+$scriptContent | Out-File -FilePath $scriptPath
 
-Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1`""
+# Create a shortcut to the script in the common Startup folder
+$WshShell = New-Object -comObject WScript.Shell
+$Shortcut = $WshShell.CreateShortcut("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\MyScriptShortcut.lnk")
+$Shortcut.TargetPath = "powershell.exe"
+$Shortcut.Arguments = "-ExecutionPolicy Bypass -File `"$scriptPath`""
+$Shortcut.Save()
+
+# # Save the PowerShell script to a file
+# $scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
+
+# Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1`""
 
 </powershell>
