@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "db_instance_class": "db.t3.small",
+      "db_instance_class": "db.t3.2xlarge",
       "db_user": "dbadmin",
       "db_allocated_storage": "100",
       "db_name": "chaps-dev",
@@ -20,7 +20,7 @@
       "client_id": "aa335a21-40a9-45a0-b0ef-16d65584b024"
     },
     "preproduction": {
-      "db_instance_class": "db.t3.xlarge",
+      "db_instance_class": "db.t3.2xlarge",
       "db_user": "dbadmin",
       "db_allocated_storage": "100",
       "db_name": "chaps-staging",
