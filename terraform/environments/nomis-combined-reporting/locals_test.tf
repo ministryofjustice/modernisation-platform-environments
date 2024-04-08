@@ -120,6 +120,9 @@ locals {
             "Ec2T1ReportingPolicy",
           ])
         })
+        instance = merge(local.web_ec2_default.instance, {
+          vpc_security_group_ids = ["web"]
+        })
         tags = merge(local.web_ec2_default.tags, {
           description                          = "For testing SAP BI Platform Web-Tier installation and configurations"
           nomis-combined-reporting-environment = "t1"
@@ -133,6 +136,9 @@ locals {
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2T1ReportingPolicy",
           ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          vpc_security_group_ids = ["bip"]
         })
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "For testing SAP BI Platform Mid-Tier installation and configurations"
