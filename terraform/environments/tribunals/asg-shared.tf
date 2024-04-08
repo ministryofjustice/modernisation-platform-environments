@@ -177,8 +177,8 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 #     delete_on_termination       = true
 #   }
 
-  user_data = filebase64("ec2-shared-user-data.sh")
-}
+#   user_data = filebase64("ec2-shared-user-data.sh")
+# }
 
 # Finally, create the Auto scaling group for the launch template
 # resource "aws_autoscaling_group" "tribunals-all-asg" {
