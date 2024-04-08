@@ -51,7 +51,8 @@ def get_tables_from_s3_path(s3_client, bucket_name="dms-em-rds-output"):
     # Convert the lists to sets to remove duplicate table names
     for key in result:
         result[key] = list(set(result[key]))
-
+    print_result = "".join(f"{key}.{value}" for key, value in result.items())
+    logger.info(f"Tables to download: {print_result}")
     return result
 
 
@@ -79,10 +80,8 @@ for database in databases:
 
         # Write DataFrame to CSV format with size check and splitting
         (
-            dataframe
-            .write
-            .option("header", "true")
-            .option(maxPartitionBytes", 5 * 1024 * 1024)
+            dataframe.write.option("header", "true")
+            .option("maxPartitionBytes", 5 * 1024 * 1024 * 1024)
             .csv(destination_table_path, mode="overwrite")
         )
         logger.info(f"Written {table_name} in {database_name} to {destination_path}.")
