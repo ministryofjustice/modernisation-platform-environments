@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
     resources = [
       "arn:aws:s3:::${local.oracle_duplicate_delius_source_environment}-oracle-database-backups",
       "arn:aws:s3:::${local.oracle_duplicate_delius_source_environment}-oracle-database-backups/*"
-      ]
+    ]
   }
 }
 

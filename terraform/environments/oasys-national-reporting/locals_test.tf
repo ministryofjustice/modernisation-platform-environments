@@ -2,7 +2,7 @@ locals {
 
   # baseline config
   test_config = {
-        baseline_ec2_autoscaling_groups = {
+    baseline_ec2_autoscaling_groups = {
       test-web-asg = merge(local.defaults_web_ec2.config, {
         config = merge(local.defaults_web_ec2.config, {
           availability_zone = "${local.region}a"
@@ -22,7 +22,7 @@ locals {
       })
       test-boe-asg = merge(local.defaults_boe_ec2, {
         config = merge(local.defaults_boe_ec2.config, {
-          availability_zone = "${local.region}a"        
+          availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_boe_ec2.instance, {
           instance_type = "t2.large"
@@ -35,10 +35,10 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours    
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
       test-bods-asg = merge(local.defaults_bods_ec2, {
-        config = merge(local.defaults_bods_ec2.config,{
+        config = merge(local.defaults_bods_ec2.config, {
           availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_bods_ec2.instance, {

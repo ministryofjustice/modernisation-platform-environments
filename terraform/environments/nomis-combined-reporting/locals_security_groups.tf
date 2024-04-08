@@ -49,6 +49,7 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   baseline_security_groups = {
+    # delete public security group once all LBs migrated to lb SG
     public = {
       description = "Security group for public subnet"
       ingress = {
@@ -78,6 +79,7 @@ locals {
         }
       }
     }
+    # delete private security group once all servers migrated to web/bip SGs
     private = {
       description = "Security group for private subnet"
       ingress = {
@@ -115,6 +117,7 @@ locals {
           to_port         = 7777
           protocol        = "tcp"
           security_groups = ["public"]
+          cidr_blocks     = local.security_group_cidrs.http7xxx
         }
         http7010 = {
           description     = "Allow http7010 ingress"
@@ -149,6 +152,89 @@ locals {
         }
       }
     }
+    lb = {
+      description = "Security group for public subnet"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.https
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+    web = {
+      description = "Security group for tomcat web servers"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http7010 = {
+          description     = "Allow http7010 ingress"
+          from_port       = 7010
+          to_port         = 7010
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb"]
+        }
+        http7777 = {
+          description     = "Allow http7777 ingress"
+          from_port       = 7777
+          to_port         = 7777
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb"]
+        }
+        http8005 = {
+          description     = "Allow http8005 ingress"
+          from_port       = 8005
+          to_port         = 8005
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb"]
+        }
+        http8443 = {
+          description     = "Allow http8443 ingress"
+          from_port       = 8443
+          to_port         = 8443
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb"]
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
     bip = {
       description = "Security group for bip"
       ingress = {
@@ -159,13 +245,26 @@ locals {
           protocol    = -1
           self        = true
         }
-        http7777 = {
-          description     = "Allow http7001 ingress"
-          from_port       = 7777
-          to_port         = 7777
+        http6400 = {
+          description     = "Allow http6400 ingress"
+          from_port       = 6400
+          to_port         = 6400
           protocol        = "tcp"
-          security_groups = ["private"]
-          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["web"]
+        }
+        http6411 = {
+          description     = "Allow http6411 ingress"
+          from_port       = 6411
+          to_port         = 6411
+          protocol        = "tcp"
+          security_groups = ["web"]
+        }
+        http6455 = {
+          description     = "Allow http6455 ingress"
+          from_port       = 6455
+          to_port         = 6455
+          protocol        = "tcp"
+          security_groups = ["web"]
         }
       }
       egress = {
