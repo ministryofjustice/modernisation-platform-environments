@@ -121,6 +121,5 @@ $action = New-ScheduledTaskAction -Execute "PowerShell.exe -ExecutionPolicy Bypa
 $trigger = New-ScheduledTaskTrigger -AtStartup
 
 Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "RunAtStartup" -Description "Runs PowerShell commands at startup"
-Start-ScheduledTask -TaskName "RunAtStartup"
 
 </powershell>
