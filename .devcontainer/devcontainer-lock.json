@@ -6,9 +6,9 @@
       "integrity": "sha256:db720f840ce5015117b1b1e7649dc59b8ac6b34a8786f07ab727dd081140737f"
     },
     "ghcr.io/ministryofjustice/devcontainer-feature/static-analysis:0": {
-      "version": "0.0.1",
-      "resolved": "ghcr.io/ministryofjustice/devcontainer-feature/static-analysis@sha256:cca6d0a095f5365ee235302b24c255c7601f2ebfa1fae73c3b42c1840b8389ed",
-      "integrity": "sha256:cca6d0a095f5365ee235302b24c255c7601f2ebfa1fae73c3b42c1840b8389ed"
+      "version": "0.0.2",
+      "resolved": "ghcr.io/ministryofjustice/devcontainer-feature/static-analysis@sha256:c824f7dee3333ecd24f8572a3cd2021968e89c0980a882c9b33630318c5231dd",
+      "integrity": "sha256:c824f7dee3333ecd24f8572a3cd2021968e89c0980a882c9b33630318c5231dd"
     },
     "ghcr.io/ministryofjustice/devcontainer-feature/terraform:0": {
       "version": "0.0.4",
