@@ -78,9 +78,13 @@ for database in databases:
         dataframe = spark.read.parquet(source_table_path)
 
         # Write DataFrame to CSV format with size check and splitting
-        dataframe.write.option("header", "true").option(
-            "maxPartitionBytes", 5 * 1024 * 1024
-        ).csv(destination_table_path, mode="overwrite")
+        (
+            dataframe
+            .write
+            .option("header", "true")
+            .option(maxPartitionBytes", 5 * 1024 * 1024)
+            .csv(destination_table_path, mode="overwrite")
+        )
         logger.info(f"Written {table_name} in {database_name} to {destination_path}.")
 
 job.commit()
