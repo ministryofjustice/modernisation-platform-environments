@@ -20,7 +20,7 @@ resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
 
 # Create a new replication instance
 
-resource "aws_dms_replication_instance" "t3small_dms_replication_instance" {
+resource "aws_dms_replication_instance" "t3medium_dms_replication_instance" {
   allocated_storage          = 20
   apply_immediately          = true
   auto_minor_version_upgrade = true
@@ -30,8 +30,8 @@ resource "aws_dms_replication_instance" "t3small_dms_replication_instance" {
   multi_az = false
   #   preferred_maintenance_window = "sun:10:30-sun:14:30"
   publicly_accessible         = false
-  replication_instance_class  = "dms.t3.small"
-  replication_instance_id     = "t3micro-dms-replication-instance-tf"
+  replication_instance_class  = "dms.t3.medium"
+  replication_instance_id     = "t3medium-dms-replication-instance-tf"
   replication_subnet_group_id = aws_dms_replication_subnet_group.dms_replication_subnet_group.id
 
   tags = merge(
