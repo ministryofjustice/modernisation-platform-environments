@@ -118,8 +118,8 @@ $scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\mo
 
 # Create a new scheduled task that runs at startup
 $action = New-ScheduledTaskAction -Execute "PowerShell.exe -ExecutionPolicy Bypass -File C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
-$trigger = New-ScheduledTaskTrigger -AtStartup
+$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 10) -RepetitionDuration ([timespan]::MaxValue)
 
-Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "RunAtStartup" -Description "Runs PowerShell commands at startup"
+Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "BackupEBSVolume" -Description "Runs PowerShell commands at startup"
 
 </powershell>
