@@ -43,7 +43,7 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/ec2/ncr-bip/t1"      = local.bip_secretsmanager_secrets
+      "/ec2/ncr-bip/t1" = local.bip_secretsmanager_secrets
       "/ec2/ncr-web/t1" = local.web_secretsmanager_secrets
 
       "/oracle/database/T1BIPSYS" = local.database_secretsmanager_secrets
@@ -263,6 +263,7 @@ locals {
           { name = "t1-ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.reporting.nomis.service.justice.gov.uk"] },
           { name = "t1-ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1-ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "cms-t1", type = "CNAME", ttl = "300", records = ["t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           # T1
