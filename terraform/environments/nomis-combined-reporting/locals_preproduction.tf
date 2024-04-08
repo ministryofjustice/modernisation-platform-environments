@@ -205,65 +205,65 @@ locals {
       #     nomis-combined-reporting-environment = "preprod"
       #   })
       # })
-      # pp-ncr-db-1-a = merge(local.database_ec2_default, {
-      #   cloudwatch_metric_alarms = merge(
-      #     local.database_cloudwatch_metric_alarms.standard,
-      #     local.database_cloudwatch_metric_alarms.db_connected,
-      #     local.database_cloudwatch_metric_alarms.db_backup,
-      #   )
-      #   config = merge(local.database_ec2_default.config, {
-      #     instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPDatabasePolicy",
-      #     ])
-      #   })
-      #   ebs_volumes = {
-      #     "/dev/sdb" = { # /u01
-      #       size  = 100
-      #       label = "app"
-      #       type  = "gp3"
-      #     }
-      #     "/dev/sdc" = { # /u02
-      #       size  = 500
-      #       label = "app"
-      #       type  = "gp3"
-      #     }
-      #     "/dev/sde" = { # DATA01
-      #       label = "data"
-      #       size  = 500
-      #       type  = "gp3"
-      #     }
-      #     "/dev/sdj" = { # FLASH01
-      #       label = "flash"
-      #       type  = "gp3"
-      #       size  = 200
-      #     }
-      #     "/dev/sds" = {
-      #       label = "swap"
-      #       type  = "gp3"
-      #       size  = 2
-      #     }
-      #   }
-      #   ebs_volume_config = {
-      #     data = {
-      #       iops       = 3000 # min 3000
-      #       type       = "gp3"
-      #       throughput = 125
-      #       total_size = 500
-      #     }
-      #     flash = {
-      #       iops       = 3000 # min 3000
-      #       type       = "gp3"
-      #       throughput = 125
-      #       total_size = 200
-      #     }
-      #   }
-      #   tags = merge(local.database_ec2_default.tags, {
-      #     description                          = "PREPROD NCR DATABASE"
-      #     nomis-combined-reporting-environment = "pp"
-      #     oracle-sids                          = "PPBIPSYS PPBIPAUD"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
+      pp-ncr-db-1-a = merge(local.database_ec2_default, {
+        cloudwatch_metric_alarms = merge(
+          local.database_cloudwatch_metric_alarms.standard,
+          local.database_cloudwatch_metric_alarms.db_connected,
+          local.database_cloudwatch_metric_alarms.db_backup,
+        )
+        config = merge(local.database_ec2_default.config, {
+          instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
+            "Ec2PPDatabasePolicy",
+          ])
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 200
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 2
+          }
+        }
+        ebs_volume_config = {
+          data = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 500
+          }
+          flash = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 200
+          }
+        }
+        tags = merge(local.database_ec2_default.tags, {
+          description                          = "PREPROD NCR DATABASE"
+          nomis-combined-reporting-environment = "pp"
+          oracle-sids                          = "PPBIPSYS PPBIPAUD"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
 
       ### LSAST
 
