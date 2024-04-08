@@ -43,8 +43,8 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/ec2/ncr-bip-cms/t1"      = local.bip_cms_secretsmanager_secrets
-      "/ec2/ncr-tomcat-admin/t1" = local.tomcat_admin_secretsmanager_secrets
+      "/ec2/ncr-bip/t1"      = local.bip_secretsmanager_secrets
+      "/ec2/ncr-web/t1" = local.web_secretsmanager_secrets
 
       "/oracle/database/T1BIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/T1BIPAUD" = local.database_secretsmanager_secrets
@@ -86,8 +86,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cms/t1/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat-admin/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/t1/*",
             ]
           }
         ]
@@ -113,29 +113,29 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-web-1-a = merge(local.tomcat_admin_ec2_default, {
-        cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
-        config = merge(local.tomcat_admin_ec2_default.config, {
-          instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
+      t1-ncr-web-1-a = merge(local.web_ec2_default, {
+        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        config = merge(local.web_ec2_default.config, {
+          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2T1ReportingPolicy",
           ])
         })
-        tags = merge(local.tomcat_admin_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
+        tags = merge(local.web_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform Web-Tier installation and configurations"
           nomis-combined-reporting-environment = "t1"
           type                                 = "processing"
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-cms-1-a = merge(local.bip_cms_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-        config = merge(local.bip_cms_ec2_default.config, {
-          instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+      t1-ncr-cms-1-a = merge(local.bip_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        config = merge(local.bip_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2T1ReportingPolicy",
           ])
         })
-        tags = merge(local.bip_cms_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform CMS installation and configurations"
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform Mid-Tier installation and configurations"
           nomis-combined-reporting-environment = "t1"
           node                                 = "1"
           type                                 = "management"

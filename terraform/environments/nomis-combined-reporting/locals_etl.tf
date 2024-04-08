@@ -23,7 +23,7 @@ locals {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "base_rhel_8_5_*"
-      iam_resource_names_prefix = "ec2-etl"
+      iam_resource_names_prefix = "ec2-ncr-etl"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"
@@ -45,7 +45,7 @@ locals {
       ami         = "base_rhel_8_5"
       os-type     = "Windows"
       server-type = "etl"
-      component   = "data"
+      component   = "etl"
     }
   }
 }
