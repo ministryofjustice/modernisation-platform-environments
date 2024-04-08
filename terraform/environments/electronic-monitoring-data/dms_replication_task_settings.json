@@ -80,7 +80,7 @@
                 "Id": "FILE_TRANSFER"
             }
         ],
-        "CloudWatchLogGroup": null,
+        "CloudWatchLogGroup": "dms-db-migration-tasks",
         "CloudWatchLogStream": null
     },
     "StreamBufferSettings": {
