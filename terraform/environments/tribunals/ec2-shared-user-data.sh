@@ -98,27 +98,19 @@ $action = {
 
 # Register the event
 Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
+
+# Keep the script running
+while ($true) {
+    Start-Sleep -Seconds 10
+}
 '@
-
-# $scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
-
-# Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"$monitorScriptFile`""
-
-# Define the action to run the PowerShell script
-# $action = New-ScheduledTaskAction -Execute "PowerShell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \`"C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\monitor-ebs.ps1\`""
-
-# Define the trigger to start at system boot
-# $trigger = New-ScheduledTaskTrigger -AtStartup
-
-# Register the scheduled task
-# Register-ScheduledTask -TaskName "MonitorEBSVolume" -Trigger $trigger -Action $action -RunLevel Highest -User "SYSTEM"
 
 # Save the PowerShell script to a file
 $scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
 # Create a new scheduled task that runs at startup
 $action = New-ScheduledTaskAction -Execute "PowerShell.exe -ExecutionPolicy Bypass -File C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
-$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 10) -RepetitionDuration ([timespan]::MaxValue)
+$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 5)
 
 Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "BackupEBSVolume" -Description "Runs PowerShell commands at startup"
 
