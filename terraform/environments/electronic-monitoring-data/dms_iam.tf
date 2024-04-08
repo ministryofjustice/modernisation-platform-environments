@@ -15,6 +15,34 @@ resource "aws_iam_policy" "dms-s3-ep-role-policy" {
 "Version": "2012-10-17",
 "Statement": [
     {
+        "Sid": "VisualEditor0",
+        "Effect": "Allow",
+        "Action": [
+            "athena:StartQueryExecution",
+            "athena:GetQueryExecution",
+            "athena:CreateWorkGroup"
+        ],
+        "Resource": "arn:aws:athena:eu-west-2:800964199911:workgroup/dms_validation_workgroup_for_task_*"
+    },
+    {
+        "Effect": "Allow",
+        "Action": [
+            "glue:CreateDatabase",
+            "glue:DeleteDatabase",
+            "glue:GetDatabase",
+            "glue:GetTables",
+            "glue:CreateTable",
+            "glue:DeleteTable",
+            "glue:GetTable"
+        ],
+        "Resource": [
+            "arn:aws:glue:eu-west-2:800964199911:catalog",
+            "arn:aws:glue:eu-west-2:800964199911:database/aws_dms_s3_validation_*",
+            "arn:aws:glue:eu-west-2:800964199911:table/aws_dms_s3_validation_*/*",
+            "arn:aws:glue:eu-west-2:800964199911:userDefinedFunction/aws_dms_s3_validation_*/*"
+        ]
+    },
+    {
         "Effect": "Allow",
         "Action": [
             "s3:*",

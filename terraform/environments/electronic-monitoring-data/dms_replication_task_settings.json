@@ -112,6 +112,23 @@
         "DataErrorPolicy": "LOG_ERROR",
         "TableErrorPolicy": "SUSPEND_TABLE"
     },
+    "ValidationSettings": {
+        "EnableValidation": true,
+        "FailureMaxCount": 1000,
+        "HandleCollationDiff": true,
+        "MaxKeyColumnSize": 8096,
+        "PartitionSize": 10000,
+        "RecordFailureDelayInMinutes": 5,
+        "RecordSuspendDelayInMinutes": 30,
+        "RecordFailureDelayLimitInMinutes": 1,
+        "SkipLobColumns": false,
+        "TableFailureMaxCount": 10000,
+        "ThreadCount": 5,
+        "ValidationMode": "ROW_LEVEL",
+        "ValidationOnly": false,
+        "ValidationPartialLobSize": 0,
+        "ValidationQueryCdcDelaySeconds": 0
+      },
     "TTSettings": null,
     "FullLoadSettings": {
         "CommitRate": 10000,
