@@ -103,6 +103,6 @@ Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 # Save the PowerShell script to a file
 $scriptContent | Out-File -FilePath "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
-Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"$monitorScriptFile`""
+Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1`""
 
 </powershell>
