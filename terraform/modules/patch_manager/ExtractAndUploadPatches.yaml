@@ -19,7 +19,7 @@ mainSteps:
           $PatchResultsTemp = "$WorkingDir\patchresults.txt"
           $PatchesYaml="$WorkingDir\${OS}Patches.yaml"
           $SSMLogsPath = "C:\ProgramData\Amazon\SSM\InstanceData\${InstanceId}\document\orchestration"
-          $PatchesBucket = "s3://hmpps-domain-services-development-windows-patch-logs"
+          $PatchesBucket = "s3://hmpps-domain-services-development-windows-patches"
 
           New-Item -ItemType Directory -Force -Path $WorkingDir > $null
 
