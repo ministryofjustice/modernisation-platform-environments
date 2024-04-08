@@ -27,3 +27,39 @@ resource "null_resource" "dms_start_replicating" {
   }
 
 }
+
+# │ Error: local-exec provisioner error
+# │ 
+# │   with module.dms_task["testDB"].null_resource.dms_start_replicating,
+# │   on modules/dms/db_migration_task.tf line 24, in resource "null_resource" "dms_start_replicating":
+# │   24:   provisioner "local-exec" {
+# │ 
+# │ Error running command 'aws dms start-replication-task
+# │ --start-replication-task-type start-replication --replication-task-arn
+# │ arn:aws:dms:eu-west-2:800964199911:task:NKG3WJEY4NE4FCRXU7UJHJHQJA': exit
+# │ status 254. Output: 
+# │ An error occurred (AccessDeniedException) when calling the
+# │ StartReplicationTask operation: User:
+# │ arn:aws:sts::800964199911:assumed-role/github-actions/githubactionsrolesession
+# │ is not authorized to perform: dms:StartReplicationTask on resource:
+# │ arn:aws:dms:eu-west-2:800964199911:task:NKG3WJEY4NE4FCRXU7UJHJHQJA because
+# │ no identity-based policy allows the dms:StartReplicationTask action
+
+# --------------------------------------------------------------------------------------------------
+
+# │ Error: local-exec provisioner error
+# │ 
+# │   with module.dms_task["test"].null_resource.dms_start_replicating,
+# │   on modules/dms/db_migration_task.tf line 24, in resource "null_resource" "dms_start_replicating":
+# │   24:   provisioner "local-exec" {
+# │ 
+# │ Error running command 'aws dms start-replication-task
+# │ --start-replication-task-type start-replication --replication-task-arn
+# │ arn:aws:dms:eu-west-2:800964199911:task:AWI5PPCIENCA3LPEFHM27LY4JY': exit
+# │ status 254. Output: 
+# │ An error occurred (AccessDeniedException) when calling the
+# │ StartReplicationTask operation: User:
+# │ arn:aws:sts::800964199911:assumed-role/github-actions/githubactionsrolesession
+# │ is not authorized to perform: dms:StartReplicationTask on resource:
+# │ arn:aws:dms:eu-west-2:800964199911:task:AWI5PPCIENCA3LPEFHM27LY4JY because
+# │ no identity-based policy allows the dms:StartReplicationTask action
