@@ -34,7 +34,8 @@ module "gdpr_api_service" {
   health_check_path = "/gdpr/api/actuator/health"
   account_info      = var.account_info
 
-  create_rds                  = var.delius_microservice_configs.gdpr_api.create_rds
+  #   create_rds                  = var.delius_microservice_configs.gdpr_api.create_rds
+  create_rds                  = false
   rds_engine                  = var.delius_microservice_configs.gdpr_api.rds_engine
   rds_engine_version          = var.delius_microservice_configs.gdpr_api.rds_engine_version
   rds_instance_class          = var.delius_microservice_configs.gdpr_api.rds_instance_class
