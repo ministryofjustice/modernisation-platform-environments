@@ -1,13 +1,13 @@
 resource "aws_glue_catalog_database" "this" {
   count = var.audit_main_account ? 1 : 0
-  name  = "audit-db"
+  name  = "audit-db-${var.env_name}"
 }
 
 resource "aws_glue_catalog_table" "this" {
-  count = var.audit_main_account ? 1 : 0
+  #   for_each = var.audit_main_account ? toset([for account in local.audit_accounts[var.env_name] : account]) : ([])
 
   database_name = aws_glue_catalog_database.this[0].name
-  name          = "audit"
+  name          = "audit-table-${var.env_name}"
   description   = "table containing the audit data stored in S3"
 
   table_type = "EXTERNAL_TABLE"
@@ -26,7 +26,8 @@ resource "aws_glue_catalog_table" "this" {
       serialization_library = "org.apache.hadoop.hive.serde2.OpenCSVSerde"
 
       parameters = {
-        "serialization.format" = 1
+        # ignore the first line of the file
+        "skip.header.line.count" : 1
       }
     }
 
