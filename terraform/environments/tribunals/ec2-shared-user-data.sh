@@ -111,14 +111,13 @@ $scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
 # Call the function
 MonitorAndSyncToS3
 
-# # Create a new scheduled task to run the PowerShell script at startup using Start-Job
-# $taskName = "MonitorEBSScript"
-# $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '-NoProfile -ExecutionPolicy Bypass -Command "Start-Job -FilePath ''C:\monitor-ebs.ps1''"'
-# $taskTrigger = New-ScheduledTaskTrigger -AtStartup
-# $taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-# Register-ScheduledTask -TaskName "MonitorEBSScript" -Action $taskAction -Trigger $taskTrigger -Principal $taskPrincipal
+# # Create a new scheduled task action to run the PowerShell script
+# $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `""C:\MonitorAndSyncToS3.ps1`""
 
-# # Start the task immediately
-# Start-ScheduledTask -TaskName "MonitorEBSScript"
+# # Create a trigger for the task (e.g., at system startup)
+# $trigger = New-ScheduledTaskTrigger -AtStartup
+
+# # Register the scheduled task
+# Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "MonitorEBSScript" -Description "Monitors a directory and syncs it to S3."
 
 </powershell>
