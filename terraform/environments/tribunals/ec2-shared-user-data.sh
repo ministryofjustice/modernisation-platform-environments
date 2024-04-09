@@ -82,36 +82,46 @@ if (-not $awsCliInstalled) {
 }
 
 $scriptContent = @'
-# Create a FileSystemWatcher object
-$watcher = New-Object System.IO.FileSystemWatcher
-$watcher.Path = "D:\storage\tribunals\"
-$watcher.IncludeSubdirectories = $true
-$watcher.EnableRaisingEvents = $true
+function MonitorAndSyncToS3 {
+    # Create a FileSystemWatcher object
+    $watcher = New-Object System.IO.FileSystemWatcher
+    $watcher.Path = "D:\storage\tribunals\"
+    $watcher.IncludeSubdirectories = $true
+    $watcher.EnableRaisingEvents = $true
 
-# Define the action to take when a file is created
-$action = {
-    param($source, $event)
-    $filePath = $event.FullPath
-    "A file was created at $filePath. Syncing to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    # Define the action to take when a file is created
+    $action = {
+        param($source, $event)
+        $filePath = $event.FullPath
+        "A file was created at $filePath. Syncing to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+        aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    }
+
+    # Register the event
+    Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 }
-
-# Register the event
-Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 '@
 
 # Save the script to a file on the EC2 instance
-$scriptPath = "C:\monitor-ebs.ps1"
-$scriptContent | Out-File -FilePath $scriptPath
+$scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
 
-# Create a new scheduled task to run the PowerShell script at startup using Start-Job
-$taskName = "MonitorEBSScript"
-$taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '-NoProfile -ExecutionPolicy Bypass -Command "Start-Job -FilePath ''C:\monitor-ebs.ps1''"'
-$taskTrigger = New-ScheduledTaskTrigger -AtStartup
-$taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-Register-ScheduledTask -TaskName "MonitorEBSScript" -Action $taskAction -Trigger $taskTrigger -Principal $taskPrincipal
+# Set the current location to the directory where the script is located
+Set-Location -Path "C:\MonitorAndSyncToS3.ps1"
 
-# Start the task immediately
-Start-ScheduledTask -TaskName "MonitorEBSScript"
+# Load the script file into the current PowerShell session
+. ".\MonitorAndSyncToS3.ps1"
+
+# Call the function
+MonitorAndSyncToS3
+
+# # Create a new scheduled task to run the PowerShell script at startup using Start-Job
+# $taskName = "MonitorEBSScript"
+# $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '-NoProfile -ExecutionPolicy Bypass -Command "Start-Job -FilePath ''C:\monitor-ebs.ps1''"'
+# $taskTrigger = New-ScheduledTaskTrigger -AtStartup
+# $taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+# Register-ScheduledTask -TaskName "MonitorEBSScript" -Action $taskAction -Trigger $taskTrigger -Principal $taskPrincipal
+
+# # Start the task immediately
+# Start-ScheduledTask -TaskName "MonitorEBSScript"
 
 </powershell>
