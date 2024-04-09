@@ -57,7 +57,7 @@ mainSteps:
           }
           
           # Upload patch yaml to bucket
-          aws s3 cp $PatchesYaml  "$PatchesBucket/windows/${OS}Patches.yaml"
+          aws s3 cp $PatchesYaml  "$PatchesBucket/${OS}Patches.yaml"
   -
     action: "aws:runShellScript"
     name: "ExtractAndUploadLinuxPatches"
