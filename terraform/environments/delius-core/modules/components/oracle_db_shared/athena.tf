@@ -87,7 +87,7 @@ resource "aws_athena_data_catalog" "example" {
   type        = "GLUE"
 
   parameters = {
-    "catalog-id" = aws_glue_catalog_database.this[0].id
+    "catalog-id" = aws_glue_catalog_database.this[0].catalog_id
   }
 
 
