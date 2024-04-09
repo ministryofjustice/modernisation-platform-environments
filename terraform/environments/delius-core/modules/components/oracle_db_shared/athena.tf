@@ -6,7 +6,7 @@ resource "aws_glue_catalog_database" "this" {
 resource "aws_glue_catalog_table" "this" {
   count = var.audit_main_account ? 1 : 0
 
-  database_name = aws_glue_catalog_database.this.name
+  database_name = aws_glue_catalog_database[0].this.name
   name          = "audit"
   description   = "table containing the audit data stored in S3"
 
