@@ -105,11 +105,8 @@ function MonitorAndSyncToS3 {
 # Save the script to a file on the EC2 instance
 $scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
 
-# Set the current location to the directory where the script is located
-Set-Location -Path "C:\MonitorAndSyncToS3.ps1"
-
-# Load the script file into the current PowerShell session
-. ".\MonitorAndSyncToS3.ps1"
+# Correctly load the script file into the current PowerShell session
+. "C:\MonitorAndSyncToS3.ps1"
 
 # Call the function
 MonitorAndSyncToS3
