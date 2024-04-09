@@ -13,7 +13,7 @@ module "dms_task" {
   rds_db_instance_pasword  = aws_db_instance.database_2022.password
 
   # DMS Target Endpoint Inputs
-  target_s3_bucket_name      = data.aws_s3_bucket.existing_dms_bucket.id
+  target_s3_bucket_name      = aws_s3_bucket.dms_target_ep_s3_bucket.id
   ep_service_access_role_arn = aws_iam_role.dms-endpoint-role.arn
 
   # DMS Migration Task Inputs

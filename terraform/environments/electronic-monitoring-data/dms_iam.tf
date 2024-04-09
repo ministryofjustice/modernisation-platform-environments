@@ -15,15 +15,29 @@ resource "aws_iam_policy" "dms-s3-ep-role-policy" {
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "DMSAccess",
             "Effect": "Allow",
+            "Principal": {
+                "Service": "dms.eu-west-2.amazonaws.com"
+            },
             "Action": [
-                "s3:*",
-                "kms:*"
+                "s3:GetBucketLocation",
+                "s3:ListBucket"
             ],
-            "Resource": [
-                "arn:aws:s3::*:dms-*/*",
-                "arn:aws:s3::*:dms-*"
-            ]
+            "Resource": "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}"
+        },
+        {
+            "Sid": "DMSObjectActions",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "dms.eu-west-2.amazonaws.com"
+            },
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*"
         }
     ]
 }
