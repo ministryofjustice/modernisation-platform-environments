@@ -318,8 +318,10 @@ module "notify_transferred_lambda" {
   attach_network_policy  = true
 
   environment_variables = {
-    MODE        = "transferred"
-    SLACK_TOKEN = data.aws_secretsmanager_secret_version.slack_token.id
+    MODE                          = "transferred"
+    GOVUK_NOTIFY_API_KEY_SECRET   = "ingestion/govuk-notify/api-key"
+    GOVUK_NOTIFY_TEMPLATES_SECRET = "ingestion/govuk-notify/templates"
+    SLACK_TOKEN_SECRET            = "ingestion/slack-token"
   }
 
   # TODO: Check if KMS key is actually needed below
@@ -335,7 +337,11 @@ module "notify_transferred_lambda" {
         "kms:DescribeKey",
         "kms:Decrypt"
       ]
-      resources = [module.quarantined_sns_kms.key_arn]
+      resources = [
+        module.quarantined_sns_kms.key_arn,
+        module.govuk_notify_kms.key_arn,
+        module.slack_token_kms.key_arn
+      ]
     },
     secretsmanager_access = {
       sid       = "AllowSecretsManager"
