@@ -12,21 +12,20 @@ resource "aws_iam_policy" "dms-s3-ep-role-policy" {
 
   policy = <<EOF
 {
-"Version": "2012-10-17",
-"Statement": [
-    {
-        "Sid": "statement-1",
-        "Effect": "Allow",
-        "Action": [
-            "s3:*",
-            "kms:*"
-        ],
-        "Resource": [
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:*",
+                "kms:*"
+            ],
+            "Resource": [
             "arn:aws:s3::*:dms-*/*",
             "arn:aws:s3::*:dms-*"
-        ]
-    }
-]
+            ]
+        }
+    ]
 }
 EOF
 }
