@@ -15,7 +15,7 @@ resource "aws_iam_policy" "dms-s3-ep-role-policy" {
 "Version": "2012-10-17",
 "Statement": [
     {
-        "Sid": "S3_T_EP_Statement_1",
+        "Sid": "statement-1",
         "Effect": "Allow",
         "Action": [
             "s3:*",
