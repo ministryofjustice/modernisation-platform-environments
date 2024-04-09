@@ -72,3 +72,64 @@ resource "aws_glue_catalog_table" "this" {
 
   }
 }
+
+resource "aws_athena_database" "example" {
+  count  = var.audit_main_account ? 1 : 0
+  name   = "database_name"
+  bucket = module.s3_bucket_athena_output.bucket.bucket
+}
+
+
+resource "aws_athena_data_catalog" "example" {
+  count       = var.audit_main_account ? 1 : 0
+  name        = "athena-audit-data-catalog"
+  description = "Audit Athena data catalog"
+  type        = "GLUE"
+
+  parameters = {
+    "glue.catalog.id" = aws_glue_catalog_database.this[0].id
+  }
+
+
+  tags = {
+    Name = "athena-audit-data-catalog"
+  }
+}
+
+module "s3_bucket_athena_output" {
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  bucket_name         = "${var.env_name}-athena-output"
+  versioning_enabled  = false
+  ownership_controls  = "BucketOwnerEnforced"
+  replication_enabled = false
+  custom_kms_key      = var.account_config.kms_keys.general_shared
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 365
+      }
+    }
+  ]
+
+  tags = var.tags
+}
