@@ -117,5 +117,4 @@ $command = "PowerShell.exe -ExecutionPolicy Bypass -File $scriptPath"
 # Add a new registry entry to run the script at startup for all users
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -Name "MonitorAndSyncToS3" -Value $command
 
-
 </powershell>
