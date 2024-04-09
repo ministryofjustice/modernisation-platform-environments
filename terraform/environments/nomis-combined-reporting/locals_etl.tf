@@ -22,12 +22,12 @@ locals {
   etl_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "base_rhel_8_5_*"
-      iam_resource_names_prefix = "ec2-ncr-etl"
+      ami_name                  = "hmpps_windows_server_2019_release_*"
+      iam_resource_names_prefix = "ec2-etl"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"
-      vpc_security_group_ids = ["private"]
+      vpc_security_group_ids = ["etl"]
     })
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
@@ -41,8 +41,8 @@ locals {
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
     tags = {
-      description = "ncr BODS component"
-      ami         = "base_rhel_8_5"
+      description = "BODS component"
+      ami         = "windows_server_2019"
       os-type     = "Windows"
       server-type = "etl"
       component   = "etl"
