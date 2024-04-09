@@ -23,7 +23,7 @@ module "ec2_test_autoscaling_group" {
   application_name          = local.application_name
   region                    = local.region
   subnet_ids                = module.environment.subnets["private"].ids
-  tags                      = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  tags                      = merge(local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
   cloudwatch_metric_alarms  = {}
 }
@@ -48,12 +48,7 @@ resource "aws_iam_policy" "ec2_autoscale_policy" {
   path        = "/"
   description = "Common policy for all ec2 instances"
   policy      = data.aws_iam_policy_document.ec2_autoscale_combined.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-common-policy"
-    },
-  )
+  tags        = { Name = "ec2-common-policy" }
 }
 
 # combine ec2-common policy documents
@@ -79,10 +74,9 @@ resource "aws_security_group" "example_ec2_autoscale_sg" {
   name        = "example_ec2_autoscale_sg"
   description = "Controls access to EC2"
   vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags        = { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
 }
+
 resource "aws_security_group_rule" "ingress_autoscale_traffic" {
   for_each          = local.application_data.example_ec2_sg_rules
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -109,10 +103,5 @@ resource "aws_security_group_rule" "egress_autoscale_traffic" {
 resource "aws_key_pair" "ec2-autoscale-user" {
   key_name   = "ec2-autoscale-user"
   public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-autoscale-user"
-    },
-  )
+  tags       = { Name = "ec2-autoscale-user" }
 }

@@ -17,12 +17,11 @@ module "ecs-cluster" {
   environment = local.environment
   name        = local.ecs_application_name
   namespace   = "platforms"
-
-  tags = local.tags
+  tags        = local.tags
 }
 
 module "service" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
 
   container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
@@ -54,8 +53,7 @@ module "service" {
   ]
 
   ignore_changes_task_definition = false
-
-  tags = local.tags
+  tags                           = local.tags
 }
 
 locals {
@@ -213,7 +211,5 @@ resource "aws_security_group" "cluster_ec2" {
       security_groups = lookup(egress.value, "security_groups", null)
     }
   }
-  tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags = { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
 }

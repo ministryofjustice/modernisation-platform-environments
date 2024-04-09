@@ -10,9 +10,7 @@ resource "aws_acm_certificate" "example_cert" {
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", local.application_name, var.networking[0].business-unit, local.environment),
   ]
 
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-certificate", local.application_name, local.environment)) }
-  )
+  tags = { Name = lower(format("%s-%s-certificate", local.application_name, local.environment)) }
 
   lifecycle {
     create_before_destroy = true
@@ -80,12 +78,7 @@ resource "aws_lb" "certificate_example_lb" {
     enabled = true
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-external-loadbalancer"
-    }
-  )
+  tags       = { Name = "${local.application_name}-external-loadbalancer" }
   depends_on = [aws_security_group.certificate_example_load_balancer_sg]
 }
 
@@ -93,7 +86,5 @@ resource "aws_security_group" "certificate_example_load_balancer_sg" {
   name        = "certificate-example-lb-sg"
   description = "controls access to load balancer"
   vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("lb-sg-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags        = { Name = lower(format("lb-sg-%s-%s-example", local.application_name, local.environment)) }
 }
