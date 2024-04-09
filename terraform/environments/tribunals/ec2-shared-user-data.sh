@@ -106,9 +106,15 @@ Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 $scriptPath = "C:\monitor-ebs.ps1"
 $scriptContent | Out-File -FilePath $scriptPath
 
-# Copy the script directly to the common Startup folder
-$startupFolderPath = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
-Copy-Item -Path $scriptPath -Destination $startupFolderPath
+# Create a new scheduled task to run the PowerShell script at startup
+$taskName = "MonitorEBSScript"
+$taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File `"$scriptPath`""
+$taskTrigger = New-ScheduledTaskTrigger -AtStartup
+$taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+Register-ScheduledTask -TaskName $taskName -Action $taskAction -Trigger $taskTrigger -Principal $taskPrincipal
+
+# Start the task immediately
+Start-ScheduledTask -TaskName $taskName
 
 # Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1`""
 
