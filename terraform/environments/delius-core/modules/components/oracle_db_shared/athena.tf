@@ -50,10 +50,6 @@ resource "aws_glue_catalog_table" "this" {
       name = "USER_ID"
       type = "string"
     }
-    columns {
-      name = "USER_ID"
-      type = "string"
-    }
 
     columns {
       name = "SPG_USERNAME"
