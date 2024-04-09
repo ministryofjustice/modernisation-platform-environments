@@ -108,13 +108,14 @@ MonitorAndSyncToS3
 # Save the script to a file on the EC2 instance
 $scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
 
-# Create a new scheduled task action to run the PowerShell script
-$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File 'C:\MonitorAndSyncToS3.ps1'"
+# Define the path to your script
+$scriptPath = "C:\MonitorAndSyncToS3.ps1"
 
-# Create a trigger for the task (e.g., at system startup)
-$trigger = New-ScheduledTaskTrigger -AtStartup
+# PowerShell command to run your script
+$command = "PowerShell.exe -ExecutionPolicy Bypass -File $scriptPath"
 
-# Register the scheduled task
-Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "MonitorEBSScript" -Description "Monitors a directory and syncs it to S3."
+# Add a new registry entry to run the script at startup for all users
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -Name "MonitorAndSyncToS3" -Value $command
+
 
 </powershell>
