@@ -17,9 +17,6 @@ resource "aws_iam_policy" "dms-s3-ep-role-policy" {
         {
             "Sid": "DMSAccess",
             "Effect": "Allow",
-            "Principal": {
-                "Service": "dms.eu-west-2.amazonaws.com"
-            },
             "Action": [
                 "s3:GetBucketLocation",
                 "s3:ListBucket"
@@ -29,9 +26,6 @@ resource "aws_iam_policy" "dms-s3-ep-role-policy" {
         {
             "Sid": "DMSObjectActions",
             "Effect": "Allow",
-            "Principal": {
-                "Service": "dms.eu-west-2.amazonaws.com"
-            },
             "Action": [
                 "s3:PutObject",
                 "s3:GetObject",
