@@ -100,24 +100,21 @@ function MonitorAndSyncToS3 {
     # Register the event
     Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 }
+
+# Call the function
+MonitorAndSyncToS3
 '@
 
 # Save the script to a file on the EC2 instance
 $scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
 
-# Correctly load the script file into the current PowerShell session
-. "C:\MonitorAndSyncToS3.ps1"
+# Create a new scheduled task action to run the PowerShell script
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File 'C:\MonitorAndSyncToS3.ps1'"
 
-# Call the function
-MonitorAndSyncToS3
+# Create a trigger for the task (e.g., at system startup)
+$trigger = New-ScheduledTaskTrigger -AtStartup
 
-# # Create a new scheduled task action to run the PowerShell script
-# $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `""C:\MonitorAndSyncToS3.ps1`""
-
-# # Create a trigger for the task (e.g., at system startup)
-# $trigger = New-ScheduledTaskTrigger -AtStartup
-
-# # Register the scheduled task
-# Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "MonitorEBSScript" -Description "Monitors a directory and syncs it to S3."
+# Register the scheduled task
+Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "MonitorEBSScript" -Description "Monitors a directory and syncs it to S3."
 
 </powershell>
