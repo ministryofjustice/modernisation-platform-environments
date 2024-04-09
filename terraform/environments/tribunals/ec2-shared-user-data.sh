@@ -108,13 +108,13 @@ MonitorAndSyncToS3
 # Save the script to a file on the EC2 instance
 $scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
 
-# Define the path to your script
-$scriptPath = "C:\MonitorAndSyncToS3.ps1"
+# # Define the path to your script
+# $scriptPath = "C:\MonitorAndSyncToS3.ps1"
 
-# PowerShell command to run your script
-$command = "PowerShell.exe -ExecutionPolicy Bypass -File $scriptPath"
+# # PowerShell command to run your script
+# $command = "PowerShell.exe -ExecutionPolicy Bypass -File $scriptPath"
 
-# Add a new registry entry to run the script at startup for all users
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -Name "MonitorAndSyncToS3" -Value $command
+# # Add a new registry entry to run the script at startup for all users
+# Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -Name "MonitorAndSyncToS3" -Value $command
 
 </powershell>
