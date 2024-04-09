@@ -284,7 +284,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = "required"
+    http_tokens   = "required" 
   }
 
   iam_instance_profile {
