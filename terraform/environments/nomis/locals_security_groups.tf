@@ -96,7 +96,6 @@ locals {
           protocol    = "tcp"
           security_groups = [
             "private-jumpserver",
-            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.https
         }
@@ -107,7 +106,6 @@ locals {
           protocol    = "tcp"
           security_groups = [
             "private-jumpserver",
-            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.https
         }
@@ -118,7 +116,6 @@ locals {
           protocol    = "tcp"
           security_groups = [
             "private-jumpserver",
-            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.http7xxx
         }
@@ -129,7 +126,6 @@ locals {
           protocol    = "tcp"
           security_groups = [
             "private-jumpserver",
-            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.http7xxx
         }
@@ -161,9 +157,6 @@ locals {
           to_port     = "22"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.ssh
-          security_groups = [
-            "bastion-linux",
-          ]
         }
         oracle3872 = {
           description = "Allow oem agent ingress"
@@ -180,7 +173,6 @@ locals {
           security_groups = [
             "private-jumpserver",
             "private-lb",
-            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.http7xxx
         },
@@ -192,7 +184,6 @@ locals {
           security_groups = [
             "private-jumpserver",
             "private-lb",
-            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.http7xxx
         },
@@ -217,15 +208,6 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
-        }
-        rdp = {
-          description = "Allow rdp ingress"
-          from_port   = "3389"
-          to_port     = "3389"
-          protocol    = "TCP"
-          security_groups = [
-            "bastion-linux",
-          ]
         }
       }
       egress = {
@@ -263,9 +245,6 @@ locals {
           to_port     = "22"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.ssh
-          security_groups = [
-            "bastion-linux",
-          ]
         }
         oracle1521 = {
           description = "Allow oracle database 1521 ingress"
@@ -276,7 +255,6 @@ locals {
           security_groups = [
             "private-jumpserver",
             "private-web",
-            "bastion-linux",
           ]
         }
         oracle3872 = {
