@@ -82,8 +82,6 @@ if (-not $awsCliInstalled) {
 }
 
 $scriptContent = @'
-Set-ExecutionPolicy Bypass -Scope Process -Force;
-
 # Create a FileSystemWatcher object
 $watcher = New-Object System.IO.FileSystemWatcher
 $watcher.Path = "D:\storage\tribunals\"
@@ -106,16 +104,14 @@ Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
 $scriptPath = "C:\monitor-ebs.ps1"
 $scriptContent | Out-File -FilePath $scriptPath
 
-# Create a new scheduled task to run the PowerShell script at startup
+# Create a new scheduled task to run the PowerShell script at startup using Start-Job
 $taskName = "MonitorEBSScript"
-$taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File `"$scriptPath`""
+$taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '-NoProfile -ExecutionPolicy Bypass -Command "Start-Job -FilePath ''C:\monitor-ebs.ps1''"'
 $taskTrigger = New-ScheduledTaskTrigger -AtStartup
 $taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-Register-ScheduledTask -TaskName $taskName -Action $taskAction -Trigger $taskTrigger -Principal $taskPrincipal
+Register-ScheduledTask -TaskName "MonitorEBSScript" -Action $taskAction -Trigger $taskTrigger -Principal $taskPrincipal
 
 # Start the task immediately
-Start-ScheduledTask -TaskName $taskName
-
-# Start-Process -FilePath "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList "-File `"C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1`""
+Start-ScheduledTask -TaskName "MonitorEBSScript"
 
 </powershell>
