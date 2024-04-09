@@ -60,7 +60,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
   # encryption_mode                             = "SSE_S3"
   # expected_bucket_owner                       = data.aws_caller_identity.current.account_id
   # external_table_definition                   = "meta"
-  # glue_catalog_generation                     = true
+  glue_catalog_generation                     = true
   # ignore_header_rows                          = 1
   # include_op_for_full_load                    = true
   # max_file_size                               = 120000
