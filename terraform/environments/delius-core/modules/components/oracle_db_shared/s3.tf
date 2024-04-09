@@ -270,3 +270,42 @@ module "s3_bucket_oracle_statistics" {
 
   tags = var.tags
 }
+
+
+module "s3_bucket_oracledb_backups" {
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  bucket_name         = "${var.env_name}-oracle-database-audit"
+  versioning_enabled  = false
+  ownership_controls  = "BucketOwnerEnforced"
+  replication_enabled = false
+  custom_kms_key      = var.account_config.kms_keys.general_shared
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 365
+      }
+    }
+  ]
+
+  tags = var.tags
+}
