@@ -83,6 +83,7 @@ if (-not $awsCliInstalled) {
 
 $scriptContent = @'
 function MonitorAndSyncToS3 {
+    "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     # Create a FileSystemWatcher object
     $watcher = New-Object System.IO.FileSystemWatcher
     $watcher.Path = "D:\storage\tribunals\"
@@ -99,22 +100,37 @@ function MonitorAndSyncToS3 {
 
     # Register the event
     Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
+
+    # Keep the script running
+    while ($true) {
+        Start-Sleep -Seconds 10
+    }
 }
 
 # Call the function
 MonitorAndSyncToS3
 '@
 
+Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
+
 # Save the script to a file on the EC2 instance
 $scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
 
-# Define the path to your script
-$scriptPath = "C:\MonitorAndSyncToS3.ps1"
+# # Define the path to script
+# $scriptPath = "C:\MonitorAndSyncToS3.ps1"
 
-# PowerShell command to run your script
-$command = "PowerShell.exe -ExecutionPolicy Bypass -File $scriptPath"
+# # PowerShell command to run script
+# $command = "PowerShell.exe -File $scriptPath"
 
 # Add a new registry entry to run the script at startup for all users
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -Name "MonitorAndSyncToS3" -Value $command
+# Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -Name "MonitorAndSyncToS3" -Value $command
+
+$Action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-ExecutionPolicy Bypass -File "C:\MonitorAndSyncToS3.ps1"'
+
+$RepetitionDuration = New-TimeSpan -Days (10 * 365)
+$Trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 10) -RepetitionDuration $RepetitionDuration
+
+Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName "MonitorAndSyncToS3" -Description "Sync to S3 every 10 minutes" -RunLevel Highest -User "SYSTEM" -Force
+
 
 </powershell>
