@@ -37,3 +37,8 @@ variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string
 }
+
+variable "audit_main_account" {
+  description = "Audit main account"
+  type        = bool
+}
