@@ -319,9 +319,9 @@ module "notify_transferred_lambda" {
 
   environment_variables = {
     MODE                          = "transferred"
-    GOVUK_NOTIFY_API_KEY_SECRET   = "ingestion/govuk-notify/api-key"
-    GOVUK_NOTIFY_TEMPLATES_SECRET = "ingestion/govuk-notify/templates"
-    SLACK_TOKEN_SECRET            = "ingestion/slack-token"
+    GOVUK_NOTIFY_API_KEY_SECRET   = "ingestion/govuk-notify/api-key"   #TODO: un-hardcode
+    GOVUK_NOTIFY_TEMPLATES_SECRET = "ingestion/govuk-notify/templates" #TODO: un-hardcode
+    SLACK_TOKEN_SECRET            = "ingestion/slack-token"            #TODO: un-hardcode
   }
 
   # TODO: Check if KMS key is actually needed below
@@ -340,7 +340,8 @@ module "notify_transferred_lambda" {
       resources = [
         module.quarantined_sns_kms.key_arn,
         module.govuk_notify_kms.key_arn,
-        module.slack_token_kms.key_arn
+        module.slack_token_kms.key_arn,
+        module.supplier_data_kms.key_arn
       ]
     },
     secretsmanager_access = {
