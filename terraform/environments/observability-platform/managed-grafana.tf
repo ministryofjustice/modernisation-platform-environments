@@ -1,5 +1,7 @@
+#tfsec:ignore:avd-aws-0057 Wildcard statements come from module's data.aws_iam_policy_document
 module "managed_grafana" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV2_AWS_5:AMG doesn't run in a VPC, so it doesn't need a security group
 
   source  = "terraform-aws-modules/managed-service-grafana/aws"
   version = "2.1.1"
