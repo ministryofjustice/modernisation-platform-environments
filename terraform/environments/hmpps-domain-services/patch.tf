@@ -27,7 +27,7 @@ module "test" {
   environment         = "test"
   predefined_baseline = "AWS-WindowsPredefinedPatchBaseline-OS-Applications"
   operating_system    = "WINDOWS"
-  schedule            = "cron(0 21 ? * WED#2* *)" # 2nd Weds @ 9pm
+  schedule            = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
   target_tag = {
     "environment-name" = "hmpps-domain-services-test"
   }
