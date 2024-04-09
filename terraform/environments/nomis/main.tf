@@ -62,10 +62,10 @@ module "baseline" {
     }
   }
 
-  bastion_linux = merge(
-    local.baseline_bastion_linux,
-    lookup(local.baseline_environment_config, "baseline_bastion_linux", {})
-  )
+  # bastion_linux = merge(
+  #   local.baseline_bastion_linux,
+  #   lookup(local.baseline_environment_config, "baseline_bastion_linux", {})
+  # )
 
   cloudwatch_metric_alarms = merge(
     local.baseline_cloudwatch_metric_alarms,

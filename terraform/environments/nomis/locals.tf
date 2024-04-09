@@ -43,19 +43,6 @@ locals {
 
   baseline_backup_plans = {}
 
-  baseline_bastion_linux = {
-    public_key_data = merge(
-      jsondecode(file(".ssh/user-keys.json"))["all-environments"],
-      jsondecode(file(".ssh/user-keys.json"))[local.environment]
-    )
-    allow_ssh_commands = false
-    extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
-      region                                  = local.region
-      application_environment_internal_domain = module.environment.domains.internal.application_environment
-      X11Forwarding                           = "no"
-    })
-  }
-
   baseline_cloudwatch_log_groups = merge(
     local.weblogic_cloudwatch_log_groups,
     local.database_cloudwatch_log_groups,
