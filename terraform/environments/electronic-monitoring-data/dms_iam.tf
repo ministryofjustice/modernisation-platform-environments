@@ -12,18 +12,53 @@ resource "aws_iam_policy" "dms-s3-ep-role-policy" {
 
   policy = <<EOF
 {
-    "Version": "2012-10-17",
-    "Statement": [
+    "Version": "2012-10-17", 
+    "Statement": [ 
+        {
+            "Effect": "Allow", 
+            "Action": [
+                "s3:GetBucketLocation", 
+                "s3:GetObject",
+                "s3:ListBucket", 
+                "s3:ListBucketMultipartUploads", 
+                "s3:ListMultipartUploadParts", 
+                "s3:AbortMultipartUpload" 
+            ], 
+            "Resource": [
+                "arn:aws:s3::*:dms-*/*",
+                "arn:aws:s3::*:dms-*"
+            ]
+        },
+        {
+            "Effect": "Allow", 
+            "Action": [ 
+                "glue:CreateDatabase", 
+                "glue:GetDatabase", 
+                "glue:CreateTable", 
+                "glue:DeleteTable", 
+                "glue:UpdateTable", 
+                "glue:GetTable", 
+                "glue:BatchCreatePartition", 
+                "glue:CreatePartition", 
+                "glue:UpdatePartition", 
+                "glue:GetPartition", 
+                "glue:GetPartitions", 
+                "glue:BatchGetPartition"
+            ], 
+            "Resource": [
+                "arn:aws:glue:*:*:catalog", 
+                "arn:aws:glue:*:*:database/*", 
+                "arn:aws:glue:*:*:table/*" 
+            ]
+        }, 
         {
             "Effect": "Allow",
             "Action": [
-                "s3:*",
-                "kms:*"
+                "athena:StartQueryExecution",
+                "athena:GetQueryExecution", 
+                "athena:CreateWorkGroup"
             ],
-            "Resource": [
-            "arn:aws:s3::*:dms-*/*",
-            "arn:aws:s3::*:dms-*"
-            ]
+            "Resource": "arn:aws:athena:*:*:workgroup/glue_catalog_generation_for_task_*"
         }
     ]
 }
