@@ -3,24 +3,12 @@ variable "database_name" {
   type        = string
 }
 
-variable "dms_replication_instance_class" {
-  description = "Name of the replication instance class to be used"
-  type        = string
-  default     = "dms.t3.micro"
+variable "local_tags" {
+  description = "The predefined local.tags"
 }
+# ---------------------------------------------------------
 
-variable "dms_availability_zone" {
-  description = "Replication Instance AZ"
-  type        = string
-  default     = "eu-west-2b"
-}
-
-variable "dms_engine_version" {
-  description = "Replication Instance Engine Version"
-  type        = string
-  default     = "3.5.1"
-}
-
+# Source Endpoint Variables
 variable "rds_db_security_group_id" {
   description = "Security Group associated to RDS Database Instance"
   type        = string
@@ -51,12 +39,9 @@ variable "rds_db_username" {
   description = "Username to login to RDS Database Instance"
   type        = string
 }
+# ---------------------------------------------------------
 
-# variable "dms_vpc_id" {
-#   description = "VPC ID same as that of the existing RDS Database instance"
-#   type        = string  
-# }
-
+# Target Endpoint Variables
 variable "ep_service_access_role_arn" {
   description = "DMS Endpoint Service Access Role-ARN"
   type        = string
@@ -66,7 +51,9 @@ variable "target_s3_bucket_name" {
   description = "DMS S3 Target Endpoint Bucket Name"
   type        = string
 }
+# ---------------------------------------------------------
 
+# Migration Task Variables
 variable "rep_task_settings_filepath" {
   description = "JSON file with DMS relevant migration task settings"
   type        = string
@@ -80,8 +67,4 @@ variable "rep_task_table_mapping_filepath" {
 variable "dms_replication_instance_arn" {
   description = "Assign the Replication Instance-ARN to be used"
   type        = string
-}
-
-variable "local_tags" {
-  description = "The predefined local.tags"
 }

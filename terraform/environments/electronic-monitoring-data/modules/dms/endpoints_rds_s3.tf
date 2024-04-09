@@ -48,8 +48,8 @@ resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
   # csv_no_sup_value                            = "false"
   # csv_null_value                              = "null"
   # csv_row_delimiter                           = "\\n"
-  data_format = "parquet"
-  # data_page_size                              = 1100000
+  data_format    = "parquet"
+  data_page_size = 68000000
   # date_partition_delimiter                    = "UNDERSCORE"
   # date_partition_enabled                      = false
   # date_partition_sequence                     = "yyyymmddhh"
@@ -60,7 +60,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
   # encryption_mode                             = "SSE_S3"
   # expected_bucket_owner                       = data.aws_caller_identity.current.account_id
   # external_table_definition                   = "meta"
-  glue_catalog_generation                     = true
+  # glue_catalog_generation                     = true
   # ignore_header_rows                          = 1
   # include_op_for_full_load                    = true
   # max_file_size                               = 120000

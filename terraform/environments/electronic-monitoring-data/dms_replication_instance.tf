@@ -20,18 +20,18 @@ resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
 
 # Create a new replication instance
 
-resource "aws_dms_replication_instance" "t3medium_dms_replication_instance" {
-  allocated_storage          = 20
+resource "aws_dms_replication_instance" "dms_replication_instance" {
+  allocated_storage          = var.dms_allocated_storage_gib
   apply_immediately          = true
   auto_minor_version_upgrade = true
-  availability_zone          = "eu-west-2b"
-  #   engine_version               = "3.5.1"
+  availability_zone          = var.dms_availability_zone
+  engine_version             = var.dms_engine_version
   #   kms_key_arn                  = "arn:aws:kms:eu-west-2:800964199911:key/b7f54acb-16a3-4958-9340-3bdf5f5842d8"
   multi_az = false
   #   preferred_maintenance_window = "sun:10:30-sun:14:30"
   publicly_accessible         = false
-  replication_instance_class  = "dms.t3.medium"
-  replication_instance_id     = "t3medium-dms-replication-instance-tf"
+  replication_instance_class  = var.dms_replication_instance_class
+  replication_instance_id     = "dms-replication-instance-tf"
   replication_subnet_group_id = aws_dms_replication_subnet_group.dms_replication_subnet_group.id
 
   tags = merge(
@@ -51,34 +51,3 @@ resource "aws_dms_replication_instance" "t3medium_dms_replication_instance" {
     aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
   ]
 }
-# resource "aws_dms_replication_instance" "t3micro_dms_replication_instance" {
-#   allocated_storage          = 20
-#   apply_immediately          = true
-#   auto_minor_version_upgrade = true
-#   availability_zone          = "eu-west-2b"
-#   #   engine_version               = "3.5.1"
-#   #   kms_key_arn                  = "arn:aws:kms:eu-west-2:800964199911:key/b7f54acb-16a3-4958-9340-3bdf5f5842d8"
-#   multi_az = false
-#   #   preferred_maintenance_window = "sun:10:30-sun:14:30"
-#   publicly_accessible         = false
-#   replication_instance_class  = "dms.t3.micro"
-#   replication_instance_id     = "t3micro-dms-replication-instance-tf"
-#   replication_subnet_group_id = aws_dms_replication_subnet_group.dms_replication_subnet_group.id
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Resource_Type = "DMS Replication Instance",
-#     }
-#   )
-
-#   vpc_security_group_ids = [
-#     aws_security_group.dms_ri_security_group.id,
-#   ]
-
-#   depends_on = [
-#     aws_iam_role_policy_attachment.dms-endpoint-role,
-#     aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole,
-#     aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
-#   ]
-# }

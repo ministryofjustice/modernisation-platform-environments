@@ -17,16 +17,15 @@ resource "aws_dms_replication_task" "dms-db-migration-task" {
   )
 }
 
-resource "null_resource" "dms_start_replicating" {
-  triggers = {
-    dms_task_arn = aws_dms_replication_task.dms-db-migration-task.replication_task_arn # aws_dms_replication_task.example.replication_task_arn
-  }
-  provisioner "local-exec" {
-    when    = create
-    command = "aws dms start-replication-task --start-replication-task-type start-replication --replication-task-arn ${self.triggers["dms_task_arn"]}"
-  }
-
-}
+# resource "null_resource" "dms_start_replicating" {
+#   triggers = {
+#     dms_task_arn = aws_dms_replication_task.dms-db-migration-task.replication_task_arn # aws_dms_replication_task.example.replication_task_arn
+#   }
+#   provisioner "local-exec" {
+#     when    = create
+#     command = "aws dms start-replication-task --start-replication-task-type start-replication --replication-task-arn ${self.triggers["dms_task_arn"]}"
+#   }
+# }
 
 # │ Error: local-exec provisioner error
 # │ 
