@@ -3,6 +3,7 @@
 #   *.laa-test.modernisation-platform.service.justice.gov.uk
 #   *.laa-preproduction.modernisation-platform.service.justice.gov.uk
 
+# Certificate
 resource "aws_acm_certificate" "external" {
   domain_name       = local.is-production ? "ccms-ebs.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
@@ -22,6 +23,7 @@ resource "aws_acm_certificate_validation" "external" {
   validation_record_fqdns = local.is-production ? [aws_route53_record.external_validation_prod[0].fqdn] : [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
+# Route53 DNS records for certificate validation
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 
@@ -44,7 +46,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-
+# Production Certificate
 resource "aws_acm_certificate" "external_prod" {
   count = local.is-production ? 1 : 0
 
