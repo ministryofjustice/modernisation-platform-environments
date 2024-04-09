@@ -700,17 +700,17 @@ locals {
           { name = "trn-int", type = "CNAME", ttl = "300", records = ["internal-private-lb-494149354.eu-west-2.elb.amazonaws.com"] },
           { name = "www", type = "CNAME", ttl = "300", records = ["hmpps-prod-ukwest-appgw2-moj.ukwest.cloudapp.azure.com"] },
           
-          # { name = "_4f7f9316bc4eaa8e9637c17aa36966b1", type = "CNAME", ttl = "86400", records = ["_83c5b5d8980ae954f876dd1b51417d43.qxcwttcyyb.acm-validations.aws."] },
-          # { name = "_9f1b86e95d13d2cc7b9629f67d672c40", type = "CNAME", ttl = "86400", records = ["_7ea92a123c65795698dd19834dd71f61.fdbjvjdfdx.acm-validations.aws."] },
-          # { name = "_26aaae7b839510727c2dd323b483ea5d.pp", type = "CNAME", ttl = "86400", records = ["_72222d02a82256bb6d75c872bc7bc1aa.qxcwttcyyb.acm-validations.aws."] },
-          # { name = "_c3a661930d89914b2b25aac7d9947b3d.pp-a", type = "CNAME", ttl = "86400", records = ["_d57e6b487b03e7a7fd25e934671601cc.plkdfvcnsy.acm-validations.aws."] },
-          # { name = "_315500c40ef2d43ce87898e24be41f4e.pp-a-int", type = "CNAME", ttl = "86400", records = ["_be7c7a6b253419ba86f08cacabb28678.plkdfvcnsy.acm-validations.aws."] },
-          # { name = "_50d671c38e9c0d7692603c84d7ed066f.pp-b", type = "CNAME", ttl = "86400", records = ["_3aa768d4e3d8825ba1c8f2c2a154e7f4.plkdfvcnsy.acm-validations.aws."] },
-          # { name = "_a1ba1dd6ae3372f75a678b39e62364e0.pp-b-int", type = "CNAME", ttl = "86400", records = ["_eba205f55455280dbf39807cc4cd4a4f.plkdfvcnsy.acm-validations.aws."] },
-          # { name = "_b895eab0227a1d047f714060e0cd970f.pp-int", type = "CNAME", ttl = "86400", records = ["_9beca5f6af7ab9851e446fb506c15558.plkdfvcnsy.acm-validations.aws."] },
-          # { name = "_16d62060ae34f0c7e45cd3303d1369de.ords.t1", type = "CNAME", ttl = "86400", records = ["_3ace3d679497ac88b6b29516dc3e92ff.jsxlrrpjwm.acm-validations.aws."] },
-          # { name = "_93b16605cbf55e463d0ee7954b20c94d.t2", type = "CNAME", ttl = "86400", records = ["_51d8f8d87c9b9c07a1b1602bb68a1634.fcgjwsnkyp.acm-validations.aws."] },
-          # { name = "_594f919f3d6c4e462084ee328bdb3236.ords.t2", type = "CNAME", ttl = "86400", records = ["_734a121cabbafd1e18bb96a0f2de6ac6.jsxlrrpjwm.acm-validations.aws."] },
+          { name = "_4f7f9316bc4eaa8e9637c17aa36966b1", type = "CNAME", ttl = "86400", records = ["_83c5b5d8980ae954f876dd1b51417d43.qxcwttcyyb.acm-validations.aws."] },
+          { name = "_9f1b86e95d13d2cc7b9629f67d672c40", type = "CNAME", ttl = "86400", records = ["_7ea92a123c65795698dd19834dd71f61.fdbjvjdfdx.acm-validations.aws."] },
+          { name = "_26aaae7b839510727c2dd323b483ea5d.pp", type = "CNAME", ttl = "86400", records = ["_72222d02a82256bb6d75c872bc7bc1aa.qxcwttcyyb.acm-validations.aws."] },
+          { name = "_c3a661930d89914b2b25aac7d9947b3d.pp-a", type = "CNAME", ttl = "86400", records = ["_d57e6b487b03e7a7fd25e934671601cc.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_315500c40ef2d43ce87898e24be41f4e.pp-a-int", type = "CNAME", ttl = "86400", records = ["_be7c7a6b253419ba86f08cacabb28678.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_50d671c38e9c0d7692603c84d7ed066f.pp-b", type = "CNAME", ttl = "86400", records = ["_3aa768d4e3d8825ba1c8f2c2a154e7f4.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_a1ba1dd6ae3372f75a678b39e62364e0.pp-b-int", type = "CNAME", ttl = "86400", records = ["_eba205f55455280dbf39807cc4cd4a4f.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_b895eab0227a1d047f714060e0cd970f.pp-int", type = "CNAME", ttl = "86400", records = ["_9beca5f6af7ab9851e446fb506c15558.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_16d62060ae34f0c7e45cd3303d1369de.ords.t1", type = "CNAME", ttl = "86400", records = ["_3ace3d679497ac88b6b29516dc3e92ff.jsxlrrpjwm.acm-validations.aws."] },
+          { name = "_93b16605cbf55e463d0ee7954b20c94d.t2", type = "CNAME", ttl = "86400", records = ["_51d8f8d87c9b9c07a1b1602bb68a1634.fcgjwsnkyp.acm-validations.aws."] },
+          { name = "_594f919f3d6c4e462084ee328bdb3236.ords.t2", type = "CNAME", ttl = "86400", records = ["_734a121cabbafd1e18bb96a0f2de6ac6.jsxlrrpjwm.acm-validations.aws."] },
         ]
       }
       
