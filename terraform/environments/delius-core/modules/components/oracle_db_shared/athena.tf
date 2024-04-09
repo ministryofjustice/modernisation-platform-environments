@@ -99,7 +99,7 @@ resource "aws_athena_data_catalog" "example" {
 module "s3_bucket_athena_output" {
   count               = var.audit_main_account ? 1 : 0
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
-  bucket_name         = "${var.env_name}-athena-output"
+  bucket_name         = "${var.env_name}-delius-athena-output"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
