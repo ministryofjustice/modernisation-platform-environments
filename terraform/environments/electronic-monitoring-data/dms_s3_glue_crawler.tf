@@ -14,10 +14,16 @@ resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
   }
 }
 
+resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
+  name = "rds_sqlserver_dms"
+  create_table_default_permission {
+    permissions = ["SELECT"]
+  }
+}
 resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
   name          = "rds-sqlserver-${aws_db_instance.database_2022.db_name}-tf"
   role          = aws_iam_role.dms-glue-crawler-role.arn
-  database_name = "rds_sqlserver_dms"
+  database_name = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db.name
   description   = "Crawler to fetch database names"
   #   table_prefix  = "your_table_prefix"
 
