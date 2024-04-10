@@ -33,12 +33,3 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
   )
 }
 
-resource "null_resource" "start_glue_crawler" {
-  triggers = {
-    glue_crawler_name = aws_glue_crawler.rds-sqlserver-db-glue-crawler.name
-  }
-  provisioner "local-exec" {
-    when    = create
-    command = "aws glue start-crawler --name ${self.triggers["glue_crawler_name"]}"
-  }
-}
