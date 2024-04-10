@@ -25,11 +25,11 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
     connection_name = aws_glue_connection.rds_sqlserver_db_glue_connection.name
     path            = "%"
   }
-  configuration = jsonencode(
-    {
-      version               = 1
-      crawler_output_format = "JSON"
-  })
+#   configuration = jsonencode(
+#     {
+#       version               = 1
+#       crawler_output_format = "JSON"
+#   })
 }
 
 resource "null_resource" "start_glue_crawler" {
