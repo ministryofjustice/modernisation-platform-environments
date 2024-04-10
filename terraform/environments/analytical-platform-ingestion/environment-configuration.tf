@@ -15,7 +15,7 @@ locals {
       /* Image Versions */
       scan_image_version     = "0.0.4"
       transfer_image_version = "0.0.4"
-      notify_image_version   = "0.0.7"
+      notify_image_version   = "0.0.8"
 
       /* Target Buckets */
       target_buckets = ["dev-ingestion-testing"]
@@ -46,7 +46,7 @@ locals {
       /* Image Versions */
       scan_image_version     = "0.0.4"
       transfer_image_version = "0.0.4"
-      notify_image_version   = "0.0.7"
+      notify_image_version   = "0.0.8"
 
       /* Target Buckets */
       target_buckets = []
