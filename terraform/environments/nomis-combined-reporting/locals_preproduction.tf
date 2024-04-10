@@ -323,9 +323,7 @@ locals {
     baseline_route53_zones = {
       "preproduction.reporting.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "preprod-ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.preproduction.reporting.nomis.service.justice.gov.uk"] },
-          { name = "preprod-ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "preprod-ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.pp.ncr.service.justice.uk", type = "CNAME", ttl = "3600", records = ["pp-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.internal"] }
         ]
       }
     }
