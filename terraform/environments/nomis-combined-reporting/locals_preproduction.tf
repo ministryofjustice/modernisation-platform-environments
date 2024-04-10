@@ -240,7 +240,7 @@ locals {
           "/dev/sds" = {
             label = "swap"
             type  = "gp3"
-            size  = 2
+            size  = 4
           }
         }
         ebs_volume_config = {
