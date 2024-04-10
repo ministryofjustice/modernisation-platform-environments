@@ -398,6 +398,7 @@ locals {
         domain_name = "oasys.service.justice.gov.uk"
         subject_alternate_names = [
           "*.oasys.service.justice.gov.uk",
+          "*.int.oasys.service.justice.gov.uk",
           "bridge-oasys.az.justice.gov.uk",
           "oasys.az.justice.gov.uk",
           "p-oasys.az.justice.gov.uk",
