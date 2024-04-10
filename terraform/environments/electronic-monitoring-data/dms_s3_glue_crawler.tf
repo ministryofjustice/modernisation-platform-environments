@@ -17,7 +17,7 @@ resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
 resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
   name          = "rds-sqlserver-db-glue-crawler-tf"
   role          = aws_iam_role.dms-glue-crawler-role.arn
-  database_name = "%"
+  database_name = "rds_sqlserver_dms"
   description   = "Crawler to fetch database names"
   #   table_prefix  = "your_table_prefix"
 
