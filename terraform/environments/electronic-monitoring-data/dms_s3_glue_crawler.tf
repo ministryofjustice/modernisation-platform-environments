@@ -18,6 +18,10 @@ resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
   name = "rds_sqlserver_dms"
   create_table_default_permission {
     permissions = ["SELECT"]
+
+    principal {
+      data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+    }
   }
 }
 resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
@@ -37,5 +41,8 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
       Resource_Type = "RDS SQLServer Glue Crawler for DMS",
     }
   )
-}
 
+  provisioner "local-exec" {
+    command = "aws glue start-crawler --name ${self.name}"
+  }
+}
