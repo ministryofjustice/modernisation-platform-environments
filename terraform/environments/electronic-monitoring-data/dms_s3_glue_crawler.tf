@@ -25,7 +25,7 @@ resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
   }
 }
 resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
-  name          = "rds-sqlserver-${aws_db_instance.database_2022.db_name}-tf"
+  name          = "rds-sqlserver-${aws_db_instance.database_2022.identifier}-tf"
   role          = aws_iam_role.dms-glue-crawler-role.arn
   database_name = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db.name
   description   = "Crawler to fetch database names"
