@@ -70,6 +70,11 @@ resource "aws_glue_catalog_table" "this" {
   }
 }
 
+resource "aws_athena_database" "example" {
+  name   = "athena_audit_db_${var.env_name}"
+  bucket = module.s3_bucket_athena_output.bucket.bucket
+}
+
 resource "aws_athena_data_catalog" "this" {
   for_each    = var.audit_main_account ? toset([for env in local.audit_envs[join("-", ["delius-core", var.account_info.mp_environment])] : env]) : toset([])
   name        = "athena-audit-data-catalog-${each.value}"
