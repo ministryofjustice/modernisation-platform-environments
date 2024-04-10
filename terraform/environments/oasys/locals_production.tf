@@ -694,13 +694,21 @@ locals {
       }
       (module.environment.domains.public.short_name) = { # oasys.service.justice.gov.uk
         lb_alias_records = [
-          { name = "",      type = "A", lbs_map_key = "public" },  # oasys.service.justice.gov.uk
-          { name = "www",   type = "A", lbs_map_key = "public" },  # www.oasys.service.justice.gov.uk
-          { name = "a",     type = "A", lbs_map_key = "public" },  # a.oasys.service.justice.gov.uk
-          { name = "b",     type = "A", lbs_map_key = "public" },  # b.oasys.service.justice.gov.uk
-          { name = "int",   type = "A", lbs_map_key = "private" }, # int.oasys.service.justice.gov.uk
-          { name = "a-int", type = "A", lbs_map_key = "private" }, # a-int.oasys.service.justice.gov.uk
-          { name = "b-int", type = "A", lbs_map_key = "private" }, # b-int.oasys.service.justice.gov.uk
+          { name = "",             type = "A", lbs_map_key = "public" },  # oasys.service.justice.gov.uk
+          { name = "www",          type = "A", lbs_map_key = "public" },  # www.oasys.service.justice.gov.uk
+          { name = "a",            type = "A", lbs_map_key = "public" },  # a.oasys.service.justice.gov.uk
+          { name = "b",            type = "A", lbs_map_key = "public" },  # b.oasys.service.justice.gov.uk
+          { name = "practice",     type = "A", lbs_map_key = "public" },
+          { name = "ptc",          type = "A", lbs_map_key = "public" },
+          { name = "training",     type = "A", lbs_map_key = "public" },
+          { name = "trn",          type = "A", lbs_map_key = "public" },
+          { name = "int",          type = "A", lbs_map_key = "private" }, # int.oasys.service.justice.gov.uk
+          { name = "a-int",        type = "A", lbs_map_key = "private" }, # a-int.oasys.service.justice.gov.uk
+          { name = "b-int",        type = "A", lbs_map_key = "private" }, # b-int.oasys.service.justice.gov.uk
+          { name = "practice.int", type = "A", lbs_map_key = "private" },
+          { name = "ptc-int",      type = "A", lbs_map_key = "private" },
+          { name = "training.int", type = "A", lbs_map_key = "private" },
+          { name = "trn-int",      type = "A", lbs_map_key = "private" },
         ]
         records = [
           { name = "db.onr",       type = "CNAME", ttl = "300", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
@@ -714,11 +722,6 @@ locals {
           { name = "pp-a-int",     type = "CNAME", ttl = "300", records = ["internal-private-lb-212442533.eu-west-2.elb.amazonaws.com"] },
           { name = "pp-int",       type = "CNAME", ttl = "300", records = ["internal-private-lb-212442533.eu-west-2.elb.amazonaws.com"] },
           
-          { name = "practice",     type = "CNAME", ttl = "300", records = ["public-lb-16512701.eu-west-2.elb.amazonaws.com"] },
-          { name = "ptc",          type = "CNAME", ttl = "300", records = ["public-lb-16512701.eu-west-2.elb.amazonaws.com"] },
-          { name = "ptc-int",      type = "CNAME", ttl = "300", records = ["internal-private-lb-494149354.eu-west-2.elb.amazonaws.com"] },
-          { name = "practice.int", type = "CNAME", ttl = "300", records = ["internal-private-lb-494149354.eu-west-2.elb.amazonaws.com"] },
-          
           { name = "t1",           type = "CNAME", ttl = "300", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
           { name = "ords.t1",      type = "CNAME", ttl = "300", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
           { name = "t1-int",       type = "CNAME", ttl = "300", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
@@ -728,11 +731,6 @@ locals {
           { name = "t2-b",         type = "CNAME", ttl = "300", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
           { name = "t2-b-int",     type = "CNAME", ttl = "300", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
           { name = "t2-int",       type = "CNAME", ttl = "300", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
-          
-          { name = "training",     type = "CNAME", ttl = "300", records = ["public-lb-16512701.eu-west-2.elb.amazonaws.com"] },
-          { name = "trn",          type = "CNAME", ttl = "300", records = ["public-lb-16512701.eu-west-2.elb.amazonaws.com"] },
-          { name = "trn-int",      type = "CNAME", ttl = "300", records = ["internal-private-lb-494149354.eu-west-2.elb.amazonaws.com"] },
-          { name = "training.int", type = "CNAME", ttl = "300", records = ["internal-private-lb-494149354.eu-west-2.elb.amazonaws.com"] },
           
           { name = "_4f7f9316bc4eaa8e9637c17aa36966b1",          type = "CNAME", ttl = "86400", records = ["_83c5b5d8980ae954f876dd1b51417d43.qxcwttcyyb.acm-validations.aws."] },
           { name = "_9f1b86e95d13d2cc7b9629f67d672c40",          type = "CNAME", ttl = "86400", records = ["_7ea92a123c65795698dd19834dd71f61.fdbjvjdfdx.acm-validations.aws."] },
