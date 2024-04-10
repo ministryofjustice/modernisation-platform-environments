@@ -148,19 +148,19 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-etl-1-a = merge(local.etl_ec2_default, {
-        cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
-        config = merge(local.etl_ec2_default.config, {
-          instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
-          ])
-        })
-        tags = merge(local.etl_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform ETL installation and configurations"
-          nomis-combined-reporting-environment = "t1"
-          instance-scheduling                  = "skip-scheduling"
-        })
-      })
+      # t1-ncr-etl-1-a = merge(local.etl_ec2_default, {
+      #   cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
+      #   config = merge(local.etl_ec2_default.config, {
+      #     instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
+      #       "Ec2T1ReportingPolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.etl_ec2_default.tags, {
+      #     description                          = "For testing SAP BI Platform ETL installation and configurations"
+      #     nomis-combined-reporting-environment = "t1"
+      #     instance-scheduling                  = "skip-scheduling"
+      #   })
+      # })
     }
     baseline_lbs = {
       private = {
