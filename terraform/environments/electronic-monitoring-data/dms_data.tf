@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "dms_glue_assume_role" {
     actions = ["sts:AssumeRole"]
 
     principals {
-      identifiers = ["glue.eu-west-2.amazonaws.com"]
+      identifiers = ["glue.amazonaws.com"]
       type        = "Service"
     }
   }
