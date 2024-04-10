@@ -24,6 +24,8 @@ locals {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "hmpps_windows_server_2019_release_*"
       iam_resource_names_prefix = "ec2-etl"
+      ebs_volumes_copy_all_from_ami = false
+      user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"
@@ -33,7 +35,9 @@ locals {
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     ebs_volumes = {
-      "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+      "/dev/sdb" = { type = "gp3", size = 100 }
+      "/dev/sdc" = { type = "gp3", size = 100 }
+      "/dev/sds" = { type = "gp3", size = 100 }
     }
 
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
