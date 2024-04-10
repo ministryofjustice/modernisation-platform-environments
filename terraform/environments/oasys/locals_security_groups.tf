@@ -133,16 +133,6 @@ locals {
           protocol    = -1
           self        = true
         }
-        http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 0
-          to_port     = 8080
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
-          ])
-          security_groups = []
-        }
         https = {
           description = "Allow https ingress"
           from_port   = 443
@@ -174,16 +164,6 @@ locals {
           protocol    = -1
           self        = true
         }
-        http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 0
-          to_port     = 8080
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_external,
-          ])
-          security_groups = []
-        }
         https = {
           description = "Allow https ingress"
           from_port   = 443
@@ -214,17 +194,6 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
-        }
-        https = {
-          description = "Allow https ingress"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          cidr_blocks = distinct(flatten([
-            local.security_group_cidrs.https_internal,
-            local.security_group_cidrs.https_external,
-          ]))
-          security_groups = ["private_lb", "public_lb"]
         }
         http8080 = {
           description = "Allow http8080 ingress"
