@@ -129,6 +129,7 @@ resource "aws_db_instance" "appdb1" {
   tags = merge(
     var.tags,
     { "Name" = "${var.application_name}-${var.environment}-database" },
+    { instance-scheduling = "skip-scheduling" }
   )
 
   timeouts {
