@@ -70,4 +70,9 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
 }
 
+resource "aws_iam_role" "dms-glue-crawler-role" {
+  name               = "dms-glue-crawler-role-tf"
+  assume_role_policy = data.aws_iam_policy_document.dms_glue_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
+}
 # ==========================================================================

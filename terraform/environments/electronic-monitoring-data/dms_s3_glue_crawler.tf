@@ -1,0 +1,43 @@
+resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
+  connection_properties = {
+    JDBC_CONNECTION_URL = "jdbc:sqlserver://${aws_db_instance.database_2022.endpoint}"
+    PASSWORD            = aws_secretsmanager_secret_version.db_password.secret_string
+    USERNAME            = "admin"
+  }
+
+  name = "rds-sqlserver-db-glue-conn-tf"
+
+  physical_connection_requirements {
+    security_group_id_list = [aws_security_group.db.id]
+    subnet_id              = data.aws_subnet.private_subnets_a.id
+    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+  }
+}
+
+resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
+  name          = "rds-sqlserver-db-glue-crawler-tf"
+  role          = aws_iam_role.dms-glue-crawler-role.arn
+  database_name = "%"
+  description   = "Crawler to fetch database names"
+  #   table_prefix  = "your_table_prefix"
+
+  jdbc_target {
+    connection_name = aws_glue_connection.rds_sqlserver_db_glue_connection.name
+    path            = "%"
+  }
+  configuration = jsonencode(
+    {
+      version               = 1
+      crawler_output_format = "JSON"
+  })
+}
+
+resource "null_resource" "start_glue_crawler" {
+  triggers = {
+    glue_crawler_name = aws_glue_crawler.rds-sqlserver-db-glue-crawler.name
+  }
+  provisioner "local-exec" {
+    when    = create
+    command = "aws glue start-crawler --name ${self.triggers["glue_crawler_name"]}"
+  }
+}
