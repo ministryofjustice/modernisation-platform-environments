@@ -58,6 +58,8 @@ module "user_management" {
   platform_vars = var.platform_vars
   tags          = var.tags
 
+  ignore_changes_service_task_definition = true
+
   providers = {
     aws          = aws
     aws.core-vpc = aws.core-vpc

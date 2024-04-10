@@ -36,6 +36,8 @@ module "weblogic" {
 
   cluster_security_group_id = aws_security_group.cluster.id
 
+  ignore_changes_service_task_definition = true
+
 
   providers = {
     aws          = aws

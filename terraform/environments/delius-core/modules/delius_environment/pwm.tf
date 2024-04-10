@@ -88,7 +88,7 @@ module "pwm" {
     "SECURITY_KEY" = "${base64encode(uuid())}"
   }
 
-  ignore_changes_task_definition = true
+  ignore_changes_service_task_definition = true
 
   providers = {
     aws          = aws
