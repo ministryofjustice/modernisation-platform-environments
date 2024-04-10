@@ -31,3 +31,19 @@ module "ingestion_transfer_bucket_notification" {
     }
   }
 }
+
+module "ingestion_quarantine_bucket_notification" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
+  version = "4.1.0"
+
+  bucket = module.quarantine_bucket.s3_bucket_id
+
+  sns_notifications = {
+    quarantine_sns = {
+      topic_arn = module.quarantine_sns.sns_topic_arn
+      events    = ["s3:ObjectCreated:*"]
+    }
+  }
+}
