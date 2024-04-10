@@ -199,8 +199,10 @@ resource "aws_ssm_document" "perform_healthcheck_s3" {
 # Test Group
 
 resource "aws_ssm_patch_group" "win_patch_test_group" {
+  count       = local.is-development == true ? 1 : 0
   baseline_id = aws_ssm_patch_baseline.windows_os_apps_test_baseline.id
-  patch_group = aws_ssm_patch_group.win_patch_test_group.patch_group
+  patch_group = local.application_data.accounts[local.environment].test_patch_group
+
 }
 
 # Create Windows Patch Baseline
