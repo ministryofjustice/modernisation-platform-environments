@@ -9,7 +9,7 @@ variable "database_list" {
 variable "dms_replication_instance_class" {
   description = "Name of the replication instance class to be used"
   type        = string
-  default     = "dms.t3.small"
+  default     = "dms.t3.medium"
 }
 
 variable "dms_engine_version" {
