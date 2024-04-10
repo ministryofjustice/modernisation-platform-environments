@@ -15,7 +15,7 @@ resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
 }
 
 resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
-  name          = "rds-sqlserver-db-glue-crawler-tf"
+  name          = "rds-sqlserver-${aws_db_instance.database_2022.db_name}-tf"
   role          = aws_iam_role.dms-glue-crawler-role.arn
   database_name = "rds_sqlserver_dms"
   description   = "Crawler to fetch database names"
@@ -25,11 +25,12 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
     connection_name = aws_glue_connection.rds_sqlserver_db_glue_connection.name
     path            = "%"
   }
-#   configuration = jsonencode(
-#     {
-#       version               = 1
-#       crawler_output_format = "JSON"
-#   })
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "RDS SQLServer Glue Crawler for DMS",
+    }
+  )
 }
 
 resource "null_resource" "start_glue_crawler" {
