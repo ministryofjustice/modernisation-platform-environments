@@ -64,6 +64,18 @@ resource "aws_glue_crawler" "example" {
   name          = "s3-parquet-dms-tf"
   role          = aws_iam_role.dms-glue-crawler-role.arn
 
+  configuration = jsonencode(
+    {
+      Grouping = {
+        TableGroupingPolicy = "CombineCompatibleSchemas"
+      }
+      CrawlerOutput = {
+        Partitions = { AddOrUpdateBehavior = "InheritFromTable" }
+      }
+      Version = 1
+    }
+  )
+
   s3_target {
     path = "s3://${aws_s3_bucket.dms_target_ep_s3_bucket.bucket}"
   }
