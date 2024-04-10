@@ -73,23 +73,7 @@ module "s3_quarantine_kms" {
   aliases               = ["s3/quarantine"]
   description           = "Family SFTP Server, Quarantine S3 KMS Key"
   enable_default_policy = true
-  key_statements = [
-    {
-      sid = "AllowS3"
-      actions = [
-        "kms:Decrypt",
-        "kms:GenerateDataKey"
-      ]
-      resources = ["*"]
-      effect    = "Allow"
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["s3.amazonaws.com"]
-        }
-      ]
-    }
-  ]
+
   deletion_window_in_days = 7
 }
 
@@ -144,6 +128,23 @@ module "quarantined_sns_kms" {
   aliases               = ["sns/quarantined"]
   description           = "Key for quarantined notifications"
   enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowS3"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["s3.amazonaws.com"]
+        }
+      ]
+    }
+  ]
 
   deletion_window_in_days = 7
 }
