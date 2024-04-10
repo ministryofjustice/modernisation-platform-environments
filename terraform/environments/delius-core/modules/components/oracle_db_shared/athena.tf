@@ -72,7 +72,7 @@ resource "aws_glue_catalog_table" "this" {
 
 resource "aws_athena_database" "example" {
   count  = var.audit_main_account ? 1 : 0
-  name   = "athena-audit-db-${var.env_name}"
+  name   = "athena_audit_db_${var.env_name}"
   bucket = module.s3_bucket_athena_output[0].bucket.bucket
 }
 
