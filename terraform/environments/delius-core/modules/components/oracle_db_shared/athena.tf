@@ -1,6 +1,6 @@
 resource "aws_glue_catalog_database" "this" {
   count = var.audit_main_account ? 1 : 0
-  name  = "audit-db-${var.env_name}"
+  name  = "glue-audit-db-${var.env_name}"
 }
 
 resource "aws_glue_catalog_table" "this" {
@@ -72,24 +72,24 @@ resource "aws_glue_catalog_table" "this" {
 
 resource "aws_athena_database" "example" {
   count  = var.audit_main_account ? 1 : 0
-  name   = "database_name"
+  name   = "athena-audit-db-${var.env_name}"
   bucket = module.s3_bucket_athena_output[0].bucket.bucket
 }
 
 
 resource "aws_athena_data_catalog" "example" {
-  count       = var.audit_main_account ? 1 : 0
-  name        = "athena-audit-data-catalog"
-  description = "Audit Athena data catalog"
+  for_each    = var.audit_main_account ? toset([for env in local.audit_envs[join("-", ["delius-core", var.account_info.mp_environment])] : env]) : toset([])
+  name        = "athena-audit-data-catalog-${each.value}"
+  description = "Audit data catalog for ${each.value}"
   type        = "GLUE"
 
   parameters = {
-    "catalog-id" = aws_glue_catalog_database.this[0].catalog_id
+    "catalog-id" = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
   }
 
 
   tags = {
-    Name = "athena-audit-data-catalog"
+    Name = "athena-audit-data-catalog-${each.value}"
   }
 }
 

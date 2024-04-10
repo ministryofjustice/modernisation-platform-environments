@@ -12,13 +12,8 @@ locals {
   oracle_duplicate_delius_source_account_id   = var.env_name == "test" ? var.platform_vars.environment_management.account_ids["delius-core-development"] : var.env_name == "prod" ? var.platform_vars.environment_management.account_ids["delius-core-preproduction"] : ""
   oracle_duplicate_delius_source_environment  = var.env_name == "test" ? "dev" : var.env_name == "prod" ? "preprod" : ""
 
-  audit_accounts = {
-    prod = [
-      "preprod",
-    ]
-    dev = [
-      "test",
-      "dev"
-    ]
+  audit_envs = {
+    "delius-core-development" = ["dev", "test"],
+    "delius-core-production"  = ["prod", "preprod"],
   }
 }
