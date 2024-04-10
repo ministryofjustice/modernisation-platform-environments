@@ -42,7 +42,7 @@ module "ingestion_quarantine_bucket_notification" {
 
   sns_notifications = {
     quarantine_sns = {
-      topic_arn = module.quarantine_sns.sns_topic_arn
+      topic_arn = module.quarantined_topic.sns_topic_arn
       events    = ["s3:ObjectCreated:*"]
     }
   }
