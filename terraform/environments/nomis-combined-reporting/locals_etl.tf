@@ -33,9 +33,7 @@ locals {
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     ebs_volumes = {
-      "/dev/sdb" = { type = "gp3", size = 100 }
-      "/dev/sdc" = { type = "gp3", size = 100 }
-      "/dev/sds" = { type = "gp3", size = 100 }
+      "/dev/sda1" = { type = "gp3", size = 128 } # root volume
     }
 
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
