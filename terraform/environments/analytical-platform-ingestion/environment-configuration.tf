@@ -15,7 +15,7 @@ locals {
       /* Image Versions */
       scan_image_version     = "0.0.4"
       transfer_image_version = "0.0.4"
-      notify_image_version   = "0.0.5"
+      notify_image_version   = "0.0.6"
 
       /* Target Buckets */
       target_buckets = ["dev-ingestion-testing"]
@@ -26,7 +26,7 @@ locals {
       transfer_server_sftp_users_with_egress = {
         "jacobwoffenden-egress" = {
           ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN+3qaLVtn6Pd+DasWHhIOBoXEEhF9GZAG+DYfJBeySS Ministry of Justice"
-          cidr_blocks           = ["90.246.52.170/32"]
+          cidr_blocks           = ["90.246.52.170/32", "81.145.185.153/32"]
           egress_bucket         = module.bold_egress_bucket.s3_bucket_id
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
@@ -46,7 +46,7 @@ locals {
       /* Image Versions */
       scan_image_version     = "0.0.4"
       transfer_image_version = "0.0.4"
-      notify_image_version   = "0.0.5"
+      notify_image_version   = "0.0.6"
 
       /* Target Buckets */
       target_buckets = []

@@ -260,10 +260,13 @@ module "notify_quarantined_lambda" {
   attach_network_policy  = true
 
   environment_variables = {
-    MODE                          = "quarantined"
-    GOVUK_NOTIFY_API_KEY_SECRET   = data.aws_secretsmanager_secret_version.govuk_notify_api_key.id
-    GOVUK_NOTIFY_TEMPLATES_SECRET = data.aws_secretsmanager_secret_version.govuk_notify_templates.id
-    SLACK_TOKEN                   = data.aws_secretsmanager_secret_version.slack_token.id
+    MODE = "quarantined"
+    # GOVUK_NOTIFY_API_KEY_SECRET   = data.aws_secretsmanager_secret_version.govuk_notify_api_key.id
+    # GOVUK_NOTIFY_TEMPLATES_SECRET = data.aws_secretsmanager_secret_version.govuk_notify_templates.id
+    # SLACK_TOKEN                   = data.aws_secretsmanager_secret_version.slack_token.id
+    GOVUK_NOTIFY_API_KEY_SECRET   = "ingestion/govuk-notify/api-key"   #TODO: un-hardcode
+    GOVUK_NOTIFY_TEMPLATES_SECRET = "ingestion/govuk-notify/templates" #TODO: un-hardcode
+    SLACK_TOKEN_SECRET            = "ingestion/slack-token"            #TODO: un-hardcode
   }
 
   # TODO: Check if KMS key is actually needed below
@@ -279,7 +282,12 @@ module "notify_quarantined_lambda" {
         "kms:DescribeKey",
         "kms:Decrypt"
       ]
-      resources = [module.quarantined_sns_kms.key_arn]
+      resources = [
+        module.quarantined_sns_kms.key_arn,
+        module.govuk_notify_kms.key_arn,
+        module.slack_token_kms.key_arn,
+        module.supplier_data_kms.key_arn
+      ]
     },
     secretsmanager_access = {
       sid       = "AllowSecretsManager"
