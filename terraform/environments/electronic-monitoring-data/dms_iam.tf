@@ -75,4 +75,9 @@ resource "aws_iam_role" "dms-glue-crawler-role" {
   assume_role_policy = data.aws_iam_policy_document.dms_glue_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 }
+
+resource "aws_iam_role_policy_attachment" "dms-glue-crawler-role" {
+  role       = aws_iam_role.dms-glue-crawler-role.name
+  policy_arn = aws_iam_policy.dms-s3-ep-role-policy.arn
+}
 # ==========================================================================
