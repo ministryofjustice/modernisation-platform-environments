@@ -192,3 +192,111 @@ resource "aws_ssm_document" "perform_healthcheck_s3" {
     }
   )
 }
+
+##########################################################################################################
+
+# Create Patch Group
+# Test Group
+
+resource "aws_ssm_patch_group" "win_patch_test_group" {
+  baseline_id = aws_ssm_patch_baseline.windows_os_apps_test_baseline.id
+  patch_group = dev_win_test_patch
+}
+
+# Create Windows Patch Baseline
+# Test Baseline
+
+resource "aws_ssm_patch_baseline" "windows_os_apps_test_baseline" {
+  name             = "WindowsOSAndMicrosoftApps"
+  description      = "Patch both Windows and Microsoft apps"
+  operating_system = "WINDOWS"
+  approved_patches = ["KB890830", "KB5034682", "KB5035857"]
+
+  approval_rule {
+    approve_after_days = 1
+
+    patch_filter {
+      key    = "PRODUCT"
+      values = ["WindowsServer2022"]
+    }
+    patch_filter {
+      key = "CLASSIFICATION"
+      #     values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"] - November 2023
+      values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups", "DefinitionUpdates"]
+    }
+    patch_filter {
+      key    = "MSRC_SEVERITY"
+      values = ["Critical", "Important", "Moderate", "Unspecified"]
+    }
+  }
+
+  approval_rule {
+    approve_after_days = 1
+    patch_filter {
+      key    = "PATCH_SET"
+      values = ["APPLICATION"]
+    }
+
+    # Filter on Microsoft product if necessary
+    patch_filter {
+      key    = "PRODUCT"
+      values = ["Office 2003", "Office 2007", "Office 2010", "Office 2013", "Office 2016", "Office 2019", "Office 2021", "Office 365"]
+    }
+  }
+}
+
+# Create Maintenance Test Window
+# Test - Every Weekday evening
+
+resource "aws_ssm_maintenance_window" "patch_maintenance_test_window" {
+  name              = "patch_maintenance_test_window"
+  schedule          = "cron(0 19 ? * MON-FRI *)"
+  duration          = 2
+  cutoff            = 1
+  schedule_timezone = "Europe/London"
+}
+
+resource "aws_ssm_maintenance_window_target" "patch_maintenance_window_test_target" {
+  window_id     = aws_ssm_maintenance_window.patch_maintenance_test_window.id
+  name          = "patch_maintenance_window_test_target"
+  description   = "This is the test patch maintenance window target"
+  resource_type = "INSTANCE"
+
+  targets {
+    key    = "tag:patch_group"
+    values = [aws_ssm_patch_group.dev_win_test_patch.patch_group]
+  }
+}
+
+# Create Maintenance Window Task
+# Test
+
+resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_test_task" {
+  window_id        = aws_ssm_maintenance_window.patch_maintenance_test_window.id
+  name             = "patch_maintenance_window_test_task"
+  description      = "Apply patch management"
+  task_type        = "RUN_COMMAND"
+  task_arn         = "AWS-RunPatchBaseline" # windows_os_apps_baseline
+  priority         = 10
+  service_role_arn = aws_iam_role.patching_role.arn
+  max_concurrency  = "15"
+  max_errors       = "2"
+
+  targets {
+    key    = "WindowTargetIds"
+    values = aws_ssm_maintenance_window_target.patch_maintenance_window_test_target.*.id
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      parameter {
+        name   = "Operation"
+        values = ["Install"]
+      }
+      parameter {
+        name   = "RebootOption"
+        values = ["RebootIfNeeded"]
+      }
+    }
+  }
+}
