@@ -24,6 +24,18 @@ resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
     }
   }
 }
+
+resource "aws_glue_catalog_database" "s3_parquet_glue_catalog_db" {
+  name = "s3_parquet_dms"
+  create_table_default_permission {
+    permissions = ["SELECT"]
+
+    principal {
+      data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+    }
+  }
+}
+
 resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
   name          = "rds-sqlserver-${aws_db_instance.database_2022.identifier}-tf"
   role          = aws_iam_role.dms-glue-crawler-role.arn
@@ -42,7 +54,17 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
     }
   )
 
-  provisioner "local-exec" {
-    command = "aws glue start-crawler --name ${self.name}"
+  # provisioner "local-exec" {
+  #   command = "aws glue start-crawler --name ${self.name}"
+  # }
+}
+
+resource "aws_glue_crawler" "example" {
+  database_name = aws_glue_catalog_database.s3_parquet_glue_catalog_db.name
+  name          = "s3-parquet-dms-tf"
+  role          = aws_iam_role.dms-glue-crawler-role.arn
+
+  s3_target {
+    path = "s3://${aws_s3_bucket.dms_target_ep_s3_bucket.bucket}"
   }
 }
