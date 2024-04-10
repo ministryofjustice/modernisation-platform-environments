@@ -43,7 +43,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     # Filter on Microsoft product if necessary
     patch_filter {
       key    = "PRODUCT"
-      values = ["Office 2003", "Office 2007", "Office 2010", "Office 2013", "Office 2016", "Office 2019", "Office 2021", "Office 365"]
+      values = ["Office 2003", "Office 2007", "Office 2010", "Office 2013", "Office 2016"]
    }
   }
 }
