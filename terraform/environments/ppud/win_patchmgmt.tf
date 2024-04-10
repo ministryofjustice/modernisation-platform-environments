@@ -200,7 +200,7 @@ resource "aws_ssm_document" "perform_healthcheck_s3" {
 
 resource "aws_ssm_patch_group" "win_patch_test_group" {
   baseline_id = aws_ssm_patch_baseline.windows_os_apps_test_baseline.id
-  patch_group = dev_win_test_patch
+  patch_group = win_patch_test_group
 }
 
 # Create Windows Patch Baseline
@@ -264,7 +264,7 @@ resource "aws_ssm_maintenance_window_target" "patch_maintenance_window_test_targ
 
   targets {
     key    = "tag:patch_group"
-    values = [aws_ssm_patch_group.dev_win_test_patch.patch_group]
+    values = [aws_ssm_patch_group.win_patch_test_group.patch_group]
   }
 }
 
