@@ -15,8 +15,13 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   operating_system = "WINDOWS"
   approved_patches = ["KB890830", "KB5034682", "KB5035857"]
 
+ global_filter {
+  key    = "PRODUCT"
+  values = ["Microsoft SQL Server 2008","Microsoft SQL Server 2012", "Microsoft SQL Server 2016", "Visual Studio 2010", "Visual Studio 2012", "Visual Studio 2013", "Visual Studio 2015", "Visual Studio 2015 Update 3", "isual Studio 2017", "Visual Studio 2019", "Visual Studio 2022"]
+ }
+
   approval_rule {
-    approve_after_days = 5
+    approve_after_days = 2
 
     patch_filter {
       key    = "PRODUCT"
@@ -34,7 +39,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   }
 
   approval_rule {
-    approve_after_days = 5
+    approve_after_days = 2
     patch_filter {
       key    = "PATCH_SET"
       values = ["APPLICATION"]
@@ -43,7 +48,8 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     # Filter on Microsoft product if necessary
     patch_filter {
       key    = "PRODUCT"
-      values = ["Office 2003", "Office 2007", "Office 2010", "Office 2013", "Office 2016"]
+      values = ["*"]
+    # values = ["Office 2003", "Microsoft 365 Apps/Office 2019/Office LTSC"]
    }
   }
 }
