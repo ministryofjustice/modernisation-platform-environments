@@ -35,8 +35,6 @@ module "managed_grafana" {
       "group_ids" = [for team in data.aws_identitystore_group.all_identity_centre_teams : team.id]
     }
   }
-
-  tags = local.tags
 }
 
 /* Slack Contact Points */
