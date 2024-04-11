@@ -15,11 +15,6 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   operating_system = "WINDOWS"
   approved_patches = ["KB890830", "KB5034682", "KB5035857"]
 
- global_filter {
-  key    = "PRODUCT"
-  values = ["Microsoft SQL Server 2008","Microsoft SQL Server 2012", "Microsoft SQL Server 2016", "Visual Studio 2010", "Visual Studio 2012", "Visual Studio 2013", "Visual Studio 2015", "Visual Studio 2015 Update 3", "isual Studio 2017", "Visual Studio 2019", "Visual Studio 2022"]
- }
-
   approval_rule {
     approve_after_days = 2
 
