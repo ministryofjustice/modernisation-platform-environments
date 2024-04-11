@@ -92,6 +92,7 @@ resource "aws_transfer_ssh_key" "this" {
 }
 
 resource "aws_security_group_rule" "this" {
+  description       = var.name
   type              = "ingress"
   from_port         = 2222
   to_port           = 2222

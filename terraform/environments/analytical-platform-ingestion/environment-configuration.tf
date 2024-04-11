@@ -21,8 +21,13 @@ locals {
       target_buckets = ["dev-ingestion-testing"]
 
       /* Transfer Server */
-      transfer_server_hostname   = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
-      transfer_server_sftp_users = {}
+      transfer_server_hostname = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
+      transfer_server_sftp_users = {
+        "garyhanderson" = {
+          ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID2lrI7AhZ9Sy/JAVDfPPEkCZawuuVJ7MHg6NNAwYImb garyconorhenderson@gmail.com"
+          cidr_blocks = ["88.97.238.146/32"]
+        }
+      }
       transfer_server_sftp_users_with_egress = {
         "jacobwoffenden-egress" = {
           ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN+3qaLVtn6Pd+DasWHhIOBoXEEhF9GZAG+DYfJBeySS Ministry of Justice"
