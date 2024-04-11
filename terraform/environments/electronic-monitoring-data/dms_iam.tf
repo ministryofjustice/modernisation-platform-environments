@@ -93,7 +93,7 @@ resource "aws_iam_role_policy_attachment" "dms-glue-crawler-role" {
 }
 # ==========================================================================
 
-# │ Error: creating DMS Replication Subnet Group (rds-replication-subnet-group-tf): AccessDeniedFault: The IAM Role arn:aws:iam::976799291502:role/dms-vpc-role is not configured properly.
+# │ Error: creating DMS Replication Subnet Group (rds-replication-subnet-group-tf): AccessDeniedFault: The IAM Role arn:aws:iam::############:role/dms-vpc-role is not configured properly.
 resource "aws_iam_role" "dms-vpc-role-v2" {
   name               = "dms-vpc-role"
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
