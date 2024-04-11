@@ -58,6 +58,25 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
+data "aws_iam_policy_document" "dms_policies" {
+  statement {
+    effect = "Allow"
+    actions = ["dms:CreateReplicationSubnetGroup"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "dms_policies" {
+  name        = "dms-policies"
+  description = "Number of DMS policies needed to apply"
+  policy      = data.aws_iam_policy_document.dms_policies.json
+}
+
+resource "aws_iam_role_policy_attachment" "attach_dms_policies" {
+  role = aws_iam_role.dms-vpc-role.name
+  policy_arn = aws_iam_policy.dms_policies.arn
+}
+
 # ==========================================================================
 
 resource "aws_iam_role" "dms-cloudwatch-logs-role" {
