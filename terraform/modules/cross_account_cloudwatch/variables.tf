@@ -16,10 +16,6 @@ variable "options" {
     enable_cloudwatch_cross_account_sharing = optional(bool, false)
   })
 }
-variable "monitoring_account_sink_identifier" {
-  type    = string
-  default = ""
-}
 
 variable "monitoring_account_id" {
   type    = string
