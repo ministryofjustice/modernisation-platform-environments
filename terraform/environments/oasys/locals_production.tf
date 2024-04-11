@@ -350,6 +350,10 @@ locals {
             "Ec2ProdWebPolicy",
           ])
         })
+        autoscaling_group = merge(local.webserver_a.autoscaling_group, {
+          desired_capacity    = 4
+          max_size            = 4
+        })
         tags = merge(local.webserver_a.tags, {
           oracle-db-sid                           = "OASPROD" # "PDOASYS"
           oracle-db-hostname                      = "db.oasys.hmpps-production.modernisation-platform.internal"
