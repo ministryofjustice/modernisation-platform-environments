@@ -51,9 +51,6 @@ locals {
       "10.40.40.0/24", # pp oasys
       "10.40.37.0/24", # pp prison nomis
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
-      module.ip_addresses.moj_cidr.aws_data_engineering_dev,
-      module.ip_addresses.moj_cidr.aws_data_engineering_prod,
-      module.ip_addresses.moj_cidr.aws_data_engineering_stage,
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -100,9 +97,10 @@ locals {
       "10.40.3.0/24", # prod prison nomis
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
       module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
       module.ip_addresses.azure_studio_hosting_cidrs.prod,
-      module.ip_addresses.azure_nomisapi_cidrs.prod,
+      module.ip_addresses.moj_cidr.aws_data_engineering_dev,
+      module.ip_addresses.moj_cidr.aws_data_engineering_prod,
+      module.ip_addresses.moj_cidr.aws_data_engineering_stage,
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
