@@ -58,14 +58,6 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
-data "aws_iam_policy_document" "dms_policies" {
-  statement {
-    effect = "Allow"
-    actions = ["dms:CreateReplicationSubnetGroup"]
-    resources = ["*"]
-  }
-}
-
 resource "aws_iam_policy" "dms_policies" {
   name        = "dms-policies"
   description = "Number of DMS policies needed to apply"

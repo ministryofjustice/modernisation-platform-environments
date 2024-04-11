@@ -40,3 +40,12 @@ data "aws_iam_policy_document" "dms_target_ep_s3_bucket" {
     }
   }
 }
+
+
+data "aws_iam_policy_document" "dms_policies" {
+  statement {
+    effect = "Allow"
+    actions = ["dms:CreateReplicationSubnetGroup"]
+    resources = ["*"]
+  }
+}
