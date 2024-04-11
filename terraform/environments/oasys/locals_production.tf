@@ -421,7 +421,7 @@ locals {
     baseline_lbs = {
       public = {
         internal_lb              = false
-        access_logs              = false
+        access_logs              = true
         s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
