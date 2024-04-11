@@ -699,7 +699,7 @@ locals {
         ]
         records = [
           { name = "db.onr",       type = "CNAME", ttl = "300", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db",           type = "CNAME", ttl = "300", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db",           type = "A",     ttl = "60",  records = ["10.40.6.133"] }, # type = "CNAME", ttl = "300", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db-b",         type = "CNAME", ttl = "300", records = ["pd-oasys-db-b.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.pp.onr",    type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
              
