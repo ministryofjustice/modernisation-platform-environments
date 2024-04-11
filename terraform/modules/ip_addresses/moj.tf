@@ -37,6 +37,9 @@ locals {
     # for connectivity from other platforms
     aws_cloud_platform_vpc            = "172.20.0.0/16"
     aws_analytical_platform_aggregate = "10.200.0.0/15"
+    aws_data_engineering_dev          = "172.24.0.0/16"
+    aws_data_engineering_prod         = "172.25.0.0/16"
+    aws_data_engineering_stage        = "172.26.0.0/16"
   }
 
   moj_cidrs = {
