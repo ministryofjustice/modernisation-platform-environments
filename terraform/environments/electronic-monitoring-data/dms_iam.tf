@@ -58,16 +58,16 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
-resource "aws_iam_policy" "dms_policies" {
-  name        = "dms-policies"
-  description = "Number of DMS policies needed to apply"
-  policy      = data.aws_iam_policy_document.dms_policies.json
-}
+# resource "aws_iam_policy" "dms_policies" {
+#   name        = "dms-policies"
+#   description = "Number of DMS policies needed to apply"
+#   policy      = data.aws_iam_policy_document.dms_policies.json
+# }
 
-resource "aws_iam_role_policy_attachment" "attach_dms_policies" {
-  role = aws_iam_role.dms-vpc-role.name
-  policy_arn = aws_iam_policy.dms_policies.arn
-}
+# resource "aws_iam_role_policy_attachment" "attach_dms_policies" {
+#   role       = aws_iam_role.dms-vpc-role.name
+#   policy_arn = aws_iam_policy.dms_policies.arn
+# }
 
 # ==========================================================================
 
@@ -82,13 +82,25 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
 }
 
 resource "aws_iam_role" "dms-glue-crawler-role" {
-  name               = "dms-glue-crawler-role-tf"
-  assume_role_policy = data.aws_iam_policy_document.dms_glue_assume_role.json
+  name                = "dms-glue-crawler-role-tf"
+  assume_role_policy  = data.aws_iam_policy_document.dms_glue_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 }
 
 resource "aws_iam_role_policy_attachment" "dms-glue-crawler-role" {
   role       = aws_iam_role.dms-glue-crawler-role.name
   policy_arn = aws_iam_policy.dms-s3-ep-role-policy.arn
+}
+# ==========================================================================
+
+# │ Error: creating DMS Replication Subnet Group (rds-replication-subnet-group-tf): AccessDeniedFault: The IAM Role arn:aws:iam::976799291502:role/dms-vpc-role is not configured properly.
+resource "aws_iam_role" "dms-vpc-role-v2" {
+  name               = "dms-vpc-role"
+  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "dms-vpc-role-v2-AmazonDMSVPCManagementRole" {
+  role       = aws_iam_role.dms-vpc-role-v2.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 # ==========================================================================

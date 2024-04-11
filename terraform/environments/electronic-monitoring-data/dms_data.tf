@@ -3,7 +3,7 @@ data "aws_iam_policy_document" "dms_assume_role" {
     actions = ["sts:AssumeRole"]
 
     principals {
-      identifiers = ["dms.amazonaws.com"]
+      identifiers = ["dms.eu-west-2.amazonaws.com"]
       type        = "Service"
     }
   }
@@ -42,10 +42,10 @@ data "aws_iam_policy_document" "dms_target_ep_s3_bucket" {
 }
 
 
-data "aws_iam_policy_document" "dms_policies" {
-  statement {
-    effect = "Allow"
-    actions = ["dms:CreateReplicationSubnetGroup"]
-    resources = ["*"]
-  }
-}
+# data "aws_iam_policy_document" "dms_policies" {
+#   statement {
+#     effect    = "Allow"
+#     actions   = ["dms:CreateReplicationSubnetGroup"]
+#     resources = ["*"]
+#   }
+# }
