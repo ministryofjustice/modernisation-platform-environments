@@ -40,6 +40,8 @@ module "ingestion_quarantine_bucket_notification" {
 
   bucket = module.quarantine_bucket.s3_bucket_id
 
+  create_sns_policy = false
+
   sns_notifications = {
     quarantine_sns = {
       topic_arn = module.quarantined_topic.topic_arn
