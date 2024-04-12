@@ -91,7 +91,7 @@ function MonitorAndSyncToS3 {
     $action = {
         param($source, $event)
         $filePath = $event.FullPath
-        $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', ''
+        $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
         "A file was created at $filePath. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
         aws s3 cp $filePath "s3://tribunals-ebs-backup/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     }
