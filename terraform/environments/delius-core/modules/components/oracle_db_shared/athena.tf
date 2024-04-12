@@ -69,6 +69,24 @@ resource "aws_glue_catalog_table" "this" {
   }
 }
 
+resource "aws_athena_workgroup" "example" {
+  name = "audit-workgroup"
+
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.s3_bucket_athena_output.bucket.bucket}/"
+
+      encryption_configuration {
+        encryption_option = "SSE_KMS"
+        kms_key_arn       = var.account_config.kms_keys.general_shared
+      }
+    }
+  }
+}
+
 # resource "aws_athena_database" "example" {
 #   name   = "athena_audit_db_${var.env_name}"
 #   bucket = module.s3_bucket_athena_output.bucket.bucket
