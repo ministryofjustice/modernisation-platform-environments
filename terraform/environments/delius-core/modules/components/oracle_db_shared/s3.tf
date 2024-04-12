@@ -291,7 +291,7 @@ module "s3_bucket_oracledb_audit" {
       actions = ["s3:*"]
       principals = {
         type        = "AWS"
-        identifiers = [for index, value in lookup(local.audit_share_map, var.env_name, []) : "arn:aws:iam::${var.platform_vars.environment_management.account_ids[value.account]}:root"]
+        identifiers = ["arn:aws:iam::${var.platform_vars.environment_management.account_ids[local.audit_env_account_map[var.account_info.mp_environment]]}:root"]
       }
     }
   ]
