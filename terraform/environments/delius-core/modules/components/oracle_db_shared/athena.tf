@@ -4,10 +4,9 @@ resource "aws_glue_catalog_database" "this" {
 
 resource "aws_glue_catalog_table" "this" {
   #   for_each = var.audit_main_account ? toset([for account in local.audit_accounts[var.env_name] : account]) : ([])
-  for_each = var.audit_main_account ? toset([for env in local.audit_envs[join("-", ["delius-core", var.account_info.mp_environment])] : env]) : toset([])
-
+  # for_each = var.audit_main_account ? toset([for env in local.audit_envs[join("-", ["delius-core", var.account_info.mp_environment])] : env]) : toset([])
   database_name = aws_glue_catalog_database.this.name
-  name          = "audit-table-${each.value}"
+  name          = "audit-table-${var.env_name}"
   description   = "table containing the audit data stored in S3"
 
   table_type = "EXTERNAL_TABLE"
@@ -17,7 +16,7 @@ resource "aws_glue_catalog_table" "this" {
   }
 
   storage_descriptor {
-    location      = "s3://${each.value}-oracle-database-audit/"
+    location      = "s3://${var.env_name}-oracle-database-audit/"
     input_format  = "org.apache.hadoop.mapred.TextInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat"
 
@@ -76,18 +75,19 @@ resource "aws_athena_database" "example" {
 }
 
 resource "aws_athena_data_catalog" "this" {
-  for_each    = var.audit_main_account ? toset([for env in local.audit_envs[join("-", ["delius-core", var.account_info.mp_environment])] : env]) : toset([])
-  name        = "athena-audit-data-catalog-${each.value}"
-  description = "Audit data catalog for ${each.value}"
+  # for_each    = var.audit_main_account ? toset([for env in local.audit_envs[join("-", ["delius-core", var.account_info.mp_environment])] : env]) : toset([])
+  name        = "athena-audit-data-catalog-${var.env_name}"
+  description = "Audit data catalog for ${var.env_name}"
   type        = "GLUE"
 
   parameters = {
-    "catalog-id" = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
+    # "catalog-id" = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
+    "catalog-id" = aws_glue_catalog_database.this.id
   }
 
 
   tags = {
-    Name = "athena-audit-data-catalog-${each.value}"
+    Name = "athena-audit-data-catalog-${var.env_name}"
   }
 }
 
