@@ -53,6 +53,6 @@ resource "aws_glue_trigger" "rds-sqlserver-db-crawler-glue_trigger" {
   type = "ON_DEMAND"
 
   actions {
-    job_name = aws_glue_crawler.rds-sqlserver-db-glue-crawler.name
+    crawler_name = aws_glue_crawler.rds-sqlserver-db-glue-crawler.name
   }
 }
