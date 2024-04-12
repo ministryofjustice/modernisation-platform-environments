@@ -69,10 +69,10 @@ resource "aws_glue_catalog_table" "this" {
   }
 }
 
-resource "aws_athena_database" "example" {
-  name   = "athena_audit_db_${var.env_name}"
-  bucket = module.s3_bucket_athena_output.bucket.bucket
-}
+# resource "aws_athena_database" "example" {
+#   name   = "athena_audit_db_${var.env_name}"
+#   bucket = module.s3_bucket_athena_output.bucket.bucket
+# }
 
 resource "aws_athena_data_catalog" "this" {
   for_each    = { for index, value in lookup(local.audit_share_map, var.env_name, []) : index => value }
