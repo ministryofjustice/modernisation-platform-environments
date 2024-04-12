@@ -285,6 +285,17 @@ module "s3_bucket_oracledb_audit" {
     aws.bucket-replication = aws.bucket-replication
   }
 
+  bucket_policy_v2 = [
+    {
+      effect  = "Allow"
+      actions = ["s3:*"]
+      principals = {
+        type        = "AWS"
+        identifiers = [for index, value in lookup(local.audit_share_map, var.env_name, []) : "arn:aws:iam::${var.platform_vars.environment_management.account_ids[value.account]}:root"]
+      }
+    }
+  ]
+
   lifecycle_rule = [
     {
       id      = "main"
