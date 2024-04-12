@@ -76,7 +76,7 @@ resource "aws_athena_database" "example" {
 
 resource "aws_athena_data_catalog" "this" {
   for_each    = { for index, value in lookup(local.audit_share_map, var.env_name, []) : index => value }
-  name        = "athena-audit-data-catalog-${each.value.env}"
+  name        = "athena-audit-dc-${each.value.env}"
   description = "Audit data catalog for ${each.value.env}"
   type        = "GLUE"
 
