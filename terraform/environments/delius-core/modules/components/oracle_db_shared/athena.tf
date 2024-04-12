@@ -75,19 +75,19 @@ resource "aws_athena_database" "example" {
 }
 
 resource "aws_athena_data_catalog" "this" {
-  # for_each    = var.audit_main_account ? toset([for env in local.audit_envs[join("-", ["delius-core", var.account_info.mp_environment])] : env]) : toset([])
-  name        = "athena-audit-data-catalog-${var.env_name}"
-  description = "Audit data catalog for ${var.env_name}"
+  for_each    = { for index, value in lookup(local.audit_share_map, var.env_name, []) : index => value }
+  name        = "athena-audit-data-catalog-${each.value.env}"
+  description = "Audit data catalog for ${each.value.env}"
   type        = "GLUE"
 
   parameters = {
-    # "catalog-id" = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
-    "catalog-id" = var.account_info.id
+    "catalog-id" = var.platform_vars.environment_management.account_ids[each.value.account]
+    # "catalog-id" = var.account_info.id
   }
 
 
   tags = {
-    Name = "athena-audit-data-catalog-${var.env_name}"
+    Name = "athena-audit-data-catalog-${each.value.env}"
   }
 }
 

@@ -11,4 +11,9 @@ locals {
   oracle_duplicate_delius_target_environment  = var.env_name == "dev" ? "test" : var.env_name == "preprod" ? "prod" : var.env_name == "stage" ? "preprod" : ""
   oracle_duplicate_delius_source_account_id   = var.env_name == "test" ? var.platform_vars.environment_management.account_ids["delius-core-development"] : var.env_name == "prod" ? var.platform_vars.environment_management.account_ids["delius-core-preproduction"] : ""
   oracle_duplicate_delius_source_environment  = var.env_name == "test" ? "dev" : var.env_name == "prod" ? "preprod" : ""
+
+  audit_share_map = {
+    test = [{ env = "test", account = "delius-core-test" }, { env = "dev", account = "delius-core-development" }],
+    prod = [{ env = "preprod", account = "delius-core-preproduction" }, { env = "prod", account = "delius-core-production" }],
+  }
 }
