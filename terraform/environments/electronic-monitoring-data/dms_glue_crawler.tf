@@ -47,3 +47,12 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
   #   command = "aws glue start-crawler --name ${self.name}"
   # }
 }
+
+resource "aws_glue_trigger" "rds-sqlserver-db-crawler-glue_trigger" {
+  name = "rds-sqlserver-db-crawler-glue_trigger"
+  type = "ON_DEMAND"
+
+  actions {
+    crawler_name = aws_glue_crawler.rds-sqlserver-db-glue-crawler.name
+  }
+}

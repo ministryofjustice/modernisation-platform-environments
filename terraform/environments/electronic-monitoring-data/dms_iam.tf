@@ -46,31 +46,6 @@ resource "aws_iam_role_policy_attachment" "dms-endpoint-role" {
 
 # ==========================================================================
 
-# Create DMS VPC EC2 Role
-resource "aws_iam_role" "dms-vpc-role" {
-  name               = "dms-vpc-mng-role-tf"
-  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
-}
-
-# Attach IAM Policy to the predefined DMS VPC EC2 Role
-resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
-  role       = aws_iam_role.dms-vpc-role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
-}
-
-# resource "aws_iam_policy" "dms_policies" {
-#   name        = "dms-policies"
-#   description = "Number of DMS policies needed to apply"
-#   policy      = data.aws_iam_policy_document.dms_policies.json
-# }
-
-# resource "aws_iam_role_policy_attachment" "attach_dms_policies" {
-#   role       = aws_iam_role.dms-vpc-role.name
-#   policy_arn = aws_iam_policy.dms_policies.arn
-# }
-
-# ==========================================================================
-
 resource "aws_iam_role" "dms-cloudwatch-logs-role" {
   name               = "dms-cloudwatch-logs-role-tf"
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
@@ -80,6 +55,8 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
   role       = aws_iam_role.dms-cloudwatch-logs-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
 }
+
+# ==========================================================================
 
 resource "aws_iam_role" "dms-glue-crawler-role" {
   name                = "dms-glue-crawler-role-tf"

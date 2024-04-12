@@ -14,12 +14,6 @@ variable "rds_db_security_group_id" {
   type        = string
 }
 
-variable "rds_db_instance" {
-  description = "Name of the RDS Database Instance"
-  type        = string
-  default     = "database_2022"
-}
-
 variable "rds_db_instance_pasword" {
   description = "Password for the RDS Database Instance"
   type        = string
