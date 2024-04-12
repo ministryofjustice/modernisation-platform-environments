@@ -73,7 +73,7 @@ locals {
     gdpr_api = {
       image_tag                   = "REPLACE"
       container_port              = 8080
-      create_rds                  = true
+      create_rds                  = false
       rds_engine                  = "postgres"
       rds_engine_version          = "15"
       rds_instance_class          = "db.t3.small"

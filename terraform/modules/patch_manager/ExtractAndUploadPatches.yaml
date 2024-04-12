@@ -19,7 +19,7 @@ mainSteps:
           $PatchResultsTemp = "$WorkingDir\patchresults.txt"
           $PatchesYaml="$WorkingDir\${OS}Patches.yaml"
           $SSMLogsPath = "C:\ProgramData\Amazon\SSM\InstanceData\${InstanceId}\document\orchestration"
-          $PatchesBucket = "s3://hmpps-domain-services-development-patch-logs"
+          $PatchesBucket = "s3://hmpps-domain-services-development-windows-patches"
 
           New-Item -ItemType Directory -Force -Path $WorkingDir > $null
 
@@ -57,7 +57,7 @@ mainSteps:
           }
           
           # Upload patch yaml to bucket
-          aws s3 cp $PatchesYaml  "$PatchesBucket/windows/${OS}Patches.yaml"
+          aws s3 cp $PatchesYaml  "$PatchesBucket/${OS}Patches.yaml"
   -
     action: "aws:runShellScript"
     name: "ExtractAndUploadLinuxPatches"
@@ -73,7 +73,7 @@ mainSteps:
           OS=$(hostnamectl | grep "Operating System:"|cut -d':' -f2- |tr -dc '[:alnum:]' )
           PatchStatesYAMLPath="/tmp/$OS.yaml"
           PatchStatesJSONPath="/var/log/amazon/ssm/patch-configuration/patch-states-configuration.json"
-          PatchBucket="s3://hmpps-domain-services-development-redhat-enterprise-linux"
+          PatchBucket="s3://hmpps-domain-services-development-redhat-patches"
 
           # Install jq if not available
           rpm -qa | grep -qw jq || sudo yum install -y  jq

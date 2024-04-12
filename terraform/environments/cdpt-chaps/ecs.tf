@@ -208,7 +208,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
-    version = "$Latest"
+    version = aws_launch_template.ec2-launch-template.latest_version
   }
 
   tag {
@@ -284,7 +284,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = "required"
+    http_tokens   = "required" 
   }
 
   iam_instance_profile {

@@ -34,6 +34,8 @@ module "gdpr_ui_service" {
   health_check_path       = "/gdpr/ui/homepage"
   account_info            = var.account_info
 
+  ignore_changes_service_task_definition = true
+
   providers = {
     aws          = aws
     aws.core-vpc = aws.core-vpc

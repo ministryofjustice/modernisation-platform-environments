@@ -16,7 +16,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   approved_patches = ["KB890830", "KB5034682", "KB5035857"]
 
   approval_rule {
-    approve_after_days = 5
+    approve_after_days = 2
 
     patch_filter {
       key    = "PRODUCT"
@@ -34,7 +34,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   }
 
   approval_rule {
-    approve_after_days = 5
+    approve_after_days = 2
     patch_filter {
       key    = "PATCH_SET"
       values = ["APPLICATION"]
@@ -43,8 +43,9 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     # Filter on Microsoft product if necessary
     patch_filter {
       key    = "PRODUCT"
-      values = ["Office 2003", "Office 2007", "Office 2010", "Office 2013", "Office 2016", "Office 2019", "Office 2021", "Office 365"]
-    }
+      values = ["*"]
+    # values = ["Office 2003", "Microsoft 365 Apps/Office 2019/Office LTSC"]
+   }
   }
 }
 
@@ -192,3 +193,4 @@ resource "aws_ssm_document" "perform_healthcheck_s3" {
     }
   )
 }
+

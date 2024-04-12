@@ -69,6 +69,8 @@ module "gdpr_api_service" {
   container_vars_env_specific = try(var.delius_microservice_configs.gdpr_api.container_vars_env_specific, {})
 
 
+  ignore_changes_service_task_definition = true
+
   providers = {
     aws          = aws
     aws.core-vpc = aws.core-vpc

@@ -455,7 +455,7 @@ variable "deployment_maximum_percent" {
   default     = 100
 }
 
-variable "ignore_changes_task_definition" {
+variable "ignore_changes_service_task_definition" {
   description = "Ignore changes to the task definition"
   type        = bool
   default     = true
