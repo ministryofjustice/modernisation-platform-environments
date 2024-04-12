@@ -6,7 +6,7 @@ resource "aws_backup_vault" "portal" {
   )
 }
 
-data "aws_iam_policy_document" "example" {
+data "aws_iam_policy_document" "portal" {
   statement {
     effect = "Allow"
 
