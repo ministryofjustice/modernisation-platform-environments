@@ -82,7 +82,7 @@ resource "aws_athena_data_catalog" "this" {
 
   parameters = {
     # "catalog-id" = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
-    "catalog-id" = aws_glue_catalog_database.this.id
+    "catalog-id" = var.account_info.id
   }
 
 
