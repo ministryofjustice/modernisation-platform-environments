@@ -699,10 +699,10 @@ locals {
         ]
         records = [
           { name = "db.onr",       type = "CNAME", ttl = "300", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db",           type = "A",     ttl = "60",  records = ["10.40.6.133"] }, # type = "CNAME", ttl = "300", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db",           type = "CNAME", ttl = "300", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db-b",         type = "CNAME", ttl = "300", records = ["pd-oasys-db-b.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          
           { name = "db.pp.onr",    type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-             
           { name = "pp",           type = "CNAME", ttl = "300", records = ["public-lb-2107358561.eu-west-2.elb.amazonaws.com"] },
           { name = "db.pp",        type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "pp-a",         type = "CNAME", ttl = "300", records = ["public-lb-2107358561.eu-west-2.elb.amazonaws.com"] },
@@ -744,8 +744,8 @@ locals {
           # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # for aws
           { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.${local.application_name}",     type = "A",     ttl = "60",   records = ["10.40.6.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-          { name = "db.onr",                           type = "A",     ttl = "60",   records = ["10.40.6.134"] }, # "pd-onr-db-a.oasys.hmpps-production.modernisation-platform.internal"] },
+          { name = "db.${local.application_name}",     type = "CNAME", ttl = "300",  records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # db.oasys.hmpps-production.modernisation-platform.internal
+          { name = "db.onr",                           type = "CNAME", ttl = "300",  records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.internal"] },   # db.onr.hmpps-production.modernisation-platform.internal
         ]
       }
     }
