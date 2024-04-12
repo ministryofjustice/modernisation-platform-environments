@@ -1,6 +1,6 @@
 resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
   connection_properties = {
-    JDBC_CONNECTION_URL = "jdbc:sqlserver://${aws_db_instance.database_2022.endpoint}:${aws_db_instance.database_2022.port}"
+    JDBC_CONNECTION_URL = "jdbc:sqlserver://${aws_db_instance.database_2022.endpoint}"
     PASSWORD            = aws_secretsmanager_secret_version.db_password.secret_string
     USERNAME            = "admin"
   }
@@ -16,13 +16,13 @@ resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
 
 resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
   name = "rds_sqlserver_dms"
-  create_table_default_permission {
-    permissions = ["SELECT"]
+  # create_table_default_permission {
+  #   permissions = ["SELECT"]
 
-    principal {
-      data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
-    }
-  }
+  #   principal {
+  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+  #   }
+  # }
 }
 
 resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
@@ -49,7 +49,7 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
 }
 
 resource "aws_glue_trigger" "rds-sqlserver-db-crawler-glue_trigger" {
-  name = "rds-sqlserver-db-crawler-glue_trigger"
+  name = "rds-sqlserver-db-crawler-trigger-tf"
   type = "ON_DEMAND"
 
   actions {
