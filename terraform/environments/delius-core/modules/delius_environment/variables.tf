@@ -84,3 +84,9 @@ variable "pagerduty_integration_key" {
   type        = string
   default     = null
 }
+
+variable "ignore_changes_service_task_definition" {
+  description = "Ignore changes to the task definition"
+  type        = bool
+  default     = true
+}
