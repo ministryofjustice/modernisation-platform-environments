@@ -9,8 +9,8 @@ resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
 
   physical_connection_requirements {
     security_group_id_list = [aws_security_group.db.id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    subnet_id              = data.aws_subnet.private_subnets_b.id
+    availability_zone      = data.aws_subnet.private_subnets_b.availability_zone
   }
 }
 
