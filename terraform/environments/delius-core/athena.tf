@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "glue-cross-account-policy" {
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*"
     ]
     principals {
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[local.audit_share_map[local.environment]]}.:root"]
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[local.audit_share_map[local.environment]]}:root"]
       type        = "AWS"
     }
   }
