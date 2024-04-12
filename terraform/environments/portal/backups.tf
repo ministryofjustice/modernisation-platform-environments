@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "portal" {
 
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = ["arn:aws:iam::${local.modernisation_platform_account_id}:root"]
     }
 
     actions = [
