@@ -86,13 +86,14 @@ function MonitorAndSyncToS3 {
     $watcher.Path = "D:\storage\tribunals\"
     $watcher.IncludeSubdirectories = $true
     $watcher.EnableRaisingEvents = $true
-
+    
     # Define the action to take when a file is created
     $action = {
         param($source, $event)
         $filePath = $event.FullPath
-        "A file was created at $filePath. Syncing to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-        aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+        $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', ''
+        "A file was created at $filePath. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+        aws s3 cp $filePath "s3://tribunals-ebs-backup/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     }
 
     # Register the event
@@ -104,7 +105,14 @@ function MonitorAndSyncToS3 {
     }
 }
 
+function InitialSyncToS3 {
+    "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+}
+
 # Call the function
+InitialSyncToS3
 MonitorAndSyncToS3
 '@
 
@@ -115,9 +123,8 @@ $scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
 
 $Action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-ExecutionPolicy Bypass -File "C:\MonitorAndSyncToS3.ps1"'
 
-$RepetitionDuration = New-TimeSpan -Days (10 * 365)
-$Trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 10) -RepetitionDuration $RepetitionDuration
+$Trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddMinutes(5))
 
-Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName "MonitorAndSyncToS3" -Description "Sync to S3 every 10 minutes" -RunLevel Highest -User "SYSTEM" -Force
+Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName "MonitorAndSyncToS3" -Description "Monitor EBS Volume and copy newly added files to S3" -RunLevel Highest -User "SYSTEM" -Force
 
 </powershell>
