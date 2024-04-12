@@ -91,6 +91,7 @@ resource "aws_athena_data_catalog" "this" {
   }
 }
 
+
 module "s3_bucket_athena_output" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
   bucket_name         = "delius-core-${var.env_name}-athena-output"

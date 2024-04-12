@@ -19,4 +19,12 @@ locals {
   }
 
   ordered_subnet_ids = [data.aws_subnets.shared-private-a.ids[0], data.aws_subnets.shared-private-b.ids[0], data.aws_subnets.shared-private-c.ids[0]]
+
+  audit_share_map = {
+    development   = "delius-core-development"
+    test          = "delius-core-development"
+    stage         = "delius-core-production"
+    preproduction = "delius-core-production"
+    production    = "delius-core-production"
+  }
 }
