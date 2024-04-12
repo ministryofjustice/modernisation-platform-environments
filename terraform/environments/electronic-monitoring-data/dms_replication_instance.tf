@@ -49,6 +49,6 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
   depends_on = [
     aws_iam_role_policy_attachment.dms-endpoint-role,
     aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole,
-    aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
+    aws_iam_role_policy_attachment.dms-vpc-role-v2-AmazonDMSVPCManagementRole
   ]
 }
