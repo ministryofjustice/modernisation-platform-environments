@@ -87,6 +87,7 @@ locals {
     lb_target_groups = {
       pv-http-8080 = local.target_group_http_8080
       pb-http-8080 = local.target_group_http_8080
+      pv-http-7777 = local.target_group_http_7777
     }
     tags = {
       component         = "web"
@@ -119,6 +120,26 @@ locals {
       matcher             = "200-399"
       path                = "/"
       port                = 8080
+      protocol            = "HTTP"
+      timeout             = 5
+      unhealthy_threshold = 5
+    }
+    stickiness = {
+      enabled = true
+      type    = "lb_cookie"
+    }
+  }
+  target_group_http_7777 = {
+    port                 = 7777
+    protocol             = "HTTP"
+    deregistration_delay = 30
+    health_check = {
+      enabled             = true
+      interval            = 30
+      healthy_threshold   = 3
+      matcher             = "200-399"
+      path                = "/"
+      port                = 7777
       protocol            = "HTTP"
       timeout             = 5
       unhealthy_threshold = 5
