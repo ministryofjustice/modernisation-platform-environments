@@ -33,6 +33,7 @@ locals {
       "/oracle/database/PDOASYS" = local.secretsmanager_secrets_oasys_db
       "/oracle/database/PROASYS" = local.secretsmanager_secrets_oasys_db
       "/oracle/database/TROASYS" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/DROASYS" = local.secretsmanager_secrets_oasys_db
 
       "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
       "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
@@ -129,6 +130,7 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/DR*/*",
             ]
           },
         ]
