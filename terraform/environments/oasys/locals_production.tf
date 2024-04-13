@@ -355,7 +355,7 @@ locals {
           max_size            = 4
         })
         tags = merge(local.webserver_a.tags, {
-          oracle-db-sid                           = "OASPROD" # "PDOASYS"
+          oracle-db-sid                           = "PDOASYS"
           oracle-db-hostname                      = "db.oasys.hmpps-production.modernisation-platform.internal"
         })
       })
