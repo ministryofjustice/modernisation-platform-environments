@@ -221,13 +221,13 @@ locals {
       data = {
         iops       = 10000 # min 3000
         type       = "gp3"
-        throughput = 125
+        throughput = 200
         total_size = 200
       }
       flash = {
         iops       = 3000 # min 3000
         type       = "gp3"
-        throughput = 125
+        throughput = 200
         total_size = 50
       }
     }
@@ -343,13 +343,13 @@ locals {
       data = {
         iops       = 10000
         type       = "gp3"
-        throughput = 125
+        throughput = 200
         total_size = 200
       }
       flash = {
         iops       = 3000
         type       = "gp3"
-        throughput = 125
+        throughput = 200
         total_size = 50
       }
     }
