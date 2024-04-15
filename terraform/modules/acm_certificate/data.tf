@@ -1,4 +1,4 @@
-data "aws_route53_zone" "core_network_services" {
+data "aws_route53_zone" "core_network_servicess" {
   for_each = local.core_network_services_domains
 
   provider = aws.core-network-services
