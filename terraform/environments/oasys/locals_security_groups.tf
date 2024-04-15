@@ -43,7 +43,8 @@ locals {
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
       module.ip_addresses.external_cidrs.cloud_platform,
-      module.ip_addresses.azure_studio_hosting_public.prod
+      module.ip_addresses.azure_studio_hosting_public.prod,
+      "10.0.0.0/8"
     ])
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
