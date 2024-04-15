@@ -44,8 +44,8 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     patch_filter {
       key    = "PRODUCT"
       values = ["*"]
-    # values = ["Office 2003", "Microsoft 365 Apps/Office 2019/Office LTSC"]
-   }
+      # values = ["Office 2003", "Microsoft 365 Apps/Office 2019/Office LTSC"]
+    }
   }
 }
 

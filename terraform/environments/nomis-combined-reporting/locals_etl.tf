@@ -22,8 +22,8 @@ locals {
   etl_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "hmpps_windows_server_2019_release_*"
-      iam_resource_names_prefix = "ec2-etl"
+      ami_name                      = "hmpps_windows_server_2019_release_*"
+      iam_resource_names_prefix     = "ec2-etl"
       ebs_volumes_copy_all_from_ami = false
       user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
     })
