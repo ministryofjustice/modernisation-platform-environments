@@ -29,7 +29,7 @@ resource "aws_vpc_security_group_ingress_rule" "efs_repo_home_inbound" {
 
 import {
   to = aws_efs_file_system.efs
-  id = ""
+  id = "fs-069d32c0103c46d68"
 }
 
 resource "aws_efs_file_system" "efs" {
