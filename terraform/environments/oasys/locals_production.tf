@@ -559,23 +559,23 @@ locals {
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["pd_${local.application_name}_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "use int.oasys.service.justice.gov.uk, or for practice ptc-int.oasys.service.justice.gov.uk, or for training trn-int.oasys.service.justice.gov.uk"
-                status_code  = "200"
-              }
-            }
             # default_action = {
-            #   type = "redirect"
-            #   redirect = {
-            #     host        = "int.oasys.service.justice.gov.uk"
-            #     port        = "443"
-            #     protocol    = "HTTPS"
-            #     status_code = "HTTP_301"
+            #   type = "fixed-response"
+            #   fixed_response = {
+            #     content_type = "text/plain"
+            #     message_body = "use int.oasys.service.justice.gov.uk, or for practice ptc-int.oasys.service.justice.gov.uk, or for training trn-int.oasys.service.justice.gov.uk"
+            #     status_code  = "200"
             #   }
             # }
+            default_action = {
+              type = "redirect"
+              redirect = {
+                host        = "int.oasys.service.justice.gov.uk"
+                port        = "443"
+                protocol    = "HTTPS"
+                status_code = "HTTP_301"
+              }
+            }
             # default_action = {
             #   type              = "forward"
             #   target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
@@ -593,7 +593,7 @@ locals {
                       values = [
                         "int.oasys.service.justice.gov.uk",
                         "oasys-ukwest.oasys.az.justice.gov.uk",
-                        "oasys.az.justice.gov.uk",
+                        # "oasys.az.justice.gov.uk",
                         "p-oasys.az.justice.gov.uk",
                       ]
                     }
