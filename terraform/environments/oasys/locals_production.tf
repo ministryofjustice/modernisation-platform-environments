@@ -568,6 +568,15 @@ locals {
               }
             }
             # default_action = {
+            #   type = "redirect"
+            #   redirect = {
+            #     host        = "int.oasys.service.justice.gov.uk"
+            #     port        = "443"
+            #     protocol    = "HTTPS"
+            #     status_code = "HTTP_301"
+            #   }
+            # }
+            # default_action = {
             #   type              = "forward"
             #   target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
             # }
