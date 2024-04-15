@@ -5,7 +5,7 @@ module "grafana_api_key_rotator" {
   #checkov:skip=CKV_AWS_258:Function is not invoked by URL
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.2.5"
+  version = "7.2.6"
 
   publish        = true
   create_package = false
