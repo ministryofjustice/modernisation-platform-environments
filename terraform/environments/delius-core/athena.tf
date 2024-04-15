@@ -20,7 +20,8 @@ resource "aws_glue_resource_policy" "this" {
 }
 
 resource "aws_glue_catalog_database" "this" {
-  name = "glue-audit-db-${local.environment}"
+  count = contains(local.audit_owners, local.environment) ? 1 : 0
+  name  = "glue-audit-db-${local.environment}"
 }
 
 resource "aws_glue_catalog_table" "this" {
