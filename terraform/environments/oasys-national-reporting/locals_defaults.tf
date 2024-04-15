@@ -77,6 +77,7 @@ locals {
       "/dev/sda1" = { type = "gp3", size = 128 } # root volume
       "/dev/sdb"  = { type = "gp3", size = 128 } # /u01
       "/dev/sdc"  = { type = "gp3", size = 128 } # /u02
+      "/dev/sds"  = { type = "gp3", size = 128, label = "swap" } # swap
     }
   })
 
