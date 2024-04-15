@@ -157,7 +157,7 @@ locals {
           desired_capacity = 2
           max_size         = 2
         })
-        autoscaling_group_schedule = {
+        autoscaling_schedules = {
           scale_up   = { recurrence = "0 7 * * Mon-Fri" }
           scale_down = { recurrence = "0 18 * * Mon-Fri", desired_capacity = 1 }
         }
