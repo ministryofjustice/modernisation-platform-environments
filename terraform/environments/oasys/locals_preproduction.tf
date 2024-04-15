@@ -357,7 +357,7 @@ locals {
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["pp_${local.application_name}_cert"]
-            default_action {
+            default_action = {
               type = "redirect"
               redirect {
                 host        = "pp-int.oasys.service.justice.gov.uk"
