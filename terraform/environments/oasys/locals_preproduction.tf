@@ -359,7 +359,7 @@ locals {
             certificate_names_or_arns = ["pp_${local.application_name}_cert"]
             default_action = {
               type = "redirect"
-              redirect {
+              redirect = {
                 host        = "pp-int.oasys.service.justice.gov.uk"
                 port        = "443"
                 protocol    = "HTTPS"
