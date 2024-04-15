@@ -160,8 +160,6 @@ resource "aws_launch_template" "tribunals-all-lt" {
     name = aws_iam_instance_profile.ec2_instance_profile.name
   }
 
-  key_name = "ec2-dev-connect"
-
   block_device_mappings {
     device_name = "/dev/sda1"
 
