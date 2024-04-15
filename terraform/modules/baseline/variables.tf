@@ -684,6 +684,7 @@ variable "lbs" {
             }))
           }))
           redirect = optional(object({
+            host        = optional(string)
             status_code = string
             port        = optional(number)
             protocol    = optional(string)
