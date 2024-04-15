@@ -132,7 +132,7 @@ module "s3_bucket_athena_output" {
 
 resource "aws_athena_database" "this" {
   count  = contains(local.audit_owners, local.environment) ? 1 : 0
-  name   = "audit-owner-db-${local.environment}"
+  name   = "audit_owner_db_${local.environment}"
   bucket = module.s3_bucket_athena_output[0].bucket.bucket
 }
 
