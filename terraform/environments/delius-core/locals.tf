@@ -27,4 +27,11 @@ locals {
     preproduction = "delius-core-production"
     production    = "delius-core-production"
   }
+
+  audit_owner_map = {
+    test       = [{ env = "test", account = "delius-core-test" }, { env = "dev", account = "delius-core-development" }],
+    production = [{ env = "stage", account = "delius-core-preproduction" }, { env = "preprod", account = "delius-core-preproduction" }, { env = "prod", account = "delius-core-production" }],
+  }
+
+  audit_owners = ["test", "production"]
 }
