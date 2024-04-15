@@ -3,7 +3,7 @@ locals {
   # baseline config
   test_config = {
     baseline_ec2_autoscaling_groups = {
-      test-web-asg = merge(local.defaults_web_ec2.config, {
+      test-web-asg = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           availability_zone = "${local.region}a"
         })
