@@ -1,7 +1,5 @@
 data "aws_secretsmanager_secret_version" "grafana_api_key" {
-  # Switching to hardcoded string while default_tags are applied
-  # secret_id = aws_secretsmanager_secret.grafana_api_key.id
-  secret_id = "grafana/api-key"
+  secret_id = aws_secretsmanager_secret.grafana_api_key.id
 }
 
 data "aws_ssoadmin_instances" "main" {
