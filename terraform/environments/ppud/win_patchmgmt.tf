@@ -13,7 +13,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   name             = "WindowsOSAndMicrosoftApps"
   description      = "Patch both Windows and Microsoft apps"
   operating_system = "WINDOWS"
-  approved_patches = ["KB890830", "KB5034682", "KB5035857"]
+# approved_patches = ["KB890830"]
 
   approval_rule {
     approve_after_days = 2
@@ -29,7 +29,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     }
     patch_filter {
       key    = "MSRC_SEVERITY"
-      values = ["Critical", "Important", "Moderate", "Unspecified"]
+      values = ["Critical", "Important", "Moderate"]
     }
   }
 
@@ -43,8 +43,8 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     # Filter on Microsoft product if necessary
     patch_filter {
       key    = "PRODUCT"
-      values = ["*"]
-    # values = ["Office 2003", "Microsoft 365 Apps/Office 2019/Office LTSC"]
+    # values = ["*"]
+      values = ["Office 2003", "Microsoft 365 Apps/Office 2019/Office LTSC"]
    }
   }
 }
@@ -85,11 +85,12 @@ resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_task" {
   name             = local.application_data.accounts[local.environment].maintenance_window_task_name
   description      = "Apply patch management"
   task_type        = "RUN_COMMAND"
-  task_arn         = "AWS-RunPatchBaseline" # windows_os_apps_baseline
+# task_arn         = "AWS-RunPatchBaseline" # windows_os_apps_baseline
+  task_arn         = "WindowsOSAndMicrosoftApps" 
   priority         = 10
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "15"
-  max_errors       = "1"
+  max_errors       = "2"
 
   targets {
     key    = "WindowTargetIds"
