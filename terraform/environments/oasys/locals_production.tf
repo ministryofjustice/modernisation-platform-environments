@@ -573,7 +573,7 @@ locals {
                 host        = "int.oasys.service.justice.gov.uk"
                 port        = "443"
                 protocol    = "HTTPS"
-                status_code = "HTTP_301"
+                status_code = "HTTP_302"
               }
             }
             # default_action = {

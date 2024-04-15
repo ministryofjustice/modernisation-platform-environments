@@ -357,23 +357,23 @@ locals {
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["pp_${local.application_name}_cert"]
-            # default_action = {
-            #   type = "redirect"
-            #   redirect = {
-            #     host        = "pp-int.oasys.service.justice.gov.uk"
-            #     port        = "443"
-            #     protocol    = "HTTPS"
-            #     status_code = "HTTP_301"
-            #   }
-            # }
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "use pp-int.oasys.service.justice.gov.uk"
-                status_code  = "200"
+              type = "redirect"
+              redirect = {
+                host        = "pp-int.oasys.service.justice.gov.uk"
+                port        = "443"
+                protocol    = "HTTPS"
+                status_code = "HTTP_302"
               }
             }
+            # default_action = {
+            #   type = "fixed-response"
+            #   fixed_response = {
+            #     content_type = "text/plain"
+            #     message_body = "use pp-int.oasys.service.justice.gov.uk"
+            #     status_code  = "200"
+            #   }
+            # }
             # default_action = {
             #   type              = "forward"
             #   target_group_name = "pp-${local.application_name}-web-a-pv-http-8080"
@@ -391,7 +391,7 @@ locals {
                       values = [
                         "pp-int.oasys.service.justice.gov.uk",
                         "pp-a-int.oasys.service.justice.gov.uk",
-                        "pp-oasys.az.justice.gov.uk",
+                        #"pp-oasys.az.justice.gov.uk",
                         "oasys-ukwest.pp-oasys.az.justice.gov.uk",
                       ]
                     }
