@@ -618,12 +618,21 @@ locals {
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["t2_${local.application_name}_cert"]
+            # default_action = {
+            #   type = "fixed-response"
+            #   fixed_response = {
+            #     content_type = "text/plain"
+            #     message_body = "T2 - use t2-int.oasys.service.justice.gov.uk, T1 - use t1-int.oasys.service.justice.gov.uk"
+            #     status_code  = "200"
+            #   }
+            # }
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "T2 - use t2-int.oasys.service.justice.gov.uk, T1 - use t1-int.oasys.service.justice.gov.uk"
-                status_code  = "200"
+              type = "redirect"
+              redirect = {
+                host        = "t2-int.oasys.service.justice.gov.uk"
+                port        = "443"
+                protocol    = "HTTPS"
+                status_code = "HTTP_301"
               }
             }
             # default_action = {
@@ -641,7 +650,7 @@ locals {
                   {
                     host_header = {
                       values = [
-                        "t2-int.oasys.service.justice.gov.uk",
+                        #"t2-int.oasys.service.justice.gov.uk",
                         "t2-a-int.oasys.service.justice.gov.uk",
                         "t2-oasys.hmpp-azdt.justice.gov.uk",
                       ]
