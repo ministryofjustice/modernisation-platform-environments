@@ -90,3 +90,9 @@ variable "ignore_changes_service_task_definition" {
   type        = bool
   default     = true
 }
+
+variable "enable_platform_backups" {
+  description = "Enable or disable Mod Platform centralised backups"
+  type        = bool
+  default     = null
+}

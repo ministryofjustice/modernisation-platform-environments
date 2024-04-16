@@ -188,6 +188,12 @@ variable "rds_enabled_cloudwatch_logs_exports" {
   default     = null
 }
 
+variable "enable_platform_backups" {
+  description = "Enable or disable Mod Platform centralised backups"
+  type        = bool
+  default     = null
+}
+
 variable "db_ingress_security_groups" {
   description = "Additional RDS/elasticache ingress security groups"
   type        = list(string)
@@ -197,7 +203,6 @@ variable "tags" {
   description = "Tags to apply to the instance"
   type        = map(string)
 }
-
 
 variable "platform_vars" {
   type = object({
