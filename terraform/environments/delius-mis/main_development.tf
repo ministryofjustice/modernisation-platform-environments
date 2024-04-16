@@ -31,5 +31,7 @@ module "environment_dev" {
   bws_config = local.bws_config_dev
   dis_config = local.dis_config_dev
 
+  db_config   = local.db_config_dev
+
   tags = local.tags
 }
