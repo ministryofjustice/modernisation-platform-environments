@@ -18,6 +18,7 @@ module "ldap" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
-  platform_vars = var.platform_vars
-  tags          = local.tags
+  platform_vars           = var.platform_vars
+  tags                    = local.tags
+  enable_platform_backups = var.enable_platform_backups
 }

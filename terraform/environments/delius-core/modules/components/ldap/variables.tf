@@ -50,3 +50,9 @@ variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string
 }
+
+variable "enable_platform_backups" {
+  description = "Enable or disable Mod Platform centralised backups"
+  type        = bool
+  default     = null
+}

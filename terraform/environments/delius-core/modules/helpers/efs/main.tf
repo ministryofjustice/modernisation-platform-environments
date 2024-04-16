@@ -10,6 +10,7 @@ resource "aws_efs_file_system" "this" {
   tags = merge(
     var.tags,
     { Name = var.name },
+    var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
   )
   lifecycle {
     prevent_destroy = true
