@@ -28,7 +28,7 @@
     "preproduction": {
       "short_environment_name": "preprod",
       "db_engine_version": "19.0.0.0.ru-2023-04.rur-2023-04.r1",
-      "db_snapshot_identifier": "iaps-2023-09-19-03-06-refresh",
+      "db_snapshot_identifier": "iaps-refresh-manual-snapshot-20240416",
       "db_auto_minor_version_upgrade": "false",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "true",
