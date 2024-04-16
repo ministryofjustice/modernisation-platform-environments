@@ -13,6 +13,8 @@ module "rds_bastion" {
 
   # s3 - used for logs and user ssh public keys
   bucket_name = "rds-bastion"
+  bucket_force_destroy = true
+  bucket_versioning = true
 
   # public keys
   public_key_data = local.public_key_data.keys[local.environment]
