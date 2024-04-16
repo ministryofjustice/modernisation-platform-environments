@@ -13,10 +13,10 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   name             = "WindowsOSAndMicrosoftApps"
   description      = "Patch both Windows and Microsoft apps"
   operating_system = "WINDOWS"
-# approved_patches = ["KB890830"]
+# approved_patches = ["KB890830"] # Malicious Software Removal Tool
 
   approval_rule {
-    approve_after_days = 2
+    approve_after_days = 5
 
     patch_filter {
       key    = "PRODUCT"
@@ -24,7 +24,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     }
     patch_filter {
       key = "CLASSIFICATION"
-      #     values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"] - November 2023
+#     values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"] - November 2023
       values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups", "DefinitionUpdates"]
     }
     patch_filter {
@@ -34,7 +34,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   }
 
   approval_rule {
-    approve_after_days = 2
+    approve_after_days = 5
     patch_filter {
       key    = "PATCH_SET"
       values = ["APPLICATION"]
@@ -85,8 +85,7 @@ resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_task" {
   name             = local.application_data.accounts[local.environment].maintenance_window_task_name
   description      = "Apply patch management"
   task_type        = "RUN_COMMAND"
-# task_arn         = "AWS-RunPatchBaseline" # windows_os_apps_baseline
-  task_arn         = "WindowsOSAndMicrosoftApps" 
+  task_arn         = "AWS-RunPatchBaseline" # windows_os_apps_baseline 
   priority         = 10
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "15"
