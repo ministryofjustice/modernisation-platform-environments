@@ -162,15 +162,6 @@ locals {
             local.security_group_cidrs.https_internal,
           ])
         }
-        http7777 = {
-          description = "Allow http7777 ingress"
-          from_port   = 7777
-          to_port     = 7777
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            local.security_group_cidrs.http7xxx,
-          ])
-        }
       }
       egress = {
         all = {
@@ -201,13 +192,6 @@ locals {
           cidr_blocks = flatten([
             local.security_group_cidrs.https_external,
           ])
-        }
-        http7777 = {
-          description = "Allow http7777 ingress"
-          from_port   = 7777
-          to_port     = 7777
-          protocol    = "tcp"
-          cidr_blocks = local.security_group_cidrs.http7xxx
         }
       }
       egress = {
@@ -241,14 +225,6 @@ locals {
             local.security_group_cidrs.https_external,
           ]))
           security_groups = ["private_lb", "public_lb"]
-        }
-        http7777 = {
-          description     = "Allow http7777 ingress"
-          from_port       = 7777
-          to_port         = 7777
-          protocol        = "tcp"
-          security_groups = ["private_lb", "public_lb"]
-          cidr_blocks     = local.security_group_cidrs.http7xxx
         }
       }
       egress = {
