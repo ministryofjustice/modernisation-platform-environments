@@ -191,4 +191,41 @@ locals {
       )
     }
   }
+
+  db_config_dev = { # CHANGE ME
+    instance_type  = "t3.large"
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    ebs_volumes = {
+      "/dev/sdb" = { label = "app", size = 200 } # /u01
+      "/dev/sdc" = { label = "app", size = 100 } # /u02
+      "/dev/sde" = { label = "data" }            # DATA
+      "/dev/sdf" = { label = "flash" }           # FLASH
+      "/dev/sds" = { label = "swap" }
+    }
+    ebs_volume_config = {
+      app = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+      data = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+        total_size = 500
+      }
+      flash = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+        total_size = 500
+      }
+    }
+    ansible_user_data_config = {
+      branch               = "main"
+      ansible_repo         = "modernisation-platform-configuration-management"
+      ansible_repo_basedir = "ansible"
+      ansible_args         = "oracle_19c_install"
+    }
+  }
 }

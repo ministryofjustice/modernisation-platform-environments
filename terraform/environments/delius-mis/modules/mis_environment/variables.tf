@@ -49,6 +49,10 @@ variable "platform_vars" {
   })
 }
 
+variable "db_config" {
+  type = any
+}
+
 variable "environments_in_account" {
   type    = list(string)
   default = []
