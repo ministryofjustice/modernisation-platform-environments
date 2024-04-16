@@ -12,6 +12,13 @@ resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
     subnet_id              = data.aws_subnet.private_subnets_c.id
     availability_zone      = data.aws_subnet.private_subnets_c.availability_zone
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "RDS-MSSQLServer JDBC-Connection for Glue-Crawler",
+    }
+  )
 }
 
 resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
@@ -39,7 +46,7 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
   tags = merge(
     local.tags,
     {
-      Resource_Type = "RDS SQLServer Glue Crawler for DMS",
+      Resource_Type = "RDS-SQLServer Glue-Crawler for DMS",
     }
   )
 

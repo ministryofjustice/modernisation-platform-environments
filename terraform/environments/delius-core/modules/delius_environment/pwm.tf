@@ -87,7 +87,7 @@ module "pwm" {
     })),
     "SECURITY_KEY" = "${base64encode(uuid())}"
   }
-  container_vars_env_specific = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
+  container_vars_env_specific            = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
   ignore_changes_service_task_definition = true
 
   providers = {

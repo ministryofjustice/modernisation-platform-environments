@@ -43,7 +43,8 @@ locals {
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
       module.ip_addresses.external_cidrs.cloud_platform,
-      module.ip_addresses.azure_studio_hosting_public.prod
+      module.ip_addresses.azure_studio_hosting_public.prod,
+      "10.0.0.0/8"
     ])
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -78,8 +79,8 @@ locals {
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
       module.ip_addresses.external_cidrs.cloud_platform,
       module.ip_addresses.azure_studio_hosting_public.prod,
-      "35.177.125.252/32", "35.177.137.160/32",  # trusted_appgw_external_client_ips infra_ip.j5_phones
-      "20.49.214.199/32", "20.49.214.228/32", "20.26.11.71/32", "20.26.11.108/32",  # Azure Landing Zone Egress
+      "35.177.125.252/32", "35.177.137.160/32",                                                     # trusted_appgw_external_client_ips infra_ip.j5_phones
+      "20.49.214.199/32", "20.49.214.228/32", "20.26.11.71/32", "20.26.11.108/32",                  # Azure Landing Zone Egress
       "195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25", "194.33.196.0/25", "194.33.197.0/25", # dom1_eucs_ras
       module.ip_addresses.external_cidrs.sodeco,
       module.ip_addresses.external_cidrs.interserve,
@@ -242,12 +243,12 @@ locals {
           security_groups = ["private_lb", "public_lb"]
         }
         http7777 = {
-          description = "Allow http7777 ingress"
-          from_port   = 7777
-          to_port     = 7777
-          protocol    = "tcp"
+          description     = "Allow http7777 ingress"
+          from_port       = 7777
+          to_port         = 7777
+          protocol        = "tcp"
           security_groups = ["private_lb", "public_lb"]
-          cidr_blocks = local.security_group_cidrs.http7xxx
+          cidr_blocks     = local.security_group_cidrs.http7xxx
         }
       }
       egress = {
