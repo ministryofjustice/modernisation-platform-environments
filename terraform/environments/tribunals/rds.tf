@@ -92,27 +92,27 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description     = "Allows Administrative Appeals ECS service to access RDS"
     security_groups = [aws_security_group.ecs_service.id]
   }
-  # ingress {
-  #   from_port       = 1433
-  #   to_port         = 1433
-  #   protocol        = "tcp"
-  #   description     = "Allows Transport ECS service to access RDS"
-  #   security_groups = [module.transport-ecs.cluster_ec2_security_group_id]
-  # }
-  # ingress {
-  #   from_port       = 1433
-  #   to_port         = 1433
-  #   protocol        = "tcp"
-  #   description     = "Allows Land Registration Division ECS service to access RDS"
-  #   security_groups = [module.hmlands-ecs.cluster_ec2_security_group_id]
-  # }
-  # ingress {
-  #   from_port       = 1433
-  #   to_port         = 1433
-  #   protocol        = "tcp"
-  #   description     = "Allows Criminal Injuries ECS service to access RDS"
-  #   security_groups = [module.cicap-ecs.cluster_ec2_security_group_id]
-  # }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Transport ECS service to access RDS"
+    security_groups = [module.transport-ecs.cluster_ec2_security_group_id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Land Registration Division ECS service to access RDS"
+    security_groups = [module.hmlands-ecs.cluster_ec2_security_group_id]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows Criminal Injuries ECS service to access RDS"
+    security_groups = [module.cicap-ecs.cluster_ec2_security_group_id]
+  }
   # ingress {
   #   from_port       = 1433
   #   to_port         = 1433
