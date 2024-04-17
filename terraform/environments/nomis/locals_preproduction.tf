@@ -156,11 +156,6 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
           desired_capacity = 2
           max_size         = 2
-
-          warm_pool = {
-            reuse_on_scale_in           = true
-            max_group_prepared_capacity = null
-          }
         })
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 7 * * Mon-Fri" }
