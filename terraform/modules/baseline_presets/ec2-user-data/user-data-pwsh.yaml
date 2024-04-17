@@ -48,6 +48,29 @@ tasks:
         type: powershell
         runAs: admin
         content: |-
+          # Fallback installation for git
+          $ErrorActionPreference = "Stop"
+          if (Get-Command "git" -ErrorAction SilentlyContinue) {
+            Write-Output "git already installed"
+          } else {
+            Set-Location -Path ([System.IO.Path]::GetTempPath())
+            Url="https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/Git-2.44.0-64-bit.exe"
+            Write-Output "Fallback installation for git - downloading from $Url"
+            Invoke-WebRequest $Url -OutFile ".\Git.exe"
+            .\Git.exe /VERYSILENT /NORESTART
+          }
+          Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          Write-Output "choco upgrade all -y"
+          choco upgrade all -y
+          Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
           # Install awscli - it should be in AMI but install if missing
           $ErrorActionPreference = "Stop"
           if (Get-Command "aws" -ErrorAction SilentlyContinue) {
