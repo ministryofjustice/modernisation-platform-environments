@@ -1,3 +1,4 @@
+# This variable needs to be supplied with the list of database names to be migrated
 variable "database_list" {
   type = list(string)
   default = [
