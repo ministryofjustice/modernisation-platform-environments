@@ -692,7 +692,7 @@ locals {
       }
       (module.environment.domains.public.short_name) = { # oasys.service.justice.gov.uk
         lb_alias_records = [
-          { name = "", type = "A", lbs_map_key = "public" },    # oasys.service.justice.gov.uk
+          { name = "", type = "A", lbs_map_key = "public", ttl = 86400 },    # oasys.service.justice.gov.uk
           { name = "www", type = "A", lbs_map_key = "public" }, # www.oasys.service.justice.gov.uk
           { name = "a", type = "A", lbs_map_key = "public" },   # a.oasys.service.justice.gov.uk
           { name = "b", type = "A", lbs_map_key = "public" },   # b.oasys.service.justice.gov.uk
