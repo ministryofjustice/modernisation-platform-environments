@@ -2,7 +2,7 @@
   "keys": {
     "development": {
       "mattprice": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEiltWt3w24iTeybMTXYLNiS8WusBqTw929Q4kMtFwuA",
-      "mattheery": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF0Gv95dSTU443dchBQ/ZTPpV52mlWehF/jNkwL8TH6R"
+      "matt-heery": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF0Gv95dSTU443dchBQ/ZTPpV52mlWehF/jNkwL8TH6R"
     },
     "production": {
       "mattprice": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEiltWt3w24iTeybMTXYLNiS8WusBqTw929Q4kMtFwuA"
