@@ -22,7 +22,29 @@ locals {
     }
 
     baseline_s3_buckets     = {}
-    baseline_ssm_parameters = {}
+    baseline_ssm_parameters = {
+      "production" = {
+        parameters = {
+          banner_message = {
+            description = "Banner message"
+          }
+        }
+      }
+      "ptc" = {
+        parameters = {
+          banner_message = {
+            description = "Banner message"
+          }
+        }
+      }
+      "trn" = {
+        parameters = {
+          banner_message = {
+            description = "Banner message"
+          }
+        }
+      }
+    }
 
     # baseline_bastion_linux = {
     #   public_key_data = local.public_key_data.keys[local.environment]
