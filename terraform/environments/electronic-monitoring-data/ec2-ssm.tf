@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "ec2-rds-access-role" {
 }
 
 resource "aws_iam_role" "ec2-instance" {
-  name               = "instance_role"
+  name               = "instance-role"
   path               = "/system/"
   assume_role_policy = data.aws_iam_policy_document.ec2-rds-access-role.json
 }
@@ -51,6 +51,11 @@ resource "aws_iam_policy_attachment" "ssm-attachments" {
     name = "ssm-attach-instance-role"
     roles = [aws_iam_role.ec2-instance.name]
     policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ec2-instance" {
+  name = "instance_role"
+  role = "${aws_iam_role.ec2-instance.name}"
 }
 
 #------------------------------------------------------------------------------
@@ -62,7 +67,7 @@ data "aws_ami" "this" {
   owners      = ["amazon"]
   filter {
     name   = "architecture"
-    values = ["arm64"]
+    values = ["x86_64"]
   }
 }
 
@@ -71,7 +76,7 @@ resource "aws_instance" "bastion_host" {
   instance_type          = "t3.micro"
   subnet_id              = data.aws_subnet.private_subnets_b.id
   associate_public_ip_address = false 
-  iam_instance_profile = aws_iam_role.ec2-instance.name
+  iam_instance_profile = aws_iam_instance_profile.ec2-instance.name
   security_groups = [aws_security_group.ec2_bastion.id]
   tags = local.tags
 }
