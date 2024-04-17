@@ -709,26 +709,26 @@ locals {
           { name = "trn-int", type = "A", lbs_map_key = "private" },
         ]
         records = [
-          { name = "db.onr", type = "CNAME", ttl = "300", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db", type = "CNAME", ttl = "300", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db-b", type = "CNAME", ttl = "300", records = ["pd-oasys-db-b.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db-b", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-b.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
 
-          { name = "db.pp.onr", type = "CNAME", ttl = "300", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "pp", type = "CNAME", ttl = "300", records = ["public-lb-2107358561.eu-west-2.elb.amazonaws.com"] },
-          { name = "db.pp", type = "CNAME", ttl = "300", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "pp-a", type = "CNAME", ttl = "300", records = ["public-lb-2107358561.eu-west-2.elb.amazonaws.com"] },
-          { name = "pp-a-int", type = "CNAME", ttl = "300", records = ["internal-private-lb-212442533.eu-west-2.elb.amazonaws.com"] },
-          { name = "pp-int", type = "CNAME", ttl = "300", records = ["internal-private-lb-212442533.eu-west-2.elb.amazonaws.com"] },
+          { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pp", type = "CNAME", ttl = "3600", records = ["public-lb-2107358561.eu-west-2.elb.amazonaws.com"] },
+          { name = "db.pp", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pp-a", type = "CNAME", ttl = "3600", records = ["public-lb-2107358561.eu-west-2.elb.amazonaws.com"] },
+          { name = "pp-a-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-212442533.eu-west-2.elb.amazonaws.com"] },
+          { name = "pp-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-212442533.eu-west-2.elb.amazonaws.com"] },
 
-          { name = "t1", type = "CNAME", ttl = "300", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
-          { name = "ords.t1", type = "CNAME", ttl = "300", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
-          { name = "t1-int", type = "CNAME", ttl = "300", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
+          { name = "t1", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "ords.t1", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "t1-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
 
-          { name = "t2", type = "CNAME", ttl = "300", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
-          { name = "ords.t2", type = "CNAME", ttl = "300", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
-          { name = "t2-b", type = "CNAME", ttl = "300", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
-          { name = "t2-b-int", type = "CNAME", ttl = "300", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
-          { name = "t2-int", type = "CNAME", ttl = "300", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "ords.t2", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-b", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-b-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
 
           { name = "_4f7f9316bc4eaa8e9637c17aa36966b1", type = "CNAME", ttl = "86400", records = ["_83c5b5d8980ae954f876dd1b51417d43.qxcwttcyyb.acm-validations.aws."] },
           { name = "_9f1b86e95d13d2cc7b9629f67d672c40", type = "CNAME", ttl = "86400", records = ["_7ea92a123c65795698dd19834dd71f61.fdbjvjdfdx.acm-validations.aws."] },
@@ -755,8 +755,8 @@ locals {
           # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # for aws
           { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.${local.application_name}", type = "CNAME", ttl = "300", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # db.oasys.hmpps-production.modernisation-platform.internal
-          { name = "db.onr", type = "CNAME", ttl = "300", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.internal"] },                         # db.onr.hmpps-production.modernisation-platform.internal
+          { name = "db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # db.oasys.hmpps-production.modernisation-platform.internal
+          { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.internal"] },                         # db.onr.hmpps-production.modernisation-platform.internal
         ]
       }
     }
