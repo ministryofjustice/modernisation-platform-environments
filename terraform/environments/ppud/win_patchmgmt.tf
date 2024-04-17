@@ -13,7 +13,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   name             = "WindowsOSAndMicrosoftApps"
   description      = "Patch both Windows and Microsoft apps"
   operating_system = "WINDOWS"
-# approved_patches = ["KB890830"] # Malicious Software Removal Tool
+  approved_patches = ["KB890830"] # Malicious Software Removal Tool
 
   approval_rule {
     approve_after_days = 5
@@ -24,7 +24,6 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     }
     patch_filter {
       key = "CLASSIFICATION"
-#     values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups"] - November 2023
       values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups", "DefinitionUpdates"]
     }
     patch_filter {
@@ -43,7 +42,6 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     # Filter on Microsoft product if necessary
     patch_filter {
       key    = "PRODUCT"
-    # values = ["*"]
       values = ["Office 2003", "Microsoft 365 Apps/Office 2019/Office LTSC"]
    }
   }

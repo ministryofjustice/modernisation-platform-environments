@@ -29,7 +29,7 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
     }
     patch_filter {
       key    = "CLASSIFICATION"
-      values = ["Security"]
+      values = ["Security", "Bugfix"]
     }
 
     patch_filter {
