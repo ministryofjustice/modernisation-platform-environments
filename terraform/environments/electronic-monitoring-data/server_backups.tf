@@ -98,7 +98,6 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
-  count = local.is-development ? 1 : 0
 
   security_group_id = aws_security_group.db.id
   description       = "Default SQL Server port 1433 access for MK"
