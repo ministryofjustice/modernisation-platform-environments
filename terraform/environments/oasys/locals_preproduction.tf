@@ -23,7 +23,7 @@ locals {
 
     baseline_s3_buckets     = {}
     baseline_ssm_parameters = {
-      "preproduction" = {
+      "/preproduction" = {
         parameters = {
           banner_message = {
             description = "Banner message"

@@ -28,14 +28,14 @@ locals {
 
     baseline_s3_buckets     = {}
     baseline_ssm_parameters = {
-      "t1" = {
+      "/t1" = {
         parameters = {
           banner_message = {
             description = "Banner message"
           }
         }
       }
-      "t2" = {
+      "/t2" = {
         parameters = {
           banner_message = {
             description = "Banner message"

@@ -23,21 +23,21 @@ locals {
 
     baseline_s3_buckets     = {}
     baseline_ssm_parameters = {
-      "production" = {
+      "/production" = {
         parameters = {
           banner_message = {
             description = "Banner message"
           }
         }
       }
-      "ptc" = {
+      "/ptc" = {
         parameters = {
           banner_message = {
             description = "Banner message"
           }
         }
       }
-      "trn" = {
+      "/trn" = {
         parameters = {
           banner_message = {
             description = "Banner message"
