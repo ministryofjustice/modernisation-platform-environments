@@ -26,6 +26,15 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
   cidr_ipv4 = data.aws_vpc.shared.cidr_block
 }
 
+resource "aws_vpc_security_group_ingress_rule" "vpc_access" {
+  security_group_id            = aws_security_group.db.id
+  description                  = "Ec2 instance"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+  referenced_security_group_id = aws_security_group.ec2_bastion.id
+}
+
 #------------------------------------------------------------------------------
 # IAM to access database
 #------------------------------------------------------------------------------
@@ -54,7 +63,7 @@ resource "aws_iam_policy_attachment" "ssm-attachments" {
 }
 
 resource "aws_iam_instance_profile" "ec2-instance" {
-  name = "instance_role"
+  name = "instance-role"
   role = "${aws_iam_role.ec2-instance.name}"
 }
 
