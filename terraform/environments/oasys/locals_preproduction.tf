@@ -151,7 +151,12 @@ locals {
           }
           "/dev/sde" = { # DATA01
             label = "data"
-            size  = 300
+            size  = 2000
+            type  = "gp3"
+          }
+          "/dev/sdf" = { # DATA02
+            label = "data"
+            size  = 2000
             type  = "gp3"
           }
           "/dev/sdj" = { # FLASH01
@@ -391,7 +396,7 @@ locals {
                       values = [
                         "pp-int.oasys.service.justice.gov.uk",
                         "pp-a-int.oasys.service.justice.gov.uk",
-                        #"pp-oasys.az.justice.gov.uk",
+                        "pp-oasys.az.justice.gov.uk",
                         "oasys-ukwest.pp-oasys.az.justice.gov.uk",
                       ]
                     }
