@@ -71,20 +71,6 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description     = "Allows ECS cluster to access RDS"
     security_groups = [aws_security_group.cluster_ec2.id]
   }
-  # ingress {
-  #   from_port       = 1433
-  #   to_port         = 1433
-  #   protocol        = "tcp"
-  #   description     = "Allows Care Standards ECS service to access RDS"
-  #   security_groups = [module.cares-ecs.cluster_ec2_security_group_id]
-  # }
-  # ingress {
-  #   from_port       = 1433
-  #   to_port         = 1433
-  #   protocol        = "tcp"
-  #   description     = "Allows Lands Chamber ECS service to access RDS"
-  #   security_groups = [module.lands-ecs.cluster_ec2_security_group_id]
-  # }
   ingress {
     from_port       = 1433
     to_port         = 1433
