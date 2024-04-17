@@ -175,7 +175,7 @@ module "cicap" {
 
 module "employment_appeals" {
   source                            = "./modules/tribunal"
-  app_name                          = "employment-appeals"
+  app_name                          = "eat"
   app_url                           = "employmentappeals"
   sql_migration_path                = "../scripts/employment-appeals"
   app_db_name                       = "eat"
@@ -208,7 +208,7 @@ module "employment_appeals" {
 
 module "finance_and_tax" {
   source                            = "./modules/tribunal"
-  app_name                          = "finance-and-tax"
+  app_name                          = "ftt"
   app_url                           = "finance-and-tax"
   sql_migration_path                = "../scripts/finance-and-tax"
   app_db_name                       = "ftt"
@@ -241,7 +241,7 @@ module "finance_and_tax" {
 
 module "immigration_services" {
   source                            = "./modules/tribunal"
-  app_name                          = "immigration-services"
+  app_name                          = "imset"
   app_url                           = "immigration-services"
   sql_migration_path                = "../scripts/immigration-services"
   app_db_name                       = "imset"
@@ -274,7 +274,7 @@ module "immigration_services" {
 
 module "information_tribunal" {
   source                            = "./modules/tribunal"
-  app_name                          = "information-tribunal"
+  app_name                          = "it"
   app_url                           = "information-tribunal"
   sql_migration_path                = "../scripts/information-tribunal"
   app_db_name                       = "it"
@@ -307,7 +307,7 @@ module "information_tribunal" {
 
 module "lands_tribunal" {
   source                            = "./modules/tribunal"
-  app_name                          = "lands-tribunal"
+  app_name                          = "lands"
   app_url                           = "lands-tribunal"
   sql_migration_path                = "../scripts/lands-tribunal"
   app_db_name                       = "lands"
