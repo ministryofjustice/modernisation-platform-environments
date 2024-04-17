@@ -920,8 +920,10 @@ variable "secretsmanager_secrets" {
         length  = number
         special = optional(bool)
       }))
+      tags  = optional(map(string), {})
       value = optional(string)
     }))
+    tags = optional(map(string), {})
   }))
   default = {}
 }
