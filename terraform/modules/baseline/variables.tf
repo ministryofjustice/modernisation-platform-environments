@@ -764,6 +764,7 @@ variable "route53_zones" {
       type                   = string
       lbs_map_key            = string
       evaluate_target_health = optional(bool, false)
+      ttl                    = optional(number)
     })), [])
     s3_alias_records = optional(list(object({
       name                   = string

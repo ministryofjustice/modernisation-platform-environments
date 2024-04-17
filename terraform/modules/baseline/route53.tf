@@ -45,7 +45,7 @@ locals {
         value = merge(record, {
           zone_key = zone_name
           provider = local.route53_zones[zone_name].provider
-          ttl      = null
+          ttl      = record.ttl
           records  = null
           alias = {
             name                   = module.lb[record.lbs_map_key].load_balancer.dns_name
