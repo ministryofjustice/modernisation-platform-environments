@@ -28,9 +28,9 @@ locals {
       }
     }
     baseline_ec2_instances = {
-      prodution-management-server-2022 = merge(local.management_server_2022, {
+      production-management-server-2022 = merge(local.management_server_2022, {
         tags = merge(local.management_server_2022.tags, {
-          nomis-data-hub-environment = "prodution"
+          nomis-data-hub-environment = "production"
         })
       })
       pd-ndh-app-a = merge(local.ndh_app_a, {
