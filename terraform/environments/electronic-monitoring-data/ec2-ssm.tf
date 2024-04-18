@@ -87,5 +87,8 @@ resource "aws_instance" "bastion_host" {
   associate_public_ip_address = false 
   iam_instance_profile = aws_iam_instance_profile.ec2-instance.name
   security_groups = [aws_security_group.ec2_bastion.id]
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    { Name = "rds-bastion" }
+  )
 }
