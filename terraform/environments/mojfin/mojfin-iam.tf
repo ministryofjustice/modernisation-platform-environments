@@ -14,6 +14,10 @@ data "aws_iam_policy_document" "mojfin_rds_oracle" {
       "s3:ListBucket",
       "s3:PutObject"
     ]
+    principals {
+      type        = "Service"
+      identifiers = ["rds.amazonaws.com"]
+    }
 #   resources = [
 #     "${aws_s3_bucket.mojfin_rds_oracle.arn}/*"
 #   ]
