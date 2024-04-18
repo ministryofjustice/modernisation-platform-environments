@@ -123,7 +123,7 @@ variable "checksum_algorithm" {
 data "archive_file" "calculate_checksum_lambda" {
   type        = "zip"
   source_file = "lambdas/calculate_checksum_lambda.py"
-  output_path = "calculate_checksum_lambda.zip"
+  output_path = "lambdas/calculate_checksum_lambda.zip"
 }
 
 resource "aws_lambda_function" "calculate_checksum_lambda" {
@@ -190,7 +190,7 @@ resource "aws_lambda_permission" "s3_allow_calculate_checksum_lambda" {
 data "archive_file" "summarise_zip_lambda" {
   type        = "zip"
   source_file = "lambdas/summarise_zip_lambda.py"
-  output_path = "summarise_zip_lambda.zip"
+  output_path = "lambdas/summarise_zip_lambda.zip"
 }
 
 resource "aws_lambda_function" "summarise_zip_lambda" {
