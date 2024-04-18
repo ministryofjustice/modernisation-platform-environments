@@ -105,7 +105,7 @@
       "x": 12,
       "type": "log",
       "properties": {
-        "query": "SOURCE 'delius-jitbit-app' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
+        "query": "SOURCE '${app_log_group_name}' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
         "region": "eu-west-2",
         "stacked": false,
         "view": "table",
