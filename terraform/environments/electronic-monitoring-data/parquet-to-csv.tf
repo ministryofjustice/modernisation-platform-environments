@@ -22,6 +22,7 @@ resource "aws_cloudwatch_log_group" "parquet-to-csv" {
 resource "aws_glue_job" "parquet-to-csv" {
     name = "parquet-to-csv"
     role_arn = aws_iam_role.parquet-to-csv.arn
+    glue_version = "4.0"
     default_arguments = {
         "--destination_bucket" = aws_s3_bucket.csv-output-bucket.id
         "--source_bucket"      = aws_s3_bucket.dms_target_ep_s3_bucket.id
