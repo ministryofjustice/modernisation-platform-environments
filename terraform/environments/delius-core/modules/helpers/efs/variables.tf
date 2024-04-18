@@ -62,3 +62,9 @@ variable "vpc_cidr" {
   description = "vpc cidr"
   type        = string
 }
+
+variable "enable_platform_backups" {
+  description = "Enable or disable Mod Platform centralised backups"
+  type        = bool
+  default     = null
+}

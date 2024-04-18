@@ -18,3 +18,7 @@ output "sg_arn" {
 output "access_point_id" {
   value = aws_efs_access_point.ldap.id
 }
+
+output "name" {
+  value = var.name
+}

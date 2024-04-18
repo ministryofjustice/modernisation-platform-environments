@@ -47,3 +47,9 @@ variable "kms_key_id" {
   type        = string
   default     = null
 }
+
+variable "enable_platform_backups" {
+  description = "Enable or disable Mod Platform centralised backups"
+  type        = bool
+  default     = null
+}

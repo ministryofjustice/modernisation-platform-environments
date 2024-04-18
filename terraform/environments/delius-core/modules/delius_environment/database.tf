@@ -57,6 +57,8 @@ module "oracle_db_primary" {
     var.db_config.ansible_user_data_config
   )
 
+  enable_platform_backups = var.enable_platform_backups
+
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
   instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
@@ -103,6 +105,8 @@ module "oracle_db_standby" {
     "${path.module}/templates/userdata.sh.tftpl",
     var.db_config.ansible_user_data_config
   )
+
+  enable_platform_backups = var.enable_platform_backups
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 

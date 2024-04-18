@@ -207,3 +207,8 @@ data "aws_route53_zone" "prod-network-services" {
   name         = "ccms-ebs.service.justice.gov.uk."
   private_zone = false
 }
+data "aws_route53_zone" "application_zone" {
+  provider     = aws.core-network-services
+  name         = "ccms-ebs.service.justice.gov.uk."
+  private_zone = false
+}

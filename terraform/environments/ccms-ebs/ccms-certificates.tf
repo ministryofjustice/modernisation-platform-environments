@@ -3,80 +3,80 @@
 #   *.laa-test.modernisation-platform.service.justice.gov.uk
 #   *.laa-preproduction.modernisation-platform.service.justice.gov.uk
 
+# Certificate
 resource "aws_acm_certificate" "external" {
-  count = local.is-production ? 0 : 1
-
+  domain_name       = local.is-production ? "ccms-ebs.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
-  subject_alternative_names = [
-    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  ]
+
+  subject_alternative_names = local.is-production ? ["*.ccms-ebs.service.justice.gov.uk"] : ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
   tags = merge(local.tags,
     { Environment = local.environment }
   )
-
   lifecycle {
     create_before_destroy = true
   }
-}
-
-# *.service.justice.gov.uk
-resource "aws_acm_certificate" "external-service" {
-  count = local.is-production ? 1 : 0
-
-  validation_method = "DNS"
-  domain_name       = "ccms-ebs.service.justice.gov.uk"
-  subject_alternative_names = [
-    "*.ccms-ebs.service.justice.gov.uk"
-  ]
-
-  tags = merge(local.tags,
-    { Environment = local.environment }
-  )
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-## Validation 
-resource "aws_route53_record" "external_validation" {
-  depends_on = [
-    aws_instance.ec2_oracle_ebs,
-    aws_instance.ec2_ebsapps,
-    aws_instance.ec2_webgate,
-    aws_instance.ec2_accessgate
-  ]
-
-  provider = aws.core-network-services
-
-  for_each = {
-    for dvo in local.cert_opts : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = local.cert_zone_id
 }
 
 resource "aws_acm_certificate_validation" "external" {
-  count = local.is-production ? 1 : 1
+  certificate_arn         = aws_acm_certificate.external.arn
+  validation_record_fqdns = local.is-production ? [aws_route53_record.external_validation_prod[0].fqdn] : [local.domain_name_main[0], local.domain_name_sub[0]]
+}
 
-  depends_on = [
-    aws_route53_record.external_validation
-  ]
+# Route53 DNS records for certificate validation
+resource "aws_route53_record" "external_validation" {
+  provider = aws.core-network-services
 
-  certificate_arn         = local.cert_arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+  allow_overwrite = true
+  name            = local.is-production ? tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name : local.domain_name_main[0]
+  records         = local.is-production ? [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value] : local.domain_record_main
+  ttl             = 60
+  type            = local.is-production ? tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type : local.domain_type_main[0]
+  zone_id         = local.is-production ? data.aws_route53_zone.application_zone.zone_id : data.aws_route53_zone.network-services.zone_id
+}
 
+resource "aws_route53_record" "external_validation_subdomain" {
+  provider = aws.core-vpc
+
+  allow_overwrite = true
+  name            = local.domain_name_sub[0]
+  records         = local.domain_record_sub
+  ttl             = 60
+  type            = local.domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+# Production Certificate
+resource "aws_acm_certificate" "external_prod" {
+  count = local.is-production ? 1 : 0
+
+  domain_name       = "ccms-ebs.service.justice.gov.uk"
+  validation_method = "DNS"
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "external_prod" {
+  count = local.is-production ? 1 : 0
+
+  certificate_arn         = aws_acm_certificate.external_prod[0].arn
+  validation_record_fqdns = [aws_route53_record.external_validation_prod[0].fqdn]
   timeouts {
     create = "10m"
   }
 }
+
+// Route53 DNS record for certificate validation
+resource "aws_route53_record" "external_validation_prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
+  records         = [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value]
+  type            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type
+  zone_id         = data.aws_route53_zone.application_zone.zone_id
+  ttl             = 60
+}
+

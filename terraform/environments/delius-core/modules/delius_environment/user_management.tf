@@ -11,13 +11,6 @@ module "user_management" {
   container_secrets_default      = {}
   container_secrets_env_specific = try(var.delius_microservice_configs.user_management.container_secrets_env_specific, {})
 
-  create_elasticache = true
-
-  elasticache_parameters = {
-    "notify-keyspace-events" = "eA"
-    "cluster-enabled"        = "yes"
-  }
-
   container_port_config = [
     {
       containerPort = var.delius_microservice_configs.user_management.container_port
@@ -42,6 +35,20 @@ module "user_management" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
+  create_elasticache               = true
+  elasticache_engine               = "redis"
+  elasticache_engine_version       = var.delius_microservice_configs.user_management.elasticache_version
+  elasticache_node_type            = var.delius_microservice_configs.user_management.elasticache_node_type
+  elasticache_port                 = 6379
+  elasticache_parameter_group_name = var.delius_microservice_configs.user_management.elasticache_parameter_group_name
+  elasticache_subnet_group_name    = "nextcloud-elasticache-subnet-group"
+
+  elasticache_parameters = {
+    "notify-keyspace-events" = "eA"
+    "cluster-enabled"        = "yes"
+  }
+
+
   microservice_lb                    = aws_lb.delius_core_frontend
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
   alb_listener_rule_paths            = ["/umt"]
@@ -51,15 +58,17 @@ module "user_management" {
   platform_vars = var.platform_vars
   tags          = var.tags
 
+  ignore_changes_service_task_definition = true
+
   providers = {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
 
-  log_error_pattern      = "ERROR"
-  sns_topic_arn          = aws_sns_topic.delius_core_alarms.arn
-  frontend_lb_arn_suffix = aws_lb.delius_core_frontend.arn_suffix
-
+  log_error_pattern       = "ERROR"
+  sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
+  frontend_lb_arn_suffix  = aws_lb.delius_core_frontend.arn_suffix
+  enable_platform_backups = var.enable_platform_backups
 }
 
 

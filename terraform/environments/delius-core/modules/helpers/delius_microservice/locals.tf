@@ -40,15 +40,15 @@ locals {
   ])
 
   rds_env_vars = var.rds_endpoint_environment_variable != "" ? {
-    var.rds_endpoint_environment_variable = aws_db_instance.this[0].endpoint
+    (var.rds_endpoint_environment_variable) = aws_db_instance.this[0].endpoint
   } : {}
 
   rds_secrets = var.rds_password_secret_variable != "" ? {
-    var.rds_password_secret_variable = "${aws_db_instance.this[0].master_user_secret[0].secret_arn}:password:AWSCURRENT"
+    (var.rds_password_secret_variable) = "${aws_db_instance.this[0].master_user_secret[0].secret_arn}:password:AWSCURRENT"
   } : {}
 
   elasticache_env_vars = var.elasticache_endpoint_environment_variable != "" ? {
-    var.elasticache_endpoint_environment_variable = aws_elasticache_cluster.this[0].cluster_address
+    (var.elasticache_endpoint_environment_variable) = aws_elasticache_cluster.this[0].cluster_address
   } : {}
 
 }

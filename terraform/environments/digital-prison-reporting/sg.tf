@@ -19,6 +19,7 @@ resource "aws_security_group" "lambda_generic" {
     {
       Resource_Type = "sg_group"
       Name          = "${local.generic_lambda}-sg"
+      Used_By       = "service_bundle"
     }
   )
 }
@@ -74,7 +75,7 @@ resource "aws_security_group_rule" "serverless_gw_ingress" {
   from_port         = 0
   to_port           = 65535
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
   security_group_id = aws_security_group.serverless_gw[0].id
 }
 

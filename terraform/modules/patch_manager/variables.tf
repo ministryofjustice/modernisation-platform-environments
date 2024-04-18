@@ -40,6 +40,10 @@ variable "target_tag" {
   type        = map(any)
 }
 
+variable "instance_roles" {
+  type = list(string)
+}
+
 locals {
-  os = replace(lower(var.operating_system), "_", "-")
+  os = replace(replace(lower(var.operating_system), "_", "-"), "redhat-enterprise-linux", "redhat")
 }

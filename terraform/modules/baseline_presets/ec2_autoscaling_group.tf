@@ -40,7 +40,6 @@ locals {
 
       warm_pool = {
         reuse_on_scale_in           = true
-        max_group_prepared_capacity = 1
       }
     }
 
@@ -61,7 +60,6 @@ locals {
 
       warm_pool = {
         reuse_on_scale_in           = true
-        max_group_prepared_capacity = 1
       }
     }
   }

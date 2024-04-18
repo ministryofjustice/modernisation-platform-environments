@@ -286,6 +286,10 @@ locals {
   thrld_dms_cdc_inc_events_check    = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
   period_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
 
+  # Operational Database
+  deploy_operational_database = local.application_data.accounts[local.environment].deploy_operational_database
+  scale_down_kinesis_agent    = local.application_data.accounts[local.environment].scale_down_kinesis_agent
+
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 

@@ -43,7 +43,8 @@ locals {
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
       module.ip_addresses.external_cidrs.cloud_platform,
-      module.ip_addresses.azure_studio_hosting_public.prod
+      module.ip_addresses.azure_studio_hosting_public.prod,
+      "10.0.0.0/8"
     ])
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -51,6 +52,7 @@ locals {
       "10.40.40.0/24", # pp oasys
       "10.40.37.0/24", # pp prison nomis
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
+      module.ip_addresses.moj_cidr.aws_data_engineering_stage,
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -58,6 +60,7 @@ locals {
     ])
     http7xxx = flatten([
       "10.0.0.0/8",
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
   }
   security_group_cidrs_prod = {
@@ -68,14 +71,27 @@ locals {
     https_internal = flatten([
       "10.0.0.0/8",
       # module.ip_addresses.azure_studio_hosting_cidrs.prod,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
       module.ip_addresses.external_cidrs.cloud_platform,
-      module.ip_addresses.azure_studio_hosting_public.prod
+      module.ip_addresses.azure_studio_hosting_public.prod,
+      "35.177.125.252/32", "35.177.137.160/32",                                                     # trusted_appgw_external_client_ips infra_ip.j5_phones
+      "20.49.214.199/32", "20.49.214.228/32", "20.26.11.71/32", "20.26.11.108/32",                  # Azure Landing Zone Egress
+      "195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25", "194.33.196.0/25", "194.33.197.0/25", # dom1_eucs_ras
+      module.ip_addresses.external_cidrs.sodeco,
+      module.ip_addresses.external_cidrs.interserve,
+      module.ip_addresses.external_cidrs.meganexus,
+      module.ip_addresses.external_cidrs.serco,
+      module.ip_addresses.external_cidrs.rrp,
+      module.ip_addresses.external_cidrs.eos,
+      module.ip_addresses.external_cidrs.oasys_sscl,
+      module.ip_addresses.external_cidrs.dtv,
+      module.ip_addresses.external_cidrs.nps_wales,
+      module.ip_addresses.external_cidrs.dxw,
     ])
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -83,6 +99,9 @@ locals {
       "10.40.6.0/24", # prod oasys
       "10.40.3.0/24", # prod prison nomis
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.azure_studio_hosting_cidrs.prod,
+      module.ip_addresses.moj_cidr.aws_data_engineering_prod,
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -90,6 +109,7 @@ locals {
     ])
     http7xxx = flatten([
       "10.0.0.0/8",
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
   }
   security_group_cidrs_by_environment = {
@@ -133,16 +153,6 @@ locals {
           protocol    = -1
           self        = true
         }
-        http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 0
-          to_port     = 8080
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
-          ])
-          security_groups = []
-        }
         https = {
           description = "Allow https ingress"
           from_port   = 443
@@ -174,16 +184,6 @@ locals {
           protocol    = -1
           self        = true
         }
-        http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 0
-          to_port     = 8080
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_external,
-          ])
-          security_groups = []
-        }
         https = {
           description = "Allow https ingress"
           from_port   = 443
@@ -214,17 +214,6 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
-        }
-        https = {
-          description = "Allow https ingress"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          cidr_blocks = distinct(flatten([
-            local.security_group_cidrs.https_internal,
-            local.security_group_cidrs.https_external,
-          ]))
-          security_groups = ["private_lb", "public_lb"]
         }
         http8080 = {
           description = "Allow http8080 ingress"

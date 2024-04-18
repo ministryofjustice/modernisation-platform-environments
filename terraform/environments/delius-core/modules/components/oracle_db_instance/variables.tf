@@ -143,3 +143,9 @@ variable "instance_profile_policies" {
   description = "A list of IAM policy ARNs to attach to the instance profile"
   type        = list(string)
 }
+
+variable "enable_platform_backups" {
+  description = "Enable or disable Mod Platform centralised backups"
+  type        = bool
+  default     = null
+}

@@ -44,8 +44,10 @@ locals {
       vpc_security_group_ids = ["web"]
     })
     tags = {
-      os-type   = "Linux"
-      component = "onr_web"
+      ami         = "base_rhel_7_9"
+      os-type     = "Linux"
+      component   = "web"
+      server-type = "onr-web"
     }
     # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
     ebs_volumes = {
@@ -57,19 +59,25 @@ locals {
   defaults_boe_ec2 = merge(local.defaults_ec2, {
     config = merge(local.defaults_ec2.config, {
       ami_owner = "374269020027"
-      ami_name  = "base_rhel_6_10_2024-03-26*"
+      ami_name  = "base_rhel_6_10_*"
     })
     instance = merge(local.defaults_ec2.instance, {
-      vpc_security_group_ids = ["boe", "oasys_db"]
+      vpc_security_group_ids       = ["boe", "oasys_db"]
+      metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
     })
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.boe off for now
     tags = {
-      os-type   = "Linux"
-      component = "onr_boe"
+      ami         = "base_rhel_6_10"
+      os-type     = "Linux"
+      component   = "boe"
+      server-type = "onr-boe"
     }
     # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
     ebs_volumes = {
       "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+      "/dev/sdb"  = { type = "gp3", size = 128 } # /u01
+      "/dev/sdc"  = { type = "gp3", size = 128 } # /u02
+      "/dev/sds"  = { type = "gp3", size = 128 } # swap
     }
   })
 

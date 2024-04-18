@@ -43,8 +43,8 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/ec2/ncr-bip-cms/t1"      = local.bip_cms_secretsmanager_secrets
-      "/ec2/ncr-tomcat-admin/t1" = local.tomcat_admin_secretsmanager_secrets
+      "/ec2/ncr-bip/t1" = local.bip_secretsmanager_secrets
+      "/ec2/ncr-web/t1" = local.web_secretsmanager_secrets
 
       "/oracle/database/T1BIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/T1BIPAUD" = local.database_secretsmanager_secrets
@@ -86,8 +86,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cms/t1/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat-admin/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/t1/*",
             ]
           }
         ]
@@ -113,32 +113,42 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-web = merge(local.tomcat_admin_ec2_default, {
-        cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
-        config = merge(local.tomcat_admin_ec2_default.config, {
-          instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
+      t1-ncr-web-1-a = merge(local.web_ec2_default, {
+        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        config = merge(local.web_ec2_default.config, {
+          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2T1ReportingPolicy",
           ])
         })
-        tags = merge(local.tomcat_admin_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
+        instance = merge(local.web_ec2_default.instance, {
+          vpc_security_group_ids = ["web"]
+        })
+        tags = merge(local.web_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform Web-Tier installation and configurations"
           nomis-combined-reporting-environment = "t1"
+          type                                 = "processing"
+          instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-cms = merge(local.bip_cms_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-        config = merge(local.bip_cms_ec2_default.config, {
-          instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+      t1-ncr-cms-1-a = merge(local.bip_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        config = merge(local.bip_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2T1ReportingPolicy",
           ])
         })
-        tags = merge(local.bip_cms_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform CMS installation and configurations"
+        instance = merge(local.web_ec2_default.instance, {
+          vpc_security_group_ids = ["bip"]
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "For testing SAP BI Platform Mid-Tier installation and configurations"
           nomis-combined-reporting-environment = "t1"
           node                                 = "1"
+          type                                 = "management"
+          instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-etl = merge(local.etl_ec2_default, {
+      t1-ncr-etl-1-a = merge(local.etl_ec2_default, {
         cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
         config = merge(local.etl_ec2_default.config, {
           instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
@@ -148,6 +158,7 @@ locals {
         tags = merge(local.etl_ec2_default.tags, {
           description                          = "For testing SAP BI Platform ETL installation and configurations"
           nomis-combined-reporting-environment = "t1"
+          instance-scheduling                  = "skip-scheduling"
         })
       })
     }
@@ -162,7 +173,7 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          t1-ncr-web = {
+          t1-ncr-web-1-a = {
             port     = 7777
             protocol = "HTTP"
             health_check = {
@@ -180,7 +191,7 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "t1-ncr-web" },
+              { ec2_instance_name = "t1-ncr-web-1-a" },
             ]
           }
         }
@@ -197,16 +208,16 @@ locals {
               }
             }
             rules = {
-              t1-ncr-web = {
+              t1-ncr-web-1-a = {
                 priority = 4000
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-web"
+                  target_group_name = "t1-ncr-web-1-a"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-web.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -227,16 +238,16 @@ locals {
               }
             }
             rules = {
-              t1-ncr-web = {
+              t1-ncr-web-1-a = {
                 priority = 4580
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-ncr-web"
+                  target_group_name = "t1-ncr-web-1-a"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-ncr-web.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+                      "t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -249,14 +260,9 @@ locals {
     baseline_route53_zones = {
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "t1-ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.test.reporting.nomis.service.justice.gov.uk"] },
-          { name = "t1-ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1-ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-        ]
-        lb_alias_records = [
-          # T1
-          { name = "t1-ncr-cms", type = "A", lbs_map_key = "private" },
-          { name = "t1-ncr-web", type = "A", lbs_map_key = "private" },
+          { name = "db", type = "CNAME", ttl = "3600", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "web", type = "CNAME", ttl = "3600", records = ["t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "etl", type = "CNAME", ttl = "3600", records = ["t1-ncr-etl-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
         ]
       }
     }

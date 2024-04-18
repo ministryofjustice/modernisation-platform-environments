@@ -12,7 +12,17 @@ resource "aws_instance" "oas_app_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
+  user_data_replace_on_change = true
   user_data                   = base64encode(data.local_file.userdata.content)
+  # user_data                   = base64encode(templatefile("./userdata.sh", {
+  #   hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
+  #   ec2_image_id = "${local.application_data.accounts[local.environment].ec2amiid}"
+  #   ec2_instance_type = "${local.application_data.accounts[local.environment].ec2instancetype}"
+  #   application_name = "${local.application_name}"
+  # }))
+  # user_data = base64encode(templatefile("./userdata.sh", {
+  #   hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
+  # }))
 
   root_block_device {
     delete_on_termination = false
@@ -84,6 +94,13 @@ resource "aws_security_group" "ec2" {
     description = "Access to the managed server from workspace"
     from_port   = 9514
     to_port     = 9514
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
+  }
+  ingress {
+    description = "ssh access to the managed server from workspace"
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
@@ -292,10 +309,34 @@ resource "aws_volume_attachment" "oas_EC2ServerVolume01" {
   instance_id = aws_instance.oas_app_instance.id
 }
 
+resource "aws_ebs_volume" "EC2ServerVolumeSTAGE" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].stageesize
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].stage_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-EC2ServerVolumeSTAGE" },
+  )
+}
+
+resource "aws_volume_attachment" "oas_EC2ServerVolume02" {
+  device_name = "/dev/sdc"
+  volume_id   = aws_ebs_volume.EC2ServerVolumeSTAGE.id
+  instance_id = aws_instance.oas_app_instance.id
+}
+
 resource "aws_route53_record" "oas-app" {
   provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.inner.zone_id
-  name     = "${local.application_name}.${data.aws_route53_zone.inner.name}"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name}.${data.aws_route53_zone.external.name}"
   type     = "A"
   ttl      = 900
   records  = [aws_instance.oas_app_instance.private_ip]

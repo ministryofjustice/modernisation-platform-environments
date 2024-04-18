@@ -1,11 +1,8 @@
 module "ecs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
-
-  environment = var.env_name
-  namespace   = "mis"
-  name        = "cluster"
-
-  tags = var.tags
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=8096707cae17a51bb5bf1cc6a36ca2b6b9c633f0"
+  name                      = "nextcloud-cluster"
+  enable_container_insights = "enabled"
+  tags                      = var.tags
 }
 
 resource "aws_security_group" "cluster" {

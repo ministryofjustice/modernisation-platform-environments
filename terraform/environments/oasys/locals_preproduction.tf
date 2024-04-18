@@ -32,6 +32,8 @@ locals {
       "/oracle/database/PPONRSYS" = local.secretsmanager_secrets_db
       "/oracle/database/PPONRAUD" = local.secretsmanager_secrets_db
       "/oracle/database/PPONRBDS" = local.secretsmanager_secrets_db
+      "/oracle/database/PPMISTN2" = local.secretsmanager_secrets_db
+      "/oracle/database/PPOASRP2" = local.secretsmanager_secrets_db
 
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
@@ -149,7 +151,12 @@ locals {
           }
           "/dev/sde" = { # DATA01
             label = "data"
-            size  = 300
+            size  = 2000
+            type  = "gp3"
+          }
+          "/dev/sdf" = { # DATA02
+            label = "data"
+            size  = 2000
             type  = "gp3"
           }
           "/dev/sdj" = { # FLASH01
@@ -356,13 +363,22 @@ locals {
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["pp_${local.application_name}_cert"]
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "use pp-int.oasys.service.justice.gov.uk"
-                status_code  = "200"
+              type = "redirect"
+              redirect = {
+                host        = "pp-int.oasys.service.justice.gov.uk"
+                port        = "443"
+                protocol    = "HTTPS"
+                status_code = "HTTP_302"
               }
             }
+            # default_action = {
+            #   type = "fixed-response"
+            #   fixed_response = {
+            #     content_type = "text/plain"
+            #     message_body = "use pp-int.oasys.service.justice.gov.uk"
+            #     status_code  = "200"
+            #   }
+            # }
             # default_action = {
             #   type              = "forward"
             #   target_group_name = "pp-${local.application_name}-web-a-pv-http-8080"

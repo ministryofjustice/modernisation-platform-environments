@@ -73,7 +73,7 @@ locals {
     gdpr_api = {
       image_tag                   = "REPLACE"
       container_port              = 8080
-      create_rds                  = true
+      create_rds                  = false
       rds_engine                  = "postgres"
       rds_engine_version          = "15"
       rds_instance_class          = "db.t3.small"
@@ -125,10 +125,14 @@ locals {
     }
 
     user_management = {
-      image_tag        = "5.7.6"
-      container_port   = 8080
-      container_memory = 4096
-      container_cpu    = 1024
+      image_tag                        = "5.7.6"
+      container_port                   = 8080
+      container_memory                 = 4096
+      container_cpu                    = 1024
+      elasticache_version              = "6.0"
+      elasticache_node_type            = "cache.t3.small"
+      elasticache_port                 = 6379
+      elasticache_parameter_group_name = "default.redis6.x"
     }
 
     user_management_config_test = {

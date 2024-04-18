@@ -3,6 +3,8 @@
     "development": {
       "project_short_id": "dpr",
       "create_database": true,
+      "deploy_operational_database": true,
+      "scale_down_kinesis_agent": false,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 3,
@@ -108,7 +110,7 @@
       "setup_sonatype_secrets": true,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
-      "dps_domains": ["activities"],
+      "dps_domains": ["dps-activities"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -181,6 +183,8 @@
     "test": {
       "project_short_id": "dpr",
       "create_database": true,
+      "deploy_operational_database": false,
+      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 3,
@@ -286,7 +290,7 @@
       "setup_sonatype_secrets": false,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
-      "dps_domains": ["activities"],
+      "dps_domains": ["dps-activities"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -359,6 +363,8 @@
     "preproduction": {
       "project_short_id": "dpr",
       "create_database": true,
+      "deploy_operational_database": false,
+      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 7,
@@ -466,7 +472,7 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
-      "dps_domains": ["activities"],
+      "dps_domains": ["dps-activities"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -539,6 +545,8 @@
     "production": {
       "project_short_id": "dpr",
       "create_database": true,
+      "deploy_operational_database": false,
+      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 7,
@@ -644,7 +652,7 @@
       "setup_sonatype_secrets": false,
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
-      "dps_domains": ["activities"],
+      "dps_domains": ["dps-activities"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {

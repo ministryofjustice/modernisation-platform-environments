@@ -80,6 +80,7 @@ variable "default_action" {
       }))
     }))
     redirect = optional(object({
+      host        = optional(string)
       status_code = string
       port        = optional(number)
       protocol    = optional(string)
@@ -112,6 +113,7 @@ variable "rules" {
         }))
       }))
       redirect = optional(object({
+        host        = optional(string)
         status_code = string
         port        = optional(number)
         protocol    = optional(string)

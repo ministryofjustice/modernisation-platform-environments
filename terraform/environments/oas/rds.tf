@@ -27,7 +27,6 @@ module "rds" {
   managementcidr              = local.application_data.accounts[local.environment].managementcidr
   lz_vpc_cidr                 = local.application_data.accounts[local.environment].lz_vpc_cidr
   deletion_protection         = local.application_data.accounts[local.environment].deletion_protection
-  rds_snapshot_arn            = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.application_data.accounts[local.environment].rds_snapshot_name)
   rds_kms_key_arn             = data.aws_kms_key.rds_shared.arn
   vpc_shared_id               = data.aws_vpc.shared.id
   vpc_shared_cidr             = data.aws_vpc.shared.cidr_block
@@ -39,9 +38,11 @@ module "rds" {
 
 resource "aws_route53_record" "oas-rds" {
   provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.inner.zone_id
-  name     = "rds.${local.application_name}.${data.aws_route53_zone.inner.name}"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
   type     = "CNAME"
   ttl      = 60
   records  = [module.rds.rds_endpoint]
 }
+
+

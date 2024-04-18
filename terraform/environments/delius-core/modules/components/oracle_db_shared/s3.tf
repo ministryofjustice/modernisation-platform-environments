@@ -1,5 +1,5 @@
 module "s3_bucket_oracledb_backups" {
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
   bucket_name         = "${var.env_name}-oracle-database-backups"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -140,7 +140,10 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
     actions = [
       "s3:*"
     ]
-    resources = ["arn:aws:s3:::${local.oracle_duplicate_delius_source_environment}-oracle-database-backups"]
+    resources = [
+      "arn:aws:s3:::${local.oracle_duplicate_delius_source_environment}-oracle-database-backups",
+      "arn:aws:s3:::${local.oracle_duplicate_delius_source_environment}-oracle-database-backups/*"
+    ]
   }
 }
 

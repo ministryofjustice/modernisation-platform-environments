@@ -22,30 +22,33 @@ locals {
   etl_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "base_rhel_8_5_*"
-      iam_resource_names_prefix = "ec2-etl"
+      ami_name                      = "hmpps_windows_server_2019_release_*"
+      iam_resource_names_prefix     = "ec2-etl"
+      ebs_volumes_copy_all_from_ami = false
+      user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"
-      vpc_security_group_ids = ["private"]
+      vpc_security_group_ids = ["etl"]
     })
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     ebs_volumes = {
-      "/dev/sdb" = { type = "gp3", size = 100 }
-      "/dev/sdc" = { type = "gp3", size = 100 }
-      "/dev/sds" = { type = "gp3", size = 100 }
+      "/dev/sda1" = { type = "gp3", size = 100 }
+      "/dev/sdb"  = { type = "gp3", size = 100 }
+      "/dev/sdc"  = { type = "gp3", size = 100 }
+      "/dev/sds"  = { type = "gp3", size = 100 }
     }
 
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
     tags = {
-      description = "ncr BODS component"
-      ami         = "base_rhel_8_5"
+      description = "BODS & IPS component"
+      ami         = "windows_server_2019"
       os-type     = "Windows"
       server-type = "etl"
-      component   = "data"
+      component   = "etl"
     }
   }
 }
