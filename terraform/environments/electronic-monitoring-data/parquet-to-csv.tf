@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "parquet-to-csv" {
             "s3:GetObject",
             "s3:ListBucket"
         ]
-        resources = ["${aws_s3_bucket.glue-jobs.arn}/*", aws_s3_bucket.glue-jobs.arn, "arn:aws:s3:::dms-em-rds-output", "arn:aws:s3:::dms-em-rds-output/*"]
+        resources = ["${aws_s3_bucket.glue-jobs.arn}/*", aws_s3_bucket.glue-jobs.arn, "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*", aws_s3_bucket.dms_target_ep_s3_bucket.arn]
     }
     statement {
         effect = "Allow"
