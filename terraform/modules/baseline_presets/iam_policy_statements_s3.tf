@@ -64,6 +64,26 @@ locals {
       }
     ]
 
+    S3WritePreprod = [
+      {
+        sid    = "S3WritePreprod"
+        effect = "Allow"
+        actions = [
+          "s3:GetBucketLocation",
+          "s3:GetObject",
+          "s3:GetObjectTagging",
+          "s3:ListBucket",
+          "s3:PutObject",
+        ]
+        principals = {
+          type = "AWS"
+          identifiers = [
+            var.environment.account_root_arns["${var.environment.application_name}-preproduction"]
+          ]
+        }
+      }
+    ]
+
     S3ReadWriteAllEnvironments = [
       {
         sid    = "S3ReadWriteAllEnvironments"
