@@ -24,8 +24,7 @@ data "aws_iam_policy_document" "portal" {
       "backup:StartBackupJob",
       "backup:GetBackupVaultNotifications",
       "backup:PutBackupVaultNotifications",
-      "backup:StartRestoreJob",
-      "backup:CopyIntoBackupVault"
+      "backup:StartRestoreJob"
     ]
 
     resources = [aws_backup_vault.portal.arn]
@@ -35,6 +34,28 @@ data "aws_iam_policy_document" "portal" {
 resource "aws_backup_vault_policy" "portal" {
   backup_vault_name = aws_backup_vault.portal.name
   policy            = data.aws_iam_policy_document.portal.json
+}
+
+data "aws_iam_policy_document" "poc_copy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::411213865113:root"]
+    }
+
+    actions = [
+      "backup:CopyIntoBackupVault"
+    ]
+
+    resources = [aws_backup_vault.portal.arn]
+  }
+}
+
+resource "aws_backup_vault_policy" "poc_copy" {
+  backup_vault_name = aws_backup_vault.portal.name
+  policy            = data.aws_iam_policy_document.poc_copy.json
 }
 
 # Non production backups
