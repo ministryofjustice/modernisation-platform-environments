@@ -9,16 +9,6 @@ data "aws_iam_policy_document" "dms_assume_role" {
   }
 }
 
-data "aws_iam_policy_document" "glue_assume_role" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      identifiers = ["glue.amazonaws.com"]
-      type        = "Service"
-    }
-  }
-}
 
 data "aws_iam_policy_document" "dms_target_ep_s3_bucket" {
   statement {
