@@ -19,7 +19,7 @@ resource "aws_glue_job" "parquet-to-csv" {
     role_arn = aws_iam_role.parquet-to-csv.arn
     default_arguments = {
         "--destination_bucket" = aws_s3_bucket.csv-output-bucket.id
-        "--source_bucket"      = "dms-em-rds-output"
+        "--source_bucket"      = aws_s3_bucket.dms_target_ep_s3_bucket.id
     }
 
     command {
@@ -72,3 +72,5 @@ data "aws_iam_policy_document" "parquet-to-csv" {
       resources = ["*"]
     }
 }
+
+
