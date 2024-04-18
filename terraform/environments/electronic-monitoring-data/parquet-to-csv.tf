@@ -32,9 +32,30 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "csv-output-bucket
   }
 }
 
+data "aws_iam_policy_document" "csv-output-bucket" {
+  statement {
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.csv-output-bucket.arn,
+      "${aws_s3_bucket.csv-output-bucket.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+}
+
 resource "aws_s3_bucket_policy" "csv-output-bucket" {
   bucket = aws_s3_bucket.csv-output-bucket.id
-  policy = data.aws_iam_policy_document.dms_target_ep_s3_bucket.json
+  policy = data.aws_iam_policy_document.csv-output-bucket.json
 }
 
 resource "aws_cloudwatch_log_group" "parquet-to-csv" {
