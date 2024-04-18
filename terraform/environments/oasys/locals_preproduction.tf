@@ -22,15 +22,7 @@ locals {
     }
 
     baseline_s3_buckets     = {}
-    baseline_ssm_parameters = {
-      "/preproduction" = {
-        parameters = {
-          banner_message = {
-            description = "Banner message"
-          }
-        }
-      }
-    }
+    baseline_ssm_parameters = {}
 
     baseline_secretsmanager_secrets = {
       "/oracle/database/PPOASYS"  = local.secretsmanager_secrets_oasys_db
@@ -47,6 +39,9 @@ locals {
       "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
 
       "/oracle/bip/preproduction" = local.secretsmanager_secrets_bip
+
+      "/web/banner/preproduction" = local.secretsmanager_secrets_web_banner
+
     }
 
     baseline_iam_policies = {

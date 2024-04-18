@@ -27,22 +27,7 @@ locals {
     }
 
     baseline_s3_buckets     = {}
-    baseline_ssm_parameters = {
-      "/t1" = {
-        parameters = {
-          banner_message = {
-            description = "Banner message"
-          }
-        }
-      }
-      "/t2" = {
-        parameters = {
-          banner_message = {
-            description = "Banner message"
-          }
-        }
-      }
-    }
+    baseline_ssm_parameters = {}
 
     baseline_secretsmanager_secrets = {
       "/oracle/database/T1OASYS"  = local.secretsmanager_secrets_oasys_db
@@ -65,6 +50,9 @@ locals {
 
       "/oracle/bip/t1" = local.secretsmanager_secrets_bip
       "/oracle/bip/t2" = local.secretsmanager_secrets_bip
+
+      "/web/banner/t2" = local.secretsmanager_secrets_web_banner
+      "/web/banner/t1" = local.secretsmanager_secrets_web_banner
     }
 
     baseline_iam_policies = {

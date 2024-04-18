@@ -22,29 +22,7 @@ locals {
     }
 
     baseline_s3_buckets     = {}
-    baseline_ssm_parameters = {
-      "/production" = {
-        parameters = {
-          banner_message = {
-            description = "Banner message"
-          }
-        }
-      }
-      "/ptc" = {
-        parameters = {
-          banner_message = {
-            description = "Banner message"
-          }
-        }
-      }
-      "/trn" = {
-        parameters = {
-          banner_message = {
-            description = "Banner message"
-          }
-        }
-      }
-    }
+    baseline_ssm_parameters = {}
 
     # baseline_bastion_linux = {
     #   public_key_data = local.public_key_data.keys[local.environment]
@@ -71,6 +49,11 @@ locals {
 
       "/oracle/bip/production" = local.secretsmanager_secrets_bip
       "/oracle/bip/trn"        = local.secretsmanager_secrets_bip
+
+      "/web/banner/production" = local.secretsmanager_secrets_web_banner
+      "/web/banner/ptc"        = local.secretsmanager_secrets_web_banner
+      "/web/banner/trn"        = local.secretsmanager_secrets_web_banner
+     
     }
 
     baseline_iam_policies = {
