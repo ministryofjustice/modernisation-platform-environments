@@ -97,8 +97,8 @@ resource "aws_route53_record" "external_eat" {
   type    = "A"
 
   alias {
-    name                   = module.eat.tribunals_lb.dns_name
-    zone_id                = module.eat.tribunals_lb.zone_id
+    name                   = module.employment_appeals.tribunals_lb.dns_name
+    zone_id                = module.employment_appeals.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
@@ -110,8 +110,8 @@ resource "aws_route53_record" "external_ftt" {
   type    = "A"
 
   alias {
-    name                   = module.ftt.tribunals_lb.dns_name
-    zone_id                = module.ftt.tribunals_lb.zone_id
+    name                   = module.finance_and_tax.tribunals_lb.dns_name
+    zone_id                = module.finance_and_tax.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
@@ -123,8 +123,8 @@ resource "aws_route53_record" "external_imset" {
   type    = "A"
 
   alias {
-    name                   = module.imset.tribunals_lb.dns_name
-    zone_id                = module.imset.tribunals_lb.zone_id
+    name                   = module.immigration_services.tribunals_lb.dns_name
+    zone_id                = module.immigration_services.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
@@ -136,8 +136,8 @@ resource "aws_route53_record" "external_it" {
   type    = "A"
 
   alias {
-    name                   = module.it.tribunals_lb.dns_name
-    zone_id                = module.it.tribunals_lb.zone_id
+    name                   = module.information_tribunal.tribunals_lb.dns_name
+    zone_id                = module.information_tribunal.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
@@ -149,8 +149,8 @@ resource "aws_route53_record" "external_lands" {
   type    = "A"
 
   alias {
-    name                   = module.lands.tribunals_lb.dns_name
-    zone_id                = module.lands.tribunals_lb.zone_id
+    name                   = module.lands_tribunal.tribunals_lb.dns_name
+    zone_id                = module.lands_tribunal.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
