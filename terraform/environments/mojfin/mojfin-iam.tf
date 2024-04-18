@@ -2,7 +2,7 @@ resource "aws_iam_role" "mojfin_rds_oracle" {
   name = "mojfin_rds_oracle-${local.environment}"
   description = "Role for Oracle RDS in ${local.environment}"
 
-  assume_role_policy = data.aws_iam_policy_document.mojfin_rds_oracle.json
+  assume_role_policy = data.aws_iam_policy_document.mojfin_rds_oracle_assume.json
 }
 
 data "aws_iam_policy_document" "mojfin_rds_oracle_assume" {
