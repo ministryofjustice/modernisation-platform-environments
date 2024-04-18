@@ -31,8 +31,3 @@ module "sftp_users_with_egress" {
   egress_bucket_kms_key          = each.value.egress_bucket_kms_key
   supplier_data_kms_key          = module.supplier_data_kms.key_arn
 }
-
-moved {
-  from = module.sftp_users["essex-police"]
-  to   = module.sftp_users_with_egress["essex-police"]
-}
