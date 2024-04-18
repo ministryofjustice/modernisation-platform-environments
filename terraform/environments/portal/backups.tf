@@ -29,14 +29,6 @@ data "aws_iam_policy_document" "portal" {
 
     resources = [aws_backup_vault.portal.arn]
   }
-}
-
-resource "aws_backup_vault_policy" "portal" {
-  backup_vault_name = aws_backup_vault.portal.name
-  policy            = data.aws_iam_policy_document.portal.json
-}
-
-data "aws_iam_policy_document" "poc_copy" {
   statement {
     effect = "Allow"
 
@@ -53,10 +45,11 @@ data "aws_iam_policy_document" "poc_copy" {
   }
 }
 
-resource "aws_backup_vault_policy" "poc_copy" {
+resource "aws_backup_vault_policy" "portal" {
   backup_vault_name = aws_backup_vault.portal.name
-  policy            = data.aws_iam_policy_document.poc_copy.json
+  policy            = data.aws_iam_policy_document.portal.json
 }
+
 
 # Non production backups
 resource "aws_backup_plan" "non_prod_portal" {
