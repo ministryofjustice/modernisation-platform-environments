@@ -77,10 +77,13 @@ locals {
       rds_engine                  = "postgres"
       rds_engine_version          = "15"
       rds_instance_class          = "db.t3.small"
-      rds_allocated_storage       = 20
-      rds_username                = "dbadmin"
+      rds_allocated_storage       = 30
+      rds_username                = "postgres"
       rds_port                    = 5432
       rds_license_model           = "postgresql-license"
+      rds_deletion_protection     = false
+      rds_skip_final_snapshot     = true
+      snapshot_identifier         = "rds-1187-shared-key-version"
       rds_backup_retention_period = 1
       maintenance_window          = "Wed:21:00-Wed:23:00"
       rds_backup_window           = "19:00-21:00"
