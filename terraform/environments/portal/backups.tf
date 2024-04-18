@@ -9,6 +9,7 @@ resource "aws_backup_vault" "portal" {
 
 data "aws_iam_policy_document" "portal" {
   statement {
+    sid = "Allow local account basic permissions to the vault"
     effect = "Allow"
 
     principals {
@@ -30,6 +31,7 @@ data "aws_iam_policy_document" "portal" {
     resources = [aws_backup_vault.portal.arn]
   }
   statement {
+    sid = "Allow copying of recovery points from Landing Zone"
     effect = "Allow"
 
     principals {
