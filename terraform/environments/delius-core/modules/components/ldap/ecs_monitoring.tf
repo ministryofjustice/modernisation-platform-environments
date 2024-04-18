@@ -16,8 +16,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
 
   metric_query {
     id          = "e1"
-    expression  = "ANOMALY_DETECTION_BAND(m1)"
-    label       = "CpuUtilized (Expected)"
+    expression  = "ANOMALY_DETECTION_BAND(m1,4)"
+    label       = "CPUUtilization (Expected)"
     return_data = "true"
   }
 
@@ -26,13 +26,13 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
     return_data = "true"
     metric {
       metric_name = "CpuUtilized"
-      namespace   = "ECS/ContainerInsights"
-      period      = "60"
+      namespace   = "AWS/ECS"
+      period      = "120"
       stat        = "Average"
-      unit        = "Count"
 
       dimensions = {
         ClusterName = local.cluster_name
+        ServiceName = local.cluster_name
       }
     }
   }
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
 resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
   alarm_name                = "ldap-${var.env_name}-ecs-memory-threshold"
   comparison_operator       = "GreaterThanUpperThreshold"
-  evaluation_periods        = "5"
+  evaluation_periods        = "2"
   threshold_metric_id       = "e1"
   alarm_description         = "Triggers alarm if ECS memory crosses a threshold"
   insufficient_data_actions = []
@@ -52,8 +52,8 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
 
   metric_query {
     id          = "e1"
-    expression  = "ANOMALY_DETECTION_BAND(m1)"
-    label       = "MemoryUtilized (Expected)"
+    expression  = "ANOMALY_DETECTION_BAND(m1,4)"
+    label       = "MemoryUtilization (Expected)"
     return_data = "true"
   }
 
@@ -61,11 +61,10 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
     id          = "m1"
     return_data = "true"
     metric {
-      metric_name = "MemoryUtilized"
-      namespace   = "ECS/ContainerInsights"
-      period      = "60"
+      metric_name = "MemoryUtilization"
+      namespace   = "AWS/ECS"
+      period      = "120"
       stat        = "Average"
-      unit        = "Count"
 
       dimensions = {
         ClusterName = local.cluster_name
