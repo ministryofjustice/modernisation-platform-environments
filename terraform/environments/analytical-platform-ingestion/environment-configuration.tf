@@ -23,19 +23,12 @@ locals {
       /* Transfer Server */
       transfer_server_hostname = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
       transfer_server_sftp_users = {
-        "garyhanderson" = {
-          ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID2lrI7AhZ9Sy/JAVDfPPEkCZawuuVJ7MHg6NNAwYImb garyconorhenderson@gmail.com"
-          cidr_blocks = ["88.97.238.146/32"]
+        "essex-police" = {
+          ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBCv3JdWZ/2NGd8KKaeICIjqw5zwI2NtzQSWtvscfKZS lalitha.nagarur@digital.justice.gov.uk"
+          cidr_blocks = ["213.121.161.124/32"]
         }
       }
-      transfer_server_sftp_users_with_egress = {
-        "jacobwoffenden-egress" = {
-          ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN+3qaLVtn6Pd+DasWHhIOBoXEEhF9GZAG+DYfJBeySS Ministry of Justice"
-          cidr_blocks           = ["90.246.52.170/32", "81.145.185.153/32"]
-          egress_bucket         = module.bold_egress_bucket.s3_bucket_id
-          egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
-        }
-      }
+      transfer_server_sftp_users_with_egress = {}
     }
     production = {
       /* VPC */
