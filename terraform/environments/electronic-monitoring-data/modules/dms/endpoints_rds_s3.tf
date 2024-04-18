@@ -3,7 +3,7 @@ resource "aws_dms_endpoint" "dms-rds-source" {
 
   #   certificate_arn             = ""
   database_name = var.database_name
-  endpoint_id   = "rds-mssql-${var.database_name}-tf"
+  endpoint_id   = "rds-mssql-${replace(var.database_name, "_", "-")}-tf"
   endpoint_type = "source"
   engine_name   = "sqlserver"
   #   extra_connection_attributes = ""
