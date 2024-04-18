@@ -23,7 +23,7 @@
       "environment_name": "staging",
       "container_port": 80,
       "client_id": "6a941975-c916-4189-b650-e7b1f1ed7975",
-      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "ami_image_id": "ami-0cf98f96c2bae561e",
       "instance_type": "t3.medium",
       "app_count": 2,
       "ec2_desired_capacity": 2,
