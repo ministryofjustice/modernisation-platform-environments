@@ -55,24 +55,24 @@ locals {
           nomis-data-hub-environment = "pd"
         })
       })
-      pd-ndh-app-b = merge(local.ndh_app_b, {
-        config = merge(local.ndh_app_b.config, {
-          instance_profile_policies = concat(local.ndh_app_b.config.instance_profile_policies, [
+      pd-ndh-app-b = merge(local.ndh_app_a, {
+        config = merge(local.ndh_app_a.config, {
+          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
             "Ec2ppPolicy",
           ])
         })
-        tags = merge(local.ndh_app_b.tags, {
+        tags = merge(local.ndh_app_a.tags, {
           os-type                    = "Linux"
           nomis-data-hub-environment = "pd"
         })
       })
-      pd-ndh-ems-b = merge(local.ndh_ems_b, {
-        config = merge(local.ndh_ems_b.config, {
-          instance_profile_policies = concat(local.ndh_ems_b.config.instance_profile_policies, [
+      pd-ndh-ems-b = merge(local.ndh_ems_a, {
+        config = merge(local.ndh_ems_a.config, {
+          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
             "Ec2ppPolicy",
           ])
         })
-        tags = merge(local.ndh_ems_b.tags, {
+        tags = merge(local.ndh_ems_a.tags, {
           os-type                    = "Linux"
           nomis-data-hub-environment = "pd"
         })
