@@ -308,7 +308,7 @@ module "information_tribunal" {
 module "lands_tribunal" {
   source                            = "./modules/tribunal"
   app_name                          = "lands"
-  app_url                           = "lands-tribunal"
+  app_url                           = "lands-chamber"
   sql_migration_path                = "../scripts/lands_chamber"
   app_db_name                       = "lands"
   app_db_login_name                 = "lands-app"
