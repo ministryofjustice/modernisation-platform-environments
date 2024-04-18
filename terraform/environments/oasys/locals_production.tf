@@ -107,6 +107,7 @@ locals {
               "s3:GetObject",
               "s3:GetObjectTagging",
               "s3:ListBucket",
+              "s3:PutObject"
             ]
             resources = [
               "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
