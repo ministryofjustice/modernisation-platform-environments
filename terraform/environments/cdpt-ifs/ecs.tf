@@ -518,3 +518,8 @@ resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
   name           = "${local.application_name}-log-stream"
   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
 }
+
+resource "aws_iam_role_policy_attachment" "bastion_managed" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.ec2_role.name
+}
