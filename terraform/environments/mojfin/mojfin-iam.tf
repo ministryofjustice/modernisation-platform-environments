@@ -1,7 +1,3 @@
-resource "aws_s3_bucket" "mojfin_rds_oracle" {
-  bucket = "mojfin-oracle-rds-${local.environment}"
-}
-
 resource "aws_iam_role" "mojfin_rds_oracle" {
   name = "mojfin_rds_oracle-${local.environment}"
   description = "Role for Oracle RDS in ${local.environment}"
@@ -19,7 +15,6 @@ data "aws_iam_policy_document" "mojfin_rds_oracle" {
       "s3:PutObject"
     ]
     resources = [
-      aws_s3_bucket.mojfin_rds_oracle.arn,
       "${aws_s3_bucket.mojfin_rds_oracle.arn}/*"
     ]
   }
