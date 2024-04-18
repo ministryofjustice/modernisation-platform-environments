@@ -77,7 +77,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
 resource "aws_cloudwatch_log_metric_filter" "error" {
   name           = "ldap-${var.env_name}-application-error"
   pattern        = "Error in Helpdesk"
-  log_group_name = aws_cloudwatch_log_group.ecs.name
+  log_group_name = aws_cloudwatch_log_group.ldap_ecs.name
 
   metric_transformation {
     name          = "ErrorCount"
@@ -104,9 +104,9 @@ resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
 
 
 resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
-  log_group_name = aws_cloudwatch_log_group.ecs.name
+  log_group_name = aws_cloudwatch_log_group.ldap_ecs.name
   name           = "ldap-${var.env_name}-logged-errors"
-  pattern        = var.log_error_pattern
+  pattern        = "error"
   metric_transformation {
     name          = "LoggedErrors"
     namespace     = "${var.env_name}/ldap"
