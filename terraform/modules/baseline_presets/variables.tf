@@ -32,6 +32,7 @@ variable "options" {
     enable_shared_s3                             = optional(bool, false)
     enable_observability_platform_monitoring     = optional(bool, false)
     db_backup_s3                                 = optional(bool, false)
+    preprod_write_prod                           = optional(bool, false)
     route53_resolver_rules                       = optional(map(list(string)), {})
     iam_policies_filter                          = optional(list(string), [])
     iam_policies_ec2_default                     = optional(list(string), [])

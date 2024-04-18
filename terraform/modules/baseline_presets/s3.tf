@@ -26,9 +26,16 @@ locals {
 
     # If db_backup_s3 enabled, create db_backups in all environments.
     # Dev and Test can both access each other: Preprod can access prod but not vice-versa
-    var.options.db_backup_s3 && var.environment.environment == "production" ? { "prod-${var.environment.application_name}-db-backup-bucket-" = {
+    var.options.db_backup_s3 && var.environment.environment == "production" && ! var.options.preprod_write_prod ? { "prod-${var.environment.application_name}-db-backup-bucket-" = {
       bucket_policy_v2 = [
         local.s3_bucket_policies.PreprodReadOnlyAccessBucketPolicy
+      ]
+      custom_kms_key = var.environment.kms_keys["general"].arn
+      iam_policies   = local.requested_s3_iam_policies
+    } } : {},
+    var.options.db_backup_s3 && var.environment.environment == "production" && var.options.preprod_write_prod ? { "prod-${var.environment.application_name}-db-backup-bucket-" = {
+      bucket_policy_v2 = [
+        local.s3_bucket_policies.PreprodWriteAccessBucketPolicy
       ]
       custom_kms_key = var.environment.kms_keys["general"].arn
       iam_policies   = local.requested_s3_iam_policies
@@ -57,6 +64,7 @@ locals {
     ImageBuilderWriteAccessBucketPolicy                 = local.iam_policy_statements_s3.S3ReadWriteCoreSharedServicesProduction[0]
     AllEnvironmentsReadOnlyAccessBucketPolicy           = local.iam_policy_statements_s3.S3ReadAllEnvironments[0]
     PreprodReadOnlyAccessBucketPolicy                   = local.iam_policy_statements_s3.S3ReadOnlyPreprod[0]
+    PreprodWriteAccessBucketPolicy                      = local.iam_policy_statements_s3.S3WritePreprod[0]
     AllEnvironmentsWriteAccessBucketPolicy              = local.iam_policy_statements_s3.S3ReadWriteAllEnvironments[0]
     ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy   = local.iam_policy_statements_s3.S3ReadProdPreprod[0]
     ProdPreprodEnvironmentsWriteAccessBucketPolicy      = local.iam_policy_statements_s3.S3ReadWriteProdPreprod[0]
