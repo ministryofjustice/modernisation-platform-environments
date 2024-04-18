@@ -61,10 +61,4 @@ locals {
     }
   }
 
-  secretsmanager_secrets_web_banner = {
-    secrets = {
-      message     = {}
-    }
-  }
-
 }
