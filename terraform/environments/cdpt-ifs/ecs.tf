@@ -521,5 +521,5 @@ resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
 
 resource "aws_iam_role_policy_attachment" "bastion_managed" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  role       = aws_iam_role.ec2_role.name
+  role       = aws_iam_role.ec2_instance_role.name
 }
