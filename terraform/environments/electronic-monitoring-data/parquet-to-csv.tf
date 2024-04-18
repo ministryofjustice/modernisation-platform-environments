@@ -14,6 +14,29 @@ resource "aws_s3_bucket" "csv-output-bucket" {
     bucket_prefix = "data-to-ap-"
 }
 
+resource "aws_s3_bucket_public_access_block" "csv-output-bucket" {
+  bucket                  = aws_s3_bucket.csv-output-bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "csv-output-bucket" {
+  bucket = aws_s3_bucket.csv-output-bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "csv-output-bucket" {
+  bucket = aws_s3_bucket.csv-output-bucket.id
+  policy = data.aws_iam_policy_document.dms_target_ep_s3_bucket.json
+}
+
 resource "aws_cloudwatch_log_group" "parquet-to-csv" {
   name              = "parquet-to-csv"
   retention_in_days = 14
