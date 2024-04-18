@@ -38,19 +38,6 @@ resource "aws_route53_record" "external_validation" {
 #   }
 # }
 
-resource "aws_route53_record" "external_transport" {
-  provider = aws.core-vpc 
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "transportappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = module.transport.tribunals_lb.dns_name
-    zone_id                = module.transport.tribunals_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
 resource "aws_route53_record" "external_appeals" {
   provider = aws.core-vpc 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -89,6 +76,97 @@ resource "aws_route53_record" "external_ahmlr" {
 #     evaluate_target_health = true
 #   }
 # }
+
+resource "aws_route53_record" "external_cicap" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "cicap.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.cicap.tribunals_lb.dns_name
+    zone_id                = module.cicap.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_eat" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "employmentappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.eat.tribunals_lb.dns_name
+    zone_id                = module.eat.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_ftt" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "finance-and-tax.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.ftt.tribunals_lb.dns_name
+    zone_id                = module.ftt.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_imset" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "immigration-services.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.imset.tribunals_lb.dns_name
+    zone_id                = module.imset.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_it" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "information-tribunal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.it.tribunals_lb.dns_name
+    zone_id                = module.it.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_lands" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "lands-chamber.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.lands.tribunals_lb.dns_name
+    zone_id                = module.lands.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_transport" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "transportappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.transport.tribunals_lb.dns_name
+    zone_id                = module.transport.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
 # Define a wildcard ACM certificate for sandbox/dev
 resource "aws_acm_certificate" "external" {
