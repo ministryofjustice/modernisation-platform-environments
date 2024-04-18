@@ -1,7 +1,7 @@
 {
   "Logging": {
     "EnableLogging": true,
-    "EnableLogContext": false,
+    "EnableLogContext": true,
     "LogComponents": [
       {
         "Severity": "LOGGER_SEVERITY_DEFAULT",
