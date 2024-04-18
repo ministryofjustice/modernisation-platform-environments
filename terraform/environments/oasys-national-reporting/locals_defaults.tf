@@ -109,16 +109,23 @@ locals {
     })
     # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
     ebs_volumes = {
-      "/dev/sdb" = { label = "app" }   # /u01
-      "/dev/sdc" = { label = "app" }   # /u02
-      "/dev/sde" = { label = "data" }  # DATA01
-      "/dev/sdf" = { label = "data" }  # DATA02
-      "/dev/sdg" = { label = "data" }  # DATA03
-      "/dev/sdh" = { label = "data" }  # DATA04
-      "/dev/sdi" = { label = "data" }  # DATA05
-      "/dev/sdj" = { label = "flash" } # FLASH01
-      "/dev/sdk" = { label = "flash" } # FLASH02
-      "/dev/sds" = { label = "swap" }
+      "/dev/sda1" = { label = "root", size = 30 }  # root volume
+      "/dev/sdb" = { label = "app", size = 128 }   # /u01
+      "/dev/sdc" = { label = "app", size = 128 }   # /u02
+      "/dev/sde" = { label = "data", size = 1023 }  # DATA01
+      # "/dev/sdf" = { label = "data", size = 1023 }  # DATA02
+      # "/dev/sdg" = { label = "data", size = 1023 }  # DATA03
+      # "/dev/sdh" = { label = "data", size = 1023 }  # DATA04
+      # "/dev/sdi" = { label = "data", size = 1023 }  # DATA05
+      # "/dev/sdj" = { label = "data", size = 1023 } # DATA06
+      "/dev/sdk" = { label = "flash", size = 1023 } # FLASH01
+      # "/dev/sdl" = { label = "flash", size = 1023 } # FLASH02
+      # "/dev/sdm" = { label = "flash", size = 1023 } # FLASH03
+      # "/dev/sdn" = { label = "flash", size = 1023 } # FLASH04
+      # "/dev/sdo" = { label = "flash", size = 1023 } # FLASH05
+      # "/dev/sdp" = { label = "flash", size = 1023 } # FLASH06
+      # "/dev/sdq" = { label = "flash", size = 1023 } # FLASH07
+      "/dev/sds" = { label = "swap", size = 128 }
     }
     ebs_volume_config = {
       data = {
@@ -132,7 +139,7 @@ locals {
     }
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.onr_db off for now
     tags = {
-      os-type   = "Windows"
+      os-type   = "Linux"
       component = "onr_db"
     }
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
