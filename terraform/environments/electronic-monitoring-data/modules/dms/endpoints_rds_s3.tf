@@ -28,7 +28,7 @@ resource "aws_dms_endpoint" "dms-rds-source" {
 resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
 
   # Minimal Config:
-  endpoint_id             = "s3-${var.database_name}-tf"
+  endpoint_id             = "s3-${replace(var.database_name, "_", "-")}-tf"
   endpoint_type           = "target"
   bucket_name             = var.target_s3_bucket_name
   service_access_role_arn = var.ep_service_access_role_arn
