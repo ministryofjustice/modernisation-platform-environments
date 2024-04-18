@@ -5,6 +5,8 @@ resource "aws_s3_bucket" "mojfin_rds_oracle" {
 resource "aws_iam_role" "mojfin_rds_oracle" {
   name = "mojfin_rds_oracle-${local.environment}"
   description = "Role for Oracle RDS in ${local.environment}"
+
+  assume_role_policy = data.aws_iam_policy_document.mojfin_rds_oracle.json
 }
 
 data "aws_iam_policy_document" "mojfin_rds_oracle" {
