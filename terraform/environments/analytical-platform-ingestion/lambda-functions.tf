@@ -154,6 +154,7 @@ module "transfer_lambda" {
 
   environment_variables = {
     PROCESSED_BUCKET_NAME = module.processed_bucket.s3_bucket_id
+    SNS_TOPIC_ARN         = module.transferred_topic.topic_arn
   }
 
   # TODO: Check if KMS key is actually needed below
@@ -171,7 +172,9 @@ module "transfer_lambda" {
       ]
       resources = [
         module.s3_processed_kms.key_arn,
-        module.supplier_data_kms.key_arn
+        module.supplier_data_kms.key_arn,
+        module.transferred_sns_kms.key_arn,
+        module.quarantined_sns_kms.key_arn
       ]
     },
     secretsmanager_access = {
@@ -216,6 +219,14 @@ module "transfer_lambda" {
         "s3:ListBucket"
       ]
       resources = formatlist("arn:aws:s3:::%s", local.environment_configuration.target_buckets)
+    },
+    sns = {
+      sid    = "AllowSNS"
+      effect = "Allow"
+      actions = [
+        "sns:Publish"
+      ]
+      resources = [module.transferred_topic.topic_arn]
     }
   }
 
@@ -223,6 +234,135 @@ module "transfer_lambda" {
     "s3" = {
       principal  = "s3.amazonaws.com"
       source_arn = module.processed_bucket.s3_bucket_arn
+    }
+  }
+}
+
+module "notify_quarantined_lambda" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "7.2.5"
+
+  publish        = true
+  create_package = false
+
+  function_name          = "notify-quarantined"
+  description            = "Quarantined notifications"
+  package_type           = "Image"
+  memory_size            = 2048
+  ephemeral_storage_size = 10240
+  timeout                = 900
+  image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-notify:${local.environment_configuration.notify_image_version}"
+
+  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
+  attach_network_policy  = true
+
+  environment_variables = {
+    MODE = "quarantined"
+    # GOVUK_NOTIFY_API_KEY_SECRET   = data.aws_secretsmanager_secret_version.govuk_notify_api_key.id
+    # GOVUK_NOTIFY_TEMPLATES_SECRET = data.aws_secretsmanager_secret_version.govuk_notify_templates.id
+    # SLACK_TOKEN                   = data.aws_secretsmanager_secret_version.slack_token.id
+    GOVUK_NOTIFY_API_KEY_SECRET   = "ingestion/govuk-notify/api-key"   #TODO: un-hardcode
+    GOVUK_NOTIFY_TEMPLATES_SECRET = "ingestion/govuk-notify/templates" #TODO: un-hardcode
+    SLACK_TOKEN_SECRET            = "ingestion/slack-token"            #TODO: un-hardcode
+  }
+
+  # TODO: Check if KMS key is actually needed below
+  attach_policy_statements = true
+  policy_statements = {
+    kms_access = {
+      sid    = "AllowKMS"
+      effect = "Allow"
+      actions = [
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Encrypt",
+        "kms:DescribeKey",
+        "kms:Decrypt"
+      ]
+      resources = [
+        module.quarantined_sns_kms.key_arn,
+        module.govuk_notify_kms.key_arn,
+        module.slack_token_kms.key_arn,
+        module.supplier_data_kms.key_arn
+      ]
+    },
+    secretsmanager_access = {
+      sid       = "AllowSecretsManager"
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+    }
+  }
+  allowed_triggers = {
+    "sns" = {
+      principal  = "sns.amazonaws.com"
+      source_arn = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${module.quarantined_topic.topic_name}"
+    }
+  }
+}
+
+module "notify_transferred_lambda" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "7.2.5"
+
+  publish        = true
+  create_package = false
+
+  function_name          = "notify-transferred"
+  description            = "Transferred notifications"
+  package_type           = "Image"
+  memory_size            = 2048
+  ephemeral_storage_size = 10240
+  timeout                = 900
+  image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-notify:${local.environment_configuration.notify_image_version}"
+
+  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
+  attach_network_policy  = true
+
+  environment_variables = {
+    MODE                          = "transferred"
+    GOVUK_NOTIFY_API_KEY_SECRET   = "ingestion/govuk-notify/api-key"   #TODO: un-hardcode
+    GOVUK_NOTIFY_TEMPLATES_SECRET = "ingestion/govuk-notify/templates" #TODO: un-hardcode
+    SLACK_TOKEN_SECRET            = "ingestion/slack-token"            #TODO: un-hardcode
+  }
+
+  # TODO: Check if KMS key is actually needed below
+  attach_policy_statements = true
+  policy_statements = {
+    kms_access = {
+      sid    = "AllowKMS"
+      effect = "Allow"
+      actions = [
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Encrypt",
+        "kms:DescribeKey",
+        "kms:Decrypt"
+      ]
+      resources = [
+        module.quarantined_sns_kms.key_arn,
+        module.govuk_notify_kms.key_arn,
+        module.slack_token_kms.key_arn,
+        module.supplier_data_kms.key_arn
+      ]
+    },
+    secretsmanager_access = {
+      sid       = "AllowSecretsManager"
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+    }
+  }
+  allowed_triggers = {
+    "sns" = {
+      principal  = "sns.amazonaws.com"
+      source_arn = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${module.transferred_topic.topic_name}"
     }
   }
 }
