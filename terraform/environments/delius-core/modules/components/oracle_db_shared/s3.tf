@@ -1,6 +1,6 @@
 module "s3_bucket_oracledb_backups" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
-  bucket_name         = "${var.env_name}-oracle-database-backups"
+  bucket_name         = "${local.oracle_backup_bucket_name}"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
@@ -141,8 +141,8 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
       "s3:*"
     ]
     resources = [
-      "arn:aws:s3:::${local.oracle_duplicate_delius_source_environment}-oracle-database-backups",
-      "arn:aws:s3:::${local.oracle_duplicate_delius_source_environment}-oracle-database-backups/*"
+      "arn:aws:s3:::${local.oracle_backup_bucket_name}",
+      "arn:aws:s3:::${local.oracle_backup_bucket_name}/*"
     ]
   }
 }
@@ -162,11 +162,11 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
 }
 
 resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
-  bucket = "${var.env_name}-oracle-database-backups-inventory"
+  bucket = "${local.oracle_backup_bucket_name}-inventory"
   tags = merge(
     var.tags,
     {
-      "Name" = "${var.env_name}-oracle-database-backups-inventory"
+      "Name" = "${local.oracle_backup_bucket_name}-inventory"
     },
     {
       "Purpose" = "Inventory of Oracle DB Backup Pieces"
