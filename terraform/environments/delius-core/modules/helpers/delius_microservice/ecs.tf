@@ -1,9 +1,9 @@
 module "container_definition" {
-  source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.61.1"
-  container_name           = var.name
-  container_image          = var.container_image
-  container_memory         = var.container_memory
-  container_cpu            = var.container_cpu
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v4.0.2"
+  name                     = var.name
+  image                    = var.container_image
+  memory                   = var.container_memory
+  cpu                      = var.container_cpu
   essential                = true
   readonly_root_filesystem = false
 
@@ -30,15 +30,10 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
-  container_definition_json = module.container_definition.json_map_encoded_list
-
-  ecs_cluster_arn = var.ecs_cluster_arn
-  name            = var.name
-  vpc_id          = var.account_config.shared_vpc_id
-
-  launch_type  = "FARGATE"
-  network_mode = "awsvpc"
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v4.0.2"
+  container_definitions = module.container_definition.json_encoded_list
+  cluster_arn           = var.ecs_cluster_arn
+  name                  = var.name
 
   task_cpu    = var.container_cpu
   task_memory = var.container_memory
@@ -51,12 +46,9 @@ module "ecs_service" {
   task_role_arn      = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_role.name}"
   task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_exec_role.name}"
 
-  environment = var.env_name
-  namespace   = var.namespace
-
   health_check_grace_period_seconds = var.health_check_grace_period_seconds
 
-  ecs_load_balancers = concat([{
+  service_load_balancers = concat([{
     target_group_arn = aws_lb_target_group.frontend.arn
     container_name   = var.name
     container_port   = var.container_port_config[0].containerPort
@@ -65,13 +57,15 @@ module "ecs_service" {
 
   efs_volumes = var.efs_volumes
 
-  security_group_ids = [aws_security_group.ecs_service.id, var.cluster_security_group_id]
+  security_groups = [aws_security_group.ecs_service.id]
 
-  subnet_ids = var.account_config.private_subnet_ids
+  subnets = var.account_config.private_subnet_ids
 
-  exec_enabled = true
+  enable_execute_command = true
 
-  ignore_changes_task_definition = var.ignore_changes_task_definition # task definition managed by Delius App team
-  redeploy_on_apply              = var.redeploy_on_apply
-  force_new_deployment           = var.force_new_deployment
+  ignore_changes = var.ignore_changes_service_task_definition
+
+  ignore_changes_service_task_definition = var.ignore_changes_service_task_definition # CHECK THIS
+
+  tags = var.tags
 }

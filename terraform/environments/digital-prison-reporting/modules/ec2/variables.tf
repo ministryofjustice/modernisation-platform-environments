@@ -129,8 +129,8 @@ variable "account" {
 
 variable "scale_down" {
   description = "Whether to scale down the auto scaling groups in the evening to save costs"
-  type    = bool
-  default = true
+  type        = bool
+  default     = true
 }
 
 #variable "s3_policy_arn" {

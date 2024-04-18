@@ -1,20 +1,20 @@
 
 # resource "aws_security_group" "efs_sg" {
-#
+
 #   name        = "${local.application_name}-${local.environment}-repo_home-efs-security-group"
 #   description = "Portal repo_home Product EFS Security Group"
 #   vpc_id      = data.aws_vpc.shared.id
 # }
-#
+
 # resource "aws_vpc_security_group_egress_rule" "efs_repo_home_outbound" {
-#
+
 #   security_group_id = aws_security_group.efs_sg.id
 #   cidr_ipv4   = "0.0.0.0/0"
 #   ip_protocol = "-1"
 # }
-#
+
 # resource "aws_vpc_security_group_ingress_rule" "efs_repo_home_inbound" {
-#
+
 #   security_group_id = aws_security_group.efs_sg.id
 #   referenced_security_group_id = aws_security_group.efs_sg.id
 #   description = "EFS Rule inbound for repo_home"
@@ -22,6 +22,17 @@
 #   ip_protocol = "tcp"
 #   to_port     = 2049
 # }
+
+# #########################################################
+# Temp import block for restoring from AWS Backup
+# #########################################################
+#
+# import {
+#   to = aws_efs_file_system.efs
+#   id = "fs-069d32c0103c46d68"
+# }
+#
+###########################################################
 
 resource "aws_efs_file_system" "efs" {
 

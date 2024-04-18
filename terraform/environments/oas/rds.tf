@@ -44,3 +44,5 @@ resource "aws_route53_record" "oas-rds" {
   ttl      = 60
   records  = [module.rds.rds_endpoint]
 }
+
+

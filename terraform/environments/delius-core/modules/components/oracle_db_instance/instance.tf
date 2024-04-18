@@ -106,7 +106,8 @@ module "instance" {
   tags = merge(var.tags,
     { Name = lower(format("%s-delius-db-%s", var.env_name, local.instance_name_index)) },
     { server-type = "delius_core_db" },
-    { database = local.database_tag }
+    { database = local.database_tag },
+    var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
   )
   #  cloudwatch_metric_alarms = {}
 }

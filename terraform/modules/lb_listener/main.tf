@@ -47,6 +47,7 @@ resource "aws_lb_listener" "this" {
       dynamic "redirect" {
         for_each = default_action.value.redirect != null ? [default_action.value.redirect] : []
         content {
+          host        = redirect.value.host
           status_code = redirect.value.status_code
           port        = redirect.value.port
           protocol    = redirect.value.protocol

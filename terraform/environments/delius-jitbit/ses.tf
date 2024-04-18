@@ -3,11 +3,11 @@
 #############"
 
 resource "aws_ses_domain_identity" "jitbit" {
-  domain = "${local.app_url}"
+  domain = local.app_url
 }
 
 resource "aws_ses_domain_identity_verification" "jitbit" {
-  domain = "${local.app_url}"
+  domain = local.app_url
 }
 
 resource "aws_route53_record" "jitbit_ses_verification_record" {

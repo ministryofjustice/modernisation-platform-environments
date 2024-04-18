@@ -20,12 +20,12 @@ locals {
       }
     }
     baseline_secretsmanager_secrets = {
-      "/oracle/database/PREPRODBIPSYS" = local.database_secretsmanager_secrets
-      "/oracle/database/PREPRODBIPAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/PPBIPSYS" = local.database_secretsmanager_secrets
+      "/oracle/database/PPBIPAUD" = local.database_secretsmanager_secrets
     }
 
     baseline_iam_policies = {
-      Ec2PREPRODDatabasePolicy = {
+      Ec2PPDatabasePolicy = {
         description = "Permissions required for PREPROD Database EC2s"
         statements = [
           {
@@ -44,8 +44,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PREPROD/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PREPROD*/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
           }
         ]
@@ -75,8 +75,8 @@ locals {
           }
         ]
       }
-      Ec2PREPRODReportingPolicy = {
-        description = "Permissions required for PREPROD reporting EC2s"
+      Ec2PPReportingPolicy = {
+        description = "Permissions required for PP reporting EC2s"
         statements = [
           {
             effect = "Allow"
@@ -85,8 +85,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cms/PREPROD/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat-admin/PREPROD/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cms/PP/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat-admin/PP/*",
             ]
           }
         ]
@@ -116,7 +116,7 @@ locals {
       #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
       #   config = merge(local.bip_cms_ec2_default.config, {
       #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PREPRODReportingPolicy",
+      #       "Ec2PPReportingPolicy",
       #     ])
       #   })
       #   instance = merge(local.bip_cms_ec2_default.instance, {
@@ -132,7 +132,7 @@ locals {
       #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
       #   config = merge(local.bip_cms_ec2_default.config, {
       #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PREPRODReportingPolicy",
+      #       "Ec2PPReportingPolicy",
       #     ])
       #   })
       #   instance = merge(local.bip_cms_ec2_default.instance, {
@@ -148,7 +148,7 @@ locals {
       #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
       #   config = merge(local.bip_cms_ec2_default.config, {
       #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PREPRODReportingPolicy",
+      #       "Ec2PPReportingPolicy",
       #     ])
       #   })
       #   instance = merge(local.bip_cms_ec2_default.instance, {
@@ -164,7 +164,7 @@ locals {
       #   cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
       #   config = merge(local.tomcat_admin_ec2_default.config, {
       #     instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PREPRODReportingPolicy",
+      #       "Ec2PPReportingPolicy",
       #     ])
       #   })
       #   instance = merge(local.bip_cms_ec2_default.instance, {
@@ -179,7 +179,7 @@ locals {
       #   cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
       #   config = merge(local.tomcat_admin_ec2_default.config, {
       #     instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PREPRODReportingPolicy",
+      #       "Ec2PPReportingPolicy",
       #     ])
       #   })
       #   instance = merge(local.bip_cms_ec2_default.instance, {
@@ -194,7 +194,7 @@ locals {
       #   cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
       #   config = merge(local.tomcat_admin_ec2_default.config, {
       #     instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PREPRODReportingPolicy",
+      #       "Ec2PPReportingPolicy",
       #     ])
       #   })
       #   instance = merge(local.bip_cms_ec2_default.instance, {
@@ -205,7 +205,7 @@ locals {
       #     nomis-combined-reporting-environment = "preprod"
       #   })
       # })
-      preprod-ncr-db-1-a = merge(local.database_ec2_default, {
+      pp-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
           local.database_cloudwatch_metric_alarms.standard,
           local.database_cloudwatch_metric_alarms.db_connected,
@@ -213,13 +213,54 @@ locals {
         )
         config = merge(local.database_ec2_default.config, {
           instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
-            "Ec2PREPRODDatabasePolicy",
+            "Ec2PPDatabasePolicy",
           ])
         })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 200
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 4
+          }
+        }
+        ebs_volume_config = {
+          data = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 500
+          }
+          flash = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 200
+          }
+        }
         tags = merge(local.database_ec2_default.tags, {
           description                          = "PREPROD NCR DATABASE"
-          nomis-combined-reporting-environment = "preprod"
-          oracle-sids                          = "PREPRODBIPSYS PREPRODBIPAUD"
+          nomis-combined-reporting-environment = "pp"
+          oracle-sids                          = "PPBIPSYS PPBIPAUD"
           instance-scheduling                  = "skip-scheduling"
         })
       })
@@ -282,9 +323,7 @@ locals {
     baseline_route53_zones = {
       "preproduction.reporting.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "preprod-ncr", type = "CNAME", ttl = "300", records = ["t1ncr-a.preproduction.reporting.nomis.service.justice.gov.uk"] },
-          { name = "preprod-ncr-a", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "preprod-ncr-b", type = "CNAME", ttl = "300", records = ["t1-ncr-db-1-b.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db", type = "CNAME", ttl = "3600", records = ["pp-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] }
         ]
       }
     }

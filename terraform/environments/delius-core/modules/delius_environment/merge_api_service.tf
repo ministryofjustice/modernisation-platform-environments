@@ -67,12 +67,15 @@ module "merge_api_service" {
   container_secrets_env_specific = try(var.delius_microservice_configs.merge_api.container_secrets_env_specific, {})
 
 
+  ignore_changes_service_task_definition = true
+
   providers = {
     aws          = aws
     aws.core-vpc = aws.core-vpc
   }
 
-  log_error_pattern      = "ERROR"
-  sns_topic_arn          = aws_sns_topic.delius_core_alarms.arn
-  frontend_lb_arn_suffix = aws_lb.delius_core_frontend.arn_suffix
+  log_error_pattern       = "ERROR"
+  sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
+  frontend_lb_arn_suffix  = aws_lb.delius_core_frontend.arn_suffix
+  enable_platform_backups = var.enable_platform_backups
 }

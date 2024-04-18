@@ -1,8 +1,11 @@
+#tfsec:ignore:avd-aws-0057 https://github.com/ministryofjustice/observability-platform/issues/57
+#tfsec:ignore:avd-aws-0066 AWS X-Ray instrumentation is not enabled in the function's code
 module "grafana_api_key_rotator" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_AWS_258:Function is not invoked by URL
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.2.5"
+  version = "7.2.6"
 
   publish        = true
   create_package = false
@@ -15,15 +18,15 @@ module "grafana_api_key_rotator" {
   image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/observability-platform-grafana-api-key-rotator:${local.environment_configuration.grafana_api_key_rotator_version}"
 
   environment_variables = {
-    WORKSPACE_API_KEY_NAME = "observability-platform-automation"
+    WORKSPACE_API_KEY_NAME = "observability-platform-automation" #checkov:skip=CKV_SECRET_6:This a reference to a secret, not a secret itself
     WORKSPACE_ID           = module.managed_grafana.workspace_id
     SECRET_ID              = aws_secretsmanager_secret.grafana_api_key.id
   }
 
   attach_policy_statements = true
   policy_statements = {
-    "amazonmanagedgrafana" = {
-      sid    = "AmazonManagedGrafana"
+    "grafana" = {
+      sid    = "Grafana"
       effect = "Allow"
       actions = [
         "grafana:CreateWorkspaceApiKey",

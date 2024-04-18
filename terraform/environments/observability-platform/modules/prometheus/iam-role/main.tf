@@ -20,7 +20,7 @@ module "iam_policy" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.38.0"
+  version = "5.39.0"
 
   name_prefix = "${var.name}-prometheus"
 
@@ -31,7 +31,7 @@ module "iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.38.0"
+  version = "5.39.0"
 
   create_role             = true
   role_name               = "${var.name}-prometheus"

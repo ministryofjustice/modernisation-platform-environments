@@ -33,18 +33,19 @@ locals {
       "/oracle/database/PDOASYS" = local.secretsmanager_secrets_oasys_db
       "/oracle/database/PROASYS" = local.secretsmanager_secrets_oasys_db
       "/oracle/database/TROASYS" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/DROASYS" = local.secretsmanager_secrets_oasys_db
 
-      # "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
+      "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
       "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
-      # "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
-      # "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
+      "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
+      "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
+      "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
+      "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
 
       "/oracle/database/TRBIPINF" = local.secretsmanager_secrets_bip_db
 
       # for azure, remove when migrated to aws db
-      # "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
 
       "/oracle/bip/production" = local.secretsmanager_secrets_bip
       "/oracle/bip/trn"        = local.secretsmanager_secrets_bip
@@ -129,6 +130,7 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/DR*/*",
             ]
           },
         ]
@@ -207,17 +209,51 @@ locals {
     }
 
     baseline_ec2_instances = {
-      # "pd-${local.application_name}-db-a" = merge(local.database_a, {
-      #   config = merge(local.database_a.config, {
-      #     instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
-      #       "Ec2ProdDatabasePolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.database_a.tags, {
-      #     bip-db-name = "PDBIPINF"
-      #     oracle-sids = "PDBIPINF PDOASYS"
-      #   })
-      # })
+      "pd-${local.application_name}-db-a" = merge(local.database_a, {
+        config = merge(local.database_a.config, {
+          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+        #     branch = "oasys-no-tns"
+        #   })
+        # })
+        tags = merge(local.database_a.tags, {
+          bip-db-name = "PDBIPINF"
+          oracle-sids = "PDBIPINF PDOASYS"
+        })
+      })
+
+      "pd-${local.application_name}-db-b" = merge(local.database_b, {
+        config = merge(local.database_b.config, {
+          instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+        #     branch = "oasys-no-tns"
+        #   })
+        # })
+        tags = merge(local.database_b.tags, {
+          bip-db-name = "PDBIPINF"
+          oracle-sids = "PDBIPINF PDOASYS"
+        })
+      })
+
+      "pd-onr-db-a" = merge(local.database_onr_a, {
+        config = merge(local.database_onr_a.config, {
+          instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        tags = merge(local.database_onr_a.tags, {
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PDMISTRN PDONRBDS PDONRSYS PDONRAUD PDOASREP"
+        })
+      })
 
 
       "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
@@ -278,6 +314,20 @@ locals {
         })
       })
 
+      "pd-${local.application_name}-bip-a" = merge(local.bip_a, {
+        config = merge(local.bip_a.config, {
+          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+            "Ec2ProdBipPolicy",
+          ])
+        })
+        tags = merge(local.bip_a.tags, {
+          bip-db-name       = "PDBIPINF"
+          bip-db-hostname   = "pd-oasys-db-a"
+          oasys-db-name     = "PDOASYS"
+          oasys-db-hostname = "pd-oasys-db-a"
+        })
+      })
+
       "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
           instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
@@ -296,11 +346,21 @@ locals {
 
 
     baseline_ec2_autoscaling_groups = {
-      # "pd-${local.application_name}-web-a" = merge(local.webserver_a, {
-      #   tags = merge(local.webserver_a.tags, {
-      #     oracle-db-sid                           = "PDOASYS"
-      #   })
-      # })
+      "pd-${local.application_name}-web-a" = merge(local.webserver_a, {
+        config = merge(local.webserver_a.config, {
+          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+            "Ec2ProdWebPolicy",
+          ])
+        })
+        autoscaling_group = merge(local.webserver_a.autoscaling_group, {
+          desired_capacity = 4
+          max_size         = 4
+        })
+        tags = merge(local.webserver_a.tags, {
+          oracle-db-sid      = "PDOASYS"
+          oracle-db-hostname = "db.oasys.hmpps-production.modernisation-platform.internal"
+        })
+      })
 
       "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(local.webserver_a.config, {
@@ -344,6 +404,7 @@ locals {
         domain_name = "oasys.service.justice.gov.uk"
         subject_alternate_names = [
           "*.oasys.service.justice.gov.uk",
+          "*.int.oasys.service.justice.gov.uk",
           "bridge-oasys.az.justice.gov.uk",
           "oasys.az.justice.gov.uk",
           "p-oasys.az.justice.gov.uk",
@@ -362,7 +423,7 @@ locals {
     baseline_lbs = {
       public = {
         internal_lb              = false
-        access_logs              = false
+        access_logs              = true
         s3_versioning            = false
         force_destroy_bucket     = true
         enable_delete_protection = false
@@ -391,24 +452,24 @@ locals {
             #   target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
             # }
             rules = {
-              # pd-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "oasys.service.justice.gov.uk",
-              #           "bridge-oasys.az.justice.gov.uk",
-              #           "www.oasys.service.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              pd-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "oasys.service.justice.gov.uk",
+                        "bridge-oasys.az.justice.gov.uk",
+                        "www.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
               ptc-web-http-8080 = {
                 priority = 200
                 actions = [{
@@ -498,12 +559,21 @@ locals {
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["pd_${local.application_name}_cert"]
+            # default_action = {
+            #   type = "fixed-response"
+            #   fixed_response = {
+            #     content_type = "text/plain"
+            #     message_body = "use int.oasys.service.justice.gov.uk, or for practice ptc-int.oasys.service.justice.gov.uk, or for training trn-int.oasys.service.justice.gov.uk"
+            #     status_code  = "200"
+            #   }
+            # }
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "use int.oasys.service.justice.gov.uk, or for practice ptc-int.oasys.service.justice.gov.uk, or for training trn-int.oasys.service.justice.gov.uk"
-                status_code  = "200"
+              type = "redirect"
+              redirect = {
+                host        = "int.oasys.service.justice.gov.uk"
+                port        = "443"
+                protocol    = "HTTPS"
+                status_code = "HTTP_302"
               }
             }
             # default_action = {
@@ -511,25 +581,25 @@ locals {
             #   target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
             # }
             rules = {
-              # pd-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "int.oasys.service.justice.gov.uk",
-              #           "oasys-ukwest.oasys.az.justice.gov.uk",
-              #           "oasys.az.justice.gov.uk",
-              #           "p-oasys.az.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
+              pd-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "int.oasys.service.justice.gov.uk",
+                        "oasys-ukwest.oasys.az.justice.gov.uk",
+                        # "oasys.az.justice.gov.uk",
+                        "p-oasys.az.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
               ptc-web-http-8080 = {
                 priority = 200
                 actions = [{
@@ -541,6 +611,7 @@ locals {
                     host_header = {
                       values = [
                         "ptc-int.oasys.service.justice.gov.uk",
+                        "practice.int.oasys.service.justice.gov.uk",
                         "practice.oasys.az.justice.gov.uk",
                         "practice.p-oasys.az.justice.gov.uk",
                         "practice-ukwest.oasys.az.justice.gov.uk",
@@ -560,6 +631,7 @@ locals {
                     host_header = {
                       values = [
                         "trn-int.oasys.service.justice.gov.uk",
+                        "training.int.oasys.service.justice.gov.uk",
                         "training.oasys.az.justice.gov.uk",
                         "training.p-oasys.az.justice.gov.uk",
                         "training-ukwest.oasys.az.justice.gov.uk",
@@ -612,14 +684,66 @@ locals {
       #
       (module.environment.domains.public.business_unit_environment) = { # hmpps-production.modernisation-platform.service.justice.gov.uk
         records = [
-          # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-          # { name = "db.trn${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-          # { name = "db.ptc.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
+      (module.environment.domains.public.short_name) = { # oasys.service.justice.gov.uk
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },    # oasys.service.justice.gov.uk
+          { name = "www", type = "A", lbs_map_key = "public" }, # www.oasys.service.justice.gov.uk
+          { name = "a", type = "A", lbs_map_key = "public" },   # a.oasys.service.justice.gov.uk
+          { name = "b", type = "A", lbs_map_key = "public" },   # b.oasys.service.justice.gov.uk
+          { name = "practice", type = "A", lbs_map_key = "public" },
+          { name = "ptc", type = "A", lbs_map_key = "public" },
+          { name = "training", type = "A", lbs_map_key = "public" },
+          { name = "trn", type = "A", lbs_map_key = "public" },
+          { name = "int", type = "A", lbs_map_key = "private" },   # int.oasys.service.justice.gov.uk
+          { name = "a-int", type = "A", lbs_map_key = "private" }, # a-int.oasys.service.justice.gov.uk
+          { name = "b-int", type = "A", lbs_map_key = "private" }, # b-int.oasys.service.justice.gov.uk
+          { name = "practice.int", type = "A", lbs_map_key = "private" },
+          { name = "ptc-int", type = "A", lbs_map_key = "private" },
+          { name = "training.int", type = "A", lbs_map_key = "private" },
+          { name = "trn-int", type = "A", lbs_map_key = "private" },
+        ]
+        records = [
+          { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db-b", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-b.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+
+          { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pp", type = "CNAME", ttl = "3600", records = ["public-lb-2107358561.eu-west-2.elb.amazonaws.com"] },
+          { name = "db.pp", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pp-a", type = "CNAME", ttl = "3600", records = ["public-lb-2107358561.eu-west-2.elb.amazonaws.com"] },
+          { name = "pp-a-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-212442533.eu-west-2.elb.amazonaws.com"] },
+          { name = "pp-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-212442533.eu-west-2.elb.amazonaws.com"] },
+
+          { name = "t1", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "ords.t1", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "t1-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
+
+          { name = "t2", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "ords.t2", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-b", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-b-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
+
+          { name = "_4f7f9316bc4eaa8e9637c17aa36966b1", type = "CNAME", ttl = "86400", records = ["_83c5b5d8980ae954f876dd1b51417d43.qxcwttcyyb.acm-validations.aws."] },
+          { name = "_9f1b86e95d13d2cc7b9629f67d672c40", type = "CNAME", ttl = "86400", records = ["_7ea92a123c65795698dd19834dd71f61.fdbjvjdfdx.acm-validations.aws."] },
+          { name = "_26aaae7b839510727c2dd323b483ea5d.pp", type = "CNAME", ttl = "86400", records = ["_72222d02a82256bb6d75c872bc7bc1aa.qxcwttcyyb.acm-validations.aws."] },
+          { name = "_c3a661930d89914b2b25aac7d9947b3d.pp-a", type = "CNAME", ttl = "86400", records = ["_d57e6b487b03e7a7fd25e934671601cc.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_315500c40ef2d43ce87898e24be41f4e.pp-a-int", type = "CNAME", ttl = "86400", records = ["_be7c7a6b253419ba86f08cacabb28678.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_50d671c38e9c0d7692603c84d7ed066f.pp-b", type = "CNAME", ttl = "86400", records = ["_3aa768d4e3d8825ba1c8f2c2a154e7f4.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_a1ba1dd6ae3372f75a678b39e62364e0.pp-b-int", type = "CNAME", ttl = "86400", records = ["_eba205f55455280dbf39807cc4cd4a4f.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_b895eab0227a1d047f714060e0cd970f.pp-int", type = "CNAME", ttl = "86400", records = ["_9beca5f6af7ab9851e446fb506c15558.plkdfvcnsy.acm-validations.aws."] },
+          { name = "_16d62060ae34f0c7e45cd3303d1369de.ords.t1", type = "CNAME", ttl = "86400", records = ["_3ace3d679497ac88b6b29516dc3e92ff.jsxlrrpjwm.acm-validations.aws."] },
+          { name = "_93b16605cbf55e463d0ee7954b20c94d.t2", type = "CNAME", ttl = "86400", records = ["_51d8f8d87c9b9c07a1b1602bb68a1634.fcgjwsnkyp.acm-validations.aws."] },
+          { name = "_594f919f3d6c4e462084ee328bdb3236.ords.t2", type = "CNAME", ttl = "86400", records = ["_734a121cabbafd1e18bb96a0f2de6ac6.jsxlrrpjwm.acm-validations.aws."] },
+        ]
+      }
+
       #
       # internal/private
       #
@@ -631,9 +755,8 @@ locals {
           # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # for aws
           { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          # { name = "db.${local.application_name}",     type = "A",     ttl = "3600", records = ["10.40.40.133"] }, #        "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
-          # { name = "db.trn.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
-          # { name = "db.ptc.${local.application_name}", type = "A",     ttl = "3600", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          { name = "db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # db.oasys.hmpps-production.modernisation-platform.internal
+          { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.internal"] },                         # db.onr.hmpps-production.modernisation-platform.internal
         ]
       }
     }

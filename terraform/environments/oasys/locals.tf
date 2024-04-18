@@ -84,6 +84,12 @@ locals {
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = {}
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
+    secretsmanager_secrets = {
+      banner_message = {
+        description = "OASys banner message text"
+        recovery_window_in_days = 0
+      }
+    }
     lb_target_groups = {
       pv-http-8080 = local.target_group_http_8080
       pb-http-8080 = local.target_group_http_8080
@@ -219,15 +225,15 @@ locals {
     }
     ebs_volume_config = {
       data = {
-        iops       = 10000 # min 3000
+        iops       = 12000 # min 3000
         type       = "gp3"
-        throughput = 125
+        throughput = 750
         total_size = 200
       }
       flash = {
-        iops       = 3000 # min 3000
+        iops       = 5000 # min 3000
         type       = "gp3"
-        throughput = 125
+        throughput = 500
         total_size = 50
       }
     }
@@ -341,15 +347,15 @@ locals {
     }
     ebs_volume_config = {
       data = {
-        iops       = 10000
+        iops       = 12000
         type       = "gp3"
-        throughput = 125
+        throughput = 750
         total_size = 200
       }
       flash = {
-        iops       = 3000
+        iops       = 5000
         type       = "gp3"
-        throughput = 125
+        throughput = 500
         total_size = 50
       }
     }
@@ -453,92 +459,8 @@ locals {
   baseline_secretsmanager_secrets        = {}
   baseline_sns_topics                    = {}
   baseline_ssm_parameters                = {}
-
-  baseline_iam_policies = {
-    DBRefresherPolicy = {
-      description = "Permissions for the db refresh process"
-      statements = [
-        {
-          sid    = "InstanceAccess"
-          effect = "Allow"
-          actions = [
-            "ec2:DescribeInstances",
-            "ssm:StartSession",
-            "ssm:TerminateSession"
-          ]
-          resources = [
-            "*",
-          ]
-        },
-        {
-          sid    = "KMSAccess"
-          effect = "Allow"
-          actions = [
-            "kms:GenerateDataKey",
-            "kms:Decrypt",
-            "kms:Encrypt",
-          ]
-          resources = [
-            data.aws_kms_key.general_shared.arn,
-          ]
-        },
-        {
-          sid    = "S3ObjectAccess"
-          effect = "Allow"
-          actions = [
-            "s3:GetObject",
-            "s3:PutObject",
-            "s3:DeleteObject",
-          ]
-          resources = [
-            "${module.baseline.s3_buckets[terraform.workspace].bucket.arn}/*",
-          ]
-        },
-        {
-          sid    = "SSMParameterAccess"
-          effect = "Allow"
-          actions = [
-            "ssm:GetParameter",
-            "ssm:GetParameters",
-            "ssm:GetParametersByPath",
-          ]
-          resources = [
-            "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/ansible/*",
-          ]
-        },
-      ]
-    },
-  }
-  baseline_iam_roles = {
-    DBRefresherRole = {
-      description = "Allows the db refresh process to access the database instance"
-      assume_role_policy = [{
-        effect  = "Allow"
-        actions = ["sts:AssumeRoleWithWebIdentity"]
-        principals = {
-          type        = "Federated"
-          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
-        }
-        conditions = [
-          {
-            test     = "StringEquals"
-            values   = ["sts.amazonaws.com"]
-            variable = "token.actions.githubusercontent.com:aud"
-          },
-          {
-            test     = "StringLike"
-            values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:*"] # ["repo:ministryofjustice/dso-modernisation-platform-automation:ref:refs/heads/main"]
-            variable = "token.actions.githubusercontent.com:sub"
-          },
-        ]
-        }
-      ]
-      policy_attachments = [
-        "DBRefresherPolicy",
-        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-      ]
-    },
-  }
+  baseline_iam_policies                  = {}
+  baseline_iam_roles                     = {}
 
   environment_cloudwatch_monitoring_options = {
     development   = local.development_cloudwatch_monitoring_options

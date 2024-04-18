@@ -18,7 +18,7 @@ variable "options" {
 }
 variable "monitoring_account_sink_identifier" {
   type    = string
-  default = "arn:aws:oam:eu-west-2:775245656481:sink/7d4f9ba0-e432-49d1-8f34-1fda2d165bf8"
+  default = ""
 }
 
 variable "monitoring_account_id" {
