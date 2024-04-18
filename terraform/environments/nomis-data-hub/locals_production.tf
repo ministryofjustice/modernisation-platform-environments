@@ -8,5 +8,8 @@ locals {
         ]
       }
     }
+    baseline_secretsmanager_secrets = {
+      "/ndh/pd" = local.ndh_secretsmanager_secrets
+    }
   }
 }
