@@ -153,7 +153,7 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix   = "tribunals-all"
   image_id      = "ami-0b145c21f0f71b68c"
-  instance_type = "m5.xlarge"
+  instance_type = "m5.2xlarge"
   update_default_version = true
 
   iam_instance_profile {
