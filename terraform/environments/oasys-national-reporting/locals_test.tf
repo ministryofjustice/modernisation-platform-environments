@@ -2,6 +2,13 @@ locals {
 
   # baseline config
   test_config = {
+
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/T3ONRAU" = local.database_secretsmanager_secrets
+      "/oracle/database/T3ONRBDS" = local.database_secretsmanager_secrets
+      "/oracle/database/T3ONRSYS" = local.database_secretsmanager_secrets
+    }
+
     # baseline_ec2_instances = {
     #   test-db = merge(local.defaults_onr_db_ec2 ,{
     #     config = merge(local.defaults_onr_db_ec2.config, {

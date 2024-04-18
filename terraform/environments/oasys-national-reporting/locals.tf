@@ -84,4 +84,5 @@ locals {
 
   baseline_sns_topics     = {}
   baseline_ssm_parameters = {}
+  baseline_secretsmanager_secrets = {}
 }
