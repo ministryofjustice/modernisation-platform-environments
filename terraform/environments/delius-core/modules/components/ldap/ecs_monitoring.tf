@@ -34,8 +34,8 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
   statistic           = "Average"
   period              = "60"
   evaluation_periods  = "5"
-  alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
-  ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
   threshold           = "80"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
