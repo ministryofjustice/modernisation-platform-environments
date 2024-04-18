@@ -14,6 +14,10 @@ nuke_account_ids_json=$(aws secretsmanager get-secret-value --secret-id nuke_acc
 declare -A account_ids
 eval "$(jq -r '.NUKE_ACCOUNT_IDS | to_entries | .[] |"account_ids[" + (.key | @sh) + "]=" + (.value | @sh)' <<<"$nuke_account_ids_json")"
 
+# Retrieve Modernisation Platform Account Id 
+BACKEND_NUMBER=$(aws ssm get-parameters --region eu-west-2 --names "modernisation_platform_account_id" --with-decryption --query "Parameters[*].{Value:Value}" --output text)
+echo "Modernisation Platform Account Id: $BACKEND_NUMBER"
+
 redeployed_envs=()
 skipped_envs=()
 failed_envs=()
@@ -22,7 +26,7 @@ for key in "${!account_ids[@]}"; do
   to_dir_name "$key"
   if [[ "$NUKE_DO_NOT_RECREATE_ENVIRONMENTS" != *"${dir_name}-development,"* ]]; then
     echo "BEGIN: terraform apply ${dir_name}-development"
-    bash scripts/terraform-init.sh "terraform/environments/${dir_name}" || exit_code=$?
+    bash scripts/terraform-init.sh "terraform/environments/${dir_name}" "assume_role={role_arn=\"arn:aws:iam::${BACKEND_NUMBER}:role/modernisation-account-terraform-state-member-access\"}" || exit_code=$?
     terraform -chdir="terraform/environments/${dir_name}" workspace select "${dir_name}-development" || exit_code=$?
     bash scripts/terraform-apply.sh "terraform/environments/${dir_name}" || exit_code=$?
     if [[ $exit_code -ne 0 ]]; then
