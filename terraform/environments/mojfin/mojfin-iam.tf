@@ -14,9 +14,9 @@ data "aws_iam_policy_document" "mojfin_rds_oracle" {
       "s3:ListBucket",
       "s3:PutObject"
     ]
-    resources = [
-      "${aws_s3_bucket.mojfin_rds_oracle.arn}/*"
-    ]
+#   resources = [
+#     "${aws_s3_bucket.mojfin_rds_oracle.arn}/*"
+#   ]
   }
 }
 
