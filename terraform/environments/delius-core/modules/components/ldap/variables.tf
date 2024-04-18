@@ -52,3 +52,13 @@ variable "enable_platform_backups" {
   type        = bool
   default     = null
 }
+
+variable "ecs_cluster_arn" {
+  description = "The ARN of the ECS cluster"
+  type        = string
+}
+
+variable "sns_topic_arn" {
+  description = "The ARN of the SNS topic"
+  type        = string
+}
