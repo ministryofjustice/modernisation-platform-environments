@@ -131,8 +131,8 @@ resource "aws_iam_role_policy" "em_ap_transfer_lambda" {
 
 data "archive_file" "em_ap_transfer_lambda" {
   type        = "zip"
-  source_file = "em_ap_transfer_lambda.py"
-  output_path = "em_ap_transfer_lambda.zip"
+  source_file = "lambdas/em_ap_transfer_lambda.py"
+  output_path = "lambdas/em_ap_transfer_lambda.zip"
 }
 
 resource "aws_lambda_function" "em_ap_transfer_lambda" {
