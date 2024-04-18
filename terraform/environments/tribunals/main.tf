@@ -76,8 +76,8 @@ module "appeals" {
 
 module "ahmlr" {
   source                            = "./modules/tribunal"
-  app_name                          = "ahmlr"
-  app_url                           = "ahmlr"
+  app_name                          = "hmlands"
+  app_url                           = "hmlands"
   sql_migration_path                = "../scripts/ahmlr"
   app_db_name                       = "hmlands"
   app_db_login_name                 = "hmlands-app"
