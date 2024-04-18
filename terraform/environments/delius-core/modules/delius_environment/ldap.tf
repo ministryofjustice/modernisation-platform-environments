@@ -4,7 +4,7 @@ module "ldap" {
 
   providers = {
     aws                       = aws
-    aws.bucket-replication    = aws
+    aws.bucket-replication    = aws.bucket-replication
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
