@@ -6,6 +6,37 @@ resource "aws_backup_vault" "portal" {
   )
 }
 
+
+data "aws_iam_policy_document" "portal" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
+    }
+
+    actions = [
+      "backup:DescribeBackupVault",
+      "backup:PutBackupVaultAccessPolicy",
+      "backup:DeleteBackupVaultAccessPolicy",
+      "backup:GetBackupVaultAccessPolicy",
+      "backup:StartBackupJob",
+      "backup:GetBackupVaultNotifications",
+      "backup:PutBackupVaultNotifications",
+      "backup:StartRestoreJob",
+      "backup:CopyIntoBackupVault"
+    ]
+
+    resources = [aws_backup_vault.portal.arn]
+  }
+}
+
+resource "aws_backup_vault_policy" "portal" {
+  backup_vault_name = aws_backup_vault.portal.name
+  policy            = data.aws_iam_policy_document.portal.json
+}
+
 # Non production backups
 resource "aws_backup_plan" "non_prod_portal" {
   count = local.environment != "production" ? 1 : 0
