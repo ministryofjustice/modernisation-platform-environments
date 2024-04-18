@@ -14,13 +14,22 @@ resource "aws_s3_bucket" "csv-output-bucket" {
     bucket_prefix = "data-to-ap-"
 }
 
+resource "aws_cloudwatch_log_group" "parquet-to-csv" {
+  name              = "parquet-to-csv"
+  retention_in_days = 14
+}
+
 resource "aws_glue_job" "parquet-to-csv" {
     name = "parquet-to-csv"
     role_arn = aws_iam_role.parquet-to-csv.arn
     default_arguments = {
         "--destination_bucket" = aws_s3_bucket.csv-output-bucket.id
         "--source_bucket"      = aws_s3_bucket.dms_target_ep_s3_bucket.id
-    }
+        "--continuous-log-logGroup"          = aws_cloudwatch_log_group.parquet-to-csv.name
+        "--enable-continuous-cloudwatch-log" = "true"
+        "--enable-continuous-log-filter"     = "true"
+        "--enable-metrics"                   = ""
+        }
 
     command {
         script_location = "s3://${aws_s3_bucket.glue-jobs.id}/parquet_to_csv.py"
@@ -35,6 +44,14 @@ resource "aws_iam_role" "parquet-to-csv" {
       policy = data.aws_iam_policy_document.parquet-to-csv.json
     }
 }
+
+resource "aws_iam_policy_attachment" "glue_log_attachment" {
+    name = "glue-log-attachment"
+    roles = [aws_iam_role.parquet-to-csv.name]
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+
+}
+
 
 data "aws_iam_policy_document" "parquet-to-csv" {
     statement {
