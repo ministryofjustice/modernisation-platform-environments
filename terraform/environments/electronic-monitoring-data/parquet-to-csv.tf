@@ -52,7 +52,7 @@ data "aws_iam_policy_document" "parquet-to-csv" {
             "s3:DeleteObject",
             "s3:ListBucket"
         ]
-        resources = [aws_s3_bucket.csv-output-bucket.id, "${aws_s3_bucket.csv-output-bucket.arn}/*"]
+        resources = [aws_s3_bucket.csv-output-bucket.arn, "${aws_s3_bucket.csv-output-bucket.arn}/*"]
     }
     statement {
       effect = "Allow"
