@@ -91,8 +91,8 @@ module "pwm" {
   ignore_changes_service_task_definition = true
 
   providers = {
-    aws          = aws
-    aws.core-vpc = aws.core-vpc
+    aws.core-vpc              = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
   }
 
   log_error_pattern       = "ERROR"
@@ -196,4 +196,3 @@ resource "aws_ssm_parameter" "pwm_ses_smtp_user" {
     ses_smtp_password = aws_iam_access_key.pwm_ses_smtp_user.ses_smtp_password_v4
   })
 }
-
