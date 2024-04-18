@@ -196,3 +196,4 @@ resource "aws_ssm_parameter" "pwm_ses_smtp_user" {
     ses_smtp_password = aws_iam_access_key.pwm_ses_smtp_user.ses_smtp_password_v4
   })
 }
+
