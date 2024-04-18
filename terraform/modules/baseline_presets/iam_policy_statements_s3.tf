@@ -64,7 +64,7 @@ locals {
       }
     ]
 
-    S3WritePreprod = [
+    S3ReadWriteDeletePreprod = [
       {
         sid    = "S3WritePreprod"
         effect = "Allow"
@@ -74,6 +74,10 @@ locals {
           "s3:GetObjectTagging",
           "s3:ListBucket",
           "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:PutObjectTagging",
+          "s3:DeleteObject",
+          "s3:RestoreObject",
         ]
         principals = {
           type = "AWS"
