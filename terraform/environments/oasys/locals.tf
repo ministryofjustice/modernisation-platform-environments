@@ -84,6 +84,12 @@ locals {
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = {}
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
+    secretsmanager_secrets = {
+      banner_message = {
+        description = "OASys banner message text"
+        recovery_window_in_days = 0
+      }
+    }
     lb_target_groups = {
       pv-http-8080 = local.target_group_http_8080
       pb-http-8080 = local.target_group_http_8080

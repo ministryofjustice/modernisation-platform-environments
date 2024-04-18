@@ -39,9 +39,6 @@ locals {
       "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
 
       "/oracle/bip/preproduction" = local.secretsmanager_secrets_bip
-
-      "/web/banner/preproduction" = local.secretsmanager_secrets_web_banner
-
     }
 
     baseline_iam_policies = {

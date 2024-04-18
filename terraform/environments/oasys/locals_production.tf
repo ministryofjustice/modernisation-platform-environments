@@ -49,11 +49,6 @@ locals {
 
       "/oracle/bip/production" = local.secretsmanager_secrets_bip
       "/oracle/bip/trn"        = local.secretsmanager_secrets_bip
-
-      "/web/banner/production" = local.secretsmanager_secrets_web_banner
-      "/web/banner/ptc"        = local.secretsmanager_secrets_web_banner
-      "/web/banner/trn"        = local.secretsmanager_secrets_web_banner
-     
     }
 
     baseline_iam_policies = {
