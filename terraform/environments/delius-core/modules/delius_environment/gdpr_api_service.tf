@@ -71,8 +71,8 @@ module "gdpr_api_service" {
   ignore_changes_service_task_definition = true
 
   providers = {
-    aws          = aws
-    aws.core-vpc = aws.core-vpc
+    aws.core-vpc              = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
   }
 
   log_error_pattern       = "ERROR"
