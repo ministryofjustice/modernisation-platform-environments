@@ -119,14 +119,44 @@ module "s3_bold_egress_kms" {
   deletion_window_in_days = 7
 }
 
-module "sns_kms" {
+module "quarantined_sns_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
   version = "2.2.1"
 
-  aliases               = ["sns/notify"]
-  description           = "Key for SNS notifications"
+  aliases               = ["sns/quarantined"]
+  description           = "Key for quarantined notifications"
+  enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowS3"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["s3.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+
+  deletion_window_in_days = 7
+}
+
+module "transferred_sns_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "2.2.1"
+
+  aliases               = ["sns/transferred"]
+  description           = "Key for transferred notifications"
   enable_default_policy = true
 
   deletion_window_in_days = 7
@@ -153,6 +183,19 @@ module "supplier_data_kms" {
 
   aliases               = ["secretsmanager/supplier-data"]
   description           = "Key for SFTP supplier data"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
+
+module "slack_token_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "2.2.1"
+
+  aliases               = ["secretsmanager/slack-token"]
+  description           = "Slack token for notifications"
   enable_default_policy = true
 
   deletion_window_in_days = 7
