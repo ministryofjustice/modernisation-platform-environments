@@ -175,7 +175,7 @@ module "employment_appeals" {
 
 module "finance_and_tax" {
   source                            = "./modules/tribunal"
-  app_name                          = "ftt"
+  app_name                          = "finance-and-tax"
   app_url                           = "finance-and-tax"
   sql_migration_path                = "../scripts/finance_and_tax"
   app_db_name                       = "ftt"
