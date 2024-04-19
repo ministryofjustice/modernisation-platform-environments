@@ -77,7 +77,7 @@ resource "aws_glue_job" "parquet-to-csv" {
         }
 
     command {
-        python_version = "3.9"
+        python_version = "3"
         script_location = "s3://${aws_s3_bucket.glue-jobs.id}/parquet_to_csv.py"
     }
 }
