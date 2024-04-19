@@ -16,7 +16,7 @@ resource "aws_iam_role" "flink_role" {
   })
 }
 
-resource "aws_iam_policy" "flink_additional_policy" {
+resource "aws_iam_policy" "flink_spike_additional_policy" {
   name = local.kms_read_access_policy
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -36,21 +36,15 @@ resource "aws_iam_policy" "flink_additional_policy" {
   })
 }
 
-resource "aws_iam_policy" "additional-policy" {
-  name        = "dpr-redshift-policy"
-  description = "Extra Policy for Flink"
-  policy      = data.aws_iam_policy_document.redshift-additional-policy.json
-}
-
-resource "aws_iam_role_policy_attachment" "redshift" {
+resource "aws_iam_role_policy_attachment" "flink_spike_policy_attachment" {
   role       = aws_iam_role.flink_role.name
-  policy_arn = aws_iam_policy.flink_additional_policy.arn
+  policy_arn = aws_iam_policy.flink_spike_additional_policy.arn
 }
 
 resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
   name                   = "flink-spike"
   runtime_environment    = "FLINK-1_18"
-  service_execution_role = aws_iam_role.example.arn
+  service_execution_role = aws_iam_role.flink_role.arn
 
   application_configuration {
     application_code_configuration {
