@@ -138,16 +138,16 @@ resource "aws_iam_role_policy_attachment" "ec2_policy_cloudwatch" {
 }
 
 # Create the Instance profile for the role
-# resource "aws_iam_instance_profile" "ec2_instance_profile" {
-#   name = local.instance_profile_name
-#   role = aws_iam_role.ec2_instance_role.name
-#   tags = merge(
-#   local.tags_common,
-#   {
-#     Name = local.instance_profile_name
-#   }
-#   )
-# }
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = local.instance_profile_name
+  role = aws_iam_role.ec2_instance_role.name
+  tags = merge(
+  local.tags_common,
+  {
+    Name = local.instance_profile_name
+  }
+  )
+}
 
 # # Create the Launch Template and assign the instance profile
 resource "aws_launch_template" "tribunals-all-lt" {
