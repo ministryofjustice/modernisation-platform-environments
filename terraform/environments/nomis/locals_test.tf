@@ -79,6 +79,15 @@ locals {
           {
             effect = "Allow"
             actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
@@ -95,6 +104,15 @@ locals {
           {
             effect = "Allow"
             actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
@@ -108,6 +126,15 @@ locals {
       Ec2T3DatabasePolicy = {
         description = "Permissions required for T3 Database EC2s"
         statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
           {
             effect = "Allow"
             actions = [
@@ -188,44 +215,6 @@ locals {
       "/oracle/database/T2NDH"    = local.database_secretsmanager_secrets
       "/oracle/database/T2TRDAT"  = local.database_secretsmanager_secrets
       "/oracle/database/T3CNOM"   = local.database_nomis_secretsmanager_secrets
-    }
-
-    baseline_ssm_parameters = {
-      "/nomis-client" = {
-        parameters = {
-          config = {
-            description = "configuration for nomis client windows instances"
-            value = jsonencode({
-              "ie_compatibility_mode_site_list" : [
-                "t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "t1-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "t1-cn.hmpp-azdt.justice.gov.uk:7777/forms/frmservlet?config=tag",
-                "t1-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
-                "c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "t2-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "t2-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "t2-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
-                "c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "t3-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "t3-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "t3-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
-                "t3-cn-ha.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
-                "c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              ],
-              "ie_trusted_domains" : [
-                "*.nomis.hmpps-test.modernisation-platform.justice.gov.uk",
-                "*.nomis.service.justice.gov.uk",
-                "*.hmpp-azdt.justice.gov.uk"
-              ],
-              "desktop_shortcuts" : [
-                "T1 NOMIS|https://c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "T2 NOMIS|https://c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-                "T3 NOMIS|https://c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag"
-              ]
-            })
-          }
-        }
-      }
     }
 
     baseline_ec2_autoscaling_groups = {

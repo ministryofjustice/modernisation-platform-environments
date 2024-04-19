@@ -75,6 +75,15 @@ locals {
           {
             effect = "Allow"
             actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
