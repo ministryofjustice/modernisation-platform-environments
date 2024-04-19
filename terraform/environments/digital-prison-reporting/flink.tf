@@ -1,0 +1,90 @@
+resource "aws_iam_role" "flink_role" {
+  name = "dpr-flink-spike-execution-role-development"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:AssumeRole"
+        ]
+        Principal = {
+          "Service" = "kinesisanalytics.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "flink_additional_policy" {
+  name = local.kms_read_access_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ],
+        "Resource" : [
+          "arn:aws:s3:::dpr-working-development",
+          "arn:aws:s3:::dpr-working-development/*",
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "additional-policy" {
+  name        = "dpr-redshift-policy"
+  description = "Extra Policy for Flink"
+  policy      = data.aws_iam_policy_document.redshift-additional-policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "redshift" {
+  role       = aws_iam_role.flink_role.name
+  policy_arn = aws_iam_policy.flink_additional_policy.arn
+}
+
+resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
+  name                   = "flink-spike"
+  runtime_environment    = "FLINK-1_18"
+  service_execution_role = aws_iam_role.example.arn
+
+  application_configuration {
+    application_code_configuration {
+      code_content {
+        s3_content_location {
+          bucket_arn = "arn:aws:s3:::dpr-working-development"
+          file_key   = "flink-spike-1.0-SNAPSHOT-all.jar"
+        }
+      }
+
+      code_content_type = "ZIPFILE"
+    }
+
+    flink_application_configuration {
+      checkpoint_configuration {
+        configuration_type = "DEFAULT"
+      }
+
+      monitoring_configuration {
+        configuration_type = "CUSTOM"
+        log_level          = "INFO"
+        metrics_level      = "APPLICATION"
+      }
+
+      parallelism_configuration {
+        auto_scaling_enabled = false
+        configuration_type   = "CUSTOM"
+        parallelism          = 1
+        parallelism_per_kpu  = 1
+      }
+    }
+  }
+
+  tags = {
+    Jira = "DPR2-560"
+  }
+}
