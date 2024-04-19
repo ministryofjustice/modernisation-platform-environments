@@ -63,7 +63,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
   # glue_catalog_generation                     = true
   # ignore_header_rows                          = 1
   # include_op_for_full_load                    = true
-  max_file_size                               = 64000000000
+  max_file_size                               = 64000000
   # parquet_timestamp_in_millisecond            = false
   # parquet_version = "parquet-2-0"
   # preserve_transactions                       = false
