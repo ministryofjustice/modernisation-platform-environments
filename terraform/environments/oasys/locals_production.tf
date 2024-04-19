@@ -115,6 +115,7 @@ locals {
             ]
             resources = [
               "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*/*",
             ]
           },
           {
@@ -158,6 +159,7 @@ locals {
             ]
             resources = [
               "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*/*",
             ]
           },
           {
