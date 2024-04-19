@@ -5,7 +5,7 @@ $targetDrive = "D"
 $targetPath = $targetDrive + ":\storage\tribunals\"
 $ecsCluster = "tribunals-all-cluster"
 $ebsVolumeTag = "tribunals-all-storage"
-$tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","ahmlr","lands-tribunal"
+$tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","hmlands","lands-chamber"
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
@@ -51,6 +51,19 @@ else {
         "created " + $subDirPath >> $logFile
     }
   }
+}
+
+if (Test-Path $linkPath) {
+  "Link exists for " + $linkPath >> $logFile
+  Get-Item $linkPath >> $logFile
+  if ((Get-Item $linkPath).LinkType -eq "SymbolicLink") {
+    "It is a symbolic link " >> $logFile
+  } else {
+    "It is not a symbolic link" >> $logFile
+  }
+} else {
+  "Linking " + $linkPath + " to " + $targetPath >> $logFile
+  New-Item -Path $linkPath -ItemType SymbolicLink -Value $targetPath
 }
 
 "Set Environment variable to enable awslogs attribute" >> $logFile

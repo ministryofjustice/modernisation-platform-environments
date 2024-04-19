@@ -142,7 +142,7 @@ module "cicap" {
 
 module "employment_appeals" {
   source                            = "./modules/tribunal"
-  app_name                          = "eat"
+  app_name                          = "employment-appeals"
   app_url                           = "employmentappeals"
   sql_migration_path                = "../scripts/employment_appeals"
   app_db_name                       = "eat"
@@ -208,7 +208,7 @@ module "finance_and_tax" {
 
 module "immigration_services" {
   source                            = "./modules/tribunal"
-  app_name                          = "imset"
+  app_name                          = "immigration-services"
   app_url                           = "immigration-services"
   sql_migration_path                = "../scripts/immigration_services"
   app_db_name                       = "imset"
@@ -241,7 +241,7 @@ module "immigration_services" {
 
 module "information_tribunal" {
   source                            = "./modules/tribunal"
-  app_name                          = "it"
+  app_name                          = "information-tribunal"
   app_url                           = "information-tribunal"
   sql_migration_path                = "../scripts/information_tribunal"
   app_db_name                       = "it"
@@ -274,7 +274,7 @@ module "information_tribunal" {
 
 module "lands_tribunal" {
   source                            = "./modules/tribunal"
-  app_name                          = "lands"
+  app_name                          = "lands-chamber"
   app_url                           = "lands-chamber"
   sql_migration_path                = "../scripts/lands_chamber"
   app_db_name                       = "lands"
