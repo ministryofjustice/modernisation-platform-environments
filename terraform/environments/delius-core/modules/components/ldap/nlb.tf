@@ -5,7 +5,7 @@ module "nlb" {
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
-  app_name            = var.app_name
+  app_name            = "ldap"
   env_name            = var.env_name
   internal            = true
   tags                = var.tags

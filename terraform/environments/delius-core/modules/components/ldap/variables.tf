@@ -1,7 +1,3 @@
-variable "app_name" {
-  description = "The name of the app"
-  type        = string
-}
 variable "env_name" {
   description = "The name of the env where file system is being created"
   type        = string
@@ -55,4 +51,14 @@ variable "enable_platform_backups" {
   description = "Enable or disable Mod Platform centralised backups"
   type        = bool
   default     = null
+}
+
+variable "ecs_cluster_arn" {
+  description = "The ARN of the ECS cluster"
+  type        = string
+}
+
+variable "sns_topic_arn" {
+  description = "The ARN of the SNS topic"
+  type        = string
 }
