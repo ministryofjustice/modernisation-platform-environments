@@ -36,7 +36,7 @@ data "aws_iam_policy_document" "mojfin_rds_oracle_s3" {
 }
 
 resource "aws_iam_policy" "mojfin_rds_oracle_s3" {
-  name        = "mojfin_rds_oracle-${local.environment}"
+  name        = "mojfin_rds_oracle_s3-${local.environment}"
   description = "Policy for Oracle RDS in ${local.environment}"
   policy      = data.aws_iam_policy_document.mojfin_rds_oracle_s3.json
 }
