@@ -81,11 +81,7 @@
       }
     ]
   },
-  "StreamBufferSettings": {
-    "StreamBufferCount": 3,
-    "CtrlStreamBufferSizeInMB": 5,
-    "StreamBufferSizeInMB": 8
-  },
+  "StreamBufferSettings": null,
   "ErrorBehavior": {
     "FailOnNoTablesCaptured": true,
     "ApplyErrorUpdatePolicy": "LOG_ERROR",
@@ -112,10 +108,10 @@
   },
   "TTSettings": null,
   "FullLoadSettings": {
-    "CommitRate": 10000,
+    "CommitRate": 50000,
     "StopTaskCachedChangesApplied": false,
     "StopTaskCachedChangesNotApplied": false,
-    "MaxFullLoadSubTasks": 8,
+    "MaxFullLoadSubTasks": 1,
     "TransactionConsistencyTimeout": 600,
     "CreatePkAfterFullLoad": false,
     "TargetTablePrepMode": "DO_NOTHING"
@@ -139,34 +135,11 @@
     "ParallelLoadBufferSize": 0
   },
   "BeforeImageSettings": null,
-  "ControlTablesSettings": {
-    "historyTimeslotInMinutes": 5,
-    "HistoryTimeslotInMinutes": 5,
-    "StatusTableEnabled": false,
-    "SuspendedTablesTableEnabled": false,
-    "HistoryTableEnabled": false,
-    "ControlSchema": "",
-    "FullLoadExceptionTableEnabled": false
-  },
+  "ControlTablesSettings": null,
   "LoopbackPreventionSettings": null,
   "CharacterSetSettings": null,
   "FailTaskWhenCleanTaskResourceFailed": false,
-  "ChangeProcessingTuning": {
-    "StatementCacheSize": 50,
-    "CommitTimeout": 1,
-    "BatchApplyPreserveTransaction": true,
-    "BatchApplyTimeoutMin": 1,
-    "BatchSplitSize": 0,
-    "BatchApplyTimeoutMax": 30,
-    "MinTransactionSize": 1000,
-    "MemoryKeepTime": 60,
-    "BatchApplyMemoryLimit": 500,
-    "MemoryLimitTotal": 1024
-  },
-  "ChangeProcessingDdlHandlingPolicy": {
-    "HandleSourceTableDropped": true,
-    "HandleSourceTableTruncated": true,
-    "HandleSourceTableAltered": true
-  },
+  "ChangeProcessingTuning": null,
+  "ChangeProcessingDdlHandlingPolicy": null,
   "PostProcessingRules": null
 }
