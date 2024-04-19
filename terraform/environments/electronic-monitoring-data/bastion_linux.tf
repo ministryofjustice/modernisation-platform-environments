@@ -36,3 +36,21 @@ module "rds_bastion" {
   tags_common = local.tags
   tags_prefix = terraform.workspace
 }
+
+resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
+  security_group_id = module.rds_bastion.bastion_security_group
+  description       = "EC2 MSSQL Access"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
+  security_group_id = aws_security_group.db.id
+  description       = "EC2 instance connection to RDS"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+  referenced_security_group_id = module.rds_bastion.bastion_security_group
+}
