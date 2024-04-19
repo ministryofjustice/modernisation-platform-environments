@@ -59,7 +59,7 @@ mount -a
 chown oracle:dba /oracle/software
 chown oracle:dba /stage
 chmod -R 777 /stage
-chmod -R 644 /oracle/software
+chmod -R 777 /oracle/software
 dd if=/dev/zero of=/root/myswapfile bs=1M count=1024
 chmod 600 /root/myswapfile
 mkswap /root/myswapfile
