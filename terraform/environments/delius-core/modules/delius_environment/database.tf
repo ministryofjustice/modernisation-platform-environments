@@ -78,7 +78,7 @@ module "oracle_db_standby" {
   }
 
   db_type        = "standby"
-  count          = 2
+  count          = var.db_config.standby_count
   db_count_index = count.index + 1
 
   ec2_instance_type = var.db_config.instance_type
