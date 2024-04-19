@@ -2,8 +2,8 @@
   "rules": [
     {
       "rule-type": "selection",
-      "rule-id": "054476697",
-      "rule-name": "054476697",
+      "rule-id": "01",
+      "rule-name": "all",
       "object-locator": {
         "schema-name": "%",
         "table-name": "%"

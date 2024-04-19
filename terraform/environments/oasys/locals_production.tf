@@ -107,10 +107,15 @@ locals {
               "s3:GetObject",
               "s3:GetObjectTagging",
               "s3:ListBucket",
-              "s3:PutObject"
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:PutObjectTagging",
+              "s3:DeleteObject",
+              "s3:RestoreObject",
             ]
             resources = [
               "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*/*",
             ]
           },
           {
@@ -146,9 +151,15 @@ locals {
               "s3:GetObject",
               "s3:GetObjectTagging",
               "s3:ListBucket",
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:PutObjectTagging",
+              "s3:DeleteObject",
+              "s3:RestoreObject",
             ]
             resources = [
               "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
+              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*/*",
             ]
           },
           {

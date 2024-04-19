@@ -2,8 +2,6 @@ module "nlb" {
   source = "../../helpers/nlb"
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
