@@ -41,6 +41,11 @@ resource "aws_iam_policy" "mojfin_rds_oracle" {
   policy      = data.aws_iam_policy_document.mojfin_rds_oracle_s3.json
 }
 
+resource "aws_iam_role_policy_attachment" "mojfin_rds_oracle_s3" {
+  role       = aws_iam_role.mojfin_rds_oracle.name
+  policy_arn = aws_iam_policy.mojfin_rds_oracle_s3.arn
+}
+
 resource "aws_db_instance_role_association" "mojfin_rds_oracle" {
   db_instance_identifier = aws_db_instance.appdb1.identifier
   feature_name           = "S3_INTEGRATION"
