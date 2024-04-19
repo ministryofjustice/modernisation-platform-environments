@@ -29,6 +29,11 @@ resource "aws_db_option_group" "mojfin" {
     }
   }
 
+  option {
+    option_name = "S3_INTEGRATION"
+    version     = "1.0"
+  }
+
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}-optiongroup" },
