@@ -229,7 +229,7 @@ resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
 
 module "s3_bucket_oracle_statistics" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
-  bucket_name         = "${var.env_name}-oracle-statistics-backup-data"
+  bucket_name         = "delius-mis-${var.env_name}-oracle-statistics-backup-data"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
