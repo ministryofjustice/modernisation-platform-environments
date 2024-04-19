@@ -27,7 +27,7 @@ destination_path = f"s3://{destination_bucket}/"
 logger.info(f"Reading from {source_bucket}, writing to {destination_bucket}.")
 
 
-def get_tables_from_s3_path(s3_client, bucket_name="dms-em-rds-output"):
+def get_tables_from_s3_path(s3_client, bucket_name=source_bucket):
     # Pagination
     paginator = s3_client.get_paginator("list_objects_v2")
     response_iterator = paginator.paginate(Bucket=bucket_name)
