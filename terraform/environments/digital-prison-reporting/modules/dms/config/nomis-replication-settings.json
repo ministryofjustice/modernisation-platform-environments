@@ -1,6 +1,5 @@
 {
   "Logging": {
-    "EnableLogging": false,
     "LogComponents": [
       {
         "Severity": "LOGGER_SEVERITY_DEFAULT",
