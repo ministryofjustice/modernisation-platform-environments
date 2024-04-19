@@ -206,26 +206,7 @@ locals {
         })
       })
 
-      prod-nomis-client-a = merge(local.jumpserver_ec2, {
-        config = merge(local.jumpserver_ec2.config, {
-          user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
-            ie_compatibility_mode_site_list = join(",", [
-              "prod-nomis-web-a.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "prod-nomis-web-b.production.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "c.nomis.az.justice.gov.uk/forms/frmservlet?config=tag",
-              "c.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-            ])
-            ie_trusted_domains = join(",", [
-              "*.nomis.hmpps-production.modernisation-platform.justice.gov.uk",
-              "*.nomis.service.justice.gov.uk",
-              "*.nomis.az.justice.gov.uk",
-            ])
-            desktop_shortcuts = join(",", [
-              "Prod NOMIS|https://c.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-            ])
-          }))
-        })
-      })
+      prod-nomis-client-a = local.jumpserver_ec2
     }
 
     baseline_ec2_instances = {
