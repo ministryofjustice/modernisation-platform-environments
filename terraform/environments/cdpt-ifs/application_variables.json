@@ -42,7 +42,7 @@
       "environment_name": "production",
       "container_port": 80,
       "client_id": "9cbaafe4-95bb-4175-8133-b6c53197c2b8",
-      "ami_image_id": "ami-06cdd5b44c17085ed",
+      "ami_image_id": "ami-0cf98f96c2bae561e",
       "instance_type": "t3.medium",
       "app_count": 2,
       "ec2_desired_capacity": 2,
