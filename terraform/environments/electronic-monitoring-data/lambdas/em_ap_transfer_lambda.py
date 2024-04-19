@@ -17,8 +17,8 @@ def handler(event, context):
     file_key = event["Records"][0]["s3"]["object"]["key"]
     file_parts = file_key.split("/")
     database_name = file_parts[0]
-    table_name = file_parts[1]
-    file_name = file_parts[2]
+    table_name = file_parts[2]
+    file_name = file_parts[3]
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
 
     # Specify destination bucket
