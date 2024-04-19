@@ -16,7 +16,6 @@ eval "$(jq -r '.NUKE_ACCOUNT_IDS | to_entries | .[] |"account_ids[" + (.key | @s
 
 # Retrieve Modernisation Platform Account Id 
 BACKEND_NUMBER=$(aws ssm get-parameters --region eu-west-2 --names "modernisation_platform_account_id" --with-decryption --query "Parameters[*].{Value:Value}" --output text)
-echo "Modernisation Platform Account Id: $BACKEND_NUMBER"
 
 redeployed_envs=()
 skipped_envs=()
