@@ -7,8 +7,8 @@ locals {
       }
     }
     baseline_secretsmanager_secrets = {
-      "/ec2/ncr-bip-cms/dev"      = local.bip_cms_secretsmanager_secrets
-      "/ec2/ncr-tomcat-admin/dev" = local.tomcat_admin_secretsmanager_secrets
+      "/ec2/ncr-bip/dev" = local.bip_secretsmanager_secrets
+      "/ec2/ncr-web/dev" = local.web_secretsmanager_secrets
 
       "/oracle/database/DEVBIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/DEVBIPAUD" = local.database_secretsmanager_secrets
@@ -49,8 +49,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip-cms/dev/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-tomcat-admin/dev/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/dev/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/dev/*",
             ]
           }
         ]
@@ -75,26 +75,26 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      dev-ncr-web-admin-a = merge(local.tomcat_admin_ec2_default, {
-        cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
-        config = merge(local.tomcat_admin_ec2_default.config, {
-          instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
+      dev-ncr-web-admin-a = merge(local.web_ec2_default, {
+        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        config = merge(local.web_ec2_default.config, {
+          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2DevReportingPolicy",
           ])
         })
-        tags = merge(local.tomcat_admin_ec2_default.tags, {
+        tags = merge(local.web_ec2_default.tags, {
           description                          = "For testing SAP BI Platform tomcat admin installation and configurations"
           nomis-combined-reporting-environment = "dev"
         })
       })
-      dev-ncr-cms-a = merge(local.bip_cms_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-        config = merge(local.bip_cms_ec2_default.config, {
-          instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+      dev-ncr-cms-a = merge(local.bip_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        config = merge(local.bip_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2DevReportingPolicy",
           ])
         })
-        tags = merge(local.bip_cms_ec2_default.tags, {
+        tags = merge(local.bip_ec2_default.tags, {
           description                          = "For testing SAP BI Platform CMS installation and configurations"
           nomis-combined-reporting-environment = "dev"
           node                                 = "1"
