@@ -64,7 +64,7 @@ locals {
       }
     ]
 
-    S3ReadWriteDeletePreprod = [
+    S3ReadWriteDeleteProdPreprod = [
       {
         sid    = "S3WritePreprod"
         effect = "Allow"
@@ -81,8 +81,8 @@ locals {
         ]
         principals = {
           type = "AWS"
-          identifiers = [
-            var.environment.account_root_arns["${var.environment.application_name}-preproduction"]
+          identifiers = [for account_name in var.environment.prodpreprod_account_names :
+            var.environment.account_root_arns[account_name]
           ]
         }
       }
