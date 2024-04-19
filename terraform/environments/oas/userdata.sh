@@ -7,7 +7,7 @@ sudo yum -y install xorg-x11-xauth
 sudo yum -y install xclock xterm
 sudo yum -y install nvme-cli
 
-hostnamectl set-hostname oas.laa-development.modernisation-platform.service.justice.gov.uk
+hostnamectl set-hostname oas
 
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 systemctl start amazon-ssm-agent
