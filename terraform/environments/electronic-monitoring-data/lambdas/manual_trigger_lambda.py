@@ -10,17 +10,20 @@ AWS_REGION = "eu-west-2"
 s3 = boto3.client("s3")
 
 
-def invoke_copy_lambda(
-    source_bucket_name, file_key, lambda_function_name, destination_bucket_name
-):
+def invoke_copy_lambda(source_bucket_name, file_key, lambda_function_name):
     """
     Invoke the Lambda function to copy file from source to destination bucket.
     """
     lambda_client = boto3.client("lambda", region_name=AWS_REGION)
     payload = {
-        "source_bucket_name": source_bucket_name,
-        "file_key": file_key,
-        "destination_bucket_name": destination_bucket_name,
+        "Records": [
+            {
+                "s3": {
+                    "bucket": {"name": source_bucket_name},
+                    "object": {"key": file_key},
+                }
+            }
+        ]
     }
     response = lambda_client.invoke(
         FunctionName=lambda_function_name,
