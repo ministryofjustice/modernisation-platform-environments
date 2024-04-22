@@ -112,49 +112,49 @@ locals {
 
       ### PREPROD
 
-      pp-ncr-cms-1 = merge(local.bip_cms_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-        config = merge(local.bip_cms_ec2_default.config, {
+      pp-ncr-cms-1 = merge(local.bip_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        config = merge(local.bip_ec2_default.config, {
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
         })
-        instance = merge(local.bip_cms_ec2_default.instance, {
+        instance = merge(local.bip_ec2_default.instance, {
           instance_type = "c5.4xlarge",
         })
-        tags = merge(local.bip_cms_ec2_default.tags, {
+        tags = merge(local.bip_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform CMS installation and configurations"
           nomis-combined-reporting-environment = "preprod"
           node                                 = "1"
         })
       })
-      pp-ncr-cms-2 = merge(local.bip_cms_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-        config = merge(local.bip_cms_ec2_default.config, {
+      pp-ncr-cms-2 = merge(local.bip_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        config = merge(local.bip_ec2_default.config, {
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
         })
-        instance = merge(local.bip_cms_ec2_default.instance, {
+        instance = merge(local.bip_ec2_default.instance, {
           instance_type = "c5.4xlarge",
         })
-        tags = merge(local.bip_cms_ec2_default.tags, {
+        tags = merge(local.bip_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform CMS installation and configurations"
           nomis-combined-reporting-environment = "preprod"
           node                                 = "2"
         })
       })
-      pp-ncr-processing-1 = merge(local.bip_cms_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-        config = merge(local.bip_cms_ec2_default.config, {
+      pp-ncr-processing-1 = merge(local.bip_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        config = merge(local.bip_ec2_default.config, {
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
         })
-        instance = merge(local.bip_cms_ec2_default.instance, {
+        instance = merge(local.bip_ec2_default.instance, {
           instance_type = "c5.4xlarge",
         })
-        tags = merge(local.bip_cms_ec2_default.tags, {
+        tags = merge(local.bip_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform installation and configurations"
           nomis-combined-reporting-environment = "preprod"
           node                                 = "3"
@@ -167,11 +167,11 @@ locals {
             "Ec2PPReportingPolicy",
           ])
         })
-        instance = merge(local.bip_cms_ec2_default.instance, {
+        instance = merge(local.web_ec2_default.instance, {
           instance_type = "r7i.large",
         })
         tags = merge(local.web_ec2_default.tags, {
-          description                          = "PreProd SAP BI Platform tomcat admin installation and configurations"
+          description                          = "PreProd SAP BI Platform web-tier admin installation and configurations"
           nomis-combined-reporting-environment = "preprod"
         })
       })
@@ -182,11 +182,11 @@ locals {
             "Ec2PPReportingPolicy",
           ])
         })
-        instance = merge(local.bip_cms_ec2_default.instance, {
+        instance = merge(local.web_ec2_default.instance, {
           instance_type = "r7i.large",
         })
         tags = merge(local.web_ec2_default.tags, {
-          description                          = "PreProd SAP BI Platform tomcat installation and configurations"
+          description                          = "PreProd SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "preprod"
         })
       })
@@ -197,11 +197,11 @@ locals {
             "Ec2PPReportingPolicy",
           ])
         })
-        instance = merge(local.bip_cms_ec2_default.instance, {
+        instance = merge(local.web_ec2_default.instance, {
           instance_type = "r7i.xlarge",
         })
         tags = merge(local.web_ec2_default.tags, {
-          description                          = "PreProd SAP BI Platform tomcat installation and configurations"
+          description                          = "PreProd SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "preprod"
         })
       })
@@ -280,17 +280,17 @@ locals {
 
       ### LSAST
 
-      # lsast-ncr-cms-1 = merge(local.bip_cms_ec2_default, {
-      #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-      #   config = merge(local.bip_cms_ec2_default.config, {
-      #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+      # lsast-ncr-cms-1 = merge(local.bip_ec2_default, {
+      #   cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+      #   config = merge(local.bip_ec2_default.config, {
+      #     instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
       #       "Ec2LSASTReportingPolicy",
       #     ])
       #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
+      #   instance = merge(local.bip_ec2_default.instance, {
       #     instance_type = "c5.4xlarge",
       #   })
-      #   tags = merge(local.bip_cms_ec2_default.tags, {
+      #   tags = merge(local.bip_ec2_default.tags, {
       #     description                          = "LSAST SAP BI Platform CMS installation and configurations"
       #     nomis-combined-reporting-environment = "lsast"
       #     node                                 = "1"
@@ -304,7 +304,7 @@ locals {
       #       "Ec2LSASTReportingPolicy",
       #     ])
       #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
+      #   instance = merge(local.web_ec2_default.instance, {
       #     instance_type = "r7i.xlarge",
       #   })
       #   tags = merge(local.web_ec2_default.tags, {
