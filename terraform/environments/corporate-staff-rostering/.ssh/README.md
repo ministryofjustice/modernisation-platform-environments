@@ -1,3 +1,5 @@
+# SSH keys
+
 Each environment has its own public/private ssh key pair for the default ec2-user.
 The private key is uploaded as a SSM parameter in each environment under `ec2-user_pem`.
 
@@ -5,7 +7,7 @@ The private key is uploaded as a SSM parameter in each environment under `ec2-us
 
 1. Generate keys (don't set password)
 
-```
+```shell
 app=corporate-staff-rostering
 for env in development test preproduction production; do
   mkdir -p $app-$env
@@ -21,7 +23,7 @@ done
 
 Assumes you have correct aws config profiles setup
 
-```
+```shell
 app=corporate-staff-rostering
 for env in development test preproduction production; do
   pem=$(cat $app-$env/ec2-user)
@@ -31,7 +33,7 @@ done
 
 4. Delete any local private keys
 
-```
+```shell
 rm */ec2-user
 ```
 
@@ -43,7 +45,8 @@ Example ssh config found [here](https://github.com/ministryofjustice/dso-useful-
 This assumes keys are stored under your .ssh directory, e.g. `~/.ssh/corporate-staff-rostering-development/ec2-user`
 
 Setup soft links in your own .ssh directory like this
-```
+
+```shell
   dir=$(pwd)
   (
     cd ~/.ssh

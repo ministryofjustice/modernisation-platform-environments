@@ -1,3 +1,5 @@
+# Load Balancer Listener
+
 Create an `aws_lb_listener` with associated resources such as:
 
 - `aws_lb_listener_rule`
@@ -16,7 +18,7 @@ variables.
 
 Example usage:
 
-```
+```terraform
 locals {
 
   lb_http_7777_rule = {

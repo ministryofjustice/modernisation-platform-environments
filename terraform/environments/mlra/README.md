@@ -14,6 +14,7 @@ _If you have any questions surrounding this page please post in the `#ask-laa-op
 ### **Description:**
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+
 MLRA (Means Assessment Administration Tool - Libra Record Access) is a web enabled application used to process criminal legal aid applications in the Magistrates and Crown Courts.
 
 Also used for assessing if defendants are entitled to legal aid for criminal cases. End users consist of approximately 400 criminal case workers.
@@ -36,20 +37,19 @@ Also <https://mlra.legalservices.gov.uk/mlra/> redirects to the above URL. This 
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
-# laa-crime-apps is the slack channel for raising any issues with the product team
+## laa-crime-apps is the slack channel for raising any issues with the product team
 
 ### **Service team contact:**
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 
-# laa-crime-apps
+## laa-crime-apps
 
 ### **Hosting environment:**
 
 Modernisation Platform
 
 <!-- If your service is hosted on another MOJ team’s infrastructure, link to their runbook. If your service has another arrangement or runs its own infrastructure, you should list the supplier of that infrastructure (ideally linking to your account’s login page) and describe, simply and briefly, how to raise an issue with them. -->
-
 
 ## Optional
 
