@@ -39,7 +39,7 @@ locals {
       vpc_zone_identifier = var.environment.subnets["private"].ids
 
       warm_pool = {
-        reuse_on_scale_in           = true
+        reuse_on_scale_in = true
       }
     }
 
@@ -59,7 +59,7 @@ locals {
       }
 
       warm_pool = {
-        reuse_on_scale_in           = true
+        reuse_on_scale_in = true
       }
     }
   }

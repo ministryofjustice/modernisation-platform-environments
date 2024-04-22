@@ -23,7 +23,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
       values = ["WindowsServer2022"]
     }
     patch_filter {
-      key = "CLASSIFICATION"
+      key    = "CLASSIFICATION"
       values = ["CriticalUpdates", "SecurityUpdates", "Updates", "UpdateRollups", "DefinitionUpdates"]
     }
     patch_filter {
@@ -43,7 +43,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     patch_filter {
       key    = "PRODUCT"
       values = ["Office 2003", "Microsoft 365 Apps/Office 2019/Office LTSC"]
-   }
+    }
   }
 }
 
