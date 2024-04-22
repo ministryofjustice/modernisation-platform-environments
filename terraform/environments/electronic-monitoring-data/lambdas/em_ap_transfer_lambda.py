@@ -2,6 +2,7 @@ import json
 import boto3
 import datetime
 from logging import getLogger
+import os
 
 logger = getLogger(__name__)
 
@@ -12,7 +13,7 @@ s3_client = boto3.client("s3", region_name="eu-west-2")
 def handler(event, context):
     # Specify source bucket
     source_bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
-
+    destination_bucket = os.environ.get("REG_BUCKET_NAME")
     # Get object that has been uploaded
     file_key = event["Records"][0]["s3"]["object"]["key"]
     file_parts = file_key.split("/")
@@ -21,26 +22,18 @@ def handler(event, context):
     file_name = file_parts[3]
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
 
-    # Specify destination bucket
-    destination_bucket = "moj-reg-dev"
-
     project_name = "electronic-monitoring-service"
     destination_key = f"landing/{project_name}/data/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
 
     # Specify from where file needs to be copied
     copy_object = {"Bucket": source_bucket_name, "Key": file_key}
 
-    # Write copy statement
-    response = s3_client.get_object(**copy_object)
-    object_body = response["Body"].read()
-    logger.info("File read succesfully")
-
     try:
         # Put the object into the destination bucket
-        response = s3_client.put_object(
-            Body=object_body,
-            Key=destination_key,
+        response = s3_client.copy_object(
             Bucket=destination_bucket,
+            Key=destination_key,
+            CopySource=copy_object,
             ServerSideEncryption="AES256",
             ACL="bucket-owner-full-control",
             BucketKeyEnabled=True,
