@@ -12,7 +12,7 @@ locals {
   capita_cidr_ipv6s = []
 
   ddc_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDR+qPXY8uS82DMd9yXJdiMFoLdFvnjgo6I79ReJOj08VV/a/ZA/ipCjHhEHSEOsQzAMWTbKCpIEI4tgjyr7aPPdUMNSkX4xNUIMdMkQ7AuEkgxp4Ak9bymik81Ik44Zjg==",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBLIW6JbERbsbTFmreQFdPclEVEyYdPPzMnra76xDhN/8KWKQIrbie4iJeYYfw6TxPwIdt1CyJhn2caGvpCtZyw26hQWDcsQnkxoxSvSfQlNGol64CaGRpCsKEN0beN0hCQ==",
   ]
   ddc_cidr_ipv4s = [
     "82.203.33.112/28",
@@ -62,7 +62,7 @@ locals {
   # CIVICA
   #----------------------------------------------------------------------------
   civica_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBERDPhblaiNoqjmERYqaDeAPN5yPhWdq58My149qBVorbemHwd/1KYaby6C3Wjsllsvo6mfTUdpe4aaCZfx9GV7ZICX3bILlHYBYQPUmL9gJ69PiqsbuK3PTZB7yotcsUA==",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBBBXwsFkiYvUwkwadVYgAjSU3L+SyN7AZnWabN+HLLf66PZHagS653rIkbA7PEpZKydTvM3FLCdbKzTZac57AdTwoWArLLnSwWRUyNQRZ+omdbXaUqa8MM1n1gNBpynkIw==",
   ]
   civica_cidr_ipv4s = [
     "172.167.3.97/32",
