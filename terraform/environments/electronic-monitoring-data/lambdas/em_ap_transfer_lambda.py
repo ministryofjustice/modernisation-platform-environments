@@ -30,15 +30,14 @@ def handler(event, context):
 
     # Write copy statement
     response = s3_client.get_object(**copy_object)
-    object_body = response["Body"].read()
     logger.info("File read succesfully")
 
     try:
         # Put the object into the destination bucket
-        response = s3_client.put_object(
-            Body=object_body,
-            Key=destination_key,
+        response = s3_client.copy_object(
             Bucket=destination_bucket,
+            Key=destination_key,
+            CopySource=copy_object,
             ServerSideEncryption="AES256",
             ACL="bucket-owner-full-control",
             BucketKeyEnabled=True,
