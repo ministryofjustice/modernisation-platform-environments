@@ -13,7 +13,7 @@ s3_client = boto3.client("s3", region_name="eu-west-2")
 def handler(event, context):
     # Specify source bucket
     source_bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
-    destination_bucket = os.environ.get("S3_BUCKET_NAME")
+    destination_bucket = os.environ.get("REG_BUCKET_NAME")
     # Get object that has been uploaded
     file_key = event["Records"][0]["s3"]["object"]["key"]
     file_parts = file_key.split("/")
