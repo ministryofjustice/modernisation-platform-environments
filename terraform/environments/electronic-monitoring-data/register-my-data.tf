@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "ap_export_bucket" {
-    bucket_prefix = "ap-export-bucket-"
+  bucket_prefix = "ap-export-bucket-"
 }
 
 resource "aws_s3_bucket_public_access_block" "ap_export_bucket" {
@@ -88,7 +88,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "ap_export_bucket"
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm     = "AES256"
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -136,13 +136,13 @@ data "archive_file" "em_ap_transfer_lambda" {
 }
 
 resource "aws_lambda_function" "em_ap_transfer_lambda" {
-    filename = "lambdas/em_ap_transfer_lambda.zip"
-    function_name = "em-ap-transfer-lambda"
-    role = aws_iam_role.em_ap_transfer_lambda.arn
-    handler = "em_ap_transfer_lambda.handler"
-    runtime = "python3.12"
-    memory_size = 4096
-    timeout = 900
+  filename      = "lambdas/em_ap_transfer_lambda.zip"
+  function_name = "em-ap-transfer-lambda"
+  role          = aws_iam_role.em_ap_transfer_lambda.arn
+  handler       = "em_ap_transfer_lambda.handler"
+  runtime       = "python3.12"
+  memory_size   = 4096
+  timeout       = 900
 }
 
 resource "aws_lambda_permission" "em_ap_transfer_lambda" {
