@@ -196,11 +196,12 @@ locals {
     }
   }
 
-  db_config_dev = { # CHANGE ME
+  # base config for each database
+  base_db_config_dev = {
     instance_type  = "t3.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
     ebs_volumes = {
-      "/dev/sdb" = { label = "app", size = 200 } # /u01
+      "/dev/sdb" = { label = "app", size = 100 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
       "/dev/sde" = { label = "data" }            # DATA
       "/dev/sdf" = { label = "flash" }           # FLASH
@@ -232,4 +233,27 @@ locals {
       ansible_args         = "oracle_19c_install"
     }
   }
+
+  # use slightly different config for each database
+  dsd_db_config_dev = merge(base_db_config_dev, {
+    ebs_volumes = merge(base_db_config_dev.ebs_volumes, {
+      "/dev/sdb" = { label = "app", size = 200 },
+      "/dev/sdc" = { label = "app", size = 100 }
+    })
+  })
+
+  boe_db_config_dev = merge(base_db_config_dev, {
+    ebs_volumes = merge(base_db_config_dev.ebs_volumes, {
+      "/dev/sdb" = { label = "app", size = 200 },
+      "/dev/sdc" = { label = "app", size = 100 }
+    })
+  })
+  
+  mis_db_config_dev = merge(base_db_config_dev, {
+    ebs_volumes = merge(base_db_config_dev.ebs_volumes, {
+      "/dev/sdb" = { label = "app", size = 500 },
+      "/dev/sdc" = { label = "app", size = 500 }
+    })
+  })
+
 }
