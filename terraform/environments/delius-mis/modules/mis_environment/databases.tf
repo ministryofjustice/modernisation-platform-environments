@@ -1,5 +1,10 @@
 locals {
   db_public_key_data = jsondecode(file("./db_users.json"))
+  availability_zone_map = {
+    0 = "a"
+    1 = "b"
+    2 = "c"
+  }
 }
 
 module "oracle_db_shared" {
@@ -67,13 +72,6 @@ module "oracle_db_dsd" {
     aws.core-network-services = aws.core-network-services
   }
 }
-locals {
-  availability_zone_map = {
-    0 = "a"
-    1 = "b"
-    2 = "c"
-  }
-}
 
 
 module "oracle_db_boe" {
@@ -120,13 +118,6 @@ module "oracle_db_boe" {
     aws.core-network-services = aws.core-network-services
   }
 }
-locals {
-  availability_zone_map = {
-    0 = "a"
-    1 = "b"
-    2 = "c"
-  }
-}
 
 
 module "oracle_db_mis" {
@@ -171,12 +162,5 @@ module "oracle_db_mis" {
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
-  }
-}
-locals {
-  availability_zone_map = {
-    0 = "a"
-    1 = "b"
-    2 = "c"
   }
 }
