@@ -9,7 +9,7 @@ variable "database_list" {
 variable "dms_replication_instance_class" {
   description = "Name of the replication instance class to be used"
   type        = string
-  default     = "dms.t3.medium"
+  default     = "dms.c5.2xlarge"
 }
 
 variable "dms_engine_version" {
@@ -27,5 +27,5 @@ variable "dms_availability_zone" {
 variable "dms_allocated_storage_gib" {
   description = "Replication instance storage allocation - GiB"
   type        = number
-  default     = 60
+  default     = 100
 }
