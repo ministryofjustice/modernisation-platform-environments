@@ -178,7 +178,6 @@ module "employment_appeals" {
 }
 
 module "finance_and_tax" {
-  depends_on                        = [ module.employment_appeals ]
   source                            = "./modules/tribunal"
   app_name                          = "finance-and-tax"
   app_url                           = "finance-and-tax"
@@ -212,7 +211,6 @@ module "finance_and_tax" {
 }
 
 module "immigration_services" {
-  depends_on                        = [ module.finance_and_tax ]
   source                            = "./modules/tribunal"
   app_name                          = "immigration-services"
   app_url                           = "immigration-services"
