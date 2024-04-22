@@ -22,7 +22,7 @@ def handler(event, context):
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
 
     # Specify destination bucket
-    destination_bucket = "moj-reg-dev"
+    destination_bucket = "moj-reg-preprod"
 
     project_name = "electronic-monitoring-service"
     destination_key = f"landing/{project_name}/data/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"

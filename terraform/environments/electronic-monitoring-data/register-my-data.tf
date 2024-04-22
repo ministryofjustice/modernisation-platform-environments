@@ -112,7 +112,7 @@ data "aws_iam_policy_document" "get_json_files" {
       "s3:PutObjectAcl"
     ]
     resources = [
-      "arn:aws:s3:::moj-reg-dev/landing/electronic-monitoring-service/data/*"
+      "arn:aws:s3:::moj-reg-preprod/landing/electronic-monitoring-service/data/*"
     ]
   }
 }
