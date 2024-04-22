@@ -28,10 +28,6 @@ def handler(event, context):
     # Specify from where file needs to be copied
     copy_object = {"Bucket": source_bucket_name, "Key": file_key}
 
-    # Write copy statement
-    response = s3_client.get_object(**copy_object)
-    logger.info("File read succesfully")
-
     try:
         # Put the object into the destination bucket
         response = s3_client.copy_object(
