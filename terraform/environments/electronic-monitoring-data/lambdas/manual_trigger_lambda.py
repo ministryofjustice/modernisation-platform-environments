@@ -42,7 +42,7 @@ def process_s3_bucket(bucket_name, lambda_function_name):
         if "Contents" in response:
             for obj in response["Contents"]:
                 file_key = obj["Key"]
-                invoke_lambda_for_file(file_key, lambda_function_name)
+                invoke_copy_lambda(file_key, lambda_function_name)
         else:
             print(f"No objects found in the bucket '{bucket_name}'.")
     except Exception as e:
