@@ -8,6 +8,7 @@ _If you have any questions surrounding this page please post in the `#dso-intern
 ## Mandatory Information
 
 ### **Last review date:**
+
 11/03/2024
 
 ### **Description:**
@@ -16,35 +17,35 @@ CSR provides scheduling, annual leave & overtime for around 30,000 Prison Office
 
 ### **Service URLs:**
 
-*Production:*
-Region | Geographical regions | URL|
-| -------- | ------------------------ | ----------------------------- |
-| Region 1 | North East & West Midlands | r1.csr.service.justice.gov.uk |
+_Production:_
+
+| Region   | Geographical regions                      | URL                           |
+| -------- | ----------------------------------------- | ----------------------------- |
+| Region 1 | North East & West Midlands                | r1.csr.service.justice.gov.uk |
 | Region 2 | Yorkshire & Humbleside, and High Security | r2.csr.service.justice.gov.uk |
-| Region 3 | North West & London | r3.csr.service.justice.gov.uk |
-| Region 4 | Wales & South Central | r4.csr.service.justice.gov.uk |
-| Region 5 | Eastern & South West | r5.csr.service.justice.gov.uk |
-| Region 6 | East Midlands, and Kent & Sussex | r6.csr.service.justice.gov.uk |
+| Region 3 | North West & London                       | r3.csr.service.justice.gov.uk |
+| Region 4 | Wales & South Central                     | r4.csr.service.justice.gov.uk |
+| Region 5 | Eastern & South West                      | r5.csr.service.justice.gov.uk |
+| Region 6 | East Midlands, and Kent & Sussex          | r6.csr.service.justice.gov.uk |
 
-*Training Servers:*  
+_Training Servers:_  
 traina.pp.csr.service.justice.gov.uk  
-trainb.pp.csr.service.justice.gov.uk  
+trainb.pp.csr.service.justice.gov.uk
 
+### **Incident response hours:**
 
-### **Incident response hours:**  
+24/7/365 cover is provided by the Application Support Team for application issues, and DBAs for database issues.
 
-24/7/365 cover is provided by the Application Support Team for application issues, and DBAs for database issues.  
-
-### **Incident contact details:**  
+### **Incident contact details:**
 
 Email <hmpps-nomis-mis-load@moj-digital-tools.pagerduty.com> for database issues.
 Email <csr_application_alerts@digital.justice.gov.uk> for application issues.  
-Email <csr_infrastructure_alerts@digital.justice.gov.uk> for infrastructure issues.  
+Email <csr_infrastructure_alerts@digital.justice.gov.uk> for infrastructure issues.
 
-### **Service team contact:**  
+### **Service team contact:**
 
 ask-digital-studio-ops  
-<digital-studio-operations-team@digital.justice.gov.uk>  
+<digital-studio-operations-team@digital.justice.gov.uk>
 
 ### **Hosting environment:**
 

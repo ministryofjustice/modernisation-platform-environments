@@ -4,11 +4,13 @@ Each environment has its own public/private ssh key pair for the default ec2-use
 The private key is uploaded as a SSM parameter in each environment under `ec2-user_pem`.
 
 ## Creating the keys
+
 Run [create-keys.sh](create-keys.sh) to create the initial keys
 Then create the SSM placeholder parameters in AWS
 Then update the SSM parameters with [put-keys.sh](put-keys.sh)
 
 ## Using the keys
+
 Run [get-keys.sh](get-keys.sh) from this directory to download all of the keys.
 Run [create-links.sh](create-links.sh) from this directory to create soft links in your ~/.ssh directory
 
