@@ -2,6 +2,7 @@ import json
 import boto3
 import datetime
 from logging import getLogger
+import os
 
 logger = getLogger(__name__)
 
@@ -12,7 +13,7 @@ s3_client = boto3.client("s3", region_name="eu-west-2")
 def handler(event, context):
     # Specify source bucket
     source_bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
-
+    destination_bucket = os.environ.get("S3_BUCKET_NAME")
     # Get object that has been uploaded
     file_key = event["Records"][0]["s3"]["object"]["key"]
     file_parts = file_key.split("/")
@@ -20,9 +21,6 @@ def handler(event, context):
     table_name = file_parts[2]
     file_name = file_parts[3]
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
-
-    # Specify destination bucket
-    destination_bucket = "moj-reg-preprod"
 
     project_name = "electronic-monitoring-service"
     destination_key = f"landing/{project_name}/data/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"

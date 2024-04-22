@@ -1,3 +1,9 @@
+locals {
+  register_my_data_bucket_suffix = local.is-production ? "preprod" : "dev"
+  register_my_data_bucket = "moj-reg-${local.register_my_data_bucket_suffix}"
+}
+
+
 resource "aws_s3_bucket" "ap_export_bucket" {
   bucket_prefix = "ap-export-bucket-"
 }
@@ -143,6 +149,11 @@ resource "aws_lambda_function" "em_ap_transfer_lambda" {
   runtime       = "python3.12"
   memory_size   = 4096
   timeout       = 900
+  environment {
+    variables = {
+      "REG_BUCKET_NAME" = local.register_my_data_bucket
+    }
+  }
 }
 
 resource "aws_lambda_permission" "em_ap_transfer_lambda" {
