@@ -76,6 +76,7 @@ module "ahmlr" {
 }
 
 module "care_standards" {
+  depends_on                        = [ module.ahmlr ]
   source                            = "./modules/tribunal"
   app_name                          = "care-standards"
   app_url                           = "carestandards"
