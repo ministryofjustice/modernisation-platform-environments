@@ -42,6 +42,7 @@ module "appeals" {
 }
 
 module "ahmlr" {
+  depends_on                        = [ module.appeals ]
   source                            = "./modules/tribunal"
   app_name                          = "hmlands"
   app_url                           = "hmlands"
@@ -75,6 +76,7 @@ module "ahmlr" {
 }
 
 module "care_standards" {
+  depends_on                        = [ module.ahmlr ]
   source                            = "./modules/tribunal"
   app_name                          = "care-standards"
   app_url                           = "carestandards"
@@ -108,6 +110,7 @@ module "care_standards" {
 }
 
 module "cicap" {
+  depends_on                        = [ module.care_standards ]
   source                            = "./modules/tribunal"
   app_name                          = "cicap"
   app_url                           = "cicap"
@@ -141,6 +144,7 @@ module "cicap" {
 }
 
 module "employment_appeals" {
+  depends_on                        = [ module.cicap ]
   source                            = "./modules/tribunal"
   app_name                          = "employment-appeals"
   app_url                           = "employmentappeals"
@@ -174,6 +178,7 @@ module "employment_appeals" {
 }
 
 module "finance_and_tax" {
+  depends_on                        = [ module.employment_appeals ]
   source                            = "./modules/tribunal"
   app_name                          = "finance-and-tax"
   app_url                           = "finance-and-tax"
@@ -207,6 +212,7 @@ module "finance_and_tax" {
 }
 
 module "immigration_services" {
+  depends_on                        = [ module.finance_and_tax ]
   source                            = "./modules/tribunal"
   app_name                          = "immigration-services"
   app_url                           = "immigration-services"
@@ -240,6 +246,7 @@ module "immigration_services" {
 }
 
 module "information_tribunal" {
+  depends_on                        = [ module.immigration_services ]
   source                            = "./modules/tribunal"
   app_name                          = "information-tribunal"
   app_url                           = "information-tribunal"
@@ -273,6 +280,7 @@ module "information_tribunal" {
 }
 
 module "lands_tribunal" {
+  depends_on                        = [ module.information_tribunal ]
   source                            = "./modules/tribunal"
   app_name                          = "lands-chamber"
   app_url                           = "lands-chamber"
@@ -306,6 +314,7 @@ module "lands_tribunal" {
 }
 
 module "transport" {
+  depends_on                        = [ module.lands_tribunal ]
   source                            = "./modules/tribunal"
   app_name                          = "transport"
   app_url                           = "transportappeals"
