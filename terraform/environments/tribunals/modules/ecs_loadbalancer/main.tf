@@ -40,7 +40,7 @@ resource "aws_lb" "tribunals_lb" {
 }
 
 resource "aws_lb_target_group" "tribunals_target_group" {
-  name                 = "${var.app_name}-tribunals-target-group"
+  name                 = "${var.app_name}-tg"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = var.vpc_shared_id
