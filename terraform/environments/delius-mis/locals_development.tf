@@ -235,22 +235,22 @@ locals {
   }
 
   # use slightly different config for each database
-  dsd_db_config_dev = merge(base_db_config_dev, {
-    ebs_volumes = merge(base_db_config_dev.ebs_volumes, {
+  dsd_db_config_dev = merge(local.base_db_config_dev, {
+    ebs_volumes = merge(local.base_db_config_dev.ebs_volumes, {
       "/dev/sdb" = { label = "app", size = 200 },
       "/dev/sdc" = { label = "app", size = 100 }
     })
   })
 
-  boe_db_config_dev = merge(base_db_config_dev, {
-    ebs_volumes = merge(base_db_config_dev.ebs_volumes, {
+  boe_db_config_dev = merge(local.base_db_config_dev, {
+    ebs_volumes = merge(local.base_db_config_dev.ebs_volumes, {
       "/dev/sdb" = { label = "app", size = 200 },
       "/dev/sdc" = { label = "app", size = 100 }
     })
   })
   
-  mis_db_config_dev = merge(base_db_config_dev, {
-    ebs_volumes = merge(base_db_config_dev.ebs_volumes, {
+  mis_db_config_dev = merge(local.base_db_config_dev, {
+    ebs_volumes = merge(local.base_db_config_dev.ebs_volumes, {
       "/dev/sdb" = { label = "app", size = 500 },
       "/dev/sdc" = { label = "app", size = 500 }
     })
