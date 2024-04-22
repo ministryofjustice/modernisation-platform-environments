@@ -178,6 +178,7 @@ module "employment_appeals" {
 }
 
 module "finance_and_tax" {
+  depends_on                        = [ module.employment_appeals ]
   source                            = "./modules/tribunal"
   app_name                          = "finance-and-tax"
   app_url                           = "finance-and-tax"
@@ -211,6 +212,7 @@ module "finance_and_tax" {
 }
 
 module "immigration_services" {
+  depends_on                        = [ module.finance_and_tax ]
   source                            = "./modules/tribunal"
   app_name                          = "immigration-services"
   app_url                           = "immigration-services"
@@ -244,6 +246,7 @@ module "immigration_services" {
 }
 
 module "information_tribunal" {
+  depends_on                        = [ module.immigration_services ]
   source                            = "./modules/tribunal"
   app_name                          = "information-tribunal"
   app_url                           = "information-tribunal"
@@ -277,6 +280,7 @@ module "information_tribunal" {
 }
 
 module "lands_tribunal" {
+  depends_on                        = [ module.information_tribunal ]
   source                            = "./modules/tribunal"
   app_name                          = "lands-chamber"
   app_url                           = "lands-chamber"
@@ -310,6 +314,7 @@ module "lands_tribunal" {
 }
 
 module "transport" {
+  depends_on                        = [ module.lands_tribunal ]
   source                            = "./modules/tribunal"
   app_name                          = "transport"
   app_url                           = "transportappeals"
