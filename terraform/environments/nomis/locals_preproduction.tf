@@ -153,14 +153,14 @@ locals {
 
       # NOT-ACTIVE (green deployment)
       preprod-nomis-web-b = merge(local.weblogic_ec2, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
-          desired_capacity = 2
-          max_size         = 2
+        # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 0
         })
-        autoscaling_schedules = {
-          scale_up   = { recurrence = "0 7 * * Mon-Fri" }
-          scale_down = { recurrence = "0 18 * * Mon-Fri", desired_capacity = 1 }
-        }
+        # autoscaling_schedules = {
+        #   scale_up   = { recurrence = "0 7 * * Mon-Fri" }
+        #   scale_down = { recurrence = "0 18 * * Mon-Fri", desired_capacity = 1 }
+        # }
         # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
