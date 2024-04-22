@@ -110,6 +110,7 @@ module "care_standards" {
 }
 
 module "cicap" {
+  depends_on                        = [ module.care_standards ]
   source                            = "./modules/tribunal"
   app_name                          = "cicap"
   app_url                           = "cicap"
@@ -143,6 +144,7 @@ module "cicap" {
 }
 
 module "employment_appeals" {
+  depends_on                        = [ module.cicap ]
   source                            = "./modules/tribunal"
   app_name                          = "employment-appeals"
   app_url                           = "employmentappeals"
