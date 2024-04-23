@@ -38,7 +38,6 @@ module "oracle_db_dsd" {
   }
   db_type           = "primary"
   db_suffix         = "dsd-db"
-  member_account_id = "mis"
   server_type_tag   = "mis_db"
   count             = 1
   db_count_index    = count.index + 1
@@ -87,7 +86,6 @@ module "oracle_db_boe" {
   }
   db_type           = "primary"
   db_suffix         = "boe-db"
-  member_account_id = "mis"
   server_type_tag   = "mis_db"
   count             = 1
   db_count_index    = count.index + 1
@@ -136,7 +134,6 @@ module "oracle_db_mis" {
   }
   db_type           = "primary"
   db_suffix         = "mis-db"
-  member_account_id = "mis"
   server_type_tag   = "mis_db"
   count             = 1
   db_count_index    = count.index + 1
