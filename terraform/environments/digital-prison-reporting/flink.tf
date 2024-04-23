@@ -37,6 +37,30 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
           "arn:aws:s3:::dpr-artifact-store-development",
           "arn:aws:s3:::dpr-artifact-store-development/*"
         ]
+      },
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Action": "cloudwatch:PutMetricData",
+            "Resource": "*",
+            "Effect": "Allow"
+          }
+        ]
+      },
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Action": [
+              "logs:DescribeLogGroups",
+              "logs:DescribeLogStreams",
+              "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:::log-group::*",
+            "Effect": "Allow"
+          }
+        ]
       }
     ]
   })
@@ -56,8 +80,8 @@ resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
     application_code_configuration {
       code_content {
         s3_content_location {
-          bucket_arn = "arn:aws:s3:::dpr-artifact-store-development"
-          file_key   = "flink-spike-1.0-SNAPSHOT-all.jar"
+          bucket_arn = "arn:aws:s3:::flink-demo-771283872747-eu-west-2-1713861000297-bucket"
+          file_key   = "kds-to-s3-datastream-java-1.0.1.jar"
         }
       }
 
