@@ -39,28 +39,18 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
         ]
       },
       {
-        "Version": "2012-10-17",
-        "Statement": [
-          {
-            "Action": "cloudwatch:PutMetricData",
-            "Resource": "*",
-            "Effect": "Allow"
-          }
-        ]
+        "Action": "cloudwatch:PutMetricData",
+        "Resource": "*",
+        "Effect": "Allow"
       },
       {
-        "Version": "2012-10-17",
-        "Statement": [
-          {
-            "Action": [
-              "logs:DescribeLogGroups",
-              "logs:DescribeLogStreams",
-              "logs:PutLogEvents"
-            ],
-            "Resource": "arn:aws:logs:::log-group::*",
-            "Effect": "Allow"
-          }
-        ]
+        "Action": [
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:::log-group::*",
+        "Effect": "Allow"
       }
     ]
   })
