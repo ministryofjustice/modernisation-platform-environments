@@ -105,7 +105,7 @@ module "instance" {
   subnet_id         = var.subnet_id
   tags = merge(var.tags,
     { Name = lower(format("%s-${var.member_account_id}-db-%s", var.env_name, local.instance_name_index)) },
-    { server-type = var.server_type },
+    { server-type = var.server_type_tag },
     { database = local.database_tag },
     var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
   )
