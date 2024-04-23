@@ -4,6 +4,12 @@ variable "db_type" {
   type        = string
 }
 
+variable "db_suffix" {
+  description = "identifier to append to name e.g. dsd, boe"
+  type        = string
+  default     = "db"
+}
+
 variable "ec2_instance_type" {
   description = "EC2 instance type"
   type        = string
