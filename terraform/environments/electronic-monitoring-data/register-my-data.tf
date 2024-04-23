@@ -114,6 +114,16 @@ data "aws_iam_policy_document" "get_json_files" {
   statement {
     effect = "Allow"
     actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::moj-reg-${local.register_my_data_bucket_suffix}"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
       "s3:PutObject",
       "s3:PutObjectAcl"
     ]
