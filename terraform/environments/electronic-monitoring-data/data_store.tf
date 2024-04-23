@@ -52,23 +52,39 @@ resource "aws_s3_bucket_policy" "data_store" {
 
 data "aws_iam_policy_document" "data_store" {
   statement {
-    sid = "EnforceTLSv12orHigher"
+    sid = "ReadBucket"
     principals {
       type        = "AWS"
       identifiers = ["*"]
     }
-    effect  = "Deny"
-    actions = ["s3:*"]
+    effect  = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject"
+    ]
     resources = [
       aws_s3_bucket.data_store.arn,
       "${aws_s3_bucket.data_store.arn}/*"
     ]
-    condition {
-      test     = "NumericLessThan"
-      variable = "s3:TlsVersion"
-      values   = [1.2]
-    }
   }
+  # statement {
+  #   sid = "EnforceTLSv12orHigher"
+  #   principals {
+  #     type        = "AWS"
+  #     identifiers = ["*"]
+  #   }
+  #   effect  = "Deny"
+  #   actions = ["s3:*"]
+  #   resources = [
+  #     aws_s3_bucket.data_store.arn,
+  #     "${aws_s3_bucket.data_store.arn}/*"
+  #   ]
+  #   condition {
+  #     test     = "NumericLessThan"
+  #     variable = "s3:TlsVersion"
+  #     values   = [1.2]
+  #   }
+  # }
 }
 
 resource "aws_s3_bucket_logging" "data_store" {
