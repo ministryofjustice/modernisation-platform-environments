@@ -62,11 +62,8 @@ resource "aws_iam_role_policy_attachment" "flink_spike_policy_attachment" {
 }
 
 resource "aws_cloudwatch_log_group" "flink_log_group" {
-  count = var.create_job ? 1 : 0
-
   name              = "/aws-flink/jobs/flink-spike-app"
   retention_in_days = var.log_group_retention_in_days
-  tags              = var.tags
 }
 
 resource "aws_cloudwatch_log_stream" "flink_log_stream" {
