@@ -106,7 +106,7 @@ resource "null_resource" "app_setup_db" {
   }
   # Use triggers to force recreation when the lock file changes
   triggers = {
-    lock_file_version = filemd5("/tmp/db_setup_lock")
+    always_run = "${timestamp()}"
   }
 }
 
