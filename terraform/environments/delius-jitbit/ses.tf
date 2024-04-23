@@ -121,3 +121,29 @@ resource "aws_ssm_parameter" "jitbit_ses_smtp_user" {
     ses_smtp_password = aws_iam_access_key.jitbit_ses_smtp_user.ses_smtp_password_v4
   })
 }
+
+#####################
+# SES Monitoring
+#####################
+
+resource "aws_cloudwatch_log_group" "jitbit_ses_logs" {
+  name              = format("%s-ses", local.application_name)
+  retention_in_days = local.application_data.accounts[local.environment].ses_log_retention_days
+}
+
+resource "aws_ses_configuration_set" "jitbit_ses_configuration_set" {
+  name = format("%s-configuration-set", local.application_name)
+}
+
+resource "aws_ses_event_destination" "jitbit_ses_event_destination" {
+  configuration_set_name = aws_ses_configuration_set.jitbit_ses_configuration_set.name
+  name                   = format("%s-event-destination", local.application_name)
+  enabled                = true
+  matching_types         = ["send", "reject", "bounce", "complaint", "delivery"]
+
+  cloudwatch_destination {
+    default_value = "default"
+    dimension_name = "email"
+    value_source = "emailHeader"
+  }
+}

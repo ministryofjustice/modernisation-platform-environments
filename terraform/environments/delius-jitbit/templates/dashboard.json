@@ -12,22 +12,12 @@
             "ECS/ContainerInsights",
             "CpuUtilized",
             "ServiceName",
-            "hmpps-${environment}-${app_name}",
+            "hmpps-development-delius-jitbit",
             "ClusterName",
-            "hmpps-${environment}-${app_name}",
-            {
-              "label": "delius-jitbit-service"
-            }
+            "hmpps-development-delius-jitbit",
+            { "label": "delius-jitbit-service" }
           ],
-          [
-            ".",
-            ".",
-            "ClusterName",
-            ".",
-            {
-              "label": "delius-jitbit-cluster"
-            }
-          ]
+          [".", ".", "ClusterName", ".", { "label": "delius-jitbit-cluster" }]
         ],
         "view": "timeSeries",
         "stacked": true,
@@ -49,22 +39,12 @@
             "ECS/ContainerInsights",
             "MemoryUtilized",
             "ServiceName",
-            "hmpps-${environment}-${app_name}",
+            "hmpps-development-delius-jitbit",
             "ClusterName",
-            "hmpps-${environment}-${app_name}",
-            {
-              "label": "delius-jitbit-service"
-            }
+            "hmpps-development-delius-jitbit",
+            { "label": "delius-jitbit-service" }
           ],
-          [
-            ".",
-            ".",
-            "ClusterName",
-            ".",
-            {
-              "label": "delius-jitbit-cluster"
-            }
-          ]
+          [".", ".", "ClusterName", ".", { "label": "delius-jitbit-cluster" }]
         ],
         "view": "timeSeries",
         "stacked": true,
@@ -81,15 +61,7 @@
       "x": 0,
       "type": "metric",
       "properties": {
-        "metrics": [
-          [
-            "JitbitMetrics",
-            "ErrorCount",
-            {
-              "color": "#d62728"
-            }
-          ]
-        ],
+        "metrics": [["JitbitMetrics", "ErrorCount", { "color": "#d62728" }]],
         "view": "timeSeries",
         "stacked": true,
         "region": "eu-west-2",
@@ -105,7 +77,7 @@
       "x": 12,
       "type": "log",
       "properties": {
-        "query": "SOURCE '${app_log_group_name}' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
+        "query": "SOURCE 'delius-jitbit-ecs' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
         "region": "eu-west-2",
         "stacked": false,
         "view": "table",
@@ -146,30 +118,30 @@
             "AWS/ApplicationELB",
             "HealthyHostCount",
             "TargetGroup",
-            "${target_group_arn}",
+            "targetgroup/delius-jitbit/2da552f38f422207",
             "LoadBalancer",
-            "${load_balancer_arn}"
+            "app/delius-jitbit-lb/b439505d1acde0b2"
           ]
         ],
         "region": "eu-west-2"
       }
     },
     {
-      "type": "text",
-      "x": 0,
-      "y": 20,
-      "width": 24,
       "height": 1,
+      "width": 24,
+      "y": 20,
+      "x": 0,
+      "type": "text",
       "properties": {
         "markdown": "RDS Metrics"
       }
     },
     {
-      "type": "metric",
-      "x": 0,
-      "y": 21,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 0,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -178,7 +150,7 @@
             "AWS/RDS",
             "ReadIOPS",
             "DBInstanceIdentifier",
-            "${app_name}-${environment}-database"
+            "delius-jitbit-development-database"
           ],
           [".", "WriteIOPS", ".", "."]
         ],
@@ -187,11 +159,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 6,
-      "y": 21,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 6,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -200,7 +172,7 @@
             "AWS/RDS",
             "CPUUtilization",
             "DBInstanceIdentifier",
-            "${app_name}-${environment}-database"
+            "delius-jitbit-development-database"
           ]
         ],
         "region": "eu-west-2",
@@ -208,11 +180,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 12,
-      "y": 21,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 12,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -221,7 +193,7 @@
             "AWS/RDS",
             "FreeStorageSpace",
             "DBInstanceIdentifier",
-            "${app_name}-${environment}-database"
+            "delius-jitbit-development-database"
           ]
         ],
         "region": "eu-west-2",
@@ -229,11 +201,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 18,
-      "y": 21,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 18,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": true,
@@ -242,7 +214,7 @@
             "AWS/RDS",
             "DatabaseConnections",
             "DBInstanceIdentifier",
-            "${app_name}-${environment}-database"
+            "delius-jitbit-development-database"
           ]
         ],
         "region": "eu-west-2",
@@ -250,11 +222,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 0,
-      "y": 27,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 0,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": true,
@@ -263,7 +235,7 @@
             "AWS/RDS",
             "ReadLatency",
             "DBInstanceIdentifier",
-            "${app_name}-${environment}-database"
+            "delius-jitbit-development-database"
           ],
           [".", "WriteLatency", ".", "."]
         ],
@@ -272,11 +244,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 6,
-      "y": 27,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 6,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": true,
@@ -285,7 +257,7 @@
             "AWS/RDS",
             "NetworkTransmitThroughput",
             "DBInstanceIdentifier",
-            "${app_name}-${environment}-database"
+            "delius-jitbit-development-database"
           ],
           [".", "NetworkReceiveThroughput", ".", "."]
         ],
@@ -294,11 +266,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 12,
-      "y": 27,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 12,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -307,28 +279,26 @@
             "AWS/RDS",
             "FreeableMemory",
             "DBInstanceIdentifier",
-            "${app_name}-${environment}-database"
+            "delius-jitbit-development-database"
           ]
         ],
         "region": "eu-west-2"
       }
     },
     {
-      "type": "metric",
-      "x": 18,
-      "y": 27,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 18,
+      "type": "metric",
       "properties": {
         "metrics": [
           [
             "AWS/RDS",
             "DiskQueueDepth",
             "DBInstanceIdentifier",
-            "${app_name}-${environment}-database",
-            {
-              "color": "#9467bd"
-            }
+            "delius-jitbit-development-database",
+            { "color": "#9467bd" }
           ]
         ],
         "view": "timeSeries",
@@ -339,11 +309,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 0,
-      "y": 14,
-      "width": 8,
       "height": 6,
+      "width": 8,
+      "y": 14,
+      "x": 0,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -352,18 +322,18 @@
             "AWS/ApplicationELB",
             "HTTPCode_Target_4XX_Count",
             "LoadBalancer",
-            "${load_balancer_arn}"
+            "app/delius-jitbit-lb/b439505d1acde0b2"
           ]
         ],
         "region": "eu-west-2"
       }
     },
     {
-      "type": "metric",
-      "x": 8,
-      "y": 14,
-      "width": 8,
       "height": 6,
+      "width": 8,
+      "y": 14,
+      "x": 8,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -372,10 +342,24 @@
             "AWS/ApplicationELB",
             "TargetResponseTime",
             "LoadBalancer",
-            "${load_balancer_arn}"
+            "app/delius-jitbit-lb/b439505d1acde0b2"
           ]
         ],
         "region": "eu-west-2"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 33,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE 'delius-jitbit-ecs' | fields @timestamp, @message, @logStream\n| sort @timestamp desc\n| filter @message like /useless/\n| limit 1000",
+        "region": "eu-west-2",
+        "stacked": false,
+        "title": "Log group: delius-jitbit-ecs",
+        "view": "table"
       }
     }
   ]
