@@ -63,7 +63,7 @@ resource "aws_iam_role_policy_attachment" "flink_spike_policy_attachment" {
 
 resource "aws_cloudwatch_log_group" "flink_log_group" {
   name              = "/aws-flink/jobs/flink-spike-app"
-  retention_in_days = var.log_group_retention_in_days
+  retention_in_days = 7
 }
 
 resource "aws_cloudwatch_log_stream" "flink_log_stream" {
