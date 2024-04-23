@@ -24,12 +24,18 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
       {
         "Effect" : "Allow",
         "Action" : [
-          "s3:GetObject",
-          "s3:ListBucket",
+          "s3:Get*",
+          "s3:List*",
+          "s3:Put*",
+          "s3:DeleteObject"
         ],
         "Resource" : [
           "arn:aws:s3:::dpr-working-development",
           "arn:aws:s3:::dpr-working-development/*",
+          "arn:aws:s3:::flink-demo-771283872747-eu-west-2-1713861000297-bucket",
+          "arn:aws:s3:::flink-demo-771283872747-eu-west-2-1713861000297-bucket/*",
+          "arn:aws:s3:::dpr-artifact-store-development",
+          "arn:aws:s3:::dpr-artifact-store-development/*"
         ]
       }
     ]
