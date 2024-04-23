@@ -80,19 +80,7 @@ resource "null_resource" "app_setup_db" {
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
-    command = <<-EOT
-      # Ensure the lock file exists
-      touch /tmp/db_setup_lock
-
-      # Wait until the lock is available
-      until mkdir /tmp/db_setup_lock; do sleep 1; done
-
-      # Execute the database setup script
-      ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh
-
-      # Release the lock
-      rmdir /tmp/db_setup_lock
-    EOT
+    command = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
 
     environment = {
       DB_URL        = local.app_rds_url
@@ -104,7 +92,7 @@ resource "null_resource" "app_setup_db" {
       APP_FOLDER    = local.sql_migration_path
     }
   }
-  # Use triggers to force recreation when the lock file changes
+
   triggers = {
     always_run = "${timestamp()}"
   }
