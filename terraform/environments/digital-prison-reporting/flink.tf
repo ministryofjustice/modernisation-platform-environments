@@ -97,8 +97,4 @@ resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
       }
     }
   }
-
-  tags = {
-    Jira = "DPR2-560"
-  }
 }
