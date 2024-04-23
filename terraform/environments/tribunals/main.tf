@@ -39,6 +39,7 @@ module "appeals" {
   vpc_shared_id                     = data.aws_vpc.shared.id 
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = ""
 }
 
 module "ahmlr" {
@@ -72,6 +73,7 @@ module "ahmlr" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = module.appeals.dummy_output
 }
 
 module "care_standards" {
@@ -105,6 +107,7 @@ module "care_standards" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = module.ahmlr.dummy_output
 }
 
 module "cicap" {
@@ -138,6 +141,7 @@ module "cicap" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = module.care_standards.dummy_output
 }
 
 module "employment_appeals" {
@@ -171,6 +175,7 @@ module "employment_appeals" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = module.cicap.dummy_output
 }
 
 module "finance_and_tax" {
@@ -204,6 +209,7 @@ module "finance_and_tax" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = module.employment_appeals.dummy_output
 }
 
 module "immigration_services" {
@@ -237,6 +243,7 @@ module "immigration_services" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = module.finance_and_tax.dummy_output
 }
 
 module "information_tribunal" {
@@ -270,6 +277,7 @@ module "information_tribunal" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = module.immigration_services.dummy_output
 }
 
 module "lands_tribunal" {
@@ -303,6 +311,7 @@ module "lands_tribunal" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = module.information_tribunal.dummy_output
 }
 
 module "transport" {
@@ -336,4 +345,5 @@ module "transport" {
   vpc_shared_id                     = data.aws_vpc.shared.id 
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
+  previous_module_dummy             = module.lands_tribunal.dummy_output
 }

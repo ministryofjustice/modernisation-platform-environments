@@ -89,3 +89,9 @@ variable "aws_acm_certificate_external" {
 
 variable "vpc_shared_id" {  
 }
+
+variable "previous_module_dummy" {
+  description = "Dummy output from the previous module to create an implicit dependency"
+  type        = string
+  default     = ""
+}
