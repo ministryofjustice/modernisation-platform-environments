@@ -11,6 +11,24 @@ locals {
       "/oracle/database/T3ONRSYS" = local.database_secretsmanager_secrets
     }
 
+    baseline_iam_policies = {
+      Ec2SecretPolicy = {
+        description = "Permissions required for secret value access by instances"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/test/*",
+            ]
+          }
+        ]
+      }
+    }
+
     # baseline_ec2_instances = {
     #   test-db = merge(local.defaults_onr_db_ec2 ,{
     #     config = merge(local.defaults_onr_db_ec2.config, {
@@ -34,6 +52,9 @@ locals {
     baseline_ec2_autoscaling_groups = {
       test-web-asg = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
+          instance_profile_policies = [
+            "Ec2SecretPolicy",
+          ]
           availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_web_ec2.instance, {
