@@ -52,9 +52,9 @@ locals {
     baseline_ec2_autoscaling_groups = {
       test-web-asg = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
-          instance_profile_policies = [
+          instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
             "Ec2SecretPolicy",
-          ]
+          ])
           availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_web_ec2.instance, {
