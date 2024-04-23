@@ -37,7 +37,7 @@ resource "aws_security_group" "load_balancer_security_group" {
     description = "Allow ingress from white listed CIDRs"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = flatten([
+    cidr_blocks = distinct(flatten([
       "20.49.214.199/32", # Azure Landing Zone Egress
       "20.49.214.228/32", # Azure Landing Zone Egress
       "20.26.11.71/32",   # Azure Landing Zone Egress
@@ -57,7 +57,7 @@ resource "aws_security_group" "load_balancer_security_group" {
       "194.33.196.0/25",   # ARK internet (DOM1)
       "194.33.197.0/25",   # ARK internet (DOM1)
       local.internal_security_group_cidrs
-    ])
+    ]))
 
     ipv6_cidr_blocks = [
       # Route53 Healthcheck Access Cidrs IPv6
