@@ -106,15 +106,15 @@ resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
         parallelism_per_kpu  = 1
       }
     }
+
+    vpc_configuration {
+      security_group_ids = [aws_security_group.flink_allow_outbound.id]
+      subnet_ids         = [data.aws_subnet.private_subnets_a.id]
+    }
   }
 
   cloudwatch_logging_options {
     log_stream_arn = aws_cloudwatch_log_stream.flink_log_stream.arn
-  }
-
-  vpc_configuration {
-    security_group_ids = [aws_security_group.flink_allow_outbound.id]
-    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
   }
 }
 
