@@ -56,7 +56,7 @@ resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
     application_code_configuration {
       code_content {
         s3_content_location {
-          bucket_arn = "arn:aws:s3:::dpr-working-development"
+          bucket_arn = "arn:aws:s3:::dpr-artifact-store-development"
           file_key   = "flink-spike-1.0-SNAPSHOT-all.jar"
         }
       }
