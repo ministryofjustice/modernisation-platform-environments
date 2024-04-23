@@ -25,6 +25,12 @@ locals {
     }
   }
 
+  web_secretsmanager_secrets = {
+    secrets = {
+      passwords = { description = "Web Passwords" }
+    }
+  }
+
   defaults_ec2 = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_owner                     = "self"
@@ -115,10 +121,10 @@ locals {
     })
     # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
     ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 30 }  # root volume
-      "/dev/sdb" = { label = "app", size = 128 }   # /u01
-      "/dev/sdc" = { label = "app", size = 128 }   # /u02
-      "/dev/sde" = { label = "data", size = 1023 }  # DATA01
+      "/dev/sda1" = { label = "root", size = 30 }   # root volume
+      "/dev/sdb"  = { label = "app", size = 128 }   # /u01
+      "/dev/sdc"  = { label = "app", size = 128 }   # /u02
+      "/dev/sde"  = { label = "data", size = 1023 } # DATA01
       # "/dev/sdf" = { label = "data", size = 1023 }  # DATA02
       # "/dev/sdg" = { label = "data", size = 1023 }  # DATA03
       # "/dev/sdh" = { label = "data", size = 1023 }  # DATA04

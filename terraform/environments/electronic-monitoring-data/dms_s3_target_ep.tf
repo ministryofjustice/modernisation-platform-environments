@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "dms_target_ep_s3_bucket" {
-  bucket_prefix = "dms-rds-to-parquet-"
+  bucket_prefix = "dms-rds-to-csv-"
 
   tags = merge(
     local.tags,

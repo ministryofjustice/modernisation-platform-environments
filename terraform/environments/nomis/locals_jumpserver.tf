@@ -17,11 +17,12 @@ locals {
       vpc_security_group_ids = ["private-jumpserver"]
     })
     tags = {
-      description = "Windows Server 2022 client testing for NOMIS"
-      os-type     = "Windows"
-      component   = "test"
-      server-type = "NomisClient"
-      backup      = "false" # no need to back this up as they are destroyed each night
+      description            = "Windows Server 2022 client testing for NOMIS"
+      instance-access-policy = "full"
+      os-type                = "Windows"
+      component              = "test"
+      server-type            = "NomisClient"
+      backup                 = "false" # no need to back this up as they are destroyed each night
     }
   }
 }

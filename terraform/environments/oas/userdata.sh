@@ -7,7 +7,9 @@ sudo yum -y install xorg-x11-xauth
 sudo yum -y install xclock xterm
 sudo yum -y install nvme-cli
 
-hostnamectl set-hostname oas.laa-development.modernisation-platform.service.justice.gov.uk
+hostnamectl set-hostname oas
+
+sed -i '2s/.*/search laa-development.modernisation-platform.service.justice.gov.uk eu-west-2.compute.internal/' /etc/resolv.conf
 
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 systemctl start amazon-ssm-agent
@@ -57,7 +59,7 @@ mount -a
 chown oracle:dba /oracle/software
 chown oracle:dba /stage
 chmod -R 777 /stage
-chmod -R 644 /oracle/software
+chmod -R 777 /oracle/software
 dd if=/dev/zero of=/root/myswapfile bs=1M count=1024
 chmod 600 /root/myswapfile
 mkswap /root/myswapfile

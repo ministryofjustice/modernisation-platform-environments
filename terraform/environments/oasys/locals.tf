@@ -87,7 +87,7 @@ locals {
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
     secretsmanager_secrets = {
       banner_message = {
-        description = "OASys banner message text"
+        description             = "OASys banner message text"
         recovery_window_in_days = 0
       }
     }

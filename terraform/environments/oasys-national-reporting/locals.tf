@@ -82,7 +82,7 @@ locals {
     oasys_db_onr_db = local.security_groups.oasys_db_onr_db # apply to onr_db prod server
   }
 
-  baseline_sns_topics     = {}
-  baseline_ssm_parameters = {}
+  baseline_sns_topics             = {}
+  baseline_ssm_parameters         = {}
   baseline_secretsmanager_secrets = {}
 }
