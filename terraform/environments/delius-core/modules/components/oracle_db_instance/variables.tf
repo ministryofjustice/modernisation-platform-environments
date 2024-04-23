@@ -27,11 +27,6 @@ variable "env_name" {
   type        = string
 }
 
-variable "member_account_id" {
-  description = "member account identifier - eg mis or delius"
-  default     = "delius"
-}
-
 variable "server_type_tag" {
   description = "tag to set on each instance for key `server_type`"
   default     = "delius_core_db"
