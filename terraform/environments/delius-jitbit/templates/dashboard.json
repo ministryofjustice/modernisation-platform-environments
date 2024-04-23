@@ -12,9 +12,9 @@
             "ECS/ContainerInsights",
             "CpuUtilized",
             "ServiceName",
-            "hmpps-development-delius-jitbit",
+            "hmpps-${environment}-${app_name}",
             "ClusterName",
-            "hmpps-development-delius-jitbit",
+            "hmpps-${environment}-${app_name}",
             { "label": "delius-jitbit-service" }
           ],
           [".", ".", "ClusterName", ".", { "label": "delius-jitbit-cluster" }]
@@ -39,9 +39,9 @@
             "ECS/ContainerInsights",
             "MemoryUtilized",
             "ServiceName",
-            "hmpps-development-delius-jitbit",
+            "hmpps-${environment}-${app_name}",
             "ClusterName",
-            "hmpps-development-delius-jitbit",
+            "hmpps-${environment}-${app_name}",
             { "label": "delius-jitbit-service" }
           ],
           [".", ".", "ClusterName", ".", { "label": "delius-jitbit-cluster" }]
@@ -77,7 +77,7 @@
       "x": 12,
       "type": "log",
       "properties": {
-        "query": "SOURCE 'delius-jitbit-ecs' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
+        "query": "SOURCE '${app_log_group_name}' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
         "region": "eu-west-2",
         "stacked": false,
         "view": "table",
@@ -118,9 +118,9 @@
             "AWS/ApplicationELB",
             "HealthyHostCount",
             "TargetGroup",
-            "targetgroup/delius-jitbit/2da552f38f422207",
+            "${target_group_arn}",
             "LoadBalancer",
-            "app/delius-jitbit-lb/b439505d1acde0b2"
+            "${load_balancer_arn}"
           ]
         ],
         "region": "eu-west-2"
@@ -150,7 +150,7 @@
             "AWS/RDS",
             "ReadIOPS",
             "DBInstanceIdentifier",
-            "delius-jitbit-development-database"
+            "${app_name}-${environment}-database"
           ],
           [".", "WriteIOPS", ".", "."]
         ],
@@ -172,7 +172,7 @@
             "AWS/RDS",
             "CPUUtilization",
             "DBInstanceIdentifier",
-            "delius-jitbit-development-database"
+            "${app_name}-${environment}-database"
           ]
         ],
         "region": "eu-west-2",
@@ -193,7 +193,7 @@
             "AWS/RDS",
             "FreeStorageSpace",
             "DBInstanceIdentifier",
-            "delius-jitbit-development-database"
+            "${app_name}-${environment}-database"
           ]
         ],
         "region": "eu-west-2",
@@ -214,7 +214,7 @@
             "AWS/RDS",
             "DatabaseConnections",
             "DBInstanceIdentifier",
-            "delius-jitbit-development-database"
+            "${app_name}-${environment}-database"
           ]
         ],
         "region": "eu-west-2",
@@ -235,7 +235,7 @@
             "AWS/RDS",
             "ReadLatency",
             "DBInstanceIdentifier",
-            "delius-jitbit-development-database"
+            "${app_name}-${environment}-database"
           ],
           [".", "WriteLatency", ".", "."]
         ],
@@ -257,7 +257,7 @@
             "AWS/RDS",
             "NetworkTransmitThroughput",
             "DBInstanceIdentifier",
-            "delius-jitbit-development-database"
+            "${app_name}-${environment}-database"
           ],
           [".", "NetworkReceiveThroughput", ".", "."]
         ],
@@ -279,7 +279,7 @@
             "AWS/RDS",
             "FreeableMemory",
             "DBInstanceIdentifier",
-            "delius-jitbit-development-database"
+            "${app_name}-${environment}-database"
           ]
         ],
         "region": "eu-west-2"
@@ -297,7 +297,7 @@
             "AWS/RDS",
             "DiskQueueDepth",
             "DBInstanceIdentifier",
-            "delius-jitbit-development-database",
+            "${app_name}-${environment}-database",
             { "color": "#9467bd" }
           ]
         ],
@@ -322,7 +322,7 @@
             "AWS/ApplicationELB",
             "HTTPCode_Target_4XX_Count",
             "LoadBalancer",
-            "app/delius-jitbit-lb/b439505d1acde0b2"
+            "${load_balancer_arn}"
           ]
         ],
         "region": "eu-west-2"
@@ -342,7 +342,7 @@
             "AWS/ApplicationELB",
             "TargetResponseTime",
             "LoadBalancer",
-            "app/delius-jitbit-lb/b439505d1acde0b2"
+            "${load_balancer_arn}"
           ]
         ],
         "region": "eu-west-2"
