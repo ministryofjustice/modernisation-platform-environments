@@ -81,6 +81,9 @@ resource "null_resource" "app_setup_db" {
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command = <<-EOT
+      # Ensure the lock file exists
+      touch /tmp/db_setup_lock
+
       # Wait until the lock is available
       until mkdir /tmp/db_setup_lock; do sleep 1; done
 
