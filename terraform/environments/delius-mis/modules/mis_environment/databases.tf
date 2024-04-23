@@ -37,6 +37,7 @@ module "oracle_db_dsd" {
     owner      = "self"
   }
   db_type           = "primary"
+  db_suffix         = "dsd-db"
   member_account_id = "mis"
   server_type_tag   = "mis_db"
   count             = 1
@@ -85,6 +86,7 @@ module "oracle_db_boe" {
     owner      = "self"
   }
   db_type           = "primary"
+  db_suffix         = "boe-db"
   member_account_id = "mis"
   server_type_tag   = "mis_db"
   count             = 1
@@ -133,6 +135,7 @@ module "oracle_db_mis" {
     owner      = "self"
   }
   db_type           = "primary"
+  db_suffix         = "mis-db"
   member_account_id = "mis"
   server_type_tag   = "mis_db"
   count             = 1
