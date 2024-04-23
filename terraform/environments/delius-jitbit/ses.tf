@@ -142,8 +142,8 @@ resource "aws_ses_event_destination" "jitbit_ses_event_destination" {
   matching_types         = ["send", "reject", "bounce", "complaint", "delivery"]
 
   cloudwatch_destination {
-    default_value = "default"
+    default_value  = "default"
     dimension_name = "email"
-    value_source = "emailHeader"
+    value_source   = "emailHeader"
   }
 }
