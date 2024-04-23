@@ -61,6 +61,19 @@ resource "aws_iam_role_policy_attachment" "flink_spike_policy_attachment" {
   policy_arn = aws_iam_policy.flink_spike_additional_policy.arn
 }
 
+resource "aws_cloudwatch_log_group" "flink_log_group" {
+  count = var.create_job ? 1 : 0
+
+  name              = "/aws-flink/jobs/flink-spike-app"
+  retention_in_days = var.log_group_retention_in_days
+  tags              = var.tags
+}
+
+resource "aws_cloudwatch_log_stream" "flink_log_stream" {
+  name           = "flink-spike-app"
+  log_group_name = aws_cloudwatch_log_group.flink_log_group.name
+}
+
 resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
   name                   = "flink-spike"
   runtime_environment    = "FLINK-1_18"
@@ -96,5 +109,9 @@ resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
         parallelism_per_kpu  = 1
       }
     }
+  }
+
+  cloudwatch_logging_options {
+    log_stream_arn = aws_cloudwatch_log_stream.flink_log_stream.arn
   }
 }
