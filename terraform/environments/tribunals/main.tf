@@ -42,7 +42,6 @@ module "appeals" {
 }
 
 module "ahmlr" {
-  depends_on                        = [ module.appeals ]
   source                            = "./modules/tribunal"
   app_name                          = "hmlands"
   app_url                           = "hmlands"
@@ -76,7 +75,6 @@ module "ahmlr" {
 }
 
 module "care_standards" {
-  depends_on                        = [ module.ahmlr ]
   source                            = "./modules/tribunal"
   app_name                          = "care-standards"
   app_url                           = "carestandards"
@@ -110,7 +108,6 @@ module "care_standards" {
 }
 
 module "cicap" {
-  depends_on                        = [ module.care_standards ]
   source                            = "./modules/tribunal"
   app_name                          = "cicap"
   app_url                           = "cicap"
@@ -144,7 +141,6 @@ module "cicap" {
 }
 
 module "employment_appeals" {
-  depends_on                        = [ module.cicap ]
   source                            = "./modules/tribunal"
   app_name                          = "employment-appeals"
   app_url                           = "employmentappeals"
