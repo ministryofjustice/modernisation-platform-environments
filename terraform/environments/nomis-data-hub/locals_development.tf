@@ -35,20 +35,19 @@ locals {
           availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
           security_groups    = ["private"]
         }]
-        #policy = [{
-        #  sid    = "test"
-        #  effect = "Allow"
-        #  actions = [
-        #    "elasticfilesystem:ClientMount",
-        #    "elasticfilesystem:ClientWrite",
-        #  ]
-        #  resources = ["*"]
-        #  conditions = [{
-        #    test     = "Bool"
-        #    variable = "aws:SecureTransport"
-        #    values   = ["true"]
-        #  }]
-        #}]
+        policy = [{
+          effect = "Allow"
+          actions = [
+            "elasticfilesystem:ClientMount",
+            "elasticfilesystem:ClientWrite",
+          ]
+          resources = ["*"]
+          conditions = [{
+            test     = "Bool"
+            variable = "aws:SecureTransport"
+            values   = ["true"]
+          }]
+        }]
         #tags = {
         #  foo = "bar"
         #}
