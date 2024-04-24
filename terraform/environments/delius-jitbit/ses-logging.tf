@@ -59,9 +59,17 @@ resource "aws_lambda_function" "sns_to_cloudwatch" {
 }
 
 resource "aws_cloudwatch_log_group" "sns_logs" {
-  name = format("%s-ses-logs", local.application_name)
+  name              = format("%s-ses-logs", local.application_name)
+  retention_in_days = local.application_data.accounts[local.environment].ses_log_retention_days
 
   tags = local.tags
+}
+
+resource "aws_cloudwatch_log_group" "execution_logs" {
+  name              = format("/aws/lambda/%s", aws_lambda_function.sns_to_cloudwatch.function_name)
+  retention_in_days = 3
+
+  tags              = local.tags
 }
 
 resource "aws_iam_role" "lambda" {
@@ -94,10 +102,7 @@ data "aws_iam_policy_document" "lambda_policy" {
       "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
-    resources = [
-      aws_cloudwatch_log_group.sns_logs.arn,
-      "${aws_cloudwatch_log_group.sns_logs.arn}:*"
-    ]
+    resources = ["arn:aws:logs:*:*:*"]
   }
 }
 

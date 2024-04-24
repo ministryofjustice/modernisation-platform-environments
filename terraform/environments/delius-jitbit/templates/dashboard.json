@@ -361,6 +361,78 @@
         "title": "Log group: delius-jitbit-ecs",
         "view": "table"
       }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 37,
+      "width": 12,
+      "height": 5,
+      "properties": {
+        "query": "SOURCE 'delius-jitbit-ses-logs' | fields @timestamp, @message\n| sort @timestamp desc\n| filter @message like /bounce/\n| limit 1000",
+        "region": "eu-west-2",
+        "stacked": false,
+        "title": "Bounced Emails",
+        "view": "table"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 34,
+      "width": 12,
+      "height": 3,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/SES",
+            "Send",
+            { "id": "m1", "label": "Sent", "region": "eu-west-2" }
+          ],
+          [".", "Bounce", { "region": "eu-west-2" }],
+          [".", "Delivery", { "region": "eu-west-2" }]
+        ],
+        "sparkline": false,
+        "view": "singleValue",
+        "region": "eu-west-2",
+        "stat": "Sum",
+        "period": 86400,
+        "setPeriodToTimeRange": true,
+        "trend": false,
+        "liveData": true,
+        "title": "SES: Totals"
+      }
+    },
+    {
+      "height": 1,
+      "width": 24,
+      "y": 33,
+      "x": 0,
+      "type": "text",
+      "properties": {
+        "markdown": "Email"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 34,
+      "width": 12,
+      "height": 8,
+      "properties": {
+        "metrics": [
+          ["AWS/SES", "Send", { "label": "Sent", "region": "eu-west-2" }],
+          [".", "Delivery", { "region": "eu-west-2" }],
+          [".", "Bounce", { "region": "eu-west-2" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "period": 900,
+        "stat": "Sum",
+        "liveData": true,
+        "title": "SES"
+      }
     }
   ]
 }
