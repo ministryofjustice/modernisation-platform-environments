@@ -6,7 +6,7 @@
       "Sid": "OracleStatisticsListPolicy",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::${oracle_statistics_delius_target_account_id}:role/instance-role-${var.account_info.application_name}-${oracle_statistics_delius_target_environment}-delius-db-1"
+        "AWS": "arn:aws:iam::${oracle_statistics_delius_target_account_id}:role/instance-role-delius-mis-${oracle_statistics_delius_target_environment}-delius-db-1"
       },
       "Action": "s3:ListBucket",
       "Resource": "${s3bucket_arn}"
@@ -15,7 +15,7 @@
       "Sid": "OracleStatisticsObjectPolicy",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::${oracle_statistics_delius_target_account_id}:role/instance-role-${var.account_info.application_name}-${oracle_statistics_delius_target_environment}-delius-db-1"
+        "AWS": "arn:aws:iam::${oracle_statistics_delius_target_account_id}:role/instance-role-delius-mis-${oracle_statistics_delius_target_environment}-delius-db-1"
       },
       "Action": [
         "s3:PutObjectAcl",

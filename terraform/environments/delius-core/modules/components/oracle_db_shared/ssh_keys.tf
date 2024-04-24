@@ -3,7 +3,7 @@ module "s3_bucket_ssh_keys" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
-  bucket_name = "${var.account_info.application_name}-${var.env_name}-oracle-database-ssh-keys"
+  bucket_name = "delius-mis-${var.env_name}-oracle-database-ssh-keys"
 
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
