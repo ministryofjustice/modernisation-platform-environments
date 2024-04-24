@@ -49,30 +49,8 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
           "logs:DescribeLogStreams",
           "logs:PutLogEvents"
         ],
-        "Resource": "arn:aws:logs:::log-group::*",
+        "Resource": "*",
         "Effect": "Allow"
-      },
-      {
-        "Sid": "VPCReadOnlyPermissions",
-        "Effect": "Allow",
-        "Action": [
-          "ec2:DescribeVpcs",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeSecurityGroups",
-          "ec2:DescribeDhcpOptions"
-        ],
-        "Resource": "*"
-      },
-      {
-        "Sid": "ENIReadWritePermissions",
-        "Effect": "Allow",
-        "Action": [
-          "ec2:CreateNetworkInterface",
-          "ec2:CreateNetworkInterfacePermission",
-          "ec2:DescribeNetworkInterfaces",
-          "ec2:DeleteNetworkInterface"
-        ],
-        "Resource": "*"
       }
     ]
   })
@@ -81,6 +59,11 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
 resource "aws_iam_role_policy_attachment" "flink_spike_policy_attachment" {
   role       = aws_iam_role.flink_role.name
   policy_arn = aws_iam_policy.flink_spike_additional_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "flink_spike_cloudwatch_full_access_policy_attachment" {
+  role       = aws_iam_role.flink_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
 }
 
 resource "aws_cloudwatch_log_group" "flink_log_group" {
