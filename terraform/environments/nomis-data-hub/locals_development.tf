@@ -18,16 +18,13 @@ locals {
             }
           }
         }
-        #backup_policy_status = "DISABLED"
+        backup_policy_status = "DISABLED"
         file_system = {
-          #availability_zone_name = "eu-west-2a"
-          #throughput_mode                 = "provisioned"
           throughput_mode = "elastic"
-          #provisioned_throughput_in_mibps = 1
           lifecycle_policy = {
-            #transition_to_archive = "AFTER_90_DAYS"
-            transition_to_ia = "AFTER_30_DAYS"
-            #transition_to_primary_storage_class = "AFTER_1_ACCESS"
+            transition_to_archive               = "AFTER_90_DAYS"
+            transition_to_ia                    = "AFTER_30_DAYS"
+            transition_to_primary_storage_class = "AFTER_1_ACCESS"
           }
         }
         mount_targets = [{
@@ -48,9 +45,6 @@ locals {
             values   = ["true"]
           }]
         }]
-        #tags = {
-        #  foo = "bar"
-        #}
       }
     }
 
