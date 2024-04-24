@@ -11,5 +11,5 @@ locals {
   oracle_duplicate_delius_target_environment  = var.env_name == "dev" ? "test" : var.env_name == "preprod" ? "prod" : var.env_name == "stage" ? "preprod" : ""
   oracle_duplicate_delius_source_account_id   = var.env_name == "test" ? var.platform_vars.environment_management.account_ids["delius-core-development"] : var.env_name == "prod" ? var.platform_vars.environment_management.account_ids["delius-core-preproduction"] : ""
   oracle_duplicate_delius_source_environment  = var.env_name == "test" ? "dev" : var.env_name == "prod" ? "preprod" : ""
-  oracle_backup_bucket_name                   = "delius-mis-${var.env_name}-oracle-database-backups"
+  oracle_backup_bucket_name                   = "${var.account_info.application_name}-${var.env_name}-oracle-database-backups"
 }
