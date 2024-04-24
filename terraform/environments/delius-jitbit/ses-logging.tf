@@ -59,7 +59,7 @@ resource "aws_lambda_function" "sns_to_cloudwatch" {
 }
 
 resource "aws_cloudwatch_log_group" "sns_logs" {
-  name = "/aws/lambda/sns_to_cloudwatch"
+  name = format("%s-ses-logs", local.application_name)
 
   tags = local.tags
 }

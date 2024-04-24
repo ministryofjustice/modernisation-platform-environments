@@ -9,7 +9,7 @@ def handler(event, context):
     todays_date = datetime.now().strftime('%Y-%m-%d')
 
     log_group_name = os.environ['LOG_GROUP_NAME']
-    log_stream_name = f'{log_group_name}/{todays_date}'
+    log_stream_name = todays_date
     logs = boto3.client('logs')
 
     message = event['Records'][0]['Sns']['Message']
