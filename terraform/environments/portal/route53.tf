@@ -270,7 +270,7 @@
 
 
 resource "aws_route53_record" "ohs_internal" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "${local.application_name}-ohs-internal.${data.aws_route53_zone.external.name}"
   type     = "A"
@@ -283,7 +283,7 @@ resource "aws_route53_record" "ohs_internal" {
 }
 
 resource "aws_route53_record" "ohs1_nonprod" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "${local.application_name}-ohs1.${data.aws_route53_zone.external.name}" # Correspond to portal-ohs1.aws.[env].legalservices.gov.uk
   type     = "A"
