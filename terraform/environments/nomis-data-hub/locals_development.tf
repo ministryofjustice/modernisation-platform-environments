@@ -24,7 +24,7 @@ locals {
           #availability_zone_name = "eu-west-2a"
           lifecycle_policy = {
             transition_to_ia                    = "AFTER_30_DAYS"
-            transition_to_primary_storage_class = "AFTER_1_ACCESS"
+            #transition_to_primary_storage_class = "AFTER_1_ACCESS"
           }
         }
         mount_targets = [{
