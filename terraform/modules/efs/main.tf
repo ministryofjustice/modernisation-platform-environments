@@ -28,7 +28,7 @@ resource "aws_efs_access_point" "this" {
   }
 
   tags = merge(var.tags, {
-    Name = each.key
+    Name = "${var.name}-${each.key}"
   })
 }
 
@@ -60,7 +60,6 @@ resource "aws_efs_file_system" "this" {
     Name = var.name
   })
 }
-
 
 data "aws_iam_policy_document" "this" {
   count = var.policy != null ? 1 : 0

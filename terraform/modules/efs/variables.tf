@@ -54,7 +54,7 @@ variable "name" {
 
 variable "policy" {
   description = "optionally create aws_efs_file_system_policy resource"
-  type = optional(list(object({
+  type = list(object({
     sid       = optional(string, null)
     effect    = string
     actions   = list(string)
@@ -68,7 +68,7 @@ variable "policy" {
       variable = string
       values   = list(string)
     })), [])
-  })))
+  }))
   default = null
 }
 
