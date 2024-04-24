@@ -1,12 +1,59 @@
 # Elastic File System (EFS) Module
 
-For use within a Modernisation Platform environment.
-See https://github.com/ministryofjustice/modernisation-platform-configuration-management repo
-for ansible code for mounting on linux server (filesystems role)
+Creates EFS file system and associated resources.
+
+See https://github.com/ministryofjustice/modernisation-platform-configuration-management repo.
+for ansible code for mounting on linux server (filesystems role).
+
+## Security Groups
+
+The module does not create security groups. NFS has no authentication
+so be sure to limit access to only what needs it.
+
+### Example 1 - Same security group as EC2
+
+Use the same security group as the EC2 what will mount the EFS.
+Just ensure there is an internal rule allowing internal traffic
+like this:
+
+```
+resource "aws_security_group_rule" "all_from_self" {
+  security_group_id = aws_security_group.ec2.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = -1
+  self              = true
+}
+```
+
+### Example 2 - Separate security group
+
+Create a separate security group and allow inbound traffic
+only from the security groups that the EC2s belong to.
+
+```
+resource "aws_security_group" "efs" {
+  name   = "efs"
+  vpc_id = data.aws_vpc.shared.id
+  tags   = merge(local.tags, { Name = "efs" })
+}
+
+resource "aws_security_group_rule" "efs_ingress" {
+  security_group_id        = aws_security_group.efs.id
+  type                     = "ingress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ec2.id
+}
+```
 
 ## Multi-AZ example
 
-With elastic throughput mode and transition to IA/Archive configured.
+This:
+- creates multi-AZ solution with mount points in each AZ
+- associates the mount point with a `aws_security_group.ec2` resource, see Security Groups - Example 1
+- enables elastic throughput mode with transition to IA and archive
 
 ```
 module "efs1" {
@@ -40,15 +87,15 @@ module "efs1" {
   mount_targets = {
     "private-eu-west-2a" = {
       subnet_id       = data.aws_subnet.private_subnets_a.id
-      security_groups = [module.baseline.security_groups["private"].id]
+      security_groups = [aws_security_group.ec2.id]
     }
     "private-eu-west-2b" = {
       subnet_id       = data.aws_subnet.private_subnets_b.id
-      security_groups = [module.baseline.security_groups["private"].id]
+      security_groups = [aws_security_group.ec2.id]
     }
     "private-eu-west-2c" = {
       subnet_id       = data.aws_subnet.private_subnets_c.id
-      security_groups = [module.baseline.security_groups["private"].id]
+      security_groups = [aws_security_group.ec2.id]
     }
   }
   name = "efs1"
@@ -64,6 +111,10 @@ output "efs1_dns_name" {
 ## Single-AZ example
 
 In default burst-mode but with example EFS policy and backup enabled
+This:
+- creates single-AZ solution with mount points in zone A only
+- associates the mount point with a `aws_security_group.efs` resource, see Security Groups - Example 2
+- uses the default burstable throughput mode with transition to IA (archive not supported in this mode)
 
 ```
 module "efs2" {
@@ -96,7 +147,7 @@ module "efs2" {
   mount_targets = {
     "private-eu-west-2a" = {
       subnet_id       = data.aws_subnet.private_subnets_a.id
-      security_groups = [module.baseline.security_groups["private"].id]
+      security_groups = [aws_security_group.efs.id]
     }
   }
   name = "efs2"
