@@ -36,7 +36,11 @@ variable "file_system" {
       transition_to_archive               = optional(string)
       transition_to_ia                    = optional(string)
       transition_to_primary_storage_class = optional(string)
-    }))
+      }), {
+      transition_to_archive               = null
+      transition_to_ia                    = null
+      transition_to_primary_storage_class = null
+    })
   })
 }
 

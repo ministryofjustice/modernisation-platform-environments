@@ -51,10 +51,21 @@ resource "aws_efs_file_system" "this" {
   throughput_mode                 = var.file_system.throughput_mode
 
   dynamic "lifecycle_policy" {
-    for_each = var.file_system.lifecycle_policy != null ? [var.file_system.lifecycle_policy] : []
+    for_each = var.file_system.lifecycle_policy.transition_to_archive != null ? [var.file_system.lifecycle_policy] : []
     content {
-      transition_to_archive               = lifecycle_policy.value.transition_to_archive
-      transition_to_ia                    = lifecycle_policy.value.transition_to_ia
+      transition_to_archive = lifecycle_policy.value.transition_to_archive
+    }
+  }
+  dynamic "lifecycle_policy" {
+    for_each = var.file_system.lifecycle_policy.transition_to_ia != null ? [var.file_system.lifecycle_policy] : []
+    content {
+      transition_to_ia = lifecycle_policy.value.transition_to_ia
+    }
+  }
+
+  dynamic "lifecycle_policy" {
+    for_each = var.file_system.lifecycle_policy.transition_to_primary_storage_class != null ? [var.file_system.lifecycle_policy] : []
+    content {
       transition_to_primary_storage_class = lifecycle_policy.value.transition_to_primary_storage_class
     }
   }
