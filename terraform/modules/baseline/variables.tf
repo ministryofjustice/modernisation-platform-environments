@@ -391,6 +391,64 @@ variable "ec2_instances" {
   default = {}
 }
 
+variable "elastic_file_systems" {
+  description = "map of elastic file systems (efs) to create where map key is tags.Name"
+
+  type = map(object({
+    # aws_efs_file_system params
+    availability_zone_name = optional(string)
+    kms_key_id             = optional(string, "general")
+    performance_mode       = optional(string)
+    lifecycle_policy = optional(object({
+      # TODO: check transition_to_archive option
+      transition_to_ia                    = optional(string)
+      transition_to_primary_storage_class = optional(string)
+    }))
+    policy = optional(list(object({
+      sid       = optional(string, null)
+      effect    = string
+      actions   = list(string)
+      resources = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    })))
+    tags = optional(map(string), {})
+
+    # aws_efs_backup_policy params
+    backup_policy = optional(string)
+
+    # aws_efs_mount_target param where key is the subnet name, e.g. private
+    mount_targets = optional(map(object({
+      availability_zones = optional(list(string), ["eu-west-2a", "eu-west-2b", "eu-west-2c"])
+      security_groups    = list(string)
+    })), {})
+
+    # aws_efs_access_point params where key is tags.Name
+    access_points = optional(map(object({
+      posix_user = optional(object({
+        gid            = number
+        uid            = number
+        secondary_gids = list(number)
+      }))
+      root_directory = optional(object({
+        path = string
+        creation_info = optional(object({
+          owner_gid   = number
+          owner_uid   = number
+          permissions = number
+        }))
+      }))
+    })), {})
+  }))
+}
+
 variable "rds_instances" {
   description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
   type = map(object({
