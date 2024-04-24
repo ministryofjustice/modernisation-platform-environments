@@ -5,8 +5,8 @@ locals {
         access_points = {
           root = {
             posix_user = {
-              gid            = 10003
-              uid            = 10003
+              gid = 10003
+              uid = 10003
             }
             root_directory = {
               path = "/"
@@ -22,7 +22,8 @@ locals {
         file_system = {
           #availability_zone_name = "eu-west-2a"
           lifecycle_policy = {
-            transition_to_ia                    = "AFTER_30_DAYS"
+            transition_to_archive = "AFTER_90_DAYS"
+            transition_to_ia      = "AFTER_30_DAYS"
             #transition_to_primary_storage_class = "AFTER_1_ACCESS"
           }
         }
