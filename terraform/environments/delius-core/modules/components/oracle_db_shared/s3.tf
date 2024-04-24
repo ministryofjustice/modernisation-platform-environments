@@ -238,7 +238,8 @@ module "s3_bucket_oracle_statistics" {
     {
       s3bucket_arn                                = module.s3_bucket_oracle_statistics.bucket.arn,
       oracle_statistics_delius_target_account_id  = local.oracle_statistics_delius_target_account_id,
-      oracle_statistics_delius_target_environment = local.oracle_statistics_delius_target_environment
+      oracle_statistics_delius_target_environment = local.oracle_statistics_delius_target_environment,
+      application_name                            = var.account_info.application_name
   }) : null])
   providers = {
     aws.bucket-replication = aws.bucket-replication
