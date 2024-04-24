@@ -391,19 +391,40 @@ variable "ec2_instances" {
   default = {}
 }
 
-variable "elastic_file_systems" {
-  description = "map of elastic file systems (efs) to create where map key is tags.Name"
+variable "efs" {
+  description = "map of efs (elastic file systems) modules to create where map key is tags.Name"
 
   type = map(object({
-    # aws_efs_file_system params
-    availability_zone_name = optional(string)
-    kms_key_id             = optional(string, "general")
-    performance_mode       = optional(string)
-    lifecycle_policy = optional(object({
-      # TODO: check transition_to_archive option
-      transition_to_ia                    = optional(string)
-      transition_to_primary_storage_class = optional(string)
-    }))
+    access_points = optional(map(object({ # map key is tags.Name
+      posix_user = optional(object({
+        gid            = number
+        uid            = number
+        secondary_gids = list(number)
+      }))
+      root_directory = optional(object({
+        path = string
+        creation_info = optional(object({
+          owner_gid   = number
+          owner_uid   = number
+          permissions = number
+        }))
+      }))
+    })), {})
+    backup_policy_status = optional(string)
+    file_system = object({
+      availability_zone_name = optional(string)
+      kms_key_id             = optional(string, "general")
+      performance_mode       = optional(string)
+      lifecycle_policy = optional(object({
+        transition_to_ia                    = optional(string)
+        transition_to_primary_storage_class = optional(string)
+      }))
+    })
+    mount_targets = optional(list(object({
+      subnet_name        = optional(string, "private")
+      availability_zones = optional(list(string), ["eu-west-2a", "eu-west-2b", "eu-west-2c"])
+      security_groups    = list(string)
+    })), [])
     policy = optional(list(object({
       sid       = optional(string, null)
       effect    = string
@@ -420,32 +441,6 @@ variable "elastic_file_systems" {
       })), [])
     })))
     tags = optional(map(string), {})
-
-    # aws_efs_backup_policy params
-    backup_policy = optional(string)
-
-    # aws_efs_mount_target param where key is the subnet name, e.g. private
-    mount_targets = optional(map(object({
-      availability_zones = optional(list(string), ["eu-west-2a", "eu-west-2b", "eu-west-2c"])
-      security_groups    = list(string)
-    })), {})
-
-    # aws_efs_access_point params where key is tags.Name
-    access_points = optional(map(object({
-      posix_user = optional(object({
-        gid            = number
-        uid            = number
-        secondary_gids = list(number)
-      }))
-      root_directory = optional(object({
-        path = string
-        creation_info = optional(object({
-          owner_gid   = number
-          owner_uid   = number
-          permissions = number
-        }))
-      }))
-    })), {})
   }))
 }
 
