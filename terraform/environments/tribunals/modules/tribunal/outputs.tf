@@ -21,3 +21,7 @@ output "tribunals_lb" {
 output "dummy_output" {
   value = "This is a dummy output to create dependencies between modules"
 }
+
+output "app_url" {
+  value = module.tribunal.app_url
+}
