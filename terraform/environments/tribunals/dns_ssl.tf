@@ -32,8 +32,8 @@ resource "aws_route53_record" "external" {
   type    = "A"
 
   alias {
-    name                   = module.local.tribunal_module_names[count.index].tribunals_lb.dns_name
-    zone_id                = module.local.tribunal_module_names[count.index].tribunals_lb.zone_id
+    name                   = "module.${local.tribunal_module_names[count.index]}.tribunals_lb.dns_name"
+    zone_id                = "module.${local.tribunal_module_names[count.index]}.tribunals_lb.zone_id"
     evaluate_target_health = true
   }
 }
