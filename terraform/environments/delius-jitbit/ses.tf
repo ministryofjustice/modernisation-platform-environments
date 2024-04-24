@@ -90,27 +90,3 @@ resource "aws_ssm_parameter" "jitbit_ses_smtp_user" {
   })
 }
 
-#####################
-# SES Monitoring
-#####################
-
-resource "aws_sesv2_configuration_set" "jitbit_ses_configuration_set" {
-  configuration_set_name = format("%s-configuration-set", local.application_name)
-}
-
-resource "aws_sns_topic" "jitbit_ses_destination_topic" {
-  name = format("%s-ses-destination-topic", local.application_name)
-}
-
-resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_destination" {
-  configuration_set_name = aws_sesv2_configuration_set.jitbit_ses_configuration_set.configuration_set_name
-  event_destination_name = format("%s-event-destination", local.application_name)
-
-  event_destination {
-    sns_destination {
-      topic_arn = aws_sns_topic.jitbit_ses_destination_topic.arn
-    }
-    enabled              = true
-    matching_event_types = ["SEND", "REJECT", "BOUNCE", "COMPLAINT", "DELIVERY"]
-  }
-}

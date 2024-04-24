@@ -1,0 +1,99 @@
+#####################
+# SES Logging
+#####################
+
+resource "aws_sesv2_configuration_set" "jitbit_ses_configuration_set" {
+  configuration_set_name = format("%s-configuration-set", local.application_name)
+}
+
+resource "aws_sns_topic" "jitbit_ses_destination_topic" {
+  name = format("%s-ses-destination-topic", local.application_name)
+}
+
+resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_destination" {
+  configuration_set_name = aws_sesv2_configuration_set.jitbit_ses_configuration_set.configuration_set_name
+  event_destination_name = format("%s-event-destination", local.application_name)
+
+  event_destination {
+    sns_destination {
+      topic_arn = aws_sns_topic.jitbit_ses_destination_topic.arn
+    }
+    enabled              = true
+    matching_event_types = ["SEND", "REJECT", "BOUNCE", "COMPLAINT", "DELIVERY"]
+  }
+}
+
+data "archive_file" "lambda_function_payload" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda"
+  output_path = "${path.module}/lambda/sns_to_cloudwatch.zip"
+  excludes    = ["*.tf", "*.tfvars", "*.zip"]
+}
+
+resource "aws_lambda_function" "sns_to_cloudwatch" {
+  filename         = "${path.module}/lambda/sns_to_cloudwatch.zip"
+  function_name    = "sns_to_cloudwatch"
+  role             = aws_iam_role.lambda.arn
+  runtime          = "python3.12"
+  handler          = "index.handler"
+  source_code_hash = filebase64sha256("${path.module}/lambda/sns_to_cloudwatch.zip")
+
+  environment {
+    variables = {
+      LOG_GROUP_NAME = aws_cloudwatch_log_group.sns_logs.name
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "sns_logs" {
+  name = "/aws/lambda/${aws_lambda_function.sns_to_cloudwatch.function_name}"
+}
+
+resource "aws_iam_role" "lambda" {
+  name               = "${aws_lambda_function.sns_to_cloudwatch.function_name}-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
+}
+
+data "aws_iam_policy_document" "lambda_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role_policy" "lambda" {
+  name   = "lambda"
+  role   = aws_iam_role.lambda.id
+  policy = data.aws_iam_policy_document.lambda_policy.json
+}
+
+data "aws_iam_policy_document" "lambda_policy" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      aws_cloudwatch_log_group.sns_logs.arn,
+      "${aws_cloudwatch_log_group.sns_logs.arn}:*"
+    ]
+  }
+}
+
+resource "aws_lambda_permission" "sns" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.sns_to_cloudwatch.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.jitbit_ses_destination_topic.arn
+}
+
+resource "aws_sns_topic_subscription" "lambda" {
+  topic_arn = aws_sns_topic.jitbit_ses_destination_topic.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.sns_to_cloudwatch.arn
+}
