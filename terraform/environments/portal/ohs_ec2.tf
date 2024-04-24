@@ -18,6 +18,9 @@ done
 
 hostnamectl set-hostname ${local.application_name}-ohs1.${local.portal_hosted_zone}
 
+# Setting up SSM Agent
+sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
 cd cloudwatch_agent
