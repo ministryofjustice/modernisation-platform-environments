@@ -10,7 +10,7 @@ variable "access_points" {
       creation_info = optional(object({
         owner_gid   = number
         owner_uid   = number
-        permissions = number
+        permissions = string
       }))
     }))
   }))

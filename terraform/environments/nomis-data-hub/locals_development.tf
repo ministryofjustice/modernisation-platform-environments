@@ -13,6 +13,7 @@ locals {
               creation_info = {
                 owner_gid   = 10003
                 owner_uid   = 10003
+                permissions = "0777"
               }
             }
           }
