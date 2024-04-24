@@ -16,8 +16,6 @@ locals {
   igdb_backup_window              = "22:00-01:00"
   igdb_maintenance_window         = "Mon:01:15-Mon:06:00"
   igdb_storage_type               = "gp2"
-  igdb_snapshot_name              = "portal-igdb-22jun20231113-finalsnapshot"
-  igdb_snapshot_arn               = "arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:snapshot:${local.application_data.accounts[local.environment].igdb_snapshot_name}"
   iadb_dbname                     = "IADB"
   iadb_storage_size               = "200"
   iadb_auto_minor_version_upgrade = false
@@ -31,8 +29,6 @@ locals {
   iadb_backup_window              = "22:00-01:00"
   iadb_maintenance_window         = "Mon:01:15-Mon:06:00"
   iadb_storage_type               = "gp2"
-  iadb_snapshot_name              = "portal-22jun20231113-finalsnapshot"
-  iadb_snapshot_arn               = "arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:snapshot:${local.application_data.accounts[local.environment].iadb_snapshot_name}"
   appstream_cidr                  = "10.200.32.0/19"
   cidr_ire_workspace              = "10.200.96.0/19"
   workspaces_cidr                 = "10.200.16.0/20"
@@ -541,7 +537,7 @@ resource "aws_db_instance" "appdb1" {
   copy_tags_to_snapshot = true
   storage_encrypted     = true
   #apply_immediately           = true
-  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.igdb_snapshot_name)
+  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, ${local.application_data.accounts[local.environment].igdb_snapshot_name})
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
   publicly_accessible         = false
   allow_major_version_upgrade = true
@@ -597,7 +593,7 @@ resource "aws_db_instance" "appdb2" {
   copy_tags_to_snapshot = true
   storage_encrypted     = true
   #apply_immediately           = true
-  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.iadb_snapshot_name)
+  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, ${local.application_data.accounts[local.environment].iadb_snapshot_name})
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
   publicly_accessible         = false
   allow_major_version_upgrade = true
