@@ -21,10 +21,11 @@ locals {
         #backup_policy_status = "DISABLED"
         file_system = {
           #availability_zone_name = "eu-west-2a"
-          throughput_mode = "elastic"
+          throughput_mode                 = "provisioned"
+          provisioned_throughput_in_mibps = 1
           lifecycle_policy = {
-            transition_to_archive = "AFTER_90_DAYS"
-            transition_to_ia      = "AFTER_30_DAYS"
+            #transition_to_archive = "AFTER_90_DAYS"
+            transition_to_ia = "AFTER_30_DAYS"
             #transition_to_primary_storage_class = "AFTER_1_ACCESS"
           }
         }
