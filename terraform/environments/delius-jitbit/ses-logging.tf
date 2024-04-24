@@ -19,7 +19,12 @@ resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_desti
       topic_arn = aws_sns_topic.jitbit_ses_destination_topic.arn
     }
     enabled              = true
-    matching_event_types = ["SEND", "REJECT", "BOUNCE", "COMPLAINT", "DELIVERY"]
+    matching_event_types = [
+        "BOUNCE",
+        "COMPLAINT",
+        "DELIVERY",
+        "REJECT",
+        "SEND"]
   }
 }
 
