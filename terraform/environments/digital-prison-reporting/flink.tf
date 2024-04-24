@@ -51,6 +51,28 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
         ],
         "Resource": "arn:aws:logs:::log-group::*",
         "Effect": "Allow"
+      },
+      {
+        "Sid": "VPCReadOnlyPermissions",
+        "Effect": "Allow",
+        "Action": [
+          "ec2:DescribeVpcs",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeDhcpOptions"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "ENIReadWritePermissions",
+        "Effect": "Allow",
+        "Action": [
+          "ec2:CreateNetworkInterface",
+          "ec2:CreateNetworkInterfacePermission",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DeleteNetworkInterface"
+        ],
+        "Resource": "*"
       }
     ]
   })
