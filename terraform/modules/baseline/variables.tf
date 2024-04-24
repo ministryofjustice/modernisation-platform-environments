@@ -412,9 +412,11 @@ variable "efs" {
     })), {})
     backup_policy_status = optional(string)
     file_system = object({
-      availability_zone_name = optional(string)
-      kms_key_id             = optional(string, "general")
-      performance_mode       = optional(string)
+      availability_zone_name          = optional(string)
+      kms_key_id                      = optional(string, "general")
+      performance_mode                = optional(string)
+      provisioned_throughput_in_mibps = optional(number)
+      throughput_mode                 = optional(string)
       lifecycle_policy = optional(object({
         transition_to_archive               = optional(string)
         transition_to_ia                    = optional(string)

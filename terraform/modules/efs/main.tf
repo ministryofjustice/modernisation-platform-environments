@@ -43,10 +43,12 @@ resource "aws_efs_backup_policy" "this" {
 }
 
 resource "aws_efs_file_system" "this" {
-  availability_zone_name = var.file_system.availability_zone_name
-  encrypted              = true
-  kms_key_id             = var.file_system.kms_key_id
-  performance_mode       = var.file_system.performance_mode
+  availability_zone_name          = var.file_system.availability_zone_name
+  encrypted                       = true
+  kms_key_id                      = var.file_system.kms_key_id
+  performance_mode                = var.file_system.performance_mode
+  provisioned_throughput_in_mibps = var.file_system.provisioned_throughput_in_mibps
+  throughput_mode                 = var.file_system.throughput_mode
 
   dynamic "lifecycle_policy" {
     for_each = var.file_system.lifecycle_policy != null ? [var.file_system.lifecycle_policy] : []

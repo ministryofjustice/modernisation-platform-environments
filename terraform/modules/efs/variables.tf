@@ -27,9 +27,11 @@ variable "backup_policy_status" {
 variable "file_system" {
   description = "aws_efs_file_system resource params"
   type = object({
-    availability_zone_name = optional(string)
-    kms_key_id             = string
-    performance_mode       = optional(string)
+    availability_zone_name          = optional(string)
+    kms_key_id                      = string
+    performance_mode                = optional(string)
+    provisioned_throughput_in_mibps = optional(number)
+    throughput_mode                 = optional(string)
     lifecycle_policy = optional(object({
       transition_to_archive               = optional(string)
       transition_to_ia                    = optional(string)
