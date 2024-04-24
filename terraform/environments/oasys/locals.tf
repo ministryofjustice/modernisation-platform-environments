@@ -87,7 +87,7 @@ locals {
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
     secretsmanager_secrets = {
       maintenance_message = {
-        description             = "OASys maintenance message text"
+        description             = "OASys maintenance message text. Use \n for new lines"
         recovery_window_in_days = 0
       }
     }
