@@ -397,9 +397,8 @@ variable "efs" {
   type = map(object({
     access_points = optional(map(object({ # map key is tags.Name
       posix_user = optional(object({
-        gid            = number
-        uid            = number
-        secondary_gids = list(number)
+        gid = number
+        uid = number
       }))
       root_directory = optional(object({
         path = string

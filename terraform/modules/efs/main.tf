@@ -6,9 +6,8 @@ resource "aws_efs_access_point" "this" {
   dynamic "posix_user" {
     for_each = each.value.posix_user != null ? [each.value.posix_user] : []
     content {
-      gid            = posix_user.value.gid
-      uid            = posix_user.value.uid
-      secondary_gids = posix_user.value.secondary_gids
+      gid = posix_user.value.gid
+      uid = posix_user.value.uid
     }
   }
 

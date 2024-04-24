@@ -2,9 +2,8 @@ variable "access_points" {
   description = "map of aws_efs_access_point resources to create where the map key is tags.Name"
   type = map(object({
     posix_user = optional(object({
-      gid            = number
-      uid            = number
-      secondary_gids = list(number)
+      gid = number
+      uid = number
     }))
     root_directory = optional(object({
       path = string
