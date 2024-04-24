@@ -67,8 +67,8 @@ resource "aws_cloudwatch_log_group" "sns_logs" {
 
 resource "aws_cloudwatch_log_group" "execution_logs" {
   name              = format("/aws/lambda/%s", aws_lambda_function.sns_to_cloudwatch.function_name)
-  retention_in_days = 2
-  
+  retention_in_days = 3
+
   tags              = local.tags
 }
 
