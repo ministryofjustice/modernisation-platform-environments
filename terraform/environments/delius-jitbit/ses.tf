@@ -2,61 +2,29 @@
 # SES
 #############"
 
-resource "aws_ses_domain_identity" "jitbit" {
-  domain = local.app_url
-}
-
-resource "aws_ses_domain_identity_verification" "jitbit" {
-  domain = local.app_url
-}
-
-resource "aws_route53_record" "jitbit_ses_verification_record" {
-  count    = local.is-production ? 0 : 1
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "_amazonses.${aws_ses_domain_identity.jitbit.id}"
-  type     = "TXT"
-  ttl      = "600"
-  records  = [aws_ses_domain_identity.jitbit.verification_token]
-}
-
-resource "aws_route53_record" "jitbit_ses_verification_record_prod" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
-  name     = "_amazonses.${aws_ses_domain_identity.jitbit.id}"
-  type     = "TXT"
-  ttl      = "600"
-  records  = [aws_ses_domain_identity.jitbit.verification_token]
-}
-
-resource "aws_ses_domain_identity_verification" "jitbit_ses_verification" {
-  domain     = aws_ses_domain_identity.jitbit.id
-  depends_on = [aws_route53_record.jitbit_ses_verification_record]
-}
-
-resource "aws_ses_domain_dkim" "jitbit" {
-  domain = aws_ses_domain_identity.jitbit.domain
+resource "aws_sesv2_email_identity" "jitbit" {
+  email_identity         = local.app_url
+  configuration_set_name = aws_sesv2_configuration_set.jitbit_ses_configuration_set.configuration_set_name
 }
 
 resource "aws_route53_record" "jitbit_amazonses_dkim_record" {
   provider = aws.core-vpc
   count    = local.is-production ? 0 : 3
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}._domainkey.${local.app_url}"
+  name     = "${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${local.app_url}"
   type     = "CNAME"
   ttl      = "600"
-  records  = ["${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}.dkim.amazonses.com"]
+  records  = ["${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"]
 }
 
 resource "aws_route53_record" "jitbit_amazonses_dkim_record_prod" {
   provider = aws.core-network-services
   count    = local.is-production ? 3 : 0
   zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
-  name     = "${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}._domainkey.${local.app_url}"
+  name     = "${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${local.app_url}"
   type     = "CNAME"
   ttl      = "600"
-  records  = ["${aws_ses_domain_dkim.jitbit.dkim_tokens[count.index]}.dkim.amazonses.com"]
+  records  = ["${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"]
 }
 
 resource "aws_route53_record" "jitbit_amazonses_dmarc_record" {
@@ -121,3 +89,4 @@ resource "aws_ssm_parameter" "jitbit_ses_smtp_user" {
     ses_smtp_password = aws_iam_access_key.jitbit_ses_smtp_user.ses_smtp_password_v4
   })
 }
+
