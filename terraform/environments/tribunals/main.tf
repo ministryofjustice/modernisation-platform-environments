@@ -78,7 +78,7 @@ module "ahmlr" {
 }
 
 module "care_standards" {
-  depends_on                        = [module.hmlands.dummy_output]
+  depends_on                        = [module.ahmlr.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "care-standards"
   app_url                           = "carestandards"
@@ -109,7 +109,7 @@ module "care_standards" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.hmlands.dummy_output
+  previous_module_dummy             = module.ahmlr.dummy_output
 }
 
 module "cicap" {
