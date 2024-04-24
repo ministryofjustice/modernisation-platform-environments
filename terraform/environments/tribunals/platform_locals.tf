@@ -3,16 +3,16 @@ locals {
   application_name = "tribunals"
 
   tribunal_names = [
-    module.appeals.app_url,
-    module.ahmlr.app_url,
-    module.care_standards.app_url,
-    module.cicap.app_url,
-    module.employment_appeals.app_url,
-    module.finance_and_tax.app_url,
-    module.immigration_services.app_url,
-    module.information_tribunal.app_url,
-    module.lands_tribunal.app_url,
-    module.transport.app_url
+    "administrativeappeals",
+    "hmlands",
+    "carestandards",
+    "cicap",
+    "employment-appeals",
+    "finance-and-tax",
+    "immigration-services",
+    "information-tribunal",
+    "lands-chamber",
+    "transportappeals"
   ]
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
