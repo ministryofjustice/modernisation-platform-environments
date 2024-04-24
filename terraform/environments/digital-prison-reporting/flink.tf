@@ -72,7 +72,7 @@ resource "aws_iam_role_policy_attachment" "flink_spike_vpc_full_access_policy_at
 }
 
 resource "aws_cloudwatch_log_group" "flink_log_group" {
-  name              = "/aws-flink/jobs/flink-spike-app"
+  name              = "/aws/kinesis-analytics/flink-spike-app"
   retention_in_days = 7
 }
 
