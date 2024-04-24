@@ -416,6 +416,7 @@ variable "efs" {
       kms_key_id             = optional(string, "general")
       performance_mode       = optional(string)
       lifecycle_policy = optional(object({
+        transition_to_archive               = optional(string)
         transition_to_ia                    = optional(string)
         transition_to_primary_storage_class = optional(string)
       }))
