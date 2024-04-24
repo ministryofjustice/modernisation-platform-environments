@@ -1,6 +1,7 @@
 import os
 import boto3
 import json
+import time
 
 def handler(event, context):
     log_group_name = os.environ['LOG_GROUP_NAME']
