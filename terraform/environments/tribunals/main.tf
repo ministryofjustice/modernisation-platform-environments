@@ -45,7 +45,7 @@ module "appeals" {
 module "ahmlr" {
   depends_on                        = [module.appeals.dummy_output]
   source                            = "./modules/tribunal"
-  app_name                          = "ahmlr"
+  app_name                          = "hmlands"
   app_url                           = "landregistrationdivison"
   sql_migration_path                = "../scripts/ahmlr"
   app_db_name                       = "hmlands"
