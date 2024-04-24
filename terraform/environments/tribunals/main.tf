@@ -45,8 +45,8 @@ module "appeals" {
 module "ahmlr" {
   depends_on                        = [module.appeals.dummy_output]
   source                            = "./modules/tribunal"
-  app_name                          = "hmlands"
-  app_url                           = "hmlands"
+  app_name                          = "ahmlr"
+  app_url                           = "landregistrationdivison"
   sql_migration_path                = "../scripts/ahmlr"
   app_db_name                       = "hmlands"
   app_db_login_name                 = "hmlands-app"
@@ -78,7 +78,7 @@ module "ahmlr" {
 }
 
 module "care_standards" {
-  depends_on                        = [module.ahmlr.dummy_output]
+  depends_on                        = [module.hmlands.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "care-standards"
   app_url                           = "carestandards"
@@ -109,7 +109,7 @@ module "care_standards" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.ahmlr.dummy_output
+  previous_module_dummy             = module.hmlands.dummy_output
 }
 
 module "cicap" {
@@ -186,7 +186,7 @@ module "finance_and_tax" {
   depends_on                        = [module.employment_appeals.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "finance-and-tax"
-  app_url                           = "finance-and-tax"
+  app_url                           = "financeandtax"
   sql_migration_path                = "../scripts/finance_and_tax"
   app_db_name                       = "ftt"
   app_db_login_name                 = "ftt-app"
@@ -221,7 +221,7 @@ module "immigration_services" {
   depends_on                        = [module.finance_and_tax.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "immigration-services"
-  app_url                           = "immigration-services"
+  app_url                           = "immigrationservices"
   sql_migration_path                = "../scripts/immigration_services"
   app_db_name                       = "imset"
   app_db_login_name                 = "imset-app"
@@ -256,7 +256,7 @@ module "information_tribunal" {
   depends_on                        = [module.immigration_services.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "information-tribunal"
-  app_url                           = "information-tribunal"
+  app_url                           = "informationrights"
   sql_migration_path                = "../scripts/information_tribunal"
   app_db_name                       = "it"
   app_db_login_name                 = "it-app"
@@ -291,7 +291,7 @@ module "lands_tribunal" {
   depends_on                        = [module.information_tribunal.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "lands-chamber"
-  app_url                           = "lands-chamber"
+  app_url                           = "landschamber"
   sql_migration_path                = "../scripts/lands_chamber"
   app_db_name                       = "lands"
   app_db_login_name                 = "lands-app"
