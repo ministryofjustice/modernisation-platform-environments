@@ -32,7 +32,7 @@ data "archive_file" "lambda_function_payload" {
   type        = "zip"
   source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/lambda/sns_to_cloudwatch.zip"
-  excludes    = ["*.tf", "*.tfvars", "*.zip"]
+  excludes    = ["sns_to_cloudwatch.zip"]
 }
 
 resource "aws_lambda_function" "sns_to_cloudwatch" {

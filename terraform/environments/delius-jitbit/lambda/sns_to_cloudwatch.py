@@ -27,7 +27,7 @@ def handler(event, context):
 
     logs.put_log_events(
         logGroupName=log_group_name,
-        logStreamName='sns',
+        logStreamName=log_stream_name,
         logEvents=[
             {
                 'timestamp': int(time.time() * 1000),
