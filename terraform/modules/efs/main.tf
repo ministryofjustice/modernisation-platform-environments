@@ -50,6 +50,7 @@ resource "aws_efs_file_system" "this" {
   provisioned_throughput_in_mibps = var.file_system.provisioned_throughput_in_mibps
   throughput_mode                 = var.file_system.throughput_mode
 
+  # annoyingly you have to define each option as separate block
   dynamic "lifecycle_policy" {
     for_each = var.file_system.lifecycle_policy.transition_to_archive != null ? [var.file_system.lifecycle_policy] : []
     content {
@@ -62,7 +63,6 @@ resource "aws_efs_file_system" "this" {
       transition_to_ia = lifecycle_policy.value.transition_to_ia
     }
   }
-
   dynamic "lifecycle_policy" {
     for_each = var.file_system.lifecycle_policy.transition_to_primary_storage_class != null ? [var.file_system.lifecycle_policy] : []
     content {
