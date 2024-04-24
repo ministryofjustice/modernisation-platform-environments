@@ -4,7 +4,7 @@ variable "access_points" {
     posix_user = optional(object({
       gid            = number
       uid            = number
-      secondary_gids = optional(string) # comma separated GIDs
+      secondary_gids = optional(list(number))
     }))
     root_directory = optional(object({
       path = string
