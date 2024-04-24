@@ -77,7 +77,7 @@ module "instance" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  name = lower(format("delius-%s-%s-%s-%s", var.account_info.application_name, var.env_name, var.db_suffix, local.instance_name_index))   # e.g. instance-role-delius-mis-dev-boe-db-1
+  name = lower(format("%s-%s-%s", var.env_name, var.db_suffix, local.instance_name_index )) # e.g. dev-boe-db-1
 
   ami_name                      = data.aws_ami.oracle_db.name
   ami_owner                     = var.db_ami.owner
