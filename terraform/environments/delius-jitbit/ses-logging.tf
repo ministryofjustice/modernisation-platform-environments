@@ -35,7 +35,7 @@ resource "aws_lambda_function" "sns_to_cloudwatch" {
   function_name    = "sns_to_cloudwatch"
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.12"
-  handler          = "index.handler"
+  handler          = "sns_to_cloudwatch.handler"
   source_code_hash = data.archive_file.lambda_function_payload.output_base64sha256
 
   environment {
