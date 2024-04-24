@@ -269,37 +269,37 @@
 # # portal-ohs2.aws.prd.legalservices.gov.uk
 
 
-# resource "aws_route53_record" "ohs_internal" {
-#   provider = aws.core-network-services
-#   zone_id  = data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id
-#   name     = "${local.application_name}-ohs-internal.${data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].name}"
-#   type     = "A"
+resource "aws_route53_record" "ohs_internal" {
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name}-ohs-internal.${data.aws_route53_zone.external.name}"
+  type     = "A"
 
-#   alias {
-#     name                   = aws_lb.internal.dns_name
-#     zone_id                = aws_lb.internal.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = aws_lb.internal.dns_name
+    zone_id                = aws_lb.internal.zone_id
+    evaluate_target_health = true
+  }
+}
 
-# resource "aws_route53_record" "ohs1_nonprod" {
-#   provider = aws.core-network-services
-#   zone_id  = data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id
-#   name     = "${local.application_name}-ohs1.${data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].name}" # Correspond to portal-ohs1.aws.[env].legalservices.gov.uk
-#   type     = "A"
-#   ttl      = 60
-#   records  = [aws_instance.ohs_instance_1.private_ip]
-# }
+resource "aws_route53_record" "ohs1_nonprod" {
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name}-ohs1.${data.aws_route53_zone.external.name}" # Correspond to portal-ohs1.aws.[env].legalservices.gov.uk
+  type     = "A"
+  ttl      = 60
+  records  = [aws_instance.ohs_instance_1.private_ip]
+}
 
-# resource "aws_route53_record" "ohs2_prod" {
-#   count    = contains(["development", "testing"], local.environment) ? 0 : 1
-#   provider = aws.core-network-services
-#   zone_id  = data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id
-#   name     = "${local.application_name}-ohs2.${data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].name}" # Correspond to portal-ohs2.aws.[env].legalservices.gov.uk
-#   type     = "A"
-#   ttl      = 60
-#   records  = [aws_instance.ohs_instance_2[0].private_ip]
-# }
+resource "aws_route53_record" "ohs2_prod" {
+  count    = contains(["development", "testing"], local.environment) ? 0 : 1
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].zone_id
+  name     = "${local.application_name}-ohs2.${data.aws_route53_zone.portal-dev-private-aws["${local.application_data.accounts[local.environment].hosted_zone}"].name}" # Correspond to portal-ohs2.aws.[env].legalservices.gov.uk
+  type     = "A"
+  ttl      = 60
+  records  = [aws_instance.ohs_instance_2[0].private_ip]
+}
 
 # ###############################################################################################################
 # ############################         IADB & IGDB Route 53 records               ###############################
