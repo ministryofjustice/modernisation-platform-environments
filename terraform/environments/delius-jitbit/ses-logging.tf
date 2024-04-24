@@ -4,10 +4,14 @@
 
 resource "aws_sesv2_configuration_set" "jitbit_ses_configuration_set" {
   configuration_set_name = format("%s-configuration-set", local.application_name)
+
+  tags = local.tags
 }
 
 resource "aws_sns_topic" "jitbit_ses_destination_topic" {
   name = format("%s-ses-destination-topic", local.application_name)
+
+  tags = local.tags
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_destination" {
@@ -18,13 +22,14 @@ resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_desti
     sns_destination {
       topic_arn = aws_sns_topic.jitbit_ses_destination_topic.arn
     }
-    enabled              = true
+    enabled = true
     matching_event_types = [
-        "BOUNCE",
-        "COMPLAINT",
-        "DELIVERY",
-        "REJECT",
-        "SEND"]
+      "BOUNCE",
+      "COMPLAINT",
+      "DELIVERY",
+      "REJECT",
+      "SEND"
+    ]
   }
 }
 
@@ -38,6 +43,7 @@ data "archive_file" "lambda_function_payload" {
 resource "aws_lambda_function" "sns_to_cloudwatch" {
   filename         = "${path.module}/lambda/sns_to_cloudwatch.zip"
   function_name    = "sns_to_cloudwatch"
+  architectures    = ["arm64"]
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.12"
   handler          = "sns_to_cloudwatch.handler"
@@ -48,15 +54,21 @@ resource "aws_lambda_function" "sns_to_cloudwatch" {
       LOG_GROUP_NAME = aws_cloudwatch_log_group.sns_logs.name
     }
   }
+
+  tags = local.tags
 }
 
 resource "aws_cloudwatch_log_group" "sns_logs" {
   name = "/aws/lambda/sns_to_cloudwatch"
+
+  tags = local.tags
 }
 
 resource "aws_iam_role" "lambda" {
   name               = "sns_to_cloudwatch-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "lambda_assume_role_policy" {
