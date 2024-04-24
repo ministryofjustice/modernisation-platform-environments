@@ -2,23 +2,21 @@ locals {
   development_config = {
     baseline_efs = {
       dev_efs = {
-        #access_points = {
-        #  root = {
-        #    posix_user = {
-        #      gid            = 100
-        #      uid            = 100
-        #      secondary_gids = [200]
-        #    }
-        #    root_directory = {
-        #      path = "/"
-        #      creation_info = {
-        #        owner_gid   = 100
-        #        owner_uid   = 100
-        #        permissions = 0777
-        #      }
-        #    }
-        #  }
-        #}
+        access_points = {
+          root = {
+            posix_user = {
+              gid            = 10003
+              uid            = 10003
+            }
+            root_directory = {
+              path = "/"
+              creation_info = {
+                owner_gid   = 10003
+                owner_uid   = 10003
+              }
+            }
+          }
+        }
         #backup_policy_status = "DISABLED"
         file_system = {
           #availability_zone_name = "eu-west-2a"
