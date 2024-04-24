@@ -36,7 +36,7 @@ resource "aws_lambda_function" "sns_to_cloudwatch" {
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.12"
   handler          = "index.handler"
-  source_code_hash = filebase64sha256("${path.module}/lambda/sns_to_cloudwatch.zip")
+  source_code_hash = data.archive_file.lambda_function_payload.output_base64sha256
 
   environment {
     variables = {
@@ -46,11 +46,11 @@ resource "aws_lambda_function" "sns_to_cloudwatch" {
 }
 
 resource "aws_cloudwatch_log_group" "sns_logs" {
-  name = "/aws/lambda/${aws_lambda_function.sns_to_cloudwatch.function_name}"
+  name = "/aws/lambda/sns_to_cloudwatch"
 }
 
 resource "aws_iam_role" "lambda" {
-  name               = "${aws_lambda_function.sns_to_cloudwatch.function_name}-role"
+  name               = "sns_to_cloudwatch-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
