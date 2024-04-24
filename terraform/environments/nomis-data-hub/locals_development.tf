@@ -22,16 +22,16 @@ locals {
         #backup_policy_status = "DISABLED"
         file_system = {
           #availability_zone_name = "eu-west-2a"
-          #lifecycle_policy = {
-          #  transition_to_ia                    = "AFTER_30_DAYS"
-          #  transition_to_primary_storage_class = "AFTER_1_ACCESS"
-          #}
+          lifecycle_policy = {
+            transition_to_ia                    = "AFTER_30_DAYS"
+            transition_to_primary_storage_class = "AFTER_1_ACCESS"
+          }
         }
-        #mount_targets = [{
-        #  subnet_name        = "private"
-        #  availability_zones = ["eu-west-2a"]
-        #  security_groups    = ["private"]
-        #}]
+        mount_targets = [{
+          subnet_name        = "private"
+          availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+          security_groups    = ["private"]
+        }]
         #policy = [{
         #  sid    = "test"
         #  effect = "Allow"
