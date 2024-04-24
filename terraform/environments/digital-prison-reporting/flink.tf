@@ -66,6 +66,11 @@ resource "aws_iam_role_policy_attachment" "flink_spike_cloudwatch_full_access_po
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
 }
 
+resource "aws_iam_role_policy_attachment" "flink_spike_vpc_full_access_policy_attachment" {
+  role       = aws_iam_role.flink_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonVPCFullAccess"
+}
+
 resource "aws_cloudwatch_log_group" "flink_log_group" {
   name              = "/aws-flink/jobs/flink-spike-app"
   retention_in_days = 7
