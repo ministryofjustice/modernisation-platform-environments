@@ -2,36 +2,36 @@ locals {
   # EC2 User data
   # TODO The hostname is too long as the domain itself is 62 characters long... If this hostname is required, a new domain is required
   # /etc/fstab mount setting as per https://docs.aws.amazon.com/efs/latest/ug/nfs-automount-efs.html
-#   oim_1_userdata = <<EOF
-# #!/bin/bash
-# echo "${aws_efs_file_system.product["oim"].dns_name}:/fmw /IDAM/product/fmw nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
-# echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
-# echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
-# echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
-# echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
-# mount -a
-# mount_status=$?
-# while [[ $mount_status != 0 ]]
-# do
-#   sleep 10
-#   mount -a
-#   mount_status=$?
-# done
+  oim_1_userdata = <<EOF
+#!/bin/bash
+echo "${aws_efs_file_system.product["oim"].dns_name}:/fmw /IDAM/product/fmw nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.product["oim"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
 
-# hostnamectl set-hostname ${local.application_name}-oim1-ms.${data.aws_route53_zone.external.name}
+hostnamectl set-hostname ${local.application_name}-oim1-ms.${data.aws_route53_zone.external.name}
 
-# # Setting up SSM Agent
-# sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+# Setting up SSM Agent
+sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 
-# # Setting up CloudWatch Agent
-# mkdir cloudwatch_agent
-# cd cloudwatch_agent
-# wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
-# rpm -U ./amazon-cloudwatch-agent.rpm
-# echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
-# /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
+# Setting up CloudWatch Agent
+mkdir cloudwatch_agent
+cd cloudwatch_agent
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U ./amazon-cloudwatch-agent.rpm
+echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
 
-# EOF
+EOF
   oim_2_userdata = <<EOF
 #!/bin/bash
 EOF
@@ -135,8 +135,8 @@ resource "aws_instance" "oim_instance_1" {
   vpc_security_group_ids      = [aws_security_group.oim_instance.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
-  # user_data_base64            = base64encode(local.oim_1_userdata)
-  # user_data_replace_on_change = true
+  user_data_base64            = base64encode(local.oim_1_userdata)
+  user_data_replace_on_change = true
 
   # root_block_device {
   #   delete_on_termination      = false
