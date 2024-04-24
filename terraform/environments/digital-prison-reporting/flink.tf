@@ -91,7 +91,7 @@ resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
       code_content {
         s3_content_location {
           bucket_arn = "arn:aws:s3:::flink-demo-771283872747-eu-west-2-1713861000297-bucket"
-          file_key   = "flink-spike-0.1-SNAPSHOT-all.jar"
+          file_key   = "flink-spike-0.2-SNAPSHOT-all.jar"
         }
       }
 
