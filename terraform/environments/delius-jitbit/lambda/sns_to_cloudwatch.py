@@ -3,6 +3,7 @@ import boto3
 import json
 import time
 from datetime import datetime
+from botocore.exceptions import ClientError
 
 def handler(event, context):
     todays_date = datetime.now().strftime('%Y-%m-%d')
