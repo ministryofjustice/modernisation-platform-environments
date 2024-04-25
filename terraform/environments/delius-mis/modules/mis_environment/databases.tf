@@ -19,6 +19,8 @@ module "oracle_db_shared" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
+  deploy_oracle_stats = false
+
   providers = {
     aws                       = aws
     aws.bucket-replication    = aws
