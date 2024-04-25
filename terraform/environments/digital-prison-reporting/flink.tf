@@ -54,6 +54,19 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
         ]
       },
       {
+        "Effect" : "Allow",
+        "Action" : [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey",
+        ],
+        "Resource" : [
+          "arn:aws:kms:*:${local.account_id}:key/*"
+        ]
+      }
+      {
         "Action": "cloudwatch:PutMetricData",
         "Resource": "*",
         "Effect": "Allow"
