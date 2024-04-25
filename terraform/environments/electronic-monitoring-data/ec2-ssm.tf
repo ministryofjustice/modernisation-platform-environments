@@ -58,7 +58,7 @@ resource "aws_iam_role" "ec2-instance" {
 
 resource "aws_iam_policy_attachment" "ssm-attachments" {
   name       = "ssm-attach-instance-role"
-  roles      = [aws_iam_role.ec2-instance.name]
+  roles      = [aws_iam_role.ec2-instance.name, aws_iam_role.s3-ec2-instance.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
