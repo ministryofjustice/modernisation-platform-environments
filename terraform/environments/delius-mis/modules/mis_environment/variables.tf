@@ -61,6 +61,12 @@ variable "mis_db_config" {
   type = any
 }
 
+variable "deploy_oracle_stats" {
+  description = "for deploying Oracle stats bucket"
+  default     = true
+  type        = bool
+}
+
 variable "environments_in_account" {
   type    = list(string)
   default = []

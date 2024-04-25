@@ -10,6 +10,12 @@ variable "db_suffix" {
   default     = "db"
 }
 
+variable "deploy_oracle_stats" {
+  description = "for deploying Oracle stats bucket"
+  default     = true
+  type        = bool
+}
+
 variable "ec2_instance_type" {
   description = "EC2 instance type"
   type        = string

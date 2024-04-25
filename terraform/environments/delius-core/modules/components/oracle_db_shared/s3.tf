@@ -1,4 +1,5 @@
 module "s3_bucket_oracledb_backups" {
+
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
   bucket_name         = "${local.oracle_backup_bucket_name}"
   versioning_enabled  = false
@@ -43,6 +44,7 @@ module "s3_bucket_oracledb_backups" {
 }
 
 data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
+
   statement {
     sid    = "allowAccessToOracleDbBackupBucket"
     effect = "Allow"
@@ -93,22 +95,26 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
     ]
   }
 
-  statement {
-    sid    = "allowAccessToOracleStatisticsBucket"
-    effect = "Allow"
-    actions = [
-      "s3:*"
-    ]
-    resources = [
-      "${module.s3_bucket_oracle_statistics.bucket.arn}",
-      "${module.s3_bucket_oracle_statistics.bucket.arn}/*"
-    ]
+  dynamic "statement" {
+    for_each = var.deploy_oracle_stats == true ? [1] : []
+    content {
+      sid    = "allowAccessToOracleStatisticsBucket"
+      effect = "Allow"
+      actions = [
+        "s3:*"
+      ]
+      resources = [
+        "${module.s3_bucket_oracle_statistics[0].bucket.arn}",
+        "${module.s3_bucket_oracle_statistics[0].bucket.arn}/*"
+      ]
+    }
   }
 
 }
 
 
 data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
+
 
   statement {
     sid    = "allowAccessToListOracleStatistics${title(local.oracle_statistics_delius_source_environment)}Bucket"
@@ -148,6 +154,7 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
 }
 
 data "aws_iam_policy_document" "combined" {
+
   source_policy_documents = compact([
     data.aws_iam_policy_document.oracledb_backup_bucket_access.json,
     local.oracle_statistics_delius_source_environment != "" ? data.aws_iam_policy_document.oracle_remote_statistics_bucket_access.json : null,
@@ -156,12 +163,14 @@ data "aws_iam_policy_document" "combined" {
 }
 
 resource "aws_iam_policy" "oracledb_backup_bucket_access" {
+
   name        = "${var.env_name}-oracledb-backup-bucket-access"
   description = "Allow access to Oracle DB Backup Bucket"
   policy      = data.aws_iam_policy_document.combined.json
 }
 
 resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
+
   bucket = "${local.oracle_backup_bucket_name}-inventory"
   tags = merge(
     var.tags,
@@ -176,6 +185,7 @@ resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
 
 
 resource "aws_s3_bucket_versioning" "s3_bucket_oracledb_backups_inventory" {
+
   bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
   versioning_configuration {
     status = "Suspended"
@@ -187,6 +197,7 @@ data "aws_caller_identity" "current" {
 }
 
 resource "aws_s3_bucket_public_access_block" "oracledb_backups_inventory" {
+
   bucket                  = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
   block_public_acls       = true # Block public access to buckets and objects granted through *new* access control lists (ACLs)
   ignore_public_acls      = true # Block public access to buckets and objects granted through any access control lists (ACLs)
@@ -195,6 +206,7 @@ resource "aws_s3_bucket_public_access_block" "oracledb_backups_inventory" {
 }
 
 resource "aws_s3_bucket_policy" "oracledb_backups_inventory_policy" {
+
   bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
   policy = templatefile("${path.module}/policies/oracledb_backups_inventory.json",
     {
@@ -206,6 +218,7 @@ resource "aws_s3_bucket_policy" "oracledb_backups_inventory_policy" {
 }
 
 resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
+
   bucket = module.s3_bucket_oracledb_backups.bucket.id
   name   = "${var.env_name}-oracle-database-backuppieces"
 
@@ -228,6 +241,7 @@ resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
 # Bucket for storing Oracle Statistics Backup Dump Files
 
 module "s3_bucket_oracle_statistics" {
+  
   count = var.deploy_oracle_stats ? 1 : 0
 
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
@@ -238,7 +252,7 @@ module "s3_bucket_oracle_statistics" {
   custom_kms_key      = var.account_config.kms_keys.general_shared
   bucket_policy = compact([local.oracle_statistics_delius_target_environment != "" ? templatefile("${path.module}/policies/oracle_statistics_backup_data.json",
     {
-      s3bucket_arn                                = module.s3_bucket_oracle_statistics.bucket.arn,
+      s3bucket_arn                                = module.s3_bucket_oracle_statistics[0].bucket.arn,
       oracle_statistics_delius_target_account_id  = local.oracle_statistics_delius_target_account_id,
       oracle_statistics_delius_target_environment = local.oracle_statistics_delius_target_environment,
       application_name                            = var.account_info.application_name
