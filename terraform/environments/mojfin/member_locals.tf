@@ -10,7 +10,7 @@ locals {
   cp_vpc_cidr                = local.application_data.accounts[local.environment].cp_vpc_cidr
   analytic_platform_cidr     = local.application_data.accounts[local.environment].analytic_platform_cidr
   lz_vpc                     = local.application_data.accounts[local.environment].landing_zone_vpc_cidr
-  storage_size               = "2500"
+  storage_size               = "3000"
   auto_minor_version_upgrade = false
   backup_retention_period    = "35"
   character_set_name         = "WE8MSWIN1252"
