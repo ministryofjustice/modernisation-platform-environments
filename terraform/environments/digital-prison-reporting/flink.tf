@@ -39,6 +39,19 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
         ]
       },
       {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:Get*",
+          "s3:List*"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::dpr-raw-archive-development",
+          "arn:aws:s3:::dpr-raw-archive-development/*",
+          "arn:aws:s3:::dpr-raw-development",
+          "arn:aws:s3:::dpr-raw-development/*"
+        ]
+      },
+      {
         "Action": "cloudwatch:PutMetricData",
         "Resource": "*",
         "Effect": "Allow"
