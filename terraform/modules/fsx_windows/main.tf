@@ -7,6 +7,7 @@ resource "aws_fsx_windows_file_system" "this" {
   kms_key_id                        = var.kms_key_id
   preferred_subnet_id               = var.preferred_subnet_id
   security_group_ids                = var.security_group_ids
+  skip_final_backup                 = var.skip_final_backup
   storage_capacity                  = var.storage_capacity
   storage_type                      = var.storage_type
   subnet_ids                        = var.subnet_ids

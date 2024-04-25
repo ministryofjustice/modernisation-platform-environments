@@ -51,6 +51,12 @@ variable "security_group_ids" {
   default     = null
 }
 
+variable "skip_final_backup" {
+  description = "When enabled, will skip the default final backup taken when the file system is deleted. This configuration must be applied separately before attempting to delete the resource to have the desired behavior. Defaults to false."
+  type        = bool
+  default     = null
+}
+
 variable "self_managed_active_directory" {
   description = "Configuration block that Amazon FSx uses to join the Windows File Server instance to your self-managed (including on-premises) Microsoft Active Directory (AD) directory. Cannot be specified with active_directory_id"
   type = object({

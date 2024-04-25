@@ -48,6 +48,7 @@ locals {
           availability_zones = ["eu-west-2a"]
         }]
         security_groups     = ["private"]
+        skip_final_backup   = true
         storage_capacity    = 32
         throughput_capacity = 8
         self_managed_active_directory = {

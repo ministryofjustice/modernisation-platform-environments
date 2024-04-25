@@ -31,6 +31,7 @@ module "fsx_windows" {
   preferred_subnet_id               = each.value.preferred_subnet_id
   security_group_ids                = each.value.security_group_ids
   self_managed_active_directory     = each.value.self_managed_active_directory
+  skip_final_backup                 = each.value.skip_final_backup
   storage_capacity                  = each.value.storage_capacity
   storage_type                      = each.value.storage_type
   subnet_ids                        = each.value.subnet_ids

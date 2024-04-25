@@ -566,6 +566,7 @@ variable "fsx_windows" {
     preferred_subnet_name             = optional(string, "private") # set if MULTI_AZ_1
     preferred_availability_zone       = optional(string)            # set if MULTI_AZ_1
     security_group_ids                = optional(list(string))
+    skip_final_backup                 = optional(bool)
     storage_capacity                  = optional(number) # GiB [32, 65536]
     storage_type                      = optional(string) # SSD (default), HDD allowed for SINGLE_AZ_2, MULTI_AZ_1
     subnets = list(object({
