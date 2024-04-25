@@ -95,3 +95,6 @@ variable "previous_module_dummy" {
   type        = string
   default     = ""
 }
+
+variable "documents_location"{
+}

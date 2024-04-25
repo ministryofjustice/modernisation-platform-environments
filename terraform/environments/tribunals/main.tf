@@ -40,6 +40,7 @@ module "appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = ""
+  documents_location                = "JudgmentFiles"
 }
 
 module "ahmlr" {
@@ -75,6 +76,7 @@ module "ahmlr" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = module.appeals.dummy_output
+  documents_location                = "Judgments"
 }
 
 module "care_standards" {
@@ -110,6 +112,7 @@ module "care_standards" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = module.ahmlr.dummy_output
+  documents_location                = "Judgments"
 }
 
 module "cicap" {
@@ -145,6 +148,7 @@ module "cicap" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = module.care_standards.dummy_output
+  documents_location                = "CaseFiles"
 }
 
 module "employment_appeals" {
@@ -180,6 +184,7 @@ module "employment_appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = module.cicap.dummy_output
+  documents_location                = "Public/Upload"
 }
 
 module "finance_and_tax" {
@@ -215,6 +220,7 @@ module "finance_and_tax" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = module.employment_appeals.dummy_output
+  documents_location                = "JudgmentFiles"
 }
 
 module "immigration_services" {
@@ -250,6 +256,7 @@ module "immigration_services" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = module.finance_and_tax.dummy_output
+  documents_location                = "JudgmentFiles"
 }
 
 module "information_tribunal" {
@@ -285,6 +292,7 @@ module "information_tribunal" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = module.immigration_services.dummy_output
+  documents_location                = "DBFiles"
 }
 
 module "lands_tribunal" {
@@ -320,6 +328,7 @@ module "lands_tribunal" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = module.information_tribunal.dummy_output
+  documents_location                = "JudgmentFiles"
 }
 
 module "transport" {
@@ -355,4 +364,5 @@ module "transport" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   previous_module_dummy             = module.lands_tribunal.dummy_output
+  documents_location                = "JudgmentFiles"
 }

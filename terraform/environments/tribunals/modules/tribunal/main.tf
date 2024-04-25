@@ -12,6 +12,7 @@ locals {
   app_source_db_url      = var.app_source_db_url
   app_source_db_user     = var.app_source_db_user
   app_source_db_password = var.app_source_db_password
+  documents_location     = var.documents_location
   app_user_data = base64encode(templatefile("user_data.sh", {
     cluster_name = "${local.app}_app_cluster"
   }))
@@ -26,6 +27,7 @@ locals {
     CurServer                  = "${var.application_data.curserver}"
     container_definition_image = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
     rds_password               = "${local.app_rds_password}"
+    documents_location         = "${local.documents_location}"
   })
   app_ec2_ingress_rules = {
     "cluster_ec2_lb_ingress_2" = {
