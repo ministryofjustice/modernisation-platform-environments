@@ -46,6 +46,15 @@ resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
   cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
+resource "aws_vpc_security_group_egress_rule" "vpc_access" {
+  security_group_id = module.rds_bastion.bastion_security_group.id
+  description       = "Reach vpc endpoints"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
   security_group_id = aws_security_group.db.id
   description       = "EC2 instance connection to RDS"
