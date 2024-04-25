@@ -36,3 +36,56 @@ module "rds_bastion" {
   tags_common = local.tags
   tags_prefix = terraform.workspace
 }
+
+resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
+  security_group_id = module.rds_bastion.bastion_security_group
+  description       = "EC2 MSSQL Access"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
+  security_group_id = aws_security_group.db.id
+  description       = "EC2 instance connection to RDS"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+  referenced_security_group_id = module.rds_bastion.bastion_security_group
+}
+
+data "aws_iam_policy_document" "ec2_s3_policy" {
+  statement {
+    sid    = "AllowListDataStore"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      aws_s3_bucket.data_store.arn,
+    ]
+  }
+  statement {
+    sid    = "AllowReadDataStore"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = [
+      "${aws_s3_bucket.data_store.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "ec2_s3_policy" {
+  name   = "ec2-s3-policy"
+  role   = module.rds_bastion.bastion_iam_role.name
+  policy = data.aws_iam_policy_document.ec2_s3_policy.json
+}
+
+resource "aws_iam_policy_attachment" "ssm-attachments" {
+  name       = "ssm-attach-instance-role"
+  roles      = [module.rds_bastion.bastion_iam_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}

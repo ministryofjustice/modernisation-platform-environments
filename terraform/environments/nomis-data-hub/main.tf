@@ -89,6 +89,11 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_ec2_instances", {})
   )
 
+  efs = merge(
+    local.baseline_efs,
+    lookup(local.baseline_environment_config, "baseline_efs", {})
+  )
+
   iam_policies = merge(
     module.baseline_presets.iam_policies,
     local.baseline_iam_policies,
