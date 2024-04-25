@@ -41,7 +41,7 @@ locals {
           name               = "private"
           availability_zones = ["eu-west-2a"]
         }]
-        security_groups     = ["private"]
+        security_groups     = ["rds-ec2s"]
         skip_final_backup   = true
         storage_capacity    = 32
         throughput_capacity = 8
