@@ -45,6 +45,8 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
           "s3:List*"
         ],
         "Resource" : [
+          "arn:aws:s3:::dpr-schema-registry-development",
+          "arn:aws:s3:::dpr-schema-registry-development/*",
           "arn:aws:s3:::dpr-raw-archive-development",
           "arn:aws:s3:::dpr-raw-archive-development/*",
           "arn:aws:s3:::dpr-raw-development",
