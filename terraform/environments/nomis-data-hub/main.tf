@@ -94,6 +94,11 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_efs", {})
   )
 
+  fsx_windows = merge(
+    local.baseline_fsx_windows,
+    lookup(local.baseline_environment_config, "baseline_fsx_windows", {})
+  )
+
   iam_policies = merge(
     module.baseline_presets.iam_policies,
     local.baseline_iam_policies,

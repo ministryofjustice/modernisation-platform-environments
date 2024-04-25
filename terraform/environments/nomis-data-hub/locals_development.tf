@@ -2,6 +2,7 @@ locals {
   development_config = {
     baseline_secretsmanager_secrets = {
       "/microsoft/AD/azure.noms.root" = {
+        recovery_window_in_days = 0
         secrets = {
           passwords = {
             description = "domain passwords only accessible by this account"
@@ -41,23 +42,23 @@ locals {
     }
 
     baseline_fsx_windows = {
-      # dev_fsx = {
-      #   subnets = [{
-      #     name               = "private"
-      #     availability_zones = ["eu-west-2a"]
-      #   }]
-      #   security_groups     = ["private"]
-      #   throughput_capacity = 8
-      #   self_managed_active_directory = {
-      #     dns_ips = [
-      #       module.ip_addresses.mp_ip.ad-azure-dc-a,
-      #       module.ip_addresses.mp_ip.ad-azure-dc-b,
-      #     ]
-      #     domain_name         = "azure.noms.root"
-      #     username            = "blah"
-      #     password_secret_arn = "arn:aws:secretsmanager:eu-west-2:161282055413:secret:/microsoft/AD/azure.noms.root/shared-passwords"
-      #   }
-      # }
+      dev_fsx = {
+        subnets = [{
+          name               = "private"
+          availability_zones = ["eu-west-2a"]
+        }]
+        security_groups     = ["private"]
+        throughput_capacity = 8
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.mp_ip.ad-azure-dc-a,
+            module.ip_addresses.mp_ip.ad-azure-dc-b,
+          ]
+          domain_name          = "azure.noms.root"
+          username             = "svc_join_domain"
+          password_secret_name = "/microsoft/AD/azure.noms.root/passwords"
+        }
+      }
     }
 
     baseline_ec2_autoscaling_groups = {
