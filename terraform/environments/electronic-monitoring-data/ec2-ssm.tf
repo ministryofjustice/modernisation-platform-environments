@@ -85,7 +85,7 @@ resource "aws_iam_policy" "ec2_rds_s3_policy" {
 
 resource "aws_iam_role_policy_attachment" "rds_s3_attachment" {
   role       = aws_iam_role.ec2-instance.name
-  policy_arn = aws_iam_policy.ec2_s3_policy.arn
+  policy_arn = aws_iam_policy.ec2_rds_s3_policy.arn
 }
 
 #------------------------------------------------------------------------------
