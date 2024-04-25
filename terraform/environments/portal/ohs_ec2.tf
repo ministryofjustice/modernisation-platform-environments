@@ -215,3 +215,10 @@ resource "aws_volume_attachment" "ohs_mserver" {
   volume_id   = aws_ebs_volume.ohs_mserver.id
   instance_id = aws_instance.ohs_instance_1.id
 }
+
+###### Please delete me ###########
+resource "aws_volume_attachment" "temp" {
+  device_name = "/dev/xvde"
+  volume_id   = "vol-08175e1a2da912d74"
+  instance_id = aws_instance.ohs_instance_1.id
+}
