@@ -1,5 +1,15 @@
 locals {
   development_config = {
+    baseline_secretsmanager_secrets = {
+      "/microsoft/AD/azure.noms.root" = {
+        secrets = {
+          passwords = {
+            description = "domain passwords only accessible by this account"
+          }
+        }
+      }
+    }
+
     baseline_efs = {
       # dev_efs = {
       #   access_points = {
@@ -27,6 +37,26 @@ locals {
       #     availability_zones = ["eu-west-2a"]
       #     security_groups    = ["private"]
       #   }]
+      # }
+    }
+
+    baseline_fsx_windows = {
+      # dev_fsx = {
+      #   subnets = [{
+      #     name               = "private"
+      #     availability_zones = ["eu-west-2a"]
+      #   }]
+      #   security_groups     = ["private"]
+      #   throughput_capacity = 8
+      #   self_managed_active_directory = {
+      #     dns_ips = [
+      #       module.ip_addresses.mp_ip.ad-azure-dc-a,
+      #       module.ip_addresses.mp_ip.ad-azure-dc-b,
+      #     ]
+      #     domain_name         = "azure.noms.root"
+      #     username            = "blah"
+      #     password_secret_arn = "arn:aws:secretsmanager:eu-west-2:161282055413:secret:/microsoft/AD/azure.noms.root/shared-passwords"
+      #   }
       # }
     }
 
