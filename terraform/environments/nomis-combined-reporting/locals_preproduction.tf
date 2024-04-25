@@ -153,7 +153,7 @@ locals {
       pp-ncr-processing-1 = merge(local.bip_ec2_default, {
         cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
         config = merge(local.bip_ec2_default.config, {
-          availability_zone = "${local.region}a"
+          availability_zone = "${local.region}c"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
