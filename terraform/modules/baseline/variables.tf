@@ -553,6 +553,40 @@ variable "environment" {
   description = "Standard environmental data resources from the environment module"
 }
 
+variable "fsx_windows" {
+  description = "map of fsx_windows (e.g. windows file system) modules to create where map key is tags.Name"
+
+  type = map(object({
+    active_directory_id               = optional(string)
+    automatic_backup_retention_days   = optional(number) # [0,90] (default 7)
+    backup_id                         = optional(string)
+    daily_automatic_backup_start_time = optional(string)
+    deployment_type                   = optional(string) # [SINGLE_AZ_1 (default), SINGLE_AZ_2, MULTI_AZ_1]
+    kms_key_id                        = optional(string, "general")
+    preferred_subnet_name             = optional(string, "private") # set if MULTI_AZ_1
+    preferred_availability_zone       = optional(string)            # set if MULTI_AZ_1
+    security_group_ids                = optional(list(string))
+    storage_capacity                  = optional(number) # GiB [32, 65536]
+    storage_type                      = optional(string) # SSD (default), HDD allowed for SINGLE_AZ_2, MULTI_AZ_1
+    subnets = list(object({
+      name               = optional(string, "private")
+      availability_zones = optional(list(string), ["eu-west-2a", "eu-west-2b", "eu-west-2c"])
+    }))
+    security_groups               = list(string)
+    throughput_capacity           = number # MBps [8, 2048] in power of 2 increments
+    weekly_maintenance_start_time = optional(string)
+    self_managed_active_directory = optional(object({
+      dns_ips                                = list(string)
+      domain_name                            = string
+      password_secret_name                   = optional(string) # secret must be json key/pair with username as key
+      username                               = string
+      file_system_administrators_group       = optional(string) # set if not "Domain Admins"
+      organizational_unit_distinguished_name = optional(string)
+    }))
+    tags = optional(map(string), {})
+  }))
+}
+
 variable "iam_policies" {
   description = "map of iam policies to create, where the key is the name of the policy"
   type = map(object({
