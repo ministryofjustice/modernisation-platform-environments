@@ -4,7 +4,7 @@ locals {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "rds_bastion" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=add-volume-size-variable"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -31,6 +31,7 @@ module "rds_bastion" {
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = "eu-west-2"
+  volume_size   = 20
 
   # tags
   tags_common = local.tags
