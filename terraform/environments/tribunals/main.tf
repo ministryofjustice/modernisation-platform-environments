@@ -349,14 +349,13 @@ module "transport" {
 }
 
 module "charity_tribunal_decisions" {
-  source                            = "./modules/tribunal-ftp"
+  source                            = "./modules/tribunal_ftp"
   app_name                          = "charity-tribunal"
   app_url                           = "charitytribunal"
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume_ftp        = local.application_data.accounts[local.environment].task_definition_volume_ftp
-
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
   ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold

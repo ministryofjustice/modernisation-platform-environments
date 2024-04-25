@@ -5,6 +5,9 @@ variable "app_name" {
 variable "app_url" {   
 }
 
+variable "environment" {   
+}
+
 variable "task_definition_volume_ftp" { 
 }
 
