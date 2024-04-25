@@ -67,6 +67,27 @@ resource "aws_iam_instance_profile" "ec2-instance" {
   role = aws_iam_role.ec2-instance.name
 }
 
+resource "aws_iam_policy" "ec2_rds_s3_policy" {
+  name        = "ec2-s3-policy"
+  description = "Policy for s3 actions"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "s3:*",
+        Resource = ["*"]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "rds_s3_attachment" {
+  role       = aws_iam_role.ec2-instance.name
+  policy_arn = aws_iam_policy.ec2_s3_policy.arn
+}
+
 #------------------------------------------------------------------------------
 # Instance definition
 #------------------------------------------------------------------------------
