@@ -23,7 +23,11 @@ do
   mount_status=$?
 done
 
-hostnamectl set-hostname ${local.application_name}-ods1-ms.${data.aws_route53_zone.external.name}
+hostnamectl set-hostname ${local.application_name}-ods1-ms
+
+sed -i '/^search/d' /etc/resolv.conf
+echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
+
 
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
