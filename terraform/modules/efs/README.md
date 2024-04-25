@@ -5,6 +5,8 @@ Creates EFS file system and associated resources.
 See https://github.com/ministryofjustice/modernisation-platform-configuration-management repo.
 for ansible code for mounting on linux server (filesystems role).
 
+EFS is expensive. Use Single-AZ solution for non-production environments to save cost.
+
 ## Security Groups
 
 The module does not create security groups. NFS has no authentication
@@ -12,7 +14,7 @@ so be sure to limit access to only what needs it.
 
 ### Example 1 - Same security group as EC2
 
-Use the same security group as the EC2 what will mount the EFS.
+Use the same security group as the EC2 mounting the EFS.
 Just ensure there is an internal rule allowing internal traffic
 like this:
 
@@ -35,7 +37,6 @@ only from the security groups that the EC2s belong to.
 resource "aws_security_group" "efs" {
   name   = "efs"
   vpc_id = data.aws_vpc.shared.id
-  tags   = merge(local.tags, { Name = "efs" })
 }
 
 resource "aws_security_group_rule" "efs_ingress" {
@@ -110,7 +111,6 @@ output "efs1_dns_name" {
 
 ## Single-AZ example
 
-In default burst-mode but with example EFS policy and backup enabled
 This:
 - creates single-AZ solution with mount points in zone A only
 - associates the mount point with a `aws_security_group.efs` resource, see Security Groups - Example 2
@@ -136,7 +136,6 @@ module "efs2" {
       }
     }
   }
-  backup_policy_status = "ENABLED"
   file_system = {
     availability_zone_name = "eu-west-2a"
     kms_key_id      = data.aws_kms_key.general_shared.arn
@@ -151,21 +150,6 @@ module "efs2" {
     }
   }
   name = "efs2"
-  policy = [{
-    sid    = "test"
-    effect = "Allow"
-    actions = [
-      "elasticfilesystem:ClientMount",
-      "elasticfilesystem:ClientWrite",
-    ]
-    resources = ["*"]
-    conditions = [{
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["true"]
-    }]
-  }]
-
   tags = local.tags
 }
 
