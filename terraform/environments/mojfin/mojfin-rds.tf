@@ -42,7 +42,7 @@ resource "aws_db_option_group" "mojfin" {
 }
 
 resource "aws_db_instance" "appdb1" {
-  allocated_storage               = local.storage_size
+  allocated_storage               = local.application_data.accounts[local.environment].allocated_storage_size
   db_name                         = upper(local.application_name)
   identifier                      = local.application_name
   engine                          = local.engine
@@ -55,7 +55,7 @@ resource "aws_db_instance" "appdb1" {
   backup_retention_period         = local.backup_retention_period
   backup_window                   = local.backup_window
   character_set_name              = local.character_set_name
-  max_allocated_storage           = local.max_allocated_storage
+  max_allocated_storage           = local.application_data.accounts[local.environment].max_allocated_storage_size
   username                        = local.username
   password                        = random_password.rds_password.result
   vpc_security_group_ids          = [aws_security_group.mojfin.id]
