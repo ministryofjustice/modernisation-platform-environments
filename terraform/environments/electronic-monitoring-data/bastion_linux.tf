@@ -12,7 +12,7 @@ module "rds_bastion" {
   }
 
   # s3 - used for logs and user ssh public keys
-  bucket_name = "rds-bastion"
+  bucket_name = "data-store-bastion-linux"
 
   # public keys
   public_key_data = local.public_key_data.keys[local.environment]
@@ -24,8 +24,9 @@ module "rds_bastion" {
   log_expiry_days      = 180 # days before log expiration
 
   # bastion
-  allow_ssh_commands = true
+  instance_name = "data_store_bastion_linux"
 
+  allow_ssh_commands = true
   app_name      = var.networking[0].application
   business_unit = local.vpc_name
   subnet_set    = local.subnet_set
