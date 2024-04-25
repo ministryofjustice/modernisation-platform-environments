@@ -117,6 +117,7 @@ locals {
       pp-ncr-cms-1 = merge(local.bip_ec2_default, {
         cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
         config = merge(local.bip_ec2_default.config, {
+          availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
@@ -134,6 +135,7 @@ locals {
       pp-ncr-cms-2 = merge(local.bip_ec2_default, {
         cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
         config = merge(local.bip_ec2_default.config, {
+          availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
@@ -168,6 +170,7 @@ locals {
       pp-ncr-web-admin = merge(local.web_ec2_default, {
         cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
         config = merge(local.web_ec2_default.config, {
+          availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
@@ -183,6 +186,7 @@ locals {
       pp-ncr-web-1 = merge(local.web_ec2_default, {
         cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
         config = merge(local.web_ec2_default.config, {
+          availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
@@ -198,6 +202,7 @@ locals {
       pp-ncr-web-2 = merge(local.web_ec2_default, {
         cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
         config = merge(local.web_ec2_default.config, {
+          availability_zone = "${local.region}c"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
