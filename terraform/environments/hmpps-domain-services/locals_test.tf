@@ -37,13 +37,13 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
       test-win-2012 = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumes
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "base_windows_server_2012_r2_release*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
-          user_data_raw                 = base64encode(file("./templates/rds-gateway-user-data.yaml"))
+          user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
@@ -59,17 +59,18 @@ locals {
           description = "Windows Server 2012 for connecting to Azure domain"
           os-type     = "Windows"
           component   = "test"
+          server-type = "HmppsDomainServicesTest"
         }
       }
 
       test-win-2022 = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumes
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2024-*"
           availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
-          user_data_raw                 = base64encode(file("./templates/rds-gateway-user-data.yaml"))
+          user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["rds-ec2s"]
@@ -85,6 +86,7 @@ locals {
           description = "Windows Server 2022 for connecting to Azure domain"
           os-type     = "Windows"
           component   = "test"
+          server-type = "HmppsDomainServicesTest"
         }
       }
 
