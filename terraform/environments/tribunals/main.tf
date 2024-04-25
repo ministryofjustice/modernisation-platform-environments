@@ -10,6 +10,7 @@ locals {
 
 module "appeals" {
   source                            = "./modules/tribunal"
+  # The app_name needs to match the folder name in the volume
   app_name                          = "appeals"
   app_url                           = "administrativeappeals"
   sql_migration_path                = "../scripts/administrative_appeals"
@@ -350,7 +351,7 @@ module "transport" {
 
 module "charity_tribunal_decisions" {
   source                            = "./modules/tribunal_ftp"
-  app_name                          = "charity-tribunal"
+  app_name                          = "ftp-charity-tribunals"
   app_url                           = "charitytribunal"
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
