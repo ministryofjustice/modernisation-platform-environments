@@ -35,9 +35,32 @@ locals {
       }
     }
 
+    baseline_fsx_windows = {
+      test-win-fs = {
+        subnets = [{
+          name               = "private"
+          availability_zones = ["eu-west-2a"]
+        }]
+        security_groups     = ["private"]
+        skip_final_backup   = true
+        storage_capacity    = 32
+        throughput_capacity = 8
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.mp_ip.ad-azure-dc-a,
+            module.ip_addresses.mp_ip.ad-azure-dc-b,
+          ]
+          domain_name          = "azure.noms.root"
+          username             = "svc_join_domain"
+          password_secret_name = "/microsoft/AD/azure.noms.root/passwords"
+        }
+      }
+    }
+
     baseline_ec2_autoscaling_groups = {
+
       test-win-2012 = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumes
+        # clean up test-win-2012 Computer and DNS entry from azure.noms.root domain before using
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "base_windows_server_2012_r2_release*"
           availability_zone             = null
@@ -52,9 +75,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "Windows Server 2012 for connecting to Azure domain"
           os-type     = "Windows"
@@ -64,7 +87,7 @@ locals {
       }
 
       test-win-2022 = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumes
+        # clean up test-win-2022 Computer and DNS entry from azure.noms.root domain before using
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "hmpps_windows_server_2022_release_2024-*"
           availability_zone             = null
@@ -79,9 +102,9 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "Windows Server 2022 for connecting to Azure domain"
           os-type     = "Windows"
