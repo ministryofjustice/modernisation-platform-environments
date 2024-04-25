@@ -1,4 +1,4 @@
-module "s3_bucket_app_deployment" {
+module "s3_bucket_dms_destination" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
