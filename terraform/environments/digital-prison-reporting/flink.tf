@@ -115,11 +115,20 @@ resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
   service_execution_role = aws_iam_role.flink_role.arn
 
   application_configuration {
+    environment_properties {
+      property_group {
+        property_group_id = "sql"
+        property_map = {
+          "viewName": "master_summary"
+        }
+      }
+    }
+
     application_code_configuration {
       code_content {
         s3_content_location {
           bucket_arn = "arn:aws:s3:::flink-demo-771283872747-eu-west-2-1713861000297-bucket"
-          file_key   = "flink-spike-0.16-SNAPSHOT-all.jar"
+          file_key   = "flink-spike-0.17-SNAPSHOT-all.jar"
         }
       }
 
