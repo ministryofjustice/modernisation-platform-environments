@@ -114,7 +114,7 @@ locals {
 
       ### PREPROD
 
-      pp-ncr-cms-1 = merge(local.bip_ec2_default, {
+      pp-ncr-cms-a = merge(local.bip_ec2_default, {
         cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
         config = merge(local.bip_ec2_default.config, {
           availability_zone = "${local.region}a"
@@ -132,7 +132,7 @@ locals {
           node                                 = "1"
         })
       })
-      pp-ncr-cms-2 = merge(local.bip_ec2_default, {
+      pp-ncr-cms-b = merge(local.bip_ec2_default, {
         cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
         config = merge(local.bip_ec2_default.config, {
           availability_zone = "${local.region}b"
@@ -150,10 +150,10 @@ locals {
           node                                 = "2"
         })
       })
-      pp-ncr-processing-1 = merge(local.bip_ec2_default, {
+      pp-ncr-processing-1-a = merge(local.bip_ec2_default, {
         cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
         config = merge(local.bip_ec2_default.config, {
-          availability_zone = "${local.region}c"
+          availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
@@ -168,7 +168,7 @@ locals {
           node                                 = "3"
         })
       })
-      pp-ncr-web-admin = merge(local.web_ec2_default, {
+      pp-ncr-web-admin-a = merge(local.web_ec2_default, {
         cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
         config = merge(local.web_ec2_default.config, {
           availability_zone = "${local.region}a"
@@ -184,10 +184,10 @@ locals {
           nomis-combined-reporting-environment = "pp"
         })
       })
-      pp-ncr-web-1 = merge(local.web_ec2_default, {
+      pp-ncr-web-1-a = merge(local.web_ec2_default, {
         cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
         config = merge(local.web_ec2_default.config, {
-          availability_zone = "${local.region}b"
+          availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
@@ -200,10 +200,10 @@ locals {
           nomis-combined-reporting-environment = "pp"
         })
       })
-      pp-ncr-web-2 = merge(local.web_ec2_default, {
+      pp-ncr-web-2-b = merge(local.web_ec2_default, {
         cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
         config = merge(local.web_ec2_default.config, {
-          availability_zone = "${local.region}c"
+          availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
@@ -216,7 +216,7 @@ locals {
           nomis-combined-reporting-environment = "pp"
         })
       })
-      pp-ncr-etl-1-a = merge(local.etl_ec2_default, {
+      pp-ncr-etl-a = merge(local.etl_ec2_default, {
         cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
         config = merge(local.etl_ec2_default.config, {
           instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
