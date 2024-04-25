@@ -4,4 +4,8 @@ module "dms" {
   account_info   = var.account_info
   tags           = var.tags
   env_name       = var.env_name
+
+  providers = {
+    aws.bucket-replication = aws
+  }
 }
