@@ -22,7 +22,7 @@ resource "aws_ecr_repository" "app-ecr-repo" {
 module "app_ecs_task" {
   source                    = "../ecs_task"
   app_name                  = local.app
-  task_definition_volume    = var.task_definition_volume_ftp
+  task_definition_volume    = var.task_definition_volume
   container_definition      = local.app_container_definition
   tags_common               = var.tags
   appscaling_min_capacity   = var.appscaling_min_capacity

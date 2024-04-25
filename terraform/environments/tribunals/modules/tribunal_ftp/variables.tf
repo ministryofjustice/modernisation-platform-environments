@@ -8,7 +8,7 @@ variable "app_url" {
 variable "environment" {   
 }
 
-variable "task_definition_volume_ftp" { 
+variable "task_definition_volume" { 
 }
 
 variable "appscaling_min_capacity" {  
