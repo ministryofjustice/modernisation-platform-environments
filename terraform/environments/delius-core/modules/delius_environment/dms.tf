@@ -6,6 +6,7 @@ module "dms" {
   env_name       = var.env_name
 
   providers = {
+    aws                    = aws
     aws.bucket-replication = aws
   }
 }
