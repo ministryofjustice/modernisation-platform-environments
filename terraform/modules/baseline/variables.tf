@@ -445,6 +445,7 @@ variable "efs" {
     })))
     tags = optional(map(string), {})
   }))
+  default = {}
 }
 
 variable "rds_instances" {
