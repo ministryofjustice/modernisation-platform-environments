@@ -14,14 +14,14 @@
     "essential" : true,
     "portMappings" : [
       {
-        "hostPort": 0,
-        "containerPort": 80,
+        "hostPort": 21,
+        "containerPort": 21,
         "protocol": "tcp"
       },
       {
-        "hostPort": 0,
-        "containerPort": 21,
-        "protocol": "ftp"
+        "hostPort": 20,
+        "containerPort": 20,
+        "protocol": "tcp"
       }
     ],
     "logConfiguration" : {
