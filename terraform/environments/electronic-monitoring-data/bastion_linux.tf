@@ -87,7 +87,7 @@ resource "aws_security_group" "ec2_bastion_s3" {
   tags        = local.tags
 }
 
-resource "aws_vpc_security_group_egress_rule" "vpc_access" {
+resource "aws_vpc_security_group_egress_rule" "s3_bast_vpc_access" {
   security_group_id = aws_security_group.ec2_bastion_s3.id
   description       = "Reach vpc endpoints"
   ip_protocol       = "tcp"
@@ -96,7 +96,7 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
   cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
-resource "aws_vpc_security_group_egress_rule" "vpc_access" {
+resource "aws_vpc_security_group_egress_rule" "s3_bast_vpc_access" {
   security_group_id            = aws_security_group.db.id
   description                  = "Ec2 instance"
   ip_protocol                  = "tcp"
@@ -108,17 +108,6 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 #------------------------------------------------------------------------------
 # IAM to access database
 #------------------------------------------------------------------------------
-
-data "aws_iam_policy_document" "ec2-rds-access-role" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
 
 resource "aws_iam_role" "s3-ec2-instance" {
   name               = "s3-instance-role"
@@ -156,7 +145,7 @@ resource "aws_iam_instance_profile" "s3-ec2-instance" {
 # Instance definition
 #------------------------------------------------------------------------------
 
-resource "aws_instance" "bastion_host" {
+resource "aws_instance" "s3_bastion_host" {
   ami                         = data.aws_ami.this.id
   instance_type               = "t3.micro"
   subnet_id                   = data.aws_subnet.private_subnets_b.id
