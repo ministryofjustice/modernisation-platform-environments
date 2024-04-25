@@ -37,3 +37,9 @@ variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string
 }
+
+variable "deploy_oracle_stats" {
+  description = "for deploying Oracle stats bucket"
+  default     = true
+  type        = bool
+}
