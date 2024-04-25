@@ -19,7 +19,7 @@ resource "aws_fsx_windows_file_system" "this" {
     content {
       dns_ips                                = self_managed_active_directory.value.dns_ips
       domain_name                            = self_managed_active_directory.value.domain_name
-      password                               = data.aws_secretsmanager_secret_version.this[0].secret_string
+      password                               = local.domain_join_password
       username                               = self_managed_active_directory.value.username
       file_system_administrators_group       = self_managed_active_directory.value.file_system_administrators_group
       organizational_unit_distinguished_name = self_managed_active_directory.value.organizational_unit_distinguished_name
