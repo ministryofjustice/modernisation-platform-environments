@@ -11,7 +11,7 @@ locals {
           ]
         ]
       ])
-      security_groups = [for sg in value.security_groups : try(aws_security_group.this[sg].id, sg)]
+      security_group_ids = [for sg in value.security_groups : try(aws_security_group.this[sg].id, sg)]
     })
   }
 }
