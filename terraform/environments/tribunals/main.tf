@@ -39,12 +39,10 @@ module "appeals" {
   vpc_shared_id                     = data.aws_vpc.shared.id 
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = ""
   documents_location                = "JudgmentFiles"
 }
 
 module "ahmlr" {
-  depends_on                        = [module.appeals.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "hmlands"
   app_url                           = "landregistrationdivision"
@@ -75,12 +73,10 @@ module "ahmlr" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.appeals.dummy_output
   documents_location                = "Judgments"
 }
 
 module "care_standards" {
-  depends_on                        = [module.ahmlr.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "care-standards"
   app_url                           = "carestandards"
@@ -111,12 +107,10 @@ module "care_standards" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.ahmlr.dummy_output
   documents_location                = "Judgments"
 }
 
 module "cicap" {
-  depends_on                        = [module.care_standards.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "cicap"
   app_url                           = "cicap"
@@ -147,12 +141,10 @@ module "cicap" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.care_standards.dummy_output
   documents_location                = "CaseFiles"
 }
 
 module "employment_appeals" {
-  depends_on                        = [module.cicap.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "employment-appeals"
   app_url                           = "employmentappeals"
@@ -183,12 +175,10 @@ module "employment_appeals" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.cicap.dummy_output
   documents_location                = "Public/Upload"
 }
 
 module "finance_and_tax" {
-  depends_on                        = [module.employment_appeals.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "finance-and-tax"
   app_url                           = "financeandtax"
@@ -219,12 +209,10 @@ module "finance_and_tax" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.employment_appeals.dummy_output
   documents_location                = "JudgmentFiles"
 }
 
 module "immigration_services" {
-  depends_on                        = [module.finance_and_tax.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "immigration-services"
   app_url                           = "immigrationservices"
@@ -255,12 +243,10 @@ module "immigration_services" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.finance_and_tax.dummy_output
   documents_location                = "JudgmentFiles"
 }
 
 module "information_tribunal" {
-  depends_on                        = [module.immigration_services.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "information-tribunal"
   app_url                           = "informationrights"
@@ -291,12 +277,10 @@ module "information_tribunal" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.immigration_services.dummy_output
   documents_location                = "DBFiles"
 }
 
 module "lands_tribunal" {
-  depends_on                        = [module.information_tribunal.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "lands-chamber"
   app_url                           = "landschamber"
@@ -327,12 +311,10 @@ module "lands_tribunal" {
   vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.information_tribunal.dummy_output
   documents_location                = "JudgmentFiles"
 }
 
 module "transport" {
-  depends_on                        = [module.lands_tribunal.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "transport"
   app_url                           = "transportappeals"
@@ -363,6 +345,28 @@ module "transport" {
   vpc_shared_id                     = data.aws_vpc.shared.id 
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
-  previous_module_dummy             = module.lands_tribunal.dummy_output
   documents_location                = "JudgmentFiles"
+}
+
+module "charity_tribunal_decisions" {
+  source                            = "./modules/tribunal-ftp"
+  app_name                          = "charity-tribunal"
+  app_url                           = "charitytribunal"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume_ftp        = local.application_data.accounts[local.environment].task_definition_volume_ftp
+
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_3
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name 
+  vpc_shared_id                     = data.aws_vpc.shared.id 
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "documents"
 }
