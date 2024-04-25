@@ -45,28 +45,28 @@ resource "aws_s3_bucket_versioning" "data_store" {
   }
 }
 
-resource "aws_s3_bucket_policy" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-  policy = data.aws_iam_policy_document.data_store.json
-}
+# resource "aws_s3_bucket_policy" "data_store" {
+#   bucket = aws_s3_bucket.data_store.id
+#   policy = data.aws_iam_policy_document.data_store.json
+# }
 
-data "aws_iam_policy_document" "data_store" {
-  statement {
-    sid = "ReadBucket"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    effect  = "Allow"
-    actions = [
-      "s3:ListBucket",
-      "s3:GetObject"
-    ]
-    resources = [
-      aws_s3_bucket.data_store.arn,
-      "${aws_s3_bucket.data_store.arn}/*"
-    ]
-  }
+# data "aws_iam_policy_document" "data_store" {
+  # statement {
+  #   sid = "ReadBucket"
+  #   principals {
+  #     type        = "AWS"
+  #     identifiers = ["*"]
+  #   }
+  #   effect  = "Allow"
+  #   actions = [
+  #     "s3:ListBucket",
+  #     "s3:GetObject"
+  #   ]
+  #   resources = [
+  #     aws_s3_bucket.data_store.arn,
+  #     "${aws_s3_bucket.data_store.arn}/*"
+  #   ]
+  # }
   # statement {
   #   sid = "EnforceTLSv12orHigher"
   #   principals {
@@ -85,7 +85,7 @@ data "aws_iam_policy_document" "data_store" {
   #     values   = [1.2]
   #   }
   # }
-}
+# }
 
 resource "aws_s3_bucket_logging" "data_store" {
   bucket = aws_s3_bucket.data_store.id

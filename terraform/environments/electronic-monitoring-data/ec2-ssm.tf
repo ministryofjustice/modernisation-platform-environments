@@ -68,7 +68,7 @@ resource "aws_iam_instance_profile" "ec2-instance" {
 }
 
 resource "aws_iam_policy" "ec2_rds_s3_policy" {
-  name        = "ec2-s3-policy"
+  name        = "ec2-rds-s3-policy"
   description = "Policy for s3 actions"
 
   policy = jsonencode({
