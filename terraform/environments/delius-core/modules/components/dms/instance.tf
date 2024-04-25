@@ -1,5 +1,5 @@
 resource "aws_dms_replication_instance" "test" {
-  allocated_storage            = 20
+  allocated_storage            = 30
   apply_immediately            = true
   auto_minor_version_upgrade   = true
   availability_zone            = data.aws_region.current.name
@@ -10,7 +10,7 @@ resource "aws_dms_replication_instance" "test" {
   publicly_accessible          = true
   replication_instance_class   = var.instance_class
   replication_instance_id      = "${var.env_name}-dms-instance"
-  replication_subnet_group_id  = aws_dms_replication_subnet_group.test-dms-replication-subnet-group-tf.id
+  replication_subnet_group_id  = aws_dms_replication_subnet_group.this.id
 
   tags = var.tags
 
@@ -23,4 +23,9 @@ resource "aws_dms_replication_instance" "test" {
     aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole,
     aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
   ]
+}
+resource "aws_dms_replication_subnet_group" "this" {
+  replication_subnet_group_description = "subnet for dms replication"
+  replication_subnet_group_id = "${var.env_name}-dms-subnet_group"
+  subnet_ids = var.account_config.ordered_private_subnet_ids
 }
