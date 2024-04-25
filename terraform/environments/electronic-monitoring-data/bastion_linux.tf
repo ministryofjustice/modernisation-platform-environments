@@ -96,7 +96,7 @@ resource "aws_vpc_security_group_egress_rule" "s3_bast_vpc_access" {
   cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
-resource "aws_vpc_security_group_egress_rule" "s3_bast_vpc_access" {
+resource "aws_vpc_security_group_egress_rule" "s3_bast_rds_access" {
   security_group_id            = aws_security_group.db.id
   description                  = "Ec2 instance"
   ip_protocol                  = "tcp"
