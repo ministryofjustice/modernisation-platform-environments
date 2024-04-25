@@ -2,7 +2,7 @@ resource "aws_dms_replication_instance" "test" {
   allocated_storage            = 30
   apply_immediately            = true
   auto_minor_version_upgrade   = true
-  availability_zone            = data.aws_region.current.name
+  availability_zone            = "${data.aws_region.current.name}a"
   engine_version               = "3.5"
   kms_key_arn                  = var.account_config.kms_keys.general_shared
   multi_az                     = false
