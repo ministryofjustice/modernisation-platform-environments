@@ -18,14 +18,10 @@ resource "aws_dms_replication_instance" "test" {
     aws_security_group.dms.id
   ]
 
-  depends_on = [
-    aws_iam_role_policy_attachment.dms-access-for-endpoint-AmazonDMSRedshiftS3Role,
-    aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole,
-    aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
-  ]
+
 }
 resource "aws_dms_replication_subnet_group" "this" {
   replication_subnet_group_description = "subnet for dms replication"
-  replication_subnet_group_id = "${var.env_name}-dms-subnet-group"
-  subnet_ids = var.account_config.ordered_private_subnet_ids
+  replication_subnet_group_id          = "${var.env_name}-dms-subnet-group"
+  subnet_ids                           = var.account_config.ordered_private_subnet_ids
 }
