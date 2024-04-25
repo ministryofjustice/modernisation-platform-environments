@@ -47,7 +47,7 @@ resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "vpc_access" {
-  security_group_id = module.rds_bastion.bastion_security_group.id
+  security_group_id = module.rds_bastion.bastion_security_group
   description       = "Reach vpc endpoints"
   ip_protocol       = "tcp"
   from_port         = 443
