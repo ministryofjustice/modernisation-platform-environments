@@ -6,7 +6,7 @@ import os
 
 logger = getLogger(__name__)
 
-s3_client = boto3.client("s3", region_name="eu-west-2")
+s3_client = boto3.client("s3")
 
 
 # lambda function to copy file from 1 s3 to another s3
@@ -20,11 +20,14 @@ def handler(event, context):
     database_name = file_parts[0]
     table_name = file_parts[2]
     file_name = file_parts[3]
+    logger.info(
+        f"Copying data... Database: {database_name}, Table: {table_name}, File: {file_name}"
+    )
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
 
     project_name = "electronic-monitoring-service"
     destination_key = f"landing/{project_name}/data/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
-
+    logger.info(f"Copying to: {destination_bucket}, {destination_key}")
     # Specify from where file needs to be copied
     copy_object = {"Bucket": source_bucket_name, "Key": file_key}
 

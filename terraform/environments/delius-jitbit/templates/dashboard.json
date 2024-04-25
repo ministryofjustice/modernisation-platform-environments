@@ -15,19 +15,9 @@
             "hmpps-${environment}-${app_name}",
             "ClusterName",
             "hmpps-${environment}-${app_name}",
-            {
-              "label": "delius-jitbit-service"
-            }
+            { "label": "delius-jitbit-service" }
           ],
-          [
-            ".",
-            ".",
-            "ClusterName",
-            ".",
-            {
-              "label": "delius-jitbit-cluster"
-            }
-          ]
+          [".", ".", "ClusterName", ".", { "label": "delius-jitbit-cluster" }]
         ],
         "view": "timeSeries",
         "stacked": true,
@@ -52,19 +42,9 @@
             "hmpps-${environment}-${app_name}",
             "ClusterName",
             "hmpps-${environment}-${app_name}",
-            {
-              "label": "delius-jitbit-service"
-            }
+            { "label": "delius-jitbit-service" }
           ],
-          [
-            ".",
-            ".",
-            "ClusterName",
-            ".",
-            {
-              "label": "delius-jitbit-cluster"
-            }
-          ]
+          [".", ".", "ClusterName", ".", { "label": "delius-jitbit-cluster" }]
         ],
         "view": "timeSeries",
         "stacked": true,
@@ -81,15 +61,7 @@
       "x": 0,
       "type": "metric",
       "properties": {
-        "metrics": [
-          [
-            "JitbitMetrics",
-            "ErrorCount",
-            {
-              "color": "#d62728"
-            }
-          ]
-        ],
+        "metrics": [["JitbitMetrics", "ErrorCount", { "color": "#d62728" }]],
         "view": "timeSeries",
         "stacked": true,
         "region": "eu-west-2",
@@ -155,21 +127,21 @@
       }
     },
     {
-      "type": "text",
-      "x": 0,
-      "y": 20,
-      "width": 24,
       "height": 1,
+      "width": 24,
+      "y": 20,
+      "x": 0,
+      "type": "text",
       "properties": {
         "markdown": "RDS Metrics"
       }
     },
     {
-      "type": "metric",
-      "x": 0,
-      "y": 21,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 0,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -187,11 +159,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 6,
-      "y": 21,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 6,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -208,11 +180,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 12,
-      "y": 21,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 12,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -229,11 +201,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 18,
-      "y": 21,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 18,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": true,
@@ -250,11 +222,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 0,
-      "y": 27,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 0,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": true,
@@ -272,11 +244,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 6,
-      "y": 27,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 6,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": true,
@@ -294,11 +266,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 12,
-      "y": 27,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 12,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -314,11 +286,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 18,
-      "y": 27,
-      "width": 6,
       "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 18,
+      "type": "metric",
       "properties": {
         "metrics": [
           [
@@ -326,9 +298,7 @@
             "DiskQueueDepth",
             "DBInstanceIdentifier",
             "${app_name}-${environment}-database",
-            {
-              "color": "#9467bd"
-            }
+            { "color": "#9467bd" }
           ]
         ],
         "view": "timeSeries",
@@ -339,11 +309,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 0,
-      "y": 14,
-      "width": 8,
       "height": 6,
+      "width": 8,
+      "y": 14,
+      "x": 0,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -359,11 +329,11 @@
       }
     },
     {
-      "type": "metric",
-      "x": 8,
-      "y": 14,
-      "width": 8,
       "height": 6,
+      "width": 8,
+      "y": 14,
+      "x": 8,
+      "type": "metric",
       "properties": {
         "view": "timeSeries",
         "stacked": false,
@@ -376,6 +346,92 @@
           ]
         ],
         "region": "eu-west-2"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 33,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE 'delius-jitbit-ecs' | fields @timestamp, @message, @logStream\n| sort @timestamp desc\n| filter @message like /useless/\n| limit 1000",
+        "region": "eu-west-2",
+        "stacked": false,
+        "title": "Log group: delius-jitbit-ecs",
+        "view": "table"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 37,
+      "width": 12,
+      "height": 5,
+      "properties": {
+        "query": "SOURCE 'delius-jitbit-ses-logs' | fields @timestamp, @message\n| sort @timestamp desc\n| filter @message like /bounce/\n| limit 1000",
+        "region": "eu-west-2",
+        "stacked": false,
+        "title": "Bounced Emails",
+        "view": "table"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 34,
+      "width": 12,
+      "height": 3,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/SES",
+            "Send",
+            { "id": "m1", "label": "Sent", "region": "eu-west-2" }
+          ],
+          [".", "Bounce", { "region": "eu-west-2" }],
+          [".", "Delivery", { "region": "eu-west-2" }]
+        ],
+        "sparkline": false,
+        "view": "singleValue",
+        "region": "eu-west-2",
+        "stat": "Sum",
+        "period": 86400,
+        "setPeriodToTimeRange": true,
+        "trend": false,
+        "liveData": true,
+        "title": "SES: Totals"
+      }
+    },
+    {
+      "height": 1,
+      "width": 24,
+      "y": 33,
+      "x": 0,
+      "type": "text",
+      "properties": {
+        "markdown": "Email"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 34,
+      "width": 12,
+      "height": 8,
+      "properties": {
+        "metrics": [
+          ["AWS/SES", "Send", { "label": "Sent", "region": "eu-west-2" }],
+          [".", "Delivery", { "region": "eu-west-2" }],
+          [".", "Bounce", { "region": "eu-west-2" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "period": 900,
+        "stat": "Sum",
+        "liveData": true,
+        "title": "SES"
       }
     }
   ]

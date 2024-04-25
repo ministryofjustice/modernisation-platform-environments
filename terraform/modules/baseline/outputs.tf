@@ -48,6 +48,11 @@ output "ec2_instances" {
   value       = module.ec2_instance
 }
 
+output "efs" {
+  description = "map of efs module outputs corresponding to var.efs"
+  value       = module.efs
+}
+
 output "iam_policies" {
   description = "map of aws_iam_policy resources"
   value       = aws_iam_policy.this

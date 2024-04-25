@@ -20,6 +20,8 @@ locals {
       }
     }
     baseline_secretsmanager_secrets = {
+      "/ec2/ncr-bip/pp" = local.bip_secretsmanager_secrets
+      "/ec2/ncr-web/pp" = local.web_secretsmanager_secrets
       "/oracle/database/PPBIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/PPBIPAUD" = local.database_secretsmanager_secrets
     }
@@ -112,99 +114,115 @@ locals {
 
       ### PREPROD
 
-      # preprod-ncr-cms-1 = merge(local.bip_cms_ec2_default, {
-      #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-      #   config = merge(local.bip_cms_ec2_default.config, {
-      #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
-      #     instance_type = "c5.4xlarge",
-      #   })
-      #   tags = merge(local.bip_cms_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform CMS installation and configurations"
-      #     nomis-combined-reporting-environment = "preprod"
-      #     node                                 = "1"
-      #   })
-      # })
-      # preprod-ncr-cms-2 = merge(local.bip_cms_ec2_default, {
-      #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-      #   config = merge(local.bip_cms_ec2_default.config, {
-      #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
-      #     instance_type = "c5.4xlarge",
-      #   })
-      #   tags = merge(local.bip_cms_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform CMS installation and configurations"
-      #     nomis-combined-reporting-environment = "preprod"
-      #     node                                 = "2"
-      #   })
-      # })
-      # preprod-ncr-processing-1 = merge(local.bip_cms_ec2_default, {
-      #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-      #   config = merge(local.bip_cms_ec2_default.config, {
-      #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
-      #     instance_type = "c5.4xlarge",
-      #   })
-      #   tags = merge(local.bip_cms_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform CMS installation and configurations"
-      #     nomis-combined-reporting-environment = "preprod"
-      #     node                                 = "3"
-      #   })
-      # })
-      # preprod-ncr-web-admin = merge(local.tomcat_admin_ec2_default, {
-      #   cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
-      #   config = merge(local.tomcat_admin_ec2_default.config, {
-      #     instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
-      #     instance_type = "r7i.large",
-      #   })
-      #   tags = merge(local.tomcat_admin_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform tomcat admin installation and configurations"
-      #     nomis-combined-reporting-environment = "preprod"
-      #   })
-      # })
-      # preprod-ncr-web-1 = merge(local.tomcat_admin_ec2_default, {
-      #   cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
-      #   config = merge(local.tomcat_admin_ec2_default.config, {
-      #     instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
-      #     instance_type = "r7i.large",
-      #   })
-      #   tags = merge(local.tomcat_admin_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform tomcat installation and configurations"
-      #     nomis-combined-reporting-environment = "preprod"
-      #   })
-      # })
-      # preprod-ncr-web-2 = merge(local.tomcat_admin_ec2_default, {
-      #   cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
-      #   config = merge(local.tomcat_admin_ec2_default.config, {
-      #     instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
-      #     instance_type = "r7i.xlarge",
-      #   })
-      #   tags = merge(local.tomcat_admin_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform tomcat installation and configurations"
-      #     nomis-combined-reporting-environment = "preprod"
-      #   })
-      # })
+      pp-ncr-cms-1 = merge(local.bip_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        config = merge(local.bip_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "c5.4xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform CMS installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          type                                 = "management"
+          node                                 = "1"
+        })
+      })
+      pp-ncr-cms-2 = merge(local.bip_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        config = merge(local.bip_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "c5.4xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform CMS installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          type                                 = "management"
+          node                                 = "2"
+        })
+      })
+      pp-ncr-processing-1 = merge(local.bip_ec2_default, {
+        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        config = merge(local.bip_ec2_default.config, {
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "c5.4xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          type                                 = "processing"
+          node                                 = "3"
+        })
+      })
+      pp-ncr-web-admin = merge(local.web_ec2_default, {
+        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        config = merge(local.web_ec2_default.config, {
+          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          instance_type = "r7i.large",
+        })
+        tags = merge(local.web_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform web-tier admin installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+      pp-ncr-web-1 = merge(local.web_ec2_default, {
+        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        config = merge(local.web_ec2_default.config, {
+          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          instance_type = "r7i.large",
+        })
+        tags = merge(local.web_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform web-tier installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+      pp-ncr-web-2 = merge(local.web_ec2_default, {
+        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        config = merge(local.web_ec2_default.config, {
+          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          instance_type = "r7i.xlarge",
+        })
+        tags = merge(local.web_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform web-tier installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+      pp-ncr-etl-1-a = merge(local.etl_ec2_default, {
+        cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
+        config = merge(local.etl_ec2_default.config, {
+          instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        tags = merge(local.etl_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform ETL installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
       pp-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
           local.database_cloudwatch_metric_alarms.standard,
@@ -267,34 +285,34 @@ locals {
 
       ### LSAST
 
-      # lsast-ncr-cms-1 = merge(local.bip_cms_ec2_default, {
-      #   cloudwatch_metric_alarms = local.bip_cms_cloudwatch_metric_alarms
-      #   config = merge(local.bip_cms_ec2_default.config, {
-      #     instance_profile_policies = concat(local.bip_cms_ec2_default.config.instance_profile_policies, [
+      # lsast-ncr-cms-1 = merge(local.bip_ec2_default, {
+      #   cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+      #   config = merge(local.bip_ec2_default.config, {
+      #     instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
       #       "Ec2LSASTReportingPolicy",
       #     ])
       #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
+      #   instance = merge(local.bip_ec2_default.instance, {
       #     instance_type = "c5.4xlarge",
       #   })
-      #   tags = merge(local.bip_cms_ec2_default.tags, {
+      #   tags = merge(local.bip_ec2_default.tags, {
       #     description                          = "LSAST SAP BI Platform CMS installation and configurations"
       #     nomis-combined-reporting-environment = "lsast"
       #     node                                 = "1"
       #   })
       # })
 
-      # lsast-ncr-web-1 = merge(local.tomcat_admin_ec2_default, {
-      #   cloudwatch_metric_alarms = local.tomcat_admin_cloudwatch_metric_alarms
-      #   config = merge(local.tomcat_admin_ec2_default.config, {
-      #     instance_profile_policies = concat(local.tomcat_admin_ec2_default.config.instance_profile_policies, [
+      # lsast-ncr-web-1 = merge(local.web_ec2_default, {
+      #   cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+      #   config = merge(local.web_ec2_default.config, {
+      #     instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
       #       "Ec2LSASTReportingPolicy",
       #     ])
       #   })
-      #   instance = merge(local.bip_cms_ec2_default.instance, {
+      #   instance = merge(local.web_ec2_default.instance, {
       #     instance_type = "r7i.xlarge",
       #   })
-      #   tags = merge(local.tomcat_admin_ec2_default.tags, {
+      #   tags = merge(local.web_ec2_default.tags, {
       #     description                          = "LSAST SAP BI Platform tomcat installation and configurations"
       #     nomis-combined-reporting-environment = "lsast"
       #   })
