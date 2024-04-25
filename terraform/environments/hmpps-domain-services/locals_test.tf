@@ -52,7 +52,7 @@ locals {
           ]
           domain_name          = "azure.noms.root"
           username             = "svc_join_domain"
-          password_secret_name = "/microsoft/AD/azure.noms.root/passwords"
+          password_secret_name = "/microsoft/AD/azure.noms.root/shared-passwords"
         }
       }
     }
