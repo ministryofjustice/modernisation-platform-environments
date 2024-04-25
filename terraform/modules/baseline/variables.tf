@@ -391,6 +391,63 @@ variable "ec2_instances" {
   default = {}
 }
 
+variable "efs" {
+  description = "map of efs (elastic file systems) modules to create where map key is tags.Name"
+
+  type = map(object({
+    access_points = optional(map(object({ # map key is tags.Name
+      posix_user = optional(object({
+        gid            = number
+        uid            = number
+        secondary_gids = optional(list(number))
+      }))
+      root_directory = optional(object({
+        path = string
+        creation_info = optional(object({
+          owner_gid   = number
+          owner_uid   = number
+          permissions = string
+        }))
+      }))
+    })), {})
+    backup_policy_status = optional(string)
+    file_system = object({
+      availability_zone_name          = optional(string)
+      kms_key_id                      = optional(string, "general")
+      performance_mode                = optional(string)
+      provisioned_throughput_in_mibps = optional(number)
+      throughput_mode                 = optional(string)
+      lifecycle_policy = optional(object({
+        transition_to_archive               = optional(string)
+        transition_to_ia                    = optional(string)
+        transition_to_primary_storage_class = optional(string)
+      }))
+    })
+    mount_targets = optional(list(object({
+      subnet_name        = optional(string, "private")
+      availability_zones = optional(list(string), ["eu-west-2a", "eu-west-2b", "eu-west-2c"])
+      security_groups    = list(string)
+    })), [])
+    policy = optional(list(object({
+      sid       = optional(string, null)
+      effect    = string
+      actions   = list(string)
+      resources = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    })))
+    tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "rds_instances" {
   description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
   type = map(object({

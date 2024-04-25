@@ -34,7 +34,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
   service_access_role_arn = var.ep_service_access_role_arn
 
   # Extra settings:
-  # add_column_name                             = false
+  add_column_name                             = true
   # add_trailing_padding_character              = false
   bucket_folder = var.database_name
   # canned_acl_for_objects                      = "NONE"
