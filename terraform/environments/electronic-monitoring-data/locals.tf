@@ -3,6 +3,8 @@ locals {
   #----------------------------------------------------------------------------
   # CAPITA
   #----------------------------------------------------------------------------
+  switch_on_server_capita = false
+
   capita_ssh_keys = [
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBMzzvEd8KCDG8lp9O6/D2tHK8aKZKIQiPWbcoPxr0I9CmDhr+DNVH8MnevXFrMx+aVreuK0lHEHWKInJBrxHXaK8OnsJjZwYjzAQSG4oBZYmHFW8r7xDkbKelOby0gNDzg==",
   ]
@@ -61,6 +63,8 @@ locals {
   #----------------------------------------------------------------------------
   # CIVICA
   #----------------------------------------------------------------------------
+  switch_on_server_civica = false
+
   civica_ssh_keys = [
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBBBXwsFkiYvUwkwadVYgAjSU3L+SyN7AZnWabN+HLLf66PZHagS653rIkbA7PEpZKydTvM3FLCdbKzTZac57AdTwoWArLLnSwWRUyNQRZ+omdbXaUqa8MM1n1gNBpynkIw==",
   ]
@@ -86,6 +90,8 @@ locals {
   #----------------------------------------------------------------------------
   # G4S
   #----------------------------------------------------------------------------
+  switch_on_server_g4s = true
+
   g4s_ssh_keys = [
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBK85G9UwgU1KKgsYXfTWDsT4MqGSmjku1XGpH1EqmSuXLk5lmwFsgoLqqsROq2oEw2Yrr3uLyNVY2Dl6Pfm+dkdljfbPtqku+AkRSkhDo4K7bIwhWPh7HImcalxhde6BUA== ecdsa-key-20240208",
   ]
