@@ -65,7 +65,7 @@ resource "aws_iam_policy" "flink_spike_additional_policy" {
         "Resource" : [
           "arn:aws:kms:*:${local.account_id}:key/*"
         ]
-      }
+      },
       {
         "Action": "cloudwatch:PutMetricData",
         "Resource": "*",
