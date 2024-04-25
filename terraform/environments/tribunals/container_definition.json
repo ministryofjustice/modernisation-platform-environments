@@ -9,8 +9,8 @@
   ],
     "name"      : "${app_name}-container",
     "image"     : "${container_definition_image}",
-    "cpu"       : 256,
-    "memory"    : 512,
+    "cpu"       : 512,
+    "memory"    : 1024,
     "essential" : true,
     "portMappings" : [
       {
