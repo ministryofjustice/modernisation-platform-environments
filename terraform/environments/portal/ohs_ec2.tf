@@ -7,7 +7,7 @@ locals {
 
 # Setting up SSM Agent
 sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.product["ohs"].dns_name}:/fmw /IDAM/product/fmw nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "/dev/xvdc /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 mount -a
@@ -21,16 +21,19 @@ done
 
 hostnamectl set-hostname ${local.application_name}-ohs1
 
-sed -i '/^search/d' /etc/resolv.conf
-echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
-
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
+pwd
 cd cloudwatch_agent
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
 rpm -U ./amazon-cloudwatch-agent.rpm
 echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
+
+
+sed -i '/^search/d' /etc/resolv.conf
+echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
+
 
 EOF
 
@@ -213,12 +216,5 @@ resource "aws_ebs_volume" "ohs_mserver" {
 resource "aws_volume_attachment" "ohs_mserver" {
   device_name = "/dev/xvdc"
   volume_id   = aws_ebs_volume.ohs_mserver.id
-  instance_id = aws_instance.ohs_instance_1.id
-}
-
-###### Please delete me ###########
-resource "aws_volume_attachment" "temp" {
-  device_name = "/dev/xvde"
-  volume_id   = "vol-08175e1a2da912d74"
   instance_id = aws_instance.ohs_instance_1.id
 }
