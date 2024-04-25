@@ -46,7 +46,7 @@ module "ahmlr" {
   depends_on                        = [module.appeals.dummy_output]
   source                            = "./modules/tribunal"
   app_name                          = "hmlands"
-  app_url                           = "landregistrationdivison"
+  app_url                           = "landregistrationdivision"
   sql_migration_path                = "../scripts/ahmlr"
   app_db_name                       = "hmlands"
   app_db_login_name                 = "hmlands-app"
