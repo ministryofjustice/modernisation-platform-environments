@@ -6,7 +6,7 @@ module "s3_bucket_dms_destination" {
   versioning_enabled = true
 
   providers = {
-    aws.bucket-replication = aws.bucket-replication
+    aws.bucket-replication = aws
   }
 
   lifecycle_rule = [
