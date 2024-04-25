@@ -55,23 +55,52 @@ resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
   referenced_security_group_id = module.rds_bastion.bastion_security_group
 }
 
-resource "aws_iam_policy" "ec2_s3_policy" {
-  name        = "ec2-s3-policy"
-  description = "Policy for s3 actions"
+# resource "aws_iam_policy" "ec2_s3_policy" {
+#   name        = "ec2-s3-policy"
+#   description = "Policy for s3 actions"
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = "s3:*",
-        Resource = ["*"]
-      }
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         Effect   = "Allow",
+#         Action   = "s3:Get",
+#         Resource = ["*"]
+#       }
+#     ]
+#   })
+# }
+
+# resource "aws_iam_role_policy_attachment" "s3_attachment" {
+#   role       = module.rds_bastion.bastion_iam_role.name
+#   policy_arn = aws_iam_policy.ec2_s3_policy.arn
+# }
+
+
+data "aws_iam_policy_document" "ec2_s3_policy" {
+  statement {
+    sid    = "AllowListDataStore"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
     ]
-  })
+    resources = [
+      aws_s3_bucket.data_store.arn,
+    ]
+  }
+  statement {
+    sid    = "AllowReadDataStore"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = [
+      "${aws_s3_bucket.data_store.arn}/*",
+    ]
+  }
 }
 
-resource "aws_iam_role_policy_attachment" "s3_attachment" {
-  role       = module.rds_bastion.bastion_iam_role.name
-  policy_arn = aws_iam_policy.ec2_s3_policy.arn
+resource "aws_iam_role_policy" "ec2_s3_policy" {
+  role   = module.rds_bastion.bastion_iam_role.name
+  policy = data.aws_iam_policy_document.ec2_s3_policy.json
 }
