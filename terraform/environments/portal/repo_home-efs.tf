@@ -27,10 +27,10 @@
 # Temp import block for restoring from AWS Backup
 # #########################################################
 
-import {
-  to = aws_efs_file_system.efs
-  id = "fs-0a10c3b13ecda7773"
-}
+# import {
+#   to = aws_efs_file_system.efs
+#   id = "fs-0a10c3b13ecda7773"
+# }
 
 ###########################################################
 

@@ -12,6 +12,7 @@ echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/Domain/aserver /ID
 echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/instances /IDAM/product/runtime/instances nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 
 mount -a
 mount_status=$?
@@ -24,8 +25,8 @@ done
 
 hostnamectl set-hostname ${local.application_name}-ods1-ms
 
-sed -i '/^search/d' /etc/resolv.conf
-echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
+# sed -i '/^search/d' /etc/resolv.conf
+# echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
 
 
 # Setting up CloudWatch Agent

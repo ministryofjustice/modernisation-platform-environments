@@ -21,19 +21,16 @@ done
 
 hostnamectl set-hostname ${local.application_name}-ohs1
 
+# sed -i '/^search/d' /etc/resolv.conf
+# echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
+
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
-pwd
 cd cloudwatch_agent
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
 rpm -U ./amazon-cloudwatch-agent.rpm
 echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
-
-
-sed -i '/^search/d' /etc/resolv.conf
-echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
-
 
 EOF
 
