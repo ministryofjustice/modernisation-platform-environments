@@ -53,6 +53,11 @@ output "efs" {
   value       = module.efs
 }
 
+output "fsx_windows" {
+  description = "map of fsx_windows module outputs corresponding to var.fsx_windows"
+  value       = module.fsx_windows
+}
+
 output "iam_policies" {
   description = "map of aws_iam_policy resources"
   value       = aws_iam_policy.this
