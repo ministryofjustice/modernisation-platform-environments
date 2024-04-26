@@ -31,7 +31,6 @@ locals {
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}
   baseline_efs                           = {}
-  baseline_fsx_windows                   = {}
   baseline_iam_policies                  = {}
   baseline_iam_roles                     = {}
   baseline_iam_service_linked_roles      = {}
