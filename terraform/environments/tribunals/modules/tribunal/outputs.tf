@@ -17,7 +17,3 @@ output "tribunals_lb" {
   description = "LB"
   value       = module.ecs_loadbalancer.tribunals_lb
 }
-
-output "dummy_output" {
-  value = "This is a dummy output to create dependencies between modules"
-}
