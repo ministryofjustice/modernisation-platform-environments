@@ -13,8 +13,10 @@ NB: if manually testing, don't run this command under Administrator.
 New-PSDrive -Name "D" -PSProvider "FileSystem" -Root "\\amznfsxf09lugmi.azure.noms.root\share" -Persist -Scope Global
 ```
 
-Use Single-AZ solution for non-production environments to save cost.
-Note that Multi-AZ can only include 2 availability zones.
+NOTES:
+- Use Single-AZ solution for non-production environments to save cost.
+- Multi-AZ can only include 2 availability zones.
+- Set `skip_final_backup true` to avoid issues deleting the resource 
 
 ## Security Groups
 
