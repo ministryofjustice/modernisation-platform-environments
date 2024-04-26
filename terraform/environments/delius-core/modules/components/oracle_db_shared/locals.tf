@@ -16,18 +16,18 @@ locals {
       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
       "source_environment" = "dev"
     },
-    "stage" = {
-      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      "target_environment" = "prod"
-    },
-    "preprod" = {
-      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      "target_environment" = "prod"
-    },
-    "prod" = {
-      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
-      "source_environment" = "preprod"
-    }
+    #     "stage" = {
+    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+    #       "target_environment" = "prod"
+    #     },
+    #     "preprod" = {
+    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+    #       "target_environment" = "prod"
+    #     },
+    #     "prod" = {
+    #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
+    #       "source_environment" = "preprod"
+    #     }
   }
 
   oracle_duplicate_map = {
@@ -39,18 +39,18 @@ locals {
       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
       "source_environment" = "dev"
     },
-    "stage" = {
-      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      "target_environment" = "prod"
-    },
-    "preprod" = {
-      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      "target_environment" = "prod"
-    },
-    "prod" = {
-      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
-      "source_environment" = "preprod"
-    }
+    #     "stage" = {
+    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+    #       "target_environment" = "prod"
+    #     },
+    #     "preprod" = {
+    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+    #       "target_environment" = "prod"
+    #     },
+    #     "prod" = {
+    #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
+    #       "source_environment" = "preprod"
+    #     }
   }
 
   oracle_backup_bucket_prefix = "${var.account_info.mp_environment}-${var.env_name}-oracle-database-backups"

@@ -1,5 +1,5 @@
 data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
-  count   = lookup(local.oracle_statistics_map[var.env_name]["target_id"], null) != null ? 1 : 0
+  count   = lookup(local.oracle_duplicate_map[var.env_name], "target_account_id", false) != false ? 1 : 0
   version = "2012-10-17"
 
   statement {
@@ -13,21 +13,20 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_id"]}:role/instance-role-${local.oracle_statistics_map[var.env_name]["target_environment"]}-db-1"]
+      identifiers = ["arn:aws:iam::${local.oracle_duplicate_map[var.env_name]["target_account_id"]}:role/instance-role-${local.oracle_duplicate_map[var.env_name]["target_environment"]}-db-1"]
     }
   }
 
 }
 
 module "s3_bucket_oracledb_backups" {
-
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
   bucket_name         = local.oracle_backup_bucket_prefix
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.kms_keys.general_shared
-  bucket_policy       = try(data.aws_iam_policy_document.s3_bucket_oracledb_backups[0].json, null)
+  bucket_policy       = [try(data.aws_iam_policy_document.s3_bucket_oracledb_backups[0].json, null)]
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
@@ -131,7 +130,7 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
 
 
 data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
-  count = lookup(local.oracle_statistics_map[var.env_name]["source_id"], null) != null ? 1 : 0
+  count = lookup(local.oracle_statistics_map[var.env_name], "source_id", null) != null ? 1 : 0
   statement {
     sid    = "allowAccessToListOracleStatistics${title(local.oracle_statistics_map[var.env_name]["source_environment"])}Bucket"
     effect = "Allow"
@@ -155,7 +154,7 @@ data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
 }
 
 data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
-
+  count = lookup(local.oracle_statistics_map[var.env_name], "source_id", null) != null ? 1 : 0
   statement {
     sid    = "allowAccessToOracleDb${title(local.oracle_statistics_map[var.env_name]["source_environment"])}Bucket"
     effect = "Allow"
@@ -170,11 +169,10 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
 }
 
 data "aws_iam_policy_document" "combined" {
-
   source_policy_documents = compact([
-    data.aws_iam_policy_document.oracledb_backup_bucket_access.json,
-    try(data.aws_iam_policy_document.oracle_remote_statistics_bucket_access.json, null),
-    try(data.aws_iam_policy_document.oracledb_remote_backup_bucket_access.json, null)
+    try(data.aws_iam_policy_document.oracledb_backup_bucket_access.json, null),
+    try(data.aws_iam_policy_document.oracle_remote_statistics_bucket_access[0].json, null),
+    try(data.aws_iam_policy_document.oracledb_remote_backup_bucket_access[0].json, null)
   ])
 }
 
@@ -286,14 +284,14 @@ resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
 # Bucket for storing Oracle Statistics Backup Dump Files
 
 data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
-  count   = lookup(local.oracle_statistics_map[var.env_name]["source_id"], null) != null ? 1 : 0
+  count   = (lookup(local.oracle_statistics_map[var.env_name], "target_account_id", null) != null) && var.deploy_oracle_stats ? 1 : 0
   version = "2012-10-17"
 
   statement {
     sid       = "OracleStatisticsListPolicy"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = ["${module.s3_bucket_oracle_statistics.bucket.arn}"]
+    resources = ["${module.s3_bucket_oracle_statistics[0].bucket.arn}"]
 
     principals {
       type        = "AWS"
@@ -310,7 +308,7 @@ data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
       "s3:GetObjectTagging",
       "s3:GetObject"
     ]
-    resources = ["${module.s3_bucket_oracle_statistics.bucket.arn}/*"]
+    resources = ["${module.s3_bucket_oracle_statistics[0].bucket.arn}/*"]
 
     principals {
       type        = "AWS"
@@ -321,7 +319,6 @@ data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
 
 
 module "s3_bucket_oracle_statistics" {
-
   count = var.deploy_oracle_stats ? 1 : 0
 
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
@@ -330,7 +327,7 @@ module "s3_bucket_oracle_statistics" {
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.kms_keys.general_shared
-  bucket_policy       = try(data.aws_iam_policy_document.s3_bucket_oracle_statistics[0].json, null)
+  bucket_policy       = [try(data.aws_iam_policy_document.s3_bucket_oracle_statistics[0].json, null)]
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
