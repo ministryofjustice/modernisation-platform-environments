@@ -43,13 +43,13 @@ Create a separate security group and allow inbound traffic
 only from the security groups that the EC2s belong to.
 
 ```
-resource "aws_security_group" "efs" {
-  name   = "efs"
+resource "aws_security_group" "fsx" {
+  name   = "fsx"
   vpc_id = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "efs_ingress" {
-  security_group_id        = aws_security_group.efs.id
+resource "aws_security_group_rule" "fsx_ingress" {
+  security_group_id        = aws_security_group.fsx.id
   type                     = "ingress"
   from_port                = 445
   to_port                  = 445
@@ -114,7 +114,7 @@ module "fsx_windows2" {
    active_directory_id         = aws_directory_service_directory.this.id
    deployment_type             = "SINGLE_AZ_1"
    name                        = "fsx_windows2"
-   security_groups             = ["aws_security_group.efs.id"]
+   security_groups             = ["aws_security_group.fsx.id"]
    skip_final_backup           = true
    storage_capacity            = 32
    subnet_ids                  = [ data.aws_subnet.private_subnets_a.id]
