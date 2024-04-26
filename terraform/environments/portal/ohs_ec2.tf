@@ -21,8 +21,8 @@ done
 
 hostnamectl set-hostname ${local.application_name}-ohs1
 
-# sed -i '/^search/d' /etc/resolv.conf
-# echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
+sed -i '/^search/d' /etc/resolv.conf
+echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
 
 chattr +i /etc/resolv.conf
 
