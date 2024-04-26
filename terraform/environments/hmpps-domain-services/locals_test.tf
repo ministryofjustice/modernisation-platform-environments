@@ -60,11 +60,13 @@ locals {
           name               = "private"
           availability_zones = ["eu-west-2a", "eu-west-2b"]
         }]
-        deployment_type     = "MULTI_AZ_1"
-        security_groups     = ["rds-ec2s"]
-        skip_final_backup   = true
-        storage_capacity    = 32
-        throughput_capacity = 8
+        preferred_subnet_name       = "private"
+        preferred_availability_zone = "eu-west-2a"
+        deployment_type             = "MULTI_AZ_1"
+        security_groups             = ["rds-ec2s"]
+        skip_final_backup           = true
+        storage_capacity            = 32
+        throughput_capacity         = 8
         self_managed_active_directory = {
           dns_ips = [
             module.ip_addresses.mp_ip.ad-azure-dc-a,
