@@ -28,5 +28,5 @@ resource "aws_oam_sink_policy" "monitoring_account_oam_sink_policy" {
 }
 
 output "sink_arn" {
-  value = aws_oam_sink.monitoring_account_oam_sink[0].id
+  value = var.options.enable_cloudwatch_cross_account_sharing ? "${aws_oam_sink.monitoring_account_oam_sink[0].arn}" : null
 }
