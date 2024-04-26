@@ -21,8 +21,3 @@ variable "monitoring_account_id" {
   type    = string
   default = "775245656481" # hmpps-oem-test account
 }
-
-variable "sink_arn" {
-  description = "ARN of the monitoring account sink"
-  type        = string
-}
