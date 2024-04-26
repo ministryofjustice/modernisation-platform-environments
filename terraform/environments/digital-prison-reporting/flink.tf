@@ -159,9 +159,7 @@ resource "aws_kinesisanalyticsv2_application" "master_summary" {
     flink_application_configuration {
       checkpoint_configuration {
         configuration_type = "CUSTOM"
-        checkpointing_enabled = true
-        checkpoint_interval = 150000
-        min_pause_between_checkpoints = 30000
+        checkpointing_enabled = false
       }
 
       monitoring_configuration {
@@ -228,7 +226,8 @@ resource "aws_kinesisanalyticsv2_application" "master_complex" {
 
     flink_application_configuration {
       checkpoint_configuration {
-        configuration_type = "DEFAULT"
+        configuration_type = "CUSTOM"
+        checkpointing_enabled = false
       }
 
       monitoring_configuration {
