@@ -134,7 +134,7 @@ module "glue_reporting_hub_cdc_job" {
   name                          = "${local.project}-reporting-hub-cdc-${local.env}"
   short_name                    = "${local.project}-reporting-hub-cdc"
   command_type                  = "gluestreaming"
-  description                   = "Monitors the reporting hub for table changes and applies them to structured and curated zones.\nArguments:\n--dpr.config.key: (Optional) config key e.g. prisoner\n--dpr.clean.cdc.checkpoint: (Optional) boolean flag to clean checkpoint directory"
+  description                   = "Monitors the reporting hub for table changes and applies them to structured and curated zones.\nArguments:\n--dpr.processed.raw.files.path: (Required) the path excluding the bucket name where processed files should be moved to. Must be in the same bucket as the raw s3 path\n--dpr.config.key: (Optional) config key e.g. prisoner\n--dpr.clean.cdc.checkpoint: (Optional) boolean flag to clean checkpoint directory"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-cdc-${local.env}/"
@@ -175,6 +175,7 @@ module "glue_reporting_hub_cdc_job" {
     "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_cdc_job_retry_max_attempts
     "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_cdc_job_retry_min_wait_millis
     "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_cdc_job_retry_max_wait_millis
+    "--dpr.processed.raw.files.path"        = local.reporting_hub_cdc_processed_raw_files_path
     "--enable-metrics"                      = true
     "--enable-spark-ui"                     = false
     "--enable-auto-scaling"                 = true
@@ -259,7 +260,7 @@ module "glue_s3_file_transfer_job" {
   name                          = "${local.project}-s3-file-transfer-job-${local.env}"
   short_name                    = "${local.project}-s3-file-transfer-job"
   command_type                  = "glueetl"
-  description                   = "Transfers s3 data from one bucket to another.\nArguments:\n--dpr.config.key: (Optional) config key e.g prisoner, when provided, the job will only transfer data belonging to specified config otherwise all data will be transferred"
+  description                   = "Transfers s3 data from one bucket to another.\nArguments:\n--dpr.config.key: (Optional) config key e.g prisoner, when provided, the job will only transfer data belonging to specified config otherwise all data will be transferred\n--dpr.file.source.prefix: (Optional) the path where the files to transfer are located\n--dpr.file.transfer.destination.prefix: (Optional) the path where the files will be transferred to"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-s3-file-transfer-${local.env}/"
@@ -293,6 +294,7 @@ module "glue_s3_file_transfer_job" {
     "--dpr.aws.region"                        = local.account_region
     "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
     "--dpr.file.transfer.source.bucket"       = module.s3_raw_bucket.bucket_id
+    "--dpr.file.source.prefix"                = local.reporting_hub_cdc_processed_raw_files_path
     "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
     "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
     "--dpr.file.transfer.delete.copied.files" = true,
@@ -384,7 +386,7 @@ module "glue_s3_data_deletion_job" {
   name                          = "${local.project}-s3-data-deletion-job-${local.env}"
   short_name                    = "${local.project}-s3-data-deletion-job"
   command_type                  = "glueetl"
-  description                   = "Deletes s3 data belonging to a configured domain from specified bucket.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.file.deletion.buckets: (Required) comma separated set of s3 buckets from which to delete data from e.g dpr-raw-zone-<env>,dpr-structured-zone-<env>"
+  description                   = "Deletes s3 data belonging to a configured domain from specified bucket.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.file.deletion.buckets: (Required) comma separated set of s3 buckets from which to delete data from e.g dpr-raw-zone-<env>,dpr-structured-zone-<env>\n--dpr.file.source.prefix: (Optional) the path where the files to delete are located"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-s3-data-deletion-${local.env}/"
