@@ -27,11 +27,6 @@ resource "aws_oam_sink_policy" "monitoring_account_oam_sink_policy" {
   })
 }
 
-locals {
-  sink_arn = aws_oam_sink.monitoring_account_oam_sink[0].arn
-}
-
 output "sink_arn" {
-  description = "The ARN of CloudWatch OAM sink"
-  value       = "${local.sink_arn}"
+  value = aws_oam_sink.monitoring_account_oam_sink[0].id
 }
