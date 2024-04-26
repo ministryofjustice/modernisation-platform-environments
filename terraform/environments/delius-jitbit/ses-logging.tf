@@ -5,6 +5,12 @@
 resource "aws_sesv2_configuration_set" "jitbit_ses_configuration_set" {
   configuration_set_name = format("%s-configuration-set", local.application_name)
 
+  suppression_options { 
+    suppressed_reasons = [
+      "COMPLAINT"
+    ]
+  }
+
   tags = local.tags
 }
 
