@@ -155,7 +155,7 @@ resource "aws_route53_record" "external_transport" {
 }
 
 // Records for FTP sites
-resource "aws_route53_record" "external_transport" {
+resource "aws_route53_record" "external_charity_ftp" {
   provider = aws.core-vpc 
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "charitytribunal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
