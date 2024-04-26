@@ -1,7 +1,7 @@
 module "s3_bucket_oracledb_backups" {
 
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
-  bucket_name         = "${local.oracle_backup_bucket_name}"
+  bucket_name         = local.oracle_backup_bucket_name
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
@@ -241,7 +241,7 @@ resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
 # Bucket for storing Oracle Statistics Backup Dump Files
 
 module "s3_bucket_oracle_statistics" {
-  
+
   count = var.deploy_oracle_stats ? 1 : 0
 
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
