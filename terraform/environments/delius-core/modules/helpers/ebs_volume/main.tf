@@ -6,7 +6,9 @@ resource "aws_ebs_volume" "this" {
   size              = var.size
   encrypted         = true
   kms_key_id        = var.kms_key_id
-  tags              = var.tags
+  tags = merge(var.tags,
+    var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
+  )
   lifecycle {
     ignore_changes = [availability_zone]
   }

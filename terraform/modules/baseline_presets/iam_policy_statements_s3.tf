@@ -64,6 +64,30 @@ locals {
       }
     ]
 
+    S3ReadWriteDeleteProdPreprod = [
+      {
+        sid    = "S3WritePreprod"
+        effect = "Allow"
+        actions = [
+          "s3:GetBucketLocation",
+          "s3:GetObject",
+          "s3:GetObjectTagging",
+          "s3:ListBucket",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:PutObjectTagging",
+          "s3:DeleteObject",
+          "s3:RestoreObject",
+        ]
+        principals = {
+          type = "AWS"
+          identifiers = [for account_name in var.environment.prodpreprod_account_names :
+            var.environment.account_root_arns[account_name]
+          ]
+        }
+      }
+    ]
+
     S3ReadWriteAllEnvironments = [
       {
         sid    = "S3ReadWriteAllEnvironments"

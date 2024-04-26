@@ -14,18 +14,19 @@ locals {
 
       /* Image Versions */
       scan_image_version     = "0.0.4"
-      transfer_image_version = "0.0.2"
+      transfer_image_version = "0.0.4"
+      notify_image_version   = "0.0.8"
 
       /* Target Buckets */
-      target_buckets = ["dev-ingestion-testing"]
+      target_buckets = ["mojap-land-dev"]
 
       /* Transfer Server */
       transfer_server_hostname   = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
       transfer_server_sftp_users = {}
       transfer_server_sftp_users_with_egress = {
-        "jacobwoffenden-egress" = {
-          ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN+3qaLVtn6Pd+DasWHhIOBoXEEhF9GZAG+DYfJBeySS Ministry of Justice"
-          cidr_blocks           = ["90.246.52.170/32"]
+        "essex-police" = {
+          ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBCv3JdWZ/2NGd8KKaeICIjqw5zwI2NtzQSWtvscfKZS lalitha.nagarur@digital.justice.gov.uk"
+          cidr_blocks           = ["213.121.161.124/32"]
           egress_bucket         = module.bold_egress_bucket.s3_bucket_id
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
@@ -44,10 +45,11 @@ locals {
 
       /* Image Versions */
       scan_image_version     = "0.0.4"
-      transfer_image_version = "0.0.2"
+      transfer_image_version = "0.0.4"
+      notify_image_version   = "0.0.8"
 
       /* Target Buckets */
-      target_buckets = []
+      target_buckets = ["mojap-land"]
 
       /* Transfer Server */
       transfer_server_hostname               = "sftp.ingestion.analytical-platform.service.justice.gov.uk"

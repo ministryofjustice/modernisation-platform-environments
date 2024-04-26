@@ -383,38 +383,7 @@ locals {
         })
       })
 
-      test-nomis-client-a = merge(local.jumpserver_ec2, {
-        config = merge(local.jumpserver_ec2.config, {
-          user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
-            ie_compatibility_mode_site_list = join(",", [
-              "t1-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t1-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t1-cn.hmpp-azdt.justice.gov.uk:7777/forms/frmservlet?config=tag",
-              "t1-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
-              "c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t2-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t2-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t2-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
-              "c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t3-nomis-web-a.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t3-nomis-web-b.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "t3-cn.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
-              "t3-cn-ha.hmpp-azdt.justice.gov.uk/forms/frmservlet?config=tag",
-              "c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-            ])
-            ie_trusted_domains = join(",", [
-              "*.nomis.hmpps-test.modernisation-platform.justice.gov.uk",
-              "*.nomis.service.justice.gov.uk",
-              "*.hmpp-azdt.justice.gov.uk",
-            ])
-            desktop_shortcuts = join(",", [
-              "T1 NOMIS|https://c-t1.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "T2 NOMIS|https://c-t2.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "T3 NOMIS|https://c-t3.test.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-            ])
-          }))
-        })
-      })
+      test-nomis-client-a = local.jumpserver_ec2
     }
 
     baseline_ec2_instances = {

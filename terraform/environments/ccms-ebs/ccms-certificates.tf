@@ -9,7 +9,7 @@ resource "aws_acm_certificate" "external" {
   validation_method = "DNS"
 
   subject_alternative_names = local.is-production ? ["*.ccms-ebs.service.justice.gov.uk"] : ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-  
+
   tags = merge(local.tags,
     { Environment = local.environment }
   )

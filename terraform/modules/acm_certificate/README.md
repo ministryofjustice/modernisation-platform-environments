@@ -1,3 +1,5 @@
+# ACM certificate
+
 Create an AWS ACM certificate with DNS validation against zones in current
 account, core-vpc account or core-network-shared-services account. Ensure
 the validation map contains entries for both the `domain_name` and all
@@ -15,7 +17,7 @@ If the DNS zone which is being added to a certificate is in azure i.e. in exampl
 
 Example usage:
 
-```
+```terraform
 locals {
   acm_certificates = {
     common = {
@@ -86,7 +88,7 @@ Validation records are created in the relevant zone. The zone is looked up from 
 variable using the domain name as the key to the map. Alternatively, use the `validation` option
 to explicitly define the mapping between `domain_name` and `zone`, e.g.
 
-```
+```terraform
         validation = {
           "modernisation-platform.service.justice.gov.uk" = {
             account   = "core-network-services"

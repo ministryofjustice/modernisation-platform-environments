@@ -1,3 +1,11 @@
+resource "random_id" "rds_suffix" {
+  keepers = {
+    snapshot_id = var.snapshot_identifier
+  }
+
+  byte_length = 2
+}
+
 resource "aws_security_group" "db" {
   count       = var.create_rds ? 1 : 0
   name        = "${var.name}-${var.env_name}-database-security-group"
@@ -53,7 +61,7 @@ resource "aws_db_instance" "this" {
   deletion_protection                 = var.rds_deletion_protection
   delete_automated_backups            = var.rds_delete_automated_backups
   skip_final_snapshot                 = var.rds_skip_final_snapshot
-  final_snapshot_identifier           = !var.rds_skip_final_snapshot ? "${var.name}-${var.env_name}-db-final-snapshot" : null
+  final_snapshot_identifier           = !var.rds_skip_final_snapshot ? "${var.name}-${var.env_name}-db-final-${random_id.rds_suffix.hex}" : null
   allocated_storage                   = var.rds_allocated_storage
   max_allocated_storage               = var.rds_max_allocated_storage
   storage_type                        = var.rds_storage_type
@@ -73,7 +81,8 @@ resource "aws_db_instance" "this" {
   performance_insights_kms_key_id = var.rds_performance_insights_enabled ? var.account_config.kms_keys.general_shared : null
   enabled_cloudwatch_logs_exports = var.rds_enabled_cloudwatch_logs_exports
   tags = merge(var.tags,
-    { Name = lower(format("%s-%s-database", var.name, var.env_name)) }
+    { Name = lower(format("%s-%s-database", var.name, var.env_name)) },
+    var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
   )
 }
 

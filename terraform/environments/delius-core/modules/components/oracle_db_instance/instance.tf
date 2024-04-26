@@ -77,7 +77,7 @@ module "instance" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  name = lower(format("%s-delius-db-%s", var.env_name, local.instance_name_index))
+  name = lower(format("%s-${var.member_account_id}-db-%s", var.env_name, local.instance_name_index))
 
   ami_name                      = data.aws_ami.oracle_db.name
   ami_owner                     = var.db_ami.owner
@@ -104,9 +104,10 @@ module "instance" {
   availability_zone = var.availability_zone
   subnet_id         = var.subnet_id
   tags = merge(var.tags,
-    { Name = lower(format("%s-delius-db-%s", var.env_name, local.instance_name_index)) },
-    { server-type = "delius_core_db" },
-    { database = local.database_tag }
+    { Name = lower(format("%s-${var.member_account_id}-db-%s", var.env_name, local.instance_name_index)) },
+    { server-type = var.server_type_tag },
+    { database = local.database_tag },
+    var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
   )
   #  cloudwatch_metric_alarms = {}
 }

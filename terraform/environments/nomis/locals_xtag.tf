@@ -25,10 +25,11 @@ locals {
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     tags = {
-      description = "nomis XTAG weblogic component"
-      ami         = "nomis_rhel_7_9_weblogic_xtag_10_3"
-      os-type     = "Linux"
-      server-type = "nomis-xtag"
+      description            = "nomis XTAG weblogic component"
+      ami                    = "nomis_rhel_7_9_weblogic_xtag_10_3"
+      instance-access-policy = "limited"
+      os-type                = "Linux"
+      server-type            = "nomis-xtag"
     }
   }
 }

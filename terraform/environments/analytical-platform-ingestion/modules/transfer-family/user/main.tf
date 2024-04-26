@@ -69,6 +69,7 @@ resource "aws_transfer_ssh_key" "this" {
 }
 
 resource "aws_security_group_rule" "this" {
+  description       = var.name
   type              = "ingress"
   from_port         = 2222
   to_port           = 2222
@@ -78,7 +79,7 @@ resource "aws_security_group_rule" "this" {
 }
 
 resource "aws_secretsmanager_secret" "this" {
-  for_each = toset(["technical-contact", "data-contact", "target-bucket"])
+  for_each = toset(["technical-contact", "data-contact", "target-bucket", "slack-channel"])
 
   name       = "ingestion/sftp/${var.name}/${each.key}"
   kms_key_id = var.supplier_data_kms_key

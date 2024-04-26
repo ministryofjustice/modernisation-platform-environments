@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_log_group" "app_logs" {
-  name              = "delius-jitbit-app"
+  name              = "delius-jitbit-ecs"
   retention_in_days = 30
 
   tags = local.tags

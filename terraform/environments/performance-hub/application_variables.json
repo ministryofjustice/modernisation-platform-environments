@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "region": "eu-west-2",
-      "ami_image_id": "ami-0cf98f96c2bae561e",
+      "ami_image_id": "ami-0063772815372d799",
       "instance_type": "t3.medium",
       "key_name": "performance-hub-ec2",
       "app_count": "1",
@@ -31,8 +31,8 @@
     },
     "preproduction": {
       "region": "eu-west-2",
-      "ami_image_id": "ami-0cf98f96c2bae561e",
-      "instance_type": "t3.medium",
+      "ami_image_id": "ami-0063772815372d799",
+      "instance_type": "t3.large",
       "key_name": "performance-hub-ec2",
       "app_count": "1",
       "ec2_desired_capacity": 2,
@@ -42,7 +42,7 @@
       "container_instance_type": "windows",
       "container_version": "preproduction",
       "container_cpu": "2048",
-      "container_memory": "3072",
+      "container_memory": "7168",
       "task_definition_volume": "upload_volume",
       "network_mode": "none",
       "db_enabled": true,
@@ -60,8 +60,8 @@
     },
     "production": {
       "region": "eu-west-2",
-      "ami_image_id": "ami-0cf98f96c2bae561e",
-      "instance_type": "t3.medium",
+      "ami_image_id": "ami-0063772815372d799",
+      "instance_type": "t3.large",
       "key_name": "performance-hub-ec2",
       "app_count": "1",
       "ec2_desired_capacity": 2,
@@ -71,7 +71,7 @@
       "container_instance_type": "windows",
       "container_version": "production",
       "container_cpu": "2048",
-      "container_memory": "3072",
+      "container_memory": "7168",
       "task_definition_volume": "upload_volume",
       "network_mode": "none",
       "db_enabled": true,

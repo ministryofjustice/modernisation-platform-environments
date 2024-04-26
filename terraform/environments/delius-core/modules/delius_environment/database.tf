@@ -16,7 +16,6 @@ module "oracle_db_shared" {
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
   providers = {
-    aws                       = aws
     aws.bucket-replication    = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
@@ -57,15 +56,14 @@ module "oracle_db_primary" {
     var.db_config.ansible_user_data_config
   )
 
+  enable_platform_backups = var.enable_platform_backups
+
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
   instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws.core-vpc = aws.core-vpc
   }
 }
 
@@ -80,7 +78,7 @@ module "oracle_db_standby" {
   }
 
   db_type        = "standby"
-  count          = 2
+  count          = var.db_config.standby_count
   db_count_index = count.index + 1
 
   ec2_instance_type = var.db_config.instance_type
@@ -104,15 +102,14 @@ module "oracle_db_standby" {
     var.db_config.ansible_user_data_config
   )
 
+  enable_platform_backups = var.enable_platform_backups
+
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
   instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws.core-vpc = aws.core-vpc
   }
 }
 locals {

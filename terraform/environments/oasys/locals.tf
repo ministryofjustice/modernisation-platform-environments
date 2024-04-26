@@ -51,6 +51,7 @@ locals {
     enable_azure_sas_token                       = true
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     db_backup_s3                                 = true # adds db backup buckets
+    db_backup_more_permissions                   = true
     iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy", "Ec2OracleEnterpriseManagerPolicy"]
@@ -84,6 +85,12 @@ locals {
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules = {}
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
+    secretsmanager_secrets = {
+      banner_message = {
+        description             = "OASys banner message text"
+        recovery_window_in_days = 0
+      }
+    }
     lb_target_groups = {
       pv-http-8080 = local.target_group_http_8080
       pb-http-8080 = local.target_group_http_8080
@@ -219,15 +226,15 @@ locals {
     }
     ebs_volume_config = {
       data = {
-        iops       = 10000 # min 3000
+        iops       = 12000 # min 3000
         type       = "gp3"
-        throughput = 125
+        throughput = 750
         total_size = 200
       }
       flash = {
-        iops       = 3000 # min 3000
+        iops       = 5000 # min 3000
         type       = "gp3"
-        throughput = 125
+        throughput = 500
         total_size = 50
       }
     }
@@ -341,15 +348,15 @@ locals {
     }
     ebs_volume_config = {
       data = {
-        iops       = 10000
+        iops       = 12000
         type       = "gp3"
-        throughput = 125
+        throughput = 750
         total_size = 200
       }
       flash = {
-        iops       = 3000
+        iops       = 5000
         type       = "gp3"
-        throughput = 125
+        throughput = 500
         total_size = 50
       }
     }

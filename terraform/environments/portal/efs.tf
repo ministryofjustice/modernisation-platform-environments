@@ -2,23 +2,39 @@ locals {
   efs = {
     ohs = {
       sec_group_id = aws_security_group.ohs_instance.id
+      # restore_id = "fs-004f04f4d85dcfc51"
 
     },
     oam = {
       sec_group_id = aws_security_group.oam_instance.id
+      # restore_id = "fs-046c1610b505b96a4"
 
     },
     oim = {
       sec_group_id = aws_security_group.oim_instance.id
+      # restore_id = "fs-0c4e976f283e342e1"
 
     },
     idm = {
       sec_group_id = aws_security_group.idm_instance.id
+      # restore_id = "fs-0c5eb17e9950ead5b"
 
     }
 
   }
 }
+
+
+# #########################################################
+# Temp import block for restoring from AWS Backup
+# #########################################################
+# import {
+#   for_each = local.efs
+#   to = aws_efs_file_system.product[each.key]
+#   id = each.value.restore_id # This is taken from the locals listed above
+# }
+###########################################################
+
 
 resource "aws_efs_file_system" "product" {
   for_each = {

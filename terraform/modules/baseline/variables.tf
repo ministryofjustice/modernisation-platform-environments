@@ -391,6 +391,63 @@ variable "ec2_instances" {
   default = {}
 }
 
+variable "efs" {
+  description = "map of efs (elastic file systems) modules to create where map key is tags.Name"
+
+  type = map(object({
+    access_points = optional(map(object({ # map key is tags.Name
+      posix_user = optional(object({
+        gid            = number
+        uid            = number
+        secondary_gids = optional(list(number))
+      }))
+      root_directory = optional(object({
+        path = string
+        creation_info = optional(object({
+          owner_gid   = number
+          owner_uid   = number
+          permissions = string
+        }))
+      }))
+    })), {})
+    backup_policy_status = optional(string)
+    file_system = object({
+      availability_zone_name          = optional(string)
+      kms_key_id                      = optional(string, "general")
+      performance_mode                = optional(string)
+      provisioned_throughput_in_mibps = optional(number)
+      throughput_mode                 = optional(string)
+      lifecycle_policy = optional(object({
+        transition_to_archive               = optional(string)
+        transition_to_ia                    = optional(string)
+        transition_to_primary_storage_class = optional(string)
+      }))
+    })
+    mount_targets = optional(list(object({
+      subnet_name        = optional(string, "private")
+      availability_zones = optional(list(string), ["eu-west-2a", "eu-west-2b", "eu-west-2c"])
+      security_groups    = list(string)
+    })), [])
+    policy = optional(list(object({
+      sid       = optional(string, null)
+      effect    = string
+      actions   = list(string)
+      resources = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    })))
+    tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "rds_instances" {
   description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
   type = map(object({
@@ -494,6 +551,42 @@ variable "environment" {
   # tflint-ignore: terraform_typed_variables
   # Not defining 'type' as it is defined in the output of the environment module
   description = "Standard environmental data resources from the environment module"
+}
+
+variable "fsx_windows" {
+  description = "map of fsx_windows (e.g. windows file system) modules to create where map key is tags.Name"
+
+  type = map(object({
+    active_directory_id               = optional(string)
+    automatic_backup_retention_days   = optional(number) # [0,90] (default 7)
+    backup_id                         = optional(string)
+    daily_automatic_backup_start_time = optional(string)
+    deployment_type                   = optional(string) # [SINGLE_AZ_1 (default), SINGLE_AZ_2, MULTI_AZ_1]
+    kms_key_id                        = optional(string, "general")
+    preferred_subnet_name             = optional(string, "private") # set if MULTI_AZ_1
+    preferred_availability_zone       = optional(string)            # set if MULTI_AZ_1
+    security_group_ids                = optional(list(string))
+    skip_final_backup                 = optional(bool)
+    storage_capacity                  = optional(number) # GiB [32, 65536]
+    storage_type                      = optional(string) # SSD (default), HDD allowed for SINGLE_AZ_2, MULTI_AZ_1
+    subnets = list(object({
+      name               = optional(string, "private")
+      availability_zones = optional(list(string), ["eu-west-2a", "eu-west-2b", "eu-west-2c"])
+    }))
+    security_groups               = list(string)
+    throughput_capacity           = number # MBps [8, 2048] in power of 2 increments
+    weekly_maintenance_start_time = optional(string)
+    self_managed_active_directory = optional(object({
+      dns_ips                                = list(string)
+      domain_name                            = string
+      password_secret_name                   = optional(string) # secret must be json key/pair with username as key
+      username                               = string
+      file_system_administrators_group       = optional(string) # set if not "Domain Admins"
+      organizational_unit_distinguished_name = optional(string)
+    }))
+    tags = optional(map(string), {})
+  }))
+  default = {}
 }
 
 variable "iam_policies" {
@@ -655,6 +748,7 @@ variable "lbs" {
           }))
         }))
         redirect = optional(object({
+          host        = optional(string)
           status_code = string
           port        = optional(number)
           protocol    = optional(string)
@@ -683,6 +777,7 @@ variable "lbs" {
             }))
           }))
           redirect = optional(object({
+            host        = optional(string)
             status_code = string
             port        = optional(number)
             protocol    = optional(string)
@@ -918,8 +1013,10 @@ variable "secretsmanager_secrets" {
         length  = number
         special = optional(bool)
       }))
+      tags  = optional(map(string), {})
       value = optional(string)
     }))
+    tags = optional(map(string), {})
   }))
   default = {}
 }

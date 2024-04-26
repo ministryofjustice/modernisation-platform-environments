@@ -119,6 +119,10 @@ resource "aws_ecs_task_definition" "ifs_task_definition" {
         {
           name  = "CLIENT_ID"
           value = "${local.application_data.accounts[local.environment].client_id}"
+        },
+		{
+		  name  = "ENV_NAME"
+          value = "${local.application_data.accounts[local.environment].env_name}"
         }
       ]
       secrets = [
@@ -517,4 +521,9 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
 resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
   name           = "${local.application_name}-log-stream"
   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+}
+
+resource "aws_iam_role_policy_attachment" "bastion_managed" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.ec2_instance_role.name
 }

@@ -1,10 +1,12 @@
+# Cost Usage Report
+
 Enable Cost Usage Reports on a 'per-environment' basis.
 
 ## Usage
 
 For example:
 
-```
+```terraform
 module "cost_usage_report" {
 
     count = lookup(var.cost_usage_report, "create", false) ? 1 : 0
@@ -26,7 +28,7 @@ module "cost_usage_report" {
 
 triggered by the following in the environment configuration file:
 
-```
+```terraform
   cost_usage_report = {
     create = true
   }

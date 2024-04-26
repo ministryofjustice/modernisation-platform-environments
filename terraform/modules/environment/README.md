@@ -19,7 +19,7 @@ resources and local variables which are often needed, such as:
 
 For example:
 
-```
+```terraform
 module "environment" {
   source = "../../modules/environment"
 

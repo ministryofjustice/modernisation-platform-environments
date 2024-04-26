@@ -4,6 +4,10 @@ locals {
   # /etc/fstab mount setting as per https://docs.aws.amazon.com/efs/latest/ug/nfs-automount-efs.html
   oam_1_userdata = <<EOF
 #!/bin/bash
+
+# Setting up SSM Agent
+sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+
 echo "${aws_efs_file_system.product["oam"].dns_name}:/fmw /IDAM/product/fmw nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.product["oam"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
@@ -19,7 +23,12 @@ do
   mount_status=$?
 done
 
-hostnamectl set-hostname ${local.application_name}-oam1-ms.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-oam1-ms
+
+sed -i '/^search/d' /etc/resolv.conf
+echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
+
+chattr +i /etc/resolv.conf
 
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
@@ -38,7 +47,7 @@ echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/
 echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDAM/product/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs nolock 0 0" >> /etc/fstab
 echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDMLCM/repo_home /IDMLCM/repo_home nfs nolock 0 0" >> /etc/fstab
 mount -a
-hostnamectl set-hostname ${local.application_name}-oam2-ms.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-oam2-ms.${data.aws_route53_zone.external.name}
 EOF
 }
 
@@ -372,7 +381,7 @@ resource "aws_ebs_volume" "oam_mserver" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].oam_mserver_snapshot
+  # snapshot_id       = local.application_data.accounts[local.environment].oam_mserver_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]

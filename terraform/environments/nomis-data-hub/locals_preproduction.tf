@@ -54,14 +54,14 @@ locals {
       })
     }
 
-    #when changing the ems entries in preprodution, also stop and start xtag to reconnect it.
+    #when changing the ems entries in preproduction, also stop and start xtag to reconnect it.
     baseline_route53_zones = {
-      "preprodution.ndh.nomis.service.justice.gov.uk" = {
+      "preproduction.ndh.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "pp-app", type = "A", ttl = 300, records = ["10.40.37.197"] }, #azure
-          #{ name = "pp-app", type = "A", ttl = 300, records = ["10.27.0.196"] }, #aws
-          { name = "pp-ems", type = "A", ttl = 300, records = ["10.40.37.199"] }, #azure
-          #{ name = "pp-ems", type = "A", ttl = 300, records = ["10.27.0.119"] }, #aws
+          #{ name = "pp-app", type = "A", ttl = 300, records = ["10.40.37.197"] }, #azure
+          { name = "pp-app", type = "A", ttl = 300, records = ["10.27.0.196"] }, #aws
+          #{ name = "pp-ems", type = "A", ttl = 300, records = ["10.40.37.199"] }, #azure
+          { name = "pp-ems", type = "A", ttl = 300, records = ["10.27.0.119"] }, #aws
         ]
       }
     }

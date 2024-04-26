@@ -4,9 +4,12 @@ locals {
   # /etc/fstab mount setting as per https://docs.aws.amazon.com/efs/latest/ug/nfs-automount-efs.html
   ohs_1_userdata = <<EOF
 #!/bin/bash
+
+# Setting up SSM Agent
+sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.product["ohs"].dns_name}:/fmw /IDAM/product/fmw nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "/dev/xvdc /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
-echo "${aws_efs_file_system.efs.dns_name}:/ /IDMLCM/repo_home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 mount -a
 mount_status=$?
 while [[ $mount_status != 0 ]]
@@ -16,7 +19,12 @@ do
   mount_status=$?
 done
 
-hostnamectl set-hostname ${local.application_name}-ohs1.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-ohs1
+
+sed -i '/^search/d' /etc/resolv.conf
+echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
+
+chattr +i /etc/resolv.conf
 
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
@@ -27,6 +35,7 @@ echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.jso
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:cloudwatch_agent_config.json
 
 EOF
+
   #   ohs_2_userdata = <<EOF
   # #!/bin/bash
   # EOF
@@ -166,7 +175,7 @@ resource "aws_ebs_volume" "ohsvolume1" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].ohssnapshot1
+  # snapshot_id       = local.application_data.accounts[local.environment].ohssnapshot1
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -191,7 +200,7 @@ resource "aws_ebs_volume" "ohs_mserver" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].ohs_mserver_snapshot
+  # snapshot_id       = local.application_data.accounts[local.environment].ohs_mserver_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -208,9 +217,3 @@ resource "aws_volume_attachment" "ohs_mserver" {
   volume_id   = aws_ebs_volume.ohs_mserver.id
   instance_id = aws_instance.ohs_instance_1.id
 }
-
-#####################################
-# OHS Route 53 records
-#####################################
-
-# TODO TBC once as part of Route53 ticket

@@ -3,7 +3,7 @@
 - Use this module to set up a patch schedule for instances.
 - Register instances to patch by giving the `target_tag` map the tag name and value of the instance that requires patching.
 - Successful patches will be picked up from the development environment and referenced by the other environments
-- Pass in a list of `instance_roles` belonging to all instances that need to pull patches from the development environment. 
+- Pass in a list of `instance_roles` belonging to all instances that need to pull patches from the development environment.
 - Other environments can still provide an `instance_role` to allow instances to send ssm logs to s3 during patching.
 - Instances that require patching require the `PatchBucketAccessPolicy` added to their role. This role also needs to be trusted by the bucket in the module.
 

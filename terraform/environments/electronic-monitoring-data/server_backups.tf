@@ -97,7 +97,16 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
   cidr_ipv4 = "213.121.161.124/32"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
 
+  security_group_id = aws_security_group.db.id
+  description       = "Default SQL Server port 1433 access for MK"
+  ip_protocol       = "tcp"
+  from_port         = 1433
+  to_port           = 1433
+
+  cidr_ipv4 = "80.195.205.143/32"
+}
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
   count = local.is-development ? 1 : 0
@@ -111,17 +120,25 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
   cidr_ipv4 = "209.35.83.77/32"
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
-#   count = local.is-development ? 1 : 0
-#
-#   security_group_id = aws_security_group.db.id
-#   description       = "Default SQL Server port 1433 access for Madhu Kadiri"
-#   ip_protocol       = "tcp"
-#   from_port         = 1433
-#   to_port           = 1433
-#
-#   cidr_ipv4 = ""
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_glue_access" {
+
+  security_group_id            = aws_security_group.db.id
+  description                  = "glue"
+  ip_protocol                  = "tcp"
+  from_port                    = 0
+  to_port                      = 65535
+  referenced_security_group_id = aws_security_group.db.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "db_glue_access" {
+
+  security_group_id            = aws_security_group.db.id
+  description                  = "glue"
+  ip_protocol                  = "tcp"
+  from_port                    = 0
+  to_port                      = 65535
+  referenced_security_group_id = aws_security_group.db.id
+}
 
 resource "aws_db_subnet_group" "db" {
   name       = "db-subnet-group"

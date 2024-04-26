@@ -278,6 +278,35 @@ locals {
         }
       }
     }
+    etl = {
+      description = "Security group for etl"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http28080 = {
+          description     = "Allow http28080 ingress"
+          from_port       = 28080
+          to_port         = 28080
+          protocol        = "tcp"
+          security_groups = []
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
     data = {
       description = "Security group for data subnet"
       ingress = {
@@ -294,7 +323,7 @@ locals {
           to_port         = "1521"
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.oracle_db
-          security_groups = ["private", "bip"]
+          security_groups = ["private", "bip", "etl"]
         }
         oracle3872 = {
           description = "Allow oem agent ingress"

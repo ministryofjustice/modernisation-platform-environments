@@ -1,9 +1,7 @@
 module "ecs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=c195026bcf0a1958fa4d3cc2efefc56ed876507e"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.0.2"
 
-  environment = var.env_name
-  namespace   = var.app_name
-  name        = "cluster"
+  name = "delius-core-${var.env_name}-cluster"
 
   tags = local.tags
 }

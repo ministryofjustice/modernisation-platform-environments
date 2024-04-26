@@ -242,32 +242,7 @@ locals {
         }
       }
 
-      dev-nomis-client-a = merge(local.jumpserver_ec2, {
-        config = merge(local.jumpserver_ec2.config, {
-          user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml.tftpl", {
-            ie_compatibility_mode_site_list = join(",", [
-              "dev-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "dev-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "c-dev.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "qa11g-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "qa11g-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "c-qa11g.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "qa11r-nomis-web-a.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "qa11r-nomis-web-b.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "c-qa11r.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-            ])
-            ie_trusted_domains = join(",", [
-              "*.nomis.hmpps-development.modernisation-platform.justice.gov.uk",
-              "*.nomis.service.justice.gov.uk",
-            ])
-            desktop_shortcuts = join(",", [
-              "DEV NOMIS|https://c-dev.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "QA11G NOMIS|https://c-qa11g.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-              "QA11R NOMIS|https://c-qa11r.development.nomis.service.justice.gov.uk/forms/frmservlet?config=tag",
-            ])
-          }))
-        })
-      })
+      dev-nomis-client-a = local.jumpserver_ec2
     }
 
     baseline_ec2_instances = {

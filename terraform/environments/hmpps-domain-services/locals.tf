@@ -47,6 +47,7 @@ locals {
   baseline_cloudwatch_metric_alarms      = {}
   baseline_ec2_autoscaling_groups        = {}
   baseline_ec2_instances                 = {}
+  baseline_fsx_windows                   = {}
   baseline_iam_policies = {
     SSMPolicy = {
       description = "Policy to allow ssm actions"
