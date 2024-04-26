@@ -23,7 +23,8 @@
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "rds:delius-jitbit-development-database-2024-03-01-06-19"
+      "db_snapshot_identifier": "rds:delius-jitbit-development-database-2024-03-01-06-19",
+      "ses_log_retention_days": "1"
     },
     "development": {
       "migration_source_account_id": "377957503799",
@@ -48,7 +49,8 @@
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy"
+      "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy",
+      "ses_log_retention_days": "1"
     },
     "test": {
       "migration_source_account_id": "377957503799",
@@ -73,7 +75,8 @@
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "copied-jitbit-training-migration-mp"
+      "db_snapshot_identifier": "copied-jitbit-training-migration-mp",
+      "ses_log_retention_days": "1"
     },
     "preproduction": {
       "migration_source_account_id": "377957503799",
@@ -98,7 +101,8 @@
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "jitbit-preproduction-migration-trial-mp-copy"
+      "db_snapshot_identifier": "jitbit-preproduction-migration-trial-mp-copy",
+      "ses_log_retention_days": "1"
     },
     "production": {
       "migration_source_account_id": "097456858629",
@@ -122,7 +126,8 @@
       "db_performance_insights_enabled": "true",
       "db_deletion_protection": "true",
       "db_skip_final_snapshot": "false",
-      "db_delete_automated_backups": "false"
+      "db_delete_automated_backups": "false",
+      "ses_log_retention_days": "1"
     }
   }
 }
