@@ -58,7 +58,7 @@ locals {
       test-win-fs2 = {
         subnets = [{
           name               = "private"
-          availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+          availability_zones = ["eu-west-2a", "eu-west-2b"]
         }]
         deployment_type     = "MULTI_AZ_1"
         security_groups     = ["rds-ec2s"]
