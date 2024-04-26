@@ -586,6 +586,7 @@ variable "fsx_windows" {
     }))
     tags = optional(map(string), {})
   }))
+  default = {}
 }
 
 variable "iam_policies" {
