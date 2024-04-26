@@ -4,7 +4,7 @@ locals {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "rds_bastion" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.1"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -24,13 +24,15 @@ module "rds_bastion" {
   log_expiry_days      = 180 # days before log expiration
 
   # bastion
-  allow_ssh_commands = true
+  # instance_name = "s3_rds_bastion_linux"
 
+  allow_ssh_commands = true
   app_name      = var.networking[0].application
   business_unit = local.vpc_name
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = "eu-west-2"
+  volume_size   = 20
 
   # tags
   tags_common = local.tags
