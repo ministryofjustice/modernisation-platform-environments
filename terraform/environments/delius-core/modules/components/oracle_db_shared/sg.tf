@@ -1,10 +1,13 @@
 resource "aws_security_group" "db_ec2" {
-  name        = format("%s-sg-delius-db-ec2-instance", var.env_name)
+  name        = format("%s-sg-${var.resource_prefix}-db-ec2-instance", var.env_name)
   description = "Controls access to db ec2 instance"
   vpc_id      = var.account_config.shared_vpc_id
   tags = merge(var.tags,
-    { Name = lower(format("%s-sg-delius-db-ec2-instance", var.env_name)) }
+    { Name = lower(format("%s-sg-${var.resource_prefix}-db-ec2-instance", var.env_name)) }
   )
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_https_out" {
