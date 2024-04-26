@@ -31,7 +31,6 @@ module "oracle_db_primary" {
     name_regex = var.db_config.ami_name_regex
     owner      = "self"
   }
-  db_suffix         = "delius-db"
   db_type           = "primary"
   count             = 1
   db_count_index    = count.index + 1
@@ -77,7 +76,6 @@ module "oracle_db_standby" {
     name_regex = var.db_config.ami_name_regex
     owner      = "self"
   }
-  db_suffix      = "delius-db"
   db_type        = "standby"
   count          = var.db_config.standby_count
   db_count_index = count.index + 1

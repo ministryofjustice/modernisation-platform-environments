@@ -43,8 +43,3 @@ variable "deploy_oracle_stats" {
   default     = true
   type        = bool
 }
-
-variable "resource_prefix" {
-  description = "Resource prefix"
-  type        = string
-}

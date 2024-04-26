@@ -1,7 +1,7 @@
 module "s3_bucket_oracledb_backups" {
 
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
-  bucket_name         = local.oracle_backup_bucket_name
+  bucket_name         = local.oracle_backup_bucket_prefix
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
@@ -147,8 +147,8 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
       "s3:*"
     ]
     resources = [
-      "arn:aws:s3:::${local.oracle_backup_bucket_name}",
-      "arn:aws:s3:::${local.oracle_backup_bucket_name}/*"
+      "arn:aws:s3:::${local.oracle_backup_bucket_prefix}",
+      "arn:aws:s3:::${local.oracle_backup_bucket_prefix}/*"
     ]
   }
 }
@@ -171,11 +171,11 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
 
 resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
 
-  bucket = "${local.oracle_backup_bucket_name}-inventory"
+  bucket = "${local.oracle_backup_bucket_prefix}-inventory"
   tags = merge(
     var.tags,
     {
-      "Name" = "${local.oracle_backup_bucket_name}-inventory"
+      "Name" = "${local.oracle_backup_bucket_prefix}-inventory"
     },
     {
       "Purpose" = "Inventory of Oracle DB Backup Pieces"
@@ -217,10 +217,10 @@ resource "aws_s3_bucket_policy" "oracledb_backups_inventory_policy" {
   )
 }
 
-resource "aws_s3_bucket_inventory" "oracledb_backuppieces" {
+resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
 
   bucket = module.s3_bucket_oracledb_backups.bucket.id
-  name   = "${var.env_name}-oracle-database-backuppieces"
+  name   = "${var.account_info.application_name}-${var.env_name}-oracle-database-backup-pieces"
 
   included_object_versions = "Current"
 
