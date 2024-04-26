@@ -128,61 +128,70 @@ resource "aws_cloudwatch_log_stream" "flink_master_summary_log_stream" {
   log_group_name = aws_cloudwatch_log_group.flink_master_summary_log_group.name
 }
 
-resource "aws_kinesisanalyticsv2_application" "master_summary" {
-  name                   = "flink-master_summary"
-  runtime_environment    = "FLINK-1_18"
-  service_execution_role = aws_iam_role.flink_role.arn
-
-  application_configuration {
-    environment_properties {
-      property_group {
-        property_group_id = "sql"
-        property_map = {
-          "viewName" : "master_summary"
-        }
-      }
-    }
-
-    application_code_configuration {
-      code_content {
-        s3_content_location {
-          bucket_arn = local.flink_jar_bucket_arn
-          file_key   = local.flink_views_jar_file
-        }
-      }
-
-      code_content_type = "ZIPFILE"
-    }
-
-    flink_application_configuration {
-      checkpoint_configuration {
-        configuration_type = "DEFAULT"
-      }
-
-      monitoring_configuration {
-        configuration_type = "CUSTOM"
-        log_level          = "INFO"
-        metrics_level      = "APPLICATION"
-      }
-
-      parallelism_configuration {
-        auto_scaling_enabled = true
-        configuration_type   = "CUSTOM"
-        parallelism          = 4
-        parallelism_per_kpu  = 4
-      }
-    }
-
-    vpc_configuration {
-      security_group_ids = [aws_security_group.flink_allow_outbound.id]
-      subnet_ids         = [data.aws_subnet.private_subnets_a.id]
-    }
-  }
-
-  cloudwatch_logging_options {
-    log_stream_arn = aws_cloudwatch_log_stream.flink_master_summary_log_stream.arn
-  }
-}
+# resource "aws_kinesisanalyticsv2_application" "master_summary" {
+#   name                   = "flink-master_summary"
+#   runtime_environment    = "FLINK-1_18"
+#   service_execution_role = aws_iam_role.flink_role.arn
+#
+#   application_configuration {
+#
+#     run_configuration {
+#       flink_run_configuration {
+#         allow_non_restored_state = true
+#       }
+#     }
+#
+#     environment_properties {
+#       property_group {
+#         property_group_id = "sql"
+#         property_map = {
+#           "viewName" : "master_summary"
+#         }
+#       }
+#     }
+#
+#     application_code_configuration {
+#       code_content {
+#         s3_content_location {
+#           bucket_arn = local.flink_jar_bucket_arn
+#           file_key   = local.flink_views_jar_file
+#         }
+#       }
+#
+#       code_content_type = "ZIPFILE"
+#     }
+#
+#
+#     flink_application_configuration {
+#       checkpoint_configuration {
+#         configuration_type = "DEFAULT"
+#       }
+#
+#       monitoring_configuration {
+#         configuration_type = "CUSTOM"
+#         log_level          = "INFO"
+#         metrics_level      = "APPLICATION"
+#       }
+#
+#       parallelism_configuration {
+#         auto_scaling_enabled = true
+#         configuration_type   = "CUSTOM"
+#         parallelism          = 4
+#         parallelism_per_kpu  = 4
+#       }
+#
+#     }
+#
+#     vpc_configuration {
+#       security_group_ids = [aws_security_group.flink_allow_outbound.id]
+#       subnet_ids         = [data.aws_subnet.private_subnets_a.id]
+#     }
+#   }
+#
+#   cloudwatch_logging_options {
+#     log_stream_arn = aws_cloudwatch_log_stream.flink_master_summary_log_stream.arn
+#   }
+# }
 
 resource "aws_cloudwatch_log_group" "flink_master_complex_log_group" {
   name              = "/aws/kinesis-analytics/flink-master-complex"
@@ -194,58 +203,58 @@ resource "aws_cloudwatch_log_stream" "flink_master_complex_log_stream" {
   log_group_name = aws_cloudwatch_log_group.flink_master_complex_log_group.name
 }
 
-resource "aws_kinesisanalyticsv2_application" "master_complex" {
-  name                   = "flink-master_complex"
-  runtime_environment    = "FLINK-1_18"
-  service_execution_role = aws_iam_role.flink_role.arn
-
-  application_configuration {
-    environment_properties {
-      property_group {
-        property_group_id = "sql"
-        property_map = {
-          "viewName" : "master_complex"
-        }
-      }
-    }
-
-    application_code_configuration {
-      code_content {
-        s3_content_location {
-          bucket_arn = local.flink_jar_bucket_arn
-          file_key   = local.flink_views_jar_file
-        }
-      }
-
-      code_content_type = "ZIPFILE"
-    }
-
-    flink_application_configuration {
-      checkpoint_configuration {
-        configuration_type = "DEFAULT"
-      }
-
-      monitoring_configuration {
-        configuration_type = "CUSTOM"
-        log_level          = "INFO"
-        metrics_level      = "APPLICATION"
-      }
-
-      parallelism_configuration {
-        auto_scaling_enabled = true
-        configuration_type   = "CUSTOM"
-        parallelism          = 4
-        parallelism_per_kpu  = 4
-      }
-    }
-
-    vpc_configuration {
-      security_group_ids = [aws_security_group.flink_allow_outbound.id]
-      subnet_ids         = [data.aws_subnet.private_subnets_a.id]
-    }
-  }
-
-  cloudwatch_logging_options {
-    log_stream_arn = aws_cloudwatch_log_stream.flink_master_complex_log_stream.arn
-  }
-}
+# resource "aws_kinesisanalyticsv2_application" "master_complex" {
+#   name                   = "flink-master_complex"
+#   runtime_environment    = "FLINK-1_18"
+#   service_execution_role = aws_iam_role.flink_role.arn
+#
+#   application_configuration {
+#     environment_properties {
+#       property_group {
+#         property_group_id = "sql"
+#         property_map = {
+#           "viewName" : "master_complex"
+#         }
+#       }
+#     }
+#
+#     application_code_configuration {
+#       code_content {
+#         s3_content_location {
+#           bucket_arn = local.flink_jar_bucket_arn
+#           file_key   = local.flink_views_jar_file
+#         }
+#       }
+#
+#       code_content_type = "ZIPFILE"
+#     }
+#
+#     flink_application_configuration {
+#       checkpoint_configuration {
+#         configuration_type = "DEFAULT"
+#       }
+#
+#       monitoring_configuration {
+#         configuration_type = "CUSTOM"
+#         log_level          = "INFO"
+#         metrics_level      = "APPLICATION"
+#       }
+#
+#       parallelism_configuration {
+#         auto_scaling_enabled = true
+#         configuration_type   = "CUSTOM"
+#         parallelism          = 4
+#         parallelism_per_kpu  = 4
+#       }
+#     }
+#
+#     vpc_configuration {
+#       security_group_ids = [aws_security_group.flink_allow_outbound.id]
+#       subnet_ids         = [data.aws_subnet.private_subnets_a.id]
+#     }
+#   }
+#
+#   cloudwatch_logging_options {
+#     log_stream_arn = aws_cloudwatch_log_stream.flink_master_complex_log_stream.arn
+#   }
+# }
