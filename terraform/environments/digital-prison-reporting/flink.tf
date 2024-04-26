@@ -135,6 +135,12 @@ resource "aws_kinesisanalyticsv2_application" "master_summary" {
 
   application_configuration {
 
+    run_configuration {
+      application_restore_configuration {
+        application_restore_type = "SKIP_RESTORE_FROM_SNAPSHOT"
+      }
+    }
+
     environment_properties {
       property_group {
         property_group_id = "sql"
@@ -174,7 +180,6 @@ resource "aws_kinesisanalyticsv2_application" "master_summary" {
         parallelism          = 6
         parallelism_per_kpu  = 1
       }
-
     }
 
     vpc_configuration {
@@ -204,6 +209,13 @@ resource "aws_kinesisanalyticsv2_application" "master_complex" {
   service_execution_role = aws_iam_role.flink_role.arn
 
   application_configuration {
+
+    run_configuration {
+      application_restore_configuration {
+        application_restore_type = "SKIP_RESTORE_FROM_SNAPSHOT"
+      }
+    }
+
     environment_properties {
       property_group {
         property_group_id = "sql"
