@@ -36,47 +36,28 @@ locals {
     }
 
     baseline_fsx_windows = {
-      test-win-fs = {
-        subnets = [{
-          name               = "private"
-          availability_zones = ["eu-west-2a"]
-        }]
-        security_groups     = ["rds-ec2s"]
-        skip_final_backup   = true
-        storage_capacity    = 32
-        throughput_capacity = 8
-        self_managed_active_directory = {
-          dns_ips = [
-            module.ip_addresses.mp_ip.ad-azure-dc-a,
-            module.ip_addresses.mp_ip.ad-azure-dc-b,
-          ]
-          domain_name          = "azure.noms.root"
-          username             = "svc_join_domain"
-          password_secret_name = "/microsoft/AD/azure.noms.root/shared-passwords"
-        }
-      }
-      test-win-fs2 = {
-        subnets = [{
-          name               = "private"
-          availability_zones = ["eu-west-2a", "eu-west-2b"]
-        }]
-        preferred_subnet_name       = "private"
-        preferred_availability_zone = "eu-west-2a"
-        deployment_type             = "MULTI_AZ_1"
-        security_groups             = ["rds-ec2s"]
-        skip_final_backup           = true
-        storage_capacity            = 32
-        throughput_capacity         = 8
-        self_managed_active_directory = {
-          dns_ips = [
-            module.ip_addresses.mp_ip.ad-azure-dc-a,
-            module.ip_addresses.mp_ip.ad-azure-dc-b,
-          ]
-          domain_name          = "azure.noms.root"
-          username             = "svc_join_domain"
-          password_secret_name = "/microsoft/AD/azure.noms.root/shared-passwords"
-        }
-      }
+      # test-win-fs = {
+      #   subnets = [{
+      #     name               = "private"
+      #     availability_zones = ["eu-west-2a", "eu-west-2b"]
+      #   }]
+      #   preferred_subnet_name       = "private"
+      #   preferred_availability_zone = "eu-west-2a"
+      #   deployment_type             = "MULTI_AZ_1"
+      #   security_groups             = ["rds-ec2s"]
+      #   skip_final_backup           = true
+      #   storage_capacity            = 32
+      #   throughput_capacity         = 8
+      #   self_managed_active_directory = {
+      #     dns_ips = [
+      #       module.ip_addresses.mp_ip.ad-azure-dc-a,
+      #       module.ip_addresses.mp_ip.ad-azure-dc-b,
+      #     ]
+      #     domain_name          = "azure.noms.root"
+      #     username             = "svc_join_domain"
+      #     password_secret_name = "/microsoft/AD/azure.noms.root/shared-passwords"
+      #   }
+      # }
     }
 
     baseline_ec2_autoscaling_groups = {
@@ -97,7 +78,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
@@ -124,7 +105,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
@@ -150,7 +131,7 @@ locals {
           })
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
