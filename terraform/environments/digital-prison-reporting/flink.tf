@@ -135,12 +135,6 @@ resource "aws_kinesisanalyticsv2_application" "master_summary" {
 
   application_configuration {
 
-    run_configuration {
-      flink_run_configuration {
-        allow_non_restored_state = true
-      }
-    }
-
     environment_properties {
       property_group {
         property_group_id = "sql"
@@ -164,7 +158,10 @@ resource "aws_kinesisanalyticsv2_application" "master_summary" {
 
     flink_application_configuration {
       checkpoint_configuration {
-        configuration_type = "DEFAULT"
+        configuration_type = "CUSTOM"
+        checkpointing_enabled = true
+        checkpoint_interval = 150000
+        min_pause_between_checkpoints = 30000
       }
 
       monitoring_configuration {
