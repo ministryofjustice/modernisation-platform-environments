@@ -135,10 +135,8 @@ resource "aws_kinesisanalyticsv2_application" "master_summary" {
 
   application_configuration {
 
-    run_configuration {
-      application_restore_configuration {
-        application_restore_type = "SKIP_RESTORE_FROM_SNAPSHOT"
-      }
+    application_snapshot_configuration {
+      snapshots_enabled = false
     }
 
     environment_properties {
@@ -210,10 +208,8 @@ resource "aws_kinesisanalyticsv2_application" "master_complex" {
 
   application_configuration {
 
-    run_configuration {
-      application_restore_configuration {
-        application_restore_type = "SKIP_RESTORE_FROM_SNAPSHOT"
-      }
+    application_snapshot_configuration {
+      snapshots_enabled = false
     }
 
     environment_properties {
