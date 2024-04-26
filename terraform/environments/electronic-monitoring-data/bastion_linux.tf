@@ -24,7 +24,7 @@ module "rds_bastion" {
   log_expiry_days      = 180 # days before log expiration
 
   # bastion
-  # instance_name = "s3_rds_bastion_linux"
+  instance_name = "s3_rds_bastion"
 
   allow_ssh_commands = true
   app_name      = var.networking[0].application
