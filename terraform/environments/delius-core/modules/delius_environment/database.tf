@@ -15,7 +15,7 @@ module "oracle_db_shared" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
-  resource_prefix = "${var.env_name}-${var.account_info.mp_environment}"
+  resource_prefix = var.env_name
 
   providers = {
     aws.bucket-replication    = aws
