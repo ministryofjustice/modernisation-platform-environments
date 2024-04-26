@@ -149,8 +149,8 @@ resource "aws_kinesisanalyticsv2_application" "flink_spike_app" {
       parallelism_configuration {
         auto_scaling_enabled = true
         configuration_type   = "CUSTOM"
-        parallelism          = 1
-        parallelism_per_kpu  = 1
+        parallelism          = 4
+        parallelism_per_kpu  = 4
       }
     }
 
