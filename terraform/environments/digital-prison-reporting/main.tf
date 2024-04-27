@@ -294,7 +294,6 @@ module "glue_s3_file_transfer_job" {
     "--dpr.aws.region"                        = local.account_region
     "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
     "--dpr.file.transfer.source.bucket"       = module.s3_raw_bucket.bucket_id
-    "--dpr.file.source.prefix"                = local.reporting_hub_cdc_processed_raw_files_path
     "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
     "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
     "--dpr.file.transfer.delete.copied.files" = true,
@@ -317,6 +316,9 @@ resource "aws_glue_trigger" "glue_s3_file_transfer_job_trigger" {
 
   actions {
     job_name = module.glue_s3_file_transfer_job.name
+    arguments = {
+      "--dpr.file.source.prefix" = local.reporting_hub_cdc_processed_raw_files_path
+    }
   }
 }
 

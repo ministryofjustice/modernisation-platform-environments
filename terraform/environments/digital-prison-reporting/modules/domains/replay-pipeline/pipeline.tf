@@ -73,6 +73,23 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
+          "Next" : "Move Processed Data Back to Raw Bucket"
+        },
+        "Move Processed Data Back to Raw Bucket" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_s3_file_transfer_job,
+            "Arguments" : {
+              "--dpr.file.transfer.source.bucket" : var.s3_raw_bucket_id,
+              "--dpr.file.source.prefix" : "processed",
+              "--dpr.file.transfer.destination.bucket" : var.s3_raw_bucket_id,
+              "--dpr.file.transfer.retention.days" : "0",
+              "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            }
+          },
           "Next" : "Move Archived Data Back to Raw Bucket"
         },
         "Move Archived Data Back to Raw Bucket" : {

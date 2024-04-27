@@ -74,15 +74,40 @@ module "reload_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Truncate Data"
+          "Next" : "Truncate Unprocessed Raw Data"
         },
-        "Truncate Data" : {
+        "Truncate Unprocessed Raw Data" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
-              "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+              "--dpr.file.deletion.buckets" : var.s3_raw_bucket_id,
+              "--dpr.config.key" : var.domain
+            }
+          },
+          "Next" : "Truncate Processed Raw Data"
+        },
+        "Truncate Processed Raw Data" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_s3_data_deletion_job,
+            "Arguments" : {
+              "--dpr.file.deletion.buckets" : var.s3_raw_bucket_id,
+              "--dpr.file.source.prefix" : "processed",
+              "--dpr.config.key" : var.domain
+            }
+          },
+          "Next" : "Truncate Data in Other Zones"
+        },
+        "Truncate Data in Other Zones" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_s3_data_deletion_job,
+            "Arguments" : {
+              "--dpr.file.deletion.buckets" : "${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
               "--dpr.config.key" : var.domain
             }
           },
