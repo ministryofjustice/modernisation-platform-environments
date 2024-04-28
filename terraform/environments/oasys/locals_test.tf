@@ -6,7 +6,7 @@ locals {
     enable_cloudwatch_cross_account_sharing = true
     enable_cloudwatch_dashboard             = true
     monitoring_account_id                   = module.environment.account_ids.hmpps-oem-test
-    source_account_ids                      = module.environment.account_ids.oasys-test
+    source_account_ids                      = [module.environment.account_ids.oasys-test]
   }
 
   test_baseline_presets_options = {
