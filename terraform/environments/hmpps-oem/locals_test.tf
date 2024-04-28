@@ -5,6 +5,8 @@ locals {
   test_cloudwatch_monitoring_options = {
     enable_cloudwatch_monitoring_account = true
     enable_cloudwatch_dashboard          = true
+    monitoring_account_id                = module.environment.account_ids.hmpps-oem-test
+    source_account_ids                   = [module.environment.account_ids.nomis-test, module.environment.account_ids.oasys-test]
   }
 
   # baseline presets config
