@@ -151,8 +151,8 @@ module "cross_account_cloudwatch" {
     local.cloudwatch_monitoring_options,
     local.cloudwatch_local_environment_monitoring_options,
   )
-  monitoring_account_id = local.cloudwatch_local_environment_monitoring_options.monitoring_account_id
-  source_account_ids    = [local.cloudwatch_local_environment_monitoring_options.source_account_ids]
+  monitoring_account_id = lookup(local.cloudwatch_local_environment_monitoring_options, "monitoring_account_id", "")
+  source_account_ids    = lookup(local.cloudwatch_local_environment_monitoring_options, "source_account_ids", [])
 }
 
 module "cloudwatch" {
