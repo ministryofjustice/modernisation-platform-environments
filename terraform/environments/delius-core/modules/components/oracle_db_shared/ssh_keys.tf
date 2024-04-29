@@ -57,7 +57,7 @@ resource "aws_s3_object" "user_public_keys" {
   tags = merge(
     var.tags,
     {
-      Name = "bastion-${var.env_name}-${each.key}-publickey"
+      Name = "${var.account_info.application_name}-${var.env_name}-${each.key}-db-publickey"
     }
   )
 
@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "db_ssh_keys_s3_policy_document" {
 }
 
 resource "aws_iam_policy" "db_ssh_keys_s3" {
-  name   = "${var.env_name}_db_ssh_keys_s3"
+  name   = "${var.account_info.application_name}-${var.env_name}-db-ssh-keys-s3"
   policy = data.aws_iam_policy_document.db_ssh_keys_s3_policy_document.json
 }
 
