@@ -34,7 +34,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
   service_access_role_arn = var.ep_service_access_role_arn
 
   # Extra settings:
-  add_column_name                             = true
+  add_column_name = true
   # add_trailing_padding_character              = false
   bucket_folder = var.database_name
   # canned_acl_for_objects                      = "NONE"
@@ -44,12 +44,12 @@ resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
   # cdc_min_file_size                           = 32000
   # cdc_path                                    = "cdc/path"
   # compression_type                            = "NONE"
-  csv_delimiter                               = ","
-  csv_no_sup_value                            = "false"
-  csv_null_value                              = "null"
-  csv_row_delimiter                           = "\\n"
-  data_format    = "csv"
-  data_page_size = 68000000
+  csv_delimiter     = ","
+  csv_no_sup_value  = "false"
+  csv_null_value    = "null"
+  csv_row_delimiter = "\\n"
+  data_format       = "csv"
+  data_page_size    = 68000000
   # date_partition_delimiter                    = "UNDERSCORE"
   # date_partition_enabled                      = false
   # date_partition_sequence                     = "yyyymmddhh"

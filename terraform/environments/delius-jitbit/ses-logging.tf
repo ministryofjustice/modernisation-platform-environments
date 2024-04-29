@@ -5,7 +5,7 @@
 resource "aws_sesv2_configuration_set" "jitbit_ses_configuration_set" {
   configuration_set_name = format("%s-configuration-set", local.application_name)
 
-  suppression_options { 
+  suppression_options {
     suppressed_reasons = [
       "COMPLAINT"
     ]
@@ -75,7 +75,7 @@ resource "aws_cloudwatch_log_group" "execution_logs" {
   name              = format("/aws/lambda/%s", aws_lambda_function.sns_to_cloudwatch.function_name)
   retention_in_days = 3
 
-  tags              = local.tags
+  tags = local.tags
 }
 
 resource "aws_iam_role" "lambda" {
