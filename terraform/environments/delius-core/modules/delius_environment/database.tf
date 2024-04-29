@@ -32,6 +32,7 @@ module "oracle_db_primary" {
     owner      = "self"
   }
   db_type           = "primary"
+  db_suffix         = "db"
   count             = 1
   db_count_index    = count.index + 1
   ec2_instance_type = var.db_config.instance_type
@@ -76,7 +77,10 @@ module "oracle_db_standby" {
     name_regex = var.db_config.ami_name_regex
     owner      = "self"
   }
-  db_type        = "standby"
+  db_type         = "standby"
+  db_suffix       = "db"
+  server_type_tag = "delius_core_db"
+
   count          = var.db_config.standby_count
   db_count_index = count.index + 1
 
