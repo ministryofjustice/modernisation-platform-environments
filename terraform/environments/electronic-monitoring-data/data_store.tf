@@ -200,6 +200,7 @@ resource "aws_lambda_function" "summarise_zip_lambda" {
   handler       = "summarise_zip_lambda.handler"
   runtime       = "python3.12"
   timeout       = 600
+  layers        = ["arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer"]
 
   tags = local.tags
 }
