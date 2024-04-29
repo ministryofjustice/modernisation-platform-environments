@@ -2,7 +2,7 @@
 
 Creates EFS file system and associated resources.
 
-See https://github.com/ministryofjustice/modernisation-platform-configuration-management repo.
+See <https://github.com/ministryofjustice/modernisation-platform-configuration-management> repo.
 for ansible code for mounting on linux server (filesystems role).
 
 EFS is expensive. Use Single-AZ solution for non-production environments to save cost.
@@ -12,7 +12,7 @@ EFS is expensive. Use Single-AZ solution for non-production environments to save
 The module does not create security groups. NFS has no authentication
 so be sure to limit access to only what needs it.
 
-### Example 1 - Same security group as EC2
+###  Example 1 - Same security group as EC2
 
 Use the same security group as the EC2 mounting the EFS.
 Just ensure there is an internal rule allowing internal traffic
@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "all_from_self" {
 }
 ```
 
-### Example 2 - Separate security group
+###  Example 2 - Separate security group
 
 Create a separate security group and allow inbound traffic
 only from the security groups that the EC2s belong to.

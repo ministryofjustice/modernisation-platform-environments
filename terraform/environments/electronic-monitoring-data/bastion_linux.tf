@@ -27,12 +27,12 @@ module "rds_bastion" {
   # instance_name = "s3_rds_bastion_linux"
 
   allow_ssh_commands = true
-  app_name      = var.networking[0].application
-  business_unit = local.vpc_name
-  subnet_set    = local.subnet_set
-  environment   = local.environment
-  region        = "eu-west-2"
-  volume_size   = 20
+  app_name           = var.networking[0].application
+  business_unit      = local.vpc_name
+  subnet_set         = local.subnet_set
+  environment        = local.environment
+  region             = "eu-west-2"
+  volume_size        = 20
 
   # tags
   tags_common = local.tags
@@ -58,11 +58,11 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
-  security_group_id = aws_security_group.db.id
-  description       = "EC2 instance connection to RDS"
-  ip_protocol       = "tcp"
-  from_port         = 1433
-  to_port           = 1433
+  security_group_id            = aws_security_group.db.id
+  description                  = "EC2 instance connection to RDS"
+  ip_protocol                  = "tcp"
+  from_port                    = 1433
+  to_port                      = 1433
   referenced_security_group_id = module.rds_bastion.bastion_security_group
 }
 
