@@ -14,12 +14,12 @@
     "essential" : true,
     "portMappings" : [
       {
-        "hostPort": 21,
+        "hostPort": 0,
         "containerPort": 21,
         "protocol": "tcp"
       },
       {
-        "hostPort": 20,
+        "hostPort": 0,
         "containerPort": 20,
         "protocol": "tcp"
       },
