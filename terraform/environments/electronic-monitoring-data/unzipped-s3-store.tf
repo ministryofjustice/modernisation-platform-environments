@@ -1,3 +1,11 @@
+module "unzipped_store_log_bucket" {
+  source = "./modules/s3_log_bucket"
+
+  source_bucket = aws_s3_bucket.unzipped_store
+  account_id    = data.aws_caller_identity.current.account_id
+  local_tags    = local.tags
+}
+
 resource "aws_s3_bucket" "unzipped_store" {
   bucket_prefix = "em-data-store-"
 
