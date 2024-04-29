@@ -169,8 +169,12 @@ module "zip_bastion" {
   log_standard_ia_days = 30  # days before moving to IA storage
   log_glacier_days     = 60  # days before moving to Glacier
   log_expiry_days      = 180 # days before log expiration
-
+  
   allow_ssh_commands = true
+  autoscaling_cron   = {
+    "down": "0 20 * * *",
+    "up": "*/30 * * * *"
+  }
   app_name           = var.networking[0].application
   business_unit      = local.vpc_name
   subnet_set         = local.subnet_set
