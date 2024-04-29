@@ -106,10 +106,6 @@ resource "aws_iam_role_policy" "zip_s3_policy" {
   policy = data.aws_iam_policy_document.ec2_s3_policy.json
 }
 
-locals {
-  public_key_data = jsondecode(file("${path.module}/bastion_linux.json"))
-}
-
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "zip_bastion" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.1"
