@@ -216,7 +216,7 @@ resource "aws_ebs_volume" "oimvolume1" {
 }
 
 resource "aws_volume_attachment" "oim_EC2ServerVolume01" {
-  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdb"
   volume_id   = aws_ebs_volume.oimvolume1[0].id
   instance_id = aws_instance.oim_instance_1.id
@@ -243,7 +243,7 @@ resource "aws_ebs_volume" "oimvolume2" {
 }
 
 resource "aws_volume_attachment" "oim_EC2ServerVolume02" {
-  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdc"
   volume_id   = aws_ebs_volume.oimvolume2[0].id
   instance_id = aws_instance.oim_instance_1.id
@@ -271,7 +271,7 @@ resource "aws_ebs_volume" "oimvolume3" {
 }
 
 resource "aws_volume_attachment" "oim_EC2ServerVolume03" {
-  count             = contains(local.ebs_conditional, local.environment) ? 1 : 0
+  count       = contains(local.ebs_conditional, local.environment) ? 1 : 0
   device_name = "/dev/xvdd"
   volume_id   = aws_ebs_volume.oimvolume3[0].id
   instance_id = aws_instance.oim_instance_1.id

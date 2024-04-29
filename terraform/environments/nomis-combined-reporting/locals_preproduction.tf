@@ -20,10 +20,10 @@ locals {
       }
     }
     baseline_secretsmanager_secrets = {
-      "/ec2/ncr-bip/pp" = local.bip_secretsmanager_secrets
-      "/ec2/ncr-web/pp" = local.web_secretsmanager_secrets
-      "/ec2/ncr-bip/lsast" = local.bip_secretsmanager_secrets
-      "/ec2/ncr-web/lsast" = local.web_secretsmanager_secrets
+      "/ec2/ncr-bip/pp"           = local.bip_secretsmanager_secrets
+      "/ec2/ncr-web/pp"           = local.web_secretsmanager_secrets
+      "/ec2/ncr-bip/lsast"        = local.bip_secretsmanager_secrets
+      "/ec2/ncr-web/lsast"        = local.web_secretsmanager_secrets
       "/oracle/database/PPBIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/PPBIPAUD" = local.database_secretsmanager_secrets
     }

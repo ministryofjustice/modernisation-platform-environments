@@ -1,6 +1,6 @@
 locals {
   register_my_data_bucket_suffix = local.is-production ? "preprod" : "dev"
-  register_my_data_bucket = "moj-reg-${local.register_my_data_bucket_suffix}"
+  register_my_data_bucket        = "moj-reg-${local.register_my_data_bucket_suffix}"
 }
 
 
