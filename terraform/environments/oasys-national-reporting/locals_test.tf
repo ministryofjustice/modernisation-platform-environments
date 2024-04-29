@@ -72,6 +72,9 @@ locals {
       })
       test-boe-asg = merge(local.defaults_boe_ec2, {
         config = merge(local.defaults_boe_ec2.config, {
+          instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
           availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_boe_ec2.instance, {
