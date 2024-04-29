@@ -33,7 +33,6 @@ module "rds_bastion" {
   environment        = local.environment
   region             = "eu-west-2"
   volume_size        = 20
-
   # tags
   tags_common = local.tags
   tags_prefix = terraform.workspace
@@ -97,6 +96,49 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
 
 resource "aws_iam_policy_attachment" "ssm-attachments" {
   name       = "ssm-attach-instance-role"
-  roles      = [module.rds_bastion.bastion_iam_role.name]
+  roles      = [module.rds_bastion.bastion_iam_role.name, module.zip_bastion.bastion_iam_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy" "zip_s3_policy" {
+  name   = "zip_s3_policy"
+  role   = module.zip_bastion.bastion_iam_role.name
+  policy = data.aws_iam_policy_document.ec2_s3_policy.json
+}
+
+locals {
+  public_key_data = jsondecode(file("${path.module}/bastion_linux.json"))
+}
+
+# tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
+module "zip_bastion" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.1"
+
+  providers = {
+    aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+    aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
+  }
+
+  # s3 - used for logs and user ssh public keys
+  bucket_name = "rds-bastion"
+  instance_name = "zip_bastion_linux"
+  # public keys
+  public_key_data = local.public_key_data.keys[local.environment]
+
+  # logs
+  log_auto_clean       = "Enabled"
+  log_standard_ia_days = 30  # days before moving to IA storage
+  log_glacier_days     = 60  # days before moving to Glacier
+  log_expiry_days      = 180 # days before log expiration
+
+  allow_ssh_commands = true
+  app_name           = var.networking[0].application
+  business_unit      = local.vpc_name
+  subnet_set         = local.subnet_set
+  environment        = local.environment
+  region             = "eu-west-2"
+  volume_size        = 96
+  # tags
+  tags_common = local.tags
+  tags_prefix = terraform.workspace
 }
