@@ -10,9 +10,9 @@ variable "account_info" {
 }
 
 variable "instance_class" {
-    description = "instance class to use for dms"
-    type = string
-    default = "dms.t3.micro"
+  description = "instance class to use for dms"
+  type        = string
+  default     = "dms.t3.micro"
 }
 
 variable "env_name" {

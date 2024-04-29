@@ -120,8 +120,8 @@ resource "aws_ecs_task_definition" "ifs_task_definition" {
           name  = "CLIENT_ID"
           value = "${local.application_data.accounts[local.environment].client_id}"
         },
-		{
-		  name  = "ENV_NAME"
+        {
+          name  = "ENV_NAME"
           value = "${local.application_data.accounts[local.environment].env_name}"
         }
       ]

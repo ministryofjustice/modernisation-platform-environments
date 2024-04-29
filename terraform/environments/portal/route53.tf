@@ -353,8 +353,8 @@ resource "aws_route53_record" "cloudfront-non-prod" {
   count    = local.environment != "production" ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name = "mp-portal.${data.aws_route53_zone.external.name}"
-  type = "A"
+  name     = "mp-portal.${data.aws_route53_zone.external.name}"
+  type     = "A"
   alias {
     name                   = aws_cloudfront_distribution.external.domain_name
     zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
