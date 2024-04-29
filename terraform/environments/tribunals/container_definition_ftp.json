@@ -1,5 +1,8 @@
 [
   {
+    "command": [
+      "C:\\ServiceMonitor.exe w3svc"
+  ],
   "entryPoint": [
       "powershell",
       "-Command"
