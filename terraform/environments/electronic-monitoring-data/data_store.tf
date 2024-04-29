@@ -200,7 +200,8 @@ resource "aws_lambda_function" "summarise_zip_lambda" {
   handler       = "summarise_zip_lambda.handler"
   runtime       = "python3.12"
   timeout       = 600
-
+  layers        = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
+  source_code_hash = data.archive_file.summarise_zip_lambda.output_base64sha256
   tags = local.tags
 }
 
