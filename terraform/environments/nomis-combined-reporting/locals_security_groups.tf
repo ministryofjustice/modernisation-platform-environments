@@ -325,12 +325,11 @@ locals {
           self        = true
         }
         oracle1521 = {
-          description     = "Allow oracle database 1521 ingress"
-          from_port       = "1521"
-          to_port         = "1521"
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.oracle_db
-          security_groups = ["private", "bip", "etl"]
+          description = "Allow oracle database 1521 ingress"
+          from_port   = "1521"
+          to_port     = "1521"
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.oracle_db
         }
         oracle3872 = {
           description = "Allow oem agent ingress"
