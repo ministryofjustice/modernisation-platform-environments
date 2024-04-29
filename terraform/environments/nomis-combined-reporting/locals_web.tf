@@ -28,7 +28,7 @@ locals {
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"
-      vpc_security_group_ids = ["private"]
+      vpc_security_group_ids = ["private", "web"]
     })
     ebs_volumes = {
       "/dev/sdb" = { type = "gp3", size = 100 }
@@ -39,11 +39,12 @@ locals {
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     tags = {
-      description = "ncr bip web-tier component"
-      ami         = "base_rhel_8_5"
-      os-type     = "Linux"
-      server-type = "ncr-web"
-      component   = "web"
+      description            = "ncr bip web-tier component"
+      ami                    = "base_rhel_8_5"
+      os-type                = "Linux"
+      server-type            = "ncr-web"
+      component              = "web"
+      instance-access-policy = "full"
     }
   }
 

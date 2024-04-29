@@ -3,16 +3,16 @@ locals {
   security_group_cidrs_devtest = {
     ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
     https = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_agent = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     http7xxx = flatten([
@@ -23,16 +23,16 @@ locals {
   security_group_cidrs_preprod_prod = {
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_agent = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     http7xxx = flatten([
@@ -161,6 +161,13 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+        }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.https
         }
         https = {
           description = "Allow https ingress"
