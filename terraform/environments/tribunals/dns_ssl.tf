@@ -128,31 +128,31 @@ resource "aws_route53_record" "external_it" {
   }
 }
 
-# resource "aws_route53_record" "external_lands" {
-#   provider = aws.core-vpc 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "landschamber.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
+resource "aws_route53_record" "external_lands" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "landschamber.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
 
-#   alias {
-#     name                   = module.lands_tribunal.tribunals_lb.dns_name
-#     zone_id                = module.lands_tribunal.tribunals_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = module.lands_tribunal.tribunals_lb.dns_name
+    zone_id                = module.lands_tribunal.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
-# resource "aws_route53_record" "external_transport" {
-#   provider = aws.core-vpc 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "transportappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
+resource "aws_route53_record" "external_transport" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "transportappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
 
-#   alias {
-#     name                   = module.transport.tribunals_lb.dns_name
-#     zone_id                = module.transport.tribunals_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = module.transport.tribunals_lb.dns_name
+    zone_id                = module.transport.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
 // Records for FTP sites
 resource "aws_route53_record" "external_charity_ftp" {
