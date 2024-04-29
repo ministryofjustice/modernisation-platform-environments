@@ -396,7 +396,7 @@ locals {
         enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
-          pp-ncr-cmc = {
+          pp-ncr-web = {
             port     = 7777
             protocol = "HTTP"
             health_check = {
@@ -422,32 +422,15 @@ locals {
         }
         listeners = {
           http = {
-            port     = 7777
+            port     = 80
             protocol = "HTTP"
+
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-            rules = {
-              pp-ncr-cmc = {
-                priority = 4000
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "pp-ncr-cmc"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
-                      "pp-ncr-web-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
-                      "pp-ncr-web-2-b.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
-                    ]
-                  }
-                }]
+              type = "redirect"
+              redirect = {
+                port        = 443
+                protocol    = "HTTPS"
+                status_code = "HTTP_301"
               }
             }
           }
@@ -465,18 +448,16 @@ locals {
               }
             }
             rules = {
-              pp-ncr-cmc = {
+              pp-ncr-web = {
                 priority = 4580
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pp-ncr-cmc"
+                  target_group_name = "pp-ncr-web"
                 }]
                 conditions = [{
                   host_header = {
                     values = [
-                      "pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
-                      "pp-ncr-web-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
-                      "pp-ncr-web-2-b.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+                      "pp.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -489,7 +470,11 @@ locals {
     baseline_route53_zones = {
       "preproduction.reporting.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "db", type = "CNAME", ttl = "3600", records = ["pp-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] }
+          { name = "db", type = "CNAME", ttl = "3600", records = ["pp-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "admin", type = "CNAME", ttl = "3600", records = ["pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+        ]
+        lb_alias_records = [
+          { name = "pp", type = "A", lbs_map_key = "private" },
         ]
       }
     }
