@@ -57,7 +57,7 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a"]
-          security_groups    = ["private"]
+          security_groups    = ["private", "bip"]
         }]
       }
     }
@@ -392,7 +392,7 @@ locals {
         enable_delete_protection         = false
         load_balancer_type               = "application"
         idle_timeout                     = 3600
-        security_groups                  = ["private"]
+        security_groups                  = ["lb"]
         subnets                          = module.environment.subnets["private"].ids
         enable_cross_zone_load_balancing = true
 
@@ -415,7 +415,6 @@ locals {
               type    = "lb_cookie"
             }
             attachments = [
-              { ec2_instance_name = "pp-ncr-web-admin-a" },
               { ec2_instance_name = "pp-ncr-web-1-a" },
               { ec2_instance_name = "pp-ncr-web-2-b" },
             ]
