@@ -28,6 +28,39 @@ locals {
       "/oracle/database/PPBIPAUD" = local.database_secretsmanager_secrets
     }
 
+    baseline_efs = {
+      bip = {
+        access_points = {
+          root = {
+            posix_user = {
+              gid = 10003 # binstall
+              uid = 10003 # bobj
+            }
+            root_directory = {
+              path = "/"
+              creation_info = {
+                owner_gid   = 10003 # binstall
+                owner_uid   = 10003 # bobj
+                permissions = "0777"
+              }
+            }
+          }
+        }
+        backup_policy_status = "DISABLED"
+        file_system = {
+          availability_zone_name = "eu-west-2a"
+          lifecycle_policy = {
+            transition_to_ia = "AFTER_30_DAYS"
+          }
+        }
+        mount_targets = [{
+          subnet_name        = "private"
+          availability_zones = ["eu-west-2a"]
+          security_groups    = ["private"]
+        }]
+      }
+    }
+
     baseline_iam_policies = {
       Ec2PPDatabasePolicy = {
         description = "Permissions required for PREPROD Database EC2s"
