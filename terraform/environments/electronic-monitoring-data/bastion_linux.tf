@@ -103,7 +103,50 @@ resource "aws_iam_policy_attachment" "ssm-attachments" {
 resource "aws_iam_role_policy" "zip_s3_policy" {
   name   = "zip_s3_policy"
   role   = module.zip_bastion.bastion_iam_role.name
-  policy = data.aws_iam_policy_document.ec2_s3_policy.json
+  policy = data.aws_iam_policy_document.zip_s3_policy.json
+}
+
+data "aws_iam_policy_document" "zip_s3_policy" {
+  statement {
+    sid    = "AllowListDataStore"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      aws_s3_bucket.data_store.arn,
+    ]
+  }
+  statement {
+    sid    = "AllowReadDataStore"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = [
+      "${aws_s3_bucket.data_store.arn}/*",
+    ]
+  }
+  statement {
+    sid = "AllowListUnzipStore"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = [
+      aws_s3_bucket.unzipped_store.arn
+    ]
+  }
+  statement {
+    sid = "AllowPutUnzipStore"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "${aws_s3_bucket.unzipped_store.arn}/*"
+    ]
+  }
 }
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
