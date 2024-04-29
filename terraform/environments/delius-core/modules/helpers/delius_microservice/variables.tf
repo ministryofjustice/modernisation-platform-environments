@@ -438,7 +438,7 @@ variable "desired_count" {
 
 variable "efs_volumes" {
   description = "The EFS volumes to mount"
-  type        = list(any)
+  type        = any
   default     = []
 }
 
