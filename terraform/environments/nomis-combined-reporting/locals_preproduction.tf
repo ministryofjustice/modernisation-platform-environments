@@ -385,6 +385,107 @@ locals {
       # })
 
     }
+    baseline_lbs = {
+      private = {
+        internal_lb                      = true
+        enable_delete_protection         = false
+        load_balancer_type               = "application"
+        idle_timeout                     = 3600
+        security_groups                  = ["private"]
+        subnets                          = module.environment.subnets["private"].ids
+        enable_cross_zone_load_balancing = true
+
+        instance_target_groups = {
+          pp-ncr-cmc = {
+            port     = 7777
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              path                = "/"
+              healthy_threshold   = 3
+              unhealthy_threshold = 5
+              timeout             = 5
+              interval            = 30
+              matcher             = "200-399"
+              port                = 7777
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-ncr-web-admin-a" },
+              { ec2_instance_name = "pp-ncr-web-1-a" },
+              { ec2_instance_name = "pp-ncr-web-2-b" },
+            ]
+          }
+        }
+        listeners = {
+          http = {
+            port     = 7777
+            protocol = "HTTP"
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+              pp-ncr-cmc = {
+                priority = 4000
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-ncr-cmc"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+                      "pp-ncr-web-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+                      "pp-ncr-web-2-b.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          }
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+              pp-ncr-cmc = {
+                priority = 4580
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-ncr-cmc"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+                      "pp-ncr-web-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+                      "pp-ncr-web-2-b.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          }
+        }
+      }
+    }
     baseline_route53_zones = {
       "preproduction.reporting.nomis.service.justice.gov.uk" = {
         records = [
