@@ -171,10 +171,10 @@ module "zip_bastion" {
   log_expiry_days      = 180 # days before log expiration
   
   allow_ssh_commands = true
-  autoscaling_cron   = {
-    "down": "0 20 * * *",
-    "up": "*/30 * * * *"
-  }
+  # autoscaling_cron   = {
+  #   "down": "0 20 * * *",
+  #   "up": "*/30 * * * *"
+  # }
   app_name           = var.networking[0].application
   business_unit      = local.vpc_name
   subnet_set         = local.subnet_set
@@ -184,4 +184,13 @@ module "zip_bastion" {
   # tags
   tags_common = local.tags
   tags_prefix = terraform.workspace
+}
+
+resource "aws_vpc_security_group_egress_rule" "zip_bastion_vpc_access" {
+  security_group_id = module.zip_bastion.bastion_security_group
+  description       = "Reach vpc endpoints"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
