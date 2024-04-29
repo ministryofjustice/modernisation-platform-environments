@@ -175,7 +175,7 @@ resource "aws_kinesisanalyticsv2_application" "master_summary" {
       parallelism_configuration {
         auto_scaling_enabled = true
         configuration_type   = "CUSTOM"
-        parallelism          = 6
+        parallelism          = 1
         parallelism_per_kpu  = 1
       }
     }
@@ -247,7 +247,7 @@ resource "aws_kinesisanalyticsv2_application" "master_complex" {
       parallelism_configuration {
         auto_scaling_enabled = true
         configuration_type   = "CUSTOM"
-        parallelism          = 6
+        parallelism          = 2
         parallelism_per_kpu  = 1
       }
     }
