@@ -221,6 +221,14 @@ resource "aws_security_group" "cluster_ec2" {
   }
 
   ingress {
+    description = "FTP access"
+    from_port   = 21
+    to_port     = 21
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     protocol    = "tcp"
     description = "Allow traffic from bastion"
     from_port   = 0
