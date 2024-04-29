@@ -7,7 +7,7 @@ module "unzipped_store_log_bucket" {
 }
 
 resource "aws_s3_bucket" "unzipped_store" {
-  bucket_prefix = "em-data-store-"
+  bucket_prefix = "em-unzipped-data-store-"
 
   tags = local.tags
 }
