@@ -1,5 +1,5 @@
 locals {
-  flink_views_jar_file = "flink-spike-0.22-SNAPSHOT-all.jar"
+  flink_views_jar_file = "flink-spike-0.23-SNAPSHOT-all.jar"
   flink_jar_bucket_arn = "arn:aws:s3:::flink-demo-771283872747-eu-west-2-1713861000297-bucket"
 }
 
