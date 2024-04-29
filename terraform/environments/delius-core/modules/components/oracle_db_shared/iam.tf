@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "business_unit_kms_key_access" {
 }
 
 resource "aws_iam_policy" "business_unit_kms_key_access" {
-  name   = format("%s-delius-db-business_unit_kms_key_access_policy", var.env_name)
+  name   = "${var.env_name}-db-business-unit-kms-key-access-policy"
   path   = "/"
   policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
 }
@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "core_shared_services_bucket_access" {
 }
 
 resource "aws_iam_policy" "core_shared_services_bucket_access" {
-  name   = format("%s-delius-db-core_shared_services_bucket_access_policy", var.env_name)
+  name   = "${var.env_name}-db-core-shared-services-bucket-access-policy"
   path   = "/"
   policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
 }
@@ -99,7 +99,7 @@ data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
 }
 
 resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
-  name   = format("%s-delius-db-allow_access_to_ssm_parameter_store", var.env_name)
+  name   = "${var.account_info.application_name}-${var.env_name}-ssm-parameter-store-access"
   path   = "/"
   policy = data.aws_iam_policy_document.allow_access_to_ssm_parameter_store.json
 }
@@ -110,7 +110,7 @@ resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
 #}
 
 resource "aws_iam_policy" "ec2_access_for_ansible" {
-  name   = format("%s-delius-db-ec2_access_for_ansible", var.env_name)
+  name   = "${var.account_info.application_name}-${var.env_name}-ansible-ec2-access"
   path   = "/"
   policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
 }
@@ -159,7 +159,7 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
 }
 
 resource "aws_iam_policy" "db_access_to_secrets_manager" {
-  name   = "${var.env_name}-delius-db-allow-access-secrets-manager"
+  name   = "${var.account_info.application_name}-${var.env_name}-secrets-manager-access"
   policy = data.aws_iam_policy_document.db_access_to_secrets_manager.json
 }
 
@@ -222,7 +222,7 @@ data "aws_iam_policy_document" "instance_ssm" {
 }
 
 resource "aws_iam_policy" "instance_ssm" {
-  name   = "${var.env_name}-delius-db-allow-access-ssm"
+  name   = "${var.account_info.application_name}-${var.env_name}-ssm-access"
   policy = data.aws_iam_policy_document.instance_ssm.json
 }
 
@@ -242,7 +242,7 @@ resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
       "Action": "sts:AssumeRole",
       "Condition": {
         "ForAnyValue:ArnLike": {
-          "aws:PrincipalArn": "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.env_name}-delius-db-*"
+          "aws:PrincipalArn": "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.account_info.application_name}-${var.env_name}-db-*"
         }
       }
     }
