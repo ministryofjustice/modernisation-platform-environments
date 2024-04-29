@@ -167,6 +167,7 @@ resource "aws_kinesisanalyticsv2_application" "master_summary_batch" {
       checkpoint_configuration {
         configuration_type    = "CUSTOM"
         checkpointing_enabled = false
+        checkpoint_interval   = 3600000
       }
 
       monitoring_configuration {
@@ -214,7 +215,7 @@ resource "aws_kinesisanalyticsv2_application" "master_summary_stream" {
   application_configuration {
 
     application_snapshot_configuration {
-      snapshots_enabled = false
+      snapshots_enabled = true
     }
 
     environment_properties {
@@ -241,8 +242,10 @@ resource "aws_kinesisanalyticsv2_application" "master_summary_stream" {
 
     flink_application_configuration {
       checkpoint_configuration {
-        configuration_type    = "CUSTOM"
-        checkpointing_enabled = false
+        configuration_type            = "CUSTOM"
+        checkpointing_enabled         = true
+        checkpoint_interval           = 60000
+        min_pause_between_checkpoints = 5000
       }
 
       monitoring_configuration {
@@ -318,6 +321,7 @@ resource "aws_kinesisanalyticsv2_application" "master_complex_batch" {
       checkpoint_configuration {
         configuration_type    = "CUSTOM"
         checkpointing_enabled = false
+        checkpoint_interval   = 3600000
       }
 
       monitoring_configuration {
@@ -365,7 +369,7 @@ resource "aws_kinesisanalyticsv2_application" "master_complex_stream" {
   application_configuration {
 
     application_snapshot_configuration {
-      snapshots_enabled = false
+      snapshots_enabled = true
     }
 
     environment_properties {
@@ -391,8 +395,10 @@ resource "aws_kinesisanalyticsv2_application" "master_complex_stream" {
 
     flink_application_configuration {
       checkpoint_configuration {
-        configuration_type    = "CUSTOM"
-        checkpointing_enabled = false
+        configuration_type            = "CUSTOM"
+        checkpointing_enabled         = true
+        checkpoint_interval           = 60000
+        min_pause_between_checkpoints = 5000
       }
 
       monitoring_configuration {
