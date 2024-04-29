@@ -5,7 +5,7 @@ locals {
 
     baseline_secretsmanager_secrets = {
       "/ec2/onr-web/test" = local.web_secretsmanager_secrets
-
+      "/ec2/onr-boe/test" = local.boe_secretsmanager_secrets
       "/oracle/database/T3ONRAU"  = local.database_secretsmanager_secrets
       "/oracle/database/T3ONRBDS" = local.database_secretsmanager_secrets
       "/oracle/database/T3ONRSYS" = local.database_secretsmanager_secrets
@@ -72,6 +72,9 @@ locals {
       })
       test-boe-asg = merge(local.defaults_boe_ec2, {
         config = merge(local.defaults_boe_ec2.config, {
+          instance_profile_policies = setunion(local.defaults_boe_ec2.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
           availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_boe_ec2.instance, {
