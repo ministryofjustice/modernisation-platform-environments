@@ -108,7 +108,7 @@ locals {
         evaluation_periods  = "60"
         datapoints_to_alarm = "60"
         metric_name         = "disk_used_percent"
-        namespace           = "CWAgent"
+        namespace           = "CWAgent, InstanceId,device,fstype,name,path,server_type"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "85"
