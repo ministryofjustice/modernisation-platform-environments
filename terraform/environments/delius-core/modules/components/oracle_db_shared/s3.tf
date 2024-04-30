@@ -26,7 +26,9 @@ module "s3_bucket_oracledb_backups" {
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.kms_keys.general_shared
-  bucket_policy       = [try(data.aws_iam_policy_document.s3_bucket_oracledb_backups[0].json, "")]
+  bucket_policy = try([data.aws_iam_policy_document.s3_bucket_oracledb_backups[0].json], [
+    "{}"
+  ])
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
@@ -327,7 +329,9 @@ module "s3_bucket_oracle_statistics" {
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.kms_keys.general_shared
-  bucket_policy       = [try(data.aws_iam_policy_document.s3_bucket_oracle_statistics[0].json, "")]
+  bucket_policy = try([data.aws_iam_policy_document.s3_bucket_oracle_statistics[0].json], [
+    "{}"
+  ])
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
