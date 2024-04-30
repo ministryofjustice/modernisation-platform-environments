@@ -7,7 +7,7 @@ locals {
   layer_name        = "create_athena_external_tables_layer"
   requirements_name = "create_athena_external_tables_requirements.txt"
   requirements_path = "${local.layer_path}/${local.requirements_name}"
-  layer_zip_path    = "${local.lambda_path}/${local.layer_zip_name}"
+  layer_zip_path    = "${local.layer_path}/${local.layer_zip_name}"
 }
 
 resource "null_resource" "lambda_layer" {
