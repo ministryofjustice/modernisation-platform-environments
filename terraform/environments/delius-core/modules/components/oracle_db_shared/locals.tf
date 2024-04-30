@@ -1,5 +1,5 @@
 locals {
-  secret_prefix = "${var.account_info.application_name}-${var.env_name}-oracle"
+  secret_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
 
   dba_secret_name = "${local.secret_prefix}-dba-passwords"
 
@@ -53,5 +53,5 @@ locals {
     #     }
   }
 
-  oracle_backup_bucket_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-database-backups"
+  oracle_backup_bucket_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
 }

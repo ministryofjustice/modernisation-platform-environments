@@ -9,6 +9,7 @@ locals {
 
 module "oracle_db_shared" {
   source             = "../../../delius-core/modules/components/oracle_db_shared"
+  for_each           = toset(["dsd-db", "boe-db", "mis-db"])
   account_config     = var.account_config
   environment_config = var.environment_config
   account_info       = var.account_info
@@ -16,6 +17,8 @@ module "oracle_db_shared" {
   env_name           = var.env_name
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
+
+  db_suffix = each.key
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
