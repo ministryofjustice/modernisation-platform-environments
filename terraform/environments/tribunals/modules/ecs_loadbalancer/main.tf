@@ -109,7 +109,6 @@ resource "aws_lb_listener" "tribunals_lb_ftp" {
   depends_on = [
     var.aws_acm_certificate_external
   ]
-  certificate_arn   = var.aws_acm_certificate_external.arn
   load_balancer_arn = aws_lb.tribunals_lb_ftp.arn
   port              = var.application_data.server_port_3
   protocol          = var.application_data.lb_listener_protocol_3
