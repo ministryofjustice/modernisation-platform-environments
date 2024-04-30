@@ -69,7 +69,7 @@ module "oracle_db_dsd" {
     var.dsd_db_config.ansible_user_data_config
   )
 
-  ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
+  ssh_keys_bucket_name = module.oracle_db_shared["dsd-db"].ssh_keys_bucket_name
 
   instance_profile_policies = [for v in values(module.oracle_db_shared["dsd-db"].instance_policies) : v.arn]
 
@@ -120,7 +120,7 @@ module "oracle_db_boe" {
     var.boe_db_config.ansible_user_data_config
   )
 
-  ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
+  ssh_keys_bucket_name = module.oracle_db_shared["boe-db"].ssh_keys_bucket_name
 
   instance_profile_policies = [for v in values(module.oracle_db_shared["boe-db"].instance_policies) : v.arn]
 
@@ -170,7 +170,7 @@ module "oracle_db_mis" {
     var.mis_db_config.ansible_user_data_config
   )
 
-  ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
+  ssh_keys_bucket_name = module.oracle_db_shared["mis-db"].ssh_keys_bucket_name
 
   instance_profile_policies = [for v in values(module.oracle_db_shared["mis-db"].instance_policies) : v.arn]
 
