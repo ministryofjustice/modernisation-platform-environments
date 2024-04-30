@@ -43,3 +43,9 @@ variable "deploy_oracle_stats" {
   default     = true
   type        = bool
 }
+
+variable "db_suffix" {
+  description = "identifier to append to name e.g. dsd, boe"
+  type        = string
+  default     = "db"
+}

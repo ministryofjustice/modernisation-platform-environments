@@ -1,9 +1,9 @@
 resource "aws_security_group" "db_ec2" {
-  name        = "${var.account_info.application_name}-${var.env_name}-db-ec2-instance-sg"
+  name        = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ec2-instance-sg"
   description = "Controls access to db ec2 instance"
   vpc_id      = var.account_config.shared_vpc_id
   tags = merge(var.tags,
-    { Name = "${var.account_info.application_name}-${var.env_name}-db-ec2-instance-sg" }
+    { Name = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ec2-instance-sg" }
   )
   lifecycle {
     create_before_destroy = true

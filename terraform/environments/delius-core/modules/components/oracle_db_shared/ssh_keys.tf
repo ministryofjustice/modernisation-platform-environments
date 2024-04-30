@@ -3,7 +3,7 @@ module "s3_bucket_ssh_keys" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
-  bucket_name = "${var.account_info.application_name}-${var.env_name}-oracle-database-ssh-keys"
+  bucket_name = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-ssh-keys"
 
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -57,7 +57,7 @@ resource "aws_s3_object" "user_public_keys" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.account_info.application_name}-${var.env_name}-${each.key}-db-publickey"
+      Name = "${var.account_info.application_name}-${var.env_name}-${each.key}-${var.db_suffix}-publickey"
     }
   )
 
@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "db_ssh_keys_s3_policy_document" {
 }
 
 resource "aws_iam_policy" "db_ssh_keys_s3" {
-  name   = "${var.account_info.application_name}-${var.env_name}-db-ssh-keys-s3"
+  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ssh-keys-s3"
   policy = data.aws_iam_policy_document.db_ssh_keys_s3_policy_document.json
 }
 

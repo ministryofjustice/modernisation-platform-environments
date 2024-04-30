@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_duplicate_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_duplicate_map[var.env_name]["target_environment"]}-db-1"]
+      identifiers = ["arn:aws:iam::${local.oracle_duplicate_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_duplicate_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
     }
   }
 
@@ -297,7 +297,7 @@ data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-db-1"]
+      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
     }
   }
 
@@ -314,7 +314,7 @@ data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-db-1"]
+      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
     }
   }
 }
@@ -324,7 +324,7 @@ module "s3_bucket_oracle_statistics" {
   count = var.deploy_oracle_stats ? 1 : 0
 
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
-  bucket_name         = "${var.account_info.application_name}-${var.env_name}-oracle-statistics-backup-data"
+  bucket_name         = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-statistics-backup-data"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
