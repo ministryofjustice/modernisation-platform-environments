@@ -70,10 +70,6 @@ resource "aws_lb_target_group" "tribunals_target_group_ftp" {
   target_type          = "instance"
   deregistration_delay = 30
 
-  stickiness {
-    type = "lb_cookie"
-  }
-
   health_check {
     healthy_threshold   = "3"
     interval            = "15"
