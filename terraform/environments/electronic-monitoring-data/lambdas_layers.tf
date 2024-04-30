@@ -3,9 +3,9 @@
 # --------------------------------------------------------------------------------------------------
 locals {
   layer_path        = "${local.lambda_path}/layers"
-  layer_zip_name    = "create_external_athena_tables_layer.zip"
-  layer_name        = "create_external_athena_tables_layer"
-  requirements_name = "create_external_athena_tables_requirements.txt"
+  layer_zip_name    = "create_athena_external_tables_layer.zip"
+  layer_name        = "create_athena_external_tables_layer"
+  requirements_name = "create_athena_external_tables_requirements.txt"
   requirements_path = "${local.layer_path}/${local.requirements_name}"
 }
 
