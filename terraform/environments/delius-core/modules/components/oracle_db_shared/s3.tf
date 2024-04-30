@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_duplicate_map[var.env_name]["target_account_id"]}:role/instance-role-${local.oracle_duplicate_map[var.env_name]["target_environment"]}-db-1"]
+      identifiers = ["arn:aws:iam::${local.oracle_duplicate_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.mp_environment}-${local.oracle_duplicate_map[var.env_name]["target_environment"]}-db-1"]
     }
   }
 
@@ -137,7 +137,7 @@ data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
     actions = [
       "s3:ListBucket"
     ]
-    resources = ["arn:aws:s3:::${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-statistics-backup-data"]
+    resources = ["arn:aws:s3:::${var.account_info.mp_environment}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-statistics-backup-data"]
   }
 
   statement {
@@ -149,7 +149,7 @@ data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
       "s3:GetObjectTagging",
       "s3:GetObject"
     ]
-    resources = ["arn:aws:s3:::${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-statistics-backup-data/*"]
+    resources = ["arn:aws:s3:::${var.account_info.mp_environment}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-statistics-backup-data/*"]
   }
 }
 
@@ -312,7 +312,7 @@ data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.mp_environment}-${local.oracle_statistics_map[var.env_name]["target_environment"]}}-db-1"]
+      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.mp_environment}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-db-1"]
     }
   }
 }
