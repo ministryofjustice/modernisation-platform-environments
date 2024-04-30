@@ -53,5 +53,5 @@ locals {
     #     }
   }
 
-  oracle_backup_bucket_prefix = "${var.account_info.mp_environment}-${var.env_name}-oracle-database-backups"
+  oracle_backup_bucket_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-database-backups"
 }
