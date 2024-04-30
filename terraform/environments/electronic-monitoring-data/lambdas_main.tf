@@ -7,8 +7,8 @@ locals {
 
 data "archive_file" "create_athena_external_tables" {
     type = "zip"
-    source_file = "${local.path}/create_athena_external_tables.py"
-    output_path = "${local.path}/create_athena_external_tables.zip"
+    source_file = "${local.lambda_path}/create_athena_external_tables.py"
+    output_path = "${local.lambda_path}/create_athena_external_tables.zip"
 }
 
 # ------------------
@@ -16,7 +16,7 @@ data "archive_file" "create_athena_external_tables" {
 # ------------------
 
 resource "aws_lambda_function" "create_athena_external_tables" {
-    filename = "${local.path}/create_athena_external_tables.zip"
+    filename = "${local.lambda_path}/create_athena_external_tables.zip"
     function_name = "create_athena_external_tables"
     role = aws_iam_role.create_athena_external_tables_lambda.name
     handler = "lambda.handler"
