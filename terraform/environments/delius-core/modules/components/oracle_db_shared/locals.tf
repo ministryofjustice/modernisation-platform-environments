@@ -1,5 +1,5 @@
 locals {
-  secret_prefix = "${var.env_name}-oracle"
+  secret_prefix = "${var.account_info.application_name}-${var.env_name}-oracle"
 
   dba_secret_name = "${local.secret_prefix}-dba-passwords"
 
