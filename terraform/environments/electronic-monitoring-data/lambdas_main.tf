@@ -20,7 +20,7 @@ resource "aws_lambda_function" "create_athena_external_tables" {
     function_name = "create_athena_external_tables"
     role = aws_iam_role.create_athena_external_tables_lambda.arn
     handler = "lambda.handler"
-
+    layers = [aws_lambda_layer_version.create_athena_external_tables_layer.arn]
     source_code_hash = data.archive_file.create_athena_external_tables.output_base64sha256
     depends_on    = [aws_cloudwatch_log_group.create_athena_external_tables_lambda]
 
