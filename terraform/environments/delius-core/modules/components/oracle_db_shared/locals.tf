@@ -8,10 +8,10 @@ locals {
   oem_account_id = var.platform_vars.environment_management.account_ids[join("-", ["hmpps-oem", var.account_info.mp_environment])]
 
   oracle_statistics_map = {
-    #     "dev" = {
-    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-    #       "target_environment" = "test"
-    #     },
+    "dev" = {
+      #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+      #       "target_environment" = "test"
+    },
     "test" = {
       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
       "source_environment" = "dev"
@@ -31,10 +31,10 @@ locals {
   }
 
   oracle_duplicate_map = {
-    #     "dev" = {
-    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-    #       "target_environment" = "test"
-    #     }
+    "dev" = {
+      #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+      #       "target_environment" = "test"
+    }
     "test" = {
       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
       "source_environment" = "dev"
