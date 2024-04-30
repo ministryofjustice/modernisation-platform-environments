@@ -388,7 +388,7 @@ locals {
       #   })
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "ords_parameter_file_update"
+      #       branch = "oasys-maintenance-message"
       #     })
       #   })
       #   #autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
