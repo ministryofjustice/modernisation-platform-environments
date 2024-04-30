@@ -1,5 +1,5 @@
 locals {
-    path = "lambdas/"
+    lambda_path = "lambdas/"
 }
 # ------------------
 # Zip Files
