@@ -39,6 +39,16 @@ resource "aws_lb" "tribunals_lb" {
   depends_on                 = [aws_security_group.tribunals_lb_sc]
 }
 
+resource "aws_lb" "tribunals_lb_ftp" {
+  name                       = "${var.app_name}-lb"
+  load_balancer_type         = "network"
+  security_groups            = [aws_security_group.tribunals_lb_sc.id]
+  subnets                    = var.subnets_shared_public_ids
+  enable_deletion_protection = false
+  internal                   = false
+  depends_on                 = [aws_security_group.tribunals_lb_sc]
+}
+
 resource "aws_lb_target_group" "tribunals_target_group" {
   name                 = "${var.app_name}-tg"
   port                 = 80
@@ -100,10 +110,9 @@ resource "aws_lb_listener" "tribunals_lb_ftp" {
     var.aws_acm_certificate_external
   ]
   certificate_arn   = var.aws_acm_certificate_external.arn
-  load_balancer_arn = aws_lb.tribunals_lb.arn
+  load_balancer_arn = aws_lb.tribunals_lb_ftp.arn
   port              = var.application_data.server_port_3
-  protocol          = var.application_data.lb_listener_protocol_2
-  ssl_policy        = var.application_data.lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+  protocol          = var.application_data.lb_listener_protocol_3
 
   default_action {
     type             = "forward"
