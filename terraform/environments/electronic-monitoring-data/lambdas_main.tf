@@ -24,7 +24,7 @@ resource "aws_lambda_function" "create_athena_external_tables" {
     source_code_hash = data.archive_file.create_athena_external_tables.output_base64sha256
     depends_on    = [aws_cloudwatch_log_group.create_athena_external_tables_lambda]
 
-    runtime = "python3.12"
+    runtime = "python3.11"
 
     environment {
       variables = {
