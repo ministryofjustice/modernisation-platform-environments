@@ -49,9 +49,9 @@ module "oracle_db_dsd" {
   db_count_index    = count.index + 1
   ec2_instance_type = var.dsd_db_config.instance_type
 
-  security_group_ids = [module.oracle_db_shared.security_group.id]
+  security_group_ids = [module.oracle_db_shared["dsd-db"].security_group.id]
 
-  ec2_key_pair_name = module.oracle_db_shared.db_key_pair.key_name
+  ec2_key_pair_name = module.oracle_db_shared["dsd-db"].db_key_pair.key_name
 
   user_data_replace_on_change = false
 
@@ -71,7 +71,7 @@ module "oracle_db_dsd" {
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
+  instance_profile_policies = [for v in values(module.oracle_db_shared["dsd-db"].instance_policies) : v.arn]
 
   deploy_oracle_stats = false
 
@@ -100,9 +100,9 @@ module "oracle_db_boe" {
   db_count_index    = count.index + 1
   ec2_instance_type = var.boe_db_config.instance_type
 
-  security_group_ids = [module.oracle_db_shared.security_group.id]
+  security_group_ids = [module.oracle_db_shared["boe-db"].security_group.id]
 
-  ec2_key_pair_name = module.oracle_db_shared.db_key_pair.key_name
+  ec2_key_pair_name = module.oracle_db_shared["boe-db"].db_key_pair.key_name
 
   user_data_replace_on_change = false
 
@@ -122,7 +122,7 @@ module "oracle_db_boe" {
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
+  instance_profile_policies = [for v in values(module.oracle_db_shared["boe-db"].instance_policies) : v.arn]
 
   deploy_oracle_stats = false
 
@@ -150,9 +150,9 @@ module "oracle_db_mis" {
   db_count_index    = count.index + 1
   ec2_instance_type = var.mis_db_config.instance_type
 
-  security_group_ids = [module.oracle_db_shared.security_group.id]
+  security_group_ids = [module.oracle_db_shared["mis-db"].security_group.id]
 
-  ec2_key_pair_name = module.oracle_db_shared.db_key_pair.key_name
+  ec2_key_pair_name = module.oracle_db_shared["mis-db"].db_key_pair.key_name
 
   user_data_replace_on_change = false
 
@@ -172,7 +172,7 @@ module "oracle_db_mis" {
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
+  instance_profile_policies = [for v in values(module.oracle_db_shared["mis-db"].instance_policies) : v.arn]
 
   deploy_oracle_stats = false
 
