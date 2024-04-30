@@ -5,6 +5,8 @@ locals {
   test_cloudwatch_monitoring_options = {
     enable_cloudwatch_cross_account_sharing = true
     enable_cloudwatch_dashboard             = true
+    monitoring_account_id                   = module.environment.account_ids.hmpps-oem-test
+    source_account_ids                      = [module.environment.account_ids.oasys-test]
   }
 
   test_baseline_presets_options = {
@@ -386,7 +388,7 @@ locals {
       #   })
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "ords_parameter_file_update"
+      #       branch = "oasys-maintenance-message"
       #     })
       #   })
       #   #autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby

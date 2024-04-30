@@ -97,5 +97,7 @@ locals {
     enable_cloudwatch_monitoring_account    = false
     enable_cloudwatch_cross_account_sharing = false
     enable_cloudwatch_dashboard             = false
+    monitoring_account_id                   = {}
+    source_account_ids                      = {}
   }
 }

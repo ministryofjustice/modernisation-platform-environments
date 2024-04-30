@@ -44,11 +44,12 @@ locals {
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
 
     tags = {
-      description = "BODS & IPS component"
-      ami         = "windows_server_2019"
-      os-type     = "Windows"
-      server-type = "etl"
-      component   = "etl"
+      description            = "BODS & IPS component"
+      ami                    = "windows_server_2019"
+      os-type                = "Windows"
+      server-type            = "etl"
+      component              = "etl"
+      instance-access-policy = "full"
     }
   }
 }
