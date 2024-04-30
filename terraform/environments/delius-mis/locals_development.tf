@@ -201,7 +201,7 @@ locals {
     instance_type  = "t3.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
     ebs_volumes = {
-      "/dev/sdb" = { label = "app", size = 100 } # /u01
+      "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
       "/dev/sde" = { label = "data" }            # DATA
       "/dev/sdf" = { label = "flash" }           # FLASH
@@ -217,13 +217,13 @@ locals {
         iops       = 3000
         throughput = 125
         type       = "gp3"
-        total_size = 500
+        total_size = 100
       }
       flash = {
         iops       = 3000
         throughput = 125
         type       = "gp3"
-        total_size = 500
+        total_size = 100
       }
     }
     ansible_user_data_config = {
@@ -235,32 +235,19 @@ locals {
   }
 
   # use slightly different config for each database
-  dsd_db_config_dev = merge(local.base_db_config_dev, {
-    ebs_volumes = merge(local.base_db_config_dev.ebs_volumes, {
-      "/dev/sdb" = { label = "app", size = 200 },
-      "/dev/sdc" = { label = "app", size = 100 }
-    })
-  })
+  dsd_db_config_dev = local.base_db_config_dev
 
-  boe_db_config_dev = merge(local.base_db_config_dev, {
-    ebs_volumes = merge(local.base_db_config_dev.ebs_volumes, {
-      "/dev/sdb" = { label = "app", size = 200 },
-      "/dev/sdc" = { label = "app", size = 100 }
-    })
-  })
+  boe_db_config_dev = local.base_db_config_dev
   
   mis_db_config_dev = merge(local.base_db_config_dev, {
-    ebs_volumes = merge(local.base_db_config_dev.ebs_volumes, {
-      "/dev/sdb" = { label = "app", size = 500 },
-      "/dev/sdc" = { label = "app", size = 500 }
-    }),
     ebs_volume_config = merge(local.base_db_config_dev.ebs_volume_config, {
       data = {
         iops       = 5000 
-        throughput = 125
-        type       = "gp3"
         total_size = 500
-        }
+        },
+      flash = {
+        total_size = 500
+      }
      })
   })
 
