@@ -65,7 +65,7 @@ resource "aws_lb_target_group" "tribunals_target_group" {
 resource "aws_lb_target_group" "tribunals_target_group_ftp" {
   name                 = "${var.app_name}-ftp-tg"
   port                 = 21
-  protocol             = "ftp"
+  protocol             = "tcp"
   vpc_id               = var.vpc_shared_id
   target_type          = "instance"
   deregistration_delay = 30
