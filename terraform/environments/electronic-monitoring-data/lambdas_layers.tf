@@ -30,5 +30,5 @@ resource "aws_lambda_layer_version" "create_external_athena_tables_layer" {
     filename            = local.layer_zip_name
     layer_name          = local.layer_name
     compatible_runtimes = ["python3.12"]
-    source_code_hash    = filesha1(local.layer_zip_name)
+    source_code_hash    = filesha1(local.layer_zip_path)
 }
