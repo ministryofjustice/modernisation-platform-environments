@@ -139,7 +139,7 @@ data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
     actions = [
       "s3:ListBucket"
     ]
-    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-statistics-backup-data"]
+    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-statistics-backup-data"]
   }
 
   statement {
@@ -151,7 +151,7 @@ data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
       "s3:GetObjectTagging",
       "s3:GetObject"
     ]
-    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-statistics-backup-data/*"]
+    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-statistics-backup-data/*"]
   }
 }
 
@@ -180,7 +180,7 @@ data "aws_iam_policy_document" "combined" {
 
 resource "aws_iam_policy" "oracledb_backup_bucket_access" {
 
-  name        = "${var.env_name}-oracledb-backup-bucket-access"
+  name        = "${var.env_name}-oracle-${var.db_suffix}-backup-bucket-access"
   description = "Allow access to Oracle DB Backup Bucket"
   policy      = data.aws_iam_policy_document.combined.json
 }
@@ -265,7 +265,7 @@ resource "aws_s3_bucket_policy" "oracledb_backups_inventory_policy" {
 resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
 
   bucket = module.s3_bucket_oracledb_backups.bucket.id
-  name   = "${var.account_info.application_name}-${var.env_name}-oracle-database-backup-pieces"
+  name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backup-pieces"
 
   included_object_versions = "Current"
 
