@@ -186,7 +186,7 @@ def get_gcatalog_rds_crawler_db_info(glue_catalog_db_name):
         next_token = response.get("NextToken")
         if next_token is None:
             break
-    # LOGGER.info("\n", crawler_rds_tables, "\n")
+    LOGGER.info("\n", crawler_rds_tables, "\n")
 
     gctl_schema_dict = OrderedDict()
     previous_db_tbl = ""
@@ -319,30 +319,30 @@ def has_query_succeeded(execution_id):
 def handler(event, context):
     # -- 1 Fetch the given list of databases to be processed after confirming their existance in list format.
     db_names_list = get_rds_database_names(RDS_GLUE_CONNECTION_STR)
-    # LOGGER.info(db_names_list)
+    LOGGER.info(db_names_list)
 
     # -- 2 Get the details like the database-table names-&-column names alongside the column order values from RDS-MSSQLServer-DB in dict format
     rds_db_sch_tbl_col_dict = get_rds_tbl_col_order(
         RDS_GLUE_CONNECTION_STR, db_names_list
     )
-    # LOGGER.info(rds_db_sch_tbl_col_dict)
+    LOGGER.info(rds_db_sch_tbl_col_dict)
 
-    # for k, v in rds_db_sch_tbl_col_dict.items():
-    #     LOGGER.info(k, v)
+    for k, v in rds_db_sch_tbl_col_dict.items():
+        LOGGER.info(k, v)
 
     # -- 3 Get the details like the database-table names-&-column names alongside the column types from AWS-Glue-DataCatalog in dict format
     gctlg_db_sch_tbl_col_dict = get_gcatalog_rds_crawler_db_info(CRAWLER_OUTPUT_DB_NAME)
-    # LOGGER.info(gctl_db_sch_tbl_col_dict)
+    LOGGER.info(gctlg_db_sch_tbl_col_dict)
 
-    # for k, v in gctl_db_sch_tbl_col_dict.items():
-    #     LOGGER.info(k, v)
+    for k, v in gctlg_db_sch_tbl_col_dict.items():
+        LOGGER.info(k, v)
 
     # -- 4 Capture the existing s3 folder paths for each corresponding rds-database-table migrated.
     full_tbl_path_dict = get_s3_csv_tbls_path(rds_db_sch_tbl_col_dict)
-    # LOGGER.info(full_tbl_path_dict)
+    LOGGER.info(full_tbl_path_dict)
 
-    # for k, v in full_tbl_path_dict.items():
-    #     LOGGER.info(k, v)
+    for k, v in full_tbl_path_dict.items():
+        LOGGER.info(k, v)
 
     # -- 5 Create Athena-Database(s) in AWSDataCatalog for each corresponding database exists in RDS-MSSQLServer-DB-Instance
     # Note: Drop the athena databases manually if needs to be replaced.
@@ -371,8 +371,8 @@ def handler(event, context):
                 tbl_colmns_str,
                 full_tbl_path_dict[table_key],
             )
-            # LOGGER.info(table_ddl)
-            # LOGGER.info("\n")
+            LOGGER.info(table_ddl)
+            LOGGER.info("\n")
 
             # Create Table
             execution_id = create_table(table_ddl)
