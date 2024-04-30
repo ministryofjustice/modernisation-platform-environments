@@ -18,7 +18,7 @@ data "archive_file" "create_athena_external_tables" {
 resource "aws_lambda_function" "create_athena_external_tables" {
     filename = "${local.lambda_path}/create_athena_external_tables.zip"
     function_name = "create_athena_external_tables"
-    role = aws_iam_role.create_athena_external_tables_lambda.name
+    role = aws_iam_role.create_athena_external_tables_lambda.arn
     handler = "lambda.handler"
 
     source_code_hash = data.archive_file.create_athena_external_tables.output_base64sha256
