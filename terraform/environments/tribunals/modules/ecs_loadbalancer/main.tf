@@ -40,7 +40,7 @@ resource "aws_lb" "tribunals_lb" {
 }
 
 resource "aws_lb" "tribunals_lb_ftp" {
-  name                       = "${var.app_name}-lb"
+  name                       = "${var.app_name}-ftp-lb"
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = var.subnets_shared_public_ids
