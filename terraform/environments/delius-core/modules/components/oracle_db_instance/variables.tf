@@ -38,6 +38,11 @@ variable "server_type_tag" {
   default     = "delius_core_db"
 }
 
+variable "database_tag_prefix" {
+  description = "tag to set on each instance for key `database`"
+  default     = "delius"
+}
+
 variable "subnet_id" {
   description = "Subnet ID to launch the instance in"
   type        = string

@@ -41,9 +41,10 @@ module "oracle_db_dsd" {
     name_regex = var.dsd_db_config.ami_name_regex
     owner      = "self"
   }
-  db_type         = "primary"
-  db_suffix       = "dsd-db"
-  server_type_tag = "mis_db"
+  db_type             = "primary"
+  db_suffix           = "dsd-db"
+  server_type_tag     = "mis_db"
+  database_tag_prefix = "dsd"
 
   count             = 1
   db_count_index    = count.index + 1
@@ -92,9 +93,10 @@ module "oracle_db_boe" {
     name_regex = var.boe_db_config.ami_name_regex
     owner      = "self"
   }
-  db_type         = "primary"
-  db_suffix       = "boe-db"
-  server_type_tag = "mis_db"
+  db_type             = "primary"
+  db_suffix           = "boe-db"
+  server_type_tag     = "mis_db"
+  database_tag_prefix = "boe"
 
   count             = 1
   db_count_index    = count.index + 1
@@ -143,9 +145,11 @@ module "oracle_db_mis" {
     name_regex = var.mis_db_config.ami_name_regex
     owner      = "self"
   }
-  db_type           = "primary"
-  db_suffix         = "mis-db"
-  server_type_tag   = "mis_db"
+  db_type             = "primary"
+  db_suffix           = "mis-db"
+  server_type_tag     = "mis_db"
+  database_tag_prefix = "mis"
+
   count             = 1
   db_count_index    = count.index + 1
   ec2_instance_type = var.mis_db_config.instance_type
