@@ -132,6 +132,7 @@ data "aws_iam_policy_document" "bold_egress_bucket_policy" {
   }
 }
 
+#tfsec:ignore:avd-aws-0088 - The bucket policy is attached to the bucket
 module "bold_egress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
