@@ -1,4 +1,6 @@
 locals {
+  vpc_flow_logs_cloudwatch_log_group_name = "/aws/vpc/flow-log"
+
   environment_configuration = local.environment_configurations[local.environment]
   environment_configurations = {
     development = {
