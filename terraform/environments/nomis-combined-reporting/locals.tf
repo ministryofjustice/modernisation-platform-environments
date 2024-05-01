@@ -29,6 +29,7 @@ locals {
   baseline_cloudwatch_log_groups  = {}
   baseline_ec2_autoscaling_groups = {}
   baseline_ec2_instances          = {}
+  baseline_efs                    = {}
   baseline_iam_policies = {
     SasTokenRotatorPolicy = {
       description = "Allows updating of secrets in SSM"

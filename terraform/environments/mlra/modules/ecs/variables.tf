@@ -169,9 +169,9 @@ variable "maatdb_password_secret_name" {
   description = "Parameter store secret name containing the MAATDB database password"
 }
 
-variable "ga_4_tag_id_secret_name" {
+variable "ga_4_tag_id_secret_name2" {
   type        = string
-  description = "Parameter store secret name containing the Google Analytics 4 Tag Id"
+  description = "Parameter store secret name containing the Google Analytics 4 Tag Id - version 2 updated value"
 }
 
 variable "ecs_target_capacity" {

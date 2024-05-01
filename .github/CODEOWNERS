@@ -11,6 +11,7 @@
 /terraform/environments/cdpt-ifs @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
 /terraform/environments/cica-copilot @ministryofjustice/cica-copilot-llm-maintainers @ministryofjustice/modernisation-platform
 /terraform/environments/cica-data-extraction @ministryofjustice/cica-extract-tool-admins @ministryofjustice/modernisation-platform
+/terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
@@ -24,6 +25,7 @@
 /terraform/environments/delius-mis @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-nextcloud @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting-non-cleared-team @ministryofjustice/modernisation-platform
+/terraform/environments/edw @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/electronic-monitoring-data @ministryofjustice/hmpps-electronic-monitoring-data-store @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/eric @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
@@ -65,5 +67,6 @@
 **/subnet_share.tf @ministryofjustice/modernisation-platform
 **/networking.auto.tfvars.json @ministryofjustice/modernisation-platform
 **/platform_*.tf @ministryofjustice/modernisation-platform
+/terraform/modules/probation-webops @ministryofjustice/modernisation-platform @ministryofjustice/hmpps-migration
 /terraform/modules
 .devcontainer @ministryofjustice/devcontainer-community

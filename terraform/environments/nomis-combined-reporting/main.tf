@@ -25,6 +25,10 @@ module "baseline" {
     local.baseline_cloudwatch_log_groups,
     lookup(local.environment_config, "baseline_cloudwatch_log_groups", {}),
   )
+  efs = merge(
+    local.baseline_efs,
+    lookup(local.environment_config, "baseline_efs", {})
+  )
   iam_policies = merge(
     module.baseline_presets.iam_policies,
     local.baseline_iam_policies,

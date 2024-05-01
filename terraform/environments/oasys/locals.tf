@@ -70,7 +70,7 @@ locals {
       ami_name                  = "oasys_webserver_release_2023-07-02*"
       ssm_parameters_prefix     = "ec2-web/"
       iam_resource_names_prefix = "ec2-web"
-      availability_zone         = "${local.region}a"
+      availability_zone         = null
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       monitoring             = true
@@ -86,8 +86,8 @@ locals {
     autoscaling_schedules = {}
     autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
     secretsmanager_secrets = {
-      banner_message = {
-        description             = "OASys banner message text"
+      maintenance_message = {
+        description             = "OASys maintenance message. Use \\n for new lines"
         recovery_window_in_days = 0
       }
     }
@@ -111,9 +111,9 @@ locals {
     }
   }
   webserver_b = merge(local.webserver_a, {
-    config = merge(local.webserver_a.config, {
-      availability_zone = "${local.region}b"
-    })
+    # config = merge(local.webserver_a.config, {
+    #   availability_zone = "${local.region}b"
+    # })
   })
   target_group_http_8080 = {
     port                 = 8080
@@ -476,5 +476,7 @@ locals {
     enable_cloudwatch_monitoring_account    = false
     enable_cloudwatch_cross_account_sharing = false
     enable_cloudwatch_dashboard             = false
+    monitoring_account_id                   = {}
+    source_account_ids                      = {}
   }
 }
