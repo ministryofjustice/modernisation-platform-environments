@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------------------add
 resource "aws_security_group" "lambda_db_security_group" {
   name        = "lambda_db_instance_sg"
-  description = "Secuity Group allowing lambda access to RDS"
+  description = "Security Group allowing lambda access to RDS"
   vpc_id      = data.aws_vpc.shared.id
 }
 
