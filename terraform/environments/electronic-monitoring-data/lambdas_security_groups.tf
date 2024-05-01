@@ -21,7 +21,7 @@ resource "aws_vpc_security_group_ingress_rule" "lambda_to_rds_sg_rule" {
 
   referenced_security_group_id = aws_security_group.lambda_db_security_group.id
   ip_protocol                  = "tcp"
-  from_port                    = 1433
-  to_port                      = 1433
+  from_port                    = 0
+  to_port                      = 65535
   description                  = "Lambda RDS Access"
 }
