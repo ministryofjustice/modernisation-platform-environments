@@ -23,7 +23,7 @@ data "archive_file" "lambda_function_payload_bounce_email_notification" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/bounce_email_notification/"
   output_path = "${path.module}/lambda/bounce_email_notification/bounce_email_notification.zip"
-  excludes    = ["sns_to_cloudwatch_bounce.zip"]
+  excludes    = ["bounce_email_notification.zip"]
 }
 
 resource "aws_lambda_function" "bounce_email_notification" {
@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "lambda_assume_role_policy_bounce_email_notificat
 
 resource "aws_iam_role_policy" "lambda_bounce_email_notification" {
   name   = "lambda"
-  role   = aws_iam_role.lambda.id
+  role   = aws_iam_role.lambda_bounce_email_notification.id
   policy = data.aws_iam_policy_document.lambda_assume_role_policy_bounce_email_notification.json
 }
 
@@ -82,5 +82,5 @@ resource "aws_lambda_permission" "sns_bounce_email_notification" {
 resource "aws_sns_topic_subscription" "lambda_bounce_email_notification" {
   topic_arn = aws_sns_topic.jitbit_ses_destination_topic_bounce_email_notification.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.sns_to_cloudwatch.arn
+  endpoint  = aws_lambda_function.bounce_email_notification.arn
 }
