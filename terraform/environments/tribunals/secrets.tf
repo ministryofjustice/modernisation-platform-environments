@@ -70,3 +70,25 @@ data "aws_secretsmanager_secret_version" "source_db_secret_current" {
   depends_on = [aws_secretsmanager_secret_version.resource_source_db_secret_current]
   secret_id  = data.aws_secretsmanager_secret.source_db_secret.id
 }
+
+resource "random_password" "sftp_password" {
+  length  = 10
+  lower   = true
+  upper   = true
+  numeric = true
+  special = true
+}
+
+resource "aws_secretsmanager_secret" "sftp_password_secret" {
+  name                    = "sftp-password"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "sftp_secret_value" {
+  secret_id     = aws_secretsmanager_secret.sftp_password_secret.id
+  secret_string = <<EOF
+  {
+    "password": "${random_password.sftp_password.result}"
+  }
+  EOF
+}
