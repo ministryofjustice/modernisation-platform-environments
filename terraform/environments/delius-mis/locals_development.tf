@@ -240,15 +240,15 @@ locals {
   boe_db_config_dev = local.base_db_config_dev
   
   mis_db_config_dev = merge(local.base_db_config_dev, {
-    ebs_volume_config = merge(local.base_db_config_dev.ebs_volume_config, {
+    ebs_volume_config = {
       data = {
-        iops       = 5000 
+        iops       = 5000
         total_size = 500
-        },
+      }
       flash = {
         total_size = 500
       }
-     })
+    }
   })
 
 }
