@@ -102,6 +102,7 @@ resource "aws_security_group_rule" "this" {
 }
 
 resource "aws_secretsmanager_secret" "this" {
+  # tflint-ignore: terraform_required_version, terraform_required_providers
   #checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
 
   for_each = toset(["technical-contact", "data-contact", "target-bucket", "slack-channel"])
