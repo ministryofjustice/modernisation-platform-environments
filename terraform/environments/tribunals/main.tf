@@ -9,6 +9,7 @@ locals {
 }
 
 module "appeals" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   # The app_name needs to match the folder name in the volume
   app_name                          = "appeals"
@@ -44,6 +45,7 @@ module "appeals" {
 }
 
 module "ahmlr" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "hmlands"
   app_url                           = "landregistrationdivision"
@@ -78,6 +80,7 @@ module "ahmlr" {
 }
 
 module "care_standards" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "care-standards"
   app_url                           = "carestandards"
@@ -112,6 +115,7 @@ module "care_standards" {
 }
 
 module "cicap" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "cicap"
   app_url                           = "cicap"
@@ -146,6 +150,7 @@ module "cicap" {
 }
 
 module "employment_appeals" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "employment-appeals"
   app_url                           = "employmentappeals"
@@ -180,6 +185,7 @@ module "employment_appeals" {
 }
 
 module "finance_and_tax" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "finance-and-tax"
   app_url                           = "financeandtax"
@@ -214,6 +220,7 @@ module "finance_and_tax" {
 }
 
 module "immigration_services" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "immigration-services"
   app_url                           = "immigrationservices"
@@ -248,6 +255,7 @@ module "immigration_services" {
 }
 
 module "information_tribunal" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "information-tribunal"
   app_url                           = "informationrights"
@@ -282,6 +290,7 @@ module "information_tribunal" {
 }
 
 module "lands_tribunal" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "lands-chamber"
   app_url                           = "landschamber"
@@ -316,6 +325,7 @@ module "lands_tribunal" {
 }
 
 module "transport" {
+  is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "transport"
   app_url                           = "transportappeals"

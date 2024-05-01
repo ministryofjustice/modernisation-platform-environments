@@ -154,4 +154,5 @@ module "ecs_loadbalancer" {
   application_data             = var.application_data
   subnets_shared_public_ids    = var.subnets_shared_public_ids
   aws_acm_certificate_external = var.aws_acm_certificate_external
+  is_ftp_app                   = var.is_ftp_app
 }

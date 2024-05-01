@@ -92,3 +92,7 @@ variable "vpc_shared_id" {
 
 variable "documents_location"{
 }
+
+variable "is_ftp_app" {
+  description = "Determines if it is an ftp app or not"
+}
