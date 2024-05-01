@@ -12,4 +12,6 @@ module "vpc_flow_logs_iam_role" {
   trusted_role_services = ["vpc-flow-logs.amazonaws.com"]
 
   custom_role_policy_arns = [module.vpc_flow_logs_iam_policy.arn]
+
+  tags = local.tags
 }
