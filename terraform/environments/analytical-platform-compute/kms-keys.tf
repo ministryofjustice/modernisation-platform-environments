@@ -8,4 +8,6 @@ module "vpc_flow_logs_kms" {
   description             = "VPC flow logs KMS key"
   enable_default_policy   = true
   deletion_window_in_days = 7
+
+  tags = local.tags
 }

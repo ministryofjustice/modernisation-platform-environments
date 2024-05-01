@@ -7,8 +7,10 @@
 checkov --directory .
 
 # Trivy
-# trivy config \
-#   --tf-exclude-downloaded-modules \
-#   --skip-dirs .terraform \
-#   --ignorefile /workspaces/modernisation-platform-environments/.trivyignore.yaml \
-#   .
+trivy config \
+  --tf-exclude-downloaded-modules \
+  --skip-dirs .terraform \
+  --ignorefile /workspaces/modernisation-platform-environments/.trivyignore.yaml \
+  .
+
+rm -rf github_conf
