@@ -72,11 +72,11 @@ data "aws_secretsmanager_secret_version" "source_db_secret_current" {
 }
 
 resource "random_password" "sftp_password" {
-  length  = 10
+  length  = 16
   lower   = true
   upper   = true
   numeric = true
-  special = true
+  special = false
 }
 
 resource "aws_secretsmanager_secret" "sftp_password_secret" {
