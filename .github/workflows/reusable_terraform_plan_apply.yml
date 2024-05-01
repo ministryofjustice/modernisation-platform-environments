@@ -224,7 +224,7 @@ jobs:
             });
 
             const teamMemberLogins = team_members.map(member => member.login);
-            const approved = reviews.some(review => review.state === 'APPROVED' && review => review.user.login === 'Kudzai-moj' );
+            const approved = reviews.some(review => review.state === 'APPROVED' && review.user.login === 'Kudzai-moj');
 
             if (approved) {
               core.notice('Pull request approved by a member of @ministryofjustice/modernisation-platform');
