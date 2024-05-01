@@ -40,25 +40,15 @@ resource "aws_lambda_function" "bounce_email_notification" {
 
 resource "aws_iam_role" "lambda_bounce_email_notification" {
   name               = "bounce_email_notification-role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy_bounce_email_notification.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 
   tags = local.tags
-}
-
-data "aws_iam_policy_document" "lambda_assume_role_policy_bounce_email_notification" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
 }
 
 resource "aws_iam_role_policy" "lambda_bounce_email_notification" {
   name   = "lambda"
   role   = aws_iam_role.lambda_bounce_email_notification.id
-  policy = data.aws_iam_policy_document.lambda_assume_role_policy_bounce_email_notification.json
+  policy = data.aws_iam_policy_document.lambda_policy_bounce_email_notification.json
 }
 
 data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
