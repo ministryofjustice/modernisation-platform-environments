@@ -228,7 +228,7 @@ resource "aws_iam_policy" "instance_ssm" {
 
 # new IAM role OEM setup to allow ec2s to access secrets manager and kms keys
 resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
-  name = "EC2OracleEnterpriseManagementSecretsRole"
+  name = "EC2OracleEnterpriseManagementSecretsRole-${var.db_suffix}"
 
   assume_role_policy = <<EOF
 {
