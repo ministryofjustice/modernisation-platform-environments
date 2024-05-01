@@ -59,4 +59,13 @@ data "aws_iam_policy_document" "get_s3_output" {
             "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*"
         ]
     }
+    statement {
+        effect = "Allow"
+        actions = [
+            "s3:ListBucket"
+        ]
+        resources = [
+            aws_s3_bucket.dms_target_ep_s3_bucket.arn
+        ]
+    }
 }
