@@ -102,6 +102,8 @@ resource "aws_security_group_rule" "this" {
 }
 
 resource "aws_secretsmanager_secret" "this" {
+  #checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
+
   for_each = toset(["technical-contact", "data-contact", "target-bucket", "slack-channel"])
 
   name       = "ingestion/sftp/${var.name}/${each.key}"
