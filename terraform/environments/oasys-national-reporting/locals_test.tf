@@ -32,7 +32,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      windows = {
+      tt-onr-bods-1-a = {
         config = {
           ami_name                      = "hmpps_windows_server_2019-release_*"
           availability_zone             = "${local.region}a"
