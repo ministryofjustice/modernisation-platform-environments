@@ -13,7 +13,7 @@ resource "aws_vpc_security_group_egress_rule" "lambda_all_outbound" {
   ip_protocol = "tcp"
   from_port   = 0
   to_port     = 65535
-  description = "DMS Terraform"
+  description = "Lambda outbound access"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "lambda_to_rds_sg_rule" {
