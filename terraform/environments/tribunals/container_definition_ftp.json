@@ -15,12 +15,7 @@
     "portMappings" : [
       {
         "hostPort": 0,
-        "containerPort": 21,
-        "protocol": "tcp"
-      },
-      {
-        "hostPort": 0,
-        "containerPort": 20,
+        "containerPort": 22,
         "protocol": "tcp"
       },
       {
