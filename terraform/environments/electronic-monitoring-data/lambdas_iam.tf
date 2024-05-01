@@ -24,7 +24,7 @@ resource "aws_iam_role_policy_attachment" "get_glue_connections_and_tables" {
 
 resource "aws_iam_policy" "get_glue_connections_and_tables" {
     name = "get_glue_connections_and_tables"
-    policy = data.aws_iam_policy_document.get_glue_connections.json
+    policy = data.aws_iam_policy_document.get_glue_connections_and_tables.json
 }
 
 resource "aws_iam_role_policy_attachment" "get_s3_output" {
