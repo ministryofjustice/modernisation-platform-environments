@@ -1,16 +1,16 @@
 data "aws_iam_policy_document" "vpc_flow_logs" {
-  #   statement {
-  #     sid    = "AllowKMS"
-  #     effect = "Allow"
-  #     actions = [
-  #       "kms:Decrypt",
-  #       "kms:Encrypt",
-  #       "kms:ReEncrypt*",
-  #       "kms:GenerateDataKey*",
-  #       "kms:DescribeKey"
-  #     ]
-  #     resources = [module.vpc_flow_logs_kms.key_arn]
-  #   }
+  statement {
+    sid    = "AllowKMS"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [module.vpc_flow_logs_kms.key_arn]
+  }
   statement {
     sid    = "AllowCloudWatchLogs"
     effect = "Allow"
