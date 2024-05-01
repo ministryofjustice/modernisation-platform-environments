@@ -60,6 +60,17 @@ module "quarantine_bucket" {
       }
     }
   }
+
+  lifecycle_rule = [
+    {
+      id      = "delete-infected-objects-after-90-days"
+      enabled = true
+
+      expiration = {
+        days = 90
+      }
+    }
+  ]
 }
 
 module "definitions_bucket" {
