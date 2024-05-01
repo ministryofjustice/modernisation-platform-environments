@@ -1,0 +1,27 @@
+# ------------------------------------------------------------------------------------------
+# create_athena_external_tables: SG for RDS Access
+# ------------------------------------------------------------------------------------------add
+resource "aws_security_group" "lambda_db_security_group" {
+  name        = "lambda_db_instance_sg"
+  description = "Secuity Group allowing lambda access to RDS"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "dms_all_tcp_outbound" {
+  security_group_id = aws_security_group.lambda_db_security_group.id
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "tcp"
+  from_port   = 1433
+  to_port     = 1433
+  description = "DMS Terraform"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "dms_to_rds_sg_rule" {
+  security_group_id = aws_security_group.db.id
+
+  referenced_security_group_id = aws_security_group.lambda_db_security_group.id
+  ip_protocol                  = "tcp"
+  from_port                    = 1433
+  to_port                      = 1433
+  description                  = "Lambda RDS Access"
+}
