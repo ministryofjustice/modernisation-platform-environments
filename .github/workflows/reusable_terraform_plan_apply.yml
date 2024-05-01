@@ -223,6 +223,14 @@ jobs:
               team_slug: teamSlug
             });
 
+            await github.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              event: 'REQUEST_CHANGES',
+              body: 'Please make necessary changes before merging.'
+            });
+
             const teamMemberLogins = team_members.map(member => member.login);
             const approved = reviews.some(review => review.state === 'APPROVED' && review.user.login === 'Kudzai-moj');
 
@@ -230,6 +238,14 @@ jobs:
               core.notice('Pull request approved by a member of @ministryofjustice/modernisation-platform');
             } else {
               core.setFailed('Terraform plan evalaution detected changes to resources that require approval from Kudzai-moj');
+
+              await github.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                event: 'REQUEST_CHANGES',
+                body: 'Please make necessary changes before merging.'
+              });
             }
 
       - name: Comment if PR Requires Approval
