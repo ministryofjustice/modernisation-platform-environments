@@ -223,14 +223,6 @@ jobs:
               team_slug: teamSlug
             });
 
-            await github.pulls.createReview({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-              event: 'REQUEST_CHANGES',
-              body: 'Please make necessary changes before merging.'
-            });
-
             const teamMemberLogins = team_members.map(member => member.login);
             const approved = reviews.some(review => review.state === 'APPROVED' && review.user.login === 'Kudzai-moj');
 
