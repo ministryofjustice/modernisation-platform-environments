@@ -1,19 +1,6 @@
 #####################
 # SES Logging
 #####################
-
-resource "aws_sesv2_configuration_set" "jitbit_ses_configuration_set" {
-  configuration_set_name = format("%s-configuration-set", local.application_name)
-
-  suppression_options {
-    suppressed_reasons = [
-      "COMPLAINT"
-    ]
-  }
-
-  tags = local.tags
-}
-
 resource "aws_sns_topic" "jitbit_ses_destination_topic" {
   name = format("%s-ses-destination-topic", local.application_name)
 
@@ -41,13 +28,13 @@ resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_desti
 
 data "archive_file" "lambda_function_payload" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda"
-  output_path = "${path.module}/lambda/sns_to_cloudwatch.zip"
+  source_dir  = "${path.module}/lambda/sns_to_cloudwatch"
+  output_path = "${path.module}/lambda/sns_to_cloudwatch/sns_to_cloudwatch.zip"
   excludes    = ["sns_to_cloudwatch.zip"]
 }
 
 resource "aws_lambda_function" "sns_to_cloudwatch" {
-  filename         = "${path.module}/lambda/sns_to_cloudwatch.zip"
+  filename         = "${path.module}/lambda/sns_to_cloudwatch/sns_to_cloudwatch.zip"
   function_name    = "sns_to_cloudwatch"
   architectures    = ["arm64"]
   role             = aws_iam_role.lambda.arn
