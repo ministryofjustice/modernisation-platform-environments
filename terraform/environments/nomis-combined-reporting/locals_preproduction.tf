@@ -258,19 +258,19 @@ locals {
       #     instance-scheduling                  = "skip-scheduling"
       #   })
       # })
-      pp-ncr-etl-a = merge(local.etl_ec2_default, {
-        cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
-        config = merge(local.etl_ec2_default.config, {
-          instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        tags = merge(local.etl_ec2_default.tags, {
-          description                          = "PreProd SAP BI Platform ETL installation and configurations"
-          nomis-combined-reporting-environment = "pp"
-          instance-scheduling                  = "skip-scheduling"
-        })
-      })
+      # pp-ncr-etl-a = merge(local.etl_ec2_default, {
+      #   cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
+      #   config = merge(local.etl_ec2_default.config, {
+      #     instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
+      #       "Ec2PPReportingPolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.etl_ec2_default.tags, {
+      #     description                          = "PreProd SAP BI Platform ETL installation and configurations"
+      #     nomis-combined-reporting-environment = "pp"
+      #     instance-scheduling                  = "skip-scheduling"
+      #   })
+      # })
       pp-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
           local.database_cloudwatch_metric_alarms.standard,
