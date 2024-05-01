@@ -78,5 +78,16 @@ locals {
         })
       })
     }
+    #when changing the ems entries in prod or t2, also stop and start xtag to reconnect it.
+    baseline_route53_zones = {
+      "production.ndh.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "pd-app", type = "A", ttl = 300, records = ["10.40.3.196"] }, #azure
+          #{ name = "pd-app", type = "A", ttl = 300, records = ["10.27.8.186"] }, #aws
+          { name = "pd-ems", type = "A", ttl = 300, records = ["10.40.3.198"] }, #azure
+          #{ name = "pd-ems", type = "A", ttl = 300, records = ["10.27.8.131"] }, #aws
+        ]
+      }
+    }
   }
 }
