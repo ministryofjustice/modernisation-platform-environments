@@ -224,23 +224,22 @@ jobs:
             });
 
             const teamMemberLogins = team_members.map(member => member.login);
-            const approved = reviews.some(review => review.state === 'APPROVED' && review.user.login === 'Kudzai-moj');
+            const approved = reviews.some(review => review.state === 'APPROVED' && teamMemberLogins.includes(review.user.login));
 
             if (approved) {
               core.notice('Pull request approved by a member of @ministryofjustice/modernisation-platform');
-            } else {
-              core.setFailed('Terraform plan evalaution detected changes to resources that require approval from Kudzai-moj');
+            } 
+            else {
+              core.setFailed('Terraform plan evalaution detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform');
 
               await github.rest.pulls.createReview({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: context.payload.pull_request.number,
                 event: 'REQUEST_CHANGES',
-                body: 'Please make necessary changes before merging.'
+                body: 'Terraform plan evalaution detected changes to resources that require approval from @ministryofjustice/modernsation-platform'
               });
             }
-      
-            
 
       - name: Comment if PR Requires Approval
         id: comment_if_not_approved
@@ -256,7 +255,7 @@ jobs:
               owner: owner,
               repo: repo,
               issue_number: context.payload.pull_request.number,
-              body: `@${context.actor} Terraform plan evalaution detected changes to resources that require approval from Kudzai-moj`
+              body: `@${context.actor} Terraform plan evalaution detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform`
             });
 
   apply:
