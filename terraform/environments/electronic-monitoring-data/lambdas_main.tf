@@ -23,8 +23,12 @@ resource "aws_lambda_function" "create_athena_external_tables" {
     layers = [aws_lambda_layer_version.create_external_athena_tables_layer.arn]
     source_code_hash = data.archive_file.create_athena_external_tables.output_base64sha256
     depends_on    = [aws_cloudwatch_log_group.create_athena_external_tables_lambda]
-
-    runtime = "python3.11"
+    timeout = 200
+    runtime = "python3.12"
+    vpc_config {
+      security_group_ids = [aws_security_group.lambda_db_security_group.id]
+      subnet_ids = data.aws_subnets.shared-public.ids
+    }
 
     environment {
       variables = {
