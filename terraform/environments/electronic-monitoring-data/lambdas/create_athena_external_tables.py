@@ -43,7 +43,7 @@ def get_glue_jdbc_connection(conn_name):
     URL = connection_properties["JDBC_CONNECTION_URL"]
     url_list = URL.split("/")
 
-    db_host = RDS_PRIVATE_HOST_ADDRESS
+    db_host = RDS_PRIVATE_HOST_ADDRESS.split(":")[0]
     db_port = "{}".format(url_list[-1].split(":")[1])
     db_user = "{}".format(connection_properties["USERNAME"])
     db_password = "{}".format(connection_properties["PASSWORD"])
@@ -70,12 +70,16 @@ def get_rds_database_names(glue_rds_connection_string):
     ORDER BY physical_database_name;  
     """.strip()
 
+    temp_db_list = list()
+
     try:
-        temp_db_list = list()
-        pyodbc_conn = pyodbc.connect(
-            get_glue_jdbc_connection(glue_rds_connection_string)
-        )
+        jdbc_conn = get_glue_jdbc_connection(glue_rds_connection_string)
+        LOGGER.warn(f"Connection String: {jdbc_conn}")
+
+        pyodbc_conn = pyodbc.connect(jdbc_conn)
+
         cursor = pyodbc_conn.cursor()
+        LOGGER.info("Succesfully connected")
 
         cursor.execute(sql_statement)
 
@@ -84,13 +88,15 @@ def get_rds_database_names(glue_rds_connection_string):
         for row in rows:
             temp_db_list.append(row[0])
 
+        return temp_db_list
+
     except Exception as e:
         LOGGER.error(e)
+        return temp_db_list
+
     finally:
         cursor.close()
         pyodbc_conn.close()
-
-    return temp_db_list
 
 
 # ==================================================================================================
