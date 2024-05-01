@@ -350,6 +350,7 @@ module "transport" {
 }
 
 module "charity_tribunal_decisions" {
+  is_ftp_app                        = true
   source                            = "./modules/tribunal_ftp"
   app_name                          = "ftp-charity-tribunals"
   app_url                           = "charitytribunal"

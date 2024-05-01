@@ -40,6 +40,7 @@ resource "aws_lb" "tribunals_lb" {
 }
 
 resource "aws_lb" "tribunals_lb_ftp" {
+  count                      = var.is_ftp_app ? 1 : 0
   name                       = "${var.app_name}-ftp-lb"
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
@@ -73,6 +74,7 @@ resource "aws_lb_target_group" "tribunals_target_group" {
 }
 
 resource "aws_lb_target_group" "tribunals_target_group_ftp" {
+  count                = var.is_ftp_app ? 1 : 0
   name                 = "${var.app_name}-ftp-tg"
   port                 = 21
   protocol             = "TCP"
@@ -106,16 +108,13 @@ resource "aws_lb_listener" "tribunals_lb" {
 }
 
 resource "aws_lb_listener" "tribunals_lb_ftp" {
-  depends_on = [
-    var.aws_acm_certificate_external
-  ]
-  load_balancer_arn = aws_lb.tribunals_lb_ftp.arn
+  load_balancer_arn = aws_lb.tribunals_lb_ftp[0].arn
   port              = var.application_data.server_port_3
   protocol          = var.application_data.lb_listener_protocol_3
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group_ftp.arn
+    target_group_arn = aws_lb_target_group.tribunals_target_group_ftp[0].arn
   }
 }
 

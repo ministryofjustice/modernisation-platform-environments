@@ -19,3 +19,7 @@ variable "subnets_shared_public_ids" {
 
 variable "aws_acm_certificate_external" {  
 }
+
+variable "is_ftp_app" {
+  description = "Determines if it is an ftp app or not"
+}
