@@ -1,21 +1,21 @@
-module "vpc" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+# module "vpc" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   source  = "terraform-aws-modules/vpc/aws"
+#   version = "~> 5.0"
 
-  name            = "${local.application_name}-${local.environment}"
-  azs             = local.availability_zones
-  cidr            = local.application_data.accounts[local.environment].vpc_cidr
-  private_subnets = local.private_subnets
+#   name            = "${local.application_name}-${local.environment}"
+#   azs             = local.availability_zones
+#   cidr            = local.application_data.accounts[local.environment].vpc_cidr
+#   private_subnets = local.private_subnets
 
-  # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
-  enable_flow_log                      = true
-  create_flow_log_cloudwatch_log_group = true
-  create_flow_log_cloudwatch_iam_role  = true
-  flow_log_max_aggregation_interval    = 60
+#   # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
+#   enable_flow_log                      = true
+#   create_flow_log_cloudwatch_log_group = true
+#   create_flow_log_cloudwatch_iam_role  = true
+#   flow_log_max_aggregation_interval    = 60
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
 # module "vpc_endpoints" {
 #   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
