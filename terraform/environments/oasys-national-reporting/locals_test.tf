@@ -31,26 +31,44 @@ locals {
       }
     }
 
-    # baseline_ec2_instances = {
-    #   test-db = merge(local.defaults_onr_db_ec2 ,{
-    #     config = merge(local.defaults_onr_db_ec2.config, {
-    #       ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2024-*"
-    #       availability_zone = "${local.region}a"
-    #     })
-    #     instance = merge(local.defaults_onr_db_ec2.instance, {
-    #       instance_type                = "r6i.xlarge"
-    #       metadata_options_http_tokens = "optional"
-    #     })
-    #     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-    #     secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
-    #     tags = merge(local.defaults_onr_db_ec2.tags, {
-    #       ami         = "base_ol_8_5"
-    #       server-type = "onr-db-test"
-    #       oracle-sids = "T3ONRAUD T3ONRBDS T3ONRSYS"
-    #       description = "ONR db for BOE Enterprise XI INSTALLATION TESTING ONLY"
-    #     })
-    #   })
-    # }
+    baseline_ec2_instances = {
+      windows = {
+        config = {
+          ami_name                      = "hmpps_windows_server_2019-release_*"
+          availability_zone             = "${local.region}a"
+          ebs_volumes_copy_all_from_ami = false
+        }
+        instance = {
+          instance_type          = "t3.large"
+          vpc_security_group_ids = ["bods"]
+        }
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+          "/dev/sdc"  = { type = "gp3", size = 100 }
+          "/dev/sds"  = { type = "gp3", size = 100 }
+        }
+      }
+      #   test-db = merge(local.defaults_onr_db_ec2 ,{
+      #     config = merge(local.defaults_onr_db_ec2.config, {
+      #       ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2024-*"
+      #       availability_zone = "${local.region}a"
+      #     })
+      #     instance = merge(local.defaults_onr_db_ec2.instance, {
+      #       instance_type                = "r6i.xlarge"
+      #       metadata_options_http_tokens = "optional"
+      #     })
+      #     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #     secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
+      #     tags = merge(local.defaults_onr_db_ec2.tags, {
+      #       ami         = "base_ol_8_5"
+      #       server-type = "onr-db-test"
+      #       oracle-sids = "T3ONRAUD T3ONRBDS T3ONRSYS"
+      #       description = "ONR db for BOE Enterprise XI INSTALLATION TESTING ONLY"
+      #     })
+      #   })
+    }
     baseline_ec2_autoscaling_groups = {
       test-web-asg = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
