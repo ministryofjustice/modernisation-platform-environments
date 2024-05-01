@@ -224,12 +224,12 @@ jobs:
             });
 
             const teamMemberLogins = team_members.map(member => member.login);
-            const approved = reviews.some(review => review.state === 'APPROVED' && teamMemberLogins.includes(review.user.login));
+            const approved = reviews.some(review => review.state === 'APPROVED' && review => review.user.login === 'Kudzai-moj' );
 
             if (approved) {
               core.notice('Pull request approved by a member of @ministryofjustice/modernisation-platform');
             } else {
-              core.setFailed('Terraform plan evalaution detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform');
+              core.setFailed('Terraform plan evalaution detected changes to resources that require approval from Kudzai-moj');
             }
 
       - name: Comment if PR Requires Approval
@@ -246,7 +246,7 @@ jobs:
               owner: owner,
               repo: repo,
               issue_number: context.payload.pull_request.number,
-              body: `@${context.actor} Terraform plan evalaution detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform`
+              body: `@${context.actor} Terraform plan evalaution detected changes to resources that require approval from Kudzai-moj`
             });
 
   apply:
