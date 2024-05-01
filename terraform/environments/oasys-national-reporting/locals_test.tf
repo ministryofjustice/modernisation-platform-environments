@@ -32,17 +32,17 @@ locals {
     }
 
     baseline_ec2_instances = {
-      tt-onr-bods-1-a = merge(local.default_bods_ec2, {
-        config = merge(local.default_bods_ec2.config, {
+      tt-onr-bods-1-a = merge(local.defaults_bods_ec2, {
+        config = merge(local.defaults_bods_ec2.config, {
           availability_zone             = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
         })
-        instance = merge(local.default_bods_ec2.instance, {
+        instance = merge(local.defaults_bods_ec2.instance, {
           instance_type = "t3.large"
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         # volumes are a direct copy of BODS in NCR
-        ebs_volumes = merge(local.default_bods_ec2.ebs_volumes, {
+        ebs_volumes = merge(local.defaults_bods_ec2.ebs_volumes, {
           "/dev/sda1" = { type = "gp3", size = 100 }
           "/dev/sdb"  = { type = "gp3", size = 100 }
           "/dev/sdc"  = { type = "gp3", size = 100 }
