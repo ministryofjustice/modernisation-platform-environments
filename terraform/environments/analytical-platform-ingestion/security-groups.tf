@@ -1,4 +1,6 @@
 resource "aws_security_group" "vpc_endpoints" {
+  #checkov:skip=CKV2_AWS_5
+
   description = "Security Group for controlling all VPC endpoint traffic"
   name        = format("%s-vpc-endpoint-sg", local.application_name)
   vpc_id      = module.vpc.vpc_id
