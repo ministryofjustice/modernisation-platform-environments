@@ -248,6 +248,16 @@ variable "glue_cdc_max_concurrent" {
   description = "(Optional) The maximum number of concurrent runs allowed for a job."
 }
 
+variable "glue_cdc_job_disable_auto_broadcast_join_threshold" {
+  type    = bool
+  default = false
+}
+
+variable "glue_cdc_job_spark_broadcast_timeout_seconds" {
+  type    = number
+  default = 300
+}
+
 variable "account_region" {
   description = "Current AWS Region."
   default     = "eu-west-2"
