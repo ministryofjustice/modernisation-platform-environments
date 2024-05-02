@@ -9,8 +9,6 @@ resource "aws_glue_job" "create_athena_external_tables" {
   command {
     script_location = "s3://${aws_s3_object.create_athena_external_tables.bucket}/${aws_s3_object.create_athena_external_tables.key}"
     python_version  = "3"
-    shell
-
   }
   default_arguments = {
     "--job-language" = "python"
