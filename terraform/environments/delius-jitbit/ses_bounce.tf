@@ -61,6 +61,12 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
   }
 }
 
+resource "aws_iam_role_policy" "lambda_policy_bounce_email_notification_logs" {
+  name   = "lambda"
+  role   = aws_iam_role.lambda.id
+  policy = data.aws_iam_policy_document.lambda_policy.json
+}
+
 resource "aws_lambda_permission" "sns_bounce_email_notification" {
   statement_id  = "AllowExecutionFromSNS"
   action        = "lambda:InvokeFunction"
