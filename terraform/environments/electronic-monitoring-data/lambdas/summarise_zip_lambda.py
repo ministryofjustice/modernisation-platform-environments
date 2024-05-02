@@ -1,14 +1,17 @@
 import boto3
 import json
+from logging import getLogger
 from aws_lambda_powertools.utilities.streaming.transformations import ZipTransform
 from aws_lambda_powertools.utilities.streaming.s3_object import S3Object
+
+logger = getLogger(__name__)
 
 
 def handler(event, context):
     """
-    Read contents of a zip file and print directory structure and item count.
+    Read contents of a zip file and log directory structure and item count.
     """
-    print(event)
+    logger.info(event)
 
     event_type = event["Records"][0]["eventName"]
     bucket = event["Records"][0]["s3"]["bucket"]["name"]
@@ -16,15 +19,17 @@ def handler(event, context):
 
     # Check if the object key ends with '.zip'
     if not object_key.endswith(".zip"):
-        print(f"Stopping for'{object_key = }' as suffix other than '.zip'")
+        logger.info(f"Stopping for'{object_key = }' as suffix other than '.zip'")
         return None
 
-    print(f"{object_key = } added to {bucket = } via {event_type = }")
+    logger.info(f"{object_key = } added to {bucket = } via {event_type = }")
 
     # Create S3 client
     s3_client = boto3.client("s3")
 
     s3_object = S3Object(bucket=bucket, key=object_key)
+
+    logger.info(f"Read in {object_key} from S3.")
 
     # Extract files from the zip
     zip_ref = s3_object.transform(ZipTransform())
@@ -33,7 +38,7 @@ def handler(event, context):
 
     # Total number of files
     total_files = len(file_list)
-
+    logger.info(f"Looping through {total_files} files.")
     # Directory structure dictionary
     directory_structure = {}
 
@@ -48,9 +53,9 @@ def handler(event, context):
                 current_dict[part] = {}
             current_dict = current_dict[part]
 
-    print(f"\n\nJSON directory structure:\n{directory_structure}")
+    logger.info(f"\n\nJSON directory structure:\n{directory_structure}")
 
-    print(f"\n\n Total files in {object_key}: {total_files}")
+    logger.info(f"\n\n Total files in {object_key}: {total_files}")
 
     # Writing the JSON file with the information
     json_data = {
@@ -66,6 +71,6 @@ def handler(event, context):
         Bucket=bucket, Key=new_object_key, Body=json_content.encode("utf-8")
     )
 
-    print(f"Zip info saved to {new_object_key}")
+    logger.info(f"Zip info saved to {new_object_key}")
 
     return None
