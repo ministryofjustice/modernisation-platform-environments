@@ -27,7 +27,3 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "athena_iceberg_s3
   }
 }
 
-resource "aws_s3_bucket_policy" "athena_iceberg_s3_bucket" {
-  bucket = aws_s3_bucket.athena_iceberg_s3_bucket.id
-  policy = data.aws_iam_policy_document.dms_target_ep_s3_bucket.json
-}
