@@ -1,7 +1,9 @@
 # This variable needs to be supplied with the list of database names to be migrated
 variable "database_list" {
   type = list(string)
-  default = local.is-production ? ["cap_dw"]:["test"]
+  default = [
+    "cap_dw"
+  ]
 }
 
 variable "dms_replication_instance_class" {
