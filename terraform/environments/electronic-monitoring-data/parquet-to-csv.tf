@@ -1,6 +1,6 @@
-resource "aws_s3_bucket" "glue-jobs" {
-  bucket_prefix = "glue-jobs-"
-}
+# resource "aws_s3_bucket" "glue-jobs" {
+#   bucket_prefix = "glue-jobs-"
+# }
 
 resource "aws_s3_object" "parquet-to-csv-job" {
   bucket = aws_s3_bucket.glue-jobs.id
