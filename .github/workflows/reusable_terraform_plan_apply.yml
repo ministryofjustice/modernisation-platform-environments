@@ -256,7 +256,7 @@ jobs:
               repo: repo,
               issue_number: context.payload.pull_request.number,
               body: `@${context.actor} Terraform plan evalaution detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform`
-            }); 
+            });
 
   apply:
     name: "apply"
