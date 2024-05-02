@@ -5,61 +5,65 @@ import time
 from datetime import datetime
 from botocore.exceptions import ClientError
 
-def handler(event, context):
-    todays_date = datetime.now().strftime('%Y-%m-%d')
 
-    message = event['Records'][0]['Sns']['Message']
+def handler(event, context):
+    todays_date = datetime.now().strftime("%Y-%m-%d")
+
+    message = event["Records"][0]["Sns"]["Message"]
     message_dict = json.loads(message)
 
-    mail = message_dict.get('mail')
-    headers = mail.get('commonHeaders')
+    mail = message_dict.get("mail")
+    common_headers = mail.get("commonHeaders")
+    headers = mail.get("headers")
 
-    # jitbit_ticket_id = headers.get('X-Jitbit-TicketID')
-    jitbit_ticket_id = filter(lambda id: id.get('name') == 'X-Jitbit-TicketID', headers)[0].get('value', "<no ticket id header>")
-    subject = headers.get('subject')
-    reply_to = headers.get('replyTo')[0]
-    source = mail.get('source')
+    print(headers)
 
-    ses = boto3.client('sesv2')
+    jitbit_ticket_id_arr = list(
+        filter(lambda id: id.get("name") == "X-Jitbit-TicketID", headers)
+    )
+    jitbit_ticket_id = jitbit_ticket_id_arr[0].get("value") if len(jitbit_ticket_id_arr) > 0 else "No Ticket ID Header"
 
-    bounce = message_dict.get('bounce')
+    subject = common_headers.get("subject")
+    reply_to = common_headers.get("replyTo")[0]
+    source = mail.get("source")
 
-    bounced_recipients = bounce.get('bouncedRecipients')
+    ses = boto3.client("sesv2")
 
-    bounced_recipients_message = ''
+    bounce = message_dict.get("bounce")
+
+    bounced_recipients = bounce.get("bouncedRecipients")
+
+    bounced_recipients_message = ""
     for bounced_recipient in bounced_recipients:
-        bounced_recipients_message += f'''Action: {bounced_recipient.get("action")} for {bounced_recipient.get("emailAddress")}\n
-                                          Status: {bounced_recipient.get("status")}\n
-                                          Diagnostic Code: {bounced_recipient.get("diagnosticCode")}\n\n'''
+        bounced_recipients_message += f"""Action: {bounced_recipient.get("action")} for {bounced_recipient.get("emailAddress")}\n
+                                        Status: {bounced_recipient.get("status")}\n
+                                        Diagnostic Code: {bounced_recipient.get("diagnosticCode")}\n
+                                        ---\n"""
 
     try:
         email = ses.send_email(
             FromEmailAddress=source,
-            Destination={
-                'ToAddresses': [reply_to]
-            },
+            Destination={"ToAddresses": [reply_to]},
             ReplyToAddresses=[reply_to],
             Content={
-                'Simple': {
-                    'Subject': {
-                        'Data': f'BOUNCE <{jitbit_ticket_id}>: {subject}'
-                    },
-                    'Body': {
-                        'Text': {
-                            'Data': f'''
-                                    Ticket ID: {jitbit_ticket_id}\n\n{message} \n
+                "Simple": {
+                    "Subject": {"Data": f"BOUNCE <{jitbit_ticket_id}>: {subject}"},
+                    "Body": {
+                        "Text": {
+                            "Data": f"""
+                                    Ticket ID: {jitbit_ticket_id}\n
                                     Feedback ID: {bounce.get('feedbackId')}\n
-                                    timestamp: {bounce.get('timestamp')}\n
+                                    Timestamp: {bounce.get('timestamp')}\n
                                     Bounced Recipients:\n
-                                    {bounced_recipients_message}\n
-                                    '''
+                                        {bounced_recipients_message}\n
+                                    """
                         }
-                    }
+                    },
                 }
-            }
+            },
         )
 
-        print(f'Email sent: {email}')
+        print(f"Email sent: {email}")
 
     except ClientError as e:
         print(e)
