@@ -80,3 +80,8 @@ resource "aws_sns_topic_subscription" "lambda_bounce_email_notification" {
   protocol  = "lambda"
   endpoint  = aws_lambda_function.bounce_email_notification.arn
 }
+
+resource "aws_cloudwatch_log_group" "bounce_email_notification" {
+  name = "/aws/lambda/bounce_email_notification"
+  tags = local.tags
+}
