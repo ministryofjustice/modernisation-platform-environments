@@ -45,6 +45,7 @@ module "ssm-auto-patching" {
 
   account_number             = local.environment_management.account_ids[terraform.workspace]
   application_name           = local.application_name
+ approval_days = "7"
   tags = merge(
     local.tags,
     {
