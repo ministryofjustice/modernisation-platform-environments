@@ -14,9 +14,10 @@ def handler(event, context):
     mail = message_dict.get('mail')
     headers = mail.get('commonHeaders')
 
-    jitbit_ticket_id = headers.get('X-Jitbit-TicketID')
+    # jitbit_ticket_id = headers.get('X-Jitbit-TicketID')
+    jitbit_ticket_id = filter(lambda id: id.get('name') == 'X-Jitbit-TicketID', headers)[0].get('value', "<no ticket id header>")
     subject = headers.get('subject')
-    reply_to = headers.get('replyTo')
+    reply_to = headers.get('replyTo')[0]
     source = mail.get('source')
 
     ses = boto3.client('sesv2')
