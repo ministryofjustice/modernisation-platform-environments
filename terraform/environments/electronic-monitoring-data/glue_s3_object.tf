@@ -14,7 +14,7 @@ resource "aws_s3_object" "create_athena_external_tables" {
 }
 
 resource "aws_s3_object" "create_athena_external_tables_layer" {
-    bucket = create_athena_external_tables
+    bucket = aws_s3_bucket.glue-jobs.id
     key = "create_athena_external_tables_layer.zip"
     source = "glue-job/create_athena_external_tables_layer.zip"
     etag = filemd5("glue-job/create_athena_external_tables_layer.zip")
