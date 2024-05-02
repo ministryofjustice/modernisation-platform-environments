@@ -140,6 +140,14 @@ resource "aws_key_pair" "portal_ssh_ohs" {
   key_name   = "portal-ssh-ohs-key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCSUq7jMvpcUZ37kacz+kUIJ8YtqGFFDCXDYtisXC9prP/ew+KfGSRphZowMBRrL2rxdkeqyo8YiMiBoRzzhNa2mL7f69P5B+vnFwqvuDyNqNGlUSRAEgTDmZNxo2psa+3kxEoMjJ1V54yBywKV78tjqSU17XDUVtekKDqUJlXQlhfGICXTO+qVcfGBhHlqrxwQHrdLJ5oxqdJ2uUVY0/67j4zjcqYlL0YGMfuUoHDckofMzRHak7IAJx56GfF+zll45VtSfg+kA2JrOrKtuj7cO0PePZ3JtWWVBiGKsH4+D4EkkdEoGcJziUpVK62Zv/tYAusxPVRP9/uQP/ouPfsTE/tzc5Wn/QltSVSu9F96J4hmV65VK4vluKuc0h2FuMtibMb3sRjJ80iqEEox1FKWM9/0qZJ3hknGAar2yaHkq6cIq+brB6qBn7vwnGu8CdE4qoIolVxXEDIAYmymg+gBW0U02kFhxu1VsymPENY1kE2oXLb98XajEoplNHMEyDU= vincent.cheung@MJ004609"
 }
+resource "aws_vpc_security_group_ingress_rule" "ohs_ssh" {
+  security_group_id = aws_security_group.ohs_instance.id
+  description       = "SSH for Portal Installation"
+  referenced_security_group_id         = module.bastion_linux.bastion_security_group
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
 
 
 resource "aws_instance" "ohs_instance_2" {
