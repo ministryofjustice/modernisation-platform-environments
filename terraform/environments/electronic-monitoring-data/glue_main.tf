@@ -8,7 +8,7 @@ resource "aws_glue_job" "create_athena_external_tables" {
   glue_version = "4.0"
   command {
     script_location = "s3://${aws_s3_object.create_athena_external_tables.bucket}/${aws_s3_object.create_athena_external_tables.key}"
-    python_version  = "3.9"
+    python_version  = "3"
 
   }
   default_arguments = {
