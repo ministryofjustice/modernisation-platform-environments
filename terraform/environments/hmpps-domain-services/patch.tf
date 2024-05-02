@@ -39,14 +39,15 @@
 module "development" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v1.0.0"
   count  = local.environment == "development" ? 1 : 0
-  providers = {
-    aws.bucket-replication = aws
-  }
+#   providers = {
+#     aws.bucket-replication = aws
+#   }
 
-  account_number             = local.environment_management.account_ids[terraform.workspace]
-  application_name           = local.application_name
- approval_days = "0"
-  patch_schedule ="cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
+  account_number   = local.environment_management.account_ids[terraform.workspace]
+  application_name = local.application_name
+  approval_days    = "0"
+  patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
+  operating_system = "REDHAT_ENTERPRISE_LINUX"
   tags = merge(
     local.tags,
     {
