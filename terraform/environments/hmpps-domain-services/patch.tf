@@ -45,7 +45,8 @@ module "ssm-auto-patching" {
 
   account_number             = local.environment_management.account_ids[terraform.workspace]
   application_name           = local.application_name
- approval_days = "7"
+ approval_days = "0"
+  patch_schedule ="cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
   tags = merge(
     local.tags,
     {
