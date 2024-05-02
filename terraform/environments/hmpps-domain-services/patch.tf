@@ -43,7 +43,7 @@ module "test" {
     aws.bucket-replication = aws
   }
 
-  account_number   = local.environment_management.account_ids[terraform.workspace]
+  account_number   = module.environment.account_ids.hmpps-domain-services-test
   application_name = local.application_name
   approval_days    = "0"
   patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
