@@ -58,13 +58,15 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
       "ses:SendEmail"
     ]
     resources = ["*"]
-  }
-}
-
-resource "aws_iam_role_policy" "lambda_policy_bounce_email_notification_logs" {
-  name   = "lambda"
-  role   = aws_iam_role.lambda.id
-  policy = data.aws_iam_policy_document.lambda_policy.json
+  },
+    statement {
+      actions = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ]
+      resources = ["arn:aws:logs:*:*:*"]
+    }
 }
 
 resource "aws_lambda_permission" "sns_bounce_email_notification" {
