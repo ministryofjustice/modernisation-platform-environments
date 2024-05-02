@@ -20,22 +20,6 @@ module "development" {
   ]
 }
 
-# module "test" {
-#   count               = local.is-test == true ? 1 : 0
-#   source              = "../../modules/patch_manager"
-#   application         = "hmpps-domain-services"
-#   environment         = "test"
-#   predefined_baseline = "AWS-WindowsPredefinedPatchBaseline-OS-Applications"
-#   operating_system    = "WINDOWS"
-#   schedule            = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
-#   target_tag = {
-#     "environment-name" = "hmpps-domain-services-test"
-#   }
-#   instance_roles = [
-#     "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-win-2022",
-#   ]
-# }
-
 module "test" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v1.0.0"
   count  = local.environment == "test" ? 1 : 0
