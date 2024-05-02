@@ -9,14 +9,12 @@ resource "aws_glue_job" "create_athena_external_tables" {
   command {
     script_location = "s3://${aws_s3_object.create_athena_external_tables.bucket}/${aws_s3_object.create_athena_external_tables.key}"
     python_version  = "3"
-  }
-  default_arguments = {
-    "--job-language" = "python"
-    "library-set"    = "analytics"
-
-  }
+    }
+    default_arguments = {
+        "--job-language" = "python"
+        "--extra-py-files" = "s3://${aws_s3_object.create_athena_external_tables_layer.bucket}/${aws_s3_object.create_athena_external_tables_layer.key}"
+    }
 }
-
 # resource "aws_glue_connection" "example_connection" {
 #   name = "create-athena-external-tables-connection"
 #   connection_properties = {
