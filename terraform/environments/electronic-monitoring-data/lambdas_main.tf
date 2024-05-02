@@ -33,7 +33,7 @@ resource "aws_lambda_function" "create_athena_external_tables" {
     environment {
       variables = {
         RDS_PRIVATE_HOST_ADDRESS = aws_db_instance.database_2022.endpoint
-        RDS_DATABASE_NAMES =  ", ".join(local.is_production and ["cap_dw"] or ["test"])
+        RDS_DATABASE_NAMES =  join(", ",  local.is-production ? ["cap_dw"]:["test"])
         RDS_GLUE_CONNECTION_STR = aws_glue_connection.rds_sqlserver_db_glue_connection.name
         CRAWLER_OUTPUT_DB_NAME = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db.name
         S3_ATHENA_OUTPUT_BUCKET_NAME = aws_s3_bucket.ap_export_bucket.id
