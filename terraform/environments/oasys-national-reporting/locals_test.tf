@@ -36,6 +36,7 @@ locals {
         config = merge(local.defaults_bods_ec2.config, {
           availability_zone             = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
         })
         instance = merge(local.defaults_bods_ec2.instance, {
           instance_type = "t3.large"
