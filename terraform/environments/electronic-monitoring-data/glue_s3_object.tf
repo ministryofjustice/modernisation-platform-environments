@@ -12,3 +12,10 @@ resource "aws_s3_object" "create_athena_external_tables" {
   source = "glue-job/create_athena_external_tables.py"
   etag   = filemd5("glue-job/create_athena_external_tables.py")
 }
+
+resource "aws_s3_object" "create_athena_external_tables_layer" {
+    bucket = create_athena_external_tables
+    key = "create_athena_external_tables_layer.zip"
+    source = "glue-job/create_athena_external_tables_layer.zip"
+    etag = filemd5("glue-job/create_athena_external_tables_layer.zip")
+}
