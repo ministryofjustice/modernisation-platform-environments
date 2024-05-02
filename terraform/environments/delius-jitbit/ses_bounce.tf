@@ -46,7 +46,7 @@ resource "aws_iam_role" "lambda_bounce_email_notification" {
 }
 
 resource "aws_iam_role_policy" "lambda_bounce_email_notification" {
-  name   = "lambda"
+  name   = "lambda_bounce_email_notification"
   role   = aws_iam_role.lambda_bounce_email_notification.id
   policy = data.aws_iam_policy_document.lambda_policy_bounce_email_notification.json
 }

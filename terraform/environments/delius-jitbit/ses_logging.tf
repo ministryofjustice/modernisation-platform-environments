@@ -65,7 +65,7 @@ resource "aws_cloudwatch_log_group" "execution_logs" {
   tags = local.tags
 }
 
-resource "aws_iam_role" "lambda" {
+resource "aws_iam_role" "lambda_logging" {
   name               = "sns_to_cloudwatch-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 
@@ -82,13 +82,13 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
   }
 }
 
-resource "aws_iam_role_policy" "lambda" {
-  name   = "lambda"
-  role   = aws_iam_role.lambda.id
-  policy = data.aws_iam_policy_document.lambda_policy.json
+resource "aws_iam_role_policy" "lambda_logging" {
+  name   = "lambda-logging"
+  role   = aws_iam_role.lambda_logging.id
+  policy = data.aws_iam_policy_document.lambda_logging__policy.json
 }
 
-data "aws_iam_policy_document" "lambda_policy" {
+data "aws_iam_policy_document" "lambda_logging__policy" {
   statement {
     actions = [
       "logs:CreateLogGroup",
