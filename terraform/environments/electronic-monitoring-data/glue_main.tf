@@ -6,7 +6,10 @@ resource "aws_glue_job" "create_athena_external_tables" {
   name          = "create-athena-external-tables"
   role_arn      = aws_iam_role.create_athena_external_tables_glue.arn
   glue_version = "4.0"
+  max_capacity = "1.0"
+
   command {
+    name = "pythonshell"
     script_location = "s3://${aws_s3_object.create_athena_external_tables.bucket}/${aws_s3_object.create_athena_external_tables.key}"
     python_version  = "3"
     }
