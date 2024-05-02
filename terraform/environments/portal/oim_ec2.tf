@@ -139,7 +139,7 @@ resource "aws_instance" "oim_instance_1" {
   instance_type               = local.application_data.accounts[local.environment].oim_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.oim_instance.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.oim_1_userdata)
   user_data_replace_on_change = true
@@ -169,7 +169,7 @@ resource "aws_instance" "oim_instance_2" {
   ami                         = local.application_data.accounts[local.environment].oim_ami_id
   instance_type               = local.application_data.accounts[local.environment].oim_instance_type
   vpc_security_group_ids      = [aws_security_group.oim_instance.id]
-  subnet_id                   = data.aws_subnet.data_subnets_b.id
+  subnet_id                   = data.aws_subnet.private_subnets_b.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.oim_2_userdata)
   user_data_replace_on_change = true
