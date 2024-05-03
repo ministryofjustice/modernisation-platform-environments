@@ -40,6 +40,25 @@ resource "aws_iam_policy" "get_s3_output" {
 
 data "aws_iam_policy_document" "get_glue_connections_and_tables" {
     statement {
+            sid       = "SecretsManagerDbCredentialsAccess"
+            effect    = "Allow"
+            actions   = ["secretsmanager:GetSecretValue"]
+            resources = ["arn:aws:secretsmanager:*:*:secret:rds-db-credentials/*"]
+        }
+    statement {
+            sid       = "RDSDataServiceAccess"
+            effect    = "Allow"
+            actions   = [
+                "rds-data:BatchExecuteStatement",
+                "rds-data:BeginTransaction",
+                "rds-data:CommitTransaction",
+                "rds-data:ExecuteStatement",
+                "rds-data:RollbackTransaction"
+            ]
+            resources = ["arn:aws:rds:us-east-2:111122223333:cluster:prod"]
+        }
+
+    statement {
         effect = "Allow"
         actions = [
             "glue:GetConnection",
