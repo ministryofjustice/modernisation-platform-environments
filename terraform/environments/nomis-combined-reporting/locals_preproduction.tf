@@ -61,6 +61,9 @@ locals {
           availability_zones = ["eu-west-2a"]
           security_groups    = ["bip"]
         }]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
       }
     }
 
