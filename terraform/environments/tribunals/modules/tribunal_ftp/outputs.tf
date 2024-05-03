@@ -17,3 +17,8 @@ output "tribunals_lb" {
   description = "LB"
   value       = module.ecs_loadbalancer.tribunals_lb
 }
+
+output "tribunals_lb_ftp" {
+  description = "SFTP LB"
+  value       = aws_lb.tribunals_lb_ftp
+}
