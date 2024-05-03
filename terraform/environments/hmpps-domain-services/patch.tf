@@ -28,6 +28,7 @@ module "test" {
     aws.bucket-replication = aws
   }
 
+
 #   account_number   = module.environment.account_ids.hmpps-domain-services-test
   account_number             = local.environment_management.account_ids[terraform.workspace]
   application_name = local.application_name
