@@ -14,7 +14,7 @@
     "essential" : true,
     "portMappings" : [
       {
-        "hostPort": "${sftp_host_port}",
+        "hostPort": 10022,
         "containerPort": 22,
         "protocol": "tcp"
       },
