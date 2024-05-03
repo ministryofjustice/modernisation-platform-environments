@@ -159,7 +159,7 @@ resource "aws_ecs_service" "ecs_service" {
 }
 
 // SFTP service
-resource "aws_ecs_service" "ecs_service" {
+resource "aws_ecs_service" "ecs_service_sftp" {
   count           = var.is_ftp_app ? 1 : 0
   name            = "${var.app_name}"
   cluster         = var.cluster_id
