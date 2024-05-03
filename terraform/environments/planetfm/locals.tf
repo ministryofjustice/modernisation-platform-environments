@@ -69,6 +69,8 @@ locals {
     }
   }
 
+  baseline_secretsmanager_secrets = {}
+
   baseline_security_groups = {
     loadbalancer              = local.security_groups.loadbalancer
     web                       = local.security_groups.web
