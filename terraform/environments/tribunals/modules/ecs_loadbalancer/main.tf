@@ -129,3 +129,14 @@ resource "aws_lb_listener" "tribunals_lb_health" {
     target_group_arn = aws_lb_target_group.tribunals_target_group.arn
   }
 }
+
+resource "aws_lb_listener" "tribunals_lb_health_sftp" {
+  load_balancer_arn = aws_lb.tribunals_lb.arn
+  port              = "22"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tribunals_target_group_sftp.arn
+  }
+}
