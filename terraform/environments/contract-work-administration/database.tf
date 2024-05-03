@@ -25,7 +25,7 @@ resource "aws_instance" "database" {
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
-    { "Name" = "${local.application_name} Database Instance" },
+    { "Name" = "${upper(local.application_name_short)} Database Instance" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
@@ -57,7 +57,7 @@ resource "aws_vpc_security_group_egress_rule" "db_outbound" {
   ip_protocol       = "-1"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "bastion_ssh" {
+resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
   security_group_id = aws_security_group.database.id
   description       = "SSH from the Bastion"
   referenced_security_group_id         = module.bastion_linux.bastion_security_group
@@ -66,7 +66,7 @@ resource "aws_vpc_security_group_ingress_rule" "bastion_ssh" {
   to_port           = 22
 }
 
-resource "aws_vpc_security_group_ingress_rule" "workspaces_1" {
+resource "aws_vpc_security_group_ingress_rule" "db_workspaces_1" {
   security_group_id = aws_security_group.database.id
   description       = "DB access for Workspaces"
   cidr_ipv4         = local.application_data.accounts[local.environment].workspaces_local_cidr1
@@ -75,7 +75,7 @@ resource "aws_vpc_security_group_ingress_rule" "workspaces_1" {
   to_port           = 1571
 }
 
-resource "aws_vpc_security_group_ingress_rule" "workspaces_2" {
+resource "aws_vpc_security_group_ingress_rule" "db_workspaces_2" {
   security_group_id = aws_security_group.database.id
   description       = "DB access for Workspaces"
   cidr_ipv4         = local.application_data.accounts[local.environment].workspaces_local_cidr2
@@ -84,7 +84,7 @@ resource "aws_vpc_security_group_ingress_rule" "workspaces_2" {
   to_port           = 1571
 }
 
-resource "aws_vpc_security_group_ingress_rule" "local_vpc" {
+resource "aws_vpc_security_group_ingress_rule" "db_local_vpc" {
   security_group_id = aws_security_group.database.id
   description       = "DB access from local VPC"
   cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
