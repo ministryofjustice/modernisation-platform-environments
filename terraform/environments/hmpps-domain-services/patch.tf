@@ -25,7 +25,7 @@ module "test" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=providerwarningfix"
   count  = local.is-test == true ? 1 : 0
   providers = {
-    aws.bucket-replication = aws
+    aws.bucket-replication = aws.bucket-replication
   }
 
 
