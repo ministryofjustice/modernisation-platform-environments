@@ -202,7 +202,7 @@ resource "aws_ecs_service" "ecs_service_sftp" {
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = var.appscaling_max_capacity
   min_capacity       = var.appscaling_min_capacity
-  resource_id        = "service/${var.cluster_name}/${aws_ecs_service.ecs_service[0].name}"
+  resource_id        = var.is_ftp_app ? "service/${var.cluster_name}/${aws_ecs_service.ecs_service_sftp[0].name}" : "service/${var.cluster_name}/${aws_ecs_service.ecs_service[0].name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
