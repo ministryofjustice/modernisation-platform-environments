@@ -63,3 +63,12 @@ variable "cluster_id" {
 
 variable "cluster_name" {  
 }
+
+variable "is_ftp_app" {
+  description = "Determines if it is an ftp app or not"
+}
+
+variable "sftp_lb_tg_arn" {
+  type        = string
+  description = "Network Load balancer target group ARN used by SFTP connections"
+}

@@ -126,6 +126,7 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
+  count           = var.is_ftp_app ? 0 : 1
   name            = "${var.app_name}"
   cluster         = var.cluster_id
   task_definition = aws_ecs_task_definition.ecs_task_definition.id
@@ -157,10 +158,51 @@ resource "aws_ecs_service" "ecs_service" {
   )
 }
 
+// SFTP service
+resource "aws_ecs_service" "ecs_service" {
+  count           = var.is_ftp_app ? 1 : 0
+  name            = "${var.app_name}"
+  cluster         = var.cluster_id
+  task_definition = aws_ecs_task_definition.ecs_task_definition.id
+  desired_count   = var.app_count
+  launch_type     = "EC2"
+
+  health_check_grace_period_seconds = 300
+
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
+  }
+
+  load_balancer {
+    target_group_arn = var.lb_tg_arn
+    container_name   = "${var.app_name}-container"
+    container_port   = var.server_port
+  }
+
+  # Additional load balancer for SFTP connections
+  load_balancer {
+    target_group_arn = var.sftp_lb_tg_arn
+    container_name   = "${var.app_name}-container"
+    container_port   = 22
+  }
+
+  depends_on = [
+    var.lb_listener, aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
+  ]
+
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-service"
+    }
+  )
+}
+
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = var.appscaling_max_capacity
   min_capacity       = var.appscaling_min_capacity
-  resource_id        = "service/${var.cluster_name}/${aws_ecs_service.ecs_service.name}"
+  resource_id        = "service/${var.cluster_name}/${aws_ecs_service.ecs_service[0].name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }

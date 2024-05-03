@@ -35,6 +35,8 @@ module "app_ecs_task" {
   lb_listener               = module.ecs_loadbalancer.tribunals_lb_listener
   cluster_id                = var.cluster_id
   cluster_name              = var.cluster_name
+  is_ftp_app                = var.is_ftp_app
+  sftp_lb_tg_arn            = module.ecs_loadbalancer.sftp_tribunals_target_group_arn
 }
 
 ####################### Load Balancer #########################################

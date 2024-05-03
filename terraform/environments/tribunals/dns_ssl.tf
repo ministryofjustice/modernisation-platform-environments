@@ -155,7 +155,7 @@ resource "aws_route53_record" "external_transport" {
 }
 
 // Records for FTP sites
-resource "aws_route53_record" "external_charity_ftp" {
+resource "aws_route53_record" "external_charity" {
   provider = aws.core-vpc 
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "charitytribunal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
@@ -166,6 +166,16 @@ resource "aws_route53_record" "external_charity_ftp" {
     zone_id                = module.charity_tribunal_decisions.tribunals_lb.zone_id
     evaluate_target_health = true
   }
+}
+
+resource "aws_route53_record" "external_charity_sftp" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "sftp.charitytribunal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "CNAME"
+
+  records = [aws_lb.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 # Define a wildcard ACM certificate for sandbox/dev

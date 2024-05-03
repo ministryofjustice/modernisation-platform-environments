@@ -73,9 +73,9 @@ resource "aws_lb_target_group" "tribunals_target_group" {
 
 }
 
-resource "aws_lb_target_group" "tribunals_target_group_ftp" {
+resource "aws_lb_target_group" "tribunals_target_group_sftp" {
   count                = var.is_ftp_app ? 1 : 0
-  name                 = "${var.app_name}-ftp-tg"
+  name                 = "${var.app_name}-sftp-tg"
   port                 = 22
   protocol             = "TCP"
   vpc_id               = var.vpc_shared_id
@@ -115,7 +115,7 @@ resource "aws_lb_listener" "tribunals_lb_ftp" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group_ftp[0].arn
+    target_group_arn = aws_lb_target_group.tribunals_target_group_sftp[0].arn
   }
 }
 
