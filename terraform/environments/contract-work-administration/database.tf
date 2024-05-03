@@ -18,6 +18,7 @@ resource "aws_instance" "database" {
   vpc_security_group_ids      = [aws_security_group.database.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
+  key_name                    = aws_key_pair.cwa.key_name
 #   user_data_base64            = base64encode(local.db_userdata)
 #   user_data_replace_on_change = true
 
@@ -29,8 +30,13 @@ resource "aws_instance" "database" {
   )
 }
 
+resource "aws_key_pair" "cwa" {
+  key_name   = "${local.application_name_short}-ssh-key"
+  public_key = local.application_data.accounts[local.environment].cwa_ec2_key
+}
+
 #################################
-# db Security Group Rules
+# Database Security Group Rules
 #################################
 
 resource "aws_security_group" "database" {
