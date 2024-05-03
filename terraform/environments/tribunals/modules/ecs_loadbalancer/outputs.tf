@@ -25,5 +25,5 @@ output "tribunals_lb_ftp" {
 
 output "sftp_tribunals_target_group_arn" {
   description = "Network Load Balancer Target Group arn for SFTP connections"
-  value       = aws_lb_target_group.tribunals_target_group_sftp[0].arn
+  value       = aws_lb_target_group.tribunals_target_group_sftp.arn
 }
