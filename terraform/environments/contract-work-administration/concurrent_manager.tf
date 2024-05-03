@@ -56,18 +56,18 @@ resource "aws_vpc_security_group_ingress_rule" "cm_bastion_ssh" {
   security_group_id = aws_security_group.concurrent_manager.id
   description       = "SSH from the Bastion"
   referenced_security_group_id         = module.bastion_linux.bastion_security_group
-  from_port         = 1676
+  from_port         = 22
   ip_protocol       = "tcp"
-  to_port           = 1676
+  to_port           = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "cm_self" {
   security_group_id = aws_security_group.concurrent_manager.id
-  description       = "SSH from the Bastion"
+  description       = "Access from itself"
   referenced_security_group_id         = aws_security_group.concurrent_manager.id
-  from_port         = 22
+  from_port         = 1676
   ip_protocol       = "tcp"
-  to_port           = 22
+  to_port           = 1676
 }
 
 # resource "aws_vpc_security_group_ingress_rule" "cm_app" {

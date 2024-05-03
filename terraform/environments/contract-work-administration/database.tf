@@ -57,41 +57,41 @@ resource "aws_vpc_security_group_egress_rule" "db_outbound" {
   ip_protocol       = "-1"
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
-#   security_group_id = aws_security_group.database.id
-#   description       = "SSH from the Bastion"
-#   referenced_security_group_id         = module.bastion_linux.bastion_security_group
-#   from_port         = 22
-#   ip_protocol       = "tcp"
-#   to_port           = 22
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
+  security_group_id = aws_security_group.database.id
+  description       = "SSH from the Bastion"
+  referenced_security_group_id         = module.bastion_linux.bastion_security_group
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
 
-# resource "aws_vpc_security_group_ingress_rule" "db_workspaces_1" {
-#   security_group_id = aws_security_group.database.id
-#   description       = "DB access for Workspaces"
-#   cidr_ipv4         = local.application_data.accounts[local.environment].workspaces_local_cidr1
-#   from_port         = 1571
-#   ip_protocol       = "tcp"
-#   to_port           = 1571
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_workspaces_1" {
+  security_group_id = aws_security_group.database.id
+  description       = "DB access for Workspaces"
+  cidr_ipv4         = local.application_data.accounts[local.environment].workspaces_local_cidr1
+  from_port         = 1571
+  ip_protocol       = "tcp"
+  to_port           = 1571
+}
 
-# resource "aws_vpc_security_group_ingress_rule" "db_workspaces_2" {
-#   security_group_id = aws_security_group.database.id
-#   description       = "DB access for Workspaces"
-#   cidr_ipv4         = local.application_data.accounts[local.environment].workspaces_local_cidr2
-#   from_port         = 1571
-#   ip_protocol       = "tcp"
-#   to_port           = 1571
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_workspaces_2" {
+  security_group_id = aws_security_group.database.id
+  description       = "DB access for Workspaces"
+  cidr_ipv4         = local.application_data.accounts[local.environment].workspaces_local_cidr2
+  from_port         = 1571
+  ip_protocol       = "tcp"
+  to_port           = 1571
+}
 
-# resource "aws_vpc_security_group_ingress_rule" "db_local_vpc" {
-#   security_group_id = aws_security_group.database.id
-#   description       = "DB access from local VPC"
-#   cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-#   from_port         = 1571
-#   ip_protocol       = "tcp"
-#   to_port           = 1571
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_local_vpc" {
+  security_group_id = aws_security_group.database.id
+  description       = "DB access from local VPC"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 1571
+  ip_protocol       = "tcp"
+  to_port           = 1571
+}
 
 ### Port 1571 rules allow inbound for 10.200.32.0/20 and 10.200.96.0/19 not added as unsure what they are for
 
