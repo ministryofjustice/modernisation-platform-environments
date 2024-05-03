@@ -137,6 +137,6 @@ resource "aws_lb_listener" "tribunals_lb_health_sftp" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group_sftp[0].arn
+    target_group_arn = length(aws_lb_target_group.tribunals_target_group_sftp) > 0 ? aws_lb_target_group.tribunals_target_group_sftp[0].arn : ""
   }
 }
