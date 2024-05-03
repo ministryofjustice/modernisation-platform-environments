@@ -48,6 +48,10 @@ resource "aws_lambda_function" "sns_to_cloudwatch" {
     }
   }
 
+  lifecycle {
+    replace_triggered_by = [aws_iam_role.lambda_logging]
+  }
+
   tags = local.tags
 }
 

@@ -40,7 +40,7 @@ def handler(event, context):
                                                 <br>
                                             </p>
                                             <p>
-                                                Recipient: <strong>{bounced_recipient.get("emailAddress")}/strong>
+                                                Recipient: <strong>{bounced_recipient.get("emailAddress")}</strong>
                                                 <br>
                                             </p>
                                             <p>
@@ -59,7 +59,7 @@ def handler(event, context):
             ReplyToAddresses=[reply_to],
             Content={
                 "Simple": {
-                    "Subject": {"Data": f"BOUNCE <{jitbit_ticket_id}>: {subject}"},
+                    "Subject": {"Data": f"BOUNCE <{jitbit_ticket_id}>: {subject} #tech#"},
                     "Body": {
                         "Html": {
                             "Data": f"""
