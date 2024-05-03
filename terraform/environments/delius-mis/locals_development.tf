@@ -2,11 +2,11 @@
 
 locals {
   environment_config_dev = {
-    legacy_engineering_vpc_cidr = "10.161.98.0/25"
-    legacy_counterpart_vpc_cidr = "10.162.32.0/20"
-    legacy_ad_domain_name       = "delius-mis-dev.local"
-    legacy_ad_ip_list           = ["10.162.36.235", "10.162.35.251"]
-    ec2_user_ssh_key            = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    legacy_engineering_vpc_cidr            = "10.161.98.0/25"
+    legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
+    legacy_ad_domain_name                  = "delius-mis-dev.local"
+    legacy_ad_ip_list                      = ["10.162.36.235", "10.162.35.251"]
+    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     migration_environment_full_name        = "dmd-mis-dev"
     migration_environment_abbreviated_name = "dmd"
     migration_environment_short_name       = "mis-dev"
@@ -200,6 +200,11 @@ locals {
   base_db_config_dev = {
     instance_type  = "t3.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
+
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
@@ -238,7 +243,7 @@ locals {
   dsd_db_config_dev = local.base_db_config_dev
 
   boe_db_config_dev = local.base_db_config_dev
-  
+
   mis_db_config_dev = merge(local.base_db_config_dev, {
     ebs_volume_config = {
       data = {

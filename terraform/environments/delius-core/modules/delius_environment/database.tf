@@ -109,7 +109,7 @@ module "oracle_db_standby" {
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
+  instance_profile_policies = [for v in values(merge(module.oracle_db_shared.instance_policies, var.db_config.instance_policies)) : v.arn]
 
   providers = {
     aws.core-vpc = aws.core-vpc
