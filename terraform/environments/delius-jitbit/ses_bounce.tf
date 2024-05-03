@@ -89,6 +89,8 @@ resource "aws_sns_topic_subscription" "lambda_bounce_email_notification" {
 }
 
 resource "aws_cloudwatch_log_group" "bounce_email_notification" {
-  name = "/aws/lambda/bounce_email_notification"
+  name              = "/aws/lambda/bounce_email_notification"
+  retention_in_days = local.application_data.accounts[local.environment].lambda_log_retention_days
+
   tags = local.tags
 }
