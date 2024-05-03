@@ -13,7 +13,7 @@ EOF
 resource "aws_instance" "database" {
   ami                         = local.application_data.accounts[local.environment].db_ami_id
   availability_zone           = "eu-west-2a"
-  instance_type               = local.application_data.accounts[local.environment].database_type
+  instance_type               = local.application_data.accounts[local.environment].db_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.database.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
