@@ -12,7 +12,7 @@ locals {
 
 module "oracle_db_shared" {
   source             = "../../../delius-core/modules/components/oracle_db_shared"
-  for_each           = toset(["dsd-dsd", "boe-db", "mis-db"])
+  for_each           = toset(["dsd-db", "boe-db", "mis-db"])
   account_config     = var.account_config
   environment_config = var.environment_config
   account_info       = var.account_info
