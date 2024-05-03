@@ -1,5 +1,8 @@
 locals {
-  db_public_key_data = jsondecode(file("./db_users.json"))
+  db_public_key_data    = jsondecode(file("./db_users.json"))
+  dsd_instance_policies = [for v in values(merge(module.oracle_db_shared["dsd"].instance_policies, var.dsd_db_config.instance_policies)) : v.arn]
+  boe_instance_policies = [for v in values(merge(module.oracle_db_shared["boe"].instance_policies, var.boe_db_config.instance_policies)) : v.arn]
+  mis_instance_policies = [for v in values(merge(module.oracle_db_shared["mis"].instance_policies, var.mis_db_config.instance_policies)) : v.arn]
   availability_zone_map = {
     0 = "a"
     1 = "b"
@@ -9,7 +12,7 @@ locals {
 
 module "oracle_db_shared" {
   source             = "../../../delius-core/modules/components/oracle_db_shared"
-  for_each           = toset(["dsd-db", "boe-db", "mis-db"])
+  for_each           = toset(["dsd", "boe", "mis"])
   account_config     = var.account_config
   environment_config = var.environment_config
   account_info       = var.account_info
@@ -18,7 +21,7 @@ module "oracle_db_shared" {
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
 
-  db_suffix = each.key
+  db_suffix = "${each.key}-db"
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
@@ -34,7 +37,8 @@ module "oracle_db_shared" {
 }
 
 module "oracle_db_dsd" {
-  source         = "../../../delius-core/modules/components/oracle_db_instance"
+  source = "../../../delius-core/modules/components/oracle_db_instance"
+
   account_config = var.account_config
   account_info   = var.account_info
   db_ami = {
@@ -50,9 +54,9 @@ module "oracle_db_dsd" {
   db_count_index    = count.index + 1
   ec2_instance_type = var.dsd_db_config.instance_type
 
-  security_group_ids = [module.oracle_db_shared["dsd-db"].security_group.id]
+  security_group_ids = [module.oracle_db_shared["dsd"].security_group.id]
 
-  ec2_key_pair_name = module.oracle_db_shared["dsd-db"].db_key_pair.key_name
+  ec2_key_pair_name = module.oracle_db_shared["dsd"].db_key_pair.key_name
 
   user_data_replace_on_change = false
 
@@ -70,9 +74,9 @@ module "oracle_db_dsd" {
     var.dsd_db_config.ansible_user_data_config
   )
 
-  ssh_keys_bucket_name = module.oracle_db_shared["dsd-db"].ssh_keys_bucket_name
+  ssh_keys_bucket_name = module.oracle_db_shared["dsd"].ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared["dsd-db"].instance_policies) : v.arn]
+  instance_profile_policies = local.dsd_instance_policies
 
   deploy_oracle_stats = false
 
@@ -102,9 +106,9 @@ module "oracle_db_boe" {
   db_count_index    = count.index + 1
   ec2_instance_type = var.boe_db_config.instance_type
 
-  security_group_ids = [module.oracle_db_shared["boe-db"].security_group.id]
+  security_group_ids = [module.oracle_db_shared["boe"].security_group.id]
 
-  ec2_key_pair_name = module.oracle_db_shared["boe-db"].db_key_pair.key_name
+  ec2_key_pair_name = module.oracle_db_shared["boe"].db_key_pair.key_name
 
   user_data_replace_on_change = false
 
@@ -122,9 +126,9 @@ module "oracle_db_boe" {
     var.boe_db_config.ansible_user_data_config
   )
 
-  ssh_keys_bucket_name = module.oracle_db_shared["boe-db"].ssh_keys_bucket_name
+  ssh_keys_bucket_name = module.oracle_db_shared["boe"].ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared["boe-db"].instance_policies) : v.arn]
+  instance_profile_policies = local.boe_instance_policies
 
   deploy_oracle_stats = false
 
@@ -154,9 +158,9 @@ module "oracle_db_mis" {
   db_count_index    = count.index + 1
   ec2_instance_type = var.mis_db_config.instance_type
 
-  security_group_ids = [module.oracle_db_shared["mis-db"].security_group.id]
+  security_group_ids = [module.oracle_db_shared["mis"].security_group.id]
 
-  ec2_key_pair_name = module.oracle_db_shared["mis-db"].db_key_pair.key_name
+  ec2_key_pair_name = module.oracle_db_shared["mis"].db_key_pair.key_name
 
   user_data_replace_on_change = false
 
@@ -174,9 +178,9 @@ module "oracle_db_mis" {
     var.mis_db_config.ansible_user_data_config
   )
 
-  ssh_keys_bucket_name = module.oracle_db_shared["mis-db"].ssh_keys_bucket_name
+  ssh_keys_bucket_name = module.oracle_db_shared["mis"].ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared["mis-db"].instance_policies) : v.arn]
+  instance_profile_policies = local.mis_instance_policies
 
   deploy_oracle_stats = false
 
