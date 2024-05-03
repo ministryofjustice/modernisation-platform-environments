@@ -113,156 +113,156 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-      t1-ncr-web-1-a = merge(local.web_ec2_default, {
-        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
-        config = merge(local.web_ec2_default.config, {
-          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
-          ])
-        })
-        instance = merge(local.web_ec2_default.instance, {
-          vpc_security_group_ids = ["web"]
-        })
-        tags = merge(local.web_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform Web-Tier installation and configurations"
-          nomis-combined-reporting-environment = "t1"
-          type                                 = "processing"
-          instance-scheduling                  = "skip-scheduling"
-        })
-      })
-      t1-ncr-cms-1-a = merge(local.bip_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
-        config = merge(local.bip_ec2_default.config, {
-          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
-          ])
-        })
-        instance = merge(local.web_ec2_default.instance, {
-          vpc_security_group_ids = ["bip"]
-        })
-        tags = merge(local.bip_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform Mid-Tier installation and configurations"
-          nomis-combined-reporting-environment = "t1"
-          node                                 = "1"
-          type                                 = "management"
-          instance-scheduling                  = "skip-scheduling"
-        })
-      })
-      t1-ncr-etl-1-a = merge(local.etl_ec2_default, {
-        cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
-        config = merge(local.etl_ec2_default.config, {
-          instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
-          ])
-        })
-        tags = merge(local.etl_ec2_default.tags, {
-          description                          = "For testing SAP BI Platform ETL installation and configurations"
-          nomis-combined-reporting-environment = "t1"
-          instance-scheduling                  = "skip-scheduling"
-        })
-      })
+      # t1-ncr-web-1-a = merge(local.web_ec2_default, {
+      #   cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+      #   config = merge(local.web_ec2_default.config, {
+      #     instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
+      #       "Ec2T1ReportingPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.web_ec2_default.instance, {
+      #     vpc_security_group_ids = ["web"]
+      #   })
+      #   tags = merge(local.web_ec2_default.tags, {
+      #     description                          = "For testing SAP BI Platform Web-Tier installation and configurations"
+      #     nomis-combined-reporting-environment = "t1"
+      #     type                                 = "processing"
+      #     instance-scheduling                  = "skip-scheduling"
+      #   })
+      # })
+      # t1-ncr-cms-1-a = merge(local.bip_ec2_default, {
+      #   cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+      #   config = merge(local.bip_ec2_default.config, {
+      #     instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+      #       "Ec2T1ReportingPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.web_ec2_default.instance, {
+      #     vpc_security_group_ids = ["bip"]
+      #   })
+      #   tags = merge(local.bip_ec2_default.tags, {
+      #     description                          = "For testing SAP BI Platform Mid-Tier installation and configurations"
+      #     nomis-combined-reporting-environment = "t1"
+      #     node                                 = "1"
+      #     type                                 = "management"
+      #     instance-scheduling                  = "skip-scheduling"
+      #   })
+      # })
+      # t1-ncr-etl-1-a = merge(local.etl_ec2_default, {
+      #   cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
+      #   config = merge(local.etl_ec2_default.config, {
+      #     instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
+      #       "Ec2T1ReportingPolicy",
+      #     ])
+      #   })
+      #   tags = merge(local.etl_ec2_default.tags, {
+      #     description                          = "For testing SAP BI Platform ETL installation and configurations"
+      #     nomis-combined-reporting-environment = "t1"
+      #     instance-scheduling                  = "skip-scheduling"
+      #   })
+      # })
     }
-    baseline_lbs = {
-      private = {
-        internal_lb                      = true
-        enable_delete_protection         = false
-        load_balancer_type               = "application"
-        idle_timeout                     = 3600
-        security_groups                  = ["lb"]
-        subnets                          = module.environment.subnets["private"].ids
-        enable_cross_zone_load_balancing = true
+    # baseline_lbs = {
+    #   private = {
+    #     internal_lb                      = true
+    #     enable_delete_protection         = false
+    #     load_balancer_type               = "application"
+    #     idle_timeout                     = 3600
+    #     security_groups                  = ["lb"]
+    #     subnets                          = module.environment.subnets["private"].ids
+    #     enable_cross_zone_load_balancing = true
 
-        instance_target_groups = {
-          t1-ncr-web-1-a = {
-            port     = 7777
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              path                = "/"
-              healthy_threshold   = 3
-              unhealthy_threshold = 5
-              timeout             = 5
-              interval            = 30
-              matcher             = "200-399"
-              port                = 7777
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "t1-ncr-web-1-a" },
-            ]
-          }
-        }
-        listeners = {
-          http = {
-            port     = 7777
-            protocol = "HTTP"
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-            rules = {
-              t1-ncr-web-1-a = {
-                priority = 4000
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t1-ncr-web-1-a"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          }
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-            rules = {
-              t1-ncr-web-1-a = {
-                priority = 4580
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t1-ncr-web-1-a"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          }
-        }
-      }
-    }
+    #     instance_target_groups = {
+    #       t1-ncr-web-1-a = {
+    #         port     = 7777
+    #         protocol = "HTTP"
+    #         health_check = {
+    #           enabled             = true
+    #           path                = "/"
+    #           healthy_threshold   = 3
+    #           unhealthy_threshold = 5
+    #           timeout             = 5
+    #           interval            = 30
+    #           matcher             = "200-399"
+    #           port                = 7777
+    #         }
+    #         stickiness = {
+    #           enabled = true
+    #           type    = "lb_cookie"
+    #         }
+    #         attachments = [
+    #           { ec2_instance_name = "t1-ncr-web-1-a" },
+    #         ]
+    #       }
+    #     }
+    #     listeners = {
+    #       http = {
+    #         port     = 7777
+    #         protocol = "HTTP"
+    #         default_action = {
+    #           type = "fixed-response"
+    #           fixed_response = {
+    #             content_type = "text/plain"
+    #             message_body = "Not implemented"
+    #             status_code  = "501"
+    #           }
+    #         }
+    #         rules = {
+    #           t1-ncr-web-1-a = {
+    #             priority = 4000
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "t1-ncr-web-1-a"
+    #             }]
+    #             conditions = [{
+    #               host_header = {
+    #                 values = [
+    #                   "t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+    #                 ]
+    #               }
+    #             }]
+    #           }
+    #         }
+    #       }
+    #       https = {
+    #         port                      = 443
+    #         protocol                  = "HTTPS"
+    #         ssl_policy                = "ELBSecurityPolicy-2016-08"
+    #         certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
+    #         default_action = {
+    #           type = "fixed-response"
+    #           fixed_response = {
+    #             content_type = "text/plain"
+    #             message_body = "Not implemented"
+    #             status_code  = "501"
+    #           }
+    #         }
+    #         rules = {
+    #           t1-ncr-web-1-a = {
+    #             priority = 4580
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "t1-ncr-web-1-a"
+    #             }]
+    #             conditions = [{
+    #               host_header = {
+    #                 values = [
+    #                   "t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+    #                 ]
+    #               }
+    #             }]
+    #           }
+    #         }
+    #       }
+    #     }
+    #   }
+    # }
     baseline_route53_zones = {
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
           { name = "db", type = "CNAME", ttl = "3600", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "web", type = "CNAME", ttl = "3600", records = ["t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "etl", type = "CNAME", ttl = "3600", records = ["t1-ncr-etl-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
+          #{ name = "web", type = "CNAME", ttl = "3600", records = ["t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          #{ name = "etl", type = "CNAME", ttl = "3600", records = ["t1-ncr-etl-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
         ]
       }
     }
