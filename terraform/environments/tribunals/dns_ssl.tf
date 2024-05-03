@@ -174,7 +174,7 @@ resource "aws_route53_record" "external_charity_sftp" {
   name     = "sftp.charitytribunal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "CNAME"
 
-  records = [aws_lb.tribunals_lb_ftp[0].dns_name]
+  records = [module.charity_tribunal_decisions.tribunals_lb_ftp[0].dns_name]
   ttl     = 60
 }
 
