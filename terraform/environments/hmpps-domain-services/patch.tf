@@ -20,6 +20,11 @@ module "development" {
   ]
 }
 
+
+provider "aws" {
+  region = "your_region" # Specify your AWS region here
+}
+
 module "test" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v1.0.0"
   count  = local.is-test == true ? 1 : 0
@@ -27,7 +32,8 @@ module "test" {
     aws.bucket-replication = aws
   }
 
-  account_number   = module.environment.account_ids.hmpps-domain-services-test
+#   account_number   = module.environment.account_ids.hmpps-domain-services-test
+  account_number             = local.environment_management.account_ids[terraform.workspace]
   application_name = local.application_name
   approval_days    = "0"
   patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
