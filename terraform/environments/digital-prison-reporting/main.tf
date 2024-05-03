@@ -4,9 +4,8 @@
 ## Glue Job, Reporting Hub
 ## Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 locals {
-  glue_avro_registry                       = split("/", module.glue_registry_avro.registry_name)
-  glue_shared_log4j_properties_s3_key      = "logging_config/shared/log4j2.properties"
-  glue_shared_log4j_properties_s3_location = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${local.glue_shared_log4j_properties_s3_key}"
+  glue_avro_registry                  = split("/", module.glue_registry_avro.registry_name)
+  glue_shared_log4j_properties_s3_key = "logging_config/shared/log4j2.properties"
 }
 
 resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
@@ -53,7 +52,7 @@ module "glue_reporting_hub_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
-    "--extra-files"                         = [local.glue_shared_log4j_properties_s3_location]
+    "--extra-files"                         = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${local.glue_shared_log4j_properties_s3_key}"
     "--job-bookmark-option"                 = "job-bookmark-disable"
     "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
     "--dpr.kinesis.stream.arn"              = module.kinesis_stream_ingestor.kinesis_stream_arn
