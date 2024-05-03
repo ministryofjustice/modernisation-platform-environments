@@ -238,7 +238,7 @@ resource "aws_ebs_volume" "share" {
 }
 
 resource "aws_volume_attachment" "share" {
-  device_name = "/dev/sdj"
+  device_name = "/dev/sdk"
   volume_id   = aws_ebs_volume.share.id
   instance_id = aws_instance.database.id
 }
