@@ -35,6 +35,10 @@ resource "aws_lambda_function" "bounce_email_notification" {
   handler          = "bounce_email_notification.handler"
   source_code_hash = data.archive_file.lambda_function_payload_bounce_email_notification.output_base64sha256
 
+  lifecycle {
+    replace_triggered_by = [aws_iam_role.lambda_bounce_email_notification]
+  }
+
   tags = local.tags
 }
 
