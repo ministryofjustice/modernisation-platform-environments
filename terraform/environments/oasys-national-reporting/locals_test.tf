@@ -103,5 +103,8 @@ locals {
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
     }
+    baseline_route53_zones = {
+      "test.reporting.oasys.service.justice.gov.uk" = {}
+    }
   }
 }

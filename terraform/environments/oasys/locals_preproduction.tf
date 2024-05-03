@@ -135,66 +135,66 @@ locals {
         })
       })
 
-      "pp-${local.application_name}-db-b" = merge(local.database_b, {
-        config = merge(local.database_b.config, {
-          instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
-            "Ec2PreprodDatabasePolicy",
-          ])
-        })
-        instance = merge(local.database_b.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            size  = 100
-            label = "app"
-            type  = "gp3"
-          }
-          "/dev/sdc" = { # /u02
-            size  = 500
-            label = "app"
-            type  = "gp3"
-          }
-          "/dev/sde" = { # DATA01
-            label = "data"
-            size  = 2000
-            type  = "gp3"
-          }
-          "/dev/sdf" = { # DATA02
-            label = "data"
-            size  = 2000
-            type  = "gp3"
-          }
-          "/dev/sdj" = { # FLASH01
-            label = "flash"
-            type  = "gp3"
-            size  = 200
-          }
-          "/dev/sds" = {
-            label = "swap"
-            type  = "gp3"
-            size  = 2
-          }
-        }
-        ebs_volume_config = {
-          data = {
-            iops       = 3000 # min 3000
-            type       = "gp3"
-            throughput = 125
-            total_size = 200
-          }
-          flash = {
-            iops       = 3000 # min 3000
-            type       = "gp3"
-            throughput = 125
-            total_size = 50
-          }
-        }
-        tags = merge(local.database_b.tags, {
-          bip-db-name = "PPBIPINF"
-          oracle-sids = "PPBIPINF PPOASYS"
-        })
-      })
+      # "pp-${local.application_name}-db-b" = merge(local.database_b, {
+      #   config = merge(local.database_b.config, {
+      #     instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
+      #       "Ec2PreprodDatabasePolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.database_b.instance, {
+      #     instance_type = "r6i.2xlarge"
+      #   })
+      #   ebs_volumes = {
+      #     "/dev/sdb" = { # /u01
+      #       size  = 100
+      #       label = "app"
+      #       type  = "gp3"
+      #     }
+      #     "/dev/sdc" = { # /u02
+      #       size  = 500
+      #       label = "app"
+      #       type  = "gp3"
+      #     }
+      #     "/dev/sde" = { # DATA01
+      #       label = "data"
+      #       size  = 2000
+      #       type  = "gp3"
+      #     }
+      #     "/dev/sdf" = { # DATA02
+      #       label = "data"
+      #       size  = 2000
+      #       type  = "gp3"
+      #     }
+      #     "/dev/sdj" = { # FLASH01
+      #       label = "flash"
+      #       type  = "gp3"
+      #       size  = 200
+      #     }
+      #     "/dev/sds" = {
+      #       label = "swap"
+      #       type  = "gp3"
+      #       size  = 2
+      #     }
+      #   }
+      #   ebs_volume_config = {
+      #     data = {
+      #       iops       = 3000 # min 3000
+      #       type       = "gp3"
+      #       throughput = 125
+      #       total_size = 200
+      #     }
+      #     flash = {
+      #       iops       = 3000 # min 3000
+      #       type       = "gp3"
+      #       throughput = 125
+      #       total_size = 50
+      #     }
+      #   }
+      #   tags = merge(local.database_b.tags, {
+      #     bip-db-name = "PPBIPINF"
+      #     oracle-sids = "PPBIPINF PPOASYS"
+      #   })
+      # })
 
       "pp-onr-db-a" = merge(local.database_onr_a, {
         config = merge(local.database_onr_a.config, {
