@@ -21,10 +21,6 @@ module "development" {
 }
 
 
-provider "aws" {
-  region = "your_region" # Specify your AWS region here
-}
-
 module "test" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v1.0.0"
   count  = local.is-test == true ? 1 : 0
