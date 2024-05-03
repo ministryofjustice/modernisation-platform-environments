@@ -125,6 +125,7 @@ module "baseline" {
     lookup(local.environment_config, "baseline_s3_buckets", {})
   )
   secretsmanager_secrets = merge(
+    module.baseline_presets.secretsmanager_secrets,
     local.baseline_secretsmanager_secrets,
     lookup(local.environment_config, "baseline_secretsmanager_secrets", {})
   )
