@@ -1,8 +1,11 @@
 module "test" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v2.0.0"
   count  = local.is-test == true ? 1 : 0
-  providers = {
-    source = "hashicorp/aws"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.16.0"
+    }
   }
 
   account_number   = local.environment_management.account_ids[terraform.workspace]
