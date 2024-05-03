@@ -20,7 +20,7 @@ output "tribunals_lb" {
 
 output "tribunals_lb_ftp" {
   description = "SFTP LB"
-  value       = aws_lb.tribunals_lb_ftp[0]
+  value       = aws_lb.tribunals_lb_ftp
 }
 
 output "sftp_tribunals_target_group_arn" {
