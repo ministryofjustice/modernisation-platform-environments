@@ -27,8 +27,3 @@ output "tribunals_lb_ftp" {
   description = "SFTP LB"
   value       = module.ecs_loadbalancer.tribunals_lb_ftp
 }
-
-output "sftp_host_port" {
-  description = "Port for SFTP"
-  value = module.tribunal_ftp.sftp_host_port
-}
