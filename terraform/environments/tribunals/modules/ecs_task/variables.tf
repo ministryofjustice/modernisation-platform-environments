@@ -72,6 +72,3 @@ variable "sftp_lb_tg_arn" {
   type        = string
   description = "Network Load balancer target group ARN used by SFTP connections"
 }
-
-variable "sftp_host_port"{
-}

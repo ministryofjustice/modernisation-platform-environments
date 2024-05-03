@@ -29,6 +29,7 @@ resource "aws_security_group" "tribunals_lb_sc" {
 }
 
 resource "aws_security_group" "tribunals_lb_sc_sftp" {
+  count       = var.is_ftp_app ? 1 : 0
   name        = "${var.app_name}-load-balancer-sg-sftp"
   description = "${var.app_name} control access to the network load balancer"
   vpc_id      = var.vpc_shared_id
