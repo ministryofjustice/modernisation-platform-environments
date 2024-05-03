@@ -74,11 +74,11 @@ resource "aws_lb" "tribunals_lb_ftp" {
   count                      = var.is_ftp_app ? 1 : 0
   name                       = "${var.app_name}-ftp-lb"
   load_balancer_type         = "network"
-  security_groups            = [aws_security_group.tribunals_lb_sc_sftp.id]
+  security_groups            = [aws_security_group.tribunals_lb_sc_sftp[0].id]
   subnets                    = var.subnets_shared_public_ids
   enable_deletion_protection = false
   internal                   = false
-  depends_on                 = [aws_security_group.tribunals_lb_sc_sftp]
+  depends_on                 = [aws_security_group.tribunals_lb_sc_sftp[0]]
 }
 
 resource "aws_lb_target_group" "tribunals_target_group" {
