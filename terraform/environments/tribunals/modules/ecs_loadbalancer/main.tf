@@ -28,6 +28,36 @@ resource "aws_security_group" "tribunals_lb_sc" {
   }
 }
 
+resource "aws_security_group" "tribunals_lb_sc_sftp" {
+  name        = "${var.app_name}-load-balancer-sg-sftp"
+  description = "${var.app_name} control access to the network load balancer"
+  vpc_id      = var.vpc_shared_id
+
+  ingress {
+    description = "allow all traffic on HTTPS port 22"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "allow all traffic on custom port"
+    from_port   = var.sftp_host_port
+    to_port     = var.sftp_host_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 //noinspection HILUnresolvedReference
 resource "aws_lb" "tribunals_lb" {
   name                       = "${var.app_name}-lb"
@@ -43,11 +73,11 @@ resource "aws_lb" "tribunals_lb_ftp" {
   count                      = var.is_ftp_app ? 1 : 0
   name                       = "${var.app_name}-ftp-lb"
   load_balancer_type         = "network"
-  security_groups            = [aws_security_group.tribunals_lb_sc.id]
+  security_groups            = [aws_security_group.tribunals_lb_sc_sftp.id]
   subnets                    = var.subnets_shared_public_ids
   enable_deletion_protection = false
   internal                   = false
-  depends_on                 = [aws_security_group.tribunals_lb_sc]
+  depends_on                 = [aws_security_group.tribunals_lb_sc_sftp]
 }
 
 resource "aws_lb_target_group" "tribunals_target_group" {
@@ -76,7 +106,7 @@ resource "aws_lb_target_group" "tribunals_target_group" {
 resource "aws_lb_target_group" "tribunals_target_group_sftp" {
   count                = var.is_ftp_app ? 1 : 0
   name                 = "${var.app_name}-sftp-tg"
-  port                 = 22
+  port                 = var.sftp_host_port
   protocol             = "TCP"
   vpc_id               = var.vpc_shared_id
   target_type          = "instance"
@@ -110,7 +140,7 @@ resource "aws_lb_listener" "tribunals_lb" {
 resource "aws_lb_listener" "tribunals_lb_ftp" {
   count             = var.is_ftp_app ? 1 : 0
   load_balancer_arn = aws_lb.tribunals_lb_ftp[0].arn
-  port              = var.application_data.server_port_3
+  port              = var.sftp_host_port
   protocol          = var.application_data.lb_listener_protocol_3
 
   default_action {

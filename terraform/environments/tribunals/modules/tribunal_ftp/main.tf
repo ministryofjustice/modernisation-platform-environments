@@ -2,11 +2,13 @@ locals {
   app                = var.app_name
   app_url            = var.app_url
   documents_location = var.documents_location
+  sftp_host_port     = var.sftp_host_port
   app_container_definition = templatefile("container_definition_ftp.json", {
     app_name                   = "${local.app}"
     awslogs-group              = "${local.app}-ecs-log-group"
     container_definition_image = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
     documents_location         = "${local.documents_location}"
+    sftp_host_port             = "${local.sftp_host_port}"
   })
 }
 
