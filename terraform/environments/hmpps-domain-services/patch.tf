@@ -24,7 +24,7 @@ module "test" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v1.0.0"
   count  = local.is-test == true ? 1 : 0
   providers = {
-    aws.bucket-replication = aws.bucket-replication
+    aws.bucket-replication = aws
   }
 
   account_number   = module.environment.account_ids.hmpps-domain-services-test
