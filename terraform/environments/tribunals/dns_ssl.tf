@@ -172,7 +172,7 @@ resource "aws_route53_record" "external_charity_sftp" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "sftp.charitytribunal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type     = "CNAME"
+  type     = "A"
 
   records = [module.charity_tribunal_decisions.tribunals_lb_ftp[0].dns_name]
   ttl     = 60
