@@ -30,5 +30,5 @@ output "sftp_tribunals_target_group_arn" {
 
 output "tribunals_lb_sc_id_sftp" {
   description = "Network LB Security Group Id for sftp"
-  value       = length(aws_security_group.tribunals_lb_sc_sftp.id) > 0 ? aws_security_group.tribunals_lb_sc_sftp[0].id : ""
+  value       = length(aws_security_group.tribunals_lb_sc_sftp) > 0 ? aws_security_group.tribunals_lb_sc_sftp[0].id : ""
 }
