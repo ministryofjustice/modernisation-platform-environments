@@ -152,8 +152,8 @@ resource "aws_security_group" "ecs_service_sftp" {
   }
 
   ingress {
-    from_port   = module.charity_tribunal_decisions.sftp_host_port
-    to_port     = module.charity_tribunal_decisions.sftp_host_port
+    from_port   = module.ecs_loadbalancer.sftp_host_port
+    to_port     = module.ecs_loadbalancer.sftp_host_port
     protocol    = "tcp"
     description = "Allow traffic on custom port from network load balancer"
     security_groups = [
