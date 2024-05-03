@@ -35,5 +35,5 @@ output "tribunals_lb_sc_id_sftp" {
 
 output "sftp_host_port" {
   description = "Port for SFTP"
-  value = module.tribunal_ftp.sftp_host_port
+  value       = var.sftp_host_port
 }
