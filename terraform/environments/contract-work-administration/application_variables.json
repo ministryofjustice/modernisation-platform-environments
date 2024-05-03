@@ -1,7 +1,18 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "db_ami_id": "ami-035cecbff25e0d91e",
+      "db_instance_type": "m4.xlarge",
+      "workspaces_local_cidr1": "10.200.2.0/24",
+      "workspaces_local_cidr2": "10.200.3.0/24",
+      "ebs_oradata_size": "800",
+      "ebs_oracle_size": "20",
+      "ebs_oraarch_size": "600",
+      "ebs_oratmp_size": "100",
+      "ebs_oraredo_size": "100",
+      "ebs_share_size": "50"
+
     },
     "test": {
       "example_var": "test-data"
