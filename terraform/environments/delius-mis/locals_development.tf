@@ -2,11 +2,11 @@
 
 locals {
   environment_config_dev = {
-    legacy_engineering_vpc_cidr = "10.161.98.0/25"
-    legacy_counterpart_vpc_cidr = "10.162.32.0/20"
-    legacy_ad_domain_name       = "delius-mis-dev.local"
-    legacy_ad_ip_list           = ["10.162.36.235", "10.162.35.251"]
-    ec2_user_ssh_key            = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    legacy_engineering_vpc_cidr            = "10.161.98.0/25"
+    legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
+    legacy_ad_domain_name                  = "delius-mis-dev.local"
+    legacy_ad_ip_list                      = ["10.162.36.235", "10.162.35.251"]
+    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     migration_environment_full_name        = "dmd-mis-dev"
     migration_environment_abbreviated_name = "dmd"
     migration_environment_short_name       = "mis-dev"
@@ -238,7 +238,7 @@ locals {
   dsd_db_config_dev = local.base_db_config_dev
 
   boe_db_config_dev = local.base_db_config_dev
-  
+
   mis_db_config_dev = merge(local.base_db_config_dev, {
     ebs_volume_config = {
       data = {

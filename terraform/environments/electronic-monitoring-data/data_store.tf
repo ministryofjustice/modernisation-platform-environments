@@ -194,16 +194,16 @@ data "archive_file" "summarise_zip_lambda" {
 }
 
 resource "aws_lambda_function" "summarise_zip_lambda" {
-  filename      = "lambdas/summarise_zip_lambda.zip"
-  function_name = "summarise-zip-lambda"
-  role          = aws_iam_role.summarise_zip_lambda.arn
-  handler       = "summarise_zip_lambda.handler"
-  runtime       = "python3.12"
-  timeout       = 900
-  memory_size   = 1024
-  layers        = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
+  filename         = "lambdas/summarise_zip_lambda.zip"
+  function_name    = "summarise-zip-lambda"
+  role             = aws_iam_role.summarise_zip_lambda.arn
+  handler          = "summarise_zip_lambda.handler"
+  runtime          = "python3.12"
+  timeout          = 900
+  memory_size      = 1024
+  layers           = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
   source_code_hash = data.archive_file.summarise_zip_lambda.output_base64sha256
-  tags = local.tags
+  tags             = local.tags
 }
 
 resource "aws_iam_role" "summarise_zip_lambda" {
