@@ -134,7 +134,7 @@ module "glue_reporting_hub_cdc_job" {
   name                          = "${local.project}-reporting-hub-cdc-${local.env}"
   short_name                    = "${local.project}-reporting-hub-cdc"
   command_type                  = "gluestreaming"
-  description                   = "Monitors the reporting hub for table changes and applies them to structured and curated zones.\nArguments:\n--dpr.processed.raw.files.path: (Required) the path excluding the bucket name where processed files should be moved to. Must be in the same bucket as the raw s3 path\n--dpr.config.key: (Optional) config key e.g. prisoner\n--dpr.clean.cdc.checkpoint: (Optional) boolean flag to clean checkpoint directory"
+  description                   = "Monitors the reporting hub for table changes and applies them to structured and curated zones.\nArguments:\n--dpr.enable.streaming.source.archiving: (Optional) Enables moving of processed files to the dpr.processed.raw.files.path\n--dpr.processed.raw.files.path: (Optional) the path excluding the bucket name where processed files should be moved to. Must be in the same bucket as the raw s3 path\n--dpr.config.key: (Optional) config key e.g. prisoner\n--dpr.clean.cdc.checkpoint: (Optional) boolean flag to clean checkpoint directory"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-cdc-${local.env}/"
