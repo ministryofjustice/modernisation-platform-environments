@@ -62,4 +62,6 @@ variable "is_ftp_app" {
 }
 
 variable "sftp_host_port"{
+  type = number
+  description = "the port number to assign for a given sftp application"
 }
