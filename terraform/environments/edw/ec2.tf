@@ -63,7 +63,7 @@ resource "aws_iam_role" "edw_ec2_role" {
 resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
   name = "${local.application_name}-S3-${local.application_data.accounts[local.environment].edw_bucket_name}-edw-RW-ec2-profile"
   path = "/"
-  role = [aws_iam_role.edw_ec2_role.name]
+  role = aws_iam_role.edw_ec2_role.name
 
   tags = merge(
     local.tags,
@@ -120,7 +120,7 @@ resource "aws_instance" "edw_db_instance" {
 
 ####### DB Volumes #######
 
-resource "aws_volume" "orahomeVolume" {
+resource "aws_ebs_volume" "orahomeVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OrahomeVolumeSize
   encrypted         = true
@@ -132,7 +132,7 @@ resource "aws_volume" "orahomeVolume" {
   }
 }
 
-resource "aws_volume" "oratempVolume" {
+resource "aws_ebs_volume" "oratempVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OratempVolumeSize
   encrypted         = true
@@ -144,7 +144,7 @@ resource "aws_volume" "oratempVolume" {
   }
 }
 
-resource "aws_volume" "oradataVolume" {
+resource "aws_ebs_volume" "oradataVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OradataVolumeSize
   encrypted         = true
@@ -156,7 +156,7 @@ resource "aws_volume" "oradataVolume" {
   }
 }
 
-resource "aws_volume" "softwareVolume" {
+resource "aws_ebs_volume" "softwareVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_SoftwareVolumeSize
   encrypted         = true
@@ -168,7 +168,7 @@ resource "aws_volume" "softwareVolume" {
   }
 }
 
-resource "aws_volume" "ArchiveVolume" {
+resource "aws_ebs_volume" "ArchiveVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_ArchiveVolumeSize
   encrypted         = true
