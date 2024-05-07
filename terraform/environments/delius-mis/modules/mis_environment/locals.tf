@@ -5,4 +5,4 @@ locals {
       delius-environment = var.env_name
     },
   )
-}   
+}
