@@ -1,33 +1,11 @@
-module "development" {
-  count               = local.is-development == true ? 1 : 0
-  source              = "../../modules/patch_manager"
-  application         = "hmpps-domain-services"
-  environment         = "development"
-  predefined_baseline = "AWS-WindowsPredefinedPatchBaseline-OS-Applications"
-  operating_system    = "WINDOWS"
-  schedule            = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
-  target_tag = {
-    "environment-name" = "hmpps-domain-services-development"
-  }
-  instance_roles = [
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-development}:role/ec2-instance-role-dev-win-2022",
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-test}:role/ec2-instance-role-test-win-2022",
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-preproduction}:role/ec2-instance-role-pp-rdgw-1-a",
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-preproduction}:role/ec2-instance-role-pp-rds-1-a",
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-production}:role/ec2-instance-role-pd-rdgw-1-a",
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-production}:role/ec2-instance-role-pd-rdgw-1-b",
-    "arn:aws:iam::${module.environment.account_ids.hmpps-domain-services-production}:role/ec2-instance-role-pd-rds-1-a"
-  ]
-}
-
 module "test" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v1.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v2.0.0"
   count  = local.is-test == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
   }
 
-  account_number   = module.environment.account_ids.hmpps-domain-services-test
+  account_number   = local.environment_management.account_ids[terraform.workspace]
   application_name = local.application_name
   approval_days    = "0"
   patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
