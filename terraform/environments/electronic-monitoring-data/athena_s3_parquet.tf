@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "athena_parquet_s3_bucket" {
-  bucket_prefix = "em-athena-parquet-"
+  bucket_prefix = "dms_data_validation-"
 
   tags = merge(
     local.tags,
