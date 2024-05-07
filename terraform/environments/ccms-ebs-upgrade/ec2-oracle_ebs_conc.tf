@@ -200,7 +200,7 @@ resource "aws_volume_attachment" "appshare_conc_att" {
     aws_ebs_volume.appshare
   ]
   device_name = "/dev/sdq"
-  volume_id   = aws_ebs_volume.appshare[count.index].id
+  volume_id   = aws_ebs_volume.appshare.id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
