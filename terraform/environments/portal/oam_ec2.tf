@@ -234,6 +234,7 @@ resource "aws_instance" "oam_instance_1" {
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.oam_1_userdata)
   user_data_replace_on_change = true
+  key_name                    = aws_key_pair.portal_ssh_ohs.key_name
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
@@ -248,10 +249,6 @@ resource "aws_instance" "oam_instance_1" {
 #############################################
 # TEMP SSH Key to installing Portal
 #############################################
-resource "aws_key_pair" "portal_ssh_oam" {
-  key_name   = "portal-ssh-oam-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCSUq7jMvpcUZ37kacz+kUIJ8YtqGFFDCXDYtisXC9prP/ew+KfGSRphZowMBRrL2rxdkeqyo8YiMiBoRzzhNa2mL7f69P5B+vnFwqvuDyNqNGlUSRAEgTDmZNxo2psa+3kxEoMjJ1V54yBywKV78tjqSU17XDUVtekKDqUJlXQlhfGICXTO+qVcfGBhHlqrxwQHrdLJ5oxqdJ2uUVY0/67j4zjcqYlL0YGMfuUoHDckofMzRHak7IAJx56GfF+zll45VtSfg+kA2JrOrKtuj7cO0PePZ3JtWWVBiGKsH4+D4EkkdEoGcJziUpVK62Zv/tYAusxPVRP9/uQP/ouPfsTE/tzc5Wn/QltSVSu9F96J4hmV65VK4vluKuc0h2FuMtibMb3sRjJ80iqEEox1FKWM9/0qZJ3hknGAar2yaHkq6cIq+brB6qBn7vwnGu8CdE4qoIolVxXEDIAYmymg+gBW0U02kFhxu1VsymPENY1kE2oXLb98XajEoplNHMEyDU= vincent.cheung@MJ004609"
-}
 resource "aws_vpc_security_group_ingress_rule" "oam_ssh" {
   security_group_id = aws_security_group.oam_instance.id
   description       = "SSH for Portal Installation"
