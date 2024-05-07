@@ -115,6 +115,7 @@ module "nextcloud_service" {
   providers = {
     aws          = aws
     aws.core-vpc = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
   }
 
 }
