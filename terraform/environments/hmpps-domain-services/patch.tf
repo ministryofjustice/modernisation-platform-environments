@@ -30,7 +30,8 @@ module "test" {
 
 #   account_number   = module.environment.account_ids.hmpps-domain-services-test
   account_number             = local.environment_management.account_ids[terraform.workspace]
-  application_name = local.application_name
+  application_name = "hmpps"
+#   application_name = local.application_name
   approval_days    = "0"
   patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
   operating_system = "REDHAT_ENTERPRISE_LINUX"
