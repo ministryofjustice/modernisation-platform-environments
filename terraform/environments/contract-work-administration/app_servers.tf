@@ -127,14 +127,14 @@ resource "aws_vpc_security_group_ingress_rule" "app_cm_1" {
   to_port           = 9050
 }
 
-resource "aws_vpc_security_group_ingress_rule" "app_cm_2" {
-  security_group_id = aws_security_group.app.id
-  description       = "Access from Concurrent Manager"
-  referenced_security_group_id         = aws_security_group.concurrent_manager.id
-  from_port         = 8250
-  ip_protocol       = "tcp"
-  to_port           = 8250
-}
+# resource "aws_vpc_security_group_ingress_rule" "app_cm_2" {
+#   security_group_id = aws_security_group.app.id
+#   description       = "Access from Concurrent Manager"
+#   referenced_security_group_id         = aws_security_group.concurrent_manager.id
+#   from_port         = 8250
+#   ip_protocol       = "tcp"
+#   to_port           = 8250
+# }
 
 resource "aws_vpc_security_group_ingress_rule" "app_cm_3" {
   security_group_id = aws_security_group.app.id
