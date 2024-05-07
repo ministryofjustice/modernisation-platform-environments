@@ -27,9 +27,20 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "athena_iceberg_s3
   }
 }
 
+resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
+  name = "dms-data-validation"
+  # create_table_default_permission {
+  #   permissions = ["SELECT"]
+
+  #   principal {
+  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+  #   }
+  # }
+}
+
 #  resource "aws_athena_database" "dms_dv_athena_database" {
 #    name   = "dms_data_validation"
-#    bucket = aws_s3_bucket.athena_iceberg_s3_bucket.id
+#    bucket = aws_s3_bucket.athena_parquet_s3_bucket.id
 
 # #    encryption_configuration {
 # #       encryption_option = "SSE_KMS"
@@ -37,7 +48,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "athena_iceberg_s3
 # #   }
 #  }
 
-#  resource "aws_athena_workgroup" "glue_iceberg_athena_workgroup" {
+#  resource "aws_athena_workgroup" "glue_parquet_athena_workgroup" {
 #    name = "glue_parquet"
 
 #    configuration {
