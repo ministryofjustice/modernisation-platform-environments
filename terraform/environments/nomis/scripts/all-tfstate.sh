@@ -1,5 +1,5 @@
 #!/bin/bash
-# wrapper script to perform secret operations across all accounts
+# wrapper script to perform ssm operations across all accounts
 
 profiles="corporate-staff-rostering-development
  corporate-staff-rostering-test
@@ -38,23 +38,17 @@ profiles="corporate-staff-rostering-development
  planetfm-preproduction
  planetfm-production"
 
-action=$1
-
-if [[ -z $action ]]; then
-  echo "Usage: $0 describe|get"
-  exit 1
-fi
-
-shift
-script="./${action}-secretsmanager-secrets.sh"
-
-if [[ ! -x $script ]]; then
-  echo "Unexpected action: $action"
-  exit 1
-fi
-
 for profile in $profiles; do
   [[ ${profile} =~ ^#.* ]] && continue
-  echo $script ${profile} $@
-  $script ${profile} $@
+  account=$(echo $profile | rev | cut -d-  -f2- | rev)
+
+  if [[ -e tfstate/$profile/terraform.tfstate ]]; then
+    echo $profile: skipping as already downloaded
+  else
+    if [[ ! -d tfstate/$profile ]]; then
+      mkdir -p tfstate/$profile
+    fi
+    echo aws s3api get-object --bucket modernisation-platform-terraform-state --key environments/members/$account/$profile/terraform.tfstate tfstate/$profile/terraform.tfstate --profile $profile
+    aws s3api get-object --bucket modernisation-platform-terraform-state --key environments/members/$account/$profile/terraform.tfstate tfstate/$profile/terraform.tfstate --profile $profile
+  fi
 done
