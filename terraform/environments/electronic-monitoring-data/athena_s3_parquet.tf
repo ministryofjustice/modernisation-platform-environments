@@ -28,7 +28,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "athena_iceberg_s3
 }
 
 resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
-  name = "dms-data-validation"
+  name = "dms_data_validation"
   # create_table_default_permission {
   #   permissions = ["SELECT"]
 
