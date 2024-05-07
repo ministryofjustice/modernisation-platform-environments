@@ -29,13 +29,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "athena_iceberg_s3
 
 resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
   name = "dms_data_validation"
-  # create_table_default_permission {
-  #   permissions = ["SELECT"]
+  create_table_default_permission {
+    permissions = ["SELECT"]
 
-  #   principal {
-  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
-  #   }
-  # }
+    principal {
+      data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+    }
+  }
 }
 
 #  resource "aws_athena_database" "dms_dv_athena_database" {
