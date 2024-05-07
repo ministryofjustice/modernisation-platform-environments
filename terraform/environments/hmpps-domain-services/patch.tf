@@ -1,9 +1,9 @@
 module "test" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v2.0.0"
   count  = local.is-test == true ? 1 : 0
-#   providers = {
-#     aws.bucket-replication = aws
-#   }
+  providers = {
+    aws.bucket-replication = aws
+  }
 
   account_number   = local.environment_management.account_ids[terraform.workspace]
   application_name = local.application_name
