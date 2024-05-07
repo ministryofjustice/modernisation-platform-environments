@@ -11,6 +11,7 @@ locals {
     sns_topics = {
       pagerduty_integrations = {
         dba_pagerduty = "hmpps_shef_dba_low_priority"
+        dso_pagerduty = "nomis_nonprod_alarms"
       }
     }
   }

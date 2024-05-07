@@ -30,7 +30,6 @@ locals {
   ssm_parameters_filter = flatten([
     length(local.account_names_for_account_ids_ssm_parameter) != 0 ? ["account"] : [],
     var.options.enable_azure_sas_token ? ["/azure"] : [],
-    var.options.enable_ec2_user_keypair ? ["ec2-user"] : [],
     var.options.enable_ec2_cloud_watch_agent && fileexists(local.cloud_watch_windows_filename) ? ["cloud-watch-config"] : [],
   ])
 
@@ -66,14 +65,6 @@ locals {
       }
     }
 
-    ec2-user = {
-      postfix = "_"
-      parameters = {
-        pem = {
-          description = "Private key for ec2-user key pair managed by baseline module"
-        }
-      }
-    }
   }
 }
 

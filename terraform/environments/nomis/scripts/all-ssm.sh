@@ -25,14 +25,18 @@ profiles="corporate-staff-rostering-development
  nomis-data-hub-test
  nomis-data-hub-preproduction
  nomis-data-hub-production
- planetfm-development
- planetfm-test
- planetfm-preproduction
- planetfm-production
  oasys-development
  oasys-test
  oasys-preproduction
- oasys-production"
+ oasys-production
+ oasys-national-reporting-development
+ oasys-national-reporting-test
+ oasys-national-reporting-preproduction
+ oasys-national-reporting-production
+ planetfm-development
+ planetfm-test
+ planetfm-preproduction
+ planetfm-production"
 
 action=$1
 

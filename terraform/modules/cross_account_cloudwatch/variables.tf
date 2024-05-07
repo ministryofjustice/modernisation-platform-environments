@@ -5,7 +5,7 @@ variable "environment" {
 }
 
 variable "source_account_ids" {
-  type    = list(string)
+  type = list(string)
 }
 
 variable "options" {
@@ -22,5 +22,5 @@ variable "monitoring_account_sink_identifier" {
 }
 
 variable "monitoring_account_id" {
-  type    = string
+  type = string
 }

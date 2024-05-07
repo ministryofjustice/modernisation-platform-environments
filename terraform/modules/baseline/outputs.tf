@@ -131,6 +131,11 @@ output "security_groups" {
   value       = aws_security_group.this
 }
 
+output "sns_topics" {
+  description = "map of aws_sns_topic resources corresponding to var.sns_topics"
+  value       = aws_sns_topic.this
+}
+
 output "ssm_parameters" {
   description = "map of security groups corresponding to var.ssm_parameters"
   value = merge(

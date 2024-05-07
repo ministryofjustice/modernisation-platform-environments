@@ -31,5 +31,9 @@ module "environment_dev" {
   bws_config = local.bws_config_dev
   dis_config = local.dis_config_dev
 
+  dsd_db_config = local.dsd_db_config_dev
+  boe_db_config = local.boe_db_config_dev
+  mis_db_config = local.mis_db_config_dev
+
   tags = local.tags
 }
