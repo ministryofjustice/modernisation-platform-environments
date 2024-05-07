@@ -22,7 +22,9 @@ module "development" {
 
 
 module "test" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=providerwarningfix"
+#   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=providerwarningfix"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git"
+
   count  = local.is-test == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
