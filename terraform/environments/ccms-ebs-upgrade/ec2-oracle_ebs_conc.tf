@@ -67,7 +67,7 @@ resource "aws_ebs_volume" "conc_export_home" {
 resource "aws_volume_attachment" "conc_export_home_att" {
   count                       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.conc_export_home.id
+  volume_id   = aws_ebs_volume.conc_export_home[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
@@ -91,7 +91,7 @@ resource "aws_ebs_volume" "conc_u01" {
 resource "aws_volume_attachment" "conc_u01_att" {
   count                       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdi"
-  volume_id   = aws_ebs_volume.conc_u01.id
+  volume_id   = aws_ebs_volume.conc_u01[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
@@ -115,7 +115,7 @@ resource "aws_ebs_volume" "conc_u03" {
 resource "aws_volume_attachment" "conc_u03_att" {
   count                       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdj"
-  volume_id   = aws_ebs_volume.conc_u03.id
+  volume_id   = aws_ebs_volume.conc_u03[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
@@ -139,7 +139,7 @@ resource "aws_ebs_volume" "conc_home" {
 resource "aws_volume_attachment" "conc_home_att" {
   count                       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdk"
-  volume_id   = aws_ebs_volume.conc_home.id
+  volume_id   = aws_ebs_volume.conc_home[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
@@ -163,7 +163,7 @@ resource "aws_ebs_volume" "conc_stage" {
 resource "aws_volume_attachment" "conc_stage_att" {
   count                       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdl"
-  volume_id   = aws_ebs_volume.conc_stage.id
+  volume_id   = aws_ebs_volume.conc_stage[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
@@ -187,7 +187,7 @@ resource "aws_ebs_volume" "conc_temp" {
 resource "aws_volume_attachment" "conc_temp_att" {
   count                       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdm"
-  volume_id   = aws_ebs_volume.conc_temp.id
+  volume_id   = aws_ebs_volume.conc_temp[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
@@ -200,7 +200,7 @@ resource "aws_volume_attachment" "appshare_conc_att" {
     aws_ebs_volume.appshare
   ]
   device_name = "/dev/sdq"
-  volume_id   = aws_ebs_volume.appshare.id
+  volume_id   = aws_ebs_volume.appshare[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
