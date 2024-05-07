@@ -1,0 +1,191 @@
+locals {
+  app_userdata = <<EOF
+#!/bin/bash
+
+EOF
+
+}
+
+######################################
+# app Instance
+######################################
+
+resource "aws_instance" "app1" {
+  ami                         = local.application_data.accounts[local.environment].app_ami_id
+  availability_zone           = "eu-west-2a"
+  instance_type               = local.application_data.accounts[local.environment].app_instance_type
+  monitoring                  = true
+  vpc_security_group_ids      = [aws_security_group.app.id]
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  iam_instance_profile        = aws_iam_instance_profile.cwa.id
+  key_name                    = aws_key_pair.cwa.key_name
+#   user_data_base64            = base64encode(local.app_userdata)
+#   user_data_replace_on_change = true
+
+  tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
+    local.tags,
+    { "Name" = "${upper(local.application_name_short)} app Instance" },
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+  )
+}
+
+#################################
+# app Security Group Rules
+#################################
+
+resource "aws_security_group" "app" {
+  name        = "${local.application_name}-${local.environment}-app-security-group"
+  description = "Security Group for Application Servers"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-app-security-group" }
+  )
+
+}
+
+resource "aws_vpc_security_group_egress_rule" "app_outbound" {
+  security_group_id = aws_security_group.app.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_bastion_ssh" {
+  security_group_id = aws_security_group.app.id
+  description       = "SSH from the Bastion"
+  referenced_security_group_id         = module.bastion_linux.bastion_security_group
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_self_1" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from itself"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 8050
+  ip_protocol       = "tcp"
+  to_port           = 8050
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_self_2" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from itself"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 9050
+  ip_protocol       = "tcp"
+  to_port           = 9050
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_self_3" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from itself"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 8250
+  ip_protocol       = "tcp"
+  to_port           = 8250
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_self_4" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from itself"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 1676
+  ip_protocol       = "tcp"
+  to_port           = 1676
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_cm_1" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 9050
+  ip_protocol       = "tcp"
+  to_port           = 9050
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_cm_2" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 8250
+  ip_protocol       = "tcp"
+  to_port           = 8250
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_cm_3" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 1676
+  ip_protocol       = "tcp"
+  to_port           = 1676
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_cm_4" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 8050
+  ip_protocol       = "tcp"
+  to_port           = 8050
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_db_1" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 8250
+  ip_protocol       = "tcp"
+  to_port           = 8250
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_db_2" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 9050
+  ip_protocol       = "tcp"
+  to_port           = 9050
+}
+
+# resource "aws_vpc_security_group_ingress_rule" "app_alb" {
+#   security_group_id = aws_security_group.app.id
+#   description       = "Access from CWA ALB"
+#   referenced_security_group_id         = aws_security_group.alb.id
+#   from_port         = 8050
+#   ip_protocol       = "tcp"
+#   to_port           = 8050
+# }
+
+
+
+###############################
+# app EBS Volumes
+###############################
+
+resource "aws_ebs_volume" "app" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_app_size
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  # snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-app" },
+  )
+}
+
+resource "aws_volume_attachment" "app" {
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.app.id
+  instance_id = aws_instance.app.id
+}

@@ -84,7 +84,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_workspaces_2" {
   to_port           = 1571
 }
 
-resource "aws_vpc_security_group_ingress_rule" "db_local_vpc" {
+resource "aws_vpc_security_group_ingress_rule" "db_local_vpc_1" {
   security_group_id = aws_security_group.database.id
   description       = "DB access from local VPC"
   cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
@@ -93,9 +93,133 @@ resource "aws_vpc_security_group_ingress_rule" "db_local_vpc" {
   to_port           = 1571
 }
 
+resource "aws_vpc_security_group_ingress_rule" "db_local_vpc_2" {
+  security_group_id = aws_security_group.database.id
+  description       = "DB access from local VPC"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_cp" {
+  security_group_id = aws_security_group.database.id
+  description       = "DB access from Cloud Platform"
+  cidr_ipv4         = local.cloud_platform_cidr
+  from_port         = 1571
+  ip_protocol       = "tcp"
+  to_port           = 1571
+}
 ### Port 1571 rules allow inbound for 10.200.32.0/20 and 10.200.96.0/19 not added as unsure what they are for
 
-### TODO: Add rules with other security groups as source
+resource "aws_vpc_security_group_ingress_rule" "db_app_1" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Application Servers"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 1571
+  ip_protocol       = "tcp"
+  to_port           = 1571
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_app_2" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Application Servers"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 32803
+  ip_protocol       = "tcp"
+  to_port           = 32803
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_app_3" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Application Servers"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 662
+  ip_protocol       = "tcp"
+  to_port           = 662
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_app_4" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Application Servers"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 111
+  ip_protocol       = "tcp"
+  to_port           = 111
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_app_5" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Application Servers"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 892
+  ip_protocol       = "tcp"
+  to_port           = 892
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_app_6" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Application Servers"
+  referenced_security_group_id         = aws_security_group.app.id
+  from_port         = 2049
+  ip_protocol       = "tcp"
+  to_port           = 2049
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_cm_1" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 1571
+  ip_protocol       = "tcp"
+  to_port           = 1571
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_cm_2" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 32803
+  ip_protocol       = "tcp"
+  to_port           = 32803
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_cm_3" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 662
+  ip_protocol       = "tcp"
+  to_port           = 662
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_cm_4" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 111
+  ip_protocol       = "tcp"
+  to_port           = 111
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_cm_5" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 892
+  ip_protocol       = "tcp"
+  to_port           = 892
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_cm_6" {
+  security_group_id = aws_security_group.database.id
+  description       = "Access from Concurrent Manager"
+  referenced_security_group_id         = aws_security_group.concurrent_manager.id
+  from_port         = 2049
+  ip_protocol       = "tcp"
+  to_port           = 2049
+}
+
 
 
 ###############################
