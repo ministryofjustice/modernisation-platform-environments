@@ -3,12 +3,46 @@ locals {
   app_url            = var.app_url
   documents_location = var.documents_location
   sftp_host_port     = var.sftp_host_port
-  app_container_definition = templatefile("container_definition_ftp.json", {
-    app_name                   = "${local.app}"
-    awslogs-group              = "${local.app}-ecs-log-group"
-    container_definition_image = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
-    documents_location         = "${local.documents_location}"
-    sftp_host_port             = local.sftp_host_port
+
+  app_container_definition = jsonencode({
+    command : [
+      "C:\\ServiceMonitor.exe w3svc"
+    ],
+    entryPoint : [
+      "powershell",
+      "-Command"
+    ],
+    name : "${local.app}-container",
+    image : "${aws_ecr_repository.app-ecr-repo.repository_url}:latest",
+    cpu : 512,
+    memory : 1024,
+    essential : true,
+    portMappings : [
+      {
+        hostPort : "${local.sftp_host_port}",
+        containerPort : 22,
+        protocol : "tcp"
+      },
+      {
+        hostPort : 0,
+        containerPort : 80,
+        protocol : "tcp"
+      }
+    ],
+    logConfiguration : {
+      logDriver : "awslogs",
+      options : {
+        "awslogs-group" : "${local.app}-ecs-log-group",
+        "awslogs-region" : "eu-west-2",
+        "awslogs-stream-prefix" : "ecs"
+      }
+    },
+    mountPoints : [
+      {
+        sourceVolume : "tribunals",
+        containerPath : "C:/inetpub/wwwroot/${local.documents_location}"
+      }
+    ]
   })
 }
 
