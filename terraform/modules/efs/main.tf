@@ -43,6 +43,7 @@ resource "aws_efs_backup_policy" "this" {
 }
 
 resource "aws_efs_file_system" "this" {
+  #checkov:skip=CKV2_AWS_18: Skipping as you can opt into AWS Backup plan by setting appropriate backup tag
   availability_zone_name          = var.file_system.availability_zone_name
   encrypted                       = true
   kms_key_id                      = var.file_system.kms_key_id

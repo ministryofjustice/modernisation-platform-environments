@@ -113,6 +113,7 @@ locals {
           os-type     = "Windows"
           component   = "test"
           server-type = "HmppsDomainServicesTest"
+          Patching    = "Yes"
         }
       }
 
@@ -139,6 +140,7 @@ locals {
           ami         = "hmpps_rhel_8_5"
           os-type     = "Linux"
           component   = "test"
+          Patching    = "Yes"
         }
       }
     }

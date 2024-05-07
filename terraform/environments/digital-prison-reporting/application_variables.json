@@ -3,8 +3,6 @@
     "development": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": true,
-      "scale_down_kinesis_agent": false,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 3,
@@ -183,8 +181,6 @@
     "test": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": false,
-      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 3,
@@ -363,8 +359,6 @@
     "preproduction": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": false,
-      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 7,
@@ -545,8 +539,6 @@
     "production": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": false,
-      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 7,

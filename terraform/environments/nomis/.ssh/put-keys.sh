@@ -1,15 +1,26 @@
 #!/bin/bash
-# Push ec2-user private keys to SSM
+# Push ec2-user private keys to SecretsManager
 set -e
 profiles=$(find . -name 'ec2-user' | cut -d/ -f2)
 for profile in $profiles; do
-  echo "# Downloading ssm parameter ec2-user_pem from $profile"
-  key=$(aws ssm get-parameter --with-decryption --name ec2-user_pem --output text --query Parameter.Value --profile "$profile")
+  if (grep "ENCRYPTED" $profile/ec2-user > /dev/null); then
+    echo "# $profile: not uploading encrypted private key"
+    continue
+  fi
+  echo "# $profile: checking ec2-user secret exists - run terraform if this fails"
+  key=$(aws secretsmanager describe-secret --secret-id "/ec2/.ssh/ec2-user" --profile "$profile")
+  echo "# $profile: checking existing ec2-user secret value"
+  key=$(aws secretsmanager get-secret-value --secret-id "/ec2/.ssh/ec2-user" --query SecretString --output text --profile "$profile" || true)
   pem=$(cat $profile/ec2-user)
   if [[ "$key" != "$pem" ]]; then
-    echo aws ssm put-parameter --name "ec2-user_pem" --type "SecureString" --data-type "text" --value "xxx" --profile "$profile"
-    aws ssm put-parameter --name "ec2-user_pem" --type "SecureString" --data-type "text" --value "$pem" --overwrite --profile "$profile"
+    echo aws secretsmanager put-secret-value --profile $profile --secret-id "/ec2/.ssh/ec2-user" --secret-string "xxxx"
+    echo "Press CTRL-C to cancel or RETURN to put secret"
+    read
+    aws secretsmanager put-secret-value --profile $profile --secret-id "/ec2/.ssh/ec2-user" --secret-string "$pem"
   else
-    echo "$profile already uploaded"
+    echo "# $profile: key already uploaded, delete the local unencrypted key"
+    echo "Press CTRL-C to cancel or RETURN to delete local unencrypted key"
+    read
+    rm $profile/ec2-user
   fi
 done

@@ -8,9 +8,7 @@ resource "aws_security_group" "example_load_balancer_sg" {
   name        = "example-lb-sg"
   description = "controls access to load balancer"
   vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("lb-sg-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags        = { Name = lower(format("lb-sg-%s-%s-example", local.application_name, local.environment)) }
 
   # Set up the ingress and egress parts of the security group
 }
@@ -55,12 +53,7 @@ resource "aws_lb" "external" {
     enabled = true
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-external-loadbalancer"
-    }
-  )
+  tags       = { Name = "${local.application_name}-external-loadbalancer" }
   depends_on = [aws_security_group.example_load_balancer_sg]
 }
 # Create the target group
@@ -85,12 +78,7 @@ resource "aws_lb_target_group" "target_group" {
     timeout             = "5"
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-tg-${local.environment}"
-    }
-  )
+  tags = { Name = "${local.application_name}-tg-${local.environment}" }
 }
 
 # Link target group to the EC2 instance on port 80
@@ -253,9 +241,7 @@ module "s3-bucket-lb" { #tfsec:ignore:aws-s3-enable-versioning
     }
   ]
 
-  tags = merge(local.tags,
-    { Name = lower(format("s3-bucket-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags = { Name = lower(format("s3-bucket-%s-%s-example", local.application_name, local.environment)) }
 }
 
 data "aws_iam_policy_document" "bucket_policy_lb" {
@@ -350,8 +336,6 @@ resource "aws_instance" "lb_example_instance" {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
-  tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags       = { Name = lower(format("ec2-%s-%s-example", local.application_name, local.environment)) }
   depends_on = [aws_security_group.example_load_balancer_sg]
 }
