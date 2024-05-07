@@ -32,5 +32,5 @@ resource "aws_route53_record" "app2" {
   name     = "${local.application_name_short}-app2.${data.aws_route53_zone.external.name}"
   type     = "A"
   ttl      = 900
-  records  = [aws_instance.app2.private_ip]
+  records  = [aws_instance.app2[0].private_ip]
 }

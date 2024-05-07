@@ -25,7 +25,28 @@ resource "aws_instance" "app1" {
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
-    { "Name" = "${upper(local.application_name_short)} app Instance" },
+    { "Name" = "${upper(local.application_name_short)} App Instance 1" },
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+  )
+}
+
+resource "aws_instance" "app2" {
+  count    = contains(["development", "testing"], local.environment) ? 0 : 1
+  ami                         = local.application_data.accounts[local.environment].app_ami_id
+  availability_zone           = "eu-west-2a"
+  instance_type               = local.application_data.accounts[local.environment].app_instance_type
+  monitoring                  = true
+  vpc_security_group_ids      = [aws_security_group.app.id]
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  iam_instance_profile        = aws_iam_instance_profile.cwa.id
+  key_name                    = aws_key_pair.cwa.key_name
+#   user_data_base64            = base64encode(local.app_userdata)
+#   user_data_replace_on_change = true
+
+  tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
+    local.tags,
+    { "Name" = "${upper(local.application_name_short)} App Instance 2" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
@@ -166,7 +187,7 @@ resource "aws_vpc_security_group_ingress_rule" "app_db_2" {
 # app EBS Volumes
 ###############################
 
-resource "aws_ebs_volume" "app" {
+resource "aws_ebs_volume" "app1" {
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_app_size
   type              = "gp2"
@@ -180,12 +201,38 @@ resource "aws_ebs_volume" "app" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-app" },
+    { "Name" = "${local.application_name}-app1" },
   )
 }
 
-resource "aws_volume_attachment" "app" {
+resource "aws_volume_attachment" "app1" {
   device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.app.id
-  instance_id = aws_instance.app.id
+  volume_id   = aws_ebs_volume.app1.id
+  instance_id = aws_instance.app1.id
+}
+
+resource "aws_ebs_volume" "app2" {
+  count    = contains(["development", "testing"], local.environment) ? 0 : 1
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_app_size
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  # snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-app2" },
+  )
+}
+
+resource "aws_volume_attachment" "app2" {
+  count    = contains(["development", "testing"], local.environment) ? 0 : 1
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.app2[0].id
+  instance_id = aws_instance.app2[0].id
 }
