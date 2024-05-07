@@ -48,7 +48,7 @@ resource "aws_instance" "ec2_oracle_conc" {
 }
 
 resource "aws_ebs_volume" "conc_export_home" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count = local.application_data.accounts[local.environment].conc_no_instances
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -65,14 +65,14 @@ resource "aws_ebs_volume" "conc_export_home" {
 }
 
 resource "aws_volume_attachment" "conc_export_home_att" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.conc_export_home[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
 resource "aws_ebs_volume" "conc_u01" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count = local.application_data.accounts[local.environment].conc_no_instances
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -89,14 +89,14 @@ resource "aws_ebs_volume" "conc_u01" {
 }
 
 resource "aws_volume_attachment" "conc_u01_att" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdi"
   volume_id   = aws_ebs_volume.conc_u01[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
 resource "aws_ebs_volume" "conc_u03" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count = local.application_data.accounts[local.environment].conc_no_instances
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -113,14 +113,14 @@ resource "aws_ebs_volume" "conc_u03" {
 }
 
 resource "aws_volume_attachment" "conc_u03_att" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdj"
   volume_id   = aws_ebs_volume.conc_u03[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
 resource "aws_ebs_volume" "conc_home" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count = local.application_data.accounts[local.environment].conc_no_instances
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -137,14 +137,14 @@ resource "aws_ebs_volume" "conc_home" {
 }
 
 resource "aws_volume_attachment" "conc_home_att" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdk"
   volume_id   = aws_ebs_volume.conc_home[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
 resource "aws_ebs_volume" "conc_stage" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count = local.application_data.accounts[local.environment].conc_no_instances
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -161,14 +161,14 @@ resource "aws_ebs_volume" "conc_stage" {
 }
 
 resource "aws_volume_attachment" "conc_stage_att" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdl"
   volume_id   = aws_ebs_volume.conc_stage[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
 resource "aws_ebs_volume" "conc_temp" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count = local.application_data.accounts[local.environment].conc_no_instances
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -185,7 +185,7 @@ resource "aws_ebs_volume" "conc_temp" {
 }
 
 resource "aws_volume_attachment" "conc_temp_att" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count       = local.application_data.accounts[local.environment].conc_no_instances
   device_name = "/dev/sdm"
   volume_id   = aws_ebs_volume.conc_temp[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
@@ -195,7 +195,7 @@ resource "aws_volume_attachment" "conc_temp_att" {
 # AppShare created for EBSDB and attached also on Conc instance
 
 resource "aws_volume_attachment" "appshare_conc_att" {
-  count                       = local.application_data.accounts[local.environment].conc_no_instances
+  count = local.application_data.accounts[local.environment].conc_no_instances
   depends_on = [
     aws_ebs_volume.appshare
   ]
@@ -206,6 +206,8 @@ resource "aws_volume_attachment" "appshare_conc_att" {
 
 module "cw-conc-ec2" {
   source = "./modules/cw-ec2"
+  count  = local.application_data.accounts[local.environment].conc_no_instances
+
   short_env    = local.application_data.accounts[local.environment].short_env
   name         = "ec2-conc"
   topic        = aws_sns_topic.cw_alerts.arn
