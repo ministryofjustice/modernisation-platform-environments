@@ -37,3 +37,15 @@ variable "bastion_sg_id" {
   description = "Security group id of the bastion"
   type        = string
 }
+
+variable "deploy_oracle_stats" {
+  description = "for deploying Oracle stats bucket"
+  default     = true
+  type        = bool
+}
+
+variable "db_suffix" {
+  description = "identifier to append to name e.g. dsd, boe"
+  type        = string
+  default     = "db"
+}

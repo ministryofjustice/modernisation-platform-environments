@@ -4,8 +4,8 @@ locals {
   test_config = {
 
     baseline_secretsmanager_secrets = {
-      "/ec2/onr-web/test" = local.web_secretsmanager_secrets
-      "/ec2/onr-boe/test" = local.boe_secretsmanager_secrets
+      "/ec2/onr-web/test"         = local.web_secretsmanager_secrets
+      "/ec2/onr-boe/test"         = local.boe_secretsmanager_secrets
       "/oracle/database/T3ONRAU"  = local.database_secretsmanager_secrets
       "/oracle/database/T3ONRBDS" = local.database_secretsmanager_secrets
       "/oracle/database/T3ONRSYS" = local.database_secretsmanager_secrets
