@@ -128,7 +128,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
     ]
   }
   statement {
-    sid = "AllowListUnzipStore"
+    sid    = "AllowListUnzipStore"
     effect = "Allow"
     actions = [
       "s3:ListBucket"
@@ -138,7 +138,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
     ]
   }
   statement {
-    sid = "AllowPutUnzipStore"
+    sid    = "AllowPutUnzipStore"
     effect = "Allow"
     actions = [
       "s3:PutObject"
@@ -159,7 +159,7 @@ module "zip_bastion" {
   }
 
   # s3 - used for logs and user ssh public keys
-  bucket_name = "zip-bastion"
+  bucket_name   = "zip-bastion"
   instance_name = "zip_bastion_linux"
   # public keys
   public_key_data = local.public_key_data.keys[local.environment]
@@ -169,18 +169,18 @@ module "zip_bastion" {
   log_standard_ia_days = 30  # days before moving to IA storage
   log_glacier_days     = 60  # days before moving to Glacier
   log_expiry_days      = 180 # days before log expiration
-  
+
   allow_ssh_commands = true
   # autoscaling_cron   = {
   #   "down": "0 20 * * *",
   #   "up": "*/30 * * * *"
   # }
-  app_name           = var.networking[0].application
-  business_unit      = local.vpc_name
-  subnet_set         = local.subnet_set
-  environment        = local.environment
-  region             = "eu-west-2"
-  volume_size        = 96
+  app_name      = var.networking[0].application
+  business_unit = local.vpc_name
+  subnet_set    = local.subnet_set
+  environment   = local.environment
+  region        = "eu-west-2"
+  volume_size   = 96
   # tags
   tags_common = local.tags
   tags_prefix = terraform.workspace

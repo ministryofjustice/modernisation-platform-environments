@@ -16,7 +16,6 @@ output "ssh_keys_bucket_name" {
 
 output "instance_policies" {
   value = {
-    "business_unit_kms_key_access"        = aws_iam_policy.business_unit_kms_key_access
     "core_shared_services_bucket_access"  = aws_iam_policy.core_shared_services_bucket_access
     "allow_access_to_ssm_parameter_store" = aws_iam_policy.allow_access_to_ssm_parameter_store
     "ec2_access_for_ansible"              = aws_iam_policy.ec2_access_for_ansible
