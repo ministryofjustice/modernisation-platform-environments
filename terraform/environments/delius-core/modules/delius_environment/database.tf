@@ -1,7 +1,12 @@
 locals {
   db_public_key_data = jsondecode(file("./db_users.json"))
+  instance_policies  = [for v in values(merge(module.oracle_db_shared.instance_policies, var.db_config.instance_policies)) : v.arn]
+  availability_zone_map = {
+    0 = "a"
+    1 = "b"
+    2 = "c"
+  }
 }
-
 
 module "oracle_db_shared" {
   source             = "../components/oracle_db_shared"
@@ -61,7 +66,7 @@ module "oracle_db_primary" {
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
+  instance_profile_policies = local.instance_policies
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -109,16 +114,9 @@ module "oracle_db_standby" {
 
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared.instance_policies) : v.arn]
+  instance_profile_policies = local.instance_policies
 
   providers = {
     aws.core-vpc = aws.core-vpc
-  }
-}
-locals {
-  availability_zone_map = {
-    0 = "a"
-    1 = "b"
-    2 = "c"
   }
 }

@@ -200,6 +200,11 @@ locals {
   base_db_config_dev = {
     instance_type  = "t3.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
+
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02

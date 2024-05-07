@@ -1,5 +1,8 @@
 locals {
-  db_public_key_data = jsondecode(file("./db_users.json"))
+  db_public_key_data    = jsondecode(file("./db_users.json"))
+  dsd_instance_policies = [for v in values(merge(module.oracle_db_shared["dsd-db"].instance_policies, var.dsd_db_config.instance_policies)) : v.arn]
+  boe_instance_policies = [for v in values(merge(module.oracle_db_shared["boe-db"].instance_policies, var.boe_db_config.instance_policies)) : v.arn]
+  mis_instance_policies = [for v in values(merge(module.oracle_db_shared["mis-db"].instance_policies, var.mis_db_config.instance_policies)) : v.arn]
   availability_zone_map = {
     0 = "a"
     1 = "b"
@@ -34,7 +37,8 @@ module "oracle_db_shared" {
 }
 
 module "oracle_db_dsd" {
-  source         = "../../../delius-core/modules/components/oracle_db_instance"
+  source = "../../../delius-core/modules/components/oracle_db_instance"
+
   account_config = var.account_config
   account_info   = var.account_info
   db_ami = {
@@ -72,7 +76,7 @@ module "oracle_db_dsd" {
 
   ssh_keys_bucket_name = module.oracle_db_shared["dsd-db"].ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared["dsd-db"].instance_policies) : v.arn]
+  instance_profile_policies = local.dsd_instance_policies
 
   deploy_oracle_stats = false
 
@@ -124,7 +128,7 @@ module "oracle_db_boe" {
 
   ssh_keys_bucket_name = module.oracle_db_shared["boe-db"].ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared["boe-db"].instance_policies) : v.arn]
+  instance_profile_policies = local.boe_instance_policies
 
   deploy_oracle_stats = false
 
@@ -176,7 +180,7 @@ module "oracle_db_mis" {
 
   ssh_keys_bucket_name = module.oracle_db_shared["mis-db"].ssh_keys_bucket_name
 
-  instance_profile_policies = [for v in values(module.oracle_db_shared["mis-db"].instance_policies) : v.arn]
+  instance_profile_policies = local.mis_instance_policies
 
   deploy_oracle_stats = false
 
