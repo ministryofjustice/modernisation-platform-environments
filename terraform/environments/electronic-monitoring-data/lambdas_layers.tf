@@ -16,3 +16,23 @@ resource "aws_lambda_layer_version" "create_external_athena_tables_layer" {
     compatible_runtimes = ["python3.11"]
     source_code_hash = filesha1(local.layer_zip_path)
 }
+
+# --------------------------------------------------------------------------------------------------
+# mojap_metadata layer
+# --------------------------------------------------------------------------------------------------
+locals {
+  mojap_metadata = {
+    layer_zip_name    = "mojap_metadata.zip"
+    layer_name        = "mojap_metadata"
+    requirements_name = "mojap_metadata_requirements.txt"
+    requirements_path = "${local.layer_path}/${local.requirements_name}"
+    layer_zip_path    = "${local.layer_path}/${local.layer_zip_name}"
+  }
+}
+
+resource "aws_lambda_layer_version" "mojap_metadata_layer" {
+    filename            = local.mojap_metadata.layer_zip_name
+    layer_name          = local.mojap_metadata.layer_name
+    compatible_runtimes = ["python3.11"]
+    source_code_hash = filesha1(local.mojap_metadata.layer_zip_path)
+}
