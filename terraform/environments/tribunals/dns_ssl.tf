@@ -63,44 +63,44 @@ resource "aws_route53_record" "external_care_standards" {
   }
 }
 
-# resource "aws_route53_record" "external_cicap" {
-#   provider = aws.core-vpc 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "cicap.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
+resource "aws_route53_record" "external_cicap" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "cicap.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
 
-#   alias {
-#     name                   = module.cicap.tribunals_lb.dns_name
-#     zone_id                = module.cicap.tribunals_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = module.cicap.tribunals_lb.dns_name
+    zone_id                = module.cicap.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
-# resource "aws_route53_record" "external_eat" {
-#   provider = aws.core-vpc 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "employmentappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
+resource "aws_route53_record" "external_eat" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "employmentappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
 
-#   alias {
-#     name                   = module.employment_appeals.tribunals_lb.dns_name
-#     zone_id                = module.employment_appeals.tribunals_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = module.employment_appeals.tribunals_lb.dns_name
+    zone_id                = module.employment_appeals.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
-# resource "aws_route53_record" "external_ftt" {
-#   provider = aws.core-vpc 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "financeandtax.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
+resource "aws_route53_record" "external_ftt" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "financeandtax.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
 
-#   alias {
-#     name                   = module.finance_and_tax.tribunals_lb.dns_name
-#     zone_id                = module.finance_and_tax.tribunals_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = module.finance_and_tax.tribunals_lb.dns_name
+    zone_id                = module.finance_and_tax.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
 # resource "aws_route53_record" "external_imset" {
 #   provider = aws.core-vpc 
