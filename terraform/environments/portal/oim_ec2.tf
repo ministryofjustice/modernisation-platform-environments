@@ -167,7 +167,7 @@ resource "aws_instance" "oim_instance_1" {
 #############################################
 # TEMP SSH Key to installing Portal
 #############################################
-resource "aws_vpc_security_group_ingress_rule" "oim_ssh" {
+resource "aws_vpc_security_group_ingress_rule" "oim_bastion_ssh" {
   security_group_id = aws_security_group.oim_instance.id
   description       = "SSH for Portal Installation"
   referenced_security_group_id         = module.bastion_linux.bastion_security_group
