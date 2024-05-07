@@ -102,31 +102,31 @@ resource "aws_route53_record" "external_ftt" {
   }
 }
 
-# resource "aws_route53_record" "external_imset" {
-#   provider = aws.core-vpc 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "immigrationservices.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
+resource "aws_route53_record" "external_imset" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "immigrationservices.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
 
-#   alias {
-#     name                   = module.immigration_services.tribunals_lb.dns_name
-#     zone_id                = module.immigration_services.tribunals_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = module.immigration_services.tribunals_lb.dns_name
+    zone_id                = module.immigration_services.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
-# resource "aws_route53_record" "external_it" {
-#   provider = aws.core-vpc 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "informationrights.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
+resource "aws_route53_record" "external_it" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "informationrights.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
 
-#   alias {
-#     name                   = module.information_tribunal.tribunals_lb.dns_name
-#     zone_id                = module.information_tribunal.tribunals_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = module.information_tribunal.tribunals_lb.dns_name
+    zone_id                = module.information_tribunal.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
 
 # resource "aws_route53_record" "external_lands" {
 #   provider = aws.core-vpc 
