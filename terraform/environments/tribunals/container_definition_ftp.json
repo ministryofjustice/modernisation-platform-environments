@@ -14,7 +14,7 @@
     "essential" : true,
     "portMappings" : [
       {
-        "hostPort": "${sftp_host_port}",
+        "hostPort": "${tonumber(sftp_host_port)}",
         "containerPort": 22,
         "protocol": "tcp"
       },
