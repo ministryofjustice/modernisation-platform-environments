@@ -3,6 +3,7 @@ module "ecs" {
   name                      = "nextcloud-cluster"
   enable_container_insights = "enabled"
   tags                      = var.tags
+  
 }
 
 resource "aws_security_group" "cluster" {
