@@ -1,5 +1,5 @@
 resource "aws_instance" "ec2_oracle_conc" {
-  count                  = local.application_data.accounts[local.environment].conc_no_instances
+  count                       = local.application_data.accounts[local.environment].conc_no_instances
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsconc
   ami                         = local.application_data.accounts[local.environment].ebsconc_ami_id
   key_name                    = local.application_data.accounts[local.environment].key_name

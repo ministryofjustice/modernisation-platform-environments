@@ -15,7 +15,7 @@ resource "aws_route53_record" "ebsconc" {
   name     = "ccms-ebs-conc-upgrade.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
   ttl      = 300
-  records  = [aws_instance.ec2_oracle_conc.private_ip]
+  records  = [aws_instance.ec2_oracle_conc[count.index].private_ip]
 }
 
 # EBS Apps
