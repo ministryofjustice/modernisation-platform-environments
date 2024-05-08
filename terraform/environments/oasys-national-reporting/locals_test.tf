@@ -23,6 +23,8 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/test/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
         ]
