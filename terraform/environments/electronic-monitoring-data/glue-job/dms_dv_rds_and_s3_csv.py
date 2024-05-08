@@ -19,7 +19,7 @@ from pyspark.sql import DataFrame
 args = getResolvedOptions(sys.argv, ["JOB_NAME",
                                      "rds_db_host_ep",
                                      "rds_db_pwd",
-                                     "rds_db_list"
+                                     "rds_db_list",
                                      "csv_src_bucket_name",
                                      "parquet_target_bucket_name",
                                      "target_catalog_db_name",
