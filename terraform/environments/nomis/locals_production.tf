@@ -210,6 +210,32 @@ locals {
     }
 
     baseline_ec2_instances = {
+      prod-nomis-db-1-a = merge(local.database_ec2, {
+        # cloudwatch_metric_alarms = set once commissioned
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 4000 } # add iops = 12000, throughput = 750 prior to go live
+          flash = { total_size = 1000 } # add iops = 5000,  throughput = 500 prior to go live
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.4xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "prod"
+          description       = "Production databases for CNOM and NDH"
+          oracle-sids       = ""
+        })
+      })
       prod-nomis-db-1-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
@@ -231,11 +257,11 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 4000 }
+          data  = { total_size = 4000 } # add at least iops = 3750, throughput = 750 prior to go live
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          instance_type = "r6i.2xlarge" # needs to be resized to r6i.4xlarge
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
@@ -273,6 +299,33 @@ locals {
           description        = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
           oracle-sids        = "CNMAUD"
           connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
+        })
+      })
+
+      prod-nomis-db-2-a = merge(local.database_ec2, {
+        # cloudwatch_metric_alarms = set once commissioned
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "prod"
+          description       = "Production databases for AUDIT/MIS"
+          oracle-sids       = ""
         })
       })
 
