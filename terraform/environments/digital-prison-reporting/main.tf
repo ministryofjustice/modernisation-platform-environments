@@ -9,7 +9,7 @@ locals {
 }
 
 resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
-  bucket = module.s3_glue_job_bucket
+  bucket = module.s3_glue_job_bucket.bucket_id
   key    = "logging/misc-jobs/log4j2.properties"
   source = "files/log4j2.properties"
   etag   = filemd5("files/log4j2.properties")
