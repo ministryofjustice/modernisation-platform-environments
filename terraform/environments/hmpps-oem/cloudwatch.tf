@@ -7,13 +7,16 @@ resource "aws_cloudwatch_metric_alarm" "github_failed_actions" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = "FailedWorkflowRuns"
   namespace           = "CustomMetrics"
-  evaluation_periods  = 72
+  evaluation_periods  = 1
   threshold           = 1
   datapoints_to_alarm = 1
   statistic           = "Maximum"
-  period              = 300
+  period              = 600
   treat_missing_data  = "notBreaching"
   alarm_description   = "Alarm if the number of failed GitHub Actions runs is greater than 0"
+  dimensions = {
+    Repository = "dso-infra-azure-fixngo"
+  }
 
   alarm_actions = [local.sns_topic_arn]
   ok_actions    = [local.sns_topic_arn]
