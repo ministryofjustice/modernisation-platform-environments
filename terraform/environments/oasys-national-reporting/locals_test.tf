@@ -4,11 +4,11 @@ locals {
   test_config = {
 
     baseline_secretsmanager_secrets = {
-      "/ec2/onr-web/test"         = local.web_secretsmanager_secrets
-      "/ec2/onr-boe/test"         = local.boe_secretsmanager_secrets
-      "/oracle/database/T3ONRAU"  = local.database_secretsmanager_secrets
-      "/oracle/database/T3ONRBDS" = local.database_secretsmanager_secrets
-      "/oracle/database/T3ONRSYS" = local.database_secretsmanager_secrets
+      "/ec2/onr-web/test"        = local.web_secretsmanager_secrets
+      "/ec2/onr-boe/t2"          = local.boe_secretsmanager_secrets
+      "/oracle/database/T2BOSYS" = local.database_secretsmanager_secrets
+      "/oracle/database/T2BOAUD" = local.database_secretsmanager_secrets
+
     }
 
     baseline_iam_policies = {
@@ -90,7 +90,7 @@ locals {
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = merge(local.defaults_boe_ec2.tags, {
-          oasys-national-reporting-environment = "test"
+          oasys-national-reporting-environment = "t2"
         })
       })
       test-bods-asg = merge(local.defaults_bods_ec2, {
