@@ -72,8 +72,8 @@ module "nextcloud_service" {
   rds_license_model        = "general-public-license"
   snapshot_identifier      = "nextcloud-migration-1251-shared"
 
-  rds_allow_major_version_upgrade = false
-  rds_apply_immediately           = false
+  rds_allow_major_version_upgrade = true
+  rds_apply_immediately           = true
 
   create_elasticache               = true
   elasticache_engine               = "redis"
