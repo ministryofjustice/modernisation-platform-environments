@@ -65,3 +65,11 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
 }
+
+# Providor for macie access
+provider "aws" {
+    alias  = "macie_access" # delegated admin
+    assume_role {
+      role_arn = "arn:aws:iam::236861075084:role/macie_access"
+    }
+  }

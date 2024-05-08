@@ -2,12 +2,6 @@
 # Create macie account
 # When logging in as adminisitrator this is not needed but may be for our customers
 # Account name is MacieAccount. Publishes data every hour (choice are FIFTEEN_MINUTES, ONE_HOUR or SIX_HOURS)
-provider "aws" {
-    alias  = "macie_access" # delegated admin
-    assume_role {
-      role_arn = "arn:aws:iam::236861075084:role/macie_access"
-    }
-  }
 
 resource "aws_macie2_account" "macieaccess" { 
    finding_publishing_frequency = "ONE_HOUR"
