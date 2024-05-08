@@ -42,13 +42,13 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    description = "allow all traffic on custom port"
-    from_port   = var.sftp_host_port
-    to_port     = var.sftp_host_port
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # ingress {
+  #   description = "allow all traffic on custom port"
+  #   from_port   = var.sftp_host_port
+  #   to_port     = var.sftp_host_port
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
   egress {
     description = "allow all outbound traffic"
@@ -107,7 +107,7 @@ resource "aws_lb_target_group" "tribunals_target_group" {
 resource "aws_lb_target_group" "tribunals_target_group_sftp" {
   count                = var.is_ftp_app ? 1 : 0
   name                 = "${var.app_name}-sftp-tg"
-  port                 = var.sftp_host_port
+  port                 = 22
   protocol             = "TCP"
   vpc_id               = var.vpc_shared_id
   target_type          = "instance"
@@ -141,7 +141,7 @@ resource "aws_lb_listener" "tribunals_lb" {
 resource "aws_lb_listener" "tribunals_lb_ftp" {
   count             = var.is_ftp_app ? 1 : 0
   load_balancer_arn = aws_lb.tribunals_lb_ftp[0].arn
-  port              = var.sftp_host_port
+  port              = 22
   protocol          = var.application_data.lb_listener_protocol_3
 
   default_action {
