@@ -93,6 +93,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--enable-metrics"                   = ""
   }
 
+  connections = [ "glue-sqlserver-db-connection" ]
   command {
     python_version  = "3"
     script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv.py"
