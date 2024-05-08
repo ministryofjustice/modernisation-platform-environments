@@ -21,7 +21,7 @@ module "ecs-cluster" {
 }
 
 module "service" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v4.2.1"
 
   container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
