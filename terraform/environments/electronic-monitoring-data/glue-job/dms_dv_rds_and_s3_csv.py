@@ -71,7 +71,7 @@ def get_rds_db_jdbc_url(in_rds_db_name=None):
         return f"""jdbc:sqlserver://{RDS_DB_HOST_ENDPOINT}:{RDS_DB_PORT};database={in_rds_db_name}"""
 
 
-def get_rds_database_list(in_rds_databases = None):
+def get_rds_database_list(in_rds_databases=None):
 
     if in_rds_databases is None or in_rds_databases == "":
         sql_sys_databases_1 = f"""
@@ -81,12 +81,12 @@ def get_rds_database_list(in_rds_databases = None):
         """.strip()
         sql_sys_databases = sql_sys_databases_1
     else:
-        
+
         if isinstance(in_rds_databases, list):
             rds_db_str = ', '.join(f'`{db}`' for db in in_rds_databases)
         elif isinstance(in_rds_databases, str):
             rds_db_str = in_rds_databases
-        
+
         sql_sys_databases_2 = f"""
         SELECT name
         FROM sys.databases
@@ -179,7 +179,8 @@ if __name__ == "__main__":
 
     TARGET_TABLE_PATH = f'''s3://{PARQUET_TARGET_S3_BUCKET_NAME}/{PARQUET_TARGET_DB_NAME}/{PARQUET_TARGET_TBL_NAME}'''
 
-    rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(get_rds_database_list(args["rds_db_list"]))
+    rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(
+        get_rds_database_list(args["rds_db_list"]))
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime, 
@@ -201,7 +202,8 @@ if __name__ == "__main__":
         # print(tbl_csv_s3_path)
         if tbl_csv_s3_path is not None:
 
-            df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema)
+            df_csv_temp = get_s3_csv_dataframe(
+                tbl_csv_s3_path, df_rds_temp.schema)
 
             if df_rds_temp.count() == df_csv_temp.count():
 
@@ -212,10 +214,10 @@ if __name__ == "__main__":
                     df_temp = (df_rds_temp.subtract(df_csv_temp)
                                .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
                                .selectExpr("json_row"))
-                
+
                     df_temp = df_temp.selectExpr("current_timestamp as run_datetime", f"""'{db_dbo_tbl}' as full_table_name""", "json_row",
-                                             f""""'{rds_tbl_name}' - dataframe-subtract-op ->> NON-ZERO row-count !" as err_msg""")
-                    
+                                                 f""""'{rds_tbl_name}' - dataframe-subtract-op ->> NON-ZERO row-count !" as err_msg""")
+
                     df_dv_output = df_dv_output.union(df_temp)
 
                     # print(f"{rds_tbl_name} - subtract op NON-ZERO row count")
@@ -224,9 +226,9 @@ if __name__ == "__main__":
                                                   f"""'{db_dbo_tbl}' as full_table_name""",
                                                   "'' as json_row",
                                                   f"""'{rds_tbl_name} - Table row count MISMATCHED !' as err_msg""")
-                
+
                 df_dv_output = df_dv_output.union(df_temp)
-                
+
                 # print(f"{rds_tbl_name} - Table row count MISMATCHED.")
 
         else:
@@ -234,13 +236,14 @@ if __name__ == "__main__":
                                               f"""'{db_dbo_tbl}' as full_table_name""",
                                               "'' as json_row",
                                               f"""'No S3-csv folder path exists for the given {rds_db_name} - {rds_tbl_name}' as err_msg""")
-            
+
             df_dv_output = df_dv_output.union(df_temp)
-            
+
             # print(f"No S3-csv folder path found for given {rds_db_name} - {rds_tbl_name}")
-        
+
         if check_s3_path_if_exists(PARQUET_TARGET_S3_BUCKET_NAME, f'''{PARQUET_TARGET_DB_NAME}/{PARQUET_TARGET_TBL_NAME}/full_table_name={db_dbo_tbl}'''):
-            glueContext.purge_s3_path(f"""{TARGET_TABLE_PATH}/full_table_name={db_dbo_tbl}""", options={"retentionPeriod": 0})
+            glueContext.purge_s3_path(
+                f"""{TARGET_TABLE_PATH}/full_table_name={db_dbo_tbl}""", options={"retentionPeriod": 0})
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")

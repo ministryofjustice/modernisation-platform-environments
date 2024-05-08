@@ -73,8 +73,28 @@ resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
     name   = "S3Policies"
     policy = data.aws_iam_policy_document.dms_dv_iam_policy_document.json
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Role having Glue-Job execution policies",
+    }
+  )
 }
 
+resource "aws_iam_policy_attachment" "rds_readonly_policy_attachment" {
+  name       = "rds-readonly-policy-attachment"
+  roles      = [aws_iam_role.dms_dv_glue_job_iam_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
+
+}
+
+resource "aws_iam_policy_attachment" "glue_service_role_policy_attachment" {
+  name       = "glue-service-role-policy-attachment"
+  roles      = [aws_iam_role.dms_dv_glue_job_iam_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+
+}
 resource "aws_glue_job" "dms_dv_glue_job" {
   name         = "dms-dv-glue-job"
   role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
@@ -93,7 +113,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--enable-metrics"                   = ""
   }
 
-  connections = [ "glue-sqlserver-db-connection" ]
+  connections = ["glue-sqlserver-db-connection"]
   command {
     python_version  = "3"
     script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv.py"
