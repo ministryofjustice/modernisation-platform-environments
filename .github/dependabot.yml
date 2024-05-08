@@ -1,4 +1,4 @@
-# This file is auto-generated here, do not manually amend. 
+# This file is auto-generated here, do not manually amend.
 # scripts/generate-dependabot.sh
 
 version: 2
@@ -103,10 +103,6 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/data-and-insights-wepi"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/data-platform"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
