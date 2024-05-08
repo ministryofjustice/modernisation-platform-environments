@@ -45,12 +45,12 @@ module "preproduction" {
     aws.bucket-replication = aws
   }
 
-  account_number   = local.environment_management.account_ids[terraform.workspace]
-  application_name = local.application_name
-  approval_days    = "7"
-  patch_schedule   = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
-  operating_system = "WINDOWS"
-  patch_classification = ["SecurityUpdates","CriticalUpdates"]
+  account_number       = local.environment_management.account_ids[terraform.workspace]
+  application_name     = local.application_name
+  approval_days        = "7"
+  patch_schedule       = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
+  operating_system     = "WINDOWS"
+  patch_classification = ["SecurityUpdates", "CriticalUpdates"]
   tags = merge(
     local.tags,
     {
@@ -66,13 +66,13 @@ module "production-eu-west-2a" {
     aws.bucket-replication = aws
   }
 
-  account_number   = local.environment_management.account_ids[terraform.workspace]
-  application_name = local.application_name
-  approval_days    = "14"
-  patch_schedule   = "cron(0 21 ? * THU#3 *)" # 3rd Thurs @ 9pm
-  operating_system = "WINDOWS"
-  patch_tag        = "eu-west-2a"
-  patch_classification = ["SecurityUpdates","CriticalUpdates"]
+  account_number       = local.environment_management.account_ids[terraform.workspace]
+  application_name     = local.application_name
+  approval_days        = "14"
+  patch_schedule       = "cron(0 21 ? * THU#3 *)" # 3rd Thurs @ 9pm
+  operating_system     = "WINDOWS"
+  patch_tag            = "eu-west-2a"
+  patch_classification = ["SecurityUpdates", "CriticalUpdates"]
   tags = merge(
     local.tags,
     {
@@ -88,13 +88,13 @@ module "production-eu-west-2b" {
     aws.bucket-replication = aws
   }
 
-  account_number   = local.environment_management.account_ids[terraform.workspace]
-  application_name = local.application_name
-  approval_days    = "14"
-  patch_schedule   = "cron(0 21 ? * THU#4 *)" # 4th Thurs @ 9pm
-  operating_system = "WINDOWS"
-  patch_tag        = "eu-west-2b"
-  patch_classification = ["SecurityUpdates","CriticalUpdates"]
+  account_number       = local.environment_management.account_ids[terraform.workspace]
+  application_name     = local.application_name
+  approval_days        = "14"
+  patch_schedule       = "cron(0 21 ? * THU#4 *)" # 4th Thurs @ 9pm
+  operating_system     = "WINDOWS"
+  patch_tag            = "eu-west-2b"
+  patch_classification = ["SecurityUpdates", "CriticalUpdates"]
   tags = merge(
     local.tags,
     {
