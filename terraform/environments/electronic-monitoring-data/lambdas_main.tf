@@ -37,7 +37,7 @@ resource "aws_lambda_function" "create_athena_external_tables" {
     environment {
       variables = {
         SECRET_NAME = aws_secretsmanager_secret.db_password.name_prefix
-        DB_NAME = db.name
+        DB_NAME = "test"
       }
     }
 }
