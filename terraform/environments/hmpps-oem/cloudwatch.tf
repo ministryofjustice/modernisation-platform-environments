@@ -9,10 +9,10 @@ resource "aws_cloudwatch_metric_alarm" "github_failed_actions" {
   threshold           = 1
   datapoints_to_alarm = 1
   treat_missing_data  = "breaching"
-  period              = 600
   alarm_description   = "Alarm if the number of failed GitHub Actions runs is greater than 0"
   metric_query {
     id         = "m1"
+    period = 600
     expression = "SEARCH('{CustomMetrics,Repository} MetricName=\"FailedWorkflowRuns\"', 'Maximum', 600)"
   }
 
