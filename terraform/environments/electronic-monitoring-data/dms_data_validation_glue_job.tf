@@ -48,7 +48,7 @@ resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
 # -------------------------------------------------------------------
 
 resource "aws_s3_bucket" "dms_dv_glue_job_s3_bucket" {
-  bucket_prefix = "glue-jobs-"
+  bucket_prefix = "glue-jobs-py-scripts-"
 }
 
 resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
@@ -77,7 +77,7 @@ resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
 
 resource "aws_glue_job" "dms_dv_glue_job" {
   name         = "dms-dv-glue-job"
-  role_arn     = aws_iam_role.parquet-to-csv.arn
+  role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
   glue_version = "4.0"
   default_arguments = {
     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
@@ -94,7 +94,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
   }
 
   command {
-    python_version  = "3.9"
+    python_version  = "3"
     script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv.py"
   }
 }
