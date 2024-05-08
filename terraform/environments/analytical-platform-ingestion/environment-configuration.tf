@@ -31,6 +31,9 @@ locals {
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
       }
+
+      /* Notification Email */
+      notification_email = "analytical-platform@digital.justice.gov.uk"
     }
     production = {
       /* VPC */
@@ -55,6 +58,9 @@ locals {
       transfer_server_hostname               = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
       transfer_server_sftp_users             = {}
       transfer_server_sftp_users_with_egress = {}
+
+      /* Notification Email */
+      notification_email = "analytical-platform@digital.justice.gov.uk"
     }
   }
 }
