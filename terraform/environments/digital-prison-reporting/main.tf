@@ -4,14 +4,15 @@
 ## Glue Job, Reporting Hub
 ## Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 locals {
-  glue_avro_registry                  = split("/", module.glue_registry_avro.registry_name)
-  glue_shared_log4j_properties_s3_key = "logging_config/shared/log4j2.properties"
+  glue_avro_registry           = split("/", module.glue_registry_avro.registry_name)
+  shared_log4j_properties_path = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${aws_s3_object.glue_job_shared_custom_log4j_properties.key}"
 }
 
 resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
-  bucket = module.s3_glue_job_bucket.bucket_id
-  key    = local.glue_shared_log4j_properties_s3_key
-  source = "glue_job_shared_log4j2.properties"
+  bucket = module.s3_glue_job_bucket
+  key    = "logging/misc-jobs/log4j2.properties"
+  source = "files/log4j2.properties"
+  etag   = filemd5("files/log4j2.properties")
 }
 
 module "glue_reporting_hub_job" {
@@ -52,7 +53,7 @@ module "glue_reporting_hub_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
-    "--extra-files"                         = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${local.glue_shared_log4j_properties_s3_key}"
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--job-bookmark-option"                 = "job-bookmark-disable"
     "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
     "--dpr.kinesis.stream.arn"              = module.kinesis_stream_ingestor.kinesis_stream_arn
@@ -118,6 +119,7 @@ module "glue_reporting_hub_batch_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
     "--datalake-formats"                    = "delta"
     "--dpr.aws.region"                      = local.account_region
@@ -171,6 +173,7 @@ module "glue_reporting_hub_cdc_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--job-bookmark-option"                 = "job-bookmark-disable"
     "--class"                               = "uk.gov.justice.digital.job.DataHubCdcJob"
     "--datalake-formats"                    = "delta"
@@ -232,6 +235,7 @@ module "glue_hive_table_creation_job" {
 
   arguments = {
     "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--extra-files"               = local.shared_log4j_properties_path
     "--class"                     = "uk.gov.justice.digital.job.HiveTableCreationJob"
     "--dpr.aws.region"            = local.account_region
     "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id,
@@ -297,6 +301,7 @@ module "glue_s3_file_transfer_job" {
 
   arguments = {
     "--extra-jars"                            = local.glue_jobs_latest_jar_location
+    "--extra-files"                           = local.shared_log4j_properties_path
     "--class"                                 = "uk.gov.justice.digital.job.S3FileTransferJob"
     "--dpr.aws.region"                        = local.account_region
     "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
@@ -363,6 +368,7 @@ module "glue_switch_prisons_hive_data_location_job" {
 
   arguments = {
     "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--extra-files"               = local.shared_log4j_properties_path
     "--class"                     = "uk.gov.justice.digital.job.SwitchHiveTableJob"
     "--dpr.aws.region"            = local.account_region
     "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id,
@@ -422,6 +428,7 @@ module "glue_s3_data_deletion_job" {
 
   arguments = {
     "--extra-jars"                     = local.glue_jobs_latest_jar_location
+    "--extra-files"                    = local.shared_log4j_properties_path
     "--class"                          = "uk.gov.justice.digital.job.S3DataDeletionJob"
     "--dpr.aws.region"                 = local.account_region
     "--dpr.config.s3.bucket"           = module.s3_glue_job_bucket.bucket_id,
@@ -475,6 +482,7 @@ module "glue_stop_glue_instance_job" {
 
   arguments = {
     "--extra-jars"     = local.glue_jobs_latest_jar_location
+    "--extra-files"    = local.shared_log4j_properties_path
     "--class"          = "uk.gov.justice.digital.job.StopGlueInstanceJob"
     "--dpr.aws.region" = local.account_region
     "--dpr.log.level"  = local.glue_job_common_log_level
