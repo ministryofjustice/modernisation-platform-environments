@@ -27,8 +27,8 @@ locals {
       "/ec2/ncr-web/lsast"        = local.web_secretsmanager_secrets
       "/oracle/database/PPBIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/PPBIPAUD" = local.database_secretsmanager_secrets
-      "/oracle/database/PPBIPSYS2" = local.database_secretsmanager_secrets
-      "/oracle/database/PPBIPAUD2" = local.database_secretsmanager_secrets
+      "/oracle/database/PPBISYS"  = local.database_secretsmanager_secrets
+      "/oracle/database/PPBIAUD"  = local.database_secretsmanager_secrets
     }
 
     baseline_efs = {
@@ -61,6 +61,9 @@ locals {
           availability_zones = ["eu-west-2a"]
           security_groups    = ["bip"]
         }]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
       }
     }
 
