@@ -177,6 +177,8 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 if __name__ == "__main__":
 
+    TARGET_TABLE_PATH = f'''s3://{PARQUET_TARGET_S3_BUCKET_NAME}/{PARQUET_TARGET_DB_NAME}/{PARQUET_TARGET_TBL_NAME}/'''
+
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(get_rds_database_list(args["rds_db_list"]))
 
     sql_select_str = f"""
@@ -236,19 +238,18 @@ if __name__ == "__main__":
             df_dv_output = df_dv_output.union(df_temp)
             
             # print(f"No S3-csv folder path found for given {rds_db_name} - {rds_tbl_name}")
+        
+        if check_s3_path_if_exists(PARQUET_TARGET_S3_BUCKET_NAME, f'''{PARQUET_TARGET_DB_NAME}/{PARQUET_TARGET_TBL_NAME}/full_table_name={db_dbo_tbl}'''):
+            glueContext.purge_s3_path(TARGET_TABLE_PATH, options={"retentionPeriod": 0})
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
 
-    TARGET_TABLE_PATH = f'''s3://{PARQUET_TARGET_S3_BUCKET_NAME}/{PARQUET_TARGET_DB_NAME}/{PARQUET_TARGET_TBL_NAME}/'''
-
-    if check_s3_path_if_exists(PARQUET_TARGET_S3_BUCKET_NAME, f'''{PARQUET_TARGET_DB_NAME}/{PARQUET_TARGET_TBL_NAME}/'''):
-        glueContext.purge_s3_path(TARGET_TABLE_PATH, options={"retentionPeriod": 0})
-
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
-                                                     'path': TARGET_TABLE_PATH},
+                                                     'path': TARGET_TABLE_PATH,
+                                                     "partitionKeys": ["full_table_name"]},
                                                  format_options={
                                                      'useGlueParquetWriter': True,
                                                      # 'compression': 'snappy', 'blockSize': 134217728, 'pageSize': 1048576
