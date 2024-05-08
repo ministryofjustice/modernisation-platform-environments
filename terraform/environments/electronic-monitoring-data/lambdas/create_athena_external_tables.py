@@ -1,17 +1,23 @@
 import awswrangler as wr
+from mojap_metadata.converters.sqlalchemy_converter import SQLAlchemyConverter
+from sqlalchemy import create_engine
 import os
 
-RDS_ARN = os.environ.get("RDS_ARN")
-SECRET_ARN = os.environ.get("SECRET_ARN")
+SECRET_NAME = os.environ("SECRET_NAME")
+DB_NAME = os.environ("DB_NAME")
 
 
-def get_rds_connection(rds_arn=RDS_ARN, secret_arn=SECRET_ARN):
-    rds_connection = wr.SECRET_AR.data_api.rds.connect(
-        secret_arn=secret_arn, rds_arn=rds_arn, database="test"
+def get_rds_connection():
+    con_sqlserver = wr.sqlserver.connect(
+        secret_id=SECRET_NAME, odbc_driver_version=17, dbname=DB_NAME
     )
-    return rds_connection
+    return con_sqlserver
 
 
 def handler(event, context):
     conn = get_rds_connection()
+    engine = create_engine("mssql+pyodbc://", creator=lambda: conn)
+    sqlc = SQLAlchemyConverter(engine)
+    metadata = sqlc.generate_to_meta_list(schema="dbo")
+    print(metadata)
     return "done"
