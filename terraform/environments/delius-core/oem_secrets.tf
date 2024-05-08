@@ -39,7 +39,7 @@ resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
       "Action": "sts:AssumeRole",
       "Condition": {
         "ForAnyValue:ArnLike": {
-          "aws:PrincipalArn": "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/instance-role-*-delius-db-*"
+          "aws:PrincipalArn": "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/instance-role-delius-*-db-*"
         }
       }
     }

@@ -61,4 +61,9 @@ locals {
     }
   }
 
+  secretsmanager_secrets_bo_db = {
+    secrets = {
+      passwords = {}
+    }
+  }
 }

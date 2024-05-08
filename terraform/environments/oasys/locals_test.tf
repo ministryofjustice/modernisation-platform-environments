@@ -52,6 +52,9 @@ locals {
 
       "/oracle/bip/t1" = local.secretsmanager_secrets_bip
       "/oracle/bip/t2" = local.secretsmanager_secrets_bip
+
+      "/oracle/database/T2BOSYS" = local.secretsmanager_secrets_bo_db
+      "/oracle/database/T2BOAUD" = local.secretsmanager_secrets_bo_db
     }
 
     baseline_iam_policies = {
@@ -217,7 +220,7 @@ locals {
           "${local.application_name}-environment" = "t2"
           bip-db-name                             = "T2BIPINF"
           instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
+          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS T2BOSYS T2BOAUD"
         })
       })
 
