@@ -90,7 +90,7 @@ def get_rds_database_list(in_rds_databases = None):
         sql_sys_databases_2 = f"""
         SELECT name
         FROM sys.databases
-        WHERE IN ({rds_db_str})
+        WHERE name IN ({rds_db_str})
         """.strip()
         sql_sys_databases = sql_sys_databases_2
 
@@ -177,7 +177,7 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 if __name__ == "__main__":
 
-    rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(get_rds_database_list())
+    rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(get_rds_database_list(args["rds_db_list"]))
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime, 
