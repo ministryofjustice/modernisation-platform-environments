@@ -65,7 +65,7 @@ data "aws_iam_policy_document" "dms_dv_glue_assume_role" {
     actions = ["sts:AssumeRole"]
 
     principals {
-      identifiers = ["glue.eu-west-2.amazonaws.com"]
+      identifiers = ["glue.amazonaws.com"]
       type        = "Service"
     }
   }
@@ -78,10 +78,12 @@ data "aws_iam_policy_document" "dms_dv_iam_policy_document" {
       "s3:GetObject",
       "s3:ListBucket"
     ]
-    resources = ["${aws_s3_bucket.dms_dv_glue_job_s3_bucket.arn}/*",
+    resources = ["${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*",
+      aws_s3_bucket.dms_target_ep_s3_bucket.arn,
+      "${aws_s3_bucket.dms_dv_glue_job_s3_bucket.arn}/*",
       aws_s3_bucket.dms_dv_glue_job_s3_bucket.arn,
       "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
-    aws_s3_bucket.dms_dv_parquet_s3_bucket.arn]
+      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn]
   }
   statement {
     effect = "Allow"
@@ -91,6 +93,6 @@ data "aws_iam_policy_document" "dms_dv_iam_policy_document" {
       "s3:ListBucket"
     ]
     resources = [aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
-    "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*"]
+      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*"]
   }
 }
