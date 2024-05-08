@@ -63,6 +63,7 @@ module "glue_compact_raw_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.compact_job_class
     "--dpr.maintenance.root.path"           = local.raw_zone_nomis_path
     "--datalake-formats"                    = "delta"
@@ -108,6 +109,7 @@ module "glue_compact_structured_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.compact_job_class
     "--dpr.maintenance.root.path"           = local.structured_zone_nomis_path
     "--datalake-formats"                    = "delta"
@@ -153,6 +155,7 @@ module "glue_compact_curated_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.compact_job_class
     "--dpr.maintenance.root.path"           = local.curated_zone_nomis_path
     "--datalake-formats"                    = "delta"
@@ -198,6 +201,7 @@ module "glue_compact_domain_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.compact_job_class
     "--dpr.maintenance.root.path"           = local.domain_zone_root_path
     "--datalake-formats"                    = "delta"
@@ -244,6 +248,7 @@ module "glue_retention_raw_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.retention_job_class
     "--dpr.maintenance.root.path"           = local.raw_zone_nomis_path
     "--datalake-formats"                    = "delta"
@@ -289,6 +294,7 @@ module "glue_retention_structured_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.retention_job_class
     "--dpr.maintenance.root.path"           = local.structured_zone_nomis_path
     "--datalake-formats"                    = "delta"
@@ -334,6 +340,7 @@ module "glue_retention_curated_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.retention_job_class
     "--dpr.maintenance.root.path"           = local.curated_zone_nomis_path
     "--datalake-formats"                    = "delta"
@@ -379,6 +386,7 @@ module "glue_retention_domain_job" {
 
   arguments = {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.retention_job_class
     "--dpr.maintenance.root.path"           = local.domain_zone_root_path
     "--datalake-formats"                    = "delta"
