@@ -253,12 +253,13 @@ locals {
             "Ec2PreprodDatabasePolicy",
           ])
         })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         instance = merge(local.database_onr_a.instance, {
           instance_type = "r6i.xlarge"
         })
         tags = merge(local.database_onr_a.tags, {
           instance-scheduling = "skip-scheduling"
-          oracle-sids         = "T2BOSYS T2BOAUD"
+          # oracle-sids         = "T2BOSYS T2BOAUD" # TODO: comment in when monitoring live
         })
       })
 
