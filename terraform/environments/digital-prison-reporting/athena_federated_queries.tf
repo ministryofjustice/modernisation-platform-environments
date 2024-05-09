@@ -1,7 +1,11 @@
+locals {
+  # The account id that AWS serves the connector from
+  oracle_connector_arn_foreign_account_id = "292517598671"
+}
 resource "aws_serverlessapplicationrepository_cloudformation_stack" "athena_oracle_connector_nomis" {
 
   name           = "${local.project}-athena-oracle-connector-nomis-${local.env}"
-  application_id = "arn:aws:serverlessrepo:us-east-1:${local.account_id}:applications/AthenaOracleConnector"
+  application_id = "arn:aws:serverlessrepo:us-east-1:${local.oracle_connector_arn_foreign_account_id}:applications/AthenaOracleConnector"
   capabilities   = [
     "CAPABILITY_IAM"
   ]
