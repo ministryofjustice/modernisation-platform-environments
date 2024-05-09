@@ -8,7 +8,7 @@ resource "aws_glue_connection" "glue_rds_sqlserver_db_connection" {
   name = "glue-rds-sqlserver-db-conn-tf"
 
   physical_connection_requirements {
-    security_group_id_list = [aws_security_group.db.id]
+    security_group_id_list = [aws_security_group.glue_rds_conn_security_group.id]
     subnet_id              = data.aws_subnet.private_subnets_c.id
     availability_zone      = data.aws_subnet.private_subnets_c.availability_zone
   }

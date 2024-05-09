@@ -52,7 +52,7 @@ resource "aws_iam_role_policy_attachment" "dms-endpoint-role" {
   policy_arn = aws_iam_policy.dms_s3_ep_role_policy.arn
 }
 
-# ==========================================================================
+# -------------------------------------------------------------
 
 resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   name               = "dms-cloudwatch-logs-role-tf"
@@ -71,7 +71,7 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
 }
 
-# ==========================================================================
+# -------------------------------------------------------------
 
 resource "aws_iam_role" "dms_glue_crawler_role" {
   name                = "dms-glue-crawler-role-tf"
@@ -91,7 +91,8 @@ resource "aws_iam_role_policy_attachment" "dms-glue-crawler-role" {
   role       = aws_iam_role.dms_glue_crawler_role.name
   policy_arn = aws_iam_policy.dms_s3_ep_role_policy.arn
 }
-# ==========================================================================
+
+# -------------------------------------------------------------
 
 # Error: creating DMS Replication Subnet Group (rds-replication-subnet-group-tf): AccessDeniedFault: The IAM Role arn:aws:iam::############:role/dms-vpc-role is not configured properly.
 resource "aws_iam_role" "dms_vpc_role_v2" {
@@ -110,4 +111,36 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-v2-AmazonDMSVPCManagemen
   role       = aws_iam_role.dms_vpc_role_v2.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
-# ==========================================================================
+
+# -------------------------------------------------------------
+
+resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
+  name               = "dms-dv-glue-job-tf"
+  assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
+
+  inline_policy {
+    name   = "S3Policies"
+    policy = data.aws_iam_policy_document.dms_dv_iam_policy_document.json
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Role having Glue-Job execution policies",
+    }
+  )
+}
+
+resource "aws_iam_policy_attachment" "rds_readonly_policy_attachment" {
+  name       = "rds-readonly-policy-attachment"
+  roles      = [aws_iam_role.dms_dv_glue_job_iam_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
+
+}
+
+resource "aws_iam_policy_attachment" "glue_service_role_policy_attachment" {
+  name       = "glue-service-role-policy-attachment"
+  roles      = [aws_iam_role.dms_dv_glue_job_iam_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+
+}
