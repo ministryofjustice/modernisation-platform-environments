@@ -34,13 +34,13 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   description = "${var.app_name} control access to the network load balancer"
   vpc_id      = var.vpc_shared_id
 
-  ingress {
-    description = "allow all traffic on HTTPS port 22"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # ingress {
+  #   description = "allow all traffic on HTTPS port 22"
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
   ingress {
     description = "allow all traffic on custom port"
