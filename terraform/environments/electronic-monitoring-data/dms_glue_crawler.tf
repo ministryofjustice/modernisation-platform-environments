@@ -5,7 +5,7 @@ resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
     USERNAME            = "admin"
   }
 
-  name = "rds-sqlserver-db-glue-conn-tf"
+  name = "glue-crawler-rds-sqlserver-db-conn-tf"
 
   physical_connection_requirements {
     security_group_id_list = [aws_security_group.db.id]
