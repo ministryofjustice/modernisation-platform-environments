@@ -59,11 +59,5 @@ locals {
       passwords     = {}
       bip-passwords = {}
     }
-  }
-
-  secretsmanager_secrets_bo_db = {
-    secrets = {
-      passwords = {}
-    }
-  }
+  }  
 }
