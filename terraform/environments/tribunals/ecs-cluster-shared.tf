@@ -141,15 +141,15 @@ resource "aws_security_group" "ecs_service_sftp" {
   name_prefix = "ecs-service-sg-sftp-"
   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    description = "Allow traffic on port 22 from network load balancer"
-    security_groups = [
-      module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp, module.claims_management_decisions.tribunals_lb_sc_id_sftp
-    ]
-  }
+  # ingress {
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "tcp"
+  #   description = "Allow traffic on port 22 from network load balancer"
+  #   security_groups = [
+  #     module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp, module.claims_management_decisions.tribunals_lb_sc_id_sftp
+  #   ]
+  # }
 
   ingress {
     from_port   = module.charity_tribunal_decisions.sftp_host_port
@@ -161,15 +161,15 @@ resource "aws_security_group" "ecs_service_sftp" {
     ]
   }
 
-  ingress {
-    from_port   = module.claims_management_decisions.sftp_host_port
-    to_port     = module.claims_management_decisions.sftp_host_port
-    protocol    = "tcp"
-    description = "Allow traffic on custom port from sftp claims management decisions network load balancer"
-    security_groups = [
-      module.claims_management_decisions.tribunals_lb_sc_id_sftp
-    ]
-  }
+  # ingress {
+  #   from_port   = module.claims_management_decisions.sftp_host_port
+  #   to_port     = module.claims_management_decisions.sftp_host_port
+  #   protocol    = "tcp"
+  #   description = "Allow traffic on custom port from sftp claims management decisions network load balancer"
+  #   security_groups = [
+  #     module.claims_management_decisions.tribunals_lb_sc_id_sftp
+  #   ]
+  # }
 
   egress {
     from_port   = 0
