@@ -2,7 +2,7 @@ locals {
   app                = var.app_name
   app_url            = var.app_url
   documents_location = var.documents_location
-  # sftp_host_port     = var.sftp_host_port
+  sftp_host_port     = var.sftp_host_port
 
   app_container_definition = jsonencode([
     {
@@ -20,7 +20,7 @@ locals {
       essential = true,
       portMappings = [
         {
-          hostPort = 0,
+          hostPort = "${local.sftp_host_port}",
           containerPort = 22,
           protocol = "tcp"
         },
