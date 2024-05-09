@@ -73,27 +73,6 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
 
 # -------------------------------------------------------------
 
-resource "aws_iam_role" "dms_glue_crawler_role" {
-  name                = "dms-glue-crawler-role-tf"
-  assume_role_policy  = data.aws_iam_policy_document.glue_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
-
-  tags = merge(
-    local.tags,
-    {
-      Resource_Type = "Role having DMS-Glue-Crawler access policies",
-    }
-  )
-
-}
-
-resource "aws_iam_role_policy_attachment" "dms-glue-crawler-role" {
-  role       = aws_iam_role.dms_glue_crawler_role.name
-  policy_arn = aws_iam_policy.dms_s3_ep_role_policy.arn
-}
-
-# -------------------------------------------------------------
-
 # Error: creating DMS Replication Subnet Group (rds-replication-subnet-group-tf): AccessDeniedFault: The IAM Role arn:aws:iam::############:role/dms-vpc-role is not configured properly.
 resource "aws_iam_role" "dms_vpc_role_v2" {
   name               = "dms-vpc-role"
