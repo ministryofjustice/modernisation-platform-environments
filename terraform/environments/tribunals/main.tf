@@ -386,7 +386,7 @@ module "charity_tribunal_decisions" {
 module "claims_management_decisions" {
   is_ftp_app                        = true
   source                            = "./modules/tribunal_ftp"
-  app_name                          = "ftp-claims-management-decisions"
+  app_name                          = "ftp-claims-management"
   app_url                           = "claimsmanagement"
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
