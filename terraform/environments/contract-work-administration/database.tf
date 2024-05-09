@@ -46,8 +46,8 @@ resource "aws_instance" "database" {
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
-#   user_data_base64            = base64encode(local.db_userdata)
-#   user_data_replace_on_change = true
+  user_data_base64            = base64encode(local.db_userdata)
+  user_data_replace_on_change = true
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
