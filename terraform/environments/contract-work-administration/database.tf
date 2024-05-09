@@ -34,15 +34,6 @@ EOF
 
 }
 
-
-while [ -z "$APP1_IP" ] || [ -z "$CM_IP" ]
-do
-  sleep 5
-  APP1_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values="CWA App Instance 1" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
-  CM_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values="CWA Concurrent Manager Instance" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
-done
-
-
 ######################################
 # Database Instance
 ######################################
