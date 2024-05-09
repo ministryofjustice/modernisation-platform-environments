@@ -8,7 +8,7 @@ resource "aws_security_group" "ifs_lb_sc" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["18.169.147.172/32, 35.176.93.186/32, 18.130.148.126/32, 35.176.148.126/32"]
   }
 
   egress {
