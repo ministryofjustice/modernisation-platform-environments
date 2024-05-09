@@ -7,7 +7,9 @@ locals {
     database_ec2_name = "${upper(local.application_name_short)} Database Instance"
     cm_ec2_name = "${upper(local.application_name_short)} Concurrent Manager Instance"
     appserver1_ec2_name = "${upper(local.application_name_short)} App Instance 1"
+    appserver2_ec2_name = "${upper(local.application_name_short)} App Instance 2"
     database_hostname = "${local.application_name_short}-db"
     cm_hostname = "${local.application_name_short}-app2"
     appserver1_hostname = "${local.application_name_short}-app1"
+    appserver2_ec2_name = "${local.application_name_short}-app3"
 }
