@@ -2,12 +2,12 @@ locals {
   db_userdata = <<EOF
 #!/bin/bash
 
-### Temp install of AWS CLI - removed once actual AMI is used
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo yum install -y unzip
-unzip awscliv2.zip
-sudo ./aws/install --update
-##############
+# ### Temp install of AWS CLI - removed once actual AMI is used
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# sudo yum install -y unzip
+# unzip awscliv2.zip
+# sudo ./aws/install --update
+# ##############
 
 hostnamectl set-hostname ${local.database_hostname}
 
@@ -18,7 +18,7 @@ CM_IP=""
 while [ -z "$APP1_IP" ] || [ -z "$CM_IP" ]
 do
   sleep 5
-  APP1_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values=${local.appserver1_ec2_name} App Instance 1" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
+  APP1_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values=${local.appserver1_ec2_name} Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
   CM_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values=${local.cm_ec2_name} Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
 done
 

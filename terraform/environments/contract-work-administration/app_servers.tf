@@ -11,12 +11,12 @@ sudo ./aws/install
 
 hostnamectl set-hostname ${local.appserver1_hostname}
 
-### Temp install of AWS CLI - removed once actual AMI is used
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo yum install -y unzip
-unzip awscliv2.zip
-sudo ./aws/install --update
-##############
+# ### Temp install of AWS CLI - removed once actual AMI is used
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# sudo yum install -y unzip
+# unzip awscliv2.zip
+# sudo ./aws/install --update
+# ##############
 
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 DB_IP=""
