@@ -11,5 +11,5 @@ locals {
     database_hostname = "${local.application_name_short}-db"
     cm_hostname = "${local.application_name_short}-app2"
     appserver1_hostname = "${local.application_name_short}-app1"
-    appserver2_ec2_name = "${local.application_name_short}-app3"
+    appserver2_hostname = "${local.application_name_short}-app3"
 }
