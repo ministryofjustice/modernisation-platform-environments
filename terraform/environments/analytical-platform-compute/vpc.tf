@@ -1,3 +1,6 @@
+
+#tfsec:ignore:avd-aws-0102 NACLs not restricted
+#tfsec:ignore:avd-aws-0105 NACLs not restricted
 module "vpc" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
