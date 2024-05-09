@@ -4,7 +4,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.8.1"
 
-  name                = local.vpc_name
+  name                = "${local.application_name}-${local.environment}"
   azs                 = slice(data.aws_availability_zones.available.names, 0, 3)
   cidr                = local.environment_configuration.vpc_cidr
   public_subnets      = local.environment_configuration.vpc_public_subnets
