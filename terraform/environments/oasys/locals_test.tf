@@ -53,8 +53,8 @@ locals {
       "/oracle/bip/t1" = local.secretsmanager_secrets_bip
       "/oracle/bip/t2" = local.secretsmanager_secrets_bip
 
-      "/oracle/database/T2BOSYS" = local.secretsmanager_secrets_bo_db
-      "/oracle/database/T2BOAUD" = local.secretsmanager_secrets_bo_db
+      "/oracle/database/T2BOSYS" = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T2BOAUD" = local.secretsmanager_secrets_bip_db
     }
 
     baseline_iam_policies = {
@@ -220,7 +220,7 @@ locals {
           "${local.application_name}-environment" = "t2"
           bip-db-name                             = "T2BIPINF"
           instance-scheduling                     = "skip-scheduling"
-          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS T2BOSYS T2BOAUD"
+          oracle-sids                             = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
         })
       })
 
@@ -245,6 +245,21 @@ locals {
           bip-db-hostname   = "t2-oasys-db-a"
           oasys-db-name     = "T2OASYS"
           oasys-db-hostname = "t2-oasys-db-a"
+        })
+      })
+      "t2-onr-db-a" = merge(local.database_onr_a, {
+        config = merge(local.database_onr_a.config, {
+          instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
+            "Ec2T2DatabasePolicy",
+          ])
+        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        instance = merge(local.database_onr_a.instance, {
+          instance_type = "r6i.xlarge"
+        })
+        tags = merge(local.database_onr_a.tags, {
+          instance-scheduling = "skip-scheduling"
+          # oracle-sids         = "T2BOSYS T2BOAUD" # TODO: comment in when monitoring live
         })
       })
 
