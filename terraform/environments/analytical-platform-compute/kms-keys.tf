@@ -4,7 +4,7 @@ module "vpc_flow_logs_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "2.2.1"
 
-  aliases                 = ["vpc/flow-logs"]
+  aliases                 = ["vpc-flow-logs"]
   description             = "VPC flow logs KMS key"
   enable_default_policy   = true
   deletion_window_in_days = 7
@@ -30,7 +30,7 @@ module "vpc_flow_logs_kms" {
         {
           test     = "ArnEquals"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.vpc_flow_logs_cloudwatch_log_group_name}"]
+          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.vpc_flow_log_cloudwatch_log_group_name_prefix}*"]
         }
       ]
     }
