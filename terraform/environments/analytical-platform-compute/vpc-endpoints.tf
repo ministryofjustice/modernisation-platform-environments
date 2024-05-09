@@ -9,22 +9,98 @@ module "vpc_endpoints" {
   security_group_ids = [module.vpc_endpoints_security_group.security_group_id]
 
   endpoints = {
+    /* Interfaces */
     sts = {
-      service      = "sts"
-      service_type = "Interface"
+      service             = "sts"
+      service_type        = "Interface"
+      private_dns_enabled = true
       tags = merge(
         local.tags,
         { Name = format("%s-sts", module.vpc.name) }
       )
     },
     logs = {
-      service      = "logs"
-      service_type = "Interface"
+      service             = "logs"
+      service_type        = "Interface"
+      private_dns_enabled = true
       tags = merge(
         local.tags,
         { Name = format("%s-logs", module.vpc.name) }
       )
     },
+    kms = {
+      service             = "kms"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-kms", module.vpc.name) }
+      )
+    },
+    eks = {
+      service             = "eks"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-eks", module.vpc.name) }
+      )
+    },
+    eks-auth = {
+      service             = "eks-auth"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-eks-auth", module.vpc.name) }
+      )
+    },
+    guardduty-data = {
+      service             = "guardduty-data"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-guardduty-data", module.vpc.name) }
+      )
+    },
+    rds = {
+      service             = "rds"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-rds", module.vpc.name) }
+      )
+    },
+    rds-data = {
+      service             = "rds-data"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-rds-data", module.vpc.name) }
+      )
+    },
+    elasticache = {
+      service             = "elasticache"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-elasticache", module.vpc.name) }
+      )
+    },
+    secretsmanager = {
+      service             = "secretsmanager"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-secretsmanager", module.vpc.name) }
+      )
+    },
+    /* Gateways */
     s3 = {
       service      = "s3"
       service_type = "Gateway"
