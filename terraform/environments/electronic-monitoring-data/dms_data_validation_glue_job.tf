@@ -67,7 +67,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
   name               = "dms-dv-glue-job"
-  assume_role_policy = data.aws_iam_policy_document.dms_dv_glue_assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
 
   inline_policy {
     name   = "S3Policies"

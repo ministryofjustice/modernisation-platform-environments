@@ -34,7 +34,7 @@ resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
   # }
 }
 
-resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
+resource "aws_glue_crawler" "dms_rds_sqlserver_db_glue_crawler" {
   name          = "rds-sqlserver-${aws_db_instance.database_2022.identifier}-tf"
   role          = aws_iam_role.dms-glue-crawler-role.arn
   database_name = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db.name
@@ -48,7 +48,7 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
   tags = merge(
     local.tags,
     {
-      Resource_Type = "RDS-SQLServer Glue-Crawler for DMS",
+      Resource_Type = "Glue-Crawler to crawl RDS-SQLServer-db",
     }
   )
 
@@ -57,11 +57,11 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
   # }
 }
 
-resource "aws_glue_trigger" "rds-sqlserver-db-crawler-glue_trigger" {
-  name = "rds-sqlserver-db-crawler-trigger-tf"
+resource "aws_glue_trigger" "dms_rds_crawler_glue_trigger" {
+  name = "dms-rds-crawler-glue-trigger-tf"
   type = "ON_DEMAND"
 
   actions {
-    crawler_name = aws_glue_crawler.rds-sqlserver-db-glue-crawler.name
+    crawler_name = aws_glue_crawler.dms_rds_sqlserver_db_glue_crawler.name
   }
 }

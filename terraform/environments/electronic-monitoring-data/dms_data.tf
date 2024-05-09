@@ -60,17 +60,6 @@ data "aws_iam_policy_document" "dms_dv_parquet_s3_bucket" {
 #   }
 # }
 
-data "aws_iam_policy_document" "dms_dv_glue_assume_role" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      identifiers = ["glue.amazonaws.com"]
-      type        = "Service"
-    }
-  }
-}
-
 data "aws_iam_policy_document" "dms_dv_iam_policy_document" {
   statement {
     effect = "Allow"
