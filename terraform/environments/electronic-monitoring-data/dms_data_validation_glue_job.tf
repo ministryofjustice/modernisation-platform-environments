@@ -95,6 +95,36 @@ resource "aws_iam_policy_attachment" "glue_service_role_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 
 }
+
+# ---------------------------------------------------------------------------
+
+resource "aws_glue_connection" "rds_sqlserver_db_glue_connection_v2" {
+  connection_properties = {
+    JDBC_CONNECTION_URL = "jdbc:sqlserver://${aws_db_instance.database_2022.endpoint}"
+    PASSWORD            = aws_secretsmanager_secret_version.db_password.secret_string
+    USERNAME            = "admin"
+  }
+
+  name = "rds-sqlserver-db-glue-conn-tf"
+
+  physical_connection_requirements {
+    security_group_id_list = [aws_security_group.glue_rds_conn_security_group.id]
+    subnet_id              = data.aws_subnet.private_subnets_c.id
+    # [for subnet in data.aws_subnet.my_database_subnets : subnet.id if subnet.availability_zone == data.aws_db_instance.my_database.availability_zone][0]
+    availability_zone = data.aws_subnet.private_subnets_c.availability_zone
+    # data.aws_db_instance.database_2022.availability_zone
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "RDS-MSSQLServer JDBC-Connection for Glue-Job",
+    }
+  )
+}
+
+# ---------------------------------------------------------------------------
+
 resource "aws_glue_job" "dms_dv_glue_job" {
   name         = "dms-dv-glue-job"
   role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
@@ -113,9 +143,17 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--enable-metrics"                   = ""
   }
 
-  connections = ["glue-sqlserver-db-connection"]
+  connections = ["${aws_glue_connection.rds_sqlserver_db_glue_connection_v2.name}"]
   command {
     python_version  = "3"
     script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv.py"
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
 }
