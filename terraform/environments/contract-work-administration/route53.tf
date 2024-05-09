@@ -20,7 +20,7 @@ resource "aws_route53_record" "concurrent_manager" {
 resource "aws_route53_record" "app1" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${local.appserver1_ec2_name}.${data.aws_route53_zone.external.name}"
+  name     = "${local.appserver1_hostname}.${data.aws_route53_zone.external.name}"
   type     = "A"
   ttl      = 900
   records  = [aws_instance.app1.private_ip]
@@ -31,7 +31,7 @@ resource "aws_route53_record" "app2" {
   count    = contains(["development", "testing"], local.environment) ? 0 : 1
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${local.appserver2_ec2_name}.${data.aws_route53_zone.external.name}"
+  name     = "${local.appserver2_hostname}.${data.aws_route53_zone.external.name}"
   type     = "A"
   ttl      = 900
   records  = [aws_instance.app2[0].private_ip]
