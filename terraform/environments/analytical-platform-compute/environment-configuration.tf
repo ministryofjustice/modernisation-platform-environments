@@ -44,7 +44,7 @@ locals {
       vpc_database_subnets       = ["10.201.1.0/26", "10.201.1.64/26", "10.201.1.128/26"]
       vpc_elasticache_subnets    = ["10.201.2.0/26", "10.201.2.64/26", "10.201.2.128/26"]
       vpc_intra_subnets          = ["10.201.3.0/26", "10.201.3.64/26", "10.201.3.128/26"]
-      vpc_private_subnets        = ["10.201.128.0/19", "10.201.160.0/19 ", "10.201.192.0/19"]
+      vpc_private_subnets        = ["10.201.128.0/19", "10.201.160.0/19", "10.201.192.0/19"]
       vpc_enable_nat_gateway     = true
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
