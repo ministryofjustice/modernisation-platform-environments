@@ -477,6 +477,24 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = file("templates/maintenance.html")
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "dev-nomis-web-b.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
