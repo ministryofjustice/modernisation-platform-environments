@@ -766,7 +766,6 @@ locals {
       }
       "test.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "maintenance", type = "A", lbs_map_key = "private" },
           # T1 [1-a: T1CNOM, T1NDH, T1TRDAT, T1ORSYS] [2-a: T1MIS, T1CNMAUD]
           { name = "t1nomis", type = "CNAME", ttl = "300", records = ["t1nomis-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1nomis-a", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
@@ -805,6 +804,7 @@ locals {
           { name = "t3nomis-b", type = "CNAME", ttl = "300", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "private" },
           # T1
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "t1-nomis-web-b", type = "A", lbs_map_key = "private" },
