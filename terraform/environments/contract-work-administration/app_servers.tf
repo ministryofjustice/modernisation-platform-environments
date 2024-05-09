@@ -29,12 +29,13 @@ do
   CM_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values=${local.cm_ec2_name} Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
 done
 
-sed -i '/^10.202.1.46/d' /etc/hosts
-sed -i '/^10.202.4.93/d' /etc/hosts
-sed -i '/^10.202.4.57/d' /etc/hosts
-echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
-echo "$PRIVATE_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
-echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
+## The following hardcoded IP beginning with 10.202.* will need to be changed once new AMI's are taken
+sudo sed -i '/^10.202.1.46/d' /etc/hosts
+sudo sed -i '/^10.202.4.93/d' /etc/hosts
+sudo sed -i '/^10.202.4.57/d' /etc/hosts
+sudo echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
+sudo echo "$PRIVATE_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
+sudo echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
 
 EOF
