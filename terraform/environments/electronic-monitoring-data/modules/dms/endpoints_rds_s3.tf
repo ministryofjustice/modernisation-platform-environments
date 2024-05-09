@@ -1,5 +1,5 @@
 # Create DMS Endpoint to RDS Source
-resource "aws_dms_endpoint" "dms-rds-source" {
+resource "aws_dms_endpoint" "dms_rds_source" {
 
   #   certificate_arn             = ""
   database_name = var.database_name

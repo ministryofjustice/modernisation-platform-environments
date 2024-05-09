@@ -1,11 +1,11 @@
-resource "aws_glue_connection" "rds_sqlserver_db_glue_connection" {
+resource "aws_glue_connection" "glue_rds_sqlserver_db_connection" {
   connection_properties = {
     JDBC_CONNECTION_URL = "jdbc:sqlserver://${aws_db_instance.database_2022.endpoint}"
     PASSWORD            = aws_secretsmanager_secret_version.db_password.secret_string
     USERNAME            = "admin"
   }
 
-  name = "rds-sqlserver-db-glue-conn-tf"
+  name = "glue-rds-sqlserver-db-conn-tf"
 
   physical_connection_requirements {
     security_group_id_list = [aws_security_group.db.id]
@@ -32,15 +32,15 @@ resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
   # }
 }
 
-resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
+resource "aws_glue_crawler" "rds_sqlserver_db_glue_crawler" {
   name          = "rds-sqlserver-${aws_db_instance.database_2022.identifier}-tf"
-  role          = aws_iam_role.dms-glue-crawler-role.arn
+  role          = aws_iam_role.dms_glue_crawler_role.arn
   database_name = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db.name
   description   = "Crawler to fetch database names"
   #   table_prefix  = "your_table_prefix"
 
   jdbc_target {
-    connection_name = aws_glue_connection.rds_sqlserver_db_glue_connection.name
+    connection_name = aws_glue_connection.glue_rds_sqlserver_db_connection.name
     path            = "%"
   }
   tags = merge(
@@ -55,11 +55,11 @@ resource "aws_glue_crawler" "rds-sqlserver-db-glue-crawler" {
   # }
 }
 
-resource "aws_glue_trigger" "rds-sqlserver-db-crawler-glue_trigger" {
-  name = "rds-sqlserver-db-crawler-trigger-tf"
+resource "aws_glue_trigger" "rds_sqlserver_db_glue_trigger" {
+  name = "${aws_glue_crawler.rds_sqlserver_db_glue_crawler.name}"
   type = "ON_DEMAND"
 
   actions {
-    crawler_name = aws_glue_crawler.rds-sqlserver-db-glue-crawler.name
+    crawler_name = aws_glue_crawler.rds_sqlserver_db_glue_crawler.name
   }
 }
