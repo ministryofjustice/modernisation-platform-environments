@@ -59,5 +59,5 @@ locals {
       passwords     = {}
       bip-passwords = {}
     }
-  }  
+  }
 }
