@@ -63,7 +63,7 @@ module "nextcloud_service" {
 
   create_rds               = true
   rds_engine               = "mariadb"
-  rds_engine_version       = "10.4.3"
+  rds_engine_version       = "10.4.30"
   rds_instance_class       = "db.t3.small"
   rds_allocated_storage    = 500
   rds_username             = "misnextcloud"
