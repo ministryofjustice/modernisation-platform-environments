@@ -164,6 +164,18 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
+            ]
           }
         ]
       }
