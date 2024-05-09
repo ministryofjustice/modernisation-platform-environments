@@ -51,4 +51,8 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
     aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole,
     aws_iam_role_policy_attachment.dms-vpc-role-v2-AmazonDMSVPCManagementRole
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
