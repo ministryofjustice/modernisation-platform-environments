@@ -68,7 +68,7 @@ module "nextcloud_service" {
   rds_allocated_storage    = 500
   rds_username             = "misnextcloud"
   rds_port                 = 3306
-  rds_parameter_group_name = "default.mariadb10.6"
+  rds_parameter_group_name = "mariadb-10-4-db-2mrajrfooaokuu2kijitzu32z4-upgrade"
   rds_license_model        = "general-public-license"
   snapshot_identifier      = "nextcloud-migration-1251-shared"
 
