@@ -37,6 +37,7 @@ sudo bash -c 'echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53
 sudo bash -c 'echo "$PRIVATE_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts'
 sudo bash -c 'echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts'
 
+sudo chattr +i /etc/hosts
 
 EOF
 
