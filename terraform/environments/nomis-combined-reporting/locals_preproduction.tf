@@ -164,7 +164,7 @@ locals {
           ])
         })
         instance = merge(local.bip_ec2_default.instance, {
-          instance_type = "c5.4xlarge",
+          instance_type = "m6i.xlarge",
         })
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform CMS installation and configurations"
@@ -183,7 +183,7 @@ locals {
           ])
         })
         instance = merge(local.bip_ec2_default.instance, {
-          instance_type = "c5.4xlarge",
+          instance_type = "m6i.xlarge",
         })
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform CMS installation and configurations"
@@ -202,7 +202,7 @@ locals {
           ])
         })
         instance = merge(local.bip_ec2_default.instance, {
-          instance_type = "c5.4xlarge",
+          instance_type = "m6i.4xlarge",
         })
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform installation and configurations"
@@ -221,7 +221,7 @@ locals {
           ])
         })
         instance = merge(local.web_ec2_default.instance, {
-          instance_type = "r7i.large",
+          instance_type = "r6i.large",
         })
         tags = merge(local.web_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform web-tier admin installation and configurations"
@@ -238,7 +238,7 @@ locals {
           ])
         })
         instance = merge(local.web_ec2_default.instance, {
-          instance_type = "r7i.large",
+          instance_type = "r6i.xlarge",
         })
         tags = merge(local.web_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
@@ -255,7 +255,7 @@ locals {
           ])
         })
         instance = merge(local.web_ec2_default.instance, {
-          instance_type = "r7i.xlarge",
+          instance_type = "r6i.xlarge",
         })
         tags = merge(local.web_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
@@ -269,6 +269,9 @@ locals {
           instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          instance_type = "m6i.2xlarge",
         })
         tags = merge(local.etl_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform ETL installation and configurations"
