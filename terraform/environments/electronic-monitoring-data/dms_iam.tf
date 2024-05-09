@@ -94,9 +94,9 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-v2-AmazonDMSVPCManagemen
 # -------------------------------------------------------------
 
 resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
-  name               = "dms-dv-glue-job-tf"
-  assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
-
+  name                = "dms-dv-glue-job-tf"
+  assume_role_policy  = data.aws_iam_policy_document.glue_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
   inline_policy {
     name   = "S3Policies"
     policy = data.aws_iam_policy_document.dms_dv_iam_policy_document.json
@@ -117,9 +117,4 @@ resource "aws_iam_policy_attachment" "rds_readonly_policy_attachment" {
 
 }
 
-resource "aws_iam_policy_attachment" "glue_service_role_policy_attachment" {
-  name       = "glue-service-role-policy-attachment"
-  roles      = [aws_iam_role.dms_dv_glue_job_iam_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
-
-}
+# -------------------------------------------------------------
