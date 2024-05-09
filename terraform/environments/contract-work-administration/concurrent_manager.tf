@@ -2,6 +2,34 @@ locals {
   cm_userdata = <<EOF
 #!/bin/bash
 
+### Temp install of AWS CLI - removed once actual AMI is used
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo yum install -y unzip
+unzip awscliv2.zip
+sudo ./aws/install
+##############
+
+hostnamectl set-hostname ${local.cm_hostname}
+
+PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+APP1_IP=""
+DB_IP=""
+
+while [ -z "$APP1_IP" ] || [ -z "$DB_IP" ]
+do
+  sleep 5
+  APP1_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values=${local.appserver1_ec2_name} Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
+  DB_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values=${local.database_ec2_name} Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
+done
+
+sed -i '/^10.202.1.46/d' /etc/hosts
+sed -i '/^10.202.4.93/d' /etc/hosts
+sed -i '/^10.202.4.57/d' /etc/hosts
+echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
+echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
+echo "$PRIVATE_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
+
+
 EOF
 
 }
@@ -25,7 +53,7 @@ resource "aws_instance" "concurrent_manager" {
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
-    { "Name" = "${upper(local.application_name_short)} concurrent_manager Instance" },
+    { "Name" = local.cm_ec2_name },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
