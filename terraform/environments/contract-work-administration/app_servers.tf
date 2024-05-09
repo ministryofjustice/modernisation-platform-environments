@@ -15,7 +15,7 @@ hostnamectl set-hostname ${local.appserver1_hostname}
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 sudo yum install -y unzip
 unzip awscliv2.zip
-sudo ./aws/install
+sudo ./aws/install --update
 ##############
 
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
@@ -36,8 +36,6 @@ sudo sed -i '/^10.202.4.57/d' /etc/hosts
 sudo bash -c 'echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts'
 sudo bash -c 'echo "$PRIVATE_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts'
 sudo bash -c 'echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts'
-
-sudo chattr +i /etc/hosts
 
 EOF
 
