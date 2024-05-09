@@ -63,12 +63,12 @@ module "nextcloud_service" {
 
   create_rds               = true
   rds_engine               = "mariadb"
-  rds_engine_version       = "10.4.30"
+  rds_engine_version       = "10.6"
   rds_instance_class       = "db.t3.small"
   rds_allocated_storage    = 500
   rds_username             = "misnextcloud"
   rds_port                 = 3306
-  rds_parameter_group_name = "default.mariadb10.4"
+  rds_parameter_group_name = "default.mariadb10.6"
   rds_license_model        = "general-public-license"
   snapshot_identifier      = "nextcloud-migration-1251-shared"
 
