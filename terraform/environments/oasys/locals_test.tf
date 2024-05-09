@@ -250,7 +250,7 @@ locals {
       "t2-onr-db-a" = merge(local.database_onr_a, {
         config = merge(local.database_onr_a.config, {
           instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
-            "Ec2PreprodDatabasePolicy",
+            "Ec2T2DatabasePolicy",
           ])
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
