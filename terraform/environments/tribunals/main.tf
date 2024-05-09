@@ -383,26 +383,26 @@ module "charity_tribunal_decisions" {
   sftp_host_port                    = 10022
 }
 
-module "claims_management_decisions" {
-  is_ftp_app                        = true
-  source                            = "./modules/tribunal_ftp"
-  app_name                          = "ftp-claims-management"
-  app_url                           = "claimsmanagement"
-  environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
-  tags                              = local.tags
-  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                         = local.application_data.accounts[local.environment].app_count
-  server_port                       = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
-  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
-  documents_location                = "Documents"
-  sftp_host_port                    = 10022
-}
+# module "claims_management_decisions" {
+#   is_ftp_app                        = true
+#   source                            = "./modules/tribunal_ftp"
+#   app_name                          = "ftp-claims-management"
+#   app_url                           = "claimsmanagement"
+#   environment                       = local.environment
+#   application_data                  = local.application_data.accounts[local.environment]
+#   tags                              = local.tags
+#   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+#   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+#   appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+#   ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+#   ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+#   app_count                         = local.application_data.accounts[local.environment].app_count
+#   server_port                       = local.application_data.accounts[local.environment].server_port_1
+#   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+#   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+#   vpc_shared_id                     = data.aws_vpc.shared.id
+#   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+#   aws_acm_certificate_external      = aws_acm_certificate.external
+#   documents_location                = "Documents"
+#   sftp_host_port                    = 10022
+# }
