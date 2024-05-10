@@ -213,7 +213,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_terminate_cpu_process" {
   arn       = aws_lambda_function.terraform_lambda_terminate_cpu_process[0].arn
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate" {
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process" {
   count         = local.is-development == true ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
@@ -228,7 +228,7 @@ resource "aws_lambda_function" "terraform_lambda_terminate_cpu_process" {
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/terminate_cpu_process/terminate_cpu_process.zip"
   function_name = "terminate_cpu_process"
-  role          = aws_iam_role.lambda_role_alarm_suppression[0].arn
+  role          = aws_iam_role.lambda_role_terminate_cpu_process[0].arn
   handler       = "terminate_cpu_process.lambda_handler"
   runtime       = "python3.12"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process]
