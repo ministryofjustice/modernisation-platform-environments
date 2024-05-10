@@ -83,7 +83,7 @@ resource "aws_instance" "edw_db_instance" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   # security_groups        = TO ADD
   user_data = base64encode(templatefile("edw-ec2-user-data.sh", {
-    edw_app_name = upper(string(local.application_name)) + "2",
+    edw_app_name = local.application_data.accounts[local.environment].edw_AppName,
     edw_dns_extension = local.application_data.accounts[local.environment].edw_dns_extension,
     edw_environment  = local.application_data.accounts[local.environment].edw_environment,
     edw_region = local.application_data.accounts[local.environment].edw_region,
