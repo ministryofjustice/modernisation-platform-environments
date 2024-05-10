@@ -94,12 +94,15 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-v2-AmazonDMSVPCManagemen
 # -------------------------------------------------------------
 
 resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
-  name                = "dms-dv-glue-job-tf"
-  assume_role_policy  = data.aws_iam_policy_document.glue_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
+  name               = "dms-dv-glue-job-tf"
+  assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole",
+    "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
+  ]
   inline_policy {
     name   = "S3Policies"
-    policy = data.aws_iam_policy_document.dms_dv_iam_policy_document.json
+    policy = data.aws_iam_policy_document.dms_dv_s3_iam_policy_document.json
   }
 
   tags = merge(
@@ -108,13 +111,6 @@ resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
       Resource_Type = "Role having Glue-Job execution policies",
     }
   )
-}
-
-resource "aws_iam_policy_attachment" "rds_readonly_policy_attachment" {
-  name       = "rds-readonly-policy-attachment"
-  roles      = [aws_iam_role.dms_dv_glue_job_iam_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
-
 }
 
 # -------------------------------------------------------------

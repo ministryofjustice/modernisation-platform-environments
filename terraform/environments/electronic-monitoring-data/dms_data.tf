@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "dms_dv_parquet_s3_bucket" {
   }
 }
 
-data "aws_iam_policy_document" "dms_dv_iam_policy_document" {
+data "aws_iam_policy_document" "dms_dv_s3_iam_policy_document" {
   statement {
     effect = "Allow"
     actions = [
