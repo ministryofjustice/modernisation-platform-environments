@@ -102,14 +102,14 @@ resource "aws_vpc_security_group_ingress_rule" "cm_self" {
   to_port           = 1676
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "cm_app" {
-#   security_group_id = aws_security_group.concurrent_manager.id
-#   description       = "SSH from the Bastion"
-#   referenced_security_group_id         = aws_security_group.application.id
-#   from_port         = 1676
-#   ip_protocol       = "tcp"
-#   to_port           = 1676
-# }
+resource "aws_vpc_security_group_ingress_rule" "cm_app" {
+  security_group_id = aws_security_group.concurrent_manager.id
+  description       = "Access from the Application Server"
+  referenced_security_group_id         = aws_security_group.application.id
+  from_port         = 1676
+  ip_protocol       = "tcp"
+  to_port           = 1676
+}
 
 ###############################
 # concurrent_manager EBS Volumes
