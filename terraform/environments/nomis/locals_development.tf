@@ -436,6 +436,8 @@ locals {
           http = local.weblogic_lb_listeners.http
 
           https = merge(local.weblogic_lb_listeners.https, {
+            # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
+            # weblogic servers can alter priorities to enable maintenance message
             rules = {
               dev-nomis-web-a-http-7777 = {
                 priority = 100

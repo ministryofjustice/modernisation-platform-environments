@@ -623,6 +623,8 @@ locals {
               # "t3-nomis-web-a-http-7777",
               "t3-nomis-web-b-http-7777",
             ]
+            # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
+            # weblogic servers can alter priorities to enable maintenance message
             rules = {
               t1-nomis-web-a-http-7777 = {
                 priority = 300
