@@ -15,9 +15,9 @@ resource "aws_macie2_classification_job" "test" {
     bucket_definitions {
       account_id = "default_migration_source_account_id"
       buckets    = [
-      "aws-sam-cli-managed-default-samclisourcebucket-1leowh6voenwy",
-      "config-20220407082146408700000002",
-      "macie-test-results-cooker"
+      data.aws_s3_bucket.bucket1.id,
+      data.aws_s3_bucket.bucket2.id,
+      data.aws_s3_bucket.bucket3.id,
       ]
     }
   }
