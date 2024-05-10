@@ -176,6 +176,15 @@ locals {
               "arn:aws:elasticloadbalancing:*:*:listener/app/private-lb/*",
               "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:*",
+            ]
+            resources = [
+              "*"
+            ]
           }
         ]
       }
