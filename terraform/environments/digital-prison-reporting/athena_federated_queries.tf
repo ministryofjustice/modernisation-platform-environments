@@ -1,7 +1,7 @@
 locals {
   spill_bucket_name               = module.s3_working_bucket.bucket_id
   oracle_connector_jar_bucket_key = "third-party/athena-connectors/athena-oracle-2024.18.2.jar"
-  connection_string_nomis         = "oracle://jdbc:oracle:thin:$${external/dpr-nomis-source-secrets-for-athena-federated-query}@10.26.24.136:1521:CNOMT3"
+  connection_string_nomis         = "oracle://jdbc:oracle:thin:$${external/dpr-nomis-source-secrets-for-athena-federated-query}@10.26.24.80:1521:CNOMT3"
 }
 
 resource "aws_iam_policy" "athena_federated_query_connector_policy" {
