@@ -50,6 +50,8 @@ RDS_DB_INSTANCE_USER = "admin"
 RDS_DB_INSTANCE_PWD = args["rds_db_pwd"]
 RDS_DB_INSTANCE_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
 
+RDS_DB_LIST_GIVEN = args["rds_sqlserver_db_list"]
+
 CSV_FILE_SRC_S3_BUCKET_NAME = args["csv_src_bucket_name"]
 
 PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
@@ -179,7 +181,7 @@ if __name__ == "__main__":
 
     CATALOG_TABLE_S3_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
-    rds_sqlserver_db_list = get_rds_database_list(args["rds_sqlserver_db_list"])
+    rds_sqlserver_db_list = get_rds_database_list(RDS_DB_LIST_GIVEN)
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_list)
 
