@@ -19,11 +19,11 @@ from pyspark.sql import DataFrame
 args = getResolvedOptions(sys.argv, ["JOB_NAME",
                                      "rds_db_host_ep",
                                      "rds_db_pwd",
-                                     "rds_db_list",
+                                     "rds_sqlserver_db_list",
                                      "csv_src_bucket_name",
-                                     "parquet_target_bucket_name",
-                                     "target_catalog_db_name",
-                                     "target_catalog_tbl_name"
+                                     "parquet_output_bucket_name",
+                                     "glue_catalog_db_name",
+                                     "glue_catalog_tbl_name"
                                      ])
 # ------------------------------
 
@@ -52,10 +52,10 @@ RDS_DB_INSTANCE_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
 
 CSV_FILE_SRC_S3_BUCKET_NAME = args["csv_src_bucket_name"]
 
-PARQUET_TARGET_S3_BUCKET_NAME = args["parquet_target_bucket_name"]
+PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 
-PARQUET_TARGET_DB_NAME = args["target_catalog_db_name"]
-PARQUET_TARGET_TBL_NAME = args["target_catalog_tbl_name"]
+GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
+GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
 
 LOGGER = getLogger(__name__)
 
@@ -177,23 +177,24 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 if __name__ == "__main__":
 
-    TARGET_TABLE_PATH = f'''s3://{PARQUET_TARGET_S3_BUCKET_NAME}/{PARQUET_TARGET_DB_NAME}/{PARQUET_TARGET_TBL_NAME}'''
+    CATALOG_TABLE_S3_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
-    rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(
-        get_rds_database_list(args["rds_db_list"]))
+    rds_sqlserver_db_list = get_rds_database_list(args["rds_sqlserver_db_list"])
+
+    rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_list)
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime, 
+    cast(null as string) as database_name,
     cast(null as string) as full_table_name, 
     cast(null as string) as json_row,
-    cast(null as string) as err_msg
+    cast(null as string) as validation_msg
     """.strip()
 
     df_dv_output = spark.sql(sql_select_str)
-
+    
     for db_dbo_tbl in rds_sqlserver_db_tbl_list:
-        rds_db_name, rds_tbl_name = db_dbo_tbl.split(
-            '_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
+        rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
         df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
 
@@ -202,14 +203,21 @@ if __name__ == "__main__":
         # print(tbl_csv_s3_path)
         if tbl_csv_s3_path is not None:
 
-            df_csv_temp = get_s3_csv_dataframe(
-                tbl_csv_s3_path, df_rds_temp.schema)
+            df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema)
 
-            if df_rds_temp.count() == df_csv_temp.count():
+            df_rds_temp_count = df_rds_temp.count()
+            df_csv_temp_count = df_csv_temp.count()
+            if df_rds_temp_count == df_csv_temp_count:
 
                 df_rds_csv_subtract_row_count = df_rds_temp.subtract(df_csv_temp).count()
                 if df_rds_csv_subtract_row_count == 0:
-                    LOGGER.info(f"{rds_tbl_name} - Validated.")
+                    df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime", f"""'{rds_db_name}' as database_name""",
+                                                  f"""'{db_dbo_tbl}' as full_table_name""",
+                                                  "'' as json_row",
+                                                  f"""'{rds_tbl_name} - Validated.' as validation_msg""")
+
+                    df_dv_output = df_dv_output.union(df_temp)
+                    # LOGGER.info(f"{rds_tbl_name} - Validated.")
                     # print(f"{rds_tbl_name} - Validated.")
                 else:
                     df_temp = (df_rds_temp.subtract(df_csv_temp)
@@ -217,44 +225,47 @@ if __name__ == "__main__":
                                .selectExpr("json_row")
                                .limit(1000))
 
-                    df_temp = df_temp.selectExpr("current_timestamp as run_datetime", f"""'{db_dbo_tbl}' as full_table_name""", "json_row",
-                                                 f""""'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as err_msg""")
+                    df_temp = df_temp.selectExpr("current_timestamp as run_datetime", f"""'{rds_db_name}' as database_name""",
+                                                 f"""'{db_dbo_tbl}' as full_table_name""", "json_row",
+                                                 f""""'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as validation_msg""")
 
                     df_dv_output = df_dv_output.union(df_temp)
 
                     # print(f"{rds_tbl_name} - subtract op NON-ZERO row count")
             else:
-                df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
+                df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime", f"""'{rds_db_name}' as database_name""",
                                                   f"""'{db_dbo_tbl}' as full_table_name""",
                                                   "'' as json_row",
-                                                  f"""'{rds_tbl_name} - Table row count MISMATCHED !' as err_msg""")
+                                                  f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_csv_temp_count} MISMATCHED !' as validation_msg""")
 
                 df_dv_output = df_dv_output.union(df_temp)
 
                 # print(f"{rds_tbl_name} - Table row count MISMATCHED.")
 
         else:
-            df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
+            df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime", f"""'{rds_db_name}' as database_name""",
                                               f"""'{db_dbo_tbl}' as full_table_name""",
                                               "'' as json_row",
-                                              f"""'No S3-csv folder path exists for the given {rds_db_name} - {rds_tbl_name}' as err_msg""")
+                                              f"""'No S3-csv folder path exists for the given {rds_db_name} - {rds_tbl_name}' as validation_msg""")
 
             df_dv_output = df_dv_output.union(df_temp)
 
             # print(f"No S3-csv folder path found for given {rds_db_name} - {rds_tbl_name}")
 
-        if check_s3_path_if_exists(PARQUET_TARGET_S3_BUCKET_NAME, f'''{PARQUET_TARGET_DB_NAME}/{PARQUET_TARGET_TBL_NAME}/full_table_name={db_dbo_tbl}'''):
-            glueContext.purge_s3_path(
-                f"""{TARGET_TABLE_PATH}/full_table_name={db_dbo_tbl}""", options={"retentionPeriod": 0})
-
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
 
+    for db in rds_sqlserver_db_list:
+        if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, 
+                                   f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={db}'''
+                                   ):
+             glueContext.purge_s3_path(f"""{CATALOG_TABLE_S3_PATH}/database_name={db}""", options={"retentionPeriod": 0})
+    
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
-                                                     'path': f"""{TARGET_TABLE_PATH}/""",
-                                                     "partitionKeys": ["full_table_name"]},
+                                                     'path': f"""{CATALOG_TABLE_S3_PATH}/""",
+                                                     "partitionKeys": ["database_name"]},
                                                  format_options={
                                                      'useGlueParquetWriter': True,
                                                      # 'compression': 'snappy', 'blockSize': 134217728, 'pageSize': 1048576
