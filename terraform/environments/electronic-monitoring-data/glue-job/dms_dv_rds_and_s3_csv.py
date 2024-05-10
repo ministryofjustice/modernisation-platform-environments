@@ -186,11 +186,11 @@ if __name__ == "__main__":
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_list)
 
     sql_select_str = f"""
-    select cast(null as timestamp) as run_datetime, 
-    cast(null as string) as database_name,
+    select cast(null as timestamp) as run_datetime,
     cast(null as string) as full_table_name, 
     cast(null as string) as json_row,
-    cast(null as string) as validation_msg
+    cast(null as string) as validation_msg,
+    cast(null as string) as database_name
     """.strip()
 
     df_dv_output = spark.sql(sql_select_str)
@@ -213,10 +213,12 @@ if __name__ == "__main__":
 
                 df_rds_csv_subtract_row_count = df_rds_temp.subtract(df_csv_temp).count()
                 if df_rds_csv_subtract_row_count == 0:
-                    df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime", f"""'{rds_db_name}' as database_name""",
-                                                  f"""'{db_dbo_tbl}' as full_table_name""",
-                                                  "'' as json_row",
-                                                  f"""'{rds_tbl_name} - Validated.' as validation_msg""")
+                    df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
+                                                      f"""'{db_dbo_tbl}' as full_table_name""",
+                                                      "'' as json_row",
+                                                      f"""'{rds_tbl_name} - Validated.' as validation_msg""",
+                                                      f"""'{rds_db_name}' as database_name"""
+                                                      )
 
                     df_dv_output = df_dv_output.union(df_temp)
                     # LOGGER.info(f"{rds_tbl_name} - Validated.")
@@ -227,28 +229,35 @@ if __name__ == "__main__":
                                .selectExpr("json_row")
                                .limit(1000))
 
-                    df_temp = df_temp.selectExpr("current_timestamp as run_datetime", f"""'{rds_db_name}' as database_name""",
-                                                 f"""'{db_dbo_tbl}' as full_table_name""", "json_row",
-                                                 f""""'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as validation_msg""")
+                    df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
+                                                 f"""'{db_dbo_tbl}' as full_table_name""", 
+                                                 "json_row",
+                                                 f""" "'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as validation_msg""",
+                                                 f"""'{rds_db_name}' as database_name"""
+                                                 )
 
                     df_dv_output = df_dv_output.union(df_temp)
 
                     # print(f"{rds_tbl_name} - subtract op NON-ZERO row count")
             else:
-                df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime", f"""'{rds_db_name}' as database_name""",
+                df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                   f"""'{db_dbo_tbl}' as full_table_name""",
                                                   "'' as json_row",
-                                                  f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_csv_temp_count} MISMATCHED !' as validation_msg""")
+                                                  f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_csv_temp_count} MISMATCHED !' as validation_msg""",
+                                                  f"""'{rds_db_name}' as database_name"""
+                                                  )
 
                 df_dv_output = df_dv_output.union(df_temp)
 
                 # print(f"{rds_tbl_name} - Table row count MISMATCHED.")
 
         else:
-            df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime", f"""'{rds_db_name}' as database_name""",
+            df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                               f"""'{db_dbo_tbl}' as full_table_name""",
                                               "'' as json_row",
-                                              f"""'No S3-csv folder path exists for the given {rds_db_name} - {rds_tbl_name}' as validation_msg""")
+                                              f"""'No S3-csv folder path exists for the given {rds_db_name} - {rds_tbl_name}' as validation_msg""",
+                                              f"""'{rds_db_name}' as database_name"""
+                                              )
 
             df_dv_output = df_dv_output.union(df_temp)
 

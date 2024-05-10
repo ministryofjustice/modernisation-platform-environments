@@ -15,7 +15,7 @@ resource "aws_iam_role" "dms_endpoint_role" {
 }
 
 # Define S3 IAM policy for DMS S3 Endpoint
-resource "aws_iam_policy" "dms_s3_ep_role_policy" {
+resource "aws_iam_policy" "dms_ep_s3_role_policy" {
   name = "dms-s3-target-ep-policy"
 
   policy = <<EOF
@@ -47,17 +47,17 @@ EOF
 }
 
 # Attach predefined IAM Policy to the Role for DMS S3 Endpoint
-resource "aws_iam_role_policy_attachment" "dms-endpoint-role" {
+resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_policy_attachment" {
   role       = aws_iam_role.dms_endpoint_role.name
-  policy_arn = aws_iam_policy.dms_s3_ep_role_policy.arn
+  policy_arn = aws_iam_policy.dms_ep_s3_role_policy.arn
 }
 
 # -------------------------------------------------------------
 
 resource "aws_iam_role" "dms_cloudwatch_logs_role" {
-  name               = "dms-cloudwatch-logs-role-tf"
-  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
-
+  name                = "dms-cloudwatch-logs-role"
+  assume_role_policy  = data.aws_iam_policy_document.dms_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"]
   tags = merge(
     local.tags,
     {
@@ -66,29 +66,19 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   )
 }
 
-resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole" {
-  role       = aws_iam_role.dms_cloudwatch_logs_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
-}
-
 # -------------------------------------------------------------
 
 # Error: creating DMS Replication Subnet Group (rds-replication-subnet-group-tf): AccessDeniedFault: The IAM Role arn:aws:iam::############:role/dms-vpc-role is not configured properly.
-resource "aws_iam_role" "dms_vpc_role_v2" {
-  name               = "dms-vpc-role"
-  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
-
+resource "aws_iam_role" "dms_vpc_role" {
+  name                = "dms-vpc-role"
+  assume_role_policy  = data.aws_iam_policy_document.dms_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
   tags = merge(
     local.tags,
     {
       Resource_Type = "Role having DMS access policies",
     }
   )
-}
-
-resource "aws_iam_role_policy_attachment" "dms-vpc-role-v2-AmazonDMSVPCManagementRole" {
-  role       = aws_iam_role.dms_vpc_role_v2.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
 # -------------------------------------------------------------
