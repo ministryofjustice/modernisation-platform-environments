@@ -168,7 +168,6 @@ resource "aws_secretsmanager_secret" "biprws" {
       Name          = "external/busobj-converter/biprws"
       Resource_Type = "Secrets"
       Source        = "NART"
-      Domain        = each.value
       Jira          = "DPR2-527"
     }
   )
