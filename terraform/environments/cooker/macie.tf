@@ -21,4 +21,5 @@ resource "aws_macie2_classification_job" "test" {
       ]
     }
   }
+  depends_on = [ aws_macie2_account.macieaccess ]
 }
