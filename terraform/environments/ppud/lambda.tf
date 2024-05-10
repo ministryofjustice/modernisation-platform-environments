@@ -203,14 +203,14 @@ resource "aws_cloudwatch_event_rule" "terminate_cpu_process" {
   count               = local.is-development == true ? 1 : 0
   name                = "terminate_cpu_process"
   description         = "Runs Weekly every Saturday at 00:00 am"
-  schedule_expression = "cron(0 23 ? * FRI *)" # Time Zone is in UTC
+  schedule_expression = "cron(0 14 ? * FRI *)" # Time Zone is in UTC
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_terminate_cpu_process" {
   count     = local.is-development == true ? 1 : 0
   rule      = aws_cloudwatch_event_rule.terminate_cpu_process[0].name
   target_id = "terminate_cpu_process"
-  arn       = aws_lambda_function.terraform_lambda_terminate_cpu_process[0].arn
+  arn       = aws_lambda_function.terraform_lambda_func_terminate_cpu_process[0].arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process" {
@@ -224,7 +224,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
 
 # Lambda functions to terminate cpu process
 
-resource "aws_lambda_function" "terraform_lambda_terminate_cpu_process" {
+resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process" {
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/terminate_cpu_process/terminate_cpu_process.zip"
   function_name = "terminate_cpu_process"
