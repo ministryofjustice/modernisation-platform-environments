@@ -25,7 +25,7 @@ resource "aws_dms_endpoint" "dms_rds_source" {
 # ==========================================================================
 
 # Create DMS Endpoint to S3 Target
-resource "aws_dms_s3_endpoint" "dms-s3-parquet-target" {
+resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
 
   # Minimal Config:
   endpoint_id             = "s3-${replace(var.database_name, "_", "-")}-tf"
