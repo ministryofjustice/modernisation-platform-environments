@@ -26,11 +26,6 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
       },
       {
         "Action" : [
-          "dynamodb:DescribeTable",
-          "dynamodb:ListSchemas",
-          "dynamodb:ListTables",
-          "dynamodb:Query",
-          "dynamodb:Scan",
           "glue:GetTableVersions",
           "glue:GetPartitions",
           "glue:GetTables",
@@ -38,8 +33,20 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
           "glue:GetDatabases",
           "glue:GetTable",
           "glue:GetPartition",
-          "glue:GetDatabase",
-          "athena:GetQueryExecution",
+          "glue:GetDatabase"
+        ],
+        "Resource" : "arn:aws:glue:${local.account_region}:${local.account_id}:*",
+        "Effect" : "Allow"
+      },
+      {
+        "Action" : [
+          "athena:GetQueryExecution"
+        ],
+        "Resource" : "arn:aws:athena:${local.account_region}:${local.account_id}:*",
+        "Effect" : "Allow"
+      },
+      {
+        "Action" : [
           "s3:ListAllMyBuckets"
         ],
         "Resource" : "*",
