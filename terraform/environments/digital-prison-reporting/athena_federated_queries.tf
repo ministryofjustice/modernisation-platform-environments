@@ -15,6 +15,28 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
     "Statement" : [
       {
         "Action" : [
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:CreateNetworkInterface",
+          "ec2:DeleteNetworkInterface",
+          "ec2:DescribeInstances",
+          "ec2:AttachNetworkInterface"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "*"
+        ]
+      },
+      {
+        "Action" : [
+          "cloudwatch:PutMetricData"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "*"
+        ]
+      },
+      {
+        "Action" : [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
@@ -127,6 +149,7 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
   }
 }
 
+# TODO: Use lambdas module
 resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
   function_name                  = "AthenaFederatedQueryOracleLambda"
   role                           = aws_iam_role.athena_federated_query_lambda_execution_role.arn
