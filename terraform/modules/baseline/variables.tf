@@ -242,6 +242,7 @@ variable "ec2_autoscaling_groups" {
         special = optional(bool)
       }))
       value = optional(string)
+      tags = optional(map(string), {})
     })))
     lb_target_groups = optional(map(object({
       port                 = optional(number)
