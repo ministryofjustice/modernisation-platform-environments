@@ -195,7 +195,7 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [data.aws_cloudformation_export.env.ManagementCIDR]
+    cidr_blocks = [local.application_data.accounts[local.environment].edw_management_cidr]
     description = "SSH access"
   }
 
@@ -203,7 +203,7 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.env.cidr_block]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
     description = "SSH access"
   }
 
@@ -211,7 +211,7 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [data.aws_cloudformation_export.env.BastionSSHCIDR]
+    cidr_blocks = [local.application_data.account[local.environment].edw_bastion_ssh_cidr]
     description = "SSH access"
   }
 
@@ -219,7 +219,7 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.env.cidr_block]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
     description = "RDS env access"
   }
 
@@ -227,7 +227,7 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [data.aws_cloudformation_export.env.ManagementCIDR]
+    cidr_blocks = [local.application_data.account[local.environment].edw_management_cidr]
     description = "RDS Workspace access"
   }
 
