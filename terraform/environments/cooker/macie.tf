@@ -13,7 +13,7 @@ resource "aws_macie2_classification_job" "test" {
   name     = "JOBNAME"
   s3_job_definition {
     bucket_definitions {
-      account_id = "default_migration_source_account_id"
+      account_id = "data.aws_ssm_parameter.modernisation_platform_account_id.value"
       buckets    = [
       data.aws_s3_bucket.bucket1.id,
       data.aws_s3_bucket.bucket2.id,
