@@ -18,6 +18,11 @@ locals {
     }
   }
 
+  # config for load balancer maintenance rule
+  production_lb_maintenance_message = {
+    maintenance_title   = "Prison-NOMIS Maintenance Window"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again after 22:00"
+  }
 
   # baseline config
   production_config = {
@@ -92,7 +97,7 @@ locals {
       }
       Ec2ProdWeblogicPolicy = {
         description = "Permissions required for prod Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -107,7 +112,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*DR/weblogic-*",
             ]
           }
-        ]
+        ])
       }
     }
 
@@ -401,47 +406,69 @@ locals {
         listeners = {
           http = local.weblogic_lb_listeners.http
 
-          https = merge(
-            local.weblogic_lb_listeners.https, {
-              alarm_target_group_names = [
-                "prod-nomis-web-a-http-7777",
-                # "prod-nomis-web-b-http-7777",
-              ]
-              rules = {
-                prod-nomis-web-a-http-7777 = {
-                  priority = 200
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "prod-nomis-web-a-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
-                        "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
-                        "c.production.nomis.az.justice.gov.uk",
-                        "c.nomis.service.justice.gov.uk",
-                        "c.nomis.az.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
-                prod-nomis-web-b-http-7777 = {
-                  priority = 400
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "prod-nomis-web-b-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
-                        "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
+          https = merge(local.weblogic_lb_listeners.https, {
+            alarm_target_group_names = [
+              "prod-nomis-web-a-http-7777",
+              # "prod-nomis-web-b-http-7777",
+            ]
+            # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
+            # weblogic servers can alter priorities to enable maintenance message
+            rules = {
+              prod-nomis-web-a-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "prod-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
+                      "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                      "c.production.nomis.az.justice.gov.uk",
+                      "c.nomis.service.justice.gov.uk",
+                      "c.nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
               }
+              prod-nomis-web-b-http-7777 = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "prod-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
+                      "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.production_lb_maintenance_message)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.production.service.justice.gov.uk",
+                      "c.nomis.service.justice.gov.uk",
+                      "c.nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
           })
         }
       }
@@ -501,6 +528,7 @@ locals {
           { name = "pnomisapiro-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
