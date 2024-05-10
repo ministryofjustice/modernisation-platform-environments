@@ -112,7 +112,7 @@ resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
     }
   )
   lifecycle {
-    create_before_destroy = true
+    create_before_destroy = false
   }
 }
 
