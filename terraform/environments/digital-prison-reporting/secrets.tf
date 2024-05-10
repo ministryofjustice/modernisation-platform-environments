@@ -151,6 +151,8 @@ resource "aws_secretsmanager_secret_version" "biprws" {
   lifecycle {
     ignore_changes = [secret_string, ]
   }
+
+  depends_on = [aws_secretsmanager_secret.biprws]  
 }
 
 # DPS Source Secrets
