@@ -128,14 +128,20 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
 }
 
 resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
-  function_name = "AthenaFederatedQueryOracleLambda"
-  role          = aws_iam_role.athena_federated_query_lambda_execution_role.arn
-  handler       = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"
-  runtime       = "java11"
-  memory_size   = 3008
-  timeout       = 900
-  s3_bucket     = module.s3_artifacts_store.bucket_id
-  s3_key        = local.oracle_connector_jar_bucket_key
+  function_name                  = "AthenaFederatedQueryOracleLambda"
+  role                           = aws_iam_role.athena_federated_query_lambda_execution_role.arn
+  handler                        = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"
+  runtime                        = "java11"
+  memory_size                    = 3008
+  timeout                        = 900
+  reserved_concurrent_executions = 20
+  s3_bucket                      = module.s3_artifacts_store.bucket_id
+  s3_key                         = local.oracle_connector_jar_bucket_key
+
+  # TODO code_signing_config_arn
+  # TODO kms_key_arn
+  # TODO dead_letter_config
+  # TODO tracing_config
 
   vpc_config {
     security_group_ids = [
