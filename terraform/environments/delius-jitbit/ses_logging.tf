@@ -1,19 +1,6 @@
 #####################
 # SES Logging
 #####################
-
-resource "aws_sesv2_configuration_set" "jitbit_ses_configuration_set" {
-  configuration_set_name = format("%s-configuration-set", local.application_name)
-
-  suppression_options {
-    suppressed_reasons = [
-      "COMPLAINT"
-    ]
-  }
-
-  tags = local.tags
-}
-
 resource "aws_sns_topic" "jitbit_ses_destination_topic" {
   name = format("%s-ses-destination-topic", local.application_name)
 
@@ -41,16 +28,16 @@ resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_desti
 
 data "archive_file" "lambda_function_payload" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda"
-  output_path = "${path.module}/lambda/sns_to_cloudwatch.zip"
+  source_dir  = "${path.module}/lambda/sns_to_cloudwatch"
+  output_path = "${path.module}/lambda/sns_to_cloudwatch/sns_to_cloudwatch.zip"
   excludes    = ["sns_to_cloudwatch.zip"]
 }
 
 resource "aws_lambda_function" "sns_to_cloudwatch" {
-  filename         = "${path.module}/lambda/sns_to_cloudwatch.zip"
+  filename         = "${path.module}/lambda/sns_to_cloudwatch/sns_to_cloudwatch.zip"
   function_name    = "sns_to_cloudwatch"
   architectures    = ["arm64"]
-  role             = aws_iam_role.lambda.arn
+  role             = aws_iam_role.lambda_logging.arn
   runtime          = "python3.12"
   handler          = "sns_to_cloudwatch.handler"
   source_code_hash = data.archive_file.lambda_function_payload.output_base64sha256
@@ -61,12 +48,16 @@ resource "aws_lambda_function" "sns_to_cloudwatch" {
     }
   }
 
+  lifecycle {
+    replace_triggered_by = [aws_iam_role.lambda_logging]
+  }
+
   tags = local.tags
 }
 
 resource "aws_cloudwatch_log_group" "sns_logs" {
   name              = format("%s-ses-logs", local.application_name)
-  retention_in_days = local.application_data.accounts[local.environment].ses_log_retention_days
+  retention_in_days = local.application_data.accounts[local.environment].lambda_log_retention_days
 
   tags = local.tags
 }
@@ -78,7 +69,7 @@ resource "aws_cloudwatch_log_group" "execution_logs" {
   tags = local.tags
 }
 
-resource "aws_iam_role" "lambda" {
+resource "aws_iam_role" "lambda_logging" {
   name               = "sns_to_cloudwatch-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 
@@ -95,13 +86,13 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
   }
 }
 
-resource "aws_iam_role_policy" "lambda" {
-  name   = "lambda"
-  role   = aws_iam_role.lambda.id
-  policy = data.aws_iam_policy_document.lambda_policy.json
+resource "aws_iam_role_policy" "lambda_logging" {
+  name   = "lambda-logging"
+  role   = aws_iam_role.lambda_logging.id
+  policy = data.aws_iam_policy_document.lambda_logging__policy.json
 }
 
-data "aws_iam_policy_document" "lambda_policy" {
+data "aws_iam_policy_document" "lambda_logging__policy" {
   statement {
     actions = [
       "logs:CreateLogGroup",
