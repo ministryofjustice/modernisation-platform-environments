@@ -312,6 +312,7 @@ locals {
   }
 
   # biprws Secrets Placeholder
+  enable_biprws_secrets = local.application_data.accounts[local.environment].biprws.enable
   biprws_secrets_placeholder = {
     busobj-converter = "placeholder"
     endpoint         = local.application_data.accounts[local.environment].biprws.endpoint

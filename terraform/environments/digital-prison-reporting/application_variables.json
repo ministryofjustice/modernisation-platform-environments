@@ -177,6 +177,7 @@
         }
       },
       "biprws": {
+        "enable": true,
         "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
         "endpoint_type": "domain_name"
       },
@@ -359,6 +360,7 @@
         }
       },
       "biprws": {
+        "enable": true,
         "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
         "endpoint_type": "domain_name"
       },      
@@ -543,6 +545,7 @@
         }
       },
       "biprws": {
+        "enable": true,
         "endpoint": "https://reporting.preprod.nomis.az.justice.gov.uk",
         "endpoint_type": "load_balancer"
       },      
@@ -725,6 +728,7 @@
         }
       },
       "biprws": {
+        "enable": false,
         "endpoint": "placeholder",
         "endpoint_type": "load_balancer"
       },
