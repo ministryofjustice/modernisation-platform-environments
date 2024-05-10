@@ -1,7 +1,9 @@
 locals {
+  # TODO Parameterise NOMIS IP
+  nomis_ip                        = "10.26.24.80"
   spill_bucket_name               = module.s3_working_bucket.bucket_id
   oracle_connector_jar_bucket_key = "third-party/athena-connectors/athena-oracle-2024.18.2.jar"
-  connection_string_nomis         = "oracle://jdbc:oracle:thin:$${external/dpr-nomis-source-secrets-for-athena-federated-query}@10.26.24.80:1521:CNOMT3"
+  connection_string_nomis         = "oracle://jdbc:oracle:thin:$${external/dpr-nomis-source-secrets-for-athena-federated-query}@${local.nomis_ip}:1521:CNOMT3"
 }
 
 resource "aws_iam_policy" "athena_federated_query_connector_policy" {
@@ -84,8 +86,8 @@ resource "aws_iam_role" "athena_federated_query_lambda_execution_role" {
     "Statement" : [
       {
         "Effect" : "Allow",
-        "Principal": {
-          "Service": "lambda.amazonaws.com"
+        "Principal" : {
+          "Service" : "lambda.amazonaws.com"
         },
         "Action" : [
           "sts:AssumeRole"
@@ -114,7 +116,7 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${local.nomis_ip}/32"]
   }
 }
 
