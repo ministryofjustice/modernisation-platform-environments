@@ -89,6 +89,10 @@ locals {
       maintenance_message = {
         description             = "OASys maintenance message. Use \\n for new lines"
         recovery_window_in_days = 0
+        tags = {
+          instance-access-policy = "full"
+          instance-management-policy = "full"
+        }
       }
     }
     lb_target_groups = {
