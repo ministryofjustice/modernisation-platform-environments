@@ -183,7 +183,7 @@ locals {
               "elasticloadbalancing:*",
             ]
             resources = [
-              "*"
+              "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/private-lb/*",
             ]
           }
         ]
