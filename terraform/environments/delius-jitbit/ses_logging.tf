@@ -76,15 +76,15 @@
 #   tags = local.tags
 # }
 
-# data "aws_iam_policy_document" "lambda_assume_role_policy" {
-#   statement {
-#     actions = ["sts:AssumeRole"]
-#     principals {
-#       type        = "Service"
-#       identifiers = ["lambda.amazonaws.com"]
-#     }
-#   }
-# }
+data "aws_iam_policy_document" "lambda_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
 
 # resource "aws_iam_role_policy" "lambda_logging" {
 #   name   = "lambda-logging"
