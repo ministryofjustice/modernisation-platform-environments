@@ -21,6 +21,11 @@ locals {
     }
   }
 
+  # config for load balancer maintenance rule
+  test_lb_maintenance_message = {
+    maintenance_title   = "Prison-NOMIS Maintenance Window"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+  }
 
   # baseline config
   test_config = {
@@ -152,7 +157,7 @@ locals {
       }
       Ec2T1WeblogicPolicy = {
         description = "Permissions required for T1 Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -164,28 +169,12 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
             ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "elasticloadbalancing:Describe*",
-            ]
-            resources = ["*"]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "elasticloadbalancing:SetRulePriorities",
-            ]
-            resources = [
-              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
-            ]
           }
-        ]
+        ])
       }
       Ec2T2WeblogicPolicy = {
         description = "Permissions required for T2 Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -198,11 +187,11 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-*",
             ]
           }
-        ]
+        ])
       }
       Ec2T3WeblogicPolicy = {
         description = "Permissions required for T3 Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -215,7 +204,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-*",
             ]
           }
-        ]
+        ])
       }
     }
 
@@ -740,7 +729,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = file("templates/maintenance.html")
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.test_lb_maintenance_message)
                     status_code  = "200"
                   }
                 }]
@@ -748,7 +737,9 @@ locals {
                   host_header = {
                     values = [
                       "maintenance.test.nomis.service.justice.gov.uk",
-                      "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "c-t2.test.nomis.service.justice.gov.uk",
+                      "c-t3.test.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
