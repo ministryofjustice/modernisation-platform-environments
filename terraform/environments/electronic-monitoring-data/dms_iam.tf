@@ -111,6 +111,9 @@ resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
       Resource_Type = "Role having Glue-Job execution policies",
     }
   )
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # -------------------------------------------------------------
