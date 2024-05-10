@@ -66,11 +66,3 @@ provider "aws" {
   }
 }
 
-# Providor for macie access
-provider "aws" {
-    region = "eu-west-2"
-    alias  = "macie_access" # delegated admin
-    assume_role {
-      role_arn = "arn:aws:iam::${local.modernisation_platform_account_id}:role/macie_access"
-    }
-  }
