@@ -84,11 +84,8 @@ resource "aws_iam_role" "athena_federated_query_lambda_execution_role" {
     "Statement" : [
       {
         "Effect" : "Allow",
-        "Principal" :
-        {
-          "Service" : [
-            "lambda.amazonaws.com"
-          ]
+        "Principal": {
+          "Service": "lambda.amazonaws.com"
         },
         "Action" : [
           "sts:AssumeRole"
