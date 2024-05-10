@@ -207,16 +207,18 @@ if __name__ == "__main__":
 
             if df_rds_temp.count() == df_csv_temp.count():
 
-                if df_rds_temp.subtract(df_csv_temp).count() == 0:
+                df_rds_csv_subtract_row_count = df_rds_temp.subtract(df_csv_temp).count()
+                if df_rds_csv_subtract_row_count == 0:
                     LOGGER.info(f"{rds_tbl_name} - Validated.")
                     # print(f"{rds_tbl_name} - Validated.")
                 else:
                     df_temp = (df_rds_temp.subtract(df_csv_temp)
                                .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
-                               .selectExpr("json_row"))
+                               .selectExpr("json_row")
+                               .limit(1000))
 
                     df_temp = df_temp.selectExpr("current_timestamp as run_datetime", f"""'{db_dbo_tbl}' as full_table_name""", "json_row",
-                                                 f""""'{rds_tbl_name}' - dataframe-subtract-op ->> NON-ZERO row-count !" as err_msg""")
+                                                 f""""'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as err_msg""")
 
                     df_dv_output = df_dv_output.union(df_temp)
 

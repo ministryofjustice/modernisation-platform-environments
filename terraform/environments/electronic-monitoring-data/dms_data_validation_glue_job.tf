@@ -47,3 +47,55 @@ resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
 
 # -------------------------------------------------------------------
 
+resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
+  name = "dms_data_validation"
+  # create_table_default_permission {
+  #   permissions = ["SELECT"]
+
+  #   principal {
+  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+  #   }
+  # }
+}
+
+# -------------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
+  name              = "dms-dv-glue-job"
+  retention_in_days = 14
+}
+
+# -------------------------------------------------------------------
+
+resource "aws_glue_job" "dms_dv_glue_job" {
+  name         = "dms-dv-glue-job"
+  role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  glue_version = "4.0"
+  default_arguments = {
+    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
+    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+    "--rds_db_list"                      = ""
+    "--csv_src_bucket_name"              = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--parquet_target_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+    "--target_catalog_db_name"           = "dms_data_validation"
+    "--target_catalog_tbl_name"          = "glue_df_output"
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.dms_dv_cw_log_group.name
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = ""
+  }
+
+  connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
+  command {
+    python_version  = "3"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv.py"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
+}
