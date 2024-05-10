@@ -20,7 +20,7 @@ locals {
       essential = true,
       portMappings = [
         {
-          hostPort = "${local.sftp_host_port}",
+          hostPort = 0,
           containerPort = 22,
           protocol = "tcp"
         },
