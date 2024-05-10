@@ -147,6 +147,14 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
     protocol    = "TCP"
     cidr_blocks = ["${local.nomis_ip}/32"]
   }
+
+  egress {
+    description = "Allow connections to Secrets Manager"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 # TODO: Use lambdas module
