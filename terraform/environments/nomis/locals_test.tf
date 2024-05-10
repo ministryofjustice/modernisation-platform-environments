@@ -169,21 +169,16 @@ locals {
             effect = "Allow"
             actions = [
               "elasticloadbalancing:Describe*",
-              "elasticloadbalancing:SetRulePriorities",
             ]
-            resources = [
-              "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/private-lb/*",
-              "arn:aws:elasticloadbalancing:*:*:listener/app/private-lb/*",
-              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
-            ]
+            resources = ["*"]
           },
           {
             effect = "Allow"
             actions = [
-              "elasticloadbalancing:*",
+              "elasticloadbalancing:SetRulePriorities",
             ]
             resources = [
-              "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
             ]
           }
         ]
