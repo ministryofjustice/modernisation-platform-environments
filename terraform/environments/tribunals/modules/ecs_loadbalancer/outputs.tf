@@ -32,8 +32,3 @@ output "tribunals_lb_sc_id_sftp" {
   description = "Network LB Security Group Id for sftp"
   value       = length(aws_security_group.tribunals_lb_sc_sftp) > 0 ? aws_security_group.tribunals_lb_sc_sftp[0].id : ""
 }
-
-output "sftp_host_port" {
-  description = "Port for SFTP"
-  value       = var.sftp_host_port
-}

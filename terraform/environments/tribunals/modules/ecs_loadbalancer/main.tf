@@ -43,9 +43,9 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   }
 
   ingress {
-    description = "allow all traffic on custom port"
-    from_port   = var.sftp_host_port
-    to_port     = var.sftp_host_port
+    description = "allow all traffic on port 10022"
+    from_port   = 10022
+    to_port     = 10022
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -141,7 +141,7 @@ resource "aws_lb_listener" "tribunals_lb" {
 resource "aws_lb_listener" "tribunals_lb_ftp" {
   count             = var.is_ftp_app ? 1 : 0
   load_balancer_arn = aws_lb.tribunals_lb_ftp[0].arn
-  port              = var.sftp_host_port
+  port              = 10022
   protocol          = var.application_data.lb_listener_protocol_3
 
   default_action {

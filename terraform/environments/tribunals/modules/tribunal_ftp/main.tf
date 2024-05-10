@@ -2,7 +2,6 @@ locals {
   app                = var.app_name
   app_url            = var.app_url
   documents_location = var.documents_location
-  sftp_host_port     = var.sftp_host_port
 
   app_container_definition = jsonencode([
     {
@@ -88,5 +87,4 @@ module "ecs_loadbalancer" {
   subnets_shared_public_ids    = var.subnets_shared_public_ids
   aws_acm_certificate_external = var.aws_acm_certificate_external
   is_ftp_app                   = var.is_ftp_app
-  sftp_host_port               = var.sftp_host_port
 }

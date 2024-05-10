@@ -380,7 +380,6 @@ module "charity_tribunal_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "documents"
-  sftp_host_port                    = 10022
 }
 
 module "claims_management_decisions" {
@@ -404,5 +403,4 @@ module "claims_management_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  sftp_host_port                    = 10022
 }

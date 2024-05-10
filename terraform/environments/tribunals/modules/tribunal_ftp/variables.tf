@@ -60,8 +60,3 @@ variable "tags" {
 variable "is_ftp_app" {
   description = "Determines if it is an ftp app or not"
 }
-
-variable "sftp_host_port"{
-  type = number
-  description = "the port number to assign for a given sftp application"
-}

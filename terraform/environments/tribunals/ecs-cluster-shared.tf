@@ -166,22 +166,12 @@ resource "aws_security_group" "ecs_service_sftp" {
   }
 
   ingress {
-    from_port   = module.charity_tribunal_decisions.sftp_host_port
-    to_port     = module.charity_tribunal_decisions.sftp_host_port
+    from_port   = 10022
+    to_port     = 10022
     protocol    = "tcp"
-    description = "Allow traffic on custom port from sftp charity tribunal network load balancer"
+    description = "Allow traffic on port 10022 from sftp network load balancers"
     security_groups = [
-      module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp
-    ]
-  }
-
-  ingress {
-    from_port   = module.claims_management_decisions.sftp_host_port
-    to_port     = module.claims_management_decisions.sftp_host_port
-    protocol    = "tcp"
-    description = "Allow traffic on custom port from sftp claims management decisions network load balancer"
-    security_groups = [
-      module.claims_management_decisions.tribunals_lb_sc_id_sftp
+      module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp, module.claims_management_decisions.tribunals_lb_sc_id_sftp
     ]
   }
 
