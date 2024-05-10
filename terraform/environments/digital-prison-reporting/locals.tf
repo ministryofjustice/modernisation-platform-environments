@@ -311,6 +311,13 @@ locals {
     port     = "5432"
   }
 
+  # biprws Secrets Placeholder
+  biprws_secrets_placeholder = {
+    busobj-converter = "placeholder"
+    endpoint         = local.application_data.accounts[local.environment].biprws.endpoint
+    endpoint_type    = local.application_data.accounts[local.environment].biprws.endpoint_type     
+  }
+
   sonatype_secrets_placeholder = {
     user     = "placeholder"
     password = "placeholder"
