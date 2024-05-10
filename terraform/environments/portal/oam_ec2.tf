@@ -234,6 +234,7 @@ resource "aws_instance" "oam_instance_1" {
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.oam_1_userdata)
   user_data_replace_on_change = true
+  key_name                    = aws_key_pair.portal_ssh_ohs.key_name
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
@@ -244,6 +245,20 @@ resource "aws_instance" "oam_instance_1" {
 
 
 }
+
+#############################################
+# TEMP SSH Key to installing Portal
+#############################################
+resource "aws_vpc_security_group_ingress_rule" "oam_ssh" {
+  security_group_id = aws_security_group.oam_instance.id
+  description       = "SSH for Portal Installation"
+  referenced_security_group_id         = module.bastion_linux.bastion_security_group
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
+
+
 
 resource "aws_instance" "oam_instance_2" {
   count                  = contains(["development", "testing"], local.environment) ? 0 : 1
