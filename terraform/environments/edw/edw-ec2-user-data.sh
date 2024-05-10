@@ -60,17 +60,3 @@
           echo $host2 >>/etc/hosts
           echo $host3 >>/etc/hosts
           mkdir -p /home/oracle/scripts
-
-          trap '/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource DBInstance --region ${edw_region}' ERR
-          #Disable firewall
-          service iptables stop
-          chkconfig iptables off
-
-          #run cfn-init
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource DBInstance --region ${edw_region} --configsets full_install
-
-          #configure cfn-init error trap handler
-
-          # TODO: Uncomment this!
-          #/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource DBInstance --region ${edw_region}
-          /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource DBInstance --region ${edw_region}
