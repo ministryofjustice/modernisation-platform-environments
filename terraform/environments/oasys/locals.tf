@@ -272,6 +272,8 @@ locals {
   database_onr_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name          = "base_rhel_7_9_2024-01-01T00-00-06.493Z"
+      # Uses base ami as Nomis DB ami not available in oasys env. 
+      # Requires ssm_agent_ansible_no_tags set in user_data to execute all ansible amibuild and ec2provision steps
       availability_zone = "${local.region}a"
       instance_profile_policies = flatten([
         module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
