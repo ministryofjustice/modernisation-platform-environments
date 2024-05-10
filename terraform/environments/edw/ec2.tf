@@ -83,7 +83,7 @@ resource "aws_instance" "edw_db_instance" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   # security_groups        = TO ADD
   user_data = base64encode(templatefile("edw-ec2-user-data.sh", {
-    edw_app_name = "upper(${local.application_name})2",
+    edw_app_name = upper(local.application_name) + "2",
     edw_dns_extension = local.application_data.accounts[local.environment].edw_dns_extension,
     edw_environment  = local.application_data.accounts[local.environment].edw_environment,
     edw_region = local.application_data.accounts[local.environment].edw_region,
@@ -124,8 +124,7 @@ resource "aws_ebs_volume" "orahomeVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OrahomeVolumeSize
   encrypted         = true
-  volume_type       = "gp3"
-  deletion_policy   = "Delete"
+  type              = "gp3"
 
   tags = {
     Name = "${local.application_data.accounts[local.environment].application_name}-orahome"
@@ -136,8 +135,7 @@ resource "aws_ebs_volume" "oratempVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OratempVolumeSize
   encrypted         = true
-  volume_type       = "gp3"
-  deletion_policy   = "Delete"
+  type              = "gp3"
 
   tags = {
     Name = "${local.application_data.accounts[local.environment].application_name} oraredo"
@@ -148,8 +146,7 @@ resource "aws_ebs_volume" "oradataVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OradataVolumeSize
   encrypted         = true
-  volume_type       = "gp3"
-  deletion_policy   = "Delete"
+  type              = "gp3"
 
   tags = {
     Name = "${local.application_data.accounts[local.environment].application_name}-oradata"
@@ -160,8 +157,7 @@ resource "aws_ebs_volume" "softwareVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_SoftwareVolumeSize
   encrypted         = true
-  volume_type       = "gp3"
-  deletion_policy   = "Delete"
+  type              = "gp3"
 
   tags = {
     Name = "${local.application_data.accounts[local.environment].application_name}-software"
@@ -172,8 +168,7 @@ resource "aws_ebs_volume" "ArchiveVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_ArchiveVolumeSize
   encrypted         = true
-  volume_type       = "gp3"
-  deletion_policy   = "Delete"
+  type              = "gp3"
 
   tags = {
     Name = "${local.application_data.accounts[local.environment].application_name}-oraarch"
