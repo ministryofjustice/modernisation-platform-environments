@@ -461,7 +461,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "maintenance.production.service.justice.gov.uk",
+                      "maintenance.production.nomis.service.justice.gov.uk",
                       "c.nomis.service.justice.gov.uk",
                       "c.nomis.az.justice.gov.uk",
                     ]
