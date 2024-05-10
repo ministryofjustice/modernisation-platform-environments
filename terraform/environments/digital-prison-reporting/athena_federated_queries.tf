@@ -97,7 +97,7 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
           "secretsmanager:GetSecretValue"
         ],
         "Resource" : [
-          "arn:aws:secretsmanager:${local.account_region}:${local.account_id}:secret:external/dpr-nomis-source-secrets-for-athena-federated-query*"
+          "arn:aws:secretsmanager:${local.account_region}:${local.account_id}:secret:*"
         ],
         "Effect" : "Allow"
       }
