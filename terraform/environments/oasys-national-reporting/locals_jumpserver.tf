@@ -11,7 +11,7 @@ locals {
       user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
     })
     ebs_volumes = {
-      "/dev/sda1" = { type = "gp3", size = 100 }
+      "/dev/sda1" = { type = "gp3", size = 200 }
     }
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type          = "t3.large"
