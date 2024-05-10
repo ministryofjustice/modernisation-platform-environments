@@ -207,29 +207,16 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   description = "Cluster EC2 ingress rule"
-  #   from_port   = 0
-  #   to_port     = 0
-  #   protocol    = "-1"
-  #   security_groups = [module.transport.tribunals_lb_sc_id, module.appeals.tribunals_lb_sc_id,
-  #     module.ahmlr.tribunals_lb_sc_id, module.care_standards.tribunals_lb_sc_id,
-  #     module.cicap.tribunals_lb_sc_id, module.employment_appeals.tribunals_lb_sc_id,
-  #     module.finance_and_tax.tribunals_lb_sc_id, module.immigration_services.tribunals_lb_sc_id,
-  #     module.information_tribunal.tribunals_lb_sc_id, module.lands_tribunal.tribunals_lb_sc_id,
-  #     module.charity_tribunal_decisions.tribunals_lb_sc_id, module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp,
-  #     module.claims_management_decisions.tribunals_lb_sc_id, module.claims_management_decisions.tribunals_lb_sc_id_sftp,
-  #   ]
-  # }
-
-  # Temporary ingress rule just for appeals and the sftp sites (when all apps are deployed,
-  # uncomment the ingress rule above and delete this one)
   ingress {
     description = "Cluster EC2 ingress rule"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    security_groups = [module.appeals.tribunals_lb_sc_id,
+    security_groups = [module.transport.tribunals_lb_sc_id, module.appeals.tribunals_lb_sc_id,
+      module.ahmlr.tribunals_lb_sc_id, module.care_standards.tribunals_lb_sc_id,
+      module.cicap.tribunals_lb_sc_id, module.employment_appeals.tribunals_lb_sc_id,
+      module.finance_and_tax.tribunals_lb_sc_id, module.immigration_services.tribunals_lb_sc_id,
+      module.information_tribunal.tribunals_lb_sc_id, module.lands_tribunal.tribunals_lb_sc_id,
       module.charity_tribunal_decisions.tribunals_lb_sc_id, module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp,
       module.claims_management_decisions.tribunals_lb_sc_id, module.claims_management_decisions.tribunals_lb_sc_id_sftp,
     ]
