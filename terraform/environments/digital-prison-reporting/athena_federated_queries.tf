@@ -149,7 +149,7 @@ resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
 }
 
 resource "aws_athena_data_catalog" "nomis_catalog" {
-  name        = "nomis-catalog"
+  name        = "nomis"
   description = "NOMIS Athena data catalog"
   type        = "LAMBDA"
 
