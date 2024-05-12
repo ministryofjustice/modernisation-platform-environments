@@ -141,3 +141,38 @@ module "sonatype_registry_secrets" {
     }
   )
 }
+
+# BO biprws Secrets
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "biprws" {
+  count    = local.enable_biprws_secrets ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.biprws[0].id
+  secret_string = jsonencode(local.biprws_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+
+  depends_on = [aws_secretsmanager_secret.biprws]  
+}
+
+# DPS Source Secrets
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret" "biprws" {
+  count    = local.enable_biprws_secrets ? 1 : 0
+
+  name     = "external/busobj-converter/biprws"
+
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/busobj-converter/biprws"
+      Resource_Type = "Secrets"
+      Source        = "NART"
+      Jira          = "DPR2-527"
+    }
+  )
+}

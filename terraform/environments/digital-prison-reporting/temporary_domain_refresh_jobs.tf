@@ -46,6 +46,7 @@ module "glue_temp_refresh_job_establishment_establishment" {
 
   arguments = {
     "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-${local.artifact_version}.jar"
+    "--extra-files"                  = local.shared_log4j_properties_path
     "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"             = "delta"
     "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
@@ -102,6 +103,7 @@ module "glue_temp_refresh_job_establishment_living_unit" {
 
   arguments = {
     "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-${local.artifact_version}.jar"
+    "--extra-files"                  = local.shared_log4j_properties_path
     "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"             = "delta"
     "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
@@ -159,6 +161,7 @@ module "glue_temp_refresh_job_movements_movements" {
 
   arguments = {
     "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-${local.artifact_version}.jar"
+    "--extra-files"                  = local.shared_log4j_properties_path
     "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"             = "delta"
     "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
@@ -215,6 +218,7 @@ module "glue_temp_refresh_job_prisoner_prisoner" {
 
   arguments = {
     "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-${local.artifact_version}.jar"
+    "--extra-files"                  = local.shared_log4j_properties_path
     "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"             = "delta"
     "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"

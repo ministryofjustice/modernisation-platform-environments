@@ -13,6 +13,7 @@ resource "aws_security_group" "transfer_server" {
   vpc_id      = module.vpc.vpc_id
 }
 
+#tfsec:ignore:avd-aws-0104 - The security group is attached to the resource
 module "definition_upload_lambda_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 

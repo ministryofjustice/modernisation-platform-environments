@@ -21,16 +21,6 @@ resource "aws_vpc_security_group_egress_rule" "icmp" {
   to_port           = -1
 }
 
-resource "aws_vpc_security_group_egress_rule" "http" {
-  for_each = toset(["80", "443"])
-
-  security_group_id = aws_security_group.legacy.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "tcp"
-  from_port         = each.key
-  to_port           = each.key
-}
-
 resource "aws_vpc_security_group_egress_rule" "oracle_db" {
   for_each = toset(["1521"])
 

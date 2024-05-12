@@ -18,7 +18,7 @@ module "bws_instance" {
   ami_owner = "self"
   instance = merge(
     var.bws_config.instance_config,
-    { vpc_security_group_ids = [aws_security_group.legacy.id, aws_security_group.bws.id] }
+    { vpc_security_group_ids = [aws_security_group.legacy.id, aws_security_group.bws.id, aws_security_group.mis_ec2_shared.id] }
   )
   ebs_kms_key_id                = var.account_config.kms_keys["ebs_shared"]
   ebs_volumes_copy_all_from_ami = false

@@ -90,3 +90,14 @@ resource "aws_ssm_parameter" "jitbit_ses_smtp_user" {
   })
 }
 
+resource "aws_sesv2_configuration_set" "jitbit_ses_configuration_set" {
+  configuration_set_name = format("%s-configuration-set", local.application_name)
+
+  suppression_options {
+    suppressed_reasons = [
+      "COMPLAINT"
+    ]
+  }
+
+  tags = local.tags
+}

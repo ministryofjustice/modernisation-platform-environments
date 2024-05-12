@@ -21,6 +21,11 @@ locals {
     }
   }
 
+  # config for load balancer maintenance rule
+  test_lb_maintenance_message = {
+    maintenance_title   = "Prison-NOMIS Maintenance Window"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+  }
 
   # baseline config
   test_config = {
@@ -152,7 +157,7 @@ locals {
       }
       Ec2T1WeblogicPolicy = {
         description = "Permissions required for T1 Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -165,11 +170,11 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
             ]
           }
-        ]
+        ])
       }
       Ec2T2WeblogicPolicy = {
         description = "Permissions required for T2 Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -182,11 +187,11 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-*",
             ]
           }
-        ]
+        ])
       }
       Ec2T3WeblogicPolicy = {
         description = "Permissions required for T3 Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -199,7 +204,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-*",
             ]
           }
-        ]
+        ])
       }
     }
 
@@ -618,6 +623,8 @@ locals {
               # "t3-nomis-web-a-http-7777",
               "t3-nomis-web-b-http-7777",
             ]
+            # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
+            # weblogic servers can alter priorities to enable maintenance message
             rules = {
               t1-nomis-web-a-http-7777 = {
                 priority = 300
@@ -718,6 +725,27 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.test_lb_maintenance_message)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "c-t2.test.nomis.service.justice.gov.uk",
+                      "c-t3.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
@@ -785,6 +813,7 @@ locals {
           { name = "t3nomis-b", type = "CNAME", ttl = "300", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "private" },
           # T1
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "t1-nomis-web-b", type = "A", lbs_map_key = "private" },

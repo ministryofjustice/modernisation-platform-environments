@@ -107,6 +107,7 @@ locals {
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
+      test-onr-client-a = local.jumpserver_ec2
     }
     baseline_route53_zones = {
       "test.reporting.oasys.service.justice.gov.uk" = {}
