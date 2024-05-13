@@ -102,6 +102,15 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
           "arn:aws:secretsmanager:${local.account_region}:${local.account_id}:secret:*"
         ],
         "Effect" : "Allow"
+      },
+      {
+        "Action" : [
+          "kms:GenerateDataKey"
+        ],
+        "Resource" : [
+          "arn:aws:kms:*:${local.account_id}:key/*"
+        ],
+        "Effect" : "Allow"
       }
     ]
   })
