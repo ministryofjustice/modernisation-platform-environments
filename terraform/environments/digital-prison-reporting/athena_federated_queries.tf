@@ -1,6 +1,6 @@
 locals {
   # TODO Parameterise NOMIS IP
-  nomis_ip                        = "10.26.24.80"
+  nomis_ip                        = "10.26.24.29"
   spill_bucket_name               = module.s3_working_bucket.bucket_id
   oracle_connector_jar_bucket_key = "third-party/athena-connectors/athena-oracle-2024.18.2.jar"
   connection_string_nomis         = "oracle://jdbc:oracle:thin:$${external/dpr-nomis-source-secrets-for-athena-federated-query}@${local.nomis_ip}:1521:CNOMT3"
