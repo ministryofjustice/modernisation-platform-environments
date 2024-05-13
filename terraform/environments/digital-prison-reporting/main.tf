@@ -958,7 +958,7 @@ module "ec2_kinesis_agent" {
   ebs_size                    = 20
   ebs_encrypted               = true
   ebs_delete_on_termination   = false
-  scale_down                  = (local.env != "dev") # Do not scale down in dev to give (relatively) stable IP
+  scale_down                  = (local.environment != "dev") # Do not scale down in dev to give (relatively) stable IP
   # s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn # TBC
   region  = local.account_region
   account = local.account_id

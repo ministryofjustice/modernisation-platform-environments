@@ -14,6 +14,19 @@ resource "aws_secretsmanager_secret" "nomis" {
   )
 }
 
+# Nomis Source Secrets in format required by Athena Federated Query
+resource "aws_secretsmanager_secret" "nomis_athena_federated" {
+  name = "external/${local.project}-nomis-secrets-athena-federated-query"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-nomis-source-secrets-athena-federated-query"
+      Resource_Type = "Secrets"
+    }
+  )
+}
+
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "nomis" {
   secret_id     = aws_secretsmanager_secret.nomis.id

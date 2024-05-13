@@ -1,9 +1,11 @@
 locals {
   # TODO Parameterise NOMIS IP
-  nomis_ip                        = "10.26.24.29"
+  #  Dev or Test for now
+  nomis_ip                        = (local.environment == "dev") ? "10.26.24.29" : "10.26.12.239"
   spill_bucket_name               = module.s3_working_bucket.bucket_id
   oracle_connector_jar_bucket_key = "third-party/athena-connectors/athena-oracle-2024.18.2.jar"
-  connection_string_nomis         = "oracle://jdbc:oracle:thin:$${external/dpr-nomis-source-secrets-for-athena-federated-query}@${local.nomis_ip}:1521:CNOMT3"
+  nomis_credentials_secret_path   = aws_secretsmanager_secret.nomis_athena_federated.name
+  connection_string_nomis         = "oracle://jdbc:oracle:thin:$${${local.nomis_credentials_secret_path}}@${local.nomis_ip}:1521:CNOMT3"
 }
 
 resource "aws_iam_policy" "athena_federated_query_connector_policy" {
@@ -149,6 +151,7 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
   }
 
   egress {
+    # TODO: Tighten up security groups
     description = "Allow connections to Secrets Manager"
     from_port   = 443
     to_port     = 443
