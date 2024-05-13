@@ -102,8 +102,3 @@ module "eks" {
     }
   }
 }
-
-import {
-  to = module.eks.module.kms.aws_kms_alias.this["eks/analytical-platform-compute-test"]
-  id = "alias/eks/${local.eks_cluster_name}"
-}
