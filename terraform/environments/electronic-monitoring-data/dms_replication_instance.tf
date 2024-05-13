@@ -52,8 +52,4 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
     aws_iam_role.dms_endpoint_role
   ]
 
-  lifecycle {
-    create_before_destroy = false
-  }
-
 }

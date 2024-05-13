@@ -1,0 +1,171 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: LAA WAFv2 infrastructure-as-code
+
+Parameters:
+  pEnvironment:
+    Description: Environment of the resources being built
+    Type: String
+    Default: ''
+  pAppName:
+    Description: Application Name in upper case
+    Type: String
+    Default: ''
+  pIsProd:
+    Description: For tagging, if we are in production or not
+    Type: String
+    Default: ''
+  pIPWhiteListArn:
+    Description: The ARN of the IP White list created via Terraform
+    Type: String
+    Default: ''
+
+Conditions:
+  cIsProduction: !Equals [ !Ref pEnvironment, "production" ]
+  cAllowpublicAppAccess: !Equals [ !Ref pEnvironment, "production" ]
+
+Resources:
+  WAFv2WebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub '${pAppName}_WebAcl'
+      Scope: REGIONAL
+      DefaultAction:
+        !If [ cAllowpublicAppAccess, Allow: {}, Block: {} ]
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true 
+        MetricName: !Sub '${pAppName}WebRequests'
+      Rules:
+        - Name: !Sub '${pAppName}_Whitelist_MOJ'
+          Priority: 4
+          Action:
+            Allow: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${pAppName}WhitelistMoJMetric'
+          Statement:
+            IPSetReferenceStatement:
+              Arn: !Sub ${pIPWhiteListArn}
+        - Name: AWSManagedRulesCommonRuleSet
+          Priority: 0
+          OverrideAction:
+            !If [ cIsProduction, Count: {}, None: {} ]
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesCommonRuleMetric
+          Statement: 
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+              ExcludedRules:
+                - Name: GenericRFI_QUERYARGUMENTS
+                - Name: CrossSiteScripting_BODY
+                - Name: CrossSiteScripting_COOKIE
+                - Name: SizeRestrictions_BODY
+                - Name: GenericRFI_BODY
+                - Name: CrossSiteScripting_QUERYARGUMENTS
+                - Name: NoUserAgent_HEADER
+        - Name: AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 1 
+          OverrideAction:
+            !If [ cIsProduction, Count: {}, None: {} ]
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesKnownBadInputsRuleMetric
+          Statement: 
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+              ExcludedRules: []
+        - Name: AWSManagedRulesAmazonIpReputationList
+          Priority: 2
+          OverrideAction:
+            !If [ cIsProduction, Count: {}, None: {} ]
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesAmazonIpReputationListMetric
+          Statement: 
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAmazonIpReputationList
+              ExcludedRules: []
+        - Name: BlockIfContainsPath
+          Priority: 3
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: JSPBlockWAFRule
+          Statement:
+            AndStatement:
+              Statements:
+                - ByteMatchStatement:
+                    SearchString: "/OA_HTML/cabo/jsps/a.jsp"
+                    FieldToMatch:
+                      UriPath: {}
+                    TextTransformations:
+                      - Priority: 0
+                        Type: "NONE"
+                    PositionalConstraint: "CONTAINS"
+                - NotStatement:
+                    Statement:
+                      OrStatement:
+                        Statements:
+                          - ByteMatchStatement:
+                              SearchString: "redirect=/OA_HTML/OA.jsp"
+                              FieldToMatch:
+                                QueryString: {}
+                              TextTransformations:
+                                - Priority: 0
+                                  Type: "NONE"
+                              PositionalConstraint: "CONTAINS"
+                          - AndStatement:
+                              Statements:
+                                - ByteMatchStatement:
+                                    SearchString: "2FOA_HTML"
+                                    FieldToMatch:
+                                      QueryString: {}
+                                    TextTransformations:
+                                      - Priority: 0
+                                        Type: "NONE"
+                                    PositionalConstraint: "CONTAINS"
+                                - ByteMatchStatement:
+                                    SearchString: "2FOA.jsp"
+                                    FieldToMatch:
+                                      QueryString: {}
+                                    TextTransformations:
+                                      - Priority: 0
+                                        Type: "NONE"
+                                    PositionalConstraint: "CONTAINS"
+                - ByteMatchStatement:
+                    SearchString: "redirect"
+                    FieldToMatch:
+                      QueryString: {}
+                    TextTransformations:
+                      - Priority: 0
+                        Type: "NONE"
+                    PositionalConstraint: "CONTAINS"
+      Tags:
+        - Key: application
+          Value: !Sub '${pAppName}'
+        - Key: environment-name
+          Value: !Sub '${pEnvironment}'
+        - Key: source-code
+          Value: "https://github.com/ministryofjustice/modernisation-platform-environments"
+        - Key: business-unit
+          Value: "LAA"
+        - Key: is-production
+          Value: !Sub '${pIsProd}'
+        - Key: owner
+          Value: "laa_ops@digital.justice.gov.uk"
+
+Outputs:
+  WAFv2ARN:
+    Description: The ARN of the WAFv2 Web ACL
+    Value: !GetAtt WAFv2WebACL.Arn
+        

@@ -297,12 +297,12 @@ resource "aws_instance" "idm_instance_1" {
 # TEMP SSH Key to installing Portal
 #############################################
 resource "aws_vpc_security_group_ingress_rule" "idm_ssh" {
-  security_group_id = aws_security_group.idm_instance.id
-  description       = "SSH for Portal Installation"
-  referenced_security_group_id         = module.bastion_linux.bastion_security_group
-  from_port         = 22
-  ip_protocol       = "tcp"
-  to_port           = 22
+  security_group_id            = aws_security_group.idm_instance.id
+  description                  = "SSH for Portal Installation"
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
 }
 
 resource "aws_instance" "idm_instance_2" {

@@ -208,7 +208,9 @@ module "transfer_lambda" {
         "s3:GetObject",
         "s3:PutObject",
         "s3:DeleteObject",
-        "s3:PutObjectTagging"
+        "s3:PutObjectTagging",
+        "s3:GetObjectAcl",
+        "s3:PutObjectAcl"
       ]
       resources = formatlist("arn:aws:s3:::%s/*", local.environment_configuration.target_buckets)
     },

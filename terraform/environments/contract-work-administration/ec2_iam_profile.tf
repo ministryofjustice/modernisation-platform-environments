@@ -23,7 +23,7 @@ resource "aws_iam_role" "cwa" {
       Name = "${local.application_name}-ec2-instance-role"
     }
   )
-  path = "/"
+  path               = "/"
   assume_role_policy = <<EOF
 {
     "Version": "2012-10-17",

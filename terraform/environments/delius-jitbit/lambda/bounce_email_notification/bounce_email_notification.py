@@ -33,6 +33,10 @@ def handler(event, context):
 
     bounced_recipients = bounce.get("bouncedRecipients")
 
+    feedback_id = bounce.get("feedbackId")
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     bounced_recipients_message = ""
     for bounced_recipient in bounced_recipients:
         bounced_recipients_message += f"""  <p>
@@ -94,10 +98,10 @@ def handler(event, context):
                                               <br>
                                               <p>Ticket ID: <strong>{jitbit_ticket_id}</strong>
                                               </p>
-                                              <p>Feedback ID: <strong>010b018f3d5323b8-1afeb777-87b9-4433-8104-f2f265151de6-000000</strong>
+                                              <p>Feedback ID: <strong>{feedback_id}</strong>
                                                 <br>
                                               </p>
-                                              <p>Timestamp: <strong>2024-05-03T07:20:10.035Z</strong>
+                                              <p>Timestamp: <strong>{timestamp}</strong>
                                                 <br>
                                               </p>
                                         </tr>

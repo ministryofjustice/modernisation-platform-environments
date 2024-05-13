@@ -145,7 +145,7 @@ module "sonatype_registry_secrets" {
 # BO biprws Secrets
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "biprws" {
-  count    = local.enable_biprws_secrets ? 1 : 0
+  count = local.enable_biprws_secrets ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.biprws[0].id
   secret_string = jsonencode(local.biprws_secrets_placeholder)
@@ -154,15 +154,15 @@ resource "aws_secretsmanager_secret_version" "biprws" {
     ignore_changes = [secret_string, ]
   }
 
-  depends_on = [aws_secretsmanager_secret.biprws]  
+  depends_on = [aws_secretsmanager_secret.biprws]
 }
 
 # DPS Source Secrets
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "biprws" {
-  count    = local.enable_biprws_secrets ? 1 : 0
+  count = local.enable_biprws_secrets ? 1 : 0
 
-  name     = "external/busobj-converter/biprws"
+  name = "external/busobj-converter/biprws"
 
   recovery_window_in_days = 0
 

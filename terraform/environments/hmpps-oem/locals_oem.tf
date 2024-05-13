@@ -20,7 +20,7 @@ locals {
     concat(
       contains(local.oem_managed_applications, key) ? ["arn:aws:iam::${value}:role/EC2OracleEnterpriseManagementSecretsRole"] : [],
       ((contains(["development", "test"], local.environment) && contains(["delius-core-${local.environment}"], key)) ||
-       (contains(["development"], local.environment) && contains(["delius-mis-${local.environment}"], key))) ? ["arn:aws:iam::${value}:role/modernisation-platform-oidc-cicd"] : []
+      (contains(["development"], local.environment) && contains(["delius-mis-${local.environment}"], key))) ? ["arn:aws:iam::${value}:role/modernisation-platform-oidc-cicd"] : []
     )
   ])
 

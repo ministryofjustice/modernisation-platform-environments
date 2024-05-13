@@ -16,6 +16,15 @@ module "baseline" {
     local.baseline_acm_certificates,
     lookup(local.environment_config, "baseline_acm_certificates", {}),
   )
+  backups = {
+    "everything" = {
+      plans = merge(
+        module.baseline_presets.backup_plans,
+        local.baseline_backup_plans,
+        lookup(local.environment_config, "baseline_backup_plans", {})
+      )
+    }
+  }
   route53_zones = merge(
     local.baseline_route53_zones,
     lookup(local.environment_config, "baseline_route53_zones", {}),
