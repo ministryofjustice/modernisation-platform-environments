@@ -248,17 +248,6 @@ resource "aws_security_group" "edw_db_security_group" {
   }
 }
 
-####### The following rule has a condition to only exist in development as the prod rule is created manually
-resource "aws_security_group_rule" "edw_db_security_group_inbound" {
-  count         = [local.application_data.accounts[local.environment].edw_sg_inbound_count]
-  security_group_id = aws_security_group.edw_db_security_group.id
-  type          = "ingress"
-  from_port     = 1521
-  to_port       = 1521
-  protocol      = "tcp"
-  cidr_blocks   = [local.application_data.accounts[local.environment].edw_mp_vpc_cidr]
-}
-
 ####### DB DNS #######
 
 resource "aws_route53_record" "edw_internal_dns_record" {
