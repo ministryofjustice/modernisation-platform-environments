@@ -26,7 +26,7 @@ locals {
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
           ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBCv3JdWZ/2NGd8KKaeICIjqw5zwI2NtzQSWtvscfKZS lalitha.nagarur@digital.justice.gov.uk"
-          cidr_blocks           = ["213.121.161.124/32", "2.99.13.52/32"]
+          cidr_blocks           = ["213.121.161.124/32", "2.99.13.52/32", "78.150.12.143"]
           egress_bucket         = module.bold_egress_bucket.s3_bucket_id
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
