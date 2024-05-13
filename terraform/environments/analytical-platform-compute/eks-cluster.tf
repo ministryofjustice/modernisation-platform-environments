@@ -104,6 +104,6 @@ module "eks" {
 }
 
 import {
-  to = module.eks.module.kms.aws_kms_alias.this["eks/${local.eks_cluster_name}"]
+  to = module.eks.module.kms.aws_kms_alias.this["eks/analytical-platform-compute-development"]
   id = "alias/eks/${local.eks_cluster_name}"
 }
