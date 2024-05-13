@@ -193,7 +193,7 @@ if __name__ == "__main__":
     cast(null as string) as database_name
     """.strip()
 
-    df_dv_output = spark.sql(sql_select_str)
+    df_dv_output = spark.sql(sql_select_str).repartition(len(rds_sqlserver_db_tbl_list))
     
     for db_dbo_tbl in rds_sqlserver_db_tbl_list:
         rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]

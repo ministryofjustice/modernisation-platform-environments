@@ -83,6 +83,8 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--continuous-log-logGroup"          = aws_cloudwatch_log_group.dms_dv_cw_log_group.name
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
+    "--enable-spark-ui"                  = "true"
+    "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
     "--enable-metrics"                   = ""
   }
 
