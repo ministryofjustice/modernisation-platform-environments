@@ -181,10 +181,13 @@ resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
   s3_bucket                      = module.s3_artifacts_store.bucket_id
   s3_key                         = local.oracle_connector_jar_bucket_key
 
+  tracing_config {
+    mode = "Active"
+  }
+
   # TODO code_signing_config_arn
   # TODO kms_key_arn
   # TODO dead_letter_config
-  # TODO tracing_config
 
   vpc_config {
     security_group_ids = [
