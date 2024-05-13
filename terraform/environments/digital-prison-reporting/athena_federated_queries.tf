@@ -73,7 +73,7 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
         "Action" : [
           "s3:ListAllMyBuckets"
         ],
-        "Resource" : "*",
+        "Resource" : "arn:aws:s3:::*",
         "Effect" : "Allow"
       },
       {
@@ -99,7 +99,7 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
           "secretsmanager:GetSecretValue"
         ],
         "Resource" : [
-          "arn:aws:secretsmanager:${local.account_region}:${local.account_id}:secret:*"
+          aws_secretsmanager_secret.nomis_athena_federated.arn
         ],
         "Effect" : "Allow"
       },
@@ -160,7 +160,6 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
   }
 
   egress {
-    # TODO: Tighten up security groups
     description = "Allow connections to Secrets Manager"
     from_port   = 443
     to_port     = 443
@@ -169,7 +168,6 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
   }
 }
 
-# TODO: Use lambdas module
 resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
   function_name                  = "AthenaFederatedQueryOracleLambda"
   role                           = aws_iam_role.athena_federated_query_lambda_execution_role.arn
@@ -184,10 +182,6 @@ resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
   tracing_config {
     mode = "Active"
   }
-
-  # TODO code_signing_config_arn
-  # TODO kms_key_arn
-  # TODO dead_letter_config
 
   vpc_config {
     security_group_ids = [
