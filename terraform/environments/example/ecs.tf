@@ -2,61 +2,61 @@
 #------------------------Comment out file if not required----------------------------------
 ###########################################################################################
 
-module "ecs-cluster" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.0.3"
+# module "ecs-cluster" {
+#   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.0.3"
 
-  ec2_capacity_instance_type     = local.application_data.accounts[local.environment].container_instance_type
-  ec2_capacity_max_size          = local.application_data.accounts[local.environment].ec2_max_size
-  ec2_capacity_min_size          = local.application_data.accounts[local.environment].ec2_min_size
-  ec2_capacity_security_group_id = aws_security_group.cluster_ec2.id
-  ec2_subnet_ids = [
-    data.aws_subnet.private_subnets_a.id,
-    data.aws_subnet.private_subnets_b.id,
-    data.aws_subnet.private_subnets_c.id
-  ]
-  environment = local.environment
-  name        = local.ecs_application_name
-  namespace   = "platforms"
+#   ec2_capacity_instance_type     = local.application_data.accounts[local.environment].container_instance_type
+#   ec2_capacity_max_size          = local.application_data.accounts[local.environment].ec2_max_size
+#   ec2_capacity_min_size          = local.application_data.accounts[local.environment].ec2_min_size
+#   ec2_capacity_security_group_id = aws_security_group.cluster_ec2.id
+#   ec2_subnet_ids = [
+#     data.aws_subnet.private_subnets_a.id,
+#     data.aws_subnet.private_subnets_b.id,
+#     data.aws_subnet.private_subnets_c.id
+#   ]
+#   environment = local.environment
+#   name        = local.ecs_application_name
+#   namespace   = "platforms"
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-module "service" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
+# module "service" {
+#   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
 
-  container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
-  ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
-  name                      = "${local.ecs_application_name}-task_definition_volume"
-  namespace                 = "platforms"
-  vpc_id                    = local.vpc_all
+#   container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
+#   ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
+#   name                      = "${local.ecs_application_name}-task_definition_volume"
+#   namespace                 = "platforms"
+#   vpc_id                    = local.vpc_all
 
-  launch_type  = local.application_data.accounts[local.environment].launch_type
-  network_mode = local.application_data.accounts[local.environment].network_mode
+#   launch_type  = local.application_data.accounts[local.environment].launch_type
+#   network_mode = local.application_data.accounts[local.environment].network_mode
 
-  task_cpu    = local.application_data.accounts[local.environment].container_cpu
-  task_memory = local.application_data.accounts[local.environment].container_memory
+#   task_cpu    = local.application_data.accounts[local.environment].container_cpu
+#   task_memory = local.application_data.accounts[local.environment].container_memory
 
-  task_exec_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-task-execution-role"
+#   task_exec_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-task-execution-role"
 
-  environment = local.environment
-  ecs_load_balancers = [
-    {
-      target_group_arn = aws_lb_target_group.ecs_target_group.arn
-      container_name   = local.ecs_application_name
-      container_port   = 80
-    }
-  ]
+#   environment = local.environment
+#   ecs_load_balancers = [
+#     {
+#       target_group_arn = aws_lb_target_group.ecs_target_group.arn
+#       container_name   = local.ecs_application_name
+#       container_port   = 80
+#     }
+#   ]
 
-  subnet_ids = [
-    data.aws_subnet.private_subnets_a.id,
-    data.aws_subnet.private_subnets_b.id,
-    data.aws_subnet.private_subnets_c.id
-  ]
+#   subnet_ids = [
+#     data.aws_subnet.private_subnets_a.id,
+#     data.aws_subnet.private_subnets_b.id,
+#     data.aws_subnet.private_subnets_c.id
+#   ]
 
-  ignore_changes_task_definition = false
+#   ignore_changes_task_definition = false
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
 locals {
   ecs_application_name = "example-app"
