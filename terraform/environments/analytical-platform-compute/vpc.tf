@@ -27,6 +27,7 @@ module "vpc" {
   flow_log_cloudwatch_log_group_kms_key_id        = module.vpc_flow_logs_kms.key_arn
   flow_log_cloudwatch_log_group_retention_in_days = local.vpc_flow_log_cloudwatch_log_group_retention_in_days
   flow_log_max_aggregation_interval               = local.vpc_flow_log_max_aggregation_interval
+  vpc_flow_log_tags                               = { Name = "${local.application_name}-${local.environment}" }
 
   tags = local.tags
 }
