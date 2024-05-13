@@ -2,6 +2,7 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
+      "lb_access_logs_existing_bucket_name": "",
       "db_ami_id": "ami-035cecbff25e0d91e",
       "db_instance_type": "m4.xlarge",
       "workspaces_local_cidr1": "10.200.2.0/24",
