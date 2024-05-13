@@ -77,6 +77,7 @@ module "g4s" {
     # local.sftp_account_g4s_atv,
     # local.sftp_account_g4s_emsys_mvp,
     # local.sftp_account_g4s_emsys_tpims,
+    local.sftp_account_g4s_x_drive,
   ]
 
   data_store_bucket = aws_s3_bucket.data_store
