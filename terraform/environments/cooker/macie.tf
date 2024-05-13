@@ -13,7 +13,7 @@ resource "aws_macie2_classification_job" "test" {
   name     = "JOBNAME"
   s3_job_definition {
     bucket_definitions {
-      account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
+      account_id = local.environment_management.account_ids[terraform.workspace]
       buckets    = [
       data.aws_s3_bucket.bucket1.id,
       data.aws_s3_bucket.bucket2.id,
