@@ -168,7 +168,7 @@ locals {
         enable_delete_protection         = false
         load_balancer_type               = "application"
         idle_timeout                     = 3600
-        security_groups                  = ["private"]
+        security_groups                  = ["lb"]
         subnets                          = module.environment.subnets["private"].ids
         enable_cross_zone_load_balancing = true
 

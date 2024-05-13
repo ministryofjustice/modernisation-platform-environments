@@ -87,7 +87,7 @@ jobs:
           echo "post_plan_to_pr=${{ inputs.post_plan_to_pr }}"
 
       - name: Checkout Repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633  # v4.1.2
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
 
       - name: Get AWS Account Number
         run: |
@@ -107,7 +107,7 @@ jobs:
           aws-region: "eu-west-2"
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c4843bcd56d36  # v3.0.0
+        uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8  # v3.1.1
         with:
           terraform_version: "${{ inputs.terraform_version }}"
           terraform_wrapper: false
@@ -228,8 +228,17 @@ jobs:
 
             if (approved) {
               core.notice('Pull request approved by a member of @ministryofjustice/modernisation-platform');
-            } else {
-              core.setFailed('Terraform plan evalaution detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform');
+            } 
+            else {
+              core.setFailed('Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance');
+
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                event: 'REQUEST_CHANGES',
+                body: 'Terraform plan evaluation detected changes to resources that require approval from @ministryofjustice/modernsation-platform - please contact #ask-modernisation-platform for assistance'
+              });
             }
 
       - name: Comment if PR Requires Approval
@@ -246,7 +255,7 @@ jobs:
               owner: owner,
               repo: repo,
               issue_number: context.payload.pull_request.number,
-              body: `@${context.actor} Terraform plan evalaution detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform`
+              body: `@${context.actor} Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance`
             });
 
   apply:
@@ -257,7 +266,7 @@ jobs:
     environment: "${{ inputs.application }}-${{ inputs.environment }}"
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633  # v4.1.2
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
 
       - name: Get AWS Account Number
         run: |
@@ -277,7 +286,7 @@ jobs:
           aws-region: "eu-west-2"
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c4843bcd56d36  # v3.0.0
+        uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8  # v3.1.1
         with:
           terraform_version: "${{ inputs.terraform_version }}"
           terraform_wrapper: false

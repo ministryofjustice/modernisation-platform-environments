@@ -3,8 +3,6 @@
     "development": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": true,
-      "scale_down_kinesis_agent": false,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 3,
@@ -178,13 +176,16 @@
           }
         }
       },
+      "biprws": {
+        "enable": true,
+        "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
+        "endpoint_type": "domain_name"
+      },
       "setup_cw_insights": true
     },
     "test": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": false,
-      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 3,
@@ -358,13 +359,16 @@
           }
         }
       },
+      "biprws": {
+        "enable": true,
+        "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
+        "endpoint_type": "domain_name"
+      },      
       "setup_cw_insights": false
     },
     "preproduction": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": false,
-      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 7,
@@ -540,13 +544,16 @@
           }
         }
       },
+      "biprws": {
+        "enable": true,
+        "endpoint": "https://reporting.preprod.nomis.az.justice.gov.uk",
+        "endpoint_type": "load_balancer"
+      },      
       "setup_cw_insights": false
     },
     "production": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": false,
-      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 7,
@@ -719,6 +726,11 @@
             "period": 60
           }
         }
+      },
+      "biprws": {
+        "enable": false,
+        "endpoint": "placeholder",
+        "endpoint_type": "load_balancer"
       },
       "setup_cw_insights": false
     }

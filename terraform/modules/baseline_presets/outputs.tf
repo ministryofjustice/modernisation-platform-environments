@@ -141,6 +141,13 @@ output "s3_lifecycle_rules" {
   value       = local.s3_lifecycle_rules
 }
 
+output "secretsmanager_secrets" {
+  description = "Map of common secretsmanager secrets to create"
+  value = {
+    for key, value in local.secretsmanager_secrets : key => value if contains(local.secretsmanager_secrets_filter, key)
+  }
+}
+
 output "ssm_documents" {
   description = "Map of common ssm documents to create"
   value = {

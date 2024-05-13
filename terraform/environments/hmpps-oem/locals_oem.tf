@@ -8,7 +8,8 @@ locals {
     "nomis-${local.environment}",
     "nomis-combined-reporting-${local.environment}",
     "oasys-${local.environment}",
-    contains(["development", "test"], local.environment) ? ["delius-core-${local.environment}"] : []
+    contains(["development", "test"], local.environment) ? ["delius-core-${local.environment}"] : [],
+    contains(["development"], local.environment) ? ["delius-mis-${local.environment}"] : [],
   ])
 
   # EC2OracleEnterpriseManagementSecretsRole is used to allow access to OEM secrets from EC2 instances
@@ -18,7 +19,8 @@ locals {
     for key, value in module.environment.account_ids :
     concat(
       contains(local.oem_managed_applications, key) ? ["arn:aws:iam::${value}:role/EC2OracleEnterpriseManagementSecretsRole"] : [],
-      contains(["development", "test"], local.environment) && contains(["delius-core-${local.environment}"], key) ? ["arn:aws:iam::${value}:role/modernisation-platform-oidc-cicd"] : []
+      ((contains(["development", "test"], local.environment) && contains(["delius-core-${local.environment}"], key)) ||
+       (contains(["development"], local.environment) && contains(["delius-mis-${local.environment}"], key))) ? ["arn:aws:iam::${value}:role/modernisation-platform-oidc-cicd"] : []
     )
   ])
 

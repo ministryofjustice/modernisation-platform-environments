@@ -59,18 +59,18 @@ module "nextcloud_service" {
   alb_listener_rule_paths            = ["/"]
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
   microservice_lb                    = aws_alb.nextcloud
-  name                               = "nextcloud"
+  name                               = "nextcloud-poc"
 
   create_rds               = true
   rds_engine               = "mariadb"
-  rds_engine_version       = "10.5"
+  rds_engine_version       = "10.6"
   rds_instance_class       = "db.t3.small"
   rds_allocated_storage    = 500
   rds_username             = "misnextcloud"
   rds_port                 = 3306
-  rds_parameter_group_name = "default.mariadb10.5"
+  rds_parameter_group_name = "default.mariadb10.6"
   rds_license_model        = "general-public-license"
-  snapshot_identifier      = "nextcloud-correct"
+  snapshot_identifier      = "rds-090524-shared-key"
 
   rds_allow_major_version_upgrade = false
   rds_apply_immediately           = false
@@ -113,8 +113,8 @@ module "nextcloud_service" {
   tags          = var.tags
 
   providers = {
-    aws          = aws
     aws.core-vpc = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
   }
 
 }

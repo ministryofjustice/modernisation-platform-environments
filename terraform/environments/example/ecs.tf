@@ -2,6 +2,7 @@
 #------------------------Comment out file if not required----------------------------------
 ###########################################################################################
 
+
 # module "ecs-cluster" {
 #   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.0.3"
 
@@ -213,7 +214,5 @@ resource "aws_security_group" "cluster_ec2" {
       security_groups = lookup(egress.value, "security_groups", null)
     }
   }
-  tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags = { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
 }

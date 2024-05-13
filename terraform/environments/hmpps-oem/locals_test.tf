@@ -5,6 +5,8 @@ locals {
   test_cloudwatch_monitoring_options = {
     enable_cloudwatch_monitoring_account = true
     enable_cloudwatch_dashboard          = true
+    monitoring_account_id                = module.environment.account_ids.hmpps-oem-test
+    source_account_ids                   = [module.environment.account_ids.nomis-test, module.environment.account_ids.oasys-test]
   }
 
   # baseline presets config
@@ -15,6 +17,7 @@ locals {
     sns_topics = {
       pagerduty_integrations = {
         dba_pagerduty = "hmpps_shef_dba_non_prod"
+        dso_pagerduty = "nomis_nonprod_alarms"
       }
     }
   }

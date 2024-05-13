@@ -60,6 +60,17 @@ module "quarantine_bucket" {
       }
     }
   }
+
+  lifecycle_rule = [
+    {
+      id      = "delete-infected-objects-after-90-days"
+      enabled = true
+
+      expiration = {
+        days = 90
+      }
+    }
+  ]
 }
 
 module "definitions_bucket" {
@@ -121,6 +132,8 @@ data "aws_iam_policy_document" "bold_egress_bucket_policy" {
   }
 }
 
+#tfsec:ignore:avd-aws-0088 - The bucket policy is attached to the bucket
+#tfsec:ignore:avd-aws-0132 - The bucket policy is attached to the bucket
 module "bold_egress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 

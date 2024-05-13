@@ -3,6 +3,10 @@ locals {
   # /etc/fstab mount setting as per https://docs.aws.amazon.com/efs/latest/ug/nfs-automount-efs.html
   idm_1_userdata = <<EOF
 #!/bin/bash
+
+# Setting up SSM Agent
+sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+
 echo "${aws_efs_file_system.product["idm"].dns_name}:/fmw /IDAM/product/fmw nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
 echo "${aws_efs_file_system.product["idm"].dns_name}:/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
@@ -19,7 +23,12 @@ do
   mount_status=$?
 done
 
-hostnamectl set-hostname ${local.application_name}-ods1-ms.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-ods1-ms
+
+sed -i '/^search/d' /etc/resolv.conf
+echo "search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal" >> /etc/resolv.conf
+
+chattr +i /etc/resolv.conf
 
 # Setting up CloudWatch Agent
 mkdir cloudwatch_agent
@@ -274,6 +283,7 @@ resource "aws_instance" "idm_instance_1" {
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.idm_1_userdata)
   user_data_replace_on_change = true
+  key_name                    = aws_key_pair.portal_ssh_ohs.key_name
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
@@ -281,6 +291,18 @@ resource "aws_instance" "idm_instance_1" {
     { "Name" = "${local.application_name} IDM Instance 1" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
+}
+
+#############################################
+# TEMP SSH Key to installing Portal
+#############################################
+resource "aws_vpc_security_group_ingress_rule" "idm_ssh" {
+  security_group_id = aws_security_group.idm_instance.id
+  description       = "SSH for Portal Installation"
+  referenced_security_group_id         = module.bastion_linux.bastion_security_group
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
 }
 
 resource "aws_instance" "idm_instance_2" {
@@ -291,7 +313,7 @@ resource "aws_instance" "idm_instance_2" {
   vpc_security_group_ids = [aws_security_group.idm_instance.id]
   monitoring             = true
   subnet_id              = data.aws_subnet.private_subnets_b.id
-  iam_instance_profile   = aws_iam_instance_profile.portal.id # TODO to be updated once merging with OHS work
+  iam_instance_profile   = aws_iam_instance_profile.portal.id
   user_data_base64       = base64encode(local.oam_2_userdata)
 
   tags = merge(
@@ -391,7 +413,7 @@ resource "aws_ebs_volume" "idm_mserver" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].idm_mserver_snapshot
+  # snapshot_id       = local.application_data.accounts[local.environment].idm_mserver_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
