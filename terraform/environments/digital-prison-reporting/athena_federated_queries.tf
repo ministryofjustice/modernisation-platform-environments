@@ -20,6 +20,7 @@ module "athena_federated_query_connector_oracle" {
   connection_string_nomis         = local.connection_string_nomis
 }
 
+# Adds an Athena data source / catalog for NOMIS
 resource "aws_athena_data_catalog" "nomis_catalog" {
   name        = "nomis"
   description = "NOMIS Athena data catalog"
