@@ -1,18 +1,8 @@
 locals {
   lb_logs_bucket                        = local.application_data.accounts[local.environment].lb_access_logs_existing_bucket_name
-  account_number                        = local.environment_management.account_ids[terraform.workspace]
   lb_enable_deletion_protection         = false
   external_lb_idle_timeout              = 900
-  custom_header                         = "X-Custom-Header-LAA-CWA"
   force_destroy_lb_logs_bucket          = true
-  lb_target_response_time_threshold     = 10
-  lb_target_response_time_threshold_max = 60
-  lb_unhealthy_hosts_threshold          = 0
-  lb_rejected_connection_threshold      = 10
-  lb_target_5xx_threshold               = 10
-  lb_origin_5xx_threshold               = 10
-  lb_target_4xx_threshold               = 50
-  lb_origin_4xx_threshold               = 10
 }
 
 ####################################
@@ -134,7 +124,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 data "aws_elb_service_account" "default" {}
 
 ####################################
-# External CWA ELB to OHS
+# External CWA ELB
 ####################################
 
 resource "aws_lb" "external" {

@@ -77,6 +77,7 @@ resource "aws_wafv2_web_acl" "cwa" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
 
+        # In the Landing Zone, these rules uses ExcludedRule (which specifies a single rule in a rule group whose action you want to override to Count), however this has been deprecated on Terraform, and AWS documentation advises instead of this option, use RuleActionOverrides. It accepts any valid action setting, including Count.
         rule_action_override {
           action_to_use {
             count {}
@@ -214,7 +215,10 @@ resource "aws_wafv2_web_acl" "cwa" {
       metric_name                = "JSPBlockWAFRule"
       sampled_requests_enabled   = true
     }
-    
+
+    ## Due to a Terraform Bug, the rule required cannot be implemented via Terraform with too many nested blocks - https://github.com/hashicorp/terraform-provider-aws/issues/15580
+    ## Thus a dummy rule is implemented here instead, with the actual rule required stored as json in BlockIfContainsPath.json
+    ## This needs to be updated manually via the AWS Console after the Terraform deployment
     statement {
       byte_match_statement {
           positional_constraint = "CONTAINS"
@@ -229,7 +233,6 @@ resource "aws_wafv2_web_acl" "cwa" {
       }
     }
 
-    ## Due to a Terraform Bug, this rule cannot be implemented via Terraform - https://github.com/hashicorp/terraform-provider-aws/issues/15580
     # statement {
     #   and_statement {
     #     statement {
@@ -322,6 +325,14 @@ resource "aws_wafv2_web_acl_association" "cwa" {
 resource "aws_cloudwatch_log_group" "wafv2" {
   count = local.environment != "production" ? 1 : 0
   name = "aws-waf-logs-${local.application_name_short}"
+  retention_in_days = 7
+  tags = merge(
+    local.tags,
+    {
+      Name = "aws-waf-logs-${local.application_name_short}"
+    },
+  )
+
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "non_prod" {
