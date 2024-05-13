@@ -204,16 +204,14 @@ resource "aws_vpc_security_group_ingress_rule" "app_db_2" {
   to_port           = 9050
 }
 
-
-### TODO Enable rule once ALB has been created
-# resource "aws_vpc_security_group_ingress_rule" "app_alb" {
-#   security_group_id = aws_security_group.app.id
-#   description       = "Access from CWA ALB"
-#   referenced_security_group_id         = aws_security_group.alb.id
-#   from_port         = 8050
-#   ip_protocol       = "tcp"
-#   to_port           = 8050
-# }
+resource "aws_vpc_security_group_ingress_rule" "app_alb" {
+  security_group_id = aws_security_group.app.id
+  description       = "Access from CWA ALB"
+  referenced_security_group_id         = aws_security_group.external_lb.id
+  from_port         = 8050
+  ip_protocol       = "tcp"
+  to_port           = 8050
+}
 
 
 
