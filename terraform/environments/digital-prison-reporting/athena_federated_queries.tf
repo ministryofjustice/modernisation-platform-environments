@@ -8,16 +8,16 @@ module "athena_federated_query_connector_oracle" {
 
   # TODO Parameterise NOMIS IP
   #  Dev or Test for now
-  nomis_ip_address                = local.nomis_ip_address
-  spill_bucket_name               = module.s3_working_bucket.bucket_id
-  connector_jar_bucket_name       = module.s3_artifacts_store.bucket_id
-  oracle_connector_jar_bucket_key = "third-party/athena-connectors/athena-oracle-2024.18.2.jar"
-  nomis_credentials_secret_arn    = aws_secretsmanager_secret.nomis_athena_federated.arn
-  account_id                      = local.account_id
-  region                          = local.account_region
-  vpc_id                          = data.aws_vpc.shared.id
-  subnet_id                       = data.aws_subnet.private_subnets_a.id
-  connection_string_nomis         = local.connection_string_nomis
+  nomis_ip_address             = local.nomis_ip_address
+  spill_bucket_name            = module.s3_working_bucket.bucket_id
+  connector_jar_bucket_name    = module.s3_artifacts_store.bucket_id
+  connector_jar_bucket_key     = "third-party/athena-connectors/athena-oracle-2024.18.2.jar"
+  nomis_credentials_secret_arn = aws_secretsmanager_secret.nomis_athena_federated.arn
+  account_id                   = local.account_id
+  region                       = local.account_region
+  vpc_id                       = data.aws_vpc.shared.id
+  subnet_id                    = data.aws_subnet.private_subnets_a.id
+  connection_string_nomis      = local.connection_string_nomis
 }
 
 # Adds an Athena data source / catalog for NOMIS
