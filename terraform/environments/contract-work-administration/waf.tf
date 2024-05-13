@@ -325,7 +325,7 @@ resource "aws_cloudformation_stack" "wafv2" {
   name = "${local.application_name_short}-wafv2"
   parameters = {
     pEnvironment = local.environment
-    pAppName = local.application_name_short
+    pAppName = upper(local.application_name_short)
     pIsProd = local.environment == "production" ? "true" : "false"
     pIPWhiteListArn = aws_wafv2_ip_set.moj_whitelist.arn
   }
