@@ -19,7 +19,7 @@ module "test" {
 }
 
 module "test-no-suffix-test" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v2.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=multiple-schedules"
   count  = local.is-test == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
@@ -39,7 +39,7 @@ module "test-no-suffix-test" {
 }
 
 module "test-suffix-test" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v2.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=multiple-schedules"
   count  = local.is-test == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
