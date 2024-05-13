@@ -73,7 +73,7 @@ module "production-eu-west-2a" {
   operating_system     = "WINDOWS"
   patch_tag            = "eu-west-2a"
   patch_classification = ["SecurityUpdates", "CriticalUpdates"]
-  suffix               = "1"
+  suffix               = "-1"
   tags = merge(
     local.tags,
     {
