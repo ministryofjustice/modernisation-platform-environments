@@ -40,9 +40,7 @@ module "eks" {
       most_recent = true
     }
     vpc-cni = {
-      most_recent              = true
-      before_compute           = true
-      service_account_role_arn = module.vpc_cni_iam_role.iam_role_arn
+      most_recent = true
     }
     # amazon-cloudwatch-observability = {
     #   most_recent = true
@@ -74,7 +72,6 @@ module "eks" {
       }
     }
 
-    iam_role_attach_cni_policy = false
     iam_role_additional_policies = {
       AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
       CloudWatchAgentServerPolicy  = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
