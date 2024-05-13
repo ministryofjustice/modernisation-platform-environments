@@ -14,8 +14,8 @@ locals {
 
       /* Image Versions */
       scan_image_version     = "0.0.5"
-      transfer_image_version = "0.0.8"
-      notify_image_version   = "0.0.9"
+      transfer_image_version = "0.0.9"
+      notify_image_version   = "0.0.10"
 
       /* Target Buckets */
       target_buckets = ["mojap-land-dev"]
