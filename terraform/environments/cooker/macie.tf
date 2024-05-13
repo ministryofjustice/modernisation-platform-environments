@@ -1,14 +1,14 @@
 
 # Create macie account
 
-resource "aws_macie2_account" "macieaccess" { 
+resource "aws_macie2_account" "cooker" { 
    finding_publishing_frequency = "ONE_HOUR"
    status                       = "ENABLED"
  }
 
 # Now create a job
 
-resource "aws_macie2_classification_job" "test" {
+resource "aws_macie2_classification_job" "cooker" {
   job_type = "ONE_TIME"
   name     = "JOBNAME"
   s3_job_definition {
@@ -21,5 +21,5 @@ resource "aws_macie2_classification_job" "test" {
       ]
     }
   }
-  depends_on = [ aws_macie2_account.macieaccess ]
+  depends_on = [ aws_macie2_account.cooker ]
 }
