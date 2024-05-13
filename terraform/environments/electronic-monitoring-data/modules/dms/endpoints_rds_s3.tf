@@ -25,10 +25,10 @@ resource "aws_dms_endpoint" "dms_rds_source" {
 # ==========================================================================
 
 # Create DMS Endpoint to S3 Target
-resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
+resource "aws_dms_s3_endpoint" "dms_s3_target" {
 
   # Minimal Config:
-  endpoint_id             = "s3-${replace(var.database_name, "_", "-")}-tf"
+  endpoint_id             = "s3-${replace(var.database_name, "_", "-")}-${var.file_target_type}"
   endpoint_type           = "target"
   bucket_name             = var.target_s3_bucket_name
   service_access_role_arn = var.ep_service_access_role_arn
@@ -44,11 +44,11 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   # cdc_min_file_size                           = 32000
   # cdc_path                                    = "cdc/path"
   # compression_type                            = "NONE"
-  csv_delimiter     = ","
-  csv_no_sup_value  = "false"
-  csv_null_value    = "null"
-  csv_row_delimiter = "\\n"
-  data_format       = "csv"
+  csv_delimiter     = var.file_target_type == "csv" ? "," : null
+  csv_no_sup_value  = var.file_target_type == "csv" ? "false" : null
+  csv_null_value    = var.file_target_type == "csv" ? "null" : null
+  csv_row_delimiter = var.file_target_type == "csv" ? "\\n": null
+  data_format       = var.file_target_type
   data_page_size    = 68000000
   # date_partition_delimiter                    = "UNDERSCORE"
   # date_partition_enabled                      = false
@@ -63,9 +63,9 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   # glue_catalog_generation                     = true
   # ignore_header_rows                          = 1
   # include_op_for_full_load                    = true
-  max_file_size = 64000
+  max_file_size = 1024000
   # parquet_timestamp_in_millisecond            = false
-  # parquet_version = "parquet-2-0"
+  parquet_version = var.file_target_type =="parquet" ? "parquet-2-0" : null
   # preserve_transactions                       = false
   # rfc_4180                                    = false
   # row_group_length                            = 11000

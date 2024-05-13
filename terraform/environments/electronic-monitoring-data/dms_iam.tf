@@ -107,3 +107,62 @@ resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
 }
 
 # -------------------------------------------------------------
+# Define IAM role for DMS S3 Endpoint
+resource "aws_iam_role" "dms_endpoint_role_parquet" {
+  name               = "dms-parquet-endpoint-access-role-tf"
+  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Role having DMS-Endpoint access policies",
+    }
+  )
+
+}
+
+# Define S3 IAM policy for DMS S3 Endpoint
+resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_parquet_bucket_policy" {
+  role = aws_iam_role.dms_endpoint_role_parquet.name
+  policy_arn = aws_iam_policy.dms_ep_s3_role_parquet_bucket.arn
+}
+
+resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_parquet_files_policy" {
+  role = aws_iam_role.dms_endpoint_role_parquet.name
+  policy_arn = aws_iam_policy.dms_ep_s3_role_parquet_files.arn
+}
+
+resource "aws_iam_policy" "dms_ep_s3_role_parquet_bucket" {
+  name = "get-dms-parquet-buckets"
+  policy = data.aws_iam_policy_document.dms_ep_s3_role_parquet_bucket.json
+}
+
+resource "aws_iam_policy" "dms_ep_s3_role_parquet_files" {
+  name = "get-dms-parquet-buckets"
+  policy = data.aws_iam_policy_document.dms_ep_s3_role_parquet_files.json
+}
+
+data "aws_iam_policy_document" "dms_ep_s3_role_parquet_bucket" {
+  statement {
+    effect = "Allow"
+    resources = [aws_s3_bucket.dms_target_ep_s3_bucket_parquet.arn]
+    actions = [                
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+      ]
+    sid = "DMSParquetEndpointAccess"
+  }
+}
+
+data "aws_iam_policy_document" "dms_ep_s3_role_parquet_files" {
+  statement {
+    effect = "Allow"
+    resources = ["${aws_s3_bucket.dms_target_ep_s3_bucket_parquet.arn}/*"]
+    actions = [                
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+      ]
+    sid = "DMSParquetGetAccess"
+  }
+}

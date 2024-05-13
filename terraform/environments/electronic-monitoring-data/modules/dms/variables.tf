@@ -62,3 +62,10 @@ variable "dms_replication_instance_arn" {
   description = "Assign the Replication Instance-ARN to be used"
   type        = string
 }
+
+# ---------------------------------------------------------
+
+variable "file_target_type" {
+  description = "Type of the file output"
+  type = string
+}

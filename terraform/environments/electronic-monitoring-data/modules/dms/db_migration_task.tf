@@ -7,7 +7,7 @@ resource "aws_dms_replication_task" "dms_db_migration_task" {
   replication_task_settings = var.rep_task_settings_filepath
   source_endpoint_arn       = aws_dms_endpoint.dms_rds_source.endpoint_arn
   table_mappings            = var.rep_task_table_mapping_filepath
-  target_endpoint_arn       = aws_dms_s3_endpoint.dms_s3_parquet_target.endpoint_arn
+  target_endpoint_arn       = aws_dms_s3_endpoint.dms_s3_target.endpoint_arn
 
   tags = merge(
     var.local_tags,

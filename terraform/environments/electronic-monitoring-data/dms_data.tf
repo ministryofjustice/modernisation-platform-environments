@@ -31,12 +31,26 @@ data "aws_iam_policy_document" "dms_target_ep_s3_bucket" {
   }
 }
 
-# data "aws_iam_policy_document" "dms_policies" {
-#   statement {
-#     effect    = "Allow"
-#     actions   = ["dms:CreateReplicationSubnetGroup"]
-#     resources = ["*"]
-#   }
-# }
 
-# ---------------------------------------------------------
+
+data "aws_iam_policy_document" "dms_target_ep_s3_bucket_parquet" {
+  statement {
+    sid = "EnforceTLSv12orHigher"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.dms_target_ep_s3_bucket_parquet.arn,
+      "${aws_s3_bucket.dms_target_ep_s3_bucket_parquet.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+}
+
