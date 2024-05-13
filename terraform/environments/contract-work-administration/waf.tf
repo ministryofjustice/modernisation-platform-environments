@@ -214,7 +214,20 @@ resource "aws_wafv2_web_acl" "cwa" {
       metric_name                = "JSPBlockWAFRule"
       sampled_requests_enabled   = true
     }
-    statement {}
+    
+    statement {
+      byte_match_statement {
+          positional_constraint = "CONTAINS"
+          search_string = "/OA_HTML/cabo/jsps/a.jsp"
+          text_transformation {
+              priority = 0
+              type = "NONE"
+          }
+          field_to_match {
+              uri_path {}
+          }
+      }
+    }
 
     ## Due to a Terraform Bug, this rule cannot be implemented via Terraform - https://github.com/hashicorp/terraform-provider-aws/issues/15580
     # statement {
