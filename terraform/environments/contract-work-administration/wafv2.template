@@ -157,8 +157,6 @@ Resources:
           Value: !Sub '${pEnvironment}'
         - Key: source-code
           Value: "https://github.com/ministryofjustice/modernisation-platform-environments"
-        - Key: name
-          Value: !Ref WAFv2WebACL
         - Key: business-unit
           Value: "LAA"
         - Key: is-production
