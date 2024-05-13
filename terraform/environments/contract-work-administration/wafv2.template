@@ -3,15 +3,15 @@ Description: LAA WAFv2 infrastructure-as-code
 
 Parameters:
   pEnvironment:
-    Description: Environment (only development, test, staging, uat, production are allowable values)
+    Description: Environment of the resources being built
     Type: String
     Default: ''
   pAppName:
-    Description: Application Name in upper case e.g. 'CCR' or 'CWA'
+    Description: Application Name in upper case
     Type: String
     Default: ''
   pIsProd:
-    Description: For tagging, if we are in production
+    Description: For tagging, if we are in production or not
     Type: String
     Default: ''
   pIPWhiteListArn:
@@ -170,7 +170,4 @@ Outputs:
   WAFv2ARN:
     Description: The ARN of the WAFv2 Web ACL
     Value: !GetAtt WAFv2WebACL.Arn
-  InstanceID:
-    Description: The Instance ID
-    Value: !Ref EC2Instance
         
