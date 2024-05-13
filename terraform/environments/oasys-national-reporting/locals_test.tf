@@ -4,11 +4,11 @@ locals {
   test_config = {
 
     baseline_secretsmanager_secrets = {
-      "/ec2/onr-web/test" = local.web_secretsmanager_secrets
+      "/ec2/onr-web/test"        = local.web_secretsmanager_secrets
+      "/ec2/onr-boe/t2"          = local.boe_secretsmanager_secrets
+      "/oracle/database/T2BOSYS" = local.database_secretsmanager_secrets
+      "/oracle/database/T2BOAUD" = local.database_secretsmanager_secrets
 
-      "/oracle/database/T3ONRAU"  = local.database_secretsmanager_secrets
-      "/oracle/database/T3ONRBDS" = local.database_secretsmanager_secrets
-      "/oracle/database/T3ONRSYS" = local.database_secretsmanager_secrets
     }
 
     baseline_iam_policies = {
@@ -23,6 +23,8 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/test/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
         ]
@@ -72,6 +74,9 @@ locals {
       })
       test-boe-asg = merge(local.defaults_boe_ec2, {
         config = merge(local.defaults_boe_ec2.config, {
+          instance_profile_policies = setunion(local.defaults_boe_ec2.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
           availability_zone = "${local.region}a"
         })
         instance = merge(local.defaults_boe_ec2.instance, {
@@ -86,6 +91,9 @@ locals {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = merge(local.defaults_boe_ec2.tags, {
+          oasys-national-reporting-environment = "t2"
+        })
       })
       test-bods-asg = merge(local.defaults_bods_ec2, {
         config = merge(local.defaults_bods_ec2.config, {
@@ -99,6 +107,10 @@ locals {
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
+      test-onr-client-a = local.jumpserver_ec2
+    }
+    baseline_route53_zones = {
+      "test.reporting.oasys.service.justice.gov.uk" = {}
     }
   }
 }

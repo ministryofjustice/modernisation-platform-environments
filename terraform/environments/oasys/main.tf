@@ -125,6 +125,7 @@ module "baseline" {
     lookup(local.environment_config, "baseline_s3_buckets", {})
   )
   secretsmanager_secrets = merge(
+    module.baseline_presets.secretsmanager_secrets,
     local.baseline_secretsmanager_secrets,
     lookup(local.environment_config, "baseline_secretsmanager_secrets", {})
   )
@@ -151,6 +152,8 @@ module "cross_account_cloudwatch" {
     local.cloudwatch_monitoring_options,
     local.cloudwatch_local_environment_monitoring_options,
   )
+  monitoring_account_id = lookup(local.cloudwatch_local_environment_monitoring_options, "monitoring_account_id", "")
+  source_account_ids    = lookup(local.cloudwatch_local_environment_monitoring_options, "source_account_ids", [])
 }
 
 module "cloudwatch" {

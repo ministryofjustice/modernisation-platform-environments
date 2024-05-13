@@ -2,10 +2,8 @@ module "nextcloud" {
   source = "../components/nextcloud"
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
+    aws.core-vpc              = aws.core-vpc
   }
 
   env_name      = "dev"

@@ -286,10 +286,6 @@ locals {
   thrld_dms_cdc_inc_events_check    = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
   period_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
 
-  # Operational Database
-  deploy_operational_database = local.application_data.accounts[local.environment].deploy_operational_database
-  scale_down_kinesis_agent    = local.application_data.accounts[local.environment].scale_down_kinesis_agent
-
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 
@@ -315,6 +311,14 @@ locals {
     port     = "5432"
   }
 
+  # biprws Secrets Placeholder
+  enable_biprws_secrets = local.application_data.accounts[local.environment].biprws.enable
+  biprws_secrets_placeholder = {
+    busobj-converter = "placeholder"
+    endpoint         = local.application_data.accounts[local.environment].biprws.endpoint
+    endpoint_type    = local.application_data.accounts[local.environment].biprws.endpoint_type     
+  }
+
   sonatype_secrets_placeholder = {
     user     = "placeholder"
     password = "placeholder"
@@ -333,7 +337,7 @@ locals {
   all_tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}"
+      Name = local.application_name
     }
   )
 }

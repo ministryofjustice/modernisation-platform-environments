@@ -18,6 +18,11 @@ locals {
     }
   }
 
+  # config for load balancer maintenance rule
+  production_lb_maintenance_message = {
+    maintenance_title   = "Prison-NOMIS Maintenance Window"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again after 22:00"
+  }
 
   # baseline config
   production_config = {
@@ -92,7 +97,7 @@ locals {
       }
       Ec2ProdWeblogicPolicy = {
         description = "Permissions required for prod Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -107,7 +112,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*DR/weblogic-*",
             ]
           }
-        ]
+        ])
       }
     }
 
@@ -210,6 +215,32 @@ locals {
     }
 
     baseline_ec2_instances = {
+      prod-nomis-db-1-a = merge(local.database_ec2, {
+        # cloudwatch_metric_alarms = set once commissioned
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 4000 } # add iops = 12000, throughput = 750 prior to go live
+          flash = { total_size = 1000 } # add iops = 5000,  throughput = 500 prior to go live
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.4xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "prod"
+          description       = "Production databases for CNOM and NDH"
+          oracle-sids       = ""
+        })
+      })
       prod-nomis-db-1-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
@@ -231,11 +262,11 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 4000 }
+          data  = { total_size = 4000 } # add at least iops = 3750, throughput = 750 prior to go live
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          instance_type = "r6i.2xlarge" # needs to be resized to r6i.4xlarge
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
@@ -276,6 +307,33 @@ locals {
         })
       })
 
+      prod-nomis-db-2-a = merge(local.database_ec2, {
+        # cloudwatch_metric_alarms = set once commissioned
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 6000 }
+          flash = { total_size = 1000 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          instance_type = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "prod"
+          description       = "Production databases for AUDIT/MIS"
+          oracle-sids       = ""
+        })
+      })
+
       prod-nomis-db-2-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
@@ -293,7 +351,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 4000 }
+          data  = { total_size = 6000 }
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
@@ -348,47 +406,69 @@ locals {
         listeners = {
           http = local.weblogic_lb_listeners.http
 
-          https = merge(
-            local.weblogic_lb_listeners.https, {
-              alarm_target_group_names = [
-                "prod-nomis-web-a-http-7777",
-                # "prod-nomis-web-b-http-7777",
-              ]
-              rules = {
-                prod-nomis-web-a-http-7777 = {
-                  priority = 200
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "prod-nomis-web-a-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
-                        "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
-                        "c.production.nomis.az.justice.gov.uk",
-                        "c.nomis.service.justice.gov.uk",
-                        "c.nomis.az.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
-                prod-nomis-web-b-http-7777 = {
-                  priority = 400
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "prod-nomis-web-b-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
-                        "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
+          https = merge(local.weblogic_lb_listeners.https, {
+            alarm_target_group_names = [
+              "prod-nomis-web-a-http-7777",
+              # "prod-nomis-web-b-http-7777",
+            ]
+            # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
+            # weblogic servers can alter priorities to enable maintenance message
+            rules = {
+              prod-nomis-web-a-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "prod-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
+                      "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                      "c.production.nomis.az.justice.gov.uk",
+                      "c.nomis.service.justice.gov.uk",
+                      "c.nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
               }
+              prod-nomis-web-b-http-7777 = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "prod-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
+                      "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.production_lb_maintenance_message)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.production.nomis.service.justice.gov.uk",
+                      "c.nomis.service.justice.gov.uk",
+                      "c.nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
           })
         }
       }
@@ -413,7 +493,7 @@ locals {
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1423.awsdns-49.org", "ns-1921.awsdns-48.co.uk", "ns-304.awsdns-38.com", "ns-747.awsdns-29.net"] },
           { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1200.awsdns-22.org", "ns-1958.awsdns-52.co.uk", "ns-44.awsdns-05.com", "ns-759.awsdns-30.net"] },
           { name = "reporting", type = "NS", ttl = "86400", records = ["ns-1122.awsdns-12.org", "ns-1844.awsdns-38.co.uk", "ns-388.awsdns-48.com", "ns-887.awsdns-46.net"] },
-          { name = "ndh", type = "NS", ttl = "86400", records = ["ns-1528.awsdns-63.org", "ns-973.awsdns-57.net", "ns-1867.awsdns-41.co.uk", "ns-427.awsdns-53.com"] },
+          { name = "ndh", type = "NS", ttl = "86400", records = ["ns-1106.awsdns-10.org", "ns-1904.awsdns-46.co.uk", "ns-44.awsdns-05.com", "ns-799.awsdns-35.net"] },
         ]
       }
       "production.nomis.az.justice.gov.uk" = {
@@ -448,6 +528,7 @@ locals {
           { name = "pnomisapiro-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },

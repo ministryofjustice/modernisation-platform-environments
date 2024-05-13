@@ -4,6 +4,18 @@ variable "db_type" {
   type        = string
 }
 
+variable "db_suffix" {
+  description = "identifier to append to name e.g. dsd, boe"
+  type        = string
+  default     = "db"
+}
+
+variable "deploy_oracle_stats" {
+  description = "for deploying Oracle stats bucket"
+  default     = true
+  type        = bool
+}
+
 variable "ec2_instance_type" {
   description = "EC2 instance type"
   type        = string
@@ -21,14 +33,14 @@ variable "env_name" {
   type        = string
 }
 
-variable "member_account_id" {
-  description = "member account identifier - eg mis or delius"
-  default     = "delius"
-}
-
 variable "server_type_tag" {
   description = "tag to set on each instance for key `server_type`"
   default     = "delius_core_db"
+}
+
+variable "database_tag_prefix" {
+  description = "tag to set on each instance for key `database`"
+  default     = "delius"
 }
 
 variable "subnet_id" {

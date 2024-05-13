@@ -60,5 +60,4 @@ locals {
       bip-passwords = {}
     }
   }
-
 }

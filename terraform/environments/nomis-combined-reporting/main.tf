@@ -16,6 +16,15 @@ module "baseline" {
     local.baseline_acm_certificates,
     lookup(local.environment_config, "baseline_acm_certificates", {}),
   )
+  backups = {
+    "everything" = {
+      plans = merge(
+        module.baseline_presets.backup_plans,
+        local.baseline_backup_plans,
+        lookup(local.environment_config, "baseline_backup_plans", {})
+      )
+    }
+  }
   route53_zones = merge(
     local.baseline_route53_zones,
     lookup(local.environment_config, "baseline_route53_zones", {}),
@@ -24,6 +33,10 @@ module "baseline" {
     module.baseline_presets.cloudwatch_log_groups,
     local.baseline_cloudwatch_log_groups,
     lookup(local.environment_config, "baseline_cloudwatch_log_groups", {}),
+  )
+  efs = merge(
+    local.baseline_efs,
+    lookup(local.environment_config, "baseline_efs", {})
   )
   iam_policies = merge(
     module.baseline_presets.iam_policies,
@@ -61,6 +74,7 @@ module "baseline" {
     lookup(local.environment_config, "baseline_s3_buckets", {}),
   )
   secretsmanager_secrets = merge(
+    module.baseline_presets.secretsmanager_secrets,
     local.baseline_secretsmanager_secrets,
     lookup(local.environment_config, "baseline_secretsmanager_secrets", {})
   )

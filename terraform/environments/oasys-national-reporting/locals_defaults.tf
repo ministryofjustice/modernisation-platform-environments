@@ -31,6 +31,12 @@ locals {
     }
   }
 
+  boe_secretsmanager_secrets = {
+    secrets = {
+      passwords = { description = "BOE Passwords" }
+    }
+  }
+
   defaults_ec2 = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_owner                     = "self"

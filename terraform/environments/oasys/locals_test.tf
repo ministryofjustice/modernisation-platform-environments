@@ -5,6 +5,8 @@ locals {
   test_cloudwatch_monitoring_options = {
     enable_cloudwatch_cross_account_sharing = true
     enable_cloudwatch_dashboard             = true
+    monitoring_account_id                   = module.environment.account_ids.hmpps-oem-test
+    source_account_ids                      = [module.environment.account_ids.oasys-test]
   }
 
   test_baseline_presets_options = {
@@ -50,6 +52,9 @@ locals {
 
       "/oracle/bip/t1" = local.secretsmanager_secrets_bip
       "/oracle/bip/t2" = local.secretsmanager_secrets_bip
+
+      "/oracle/database/T2BOSYS" = local.secretsmanager_secrets_bip_db
+      "/oracle/database/T2BOAUD" = local.secretsmanager_secrets_bip_db
     }
 
     baseline_iam_policies = {
@@ -242,6 +247,20 @@ locals {
           oasys-db-hostname = "t2-oasys-db-a"
         })
       })
+      "t2-onr-db-a" = merge(local.database_onr_a, {
+        config = merge(local.database_onr_a.config, {
+          instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
+            "Ec2T2DatabasePolicy",
+          ])
+        })
+        instance = merge(local.database_onr_a.instance, {
+          instance_type = "r6i.xlarge"
+        })
+        tags = merge(local.database_onr_a.tags, {
+          instance-scheduling = "skip-scheduling"
+          # oracle-sids         = "T2BOSYS T2BOAUD" # TODO: comment in when monitoring live
+        })
+      })
 
       ##
       ## T1
@@ -386,7 +405,7 @@ locals {
       #   })
       #   user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-      #       branch = "ords_parameter_file_update"
+      #       branch = "oasys-maintenance-message"
       #     })
       #   })
       #   #autoscaling_group  = module.baseline_presets.ec2_autoscaling_group.cold_standby
