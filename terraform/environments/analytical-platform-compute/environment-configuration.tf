@@ -1,8 +1,15 @@
 locals {
   /* VPC */
+  our_vpc_name                                        = "${local.application_name}-${local.environment}"
   vpc_flow_log_cloudwatch_log_group_name_prefix       = "/aws/vpc-flow-log/"
   vpc_flow_log_cloudwatch_log_group_retention_in_days = 400
   vpc_flow_log_max_aggregation_interval               = 60
+
+  /* EKS */
+  eks_cluster_name                           = "${local.application_name}-${local.environment}"
+  eks_cloudwatch_log_group_retention_in_days = 400
+  eks_cluster_version                        = "1.29"
+
 
   /* Environment Configuration */
   environment_configuration = local.environment_configurations[local.environment]
@@ -19,6 +26,9 @@ locals {
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
 
+      /* EKS */
+      eks_sso_access_role = "modernisation-platform-sandbox"
+
       /* Observability Platform */
       observability_platform = "development"
     }
@@ -34,6 +44,9 @@ locals {
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
 
+      /* EKS */
+      eks_sso_access_role = "modernisation-platform-developer"
+
       /* Observability Platform */
       observability_platform = "development"
     }
@@ -48,6 +61,9 @@ locals {
       vpc_enable_nat_gateway     = true
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
+
+      /* EKS */
+      eks_sso_access_role = "modernisation-platform-developer"
 
       /* Observability Platform */
       observability_platform = "production"
