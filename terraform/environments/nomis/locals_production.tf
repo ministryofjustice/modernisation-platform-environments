@@ -225,8 +225,8 @@ locals {
           ])
         })
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 500 }
+          "/dev/sdb" = { label = "app", size = 100 }  # /u01
+          "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data  = { total_size = 4000 } # add iops = 12000, throughput = 750 prior to go live
@@ -317,8 +317,8 @@ locals {
           ])
         })
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 500 }
+          "/dev/sdb" = { label = "app", size = 100 }  # /u01
+          "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data  = { total_size = 6000 }
