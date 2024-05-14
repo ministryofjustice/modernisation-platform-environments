@@ -76,4 +76,6 @@ module "eks_cluster_logs_kms" {
       ]
     }
   ]
+
+  tags = local.tags
 }

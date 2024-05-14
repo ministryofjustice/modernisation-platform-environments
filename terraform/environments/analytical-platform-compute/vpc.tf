@@ -30,5 +30,13 @@ module "vpc" {
   flow_log_max_aggregation_interval               = local.vpc_flow_log_max_aggregation_interval
   vpc_flow_log_tags                               = { Name = local.our_vpc_name }
 
+  public_subnet_tags = {
+    "kubernetes.io/role/elb" = 1
+  }
+
+  private_subnet_tags = {
+    "kubernetes.io/role/internal-elb" = 1
+  }
+
   tags = local.tags
 }

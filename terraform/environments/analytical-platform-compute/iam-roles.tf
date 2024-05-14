@@ -14,4 +14,6 @@ module "vpc_cni_iam_role" {
       namespace_service_accounts = ["kube-system:aws-node"]
     }
   }
+
+  tags = local.tags
 }
