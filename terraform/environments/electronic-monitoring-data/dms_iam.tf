@@ -138,7 +138,7 @@ resource "aws_iam_policy" "dms_ep_s3_role_parquet_bucket" {
 }
 
 resource "aws_iam_policy" "dms_ep_s3_role_parquet_files" {
-  name = "get-dms-parquet-buckets"
+  name = "get-dms-parquet-files"
   policy = data.aws_iam_policy_document.dms_ep_s3_role_parquet_files.json
 }
 
