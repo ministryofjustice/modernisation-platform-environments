@@ -208,7 +208,6 @@ resource "aws_cloudwatch_event_rule" "terminate_cpu_process" {
   "source": ["aws.ec2"],
   "detail-type": ["EC2 Instance High CPU Utilisation"]
   }
-}
 EOF
 }
 
