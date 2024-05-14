@@ -9,7 +9,15 @@ resource "aws_secretsmanager_secret" "edw_ec2_root_secret" {
   description = "EDW DB EC2 Root Password"
   }
 
-resource "aws_secretsmanager_rotation" "edw_db_root_rotate" {
+data "aws_secretsmanager_secret_version" "current" {
+  secret_id = aws_secretsmanager_secret.edw_db_secret.id
+}
+
+output "edw_db_secret" {
+  value = jsondecode(data.aws_secretsmanager_secret_version.current.secret_string)["db-master-password"]
+}
+
+resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
   secret_id                  = aws_secretsmanager_secret.edw_db_ec2_root_secret.id
 #  rotation_lambda_arn        = data.aws_ssm_parameter.SecretsRotation.arn
   rotate_immediately = true
