@@ -1,7 +1,7 @@
 resource "aws_efs_file_system" "cwa" {
 
   performance_mode = "maxIO"
-#   throughput_mode  = "elastic"
+#   throughput_mode  = "Bursting"
   encrypted        = "true"
   kms_key_id       = aws_kms_key.efs.arn
 
@@ -11,8 +11,7 @@ resource "aws_efs_file_system" "cwa" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${upper(local.application_name_short)}-EFS" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+    { "Name" = "${upper(local.application_name_short)}-EFS" }
   )
 
 }
@@ -29,6 +28,7 @@ resource "aws_kms_key" "efs" {
   description             = "KMS key for encrypting EFS"
 #   deletion_window_in_days = 10
   enable_key_rotation     = true
+  tags = local.tags
 }
         
 resource "aws_kms_key_policy" "efs" {
@@ -52,7 +52,7 @@ resource "aws_kms_key_policy" "efs" {
 }
 
 resource "aws_kms_alias" "efs" {
-  name          = "alias/${local.application_name_short}-efs-stack-kms"
+  name          = "alias/${upper(local.application_name_short)}-efs-kms"
   target_key_id = aws_kms_key.efs.key_id
 }
 
@@ -61,7 +61,7 @@ resource "aws_kms_alias" "efs" {
 resource "aws_efs_mount_target" "target_a" {
 
   file_system_id  = aws_efs_file_system.cwa.id
-  subnet_id       = data.aws_subnet.private_subnets_a.id
+  subnet_id       = data.aws_subnet.data_subnets_a.id
   security_groups = [aws_security_group.efs.id]
 }
 
