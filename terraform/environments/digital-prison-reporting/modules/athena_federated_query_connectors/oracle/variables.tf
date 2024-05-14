@@ -58,3 +58,20 @@ variable "nomis_cidr" {
   type        = string
   description = "CIDR that can be used to allow connectivity to NOMIS"
 }
+
+variable "lambda_memory_allocation_mb" {
+  type        = number
+  default     = 3000
+  description = "Amount of memory in MB the Connector Lambda Function can use at runtime"
+}
+
+variable "lambda_timeout_seconds" {
+  type        = number
+  default     = 900
+  description = "Limit of time the Connector lambda has to run in seconds."
+}
+
+variable "lambda_reserved_concurrent_executions" {
+  type        = number
+  description = "Amount of reserved concurrent executions for the Connector lambda function. A value of 0 disables the lambda from being triggered and -1 removes any concurrency limitations"
+}

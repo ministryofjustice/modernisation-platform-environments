@@ -29,9 +29,9 @@ resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
   role                           = aws_iam_role.athena_federated_query_lambda_execution_role.arn
   handler                        = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"
   runtime                        = "java11"
-  memory_size                    = 3008
-  timeout                        = 900
-  reserved_concurrent_executions = 20
+  memory_size                    = var.lambda_memory_allocation_mb
+  timeout                        = var.lambda_timeout_seconds
+  reserved_concurrent_executions = var.lambda_reserved_concurrent_executions
   s3_bucket                      = var.connector_jar_bucket_name
   s3_key                         = var.connector_jar_bucket_key
 
