@@ -5,13 +5,14 @@ module "test-2a" {
     aws.bucket-replication = aws
   }
 
-  account_number   = local.environment_management.account_ids[terraform.workspace]
-  application_name = local.application_name
-  approval_days    = "0"
-  patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
-  operating_system = "WINDOWS"
-  suffix           = "-2a"
-  patch_tag        = "eu-west-2a"
+  account_number       = local.environment_management.account_ids[terraform.workspace]
+  application_name     = local.application_name
+  approval_days        = "0"
+  patch_schedule       = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
+  operating_system     = "WINDOWS"
+  suffix               = "-2a"
+  patch_tag            = "eu-west-2a"
+  patch_classification = ["SecurityUpdates", "CriticalUpdates"]
 
   tags = merge(
     local.tags,
@@ -28,13 +29,14 @@ module "test-2c" {
     aws.bucket-replication = aws
   }
 
-  account_number   = local.environment_management.account_ids[terraform.workspace]
-  application_name = local.application_name
-  approval_days    = "0"
-  patch_schedule   = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
-  operating_system = "WINDOWS"
-  suffix           = "-2c"
-  patch_tag        = "eu-west-2c"
+  account_number       = local.environment_management.account_ids[terraform.workspace]
+  application_name     = local.application_name
+  approval_days        = "0"
+  patch_schedule       = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
+  operating_system     = "WINDOWS"
+  suffix               = "-2c"
+  patch_tag            = "eu-west-2c"
+  patch_classification = ["SecurityUpdates", "CriticalUpdates"]
 
   tags = merge(
     local.tags,
