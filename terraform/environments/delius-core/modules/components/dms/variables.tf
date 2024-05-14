@@ -9,7 +9,7 @@ variable "account_info" {
   type        = any
 }
 
-variable "instance_class" {
+variable "replication_instance_class" {
   description = "instance class to use for dms"
   type        = string
   default     = "dms.t3.micro"

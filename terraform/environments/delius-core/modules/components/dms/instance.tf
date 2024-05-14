@@ -8,7 +8,7 @@ resource "aws_dms_replication_instance" "test" {
   multi_az                     = false
   preferred_maintenance_window = "wed:22:00-wed:23:30"
   publicly_accessible          = false
-  replication_instance_class   = var.instance_class
+  replication_instance_class   = var.dms_config.replication_instance_class
   replication_instance_id      = "${var.env_name}-dms-instance"
   replication_subnet_group_id  = aws_dms_replication_subnet_group.this.id
   network_type                 = "IPV4"
