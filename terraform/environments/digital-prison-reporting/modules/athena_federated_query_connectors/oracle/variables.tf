@@ -46,10 +46,10 @@ variable "spill_bucket_prefix" {
 
 variable "nomis_credentials_secret_arn" {
   type        = string
-  description = ""
+  description = "The ARN of the Secret Manager secret containing NOMIS credentials"
 }
 
 variable "connection_string_nomis" {
   type        = string
-  description = ""
+  description = "The Athena Federated Query connection string for NOMIS (a JDBC connection string with an additional prefix)"
 }
