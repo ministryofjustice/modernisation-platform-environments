@@ -47,7 +47,14 @@ module "dms_parquet_task" {
 
   # DMS Migration Task Inputs
   dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
-  rep_task_settings_filepath      = trimspace(file("${path.module}/dms_replication_task_settings.json"))
+  rep_task_settings_filepath = merge(
+    trimspace(file("${path.module}/dms_replication_task_settings.json")),
+    {
+      "ValidationSettings": {
+        "EnableValidation": true
+      }
+    }
+  )
   rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_rep_task_table_mappings.json"))
 
   file_target_type = "parquet"
