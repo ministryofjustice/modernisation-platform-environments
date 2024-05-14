@@ -83,7 +83,7 @@ def get_rds_database_list(in_rds_databases=None):
     else:
 
         if isinstance(in_rds_databases, list):
-            rds_db_str = ', '.join(f'`{db}`' for db in in_rds_databases)
+            rds_db_str = ', '.join(f'\'{db}\'' for db in in_rds_databases)
         elif isinstance(in_rds_databases, str):
             rds_db_str = in_rds_databases
 
