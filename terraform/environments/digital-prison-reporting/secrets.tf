@@ -37,6 +37,15 @@ resource "aws_secretsmanager_secret_version" "nomis" {
   }
 }
 
+resource "aws_secretsmanager_secret_version" "nomis_athena_federated" {
+  secret_id     = aws_secretsmanager_secret.nomis_athena_federated.id
+  secret_string = jsonencode(local.nomis_secrets_placeholder_athena_federated)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
 # DPS Source Secrets
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "dps" {

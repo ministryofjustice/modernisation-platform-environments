@@ -301,6 +301,12 @@ locals {
     port     = "1521"
   }
 
+  # Nomis Secrets PlaceHolder in Athena Federated Query format
+  nomis_secrets_placeholder_athena_federated = {
+    username = "placeholder"
+    password = "placeholder"
+  }
+
   # DPS Secrets PlaceHolder
   dps_domains_list = local.application_data.accounts[local.environment].dps_domains
   dps_secrets_placeholder = {
