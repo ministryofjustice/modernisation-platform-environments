@@ -55,11 +55,12 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.29"
-      eks_cluster_addon_version = {
+      eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
         vpc_cni                = "v1.18.1-eksbuild.1"
+        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
       }
 
       /* Observability Platform */
@@ -80,11 +81,12 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.29"
-      eks_cluster_addon_version = {
+      eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
         vpc_cni                = "v1.18.1-eksbuild.1"
+        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
       }
 
       /* Observability Platform */
