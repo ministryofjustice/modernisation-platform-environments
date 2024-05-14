@@ -152,6 +152,7 @@ data "archive_file" "em_ap_transfer_lambda" {
 }
 
 resource "aws_lambda_function" "em_ap_transfer_lambda" {
+  #checkov:skip=CKV_AWS_116:Dead Letter Queue does not exist yet - See ELM-1957
   filename                       = "lambdas/em_ap_transfer_lambda.zip"
   function_name                  = "em-ap-transfer-lambda"
   role                           = aws_iam_role.em_ap_transfer_lambda.arn

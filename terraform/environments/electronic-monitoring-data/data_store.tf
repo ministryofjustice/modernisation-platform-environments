@@ -127,6 +127,7 @@ data "archive_file" "calculate_checksum_lambda" {
 }
 
 resource "aws_lambda_function" "calculate_checksum_lambda" {
+  #checkov:skip=CKV_AWS_116:Dead Letter Queue does not exist yet - See ELM-1957
   filename                       = "lambdas/calculate_checksum_lambda.zip"
   function_name                  = "calculate-checksum-lambda"
   role                           = aws_iam_role.calculate_checksum_lambda.arn
@@ -195,6 +196,7 @@ data "archive_file" "summarise_zip_lambda" {
 }
 
 resource "aws_lambda_function" "summarise_zip_lambda" {
+  #checkov:skip=CKV_AWS_116:Dead Letter Queue does not exist yet - See ELM-1957
   filename                       = "lambdas/summarise_zip_lambda.zip"
   function_name                  = "summarise-zip-lambda"
   role                           = aws_iam_role.summarise_zip_lambda.arn
