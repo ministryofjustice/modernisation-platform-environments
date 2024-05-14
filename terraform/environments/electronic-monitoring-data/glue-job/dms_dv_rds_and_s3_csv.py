@@ -177,22 +177,22 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 # def create_or_replace_table(in_replace=False):
 #     table_ddl = f'''
 #     CREATE EXTERNAL TABLE `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
-#     `run_datetime` timestamp, 
-#     `full_table_name` string, 
-#     `json_row` string, 
+#     `run_datetime` timestamp,
+#     `full_table_name` string,
+#     `json_row` string,
 #     `validation_msg` string)
-#     PARTITIONED BY ( 
+#     PARTITIONED BY (
 #         `database_name` string)
-#     ROW FORMAT SERDE 
-#         'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' 
-#     STORED AS INPUTFORMAT 
-#         'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat' 
-#     OUTPUTFORMAT 
+#     ROW FORMAT SERDE
+#         'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+#     STORED AS INPUTFORMAT
+#         'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
+#     OUTPUTFORMAT
 #         'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
 #     LOCATION
 #         's3://dms-data-validation-20240509174326500600000002/dms_data_validation/glue_df_output/'
 #     TBLPROPERTIES (
-#         'classification'='parquet', 
+#         'classification'='parquet',
 #         'partition_filtering.enabled'='true',
 #         'typeOfData'='file')
 #     '''.strip()
@@ -205,7 +205,7 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 #             None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
 #     except Exception as e:
 #         print(e)
-    
+
 #     return None
 
 # ===================================================================================================
@@ -231,8 +231,9 @@ if __name__ == "__main__":
     if number_of_tables_in_database == 0:
         df_dv_output = spark.sql(sql_select_str)
     else:
-        df_dv_output = spark.sql(sql_select_str).repartition(number_of_tables_in_database * 2)
-    
+        df_dv_output = spark.sql(sql_select_str).repartition(
+            number_of_tables_in_database * 2)
+
     for db_dbo_tbl in rds_sqlserver_db_tbl_list:
         rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
@@ -243,13 +244,15 @@ if __name__ == "__main__":
         # print(tbl_csv_s3_path)
         if tbl_csv_s3_path is not None:
 
-            df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema)
+            df_csv_temp = get_s3_csv_dataframe(
+                tbl_csv_s3_path, df_rds_temp.schema)
 
             df_rds_temp_count = df_rds_temp.count()
             df_csv_temp_count = df_csv_temp.count()
             if df_rds_temp_count == df_csv_temp_count:
 
-                df_rds_csv_subtract_row_count = df_rds_temp.subtract(df_csv_temp).count()
+                df_rds_csv_subtract_row_count = df_rds_temp.subtract(
+                    df_csv_temp).count()
                 if df_rds_csv_subtract_row_count == 0:
                     df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                       f"""'{db_dbo_tbl}' as full_table_name""",
@@ -266,7 +269,7 @@ if __name__ == "__main__":
                                .limit(1000))
 
                     df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
-                                                 f"""'{db_dbo_tbl}' as full_table_name""", 
+                                                 f"""'{db_dbo_tbl}' as full_table_name""",
                                                  "json_row",
                                                  f""" "'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as validation_msg""",
                                                  f"""'{rds_db_name}' as database_name"""
@@ -297,25 +300,25 @@ if __name__ == "__main__":
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
-    df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition("database_name")
+    df_dv_output = df_dv_output.orderBy(
+        "database_name", "full_table_name").repartition("database_name")
 
     for db in rds_sqlserver_db_list:
-        if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, 
+        if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                    f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={db}'''
                                    ):
-             glueContext.purge_s3_path(f"""{CATALOG_TABLE_S3_PATH}/database_name={db}""", options={"retentionPeriod": 0})
-    
+            glueContext.purge_s3_path(
+                f"""{CATALOG_TABLE_S3_PATH}/database_name={db}""", options={"retentionPeriod": 0})
+
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
                                                      'path': f"""{CATALOG_TABLE_S3_PATH}/""",
-                                                     "partitionKeys": ["database_name"],
-                                                     "groupFiles": "inPartition", 
-                                                     "groupSize": "13421773"},
+                                                     "partitionKeys": ["database_name"]
+                                                 },
                                                  format_options={
                                                      'useGlueParquetWriter': True,
-                                                     # 'compression': 'snappy', 'blockSize': 134217728, 'pageSize': 1048576
+                                                     'compression': 'snappy', 'blockSize': 13421773, 'pageSize': 1048576
                                                  })
 
     job.commit()
-
