@@ -43,7 +43,7 @@ module "dms_parquet_task" {
 
   # DMS Target Endpoint Inputs
   target_s3_bucket_name      = aws_s3_bucket.dms_target_ep_s3_bucket_parquet.id
-  ep_service_access_role_arn = aws_iam_role.dms_endpoint_role.arn
+  ep_service_access_role_arn = aws_iam_role.dms_endpoint_role_parquet.arn
 
   # DMS Migration Task Inputs
   dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
