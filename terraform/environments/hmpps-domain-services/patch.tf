@@ -12,6 +12,7 @@ module "test-2a" {
   operating_system = "WINDOWS"
   suffix           = "-2a"
   patch_tag        = "eu-west-2a"
+  patch_classification = ["SecurityUpdates", "CriticalUpdates"]
 
   tags = merge(
     local.tags,
@@ -35,6 +36,7 @@ module "test-2c" {
   operating_system = "WINDOWS"
   suffix           = "-2c"
   patch_tag        = "eu-west-2c"
+  patch_classification = ["SecurityUpdates", "CriticalUpdates"]
 
   tags = merge(
     local.tags,
