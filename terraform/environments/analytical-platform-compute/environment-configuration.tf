@@ -55,6 +55,7 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.29"
+      eks_node_version    = "1.19.5-64049ba8"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
@@ -81,6 +82,7 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.29"
+      eks_node_version    = "1.19.5-64049ba8"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
