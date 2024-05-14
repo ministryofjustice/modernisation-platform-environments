@@ -24,6 +24,7 @@ module "vpc" {
   create_flow_log_cloudwatch_log_group            = true
   create_flow_log_cloudwatch_iam_role             = true
   flow_log_cloudwatch_log_group_name_prefix       = local.vpc_flow_log_cloudwatch_log_group_name_prefix
+  flow_log_cloudwatch_log_group_name_suffix       = local.vpc_flow_log_cloudwatch_log_group_name_suffix
   flow_log_cloudwatch_log_group_kms_key_id        = module.vpc_flow_logs_kms.key_arn
   flow_log_cloudwatch_log_group_retention_in_days = local.vpc_flow_log_cloudwatch_log_group_retention_in_days
   flow_log_max_aggregation_interval               = local.vpc_flow_log_max_aggregation_interval
