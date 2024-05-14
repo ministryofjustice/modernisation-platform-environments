@@ -81,7 +81,7 @@ module "preproduction" {
 }
 
 # module "production-eu-west-2a" {
-#   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=multiple-schedules"
+#   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v2.0.0"
 #   count  = local.is-production == true ? 1 : 0
 #   providers = {
 #     aws.bucket-replication = aws
