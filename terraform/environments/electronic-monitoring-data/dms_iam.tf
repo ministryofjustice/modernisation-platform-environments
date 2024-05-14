@@ -127,30 +127,87 @@ resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_parquet_bucket_policy"
   policy_arn = aws_iam_policy.dms_ep_s3_role_parquet_bucket.arn
 }
 
-resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_parquet_files_policy" {
+resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_glue_validation_policy" {
   role = aws_iam_role.dms_endpoint_role_parquet.name
-  policy_arn = aws_iam_policy.dms_ep_s3_role_parquet_files.arn
+  policy_arn = aws_iam_policy.dms_ep_s3_role_glue_validation.arn
+}
+
+resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_athena_validation_policy" {
+  role = aws_iam_role.dms_endpoint_role_parquet.name
+  policy_arn = aws_iam_policy.dms_ep_s3_role_athena_validation.arn
 }
 
 resource "aws_iam_policy" "dms_ep_s3_role_parquet_bucket" {
-  name = "get-dms-parquet-buckets"
+  name = "get-dms-parquet-files"
   policy = data.aws_iam_policy_document.dms_ep_s3_role_parquet_bucket.json
 }
 
-resource "aws_iam_policy" "dms_ep_s3_role_parquet_files" {
-  name = "get-dms-parquet-files"
-  policy = data.aws_iam_policy_document.dms_ep_s3_role_parquet_files.json
+resource "aws_iam_policy" "dms_ep_s3_role_glue_validation" {
+  name = "get-dms-glue-validation"
+  policy = data.aws_iam_policy_document.dms_ep_s3_role_glue_validation.json
+}
+
+resource "aws_iam_policy" "dms_ep_s3_role_athena_validation" {
+  name = "get-dms-athena-validation"
+  policy = data.aws_iam_policy_document.dms_ep_s3_role_athena_validation.json
+}
+
+data "aws_iam_policy_document" "dms_ep_s3_role_athena_validation" {
+  statement {
+    effect = "Allow"
+    resources = [                
+      "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:workgroup/dms_validation_workgroup_for_task_*"
+      ]
+    actions =  [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:CreateWorkGroup"
+    ]
+    sid = "DMSValidationAthenaEndpointAccess"
+  }
+}
+
+data "aws_iam_policy_document" "dms_ep_s3_role_glue_validation" {
+  statement {
+    effect = "Allow"
+    resources = [                
+      "arn:aws:glue:eu-west-2:${local.modernisation_platform_account_id}:catalog",
+      "arn:aws:glue:eu-west-2:${local.modernisation_platform_account_id}:database/aws_dms_s3_validation_*",
+      "arn:aws:glue:eu-west-2:${local.modernisation_platform_account_id}:table/aws_dms_s3_validation_*/*",
+      "arn:aws:glue:eu-west-2:${local.modernisation_platform_account_id}:userDefinedFunction/aws_dms_s3_validation_*/*"
+      ]
+    actions =  [
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:GetTable"
+    ]
+    sid = "DMSValidationGlueEndpointAccess"
+  }
 }
 
 data "aws_iam_policy_document" "dms_ep_s3_role_parquet_bucket" {
   statement {
     effect = "Allow"
-    resources = [aws_s3_bucket.dms_target_ep_s3_bucket_parquet.arn]
+    resources = [
+      aws_s3_bucket.dms_target_ep_s3_bucket_parquet.arn,
+    "${aws_s3_bucket.dms_target_ep_s3_bucket_parquet.arn}/*"
+    ]
     actions = [                
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
       "s3:GetBucketLocation",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetObject",
+      "s3:ListBucketMultipartUploads",
+      "s3:AbortMultipartUpload",
+      "s3:ListMultipartUploadParts"
       ]
-    sid = "DMSParquetEndpointAccess"
+    sid = "DMSParquetGetAccess"
   }
 }
 
