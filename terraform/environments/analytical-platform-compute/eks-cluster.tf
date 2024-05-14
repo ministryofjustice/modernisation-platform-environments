@@ -5,7 +5,7 @@ module "eks" {
   version = "20.10.0"
 
   cluster_name    = local.eks_cluster_name
-  cluster_version = local.eks_cluster_version
+  cluster_version = local.environment_configuration.eks_cluster_version
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
@@ -31,31 +31,30 @@ module "eks" {
 
   cluster_addons = {
     coredns = {
-      most_recent = true
+      addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
     }
     kube-proxy = {
-      most_recent = true
+      addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
     }
     eks-pod-identity-agent = {
-      most_recent = true
+      addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
     }
     vpc-cni = {
-      most_recent = true
+      addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
+      service_account_role_arn = module.vpc_cni_iam_role.iam_role_arn
     }
     # amazon-cloudwatch-observability = {
     #   most_recent = true
     # }
-    /* Disabled as this add-on just sits, I think because IIRC it needs a VPC endpoint
     aws-guardduty-agent = {
       most_recent = true
     }
-    */
   }
 
   eks_managed_node_group_defaults = {
-    # ami_release_version = local.environment_configuration.eks_versions.ami_release
-    ami_type = "BOTTLEROCKET_x86_64"
-    platform = "bottlerocket"
+    ami_release_version = local.environment_configuration.eks_node_version
+    ami_type            = "BOTTLEROCKET_x86_64"
+    platform            = "bottlerocket"
     metadata_options = {
       http_endpoint               = "enabled"
       http_put_response_hop_limit = 1 /* This stop pods inheriting the nodes IAM role https://aws.github.io/aws-eks-best-practices/security/docs/iam/#restrict-access-to-the-instance-profile-assigned-to-the-worker-node */

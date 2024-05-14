@@ -8,7 +8,6 @@ locals {
   /* EKS */
   eks_cluster_name                           = "${local.application_name}-${local.environment}"
   eks_cloudwatch_log_group_retention_in_days = 400
-  eks_cluster_version                        = "1.29"
 
 
   /* Environment Configuration */
@@ -28,6 +27,15 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
+      eks_cluster_version = "1.29"
+      eks_node_version    = "1.19.5-64049ba8"
+      eks_cluster_addon_versions = {
+        coredns                = "v1.11.1-eksbuild.9"
+        kube_proxy             = "v1.29.3-eksbuild.2"
+        eks_pod_identity_agent = "v1.2.0-eksbuild.1"
+        vpc_cni                = "v1.18.1-eksbuild.1"
+        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
+      }
 
       /* Observability Platform */
       observability_platform = "development"
@@ -46,6 +54,13 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
+      eks_cluster_version = "1.29"
+      eks_cluster_addon_version = {
+        coredns                = "v1.11.1-eksbuild.9"
+        kube_proxy             = "v1.29.3-eksbuild.2"
+        eks_pod_identity_agent = "v1.2.0-eksbuild.1"
+        vpc_cni                = "v1.18.1-eksbuild.1"
+      }
 
       /* Observability Platform */
       observability_platform = "development"
@@ -64,6 +79,13 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
+      eks_cluster_version = "1.29"
+      eks_cluster_addon_version = {
+        coredns                = "v1.11.1-eksbuild.9"
+        kube_proxy             = "v1.29.3-eksbuild.2"
+        eks_pod_identity_agent = "v1.2.0-eksbuild.1"
+        vpc_cni                = "v1.18.1-eksbuild.1"
+      }
 
       /* Observability Platform */
       observability_platform = "production"
