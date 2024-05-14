@@ -52,6 +52,14 @@ variable "db_config" {
   type = any
 }
 
+variable "dms_config" {
+  type = object({
+    replication_instance_class = string
+  })
+  default = {
+    replication_instance_class = "dms.t3.micro"
+  }
+}
 
 variable "tags" {
   type = any

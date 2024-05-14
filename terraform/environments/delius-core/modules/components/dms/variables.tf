@@ -26,3 +26,12 @@ variable "tags" {
   default = {
   }
 }
+
+variable "dms_config" {
+  type = object({
+    replication_instance_class = string
+  })
+  default = {
+    replication_instance_class = "dms.t3.micro"
+  }
+}
