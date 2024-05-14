@@ -202,8 +202,13 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
 resource "aws_cloudwatch_event_rule" "terminate_cpu_process" {
   count               = local.is-development == true ? 1 : 0
   name                = "terminate_cpu_process"
-  description         = "Runs Weekly every Saturday at 00:00 am"
-  schedule_expression = "cron(0 14 ? * FRI *)" # Time Zone is in UTC
+  description         = "Terminates a CPU process"
+  event_pattern = <<EOF
+{
+  "source": ["aws.ec2"],
+  "detail-type": ["EC2 Instance High CPU Utilisation"]
+  }
+EOF
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_terminate_cpu_process" {
