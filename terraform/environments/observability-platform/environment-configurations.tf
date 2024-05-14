@@ -22,6 +22,16 @@ locals {
               cloudwatch_enabled      = true
               prometheus_push_enabled = false
               xray_enabled            = true
+            },
+            "analytical-platform-compute-development" = {
+              cloudwatch_enabled      = true
+              prometheus_push_enabled = true
+              xray_enabled            = true
+            },
+            "analytical-platform-compute-test" = {
+              cloudwatch_enabled      = true
+              prometheus_push_enabled = true
+              xray_enabled            = true
             }
           }
         },
@@ -66,7 +76,7 @@ locals {
           }
         }
       }
-      grafana_api_key_rotator_version = "1.0.1"
+      grafana_api_key_rotator_version = "1.0.3"
     }
     production = {
       tenant_configuration = {
@@ -88,6 +98,11 @@ locals {
               cloudwatch_enabled      = true
               prometheus_push_enabled = false
               xray_enabled            = true
+            },
+            "analytical-platform-compute-production" = {
+              cloudwatch_enabled      = true
+              prometheus_push_enabled = true
+              xray_enabled            = true
             }
           }
         },
@@ -107,7 +122,7 @@ locals {
           }
         }
       }
-      grafana_api_key_rotator_version = "1.0.1"
+      grafana_api_key_rotator_version = "1.0.3"
     }
   }
 }
