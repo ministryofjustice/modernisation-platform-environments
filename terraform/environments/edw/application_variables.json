@@ -27,7 +27,8 @@
       "edw_mp_vpc_cidr"  : "",
       "edw_sg_inbound_count" : "1",
       "edw_management_cidr": "10.200.0.0/20",
-      "edw_bastion_ssh_cidr": "10.202.0.0/20"
+      "edw_bastion_ssh_cidr": "10.202.0.0/20",
+      "mp_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "example_var": "test-data"

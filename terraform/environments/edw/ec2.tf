@@ -251,7 +251,7 @@ resource "aws_security_group" "edw_db_security_group" {
 ####### DB DNS #######
 
 resource "aws_route53_record" "edw_internal_dns_record" {
-  zone_id = data.aws_route53_zone.dns.id
+  zone_id = data.aws_route53_zone.external.id
   name    = "${local.application_name}.${data.aws_route53_zone.external.name}"
   type    = "A"
   ttl     = 900
