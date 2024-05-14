@@ -127,7 +127,7 @@ resource "aws_ebs_volume" "orahomeVolume" {
   type              = "gp3"
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].application_name}-orahome"
+    Name = "${local.application_data.accounts[local.environment].edw_AppName}-orahome"
   }
 }
 
@@ -138,7 +138,7 @@ resource "aws_ebs_volume" "oratempVolume" {
   type              = "gp3"
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].application_name} oraredo"
+    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraredo"
   }
 }
 
@@ -149,7 +149,7 @@ resource "aws_ebs_volume" "oradataVolume" {
   type              = "gp3"
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].application_name}-oradata"
+    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oradata"
   }
 }
 
@@ -160,7 +160,7 @@ resource "aws_ebs_volume" "softwareVolume" {
   type              = "gp3"
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].application_name}-software"
+    Name = "${local.application_data.accounts[local.environment].edw_AppName}-software"
   }
 }
 
@@ -171,7 +171,7 @@ resource "aws_ebs_volume" "ArchiveVolume" {
   type              = "gp3"
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].application_name}-oraarch"
+    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraarch"
     "dlm:snapshot-with:volume-hourly-35-day-retention" = "yes"
   }
 }
