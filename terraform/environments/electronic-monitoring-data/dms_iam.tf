@@ -91,8 +91,13 @@ resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
     "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
   ]
   inline_policy {
-    name   = "S3Policies"
+    name   = "DV-S3-Policies"
     policy = data.aws_iam_policy_document.dms_dv_s3_iam_policy_document.json
+  }
+
+  inline_policy {
+    name   = "DV-Athena-Policies"
+    policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
   }
 
   tags = merge(

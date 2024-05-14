@@ -255,8 +255,6 @@ if __name__ == "__main__":
                                                       )
 
                     df_dv_output = df_dv_output.union(df_temp)
-                    # LOGGER.info(f"{rds_tbl_name} - Validated.")
-                    # print(f"{rds_tbl_name} - Validated.")
                 else:
                     df_temp = (df_rds_temp.subtract(df_csv_temp)
                                .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
@@ -283,8 +281,6 @@ if __name__ == "__main__":
 
                 df_dv_output = df_dv_output.union(df_temp)
 
-                # print(f"{rds_tbl_name} - Table row count MISMATCHED.")
-
         else:
             df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                               f"""'{db_dbo_tbl}' as full_table_name""",
@@ -294,8 +290,6 @@ if __name__ == "__main__":
                                               )
 
             df_dv_output = df_dv_output.union(df_temp)
-
-            # print(f"No S3-csv folder path found for given {rds_db_name} - {rds_tbl_name}")
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")

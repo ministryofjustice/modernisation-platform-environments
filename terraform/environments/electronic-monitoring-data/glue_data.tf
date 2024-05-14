@@ -61,3 +61,57 @@ data "aws_iam_policy_document" "dms_dv_s3_iam_policy_document" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "dms_dv_athena_iam_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "athena:TerminateSession",
+      "athena:CreateDataCatalog",
+      "athena:UpdateDataCatalog",
+      "athena:GetTableMetadata",
+      "athena:StartQueryExecution",
+      "athena:GetSession",
+      "athena:DeleteWorkGroup",
+      "athena:GetQueryResults",
+      "athena:GetDatabase",
+      "athena:GetDataCatalog",
+      "athena:UpdateWorkGroup",
+      "athena:CreateWorkGroup",
+      "athena:ListQueryExecutions",
+      "athena:ListSessions",
+      "athena:GetWorkGroup",
+      "athena:ListDatabases",
+      "athena:GetSessionStatus",
+      "athena:StopQueryExecution",
+      "athena:DeleteDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:StartSession",
+      "athena:ListTableMetadata"
+    ]
+    resources = [
+      "arn:aws:athena:*:*:workgroup/*",
+      "arn:aws:athena:*:*:datacatalog/dms_data_validation"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "athena:GetNamespaces",
+      "athena:ListDataCatalogs",
+      "athena:GetExecutionEngine",
+      "athena:GetNamespace",
+      "athena:GetQueryExecutions",
+      "athena:GetExecutionEngines",
+      "athena:GetTables",
+      "athena:GetTable",
+      "athena:ListExecutors",
+      "athena:RunQuery",
+      "athena:GetCatalogs"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
