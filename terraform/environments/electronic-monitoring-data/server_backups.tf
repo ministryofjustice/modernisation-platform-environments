@@ -34,6 +34,7 @@ resource "aws_db_instance" "database_2022" {
   allocated_storage     = 2100
   max_allocated_storage = 2500
   storage_encrypted     = true
+  monitoring_interval   = 60 #CKV_AWS_118
 
   multi_az = false
 
