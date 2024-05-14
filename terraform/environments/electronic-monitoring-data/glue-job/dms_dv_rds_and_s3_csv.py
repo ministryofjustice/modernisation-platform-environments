@@ -213,6 +213,8 @@ def create_or_replace_table(in_replace=False):
 
 if __name__ == "__main__":
 
+    create_or_replace_table(True)
+
     CATALOG_TABLE_S3_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
     rds_sqlserver_db_list = get_rds_database_list(RDS_DB_LIST_GIVEN)
@@ -318,7 +320,7 @@ if __name__ == "__main__":
                                                      'useGlueParquetWriter': True,
                                                      # 'compression': 'snappy', 'blockSize': 134217728, 'pageSize': 1048576
                                                  })
+    create_or_replace_table()
     
     job.commit()
 
-    create_or_replace_table(True)
