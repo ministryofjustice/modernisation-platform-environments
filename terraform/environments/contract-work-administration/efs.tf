@@ -60,9 +60,9 @@ resource "aws_kms_alias" "efs" {
 ### Only allow access from Subnet A matching Landing Zone
 resource "aws_efs_mount_target" "target_a" {
 
-  file_system_id  = aws_efs_file_system.efs.id
+  file_system_id  = aws_efs_file_system.cwa.id
   subnet_id       = data.aws_subnet.private_subnets_a.id
-  security_groups = aws_security_group.efs_product.id
+  security_groups = [aws_security_group.efs.id]
 }
 
 
