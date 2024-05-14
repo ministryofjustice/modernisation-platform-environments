@@ -35,16 +35,16 @@ sudo bash -c "echo '$APP1_IP	${local.application_name_short}-app1.${data.aws_rou
 sudo bash -c "echo '$PRIVATE_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}' >> /etc/hosts"
 
 
-## Mounting to EFS
-echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-mount -a
-mount_status=$?
-while [[ $mount_status != 0 ]]
-do
-  sleep 10
-  mount -a
-  mount_status=$?
-done
+## Mounting to EFS - uncomment when AMI has been applied
+# echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+# mount -a
+# mount_status=$?
+# while [[ $mount_status != 0 ]]
+# do
+#   sleep 10
+#   mount -a
+#   mount_status=$?
+# done
 
 
 
