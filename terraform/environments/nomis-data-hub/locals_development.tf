@@ -1,5 +1,8 @@
 locals {
   development_config = {
+    baseline_cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux
+    )
     baseline_efs = {
       # dev_efs = {
       #   access_points = {
@@ -32,7 +35,6 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
       dev-base-rhel85 = {
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
