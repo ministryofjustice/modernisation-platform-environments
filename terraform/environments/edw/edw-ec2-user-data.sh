@@ -51,7 +51,7 @@
           export ENV="${edw_environment}"
           export BACKUPBUCKET="${edw_s3_backup_bucket}"
           export ROLE="${edw_ec2_role}"
-          export SECRET=`/usr/local/bin/aws --region ${edw_region} secretsmanager get-secret-value --secret-id ${terraform output -raw edw_db_secret} --query SecretString --output text`
+          export SECRET=`/usr/local/bin/aws --region ${edw_region} secretsmanager get-secret-value --secret-id $${terraform output -raw edw_db_secret} --query SecretString --output text`
           export host="$ip4 $APPNAME-$ENV $APPNAME.${edw_dns_extension}"
           export host2="${edw_cis_ip} cis.aws.${edw_environment}.legalservices.gov.uk"
           export host3="${edw_eric_ip} eric.aws.${edw_environment}.legalservices.gov.uk"

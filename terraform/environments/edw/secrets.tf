@@ -4,10 +4,10 @@ resource "aws_secretsmanager_secret" "edw_db_secret" {
   description = "EDW DB Password"
 }
 
-resource "aws_secretsmanager_secret" "edw_ec2_root_secret" {
+resource "aws_secretsmanager_secret" "edw_db_ec2_root_secret" {
   name        = "${local.application_name}/app/db-EC2-root-password"
   description = "EDW DB EC2 Root Password"
-  }
+}
 
 data "aws_secretsmanager_secret_version" "current" {
   secret_id = aws_secretsmanager_secret.edw_db_secret.id
