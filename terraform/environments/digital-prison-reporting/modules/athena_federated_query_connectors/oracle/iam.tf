@@ -1,6 +1,6 @@
 # The Connector Lambda will use this policy to access everything it needs
 resource "aws_iam_policy" "athena_federated_query_connector_policy" {
-  name        = "athena-federated-query-connector-policy"
+  name        = "${var.project_prefix}_athena_federated_query_connector_policy"
   description = "The policy the connector will use"
 
   policy = jsonencode({
@@ -109,7 +109,7 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
 
 resource "aws_iam_role" "athena_federated_query_lambda_execution_role" {
 
-  name        = "athena-federated-query-oracle-lambda-execution-role"
+  name        = "${var.project_prefix}-athena-federated-query-oracle-lambda-execution-role"
   description = "Lambda will assume this role to run the connector"
 
   assume_role_policy = jsonencode({

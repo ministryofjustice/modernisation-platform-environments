@@ -1,5 +1,5 @@
 resource "aws_security_group" "athena_federated_query_lambda_sg" {
-  name_prefix = "athena-federated-query-lambda-sg"
+  name_prefix = "${var.project_prefix}-athena-federated-query-lambda-security-group"
   description = "Athena Federated Query Oracle Lambda Security Group"
   vpc_id      = var.vpc_id
 
@@ -25,7 +25,7 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
 }
 
 resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
-  function_name                  = "${project_prefix}-athena-federated-query-oracle-function"
+  function_name                  = "${var.project_prefix}-athena-federated-query-oracle-function"
   role                           = aws_iam_role.athena_federated_query_lambda_execution_role.arn
   handler                        = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"
   runtime                        = "java11"
