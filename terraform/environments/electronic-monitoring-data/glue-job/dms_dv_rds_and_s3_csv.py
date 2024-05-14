@@ -300,8 +300,7 @@ if __name__ == "__main__":
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
-    df_dv_output = df_dv_output.orderBy(
-        "database_name", "full_table_name").repartition("database_name")
+    df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition("database_name")
 
     for db in rds_sqlserver_db_list:
         if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
