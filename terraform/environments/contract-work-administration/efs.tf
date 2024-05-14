@@ -40,7 +40,7 @@ resource "aws_kms_key_policy" "efs" {
         Action = "kms:*"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${local.modernisation_platform_account_id}:root"
+          AWS = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"
         }
 
         Resource = "*"
