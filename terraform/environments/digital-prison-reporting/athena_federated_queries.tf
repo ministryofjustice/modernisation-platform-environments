@@ -8,7 +8,7 @@ locals {
 module "athena_federated_query_connector_oracle" {
   source = "./modules/athena_federated_query_connectors/oracle"
 
-  nomis_ip_address             = local.nomis_ip_address
+  nomis_cidr                   = "${local.nomis_ip_address}/32"
   spill_bucket_name            = module.s3_working_bucket.bucket_id
   connector_jar_bucket_name    = module.s3_artifacts_store.bucket_id
   connector_jar_bucket_key     = "third-party/athena-connectors/athena-oracle-2024.18.2.jar"

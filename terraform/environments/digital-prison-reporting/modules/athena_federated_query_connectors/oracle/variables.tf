@@ -8,6 +8,11 @@ variable "region" {
   description = "AWS region"
 }
 
+variable "project_prefix" {
+  type        = string
+  description = "Prefix identifying the project"
+}
+
 variable "vpc_id" {
   type        = string
   description = "VPC ID"
@@ -16,11 +21,6 @@ variable "vpc_id" {
 variable "subnet_id" {
   type        = string
   description = "VPC Subnet ID"
-}
-
-variable "nomis_ip_address" {
-  type        = string
-  description = "IP address of NOMIS"
 }
 
 variable "connector_jar_bucket_name" {
@@ -52,4 +52,9 @@ variable "nomis_credentials_secret_arn" {
 variable "connection_string_nomis" {
   type        = string
   description = "The Athena Federated Query connection string for NOMIS (a JDBC connection string with an additional prefix)"
+}
+
+variable "nomis_cidr" {
+  type        = string
+  description = "CIDR that can be used to allow connectivity to NOMIS"
 }
