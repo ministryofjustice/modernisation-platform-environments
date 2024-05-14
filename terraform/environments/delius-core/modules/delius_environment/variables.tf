@@ -55,9 +55,11 @@ variable "db_config" {
 variable "dms_config" {
   type = object({
     replication_instance_class = string
+    engine_version             = string
   })
   default = {
     replication_instance_class = "dms.t3.micro"
+    engine_version             = "3.5.1"
   }
 }
 

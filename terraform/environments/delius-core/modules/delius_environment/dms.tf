@@ -4,7 +4,7 @@ module "dms" {
   account_info               = var.account_info
   tags                       = var.tags
   env_name                   = var.env_name
-  replication_instance_class = var.dms_config.replication_instance_class
+  dms_config                 = var.dms_config
 
   providers = {
     aws                    = aws

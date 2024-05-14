@@ -27,11 +27,15 @@ variable "tags" {
   }
 }
 
+variable "engine_version" {
+  description = "instance version to use for dms"
+  type        = string
+  default     = "3.5.1"
+}
+
 variable "dms_config" {
   type = object({
     replication_instance_class = string
+    engine_version             = string
   })
-  default = {
-    replication_instance_class = "dms.t3.micro"
-  }
 }
