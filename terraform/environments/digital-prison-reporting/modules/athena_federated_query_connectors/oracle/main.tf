@@ -12,7 +12,7 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "TCP"
-    cidr_blocks = ["${var.nomis_cidr}/32"]
+    cidr_blocks = [var.nomis_cidr]
   }
 
   egress {
