@@ -6,6 +6,8 @@ resource "aws_lb" "this" {
   drop_invalid_header_fields = var.drop_invalid_header_fields
   enable_deletion_protection = var.enable_deletion_protection
 
+
+
   tags = var.tags
 }
 
@@ -55,8 +57,25 @@ resource "aws_lb_target_group" "this" {
 
   preserve_client_ip = "true"
 
+  target_health_state {
+    enable_unhealthy_connection_termination = true
+  }
+
+  connection_termination = true
+
+  deregistration_delay = var.deregistration_delay
+
   target_type          = "ip"
-  deregistration_delay = "30"
+
+  health_check {
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    timeout             = 5
+    interval            = 10
+    port                = "traffic-port"
+    protocol            = "TCP"
+  }
+
   tags = merge(
     var.tags,
     {
