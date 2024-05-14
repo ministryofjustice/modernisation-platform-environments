@@ -1,3 +1,6 @@
+locals {
+  rep_task_settings = jsondecode(file("${path.module}/dms_replication_task_settings.json"))
+}
 module "dms_task" {
   source = "./modules/dms"
 
@@ -48,7 +51,7 @@ module "dms_parquet_task" {
   # DMS Migration Task Inputs
   dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
   rep_task_settings_filepath = merge(
-    trimspace(file("${path.module}/dms_replication_task_settings.json")),
+    local.rep_task_settings,
     {
       "ValidationSettings": {
         "EnableValidation": true
