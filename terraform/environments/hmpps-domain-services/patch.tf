@@ -1,5 +1,5 @@
-module "test" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=multiple-schedules"
+module "test-2a" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v3.0.0"
   count  = local.is-test == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
@@ -9,7 +9,10 @@ module "test" {
   application_name = local.application_name
   approval_days    = "0"
   patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
-  operating_system = "REDHAT_ENTERPRISE_LINUX"
+  operating_system = "WINDOWS"
+  suffix           = "-2a"
+  patch_tag        = "eu-west-2a"
+
   tags = merge(
     local.tags,
     {
@@ -18,8 +21,8 @@ module "test" {
   )
 }
 
-module "test-suffix-test" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=multiple-schedules"
+module "test-2c" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v3.0.0"
   count  = local.is-test == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
@@ -29,8 +32,10 @@ module "test-suffix-test" {
   application_name = local.application_name
   approval_days    = "0"
   patch_schedule   = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
-  operating_system = "REDHAT_ENTERPRISE_LINUX"
-  suffix           = "-2"
+  operating_system = "WINDOWS"
+  suffix           = "-2c"
+  patch_tag        = "eu-west-2c"
+
   tags = merge(
     local.tags,
     {
@@ -51,6 +56,7 @@ module "development" {
   approval_days    = "0"
   patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
   operating_system = "REDHAT_ENTERPRISE_LINUX"
+
   tags = merge(
     local.tags,
     {
