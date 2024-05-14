@@ -69,7 +69,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 resource "aws_glue_job" "dms_dv_glue_job" {
   name         = "dms-dv-glue-job"
-  description = "DMS Data Validation Glue-Job (PySpark)."
+  description  = "DMS Data Validation Glue-Job (PySpark)."
   role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
   glue_version = "4.0"
   default_arguments = {

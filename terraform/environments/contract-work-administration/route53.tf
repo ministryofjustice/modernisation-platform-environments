@@ -36,3 +36,17 @@ resource "aws_route53_record" "app2" {
   ttl      = 900
   records  = [aws_instance.app2[0].private_ip]
 }
+
+# Domain A record for ALB
+resource "aws_route53_record" "external" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name_short}.${data.aws_route53_zone.external.name}" # cwa.dev.legalservices.gov.uk
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.external.dns_name
+    zone_id                = aws_lb.external.zone_id
+    evaluate_target_health = true
+  }
+}

@@ -1,5 +1,5 @@
 module "test" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v2.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=multiple-schedules"
   count  = local.is-test == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
@@ -10,6 +10,27 @@ module "test" {
   approval_days    = "0"
   patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
   operating_system = "REDHAT_ENTERPRISE_LINUX"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ssm-patching"
+    },
+  )
+}
+
+module "test-suffix-test" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=multiple-schedules"
+  count  = local.is-test == true ? 1 : 0
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  account_number   = local.environment_management.account_ids[terraform.workspace]
+  application_name = local.application_name
+  approval_days    = "0"
+  patch_schedule   = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
+  operating_system = "REDHAT_ENTERPRISE_LINUX"
+  suffix           = "-2"
   tags = merge(
     local.tags,
     {
@@ -80,7 +101,7 @@ module "preproduction" {
 #     },
 #   )
 # }
-#
+
 # module "production-eu-west-2b" {
 #   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v2.0.0"
 #   count  = local.is-production == true ? 1 : 0

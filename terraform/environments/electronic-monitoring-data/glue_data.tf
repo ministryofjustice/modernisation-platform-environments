@@ -55,7 +55,9 @@ data "aws_iam_policy_document" "dms_dv_s3_iam_policy_document" {
     ]
     resources = [
       aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*"
+      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
+      aws_s3_bucket.dms_dv_glue_job_s3_bucket.arn,
+      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
     ]
   }
 }

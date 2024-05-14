@@ -250,6 +250,59 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_alarm_suppressio
   policy_arn = aws_iam_policy.iam_policy_for_lambda_alarm_suppression[0].arn
 }
 
+####################################################
+# IAM Role & Policy for Lambda Terminate CPU Process
+####################################################
+
+resource "aws_iam_role" "lambda_role_terminate_cpu_process" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Terminate_CPU_Process"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_terminate_cpu_process"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role terminate cpu processes"
+  policy      = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+        "ssm:*",
+        "ec2:DescribeInstances"
+      ],
+      "Resource": [
+      "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:CPU-High-i-0b5c31ecda24ebc04"
+      ]
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process" {
+  count      = local.is-development == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_terminate_cpu_process[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_terminate_cpu_process[0].arn
+}
 
 ###################
 # SNS IAM Policies
