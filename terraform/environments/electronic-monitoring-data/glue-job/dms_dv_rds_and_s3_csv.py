@@ -174,6 +174,37 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
     except Exception as err:
         print(err)
 
+def create_or_replace_table():
+    table_ddl = f'''
+    CREATE EXTERNAL TABLE `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
+    `run_datetime` timestamp, 
+    `full_table_name` string, 
+    `json_row` string, 
+    `validation_msg` string)
+    PARTITIONED BY ( 
+        `database_name` string)
+    ROW FORMAT SERDE 
+        'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' 
+    STORED AS INPUTFORMAT 
+        'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat' 
+    OUTPUTFORMAT 
+        'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+    LOCATION
+        's3://dms-data-validation-20240509174326500600000002/dms_data_validation/glue_df_output/'
+    TBLPROPERTIES (
+        'classification'='parquet', 
+        'partition_filtering.enabled'='true',
+        'typeOfData'='file')
+    '''.strip()
+    try:
+        None_DF = spark.sql(f"drop table if exists {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
+        None_DF = spark.sql(table_ddl).collect()
+        None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
+    except Exception as e:
+        print(e)
+    
+    return None
+
 # ===================================================================================================
 
 
@@ -265,6 +296,7 @@ if __name__ == "__main__":
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
+    df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition("database_name")
 
     for db in rds_sqlserver_db_list:
         if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, 
@@ -276,10 +308,14 @@ if __name__ == "__main__":
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
                                                      'path': f"""{CATALOG_TABLE_S3_PATH}/""",
-                                                     "partitionKeys": ["database_name"]},
+                                                     "partitionKeys": ["database_name"],
+                                                     "groupFiles": "inPartition", 
+                                                     "groupSize": "13421773"},
                                                  format_options={
                                                      'useGlueParquetWriter': True,
                                                      # 'compression': 'snappy', 'blockSize': 134217728, 'pageSize': 1048576
                                                  })
 
+    create_or_replace_table()
+    
     job.commit()
