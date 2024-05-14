@@ -174,46 +174,44 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
     except Exception as err:
         print(err)
 
-def create_or_replace_table(in_replace=False):
-    table_ddl = f'''
-    CREATE EXTERNAL TABLE `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
-    `run_datetime` timestamp, 
-    `full_table_name` string, 
-    `json_row` string, 
-    `validation_msg` string)
-    PARTITIONED BY ( 
-        `database_name` string)
-    ROW FORMAT SERDE 
-        'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' 
-    STORED AS INPUTFORMAT 
-        'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat' 
-    OUTPUTFORMAT 
-        'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
-    LOCATION
-        's3://dms-data-validation-20240509174326500600000002/dms_data_validation/glue_df_output/'
-    TBLPROPERTIES (
-        'classification'='parquet', 
-        'partition_filtering.enabled'='true',
-        'typeOfData'='file')
-    '''.strip()
-    try:
-        if in_replace:
-            None_DF = spark.sql(f"drop table if exists {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
-            None_DF = spark.sql(table_ddl).collect()
-            None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
-        else:
-            None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
-    except Exception as e:
-        print(e)
+# def create_or_replace_table(in_replace=False):
+#     table_ddl = f'''
+#     CREATE EXTERNAL TABLE `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
+#     `run_datetime` timestamp, 
+#     `full_table_name` string, 
+#     `json_row` string, 
+#     `validation_msg` string)
+#     PARTITIONED BY ( 
+#         `database_name` string)
+#     ROW FORMAT SERDE 
+#         'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' 
+#     STORED AS INPUTFORMAT 
+#         'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat' 
+#     OUTPUTFORMAT 
+#         'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+#     LOCATION
+#         's3://dms-data-validation-20240509174326500600000002/dms_data_validation/glue_df_output/'
+#     TBLPROPERTIES (
+#         'classification'='parquet', 
+#         'partition_filtering.enabled'='true',
+#         'typeOfData'='file')
+#     '''.strip()
+#     try:
+#         if in_replace:
+#             None_DF = spark.sql(f"drop table if exists {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
+#             None_DF = spark.sql(table_ddl).collect()
+#             None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
+#         else:
+#             None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
+#     except Exception as e:
+#         print(e)
     
-    return None
+#     return None
 
 # ===================================================================================================
 
 
 if __name__ == "__main__":
-
-    create_or_replace_table(True)
 
     CATALOG_TABLE_S3_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
@@ -320,7 +318,6 @@ if __name__ == "__main__":
                                                      'useGlueParquetWriter': True,
                                                      # 'compression': 'snappy', 'blockSize': 134217728, 'pageSize': 1048576
                                                  })
-    create_or_replace_table()
-    
+
     job.commit()
 
