@@ -174,7 +174,7 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
     except Exception as err:
         print(err)
 
-def create_or_replace_table():
+def create_or_replace_table(in_replace=False):
     table_ddl = f'''
     CREATE EXTERNAL TABLE `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
     `run_datetime` timestamp, 
@@ -197,9 +197,12 @@ def create_or_replace_table():
         'typeOfData'='file')
     '''.strip()
     try:
-        None_DF = spark.sql(f"drop table if exists {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
-        None_DF = spark.sql(table_ddl).collect()
-        None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
+        if in_replace:
+            None_DF = spark.sql(f"drop table if exists {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
+            None_DF = spark.sql(table_ddl).collect()
+            None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
+        else:
+            None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
     except Exception as e:
         print(e)
     
@@ -315,7 +318,7 @@ if __name__ == "__main__":
                                                      'useGlueParquetWriter': True,
                                                      # 'compression': 'snappy', 'blockSize': 134217728, 'pageSize': 1048576
                                                  })
-
-    create_or_replace_table()
     
     job.commit()
+
+    create_or_replace_table(True)
