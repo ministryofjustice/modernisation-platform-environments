@@ -75,21 +75,18 @@ def get_rds_database_list(in_rds_databases=None):
 
     if in_rds_databases is None or in_rds_databases == "":
         sql_sys_databases_1 = f"""
-        SELECT name
-        FROM sys.databases
+        SELECT name FROM sys.databases
         WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb', 'experimentation', 'rdsadmin')
         """.strip()
         sql_sys_databases = sql_sys_databases_1
     else:
-
         if isinstance(in_rds_databases, list):
             rds_db_str = ', '.join(f'\'{db}\'' for db in in_rds_databases)
         elif isinstance(in_rds_databases, str):
             rds_db_str = in_rds_databases
 
         sql_sys_databases_2 = f"""
-        SELECT name
-        FROM sys.databases
+        SELECT name FROM sys.databases
         WHERE name IN ({rds_db_str})
         """.strip()
         sql_sys_databases = sql_sys_databases_2
@@ -224,13 +221,8 @@ if __name__ == "__main__":
     cast(null as string) as validation_msg,
     cast(null as string) as database_name
     """.strip()
-
-    number_of_tables_in_database = len(rds_sqlserver_db_tbl_list)
-
-    if number_of_tables_in_database == 0:
-        df_dv_output = spark.sql(sql_select_str)
-    else:
-        df_dv_output = spark.sql(sql_select_str).repartition(number_of_tables_in_database)
+    
+    df_dv_output = spark.sql(sql_select_str)
 
     for db_dbo_tbl in rds_sqlserver_db_tbl_list:
         rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
