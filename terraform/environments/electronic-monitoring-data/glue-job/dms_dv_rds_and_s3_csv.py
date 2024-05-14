@@ -38,9 +38,7 @@ job.init(args["JOB_NAME"], args)
 
 # ------------------------------
 
-GLUE_CLIENT = boto3.client('glue', region_name='eu-west-2')
 S3_CLIENT = boto3.client("s3")
-ATHENA_CLIENT = boto3.client("athena", region_name='eu-west-2')
 
 # ------------------------------
 
@@ -213,7 +211,7 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 if __name__ == "__main__":
 
-    CATALOG_TABLE_S3_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
+    catalog_table_s3_full_path = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
     rds_sqlserver_db_list = get_rds_database_list(RDS_DB_LIST_GIVEN)
 
@@ -228,11 +226,11 @@ if __name__ == "__main__":
     """.strip()
 
     number_of_tables_in_database = len(rds_sqlserver_db_tbl_list)
+
     if number_of_tables_in_database == 0:
         df_dv_output = spark.sql(sql_select_str)
     else:
-        df_dv_output = spark.sql(sql_select_str).repartition(
-            number_of_tables_in_database * 2)
+        df_dv_output = spark.sql(sql_select_str).repartition(number_of_tables_in_database)
 
     for db_dbo_tbl in rds_sqlserver_db_tbl_list:
         rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
@@ -241,7 +239,6 @@ if __name__ == "__main__":
 
         tbl_csv_s3_path = get_s3_csv_tbl_path(rds_db_name, rds_tbl_name)
 
-        # print(tbl_csv_s3_path)
         if tbl_csv_s3_path is not None:
 
             df_csv_temp = get_s3_csv_dataframe(
@@ -276,8 +273,6 @@ if __name__ == "__main__":
                                                  )
 
                     df_dv_output = df_dv_output.union(df_temp)
-
-                    # print(f"{rds_tbl_name} - subtract op NON-ZERO row count")
             else:
                 df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                   f"""'{db_dbo_tbl}' as full_table_name""",
@@ -287,7 +282,6 @@ if __name__ == "__main__":
                                                   )
 
                 df_dv_output = df_dv_output.union(df_temp)
-
         else:
             df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                               f"""'{db_dbo_tbl}' as full_table_name""",
@@ -306,13 +300,14 @@ if __name__ == "__main__":
         if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                    f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={db}'''
                                    ):
-            glueContext.purge_s3_path(
-                f"""{CATALOG_TABLE_S3_PATH}/database_name={db}""", options={"retentionPeriod": 0})
+            glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={db}""", 
+                                      options={"retentionPeriod": 0}
+                                      )
 
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
-                                                     'path': f"""{CATALOG_TABLE_S3_PATH}/""",
+                                                     'path': f"""{catalog_table_s3_full_path}/""",
                                                      "partitionKeys": ["database_name"]
                                                  },
                                                  format_options={

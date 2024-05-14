@@ -91,7 +91,7 @@ data "aws_iam_policy_document" "dms_dv_athena_iam_policy_document" {
     ]
     resources = [
       "arn:aws:athena:*:*:workgroup/*",
-      "arn:aws:athena:*:*:datacatalog/dms_data_validation"
+      "arn:aws:athena:*:*:datacatalog/dms_data_validation/*"
     ]
   }
 
