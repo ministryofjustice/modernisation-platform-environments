@@ -11,6 +11,8 @@ resource "aws_s3_object" "parquet-to-csv-job" {
 
 
 resource "aws_s3_bucket" "csv-output-bucket" {
+  #checkov:skip=CKV_AWS_144:Unsure of policy on this yet, should be covered by module - See ELM-1949
+  #checkov:skip=CKV_AWS_145:Decide on a KMS key for encryption, should be covered by moudle - See ELM-1949
   bucket_prefix = "data-to-ap-"
 }
 

@@ -27,6 +27,8 @@ resource "random_string" "this" {
 }
 
 resource "aws_s3_bucket" "landing_bucket" {
+  #checkov:skip=CKV_AWS_144:Unsure of policy on this yet, should be covered by module - See ELM-1949
+  #checkov:skip=CKV_AWS_145:Decide on a KMS key for encryption, should be covered by moudle - See ELM-1949
   bucket = "${var.supplier}-${random_string.this.result}"
 
   tags = merge(
