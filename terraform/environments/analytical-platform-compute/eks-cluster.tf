@@ -1,3 +1,6 @@
+#tfsec:ignore:avd-aws-0040 - EKS clusters are accessed from GitHub Actions and MoJ Digital Macs, we will evaluate if we can lock down to GitHub Actions IPv4 and MoJ Digital GlobalProtect.
+#tfsec:ignore:avd-aws-0041 - Same as avd-aws-0040
+#tfsec:ignore:avd-aws-0104 - Currently no requirement to lock down egress traffic from EKS cluster
 module "eks" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
