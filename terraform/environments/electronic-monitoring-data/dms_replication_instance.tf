@@ -22,11 +22,13 @@ resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
 # Create a new replication instance
 
 resource "aws_dms_replication_instance" "dms_replication_instance" {
+
   allocated_storage          = var.dms_allocated_storage_gib
   apply_immediately          = true
   auto_minor_version_upgrade = true
   availability_zone          = var.dms_availability_zone
   engine_version             = var.dms_engine_version
+  #checkov:skip=CKV_AWS_212:Fixed by uncommenting the line below if it makes sense to do so, see ELM-1962
   #   kms_key_arn                  = "arn:aws:kms:eu-west-2:800964199911:key/b7f54acb-16a3-4958-9340-3bdf5f5842d8"
   multi_az = false
   #   preferred_maintenance_window = "sun:10:30-sun:14:30"
