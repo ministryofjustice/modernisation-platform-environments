@@ -2,6 +2,7 @@
 # Secret generation for database access.
 #------------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "db_password" {
+  #checkov:skip=CKV_AWS_157:Need to use CMK - See ELM-1959
   name = "db_password"
 }
 
