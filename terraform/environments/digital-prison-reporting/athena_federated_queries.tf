@@ -1,5 +1,6 @@
 locals {
-  nomis_host              = (local.environment == "dev") ? "10.26.24.29" : jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
+  nomis_host              = (local.environment == "dev") ? "10.26.24.29" :
+    jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
   connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis_athena_federated.name}}@${local.nomis_host}:1521:CNOMT3"
 }
 
@@ -19,6 +20,7 @@ module "athena_federated_query_connector_oracle" {
   lambda_memory_allocation_mb           = 3000
   lambda_timeout_seconds                = 900
   lambda_reserved_concurrent_executions = 20
+  connector_log_level                   = "debug"
 }
 
 # Adds an Athena data source / catalog for NOMIS
