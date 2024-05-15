@@ -169,7 +169,7 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
     try:
         return spark.read.csv(in_csv_tbl_s3_folder_path, header="true", schema=in_rds_df_schema)
     except Exception as err:
-        print(err)
+        LOGGER.error(err)
 
 # def create_or_replace_table(in_replace=False):
 #     table_ddl = f'''
@@ -287,6 +287,7 @@ if __name__ == "__main__":
                                               )
 
             df_dv_output = df_dv_output.union(df_temp)
+        LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
@@ -296,11 +297,13 @@ if __name__ == "__main__":
         if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                    f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={db}'''
                                    ):
+            LOGGER.info(f"""Purging S3-path: {catalog_table_s3_full_path}/database_name={db}""")
             glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={db}""", 
                                       options={"retentionPeriod": 0}
                                       )
-
+    
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
+    LOGGER.info(f"""Writing Dataframe to {catalog_table_s3_full_path}/""")
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
                                                      'path': f"""{catalog_table_s3_full_path}/""",
