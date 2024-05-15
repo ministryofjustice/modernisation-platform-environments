@@ -125,7 +125,9 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_glue_access" {
-
+  #checkov:skip=CKV_AWS_24:Self-referencing rule restricts to same security group in VPC, which will not open the VPC to all networks. Security group elsewhere clearly does not allow ingress from 0.0.0.00 to port 22
+  #checkov:skip=CKV_AWS_25:Self-referencing rule restricts to same security group in VPC, which will not open the VPC to all networks. Security group elsewhere clearly does not allow ingress from 0.0.0.00 to port 3389
+  #checkov:skip=CKV_AWS_260:Self-referencing rule restricts to same security group in VPC, which will not open the VPC to all networks. Security group elsewhere clearly does not allow ingress from 0.0.0.00 to port 80
   security_group_id            = aws_security_group.db.id
   description                  = "glue"
   ip_protocol                  = "tcp"
