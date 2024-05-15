@@ -47,6 +47,7 @@ resource "aws_db_instance" "database_2022" {
   auto_minor_version_upgrade      = true
   skip_final_snapshot             = true
   maintenance_window              = "Mon:00:00-Mon:03:00"
+  #checkov:skip=CKV_AWS_293:This database will eventually be deleted so we don't want to protect its deletion.
   deletion_protection             = false
   enabled_cloudwatch_logs_exports = ["general", "error", "slowquery"] #CKV_AWS_129
 
