@@ -2,7 +2,7 @@
 # Secret generation for database access.
 #------------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "db_password" {
-  #checkov:skip=CKV_AWS_157:Need to use CMK - See ELM-1959
+  #checkov:skip=CKV_AWS_149:Need to use CMK - See ELM-1959
   name = "db_password"
 }
 
@@ -37,6 +37,7 @@ resource "aws_db_instance" "database_2022" {
   storage_encrypted     = true
   monitoring_interval   = 60 #CKV_AWS_118
 
+  #checkov:skip=CKV_AWS_157:Unsure of cost implications of making this true - see ELM-1960
   multi_az = false
 
   db_subnet_group_name   = aws_db_subnet_group.db.id
