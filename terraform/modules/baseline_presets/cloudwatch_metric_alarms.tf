@@ -105,8 +105,8 @@ locals {
     ec2_cwagent_linux = {
       free-disk-space-low = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "60"
-        datapoints_to_alarm = "60"
+        evaluation_periods  = "15"
+        datapoints_to_alarm = "15"
         metric_name         = "disk_used_percent"
         namespace           = "CWAgent"
         period              = "60"
