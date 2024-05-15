@@ -69,7 +69,7 @@ resource "aws_s3_bucket_policy" "csv-output-bucket" {
 resource "aws_cloudwatch_log_group" "parquet-to-csv" {
   #checkov:skip=CKV_AWS_158:Decide on KMS key for encryption - see ELM-1961
   name              = "parquet-to-csv"
-  retention_in_days = 14
+  retention_in_days = 365
 }
 
 resource "aws_glue_job" "parquet-to-csv" {
