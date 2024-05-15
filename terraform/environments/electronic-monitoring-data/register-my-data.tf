@@ -164,6 +164,7 @@ resource "aws_lambda_function" "em_ap_transfer_lambda" {
   memory_size                    = 4096
   timeout                        = 900
   reserved_concurrent_executions = 100 #CKV_AWS_115
+  #checkov:skip=CKV_AWS_173:Check would incur unnecessary cost, default free encryption key fine for purpose
   environment {
     variables = {
       "REG_BUCKET_NAME" = local.register_my_data_bucket
