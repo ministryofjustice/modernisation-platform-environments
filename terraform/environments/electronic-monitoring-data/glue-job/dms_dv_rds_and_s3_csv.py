@@ -183,6 +183,73 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 # ===================================================================================================
 
+def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
+
+    df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
+
+    tbl_csv_s3_path = get_s3_csv_tbl_path(rds_db_name, rds_tbl_name)
+
+    if tbl_csv_s3_path is not None:
+
+        df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema)
+
+        df_rds_temp_count = df_rds_temp.count()
+        df_csv_temp_count = df_csv_temp.count()
+
+        if df_rds_temp_count == df_csv_temp_count:
+
+            df_subtract = df_rds_temp.subtract(df_csv_temp).persist()
+            df_rds_csv_subtract_row_count = df_subtract.count()
+            
+            if df_rds_csv_subtract_row_count == 0:
+                df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
+                                                  f"""'{db_dbo_tbl}' as full_table_name""",
+                                                  "'' as json_row",
+                                                  f"""'{rds_tbl_name} - Validated.' as validation_msg""",
+                                                  f"""'{rds_db_name}' as database_name"""
+                                                  )
+
+                df_dv_output = df_dv_output.union(df_temp)
+            else:
+                df_temp = (df_subtract
+                            .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
+                            .selectExpr("json_row")
+                            .limit(1000))
+
+                df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
+                                             f"""'{db_dbo_tbl}' as full_table_name""",
+                                             "json_row",
+                                             f""" "'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as validation_msg""",
+                                             f"""'{rds_db_name}' as database_name"""
+                                             )
+
+                df_dv_output = df_dv_output.union(df_temp)
+        else:
+            df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
+                                              f"""'{db_dbo_tbl}' as full_table_name""",
+                                              "'' as json_row",
+                                              f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_csv_temp_count} MISMATCHED !' as validation_msg""",
+                                              f"""'{rds_db_name}' as database_name"""
+                                              )
+
+            df_dv_output = df_dv_output.union(df_temp)
+    else:
+        df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
+                                          f"""'{db_dbo_tbl}' as full_table_name""",
+                                          "'' as json_row",
+                                          f"""'No S3-csv folder path exists for the given {rds_db_name} - {rds_tbl_name}' as validation_msg""",
+                                          f"""'{rds_db_name}' as database_name"""
+                                          )
+
+        df_dv_output = df_dv_output.union(df_temp)
+    
+    df_subtract.unpersist()
+    LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
+
+    return df_dv_output
+
+# ===================================================================================================
+
 
 if __name__ == "__main__":
 
@@ -207,66 +274,7 @@ if __name__ == "__main__":
     for db_dbo_tbl in rds_sqlserver_db_tbl_list:
         rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-        df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
-
-        tbl_csv_s3_path = get_s3_csv_tbl_path(rds_db_name, rds_tbl_name)
-
-        if tbl_csv_s3_path is not None:
-
-            df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema)
-
-            df_rds_temp_count = df_rds_temp.count()
-            df_csv_temp_count = df_csv_temp.count()
-
-            if df_rds_temp_count == df_csv_temp_count:
-
-                df_subtract = df_rds_temp.subtract(df_csv_temp).persist()
-                df_rds_csv_subtract_row_count = df_subtract.count()
-                
-                if df_rds_csv_subtract_row_count == 0:
-                    df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                                      f"""'{db_dbo_tbl}' as full_table_name""",
-                                                      "'' as json_row",
-                                                      f"""'{rds_tbl_name} - Validated.' as validation_msg""",
-                                                      f"""'{rds_db_name}' as database_name"""
-                                                      )
-
-                    df_dv_output = df_dv_output.union(df_temp).persist()
-                else:
-                    df_temp = (df_subtract
-                               .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
-                               .selectExpr("json_row")
-                               .limit(1000))
-
-                    df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
-                                                 f"""'{db_dbo_tbl}' as full_table_name""",
-                                                 "json_row",
-                                                 f""" "'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as validation_msg""",
-                                                 f"""'{rds_db_name}' as database_name"""
-                                                 )
-
-                    df_dv_output = df_dv_output.union(df_temp).persist()
-            else:
-                df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                                  f"""'{db_dbo_tbl}' as full_table_name""",
-                                                  "'' as json_row",
-                                                  f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_csv_temp_count} MISMATCHED !' as validation_msg""",
-                                                  f"""'{rds_db_name}' as database_name"""
-                                                  )
-
-                df_dv_output = df_dv_output.union(df_temp).persist()
-        else:
-            df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                              f"""'{db_dbo_tbl}' as full_table_name""",
-                                              "'' as json_row",
-                                              f"""'No S3-csv folder path exists for the given {rds_db_name} - {rds_tbl_name}' as validation_msg""",
-                                              f"""'{rds_db_name}' as database_name"""
-                                              )
-
-            df_dv_output = df_dv_output.union(df_temp).persist()
-        
-        df_subtract.unpersist()
-        LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
+        df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
