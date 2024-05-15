@@ -11,6 +11,154 @@ locals {
       }
     }
 
+    baseline_secretsmanager_secrets = {
+      "/oracle/database/PDBIPSYS" = local.database_secretsmanager_secrets
+      "/oracle/database/PDBIPAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/PDBISYS"  = local.database_secretsmanager_secrets
+      "/oracle/database/PDBIAUD"  = local.database_secretsmanager_secrets
+    }
+
+    baseline_iam_policies = {
+      Ec2PDDatabasePolicy = {
+        description = "Permissions required for PROD Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
+            ]
+          }
+        ]
+      }
+    }
+
+    baseline_ec2_instances = {
+      pd-ncr-db-1-a = merge(local.database_ec2_default, {
+        config = merge(local.database_ec2_default.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
+            "Ec2PDDatabasePolicy",
+          ])
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 200
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 4
+          }
+        }
+        ebs_volume_config = {
+          data = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 500
+          }
+          flash = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 200
+          }
+        }
+        tags = merge(local.database_ec2_default.tags, {
+          description                          = "PROD NCR DATABASE"
+          nomis-combined-reporting-environment = "pd"
+          oracle-sids                          = ""
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
+      pd-ncr-db-1-b = merge(local.database_ec2_default, {
+        config = merge(local.database_ec2_default.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
+            "Ec2PDDatabasePolicy",
+          ])
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 200
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 4
+          }
+        }
+        ebs_volume_config = {
+          data = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 500
+          }
+          flash = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 200
+          }
+        }
+        tags = merge(local.database_ec2_default.tags, {
+          description                          = "PROD NCR DATABASE"
+          nomis-combined-reporting-environment = "pd"
+          oracle-sids                          = ""
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
+    }
+
     baseline_route53_zones = {
       "reporting.nomis.service.justice.gov.uk" = {
         ns_records = [
