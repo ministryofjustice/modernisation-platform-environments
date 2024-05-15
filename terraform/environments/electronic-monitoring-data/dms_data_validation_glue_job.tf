@@ -45,6 +45,13 @@ resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
   etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv.py")
 }
 
+resource "aws_s3_object" "catalog_dv_table_glue_job_s3_object" {
+  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  key    = "create_or_replace_dv_table.py"
+  source = "glue-job/create_or_replace_dv_table.py"
+  etag   = filemd5("glue-job/create_or_replace_dv_table.py")
+}
+
 # -------------------------------------------------------------------
 
 resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
@@ -80,9 +87,11 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"             = "${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}"
     "--glue_catalog_tbl_name"            = "glue_df_output"
-    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.dms_dv_cw_log_group.name
+    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
+    "--enable-spark-ui"                  = "true"
+    "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
     "--enable-metrics"                   = ""
   }
 
@@ -96,6 +105,34 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     local.tags,
     {
       Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
+}
+
+resource "aws_glue_job" "catalog_dv_table_glue_job" {
+  name         = "catalog-dv-table-glue-job"
+  description  = "Python script uses Boto3-Athena-Client to run sql-statements"
+  role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  glue_version = "4.0"
+  default_arguments = {
+    "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+    "--glue_catalog_db_name"             = "${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}"
+    "--glue_catalog_tbl_name"            = "glue_df_output"
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.dms_dv_cw_log_group.name
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = ""
+  }
+  command {
+    python_version  = "3"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/create_or_replace_dv_table.py"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Py script as glue-job that creates dv table / refreshes its partitions",
     }
   )
 
