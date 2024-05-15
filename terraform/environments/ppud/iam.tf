@@ -291,6 +291,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process" {
         "ec2:DescribeInstances"        
       ],
       "Resource": [
+      "arn:aws:ssm:eu-west-2:075585660276:*",
       "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:CPU-High-i-0b5c31ecda24ebc04",
       "arn:aws:ec2:eu-west-2:075585660276:instance/i-0b5c31ecda24ebc04",
       "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
