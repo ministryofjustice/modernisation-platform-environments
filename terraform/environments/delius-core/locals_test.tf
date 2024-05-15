@@ -157,7 +157,6 @@ locals {
     }
   }
 
-
   bastion_config_test = {
     business_unit           = local.vpc_name
     subnet_set              = local.subnet_set

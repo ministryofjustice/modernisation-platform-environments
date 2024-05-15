@@ -9,7 +9,7 @@ variable "account_info" {
   type        = any
 }
 
-variable "instance_class" {
+variable "replication_instance_class" {
   description = "instance class to use for dms"
   type        = string
   default     = "dms.t3.micro"
@@ -25,4 +25,17 @@ variable "tags" {
   type        = map(string)
   default = {
   }
+}
+
+variable "engine_version" {
+  description = "instance version to use for dms"
+  type        = string
+  default     = "3.5.1"
+}
+
+variable "dms_config" {
+  type = object({
+    replication_instance_class = string
+    engine_version             = string
+  })
 }
