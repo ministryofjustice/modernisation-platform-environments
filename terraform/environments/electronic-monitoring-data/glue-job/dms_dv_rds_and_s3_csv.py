@@ -16,16 +16,27 @@ from pyspark.sql import DataFrame
 
 # ===============================================================================
 
-# Set up Glue context and job
-args = getResolvedOptions(sys.argv, ["JOB_NAME",
-                                     "rds_db_host_ep",
-                                     "rds_db_pwd",
-                                     "rds_sqlserver_db_list",
-                                     "csv_src_bucket_name",
-                                     "parquet_output_bucket_name",
-                                     "glue_catalog_db_name",
-                                     "glue_catalog_tbl_name"
-                                     ])
+# Organise capturing input parameters.
+DEFAULT_INPUTS_LIST = ["JOB_NAME",
+                       "rds_db_host_ep",
+                       "rds_db_pwd",
+                       "csv_src_bucket_name",
+                       "parquet_output_bucket_name",
+                       "glue_catalog_db_name",
+                       "glue_catalog_tbl_name"
+                       ]
+
+OPTIONAL_INPUTS = ['rds_sqlserver_dbs', 'rds_sqlserver_tbls']
+
+for e in OPTIONAL_INPUTS:
+    if ('--{}'.format(e) in sys.argv):
+        DEFAULT_INPUTS_LIST.append(e)
+
+args = getResolvedOptions(sys.argv, DEFAULT_INPUTS_LIST)
+
+for e in OPTIONAL_INPUTS:
+    if not ('--{}'.format(e) in sys.argv):
+        args = {f"'{e}": None}
 # ------------------------------
 
 sc = SparkContext.getOrCreate()
@@ -49,8 +60,6 @@ RDS_DB_INSTANCE_USER = "admin"
 RDS_DB_INSTANCE_PWD = args["rds_db_pwd"]
 RDS_DB_INSTANCE_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
 
-RDS_DB_LIST_GIVEN = args.get("rds_sqlserver_db_list", None)
-
 CSV_FILE_SRC_S3_BUCKET_NAME = args["csv_src_bucket_name"]
 
 PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
@@ -72,7 +81,7 @@ def get_rds_db_jdbc_url(in_rds_db_name=None):
         return f"""jdbc:sqlserver://{RDS_DB_HOST_ENDPOINT}:{RDS_DB_PORT};database={in_rds_db_name}"""
 
 
-def get_rds_database_list(in_rds_databases=None):
+def get_rds_database_list(in_rds_databases):
 
     if in_rds_databases is None:
         sql_sys_databases_1 = f"""
@@ -178,10 +187,9 @@ if __name__ == "__main__":
 
     catalog_table_s3_full_path = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
-    if RDS_DB_LIST_GIVEN.strip() == "":
-        rds_sqlserver_db_list = get_rds_database_list(None)
-    else:
-        rds_sqlserver_db_list = get_rds_database_list(RDS_DB_LIST_GIVEN)
+    LOGGER.info(f"""Given database(s): {args["rds_sqlserver_dbs"]}""")
+    rds_sqlserver_db_list = get_rds_database_list(args["rds_sqlserver_dbs"])
+    LOGGER.info(f"""Using databases {rds_sqlserver_db_list}""")
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_list)
 
@@ -287,5 +295,3 @@ if __name__ == "__main__":
                                                  })
 
     job.commit()
-    spark.stop()
-    time.sleep(60)
