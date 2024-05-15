@@ -103,8 +103,8 @@ locals {
         })
       })
       pd-ncr-db-1-b = merge(local.database_ec2_default, {
-        availability_zone = "eu-west-2b"
         config = merge(local.database_ec2_default.config, {
+          availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
             "Ec2PDDatabasePolicy",
           ])
