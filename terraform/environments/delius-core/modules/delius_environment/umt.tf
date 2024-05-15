@@ -18,7 +18,7 @@ module "umt" {
     }
   ]
 
-  name     = "user-management"
+  name     = "umt"
   env_name = var.env_name
 
   ecs_cluster_arn  = module.ecs.ecs_cluster_arn
