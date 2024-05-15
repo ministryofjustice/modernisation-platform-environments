@@ -42,6 +42,7 @@ module "umt" {
   elasticache_port                 = 6379
   elasticache_parameter_group_name = var.delius_microservice_configs.umt.elasticache_parameter_group_name
   elasticache_subnet_group_name    = "nextcloud-elasticache-subnet-group"
+  elasticache_apply_immediately   = true
 
   elasticache_parameters = {
     "notify-keyspace-events" = "eA"

@@ -281,6 +281,12 @@ variable "elasticache_engine" {
   default     = "redis"
 }
 
+variable "elasticache_apply_immediately" {
+  description = "Apply changes immediately"
+  type        = bool
+  default     = false
+}
+
 variable "elasticache_endpoint_environment_variable" {
   description = "Environment variable to store the elasticache endpoint"
   type        = string

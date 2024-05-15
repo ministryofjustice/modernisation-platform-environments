@@ -16,6 +16,7 @@ resource "aws_elasticache_cluster" "this" {
   engine_version             = var.elasticache_engine_version
   port                       = var.elasticache_port
   subnet_group_name          = aws_elasticache_subnet_group.this[0].name
+  apply_immediately          = var.elasticache_apply_immediately
   auto_minor_version_upgrade = true
   final_snapshot_identifier  = var.elasticache_engine == "redis" ? "final-redis-${var.name}-${var.env_name}" : null
   maintenance_window         = var.maintenance_window
