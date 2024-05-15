@@ -36,7 +36,7 @@ args = getResolvedOptions(sys.argv, DEFAULT_INPUTS_LIST)
 
 for e in OPTIONAL_INPUTS:
     if not ('--{}'.format(e) in sys.argv):
-        args = {f"'{e}": None}
+        args[f"{e}"] = None
 
 # ------------------------------
 
