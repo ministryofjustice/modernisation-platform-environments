@@ -2,6 +2,13 @@ locals {
 
   # baseline config
   production_config = {
+    
+    # Instance Type Defaults for production
+    # instance_type_defaults = {
+    #   web = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
+    #   boe = "m4.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
+    #   bods = "r4.2xlarge" # 8 vCPUs, 61GB RAM x 2 instance
+    # }
     baseline_route53_zones = {
       "reporting.oasys.service.justice.gov.uk" = {
         ns_records = [

@@ -117,49 +117,49 @@ locals {
     }
   })
 
-  defaults_onr_db_ec2 = merge(local.defaults_ec2, {
-    config = merge(local.defaults_ec2.config, {
-      ami_name = "base_rhel_7_9_*"
-    })
-    instance = merge(local.defaults_ec2.instance, {
-      disable_api_stop       = false
-      vpc_security_group_ids = ["onr_db", "oasys_db_onr_db"]
-    })
-    # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
-    ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 30 }   # root volume
-      "/dev/sdb"  = { label = "app", size = 128 }   # /u01
-      "/dev/sdc"  = { label = "app", size = 128 }   # /u02
-      "/dev/sde"  = { label = "data", size = 1023 } # DATA01
-      # "/dev/sdf" = { label = "data", size = 1023 }  # DATA02
-      # "/dev/sdg" = { label = "data", size = 1023 }  # DATA03
-      # "/dev/sdh" = { label = "data", size = 1023 }  # DATA04
-      # "/dev/sdi" = { label = "data", size = 1023 }  # DATA05
-      # "/dev/sdj" = { label = "data", size = 1023 } # DATA06
-      "/dev/sdk" = { label = "flash", size = 1023 } # FLASH01
-      # "/dev/sdl" = { label = "flash", size = 1023 } # FLASH02
-      # "/dev/sdm" = { label = "flash", size = 1023 } # FLASH03
-      # "/dev/sdn" = { label = "flash", size = 1023 } # FLASH04
-      # "/dev/sdo" = { label = "flash", size = 1023 } # FLASH05
-      # "/dev/sdp" = { label = "flash", size = 1023 } # FLASH06
-      # "/dev/sdq" = { label = "flash", size = 1023 } # FLASH07
-      "/dev/sds" = { label = "swap", size = 128 }
-    }
-    ebs_volume_config = {
-      data = {
-        iops       = 5000 # confirmed, by looking at Azure
-        throughput = 200
-      }
-      flash = {
-        iops       = 5000 # confirmed, by looking at Azure
-        throughput = 200
-      }
-    }
-    # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.onr_db off for now
-    tags = {
-      os-type   = "Linux"
-      component = "onr_db"
-    }
-    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
-  })
+  # defaults_onr_db_ec2 = merge(local.defaults_ec2, {
+  #   config = merge(local.defaults_ec2.config, {
+  #     ami_name = "base_rhel_7_9_*"
+  #   })
+  #   instance = merge(local.defaults_ec2.instance, {
+  #     disable_api_stop       = false
+  #     vpc_security_group_ids = ["onr_db", "oasys_db_onr_db"]
+  #   })
+  #   # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
+  #   ebs_volumes = {
+  #     "/dev/sda1" = { label = "root", size = 30 }   # root volume
+  #     "/dev/sdb"  = { label = "app", size = 128 }   # /u01
+  #     "/dev/sdc"  = { label = "app", size = 128 }   # /u02
+  #     "/dev/sde"  = { label = "data", size = 1023 } # DATA01
+  #     # "/dev/sdf" = { label = "data", size = 1023 }  # DATA02
+  #     # "/dev/sdg" = { label = "data", size = 1023 }  # DATA03
+  #     # "/dev/sdh" = { label = "data", size = 1023 }  # DATA04
+  #     # "/dev/sdi" = { label = "data", size = 1023 }  # DATA05
+  #     # "/dev/sdj" = { label = "data", size = 1023 } # DATA06
+  #     "/dev/sdk" = { label = "flash", size = 1023 } # FLASH01
+  #     # "/dev/sdl" = { label = "flash", size = 1023 } # FLASH02
+  #     # "/dev/sdm" = { label = "flash", size = 1023 } # FLASH03
+  #     # "/dev/sdn" = { label = "flash", size = 1023 } # FLASH04
+  #     # "/dev/sdo" = { label = "flash", size = 1023 } # FLASH05
+  #     # "/dev/sdp" = { label = "flash", size = 1023 } # FLASH06
+  #     # "/dev/sdq" = { label = "flash", size = 1023 } # FLASH07
+  #     "/dev/sds" = { label = "swap", size = 128 }
+  #   }
+  #   ebs_volume_config = {
+  #     data = {
+  #       iops       = 5000 # confirmed, by looking at Azure
+  #       throughput = 200
+  #     }
+  #     flash = {
+  #       iops       = 5000 # confirmed, by looking at Azure
+  #       throughput = 200
+  #     }
+  #   }
+  #   # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.onr_db off for now
+  #   tags = {
+  #     os-type   = "Linux"
+  #     component = "onr_db"
+  #   }
+  #   route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+  # })
 }
