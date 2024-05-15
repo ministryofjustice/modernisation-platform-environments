@@ -154,7 +154,7 @@ resource "aws_cloudwatch_metric_alarm" "app2_ec2_status_check" {
   alarm_description   = "App2 EC2 Instance Status Check Failed"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    InstanceId = aws_instance.app2.id
+    InstanceId = aws_instance.app2[0].id
   }
   evaluation_periods = "5"
   metric_name        = "StatusCheckFailed_Instance"
