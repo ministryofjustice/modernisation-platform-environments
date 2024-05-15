@@ -173,6 +173,9 @@ resource "aws_lambda_function" "em_ap_transfer_lambda" {
       "REG_BUCKET_NAME" = local.register_my_data_bucket
     }
   }
+  tracing_config {
+    mode = "Active" #CKV_AWS_50
+  }
   source_code_hash = data.archive_file.em_ap_transfer_lambda.output_base64sha256
 }
 
