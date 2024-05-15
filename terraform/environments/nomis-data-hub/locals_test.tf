@@ -97,16 +97,17 @@ locals {
       })
     }
 
-    # baseline_ssm_parameters = {
-    #   "/offloc" = {
-    #     parameters = {
-    #       offloc_bucket_name = {
-    #         description = "The name of the offloc upload bucket"
-    #         value = module.baseline.offloc-upload.bucket.bucket
-    #       }
-    #     }
-    #   }
-    # }
+    baseline_ssm_parameters = {
+      "/offloc" = {
+        parameters = {
+          offloc_bucket_name = {
+            description = "The name of the offloc upload bucket"
+            value_s3_bucket_name = "offloc-upload"
+          }
+        }
+      }
+    }
+
 
     baseline_s3_buckets = {
 
