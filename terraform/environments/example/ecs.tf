@@ -2,6 +2,7 @@
 #------------------------Comment out file if not required----------------------------------
 ###########################################################################################
 
+
 module "ecs-cluster" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.0.3"
 
@@ -17,11 +18,12 @@ module "ecs-cluster" {
   environment = local.environment
   name        = local.ecs_application_name
   namespace   = "platforms"
-  tags        = local.tags
+
+  tags = local.tags
 }
 
 module "service" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
 
   container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
@@ -53,7 +55,8 @@ module "service" {
   ]
 
   ignore_changes_task_definition = false
-  tags                           = local.tags
+
+  tags = local.tags
 }
 
 locals {
