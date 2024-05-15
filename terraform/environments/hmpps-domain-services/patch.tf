@@ -101,6 +101,7 @@ module "production-eu-west-2a" {
   patch_schedule       = "cron(0 21 ? * THU#3 *)" # 3rd Thurs @ 9pm
   operating_system     = "WINDOWS"
   patch_tag            = "eu-west-2a"
+  suffix               = "-2a"
   patch_classification = ["SecurityUpdates", "CriticalUpdates"]
   tags = merge(
     local.tags,
@@ -123,6 +124,7 @@ module "production-eu-west-2b" {
   patch_schedule       = "cron(0 21 ? * THU#4 *)" # 4th Thurs @ 9pm
   operating_system     = "WINDOWS"
   patch_tag            = "eu-west-2b"
+  suffix               = "-2b"
   patch_classification = ["SecurityUpdates", "CriticalUpdates"]
   tags = merge(
     local.tags,
