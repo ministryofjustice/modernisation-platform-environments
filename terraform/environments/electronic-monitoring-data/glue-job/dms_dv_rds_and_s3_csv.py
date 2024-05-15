@@ -73,7 +73,7 @@ def get_rds_db_jdbc_url(in_rds_db_name=None):
 
 def get_rds_database_list(in_rds_databases=None):
 
-    if in_rds_databases is None or in_rds_databases == "":
+    if in_rds_databases is None:
         sql_sys_databases_1 = f"""
         SELECT name FROM sys.databases
         WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb', 'experimentation', 'rdsadmin')
@@ -210,7 +210,10 @@ if __name__ == "__main__":
 
     catalog_table_s3_full_path = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
-    rds_sqlserver_db_list = get_rds_database_list(RDS_DB_LIST_GIVEN)
+    if RDS_DB_LIST_GIVEN.strip() == "":
+        rds_sqlserver_db_list = get_rds_database_list(None)
+    else:
+        rds_sqlserver_db_list = get_rds_database_list(RDS_DB_LIST_GIVEN)
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_list)
 
