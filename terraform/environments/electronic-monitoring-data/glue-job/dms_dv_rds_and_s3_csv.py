@@ -37,12 +37,15 @@ args = getResolvedOptions(sys.argv, DEFAULT_INPUTS_LIST)
 for e in OPTIONAL_INPUTS:
     if not ('--{}'.format(e) in sys.argv):
         args = {f"'{e}": None}
+
 # ------------------------------
 
 sc = SparkContext.getOrCreate()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
+LOGGER = glueContext.get_logger()
+LOGGER.info(f"""args = \n{args}""")
 # ------------------------------
 
 job = Job(glueContext)
@@ -66,8 +69,6 @@ PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 
 GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
 GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
-
-LOGGER = glueContext.get_logger()
 
 # ===================================================================================================
 # USER-DEFINED-FUNCTIONS
