@@ -110,6 +110,7 @@ resource "aws_iam_policy_attachment" "glue_log_attachment" {
 
 
 data "aws_iam_policy_document" "parquet-to-csv" {
+  #checkov:skip=CKV_AWS_356:Restrict IAM resource to resources glue needs - see ELM-1977
   statement {
     effect = "Allow"
     actions = [
