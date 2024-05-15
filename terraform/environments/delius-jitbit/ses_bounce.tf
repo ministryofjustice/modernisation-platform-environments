@@ -14,7 +14,8 @@ resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_desti
     }
     enabled = true
     matching_event_types = [
-      "BOUNCE"
+      "BOUNCE",
+      "DELIVERY_DELAY"
     ]
   }
 }
