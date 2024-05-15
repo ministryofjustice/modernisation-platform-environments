@@ -48,7 +48,7 @@ RDS_DB_INSTANCE_USER = "admin"
 RDS_DB_INSTANCE_PWD = args["rds_db_pwd"]
 RDS_DB_INSTANCE_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
 
-RDS_DB_LIST_GIVEN = args["rds_sqlserver_db_list"]
+RDS_DB_LIST_GIVEN = args.get("rds_sqlserver_db_list", None)
 
 CSV_FILE_SRC_S3_BUCKET_NAME = args["csv_src_bucket_name"]
 
@@ -304,7 +304,9 @@ if __name__ == "__main__":
                                                  },
                                                  format_options={
                                                      'useGlueParquetWriter': True,
-                                                     'compression': 'snappy', 'blockSize': 13421773, 'pageSize': 1048576
+                                                     'compression': 'snappy', 
+                                                     'blockSize': 13421773, 
+                                                     'pageSize': 1048576
                                                  })
 
     job.commit()
