@@ -70,6 +70,9 @@ locals {
 
       /* Observability Platform */
       observability_platform = "development"
+
+      /* QuickSight */
+      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
     }
     production = {
       /* VPC */
