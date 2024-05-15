@@ -7,6 +7,7 @@ resource "aws_dms_endpoint" "dms_rds_source" {
   endpoint_type = "source"
   engine_name   = "sqlserver"
   #   extra_connection_attributes = ""
+  #checkov:skip=CKV_AWS_296:Fixed by uncommenting the line below this one with a correct kms key arn - See ELM-1962
   #   kms_key_arn                 = aws_db_instance.database_2022.kms_key_id
   password    = var.rds_db_instance_pasword
   port        = var.rds_db_instance_port
@@ -26,6 +27,8 @@ resource "aws_dms_endpoint" "dms_rds_source" {
 
 # Create DMS Endpoint to S3 Target
 resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
+  #checkov:skip=CKV_AWS_298:MUST use Customer Managed Key (CMK) for encryption - See ELM-1962
+
 
   # Minimal Config:
   endpoint_id             = "s3-${replace(var.database_name, "_", "-")}-tf"
