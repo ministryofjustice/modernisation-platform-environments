@@ -57,7 +57,6 @@ PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
 GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
 
-# LOGGER = getLogger(__name__)
 LOGGER = glueContext.get_logger()
 
 # ===================================================================================================
@@ -84,7 +83,7 @@ def get_rds_database_list(in_rds_databases=None):
         if isinstance(in_rds_databases, list):
             rds_db_str = ', '.join(f"\'{db}\'" for db in in_rds_databases)
         elif isinstance(in_rds_databases, str):
-            rds_db_str = in_rds_databases # f'\'{in_rds_databases}\''
+            rds_db_str = in_rds_databases
 
         sql_sys_databases_2 = f"""
         SELECT name FROM sys.databases
@@ -170,40 +169,6 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
         return spark.read.csv(in_csv_tbl_s3_folder_path, header="true", schema=in_rds_df_schema)
     except Exception as err:
         LOGGER.error(err)
-
-# def create_or_replace_table(in_replace=False):
-#     table_ddl = f'''
-#     CREATE EXTERNAL TABLE `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
-#     `run_datetime` timestamp,
-#     `full_table_name` string,
-#     `json_row` string,
-#     `validation_msg` string)
-#     PARTITIONED BY (
-#         `database_name` string)
-#     ROW FORMAT SERDE
-#         'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
-#     STORED AS INPUTFORMAT
-#         'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
-#     OUTPUTFORMAT
-#         'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
-#     LOCATION
-#         's3://dms-data-validation-20240509174326500600000002/dms_data_validation/glue_df_output/'
-#     TBLPROPERTIES (
-#         'classification'='parquet',
-#         'partition_filtering.enabled'='true',
-#         'typeOfData'='file')
-#     '''.strip()
-#     try:
-#         if in_replace:
-#             None_DF = spark.sql(f"drop table if exists {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
-#             None_DF = spark.sql(table_ddl).collect()
-#             None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
-#         else:
-#             None_DF = spark.sql(f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}").collect()
-#     except Exception as e:
-#         print(e)
-
-#     return None
 
 # ===================================================================================================
 
