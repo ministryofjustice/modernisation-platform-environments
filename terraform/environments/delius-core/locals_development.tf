@@ -133,7 +133,7 @@ locals {
     }
 
     umt = {
-      image_tag                        = "5.7.6"
+      image_tag                        = "6.2"
       container_port                   = 8080
       container_memory                 = 4096
       container_cpu                    = 1024
