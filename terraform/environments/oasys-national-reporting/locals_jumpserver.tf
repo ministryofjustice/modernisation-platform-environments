@@ -14,7 +14,7 @@ locals {
       "/dev/sda1" = { type = "gp3", size = 200 }
     }
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      instance_type          = "t3.large"
+      instance_type          = "m4.large"
       vpc_security_group_ids = ["private-jumpserver"]
     })
     tags = {
@@ -23,7 +23,7 @@ locals {
       os-type                = "Windows"
       component              = "test"
       server-type            = "OnrClient"
-      backup                 = "false" # no need to back this up as they are destroyed each night
+      backup                 = "false" # no need to backup as these shouldn't contain persistent data
     }
   }
 }
