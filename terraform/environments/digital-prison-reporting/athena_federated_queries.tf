@@ -1,14 +1,12 @@
 locals {
-  # TODO Parameterise NOMIS IP
-  #  Dev or Test for now
-  nomis_ip_address        = (local.environment == "dev") ? "10.26.24.29" : "10.26.12.239"
-  connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis_athena_federated.name}}@${local.nomis_ip_address}:1521:CNOMT3"
+  nomis_host              = (local.environment == "dev") ? "10.26.24.29" :
+    jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
+  connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis_athena_federated.name}}@${local.nomis_host}:1521:CNOMT3"
 }
 
 module "athena_federated_query_connector_oracle" {
   source = "./modules/athena_federated_query_connectors/oracle"
 
-  nomis_cidr                            = "${local.nomis_ip_address}/32"
   spill_bucket_name                     = module.s3_working_bucket.bucket_id
   connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
   connector_jar_bucket_key              = "third-party/athena-connectors/athena-oracle-2024.18.2.jar"

@@ -54,11 +54,6 @@ variable "connection_string_nomis" {
   description = "The Athena Federated Query connection string for NOMIS (a JDBC connection string with an additional prefix)"
 }
 
-variable "nomis_cidr" {
-  type        = string
-  description = "CIDR that can be used to allow connectivity to NOMIS"
-}
-
 variable "lambda_memory_allocation_mb" {
   type        = number
   default     = 3000
