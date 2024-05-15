@@ -1,5 +1,6 @@
 import sys
 import boto3
+import time
 from logging import getLogger
 
 from awsglue.transforms import *
@@ -207,9 +208,11 @@ if __name__ == "__main__":
 
             df_rds_temp_count = df_rds_temp.count()
             df_csv_temp_count = df_csv_temp.count()
+
             if df_rds_temp_count == df_csv_temp_count:
 
-                df_rds_csv_subtract_row_count = df_rds_temp.subtract(df_csv_temp).count()
+                df_subtract = df_rds_temp.subtract(df_csv_temp).persist()
+                df_rds_csv_subtract_row_count = df_subtract.count()
                 
                 if df_rds_csv_subtract_row_count == 0:
                     df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
@@ -219,9 +222,9 @@ if __name__ == "__main__":
                                                       f"""'{rds_db_name}' as database_name"""
                                                       )
 
-                    df_dv_output = df_dv_output.union(df_temp)
+                    df_dv_output = df_dv_output.union(df_temp).persist()
                 else:
-                    df_temp = (df_rds_temp.subtract(df_csv_temp)
+                    df_temp = (df_subtract
                                .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
                                .selectExpr("json_row")
                                .limit(1000))
@@ -233,7 +236,7 @@ if __name__ == "__main__":
                                                  f"""'{rds_db_name}' as database_name"""
                                                  )
 
-                    df_dv_output = df_dv_output.union(df_temp)
+                    df_dv_output = df_dv_output.union(df_temp).persist()
             else:
                 df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                   f"""'{db_dbo_tbl}' as full_table_name""",
@@ -242,7 +245,7 @@ if __name__ == "__main__":
                                                   f"""'{rds_db_name}' as database_name"""
                                                   )
 
-                df_dv_output = df_dv_output.union(df_temp)
+                df_dv_output = df_dv_output.union(df_temp).persist()
         else:
             df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                               f"""'{db_dbo_tbl}' as full_table_name""",
@@ -251,7 +254,9 @@ if __name__ == "__main__":
                                               f"""'{rds_db_name}' as database_name"""
                                               )
 
-            df_dv_output = df_dv_output.union(df_temp)
+            df_dv_output = df_dv_output.union(df_temp).persist()
+        
+        df_subtract.unpersist()
         LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
 
     df_dv_output = df_dv_output.dropDuplicates()
@@ -282,3 +287,5 @@ if __name__ == "__main__":
                                                  })
 
     job.commit()
+    spark.stop()
+    time.sleep(60)
