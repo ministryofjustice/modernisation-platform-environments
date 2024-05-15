@@ -34,7 +34,7 @@ locals {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
-        vpc_cni                = "v1.18.1-eksbuild.1"
+        vpc_cni                = "v1.18.1-eksbuild.3"
         aws_guardduty_agent    = "v1.5.0-eksbuild.1"
       }
 
@@ -61,7 +61,7 @@ locals {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
-        vpc_cni                = "v1.18.1-eksbuild.1"
+        vpc_cni                = "v1.18.1-eksbuild.3"
         aws_guardduty_agent    = "v1.5.0-eksbuild.1"
       }
 
@@ -88,7 +88,7 @@ locals {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
-        vpc_cni                = "v1.18.1-eksbuild.1"
+        vpc_cni                = "v1.18.1-eksbuild.3"
         aws_guardduty_agent    = "v1.5.0-eksbuild.1"
       }
 
