@@ -4,43 +4,28 @@
 
 
 module "ecs-cluster" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.0.3"
-
-  ec2_capacity_instance_type     = local.application_data.accounts[local.environment].container_instance_type
-  ec2_capacity_max_size          = local.application_data.accounts[local.environment].ec2_max_size
-  ec2_capacity_min_size          = local.application_data.accounts[local.environment].ec2_min_size
-  ec2_capacity_security_group_id = aws_security_group.cluster_ec2.id
-  ec2_subnet_ids = [
-    data.aws_subnet.private_subnets_a.id,
-    data.aws_subnet.private_subnets_b.id,
-    data.aws_subnet.private_subnets_c.id
-  ]
-  environment = local.environment
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.3.0"
   name        = local.ecs_application_name
-  namespace   = "platforms"
-
   tags = local.tags
 }
 
 module "service" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v4.3.0"
 
-  container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
-  ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
+  container_definitions = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
+  cluster_arn           = module.ecs-cluster.ecs_cluster_arn
   name                      = "${local.ecs_application_name}-task_definition_volume"
-  namespace                 = "platforms"
-  vpc_id                    = local.vpc_all
-
-  launch_type  = local.application_data.accounts[local.environment].launch_type
-  network_mode = local.application_data.accounts[local.environment].network_mode
 
   task_cpu    = local.application_data.accounts[local.environment].container_cpu
   task_memory = local.application_data.accounts[local.environment].container_memory
 
+  service_role_arn   = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-service-role"
+  task_role_arn      = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-task-role"
   task_exec_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-task-execution-role"
 
-  environment = local.environment
-  ecs_load_balancers = [
+  health_check_grace_period_seconds = "300"
+
+  service_load_balancers = [
     {
       target_group_arn = aws_lb_target_group.ecs_target_group.arn
       container_name   = local.ecs_application_name
@@ -48,13 +33,15 @@ module "service" {
     }
   ]
 
-  subnet_ids = [
+  subnets = [
     data.aws_subnet.private_subnets_a.id,
     data.aws_subnet.private_subnets_b.id,
     data.aws_subnet.private_subnets_c.id
   ]
 
-  ignore_changes_task_definition = false
+  security_groups = []
+
+  ignore_changes = false
 
   tags = local.tags
 }

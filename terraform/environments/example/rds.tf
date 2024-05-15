@@ -35,12 +35,25 @@ resource "aws_db_instance" "Example-RDS" { #tfsec:ignore:aws-rds-enable-deletion
   monitoring_role_arn = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? "" : aws_iam_role.rds_enhanced_monitoring[0].arn
   #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
   storage_encrypted               = true
+  db_subnet_group_name = aws_db_subnet_group.example.name
+  vpc_security_group_ids = [aws_security_group.rds-example.id]
   performance_insights_enabled    = local.application_data.accounts[local.environment].db_performance_insights_enabled
   performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-example", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_db_subnet_group" "example" {
+  name       = "data"
+  subnet_ids = data.aws_subnets.shared-data.ids
+
+  tags = local.tags
+}
+
+resource "aws_security_group" "rds-example" {
+  vpc_id = data.aws_vpc.shared.id
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {
