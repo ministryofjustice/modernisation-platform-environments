@@ -158,6 +158,7 @@ data "archive_file" "em_ap_transfer_lambda" {
 resource "aws_lambda_function" "em_ap_transfer_lambda" {
   #checkov:skip=CKV_AWS_116:Dead Letter Queue does not exist yet - See ELM-1957
   #checkov:skip=CKV_AWS_117:Uncertain on VPC configurations - See ELM-1958
+  #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
   filename                       = "lambdas/em_ap_transfer_lambda.zip"
   function_name                  = "em-ap-transfer-lambda"
   role                           = aws_iam_role.em_ap_transfer_lambda.arn
