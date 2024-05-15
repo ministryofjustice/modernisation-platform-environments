@@ -1,6 +1,7 @@
 resource "aws_s3_bucket" "dms_dv_parquet_s3_bucket" {
   #checkov:skip=CKV_AWS_144:Unsure of policy on this yet, should be covered by module - See ELM-1949
   #checkov:skip=CKV_AWS_145:Decide on a KMS key for encryption, should be covered by moudle - See ELM-1949
+  #checkov:skip=CKV_AWS_18:AWS Access Logging should be enabled on S3 buckets, should be covered by module - See ELM-1949
   bucket_prefix = "dms-data-validation-"
 
   tags = merge(
@@ -37,6 +38,7 @@ resource "aws_s3_bucket_policy" "dms_dv_parquet_s3_bucket" {
 # -------------------------------------------------------------------
 
 resource "aws_s3_bucket" "dms_dv_glue_job_s3_bucket" {
+  #checkov:skip=CKV_AWS_18:AWS Access Logging should be enabled on S3 buckets, should be covered by module - See ELM-1949
   bucket_prefix = "glue-jobs-py-scripts-"
 }
 
