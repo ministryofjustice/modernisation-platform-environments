@@ -50,7 +50,8 @@ resource "aws_db_instance" "database_2022" {
   #checkov:skip=CKV_AWS_293:This database will eventually be deleted so we don't want to protect its deletion.
   deletion_protection             = false
   enabled_cloudwatch_logs_exports = ["general", "error", "slowquery"] #CKV_AWS_129
-  performance_insights_enabled    = true
+  #checkov:skip=CKV_AWS_354:Performance insight logs must be encrypted with KMS CMKs, see ELM-1962
+  performance_insights_enabled = true
 
   option_group_name = aws_db_option_group.sqlserver_backup_restore_2022.name
 
