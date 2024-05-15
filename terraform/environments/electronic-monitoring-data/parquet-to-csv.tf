@@ -73,6 +73,7 @@ resource "aws_cloudwatch_log_group" "parquet-to-csv" {
 }
 
 resource "aws_glue_job" "parquet-to-csv" {
+  #checkov:skip=CKV_AWS_195:security configuration does not exist to attach - see ELM-1974
   name         = "parquet-to-csv"
   role_arn     = aws_iam_role.parquet-to-csv.arn
   glue_version = "4.0"
