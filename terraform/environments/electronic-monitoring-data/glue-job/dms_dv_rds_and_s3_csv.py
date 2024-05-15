@@ -224,6 +224,9 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
                                              )
 
                 df_dv_output = df_dv_output.union(df_temp)
+
+            df_subtract.unpersist()
+            
         else:
             df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                               f"""'{db_dbo_tbl}' as full_table_name""",
@@ -243,7 +246,6 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
 
         df_dv_output = df_dv_output.union(df_temp)
     
-    df_subtract.unpersist()
     LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
 
     return df_dv_output
