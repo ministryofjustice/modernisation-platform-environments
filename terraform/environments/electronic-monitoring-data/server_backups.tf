@@ -44,12 +44,13 @@ resource "aws_db_instance" "database_2022" {
   vpc_security_group_ids = [aws_security_group.db.id]
   port                   = 1433
 
-  auto_minor_version_upgrade      = true
-  skip_final_snapshot             = true
-  maintenance_window              = "Mon:00:00-Mon:03:00"
+  auto_minor_version_upgrade = true
+  skip_final_snapshot        = true
+  maintenance_window         = "Mon:00:00-Mon:03:00"
   #checkov:skip=CKV_AWS_293:This database will eventually be deleted so we don't want to protect its deletion.
   deletion_protection             = false
   enabled_cloudwatch_logs_exports = ["general", "error", "slowquery"] #CKV_AWS_129
+  performance_insights_enabled    = true
 
   option_group_name = aws_db_option_group.sqlserver_backup_restore_2022.name
 
