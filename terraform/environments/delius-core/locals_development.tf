@@ -132,12 +132,12 @@ locals {
       container_cpu    = 1024
     }
 
-    user_management = {
+    umt = {
       image_tag                        = "5.7.6"
       container_port                   = 8080
       container_memory                 = 4096
       container_cpu                    = 1024
-      elasticache_version              = "6.0"
+      elasticache_version              = "6.2"
       elasticache_node_type            = "cache.t3.small"
       elasticache_port                 = 6379
       elasticache_parameter_group_name = "default.redis6.x"
