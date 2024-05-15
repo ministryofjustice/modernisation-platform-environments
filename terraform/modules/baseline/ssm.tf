@@ -24,25 +24,33 @@ locals {
     item.key => item.value if item.value.value != null
   }
 
+  # use s3 bucket name as value, lookup from module
+  ssm_parameters_value_s3_bucket_name = {
+    for item in local.ssm_parameters_list :
+    item.key => merge(item.value, {
+      value = module.s3_bucket[item.value.value_s3_bucket_name].bucket.bucket
+    }) if item.value.value_s3_bucket_name != null
+  }
+
   ssm_parameters_random = {
     for item in local.ssm_parameters_list :
     item.key => merge(item.value, {
       value = random_password.this[item.key].result
-    }) if item.value.value == null && item.value.random != null
+    }) if item.value.random != null
   }
 
   ssm_parameters_file = {
     for item in local.ssm_parameters_list :
     item.key => merge(item.value, {
       value = file(item.value.file)
-    }) if item.value.value == null && item.value.random == null && item.value.file != null
+    }) if item.value.file != null
   }
 
   ssm_parameters_default = {
     for item in local.ssm_parameters_list :
     item.key => merge(item.value, {
       value = "placeholder, overwrite me outside of terraform"
-    }) if item.value.value == null && item.value.random == null && item.value.file == null
+    }) if item.value.value == null && item.value.value_s3_bucket_name == null && item.value.random == null && item.value.file == null
   }
 }
 
@@ -72,6 +80,7 @@ resource "aws_ssm_parameter" "fixed" {
 
   for_each = merge(
     local.ssm_parameters_value,
+    local.ssm_parameters_value_s3_bucket_name,
     local.ssm_parameters_random,
     local.ssm_parameters_file
   )
