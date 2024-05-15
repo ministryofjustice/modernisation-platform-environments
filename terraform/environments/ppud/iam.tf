@@ -288,7 +288,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process" {
      "Action": [
         "ssm:SendCommand",
         "ssm:GetCommandInvocation",
-        "ec2:DescribeInstances"        
+        "ec2:DescribeInstances",
+        "lambda:InvokeAsync",
+        "lambda:InvokeFunction"
       ],
       "Resource": [
       "arn:aws:ssm:eu-west-2:075585660276:*",
