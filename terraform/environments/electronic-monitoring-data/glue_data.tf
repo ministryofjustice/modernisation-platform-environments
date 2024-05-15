@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "dms_dv_athena_iam_policy_document" {
       "athena:GetQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:workgroup/*",
+      "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:workgroup/primary",
       "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:datacatalog/dms_data_validation/*"
     ]
   }
