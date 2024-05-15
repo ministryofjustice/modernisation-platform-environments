@@ -83,14 +83,15 @@ def get_rds_database_list(in_rds_databases=None):
         if isinstance(in_rds_databases, list):
             rds_db_str = ', '.join(f"\'{db}\'" for db in in_rds_databases)
         elif isinstance(in_rds_databases, str):
-            rds_db_str = f"\'{in_rds_databases}\'"
+            rds_db_str = in_rds_databases # f'\'{in_rds_databases}\''
 
         sql_sys_databases_2 = f"""
         SELECT name FROM sys.databases
         WHERE name IN ({rds_db_str})
         """.strip()
         sql_sys_databases = sql_sys_databases_2
-
+    
+    LOGGER.info(f"""Using SQL Statement >>>\n{sql_sys_databases}""")
     df_rds_sys = (spark.read.format("jdbc")
                             .option("url", get_rds_db_jdbc_url())
                             .option("query", sql_sys_databases)
@@ -236,15 +237,14 @@ if __name__ == "__main__":
 
         if tbl_csv_s3_path is not None:
 
-            df_csv_temp = get_s3_csv_dataframe(
-                tbl_csv_s3_path, df_rds_temp.schema)
+            df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema)
 
             df_rds_temp_count = df_rds_temp.count()
             df_csv_temp_count = df_csv_temp.count()
             if df_rds_temp_count == df_csv_temp_count:
 
-                df_rds_csv_subtract_row_count = df_rds_temp.subtract(
-                    df_csv_temp).count()
+                df_rds_csv_subtract_row_count = df_rds_temp.subtract(df_csv_temp).count()
+                
                 if df_rds_csv_subtract_row_count == 0:
                     df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                       f"""'{db_dbo_tbl}' as full_table_name""",
