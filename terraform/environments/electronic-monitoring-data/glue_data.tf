@@ -57,7 +57,23 @@ data "aws_iam_policy_document" "dms_dv_s3_iam_policy_document" {
       aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
       "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
       aws_s3_bucket.dms_dv_glue_job_s3_bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
+      "${aws_s3_bucket.dms_dv_glue_job_s3_bucket.arn}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "dms_dv_athena_iam_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:workgroup/primary",
+      "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:datacatalog/dms_data_validation/*",
+      "arn:aws:athena:eu-west-2:800964199911:workgroup/primary",
+      "arn:aws:athena:eu-west-2:800964199911:datacatalog/dms_data_validation/*"
     ]
   }
 }
