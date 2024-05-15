@@ -34,6 +34,17 @@ sudo bash -c "echo '$DB_IP	${local.application_name_short}-db.${data.aws_route53
 sudo bash -c "echo '$PRIVATE_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}' >> /etc/hosts"
 sudo bash -c "echo '$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}' >> /etc/hosts"
 
+## Mounting to EFS - uncomment when AMI has been applied
+# echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+# mount -a
+# mount_status=$?
+# while [[ $mount_status != 0 ]]
+# do
+#   sleep 10
+#   mount -a
+#   mount_status=$?
+# done
+
 EOF
 
 }
@@ -48,7 +59,7 @@ resource "aws_instance" "app1" {
   instance_type               = local.application_data.accounts[local.environment].app_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.app.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.app_userdata)
