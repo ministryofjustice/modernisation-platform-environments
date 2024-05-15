@@ -22,7 +22,6 @@ resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
 # Create a new replication instance
 
 resource "aws_dms_replication_instance" "dms_replication_instance" {
-
   allocated_storage          = var.dms_allocated_storage_gib
   apply_immediately          = true
   auto_minor_version_upgrade = true
