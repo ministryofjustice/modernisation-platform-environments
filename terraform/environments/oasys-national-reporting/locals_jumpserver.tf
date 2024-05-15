@@ -4,17 +4,17 @@ locals {
     autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     # ami has unwanted ephemeral device, don't copy all the ebs_volumes
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                      = "base_windows_server_2012_r2_release_2024-*"
+      ami_name                      = "base_windows_server_2012_r2_release_2024-05-15*"
       ami_owner                     = "374269020027"
       availability_zone             = null
       ebs_volumes_copy_all_from_ami = false
-      user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
+      # user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
     })
     ebs_volumes = {
       "/dev/sda1" = { type = "gp3", size = 200 }
     }
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      instance_type          = "t3.large"
+      instance_type          = "m4.large"
       vpc_security_group_ids = ["private-jumpserver"]
     })
     tags = {
