@@ -1,5 +1,6 @@
 resource "aws_lb_listener" "this" {
-  #checkov:skip=CKV_AWS_2:skip "Ensure ALB protocol is HTTPS"
+  #checkov:skip=CKV_AWS_2:skip "Ensure ALB protocol is HTTPS" - CSR is http
+  #checkov:skip=CKV_AWS_103: "Ensure that load balancer is using at least TLS 1.2" - nice idea but not possible with nomis
   #Allow http listener to be configured, e.g. for auto redirection to https
 
   load_balancer_arn = local.aws_lb.arn
