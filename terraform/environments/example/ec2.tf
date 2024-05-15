@@ -103,7 +103,7 @@ resource "aws_instance" "develop" {
 
 # create single managed policy
 resource "random_id" "ec2_common_policy" {
-  byte_length = 1
+  byte_length = 4
 }
 
 resource "aws_iam_policy" "ec2_common_policy" {
@@ -111,7 +111,7 @@ resource "aws_iam_policy" "ec2_common_policy" {
   path        = "/"
   description = "Common policy for all ec2 instances"
   policy      = data.aws_iam_policy_document.ec2_common_combined.json
-  tags        = { Name = "ec2-common-policy" }
+  tags        = { Name = "${random_id.ec2_common_policy.dec}-ec2-common-policy" }
 }
 
 # combine ec2-common policy documents
