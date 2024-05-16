@@ -79,6 +79,9 @@ resource "aws_lb_target_group" "target_group" {
   }
 
   tags = { Name = "${local.application_name}-tg-${local.environment}" }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Link target group to the EC2 instance on port 80
@@ -88,7 +91,7 @@ resource "aws_lb_target_group_attachment" "develop" {
   port             = 80
 }
 
-# Load blancer listener
+# Load balancer listener
 resource "aws_lb_listener" "external" {
   load_balancer_arn = aws_lb.external.arn
   port              = local.application_data.accounts[local.environment].server_port
@@ -180,7 +183,7 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
 ######################### S3 Bucket required for logs  ##########################
 #################################################################################
 module "s3-bucket-lb" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=568694e50e03630d99cb569eafa06a0b879a1239" #v7.1.0
 
   bucket_prefix      = "s3-bucket-example-lb"
   versioning_enabled = false
@@ -324,6 +327,7 @@ data "aws_elb_service_account" "default_lb" {}
 
 resource "aws_instance" "lb_example_instance" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
+  #checkov:skip=CKV_AWS_8: "Encryption not required for example instance"
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
   instance_type          = local.application_data.accounts[local.environment].instance_type
   ami                    = local.application_data.accounts[local.environment].ami_image_id
