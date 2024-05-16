@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
   statement {
     actions = [
       "dynamodb:PutItem",
-      "dynamodb:GetItem"
+      "dynamodb:GetItem",
       "kms:Decrypt"
     ]
     resources = [aws_dynamodb_table.bounce_email_notification.arn]
