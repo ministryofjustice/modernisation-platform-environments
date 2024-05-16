@@ -32,7 +32,7 @@ locals {
     }
 
     baseline_efs = {
-      bip = {
+      pp-ncr-sap-share = {
         access_points = {
           root = {
             posix_user = {
@@ -49,7 +49,6 @@ locals {
             }
           }
         }
-        backup_policy_status = "DISABLED"
         file_system = {
           availability_zone_name = "eu-west-2a"
           lifecycle_policy = {
@@ -62,7 +61,7 @@ locals {
           security_groups    = ["bip"]
         }]
         tags = {
-          backup-plan = "daily-and-weekly"
+          backup = "false"
         }
       }
     }
