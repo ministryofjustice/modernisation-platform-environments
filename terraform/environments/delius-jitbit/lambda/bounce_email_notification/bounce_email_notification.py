@@ -55,32 +55,32 @@ def handler(event, context):
     #         "expiresAt": ttl
     #     }
     # )
-    table.update_item(
+    response = table.update_item(
         Key={"email_ticket_id": f"{source}|{jitbit_ticket_id}"},
         UpdateExpression="SET #count = if_not_exists(#count, :initial) + :increment, expiresAt = :ttl",
         ExpressionAttributeNames={"#count": "count"},
         ExpressionAttributeValues={":increment": 1, ":initial": 0, ":ttl": ttl},
         ReturnValues="ALL_NEW",  # Optionally, specify which attributes to return after the update
     )
-    # search for the count of email + ticket_id in the table
-    response = table.query(
-        KeyConditionExpression=Key('email').eq(source),
-        FilterExpression=Attr('ticket_id').eq(jitbit_ticket_id)
-    )
+    # # search for the count of email + ticket_id in the table
+    # response = table.query(
+    #     KeyConditionExpression=Key("email_ticket_id").eq(fsource),
+    #     FilterExpression=Attr("ticket_id").eq(jitbit_ticket_id),
+    # )
 
-    print(response.get('Items')[0])
+    print(response)
 
     print(f"Rate limit: {rate_limit}")
 
-    print(f"Rate limit count: {response.get('Items')[0].get('count')}")
+    print(f"Rate limit count: {response.get('Attributes').get('count')}")
 
     rate_limit_warning_message = ""
     # if the count is not none and greater than the rate limit then exit
-    if response.get("Items") is not None and response.get("Items")[0].get("count") > int(rate_limit):
+    if response.get("Attributes") is not None and response.get("Attributes").get("count") > int(rate_limit):
         print(f"Rate limit exceeded for {source} and {jitbit_ticket_id}")
         return None
     # if the count is not none and 1 less than the rate limit
-    elif response.get("Items") is not None and response.get("Items")[0].get("count") == int(rate_limit) - 1:
+    elif response.get("Attributes") is not None and response.get("Attributes").get("count") == int(rate_limit) - 1:
         rate_limit_warning_message = f"""  <p>
                                     <strong>RATE LIMIT WARNING:</strong>
                                     <br>
