@@ -32,16 +32,6 @@ resource "aws_efs_access_point" "this" {
   })
 }
 
-resource "aws_efs_backup_policy" "this" {
-  count = var.backup_policy_status != null ? 1 : 0
-
-  file_system_id = aws_efs_file_system.this.id
-
-  backup_policy {
-    status = var.backup_policy_status
-  }
-}
-
 resource "aws_efs_file_system" "this" {
   #checkov:skip=CKV2_AWS_18: Skipping as you can opt into AWS Backup plan by setting appropriate backup tag
   availability_zone_name          = var.file_system.availability_zone_name
