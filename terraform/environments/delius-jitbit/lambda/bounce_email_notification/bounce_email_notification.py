@@ -16,8 +16,6 @@ def handler(event, context):
     # this rate limit is per the ttl delta defined above
     rate_limit = os.environ["RATE_LIMIT"]
 
-    todays_date = datetime.now().strftime("%Y-%m-%d")
-
     message = event["Records"][0]["Sns"]["Message"]
     message_dict = json.loads(message)
 
@@ -46,15 +44,6 @@ def handler(event, context):
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # add the record to the dynamodb table
-    # table.put_item(
-    #     Item={
-    #         "email": source,
-    #         "ticket_id": jitbit_ticket_id,
-    #         "count": 1,
-    #         "expiresAt": ttl
-    #     }
-    # )
     response = table.update_item(
         Key={"email_ticket_id": f"{source}|{jitbit_ticket_id}"},
         UpdateExpression="SET #count = if_not_exists(#count, :initial) + :increment, expiresAt = :ttl",
@@ -62,11 +51,6 @@ def handler(event, context):
         ExpressionAttributeValues={":increment": 1, ":initial": 0, ":ttl": ttl},
         ReturnValues="ALL_NEW",  # Optionally, specify which attributes to return after the update
     )
-    # # search for the count of email + ticket_id in the table
-    # response = table.query(
-    #     KeyConditionExpression=Key("email_ticket_id").eq(fsource),
-    #     FilterExpression=Attr("ticket_id").eq(jitbit_ticket_id),
-    # )
 
     print(response)
 
