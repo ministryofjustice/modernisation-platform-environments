@@ -48,7 +48,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "parquet_output_bucket_name",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
-                       "df_coalesce_paartition_count"
+                       "df_coalesce_partition_count"
                        ]
 
 OPTIONAL_INPUTS = ['rds_sqlserver_dbs', 'rds_sqlserver_tbls']
@@ -280,7 +280,7 @@ if __name__ == "__main__":
     cast(null as string) as database_name
     """.strip()
     
-    df_dv_output = spark.sql(sql_select_str).coalesce(args["df_coalesce_paartition_count"])
+    df_dv_output = spark.sql(sql_select_str).coalesce(int(args["df_coalesce_partition_count"]))
 
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")

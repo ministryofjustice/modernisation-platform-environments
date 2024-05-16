@@ -88,6 +88,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"             = "${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}"
     "--glue_catalog_tbl_name"            = "glue_df_output"
+    "--df_coalesce_partition_count"      = 16
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
@@ -95,8 +96,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
     "--enable-metrics"                   = ""
     "--conf"                             = "spark.driver.memory=6g"
-    "--executor-cores"                   = 16
-    "--df_coalesce_paartition_count"     = 16
+    "--executor-cores"                   = 8
   }
 
   connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
