@@ -11,7 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "efs_data_write" {
   namespace          = "AWS/EFS"
   period             = "60"
   statistic          = "Average"
-  threshold          = "1100000"
+  threshold          = local.application_data.accounts[local.environment].efs_data_write_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data = "ignore"
@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "efs_data_read" {
   namespace          = "AWS/EFS"
   period             = "60"
   statistic          = "Average"
-  threshold          = "1100000"
+  threshold          = local.application_data.accounts[local.environment].efs_data_read_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data = "ignore"
@@ -61,7 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "database_cpu" {
   namespace          = "AWS/EC2"
   period             = "60"
   statistic          = "Average"
-  threshold          = "95"
+  threshold          = local.application_data.accounts[local.environment].database_cpu_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
 #   treat_missing_data = "ignore"
@@ -73,27 +73,27 @@ resource "aws_cloudwatch_metric_alarm" "database_cpu" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "elb_latency" {
+resource "aws_cloudwatch_metric_alarm" "elb_target_response_time" {
 
-  alarm_name          = "${local.application_name_short}-${local.environment}-elb-latency"
-  alarm_description   = "ELB Latency Too High"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
+  alarm_name          = "${local.application_name_short}-${local.environment}-elb-target-response-time"
+  alarm_description   = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received. Triggered if response is longer than 1s."
+  comparison_operator = "GreaterThanThreshold"
   dimensions = {
-    AvailabilityZone = "eu-west-2a"
+    LoadBalancer = aws_lb.external.name
   }
-  evaluation_periods = "5"
-  metric_name        = "Latency"
-  namespace          = "AWS/ELB"
+  evaluation_periods = "1"
+  metric_name        = "TargetResponseTime"
+  namespace          = "AWS/ApplicationELB"
   period             = "60"
   statistic          = "Average"
-  threshold          = "1"
+  threshold          = local.application_data.accounts[local.environment].elb_target_response_time_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
 #   treat_missing_data = ""
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name_short}-${local.environment}-elb-latency"
+      Name = "${local.application_name_short}-${local.environment}-elb-target-response-time"
     }
   )
 }
@@ -104,14 +104,14 @@ resource "aws_cloudwatch_metric_alarm" "elb_request_count" {
   alarm_description   = "ELB Request Count Too High"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    AvailabilityZone = "eu-west-2a"
+    LoadBalancer = aws_lb.external.name
   }
   evaluation_periods = "5"
   metric_name        = "RequestCount"
-  namespace          = "AWS/ELB"
+  namespace          = "AWS/ApplicationELB"
   period             = "60"
   statistic          = "Sum"
-  threshold          = "1000"
+  threshold          = local.application_data.accounts[local.environment].elb_request_count_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
 #   treat_missing_data = ""
@@ -136,7 +136,7 @@ resource "aws_cloudwatch_metric_alarm" "app1_ec2_status_check" {
   namespace          = "AWS/EC2"
   period             = "60"
   statistic          = "Sum"
-  threshold          = "1"
+  threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
 #   treat_missing_data = ""
@@ -161,7 +161,7 @@ resource "aws_cloudwatch_metric_alarm" "app2_ec2_status_check" {
   namespace          = "AWS/EC2"
   period             = "60"
   statistic          = "Sum"
-  threshold          = "1"
+  threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
 #   treat_missing_data = ""
@@ -186,7 +186,7 @@ resource "aws_cloudwatch_metric_alarm" "cm_ec2_status_check" {
   namespace          = "AWS/EC2"
   period             = "60"
   statistic          = "Sum"
-  threshold          = "1"
+  threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
 #   treat_missing_data = ""
@@ -211,7 +211,7 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_status_check" {
   namespace          = "AWS/EC2"
   period             = "60"
   statistic          = "Sum"
-  threshold          = "1"
+  threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
 #   treat_missing_data = ""
@@ -222,58 +222,6 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_status_check" {
     }
   )
 }
-
-
-resource "aws_cloudwatch_metric_alarm" "database_ec2_read_ops" {
-
-  alarm_name          = "${local.application_name_short}-${local.environment}-database-ec2-read-ops"
-  alarm_description   = "EC2 Data Read Ops Too High"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  dimensions = {
-    InstanceId = aws_instance.database.id
-  }
-  evaluation_periods = "5"
-  metric_name        = "DiskReadOps"
-  namespace          = "AWS/EC2"
-  period             = "60"
-  statistic          = "Average"
-  threshold          = "1100000"
-#   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-#   ok_actions         = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data = "ignore"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name_short}-${local.environment}-database-ec2-read-ops"
-    }
-  )
-}
-
-resource "aws_cloudwatch_metric_alarm" "database_ec2_write_ops" {
-
-  alarm_name          = "${local.application_name_short}-${local.environment}-database-ec2-write-ops"
-  alarm_description   = "EC2 Data Write Ops Too High"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  dimensions = {
-    InstanceId = aws_instance.database.id
-  }
-  evaluation_periods = "5"
-  metric_name        = "DiskWriteOps"
-  namespace          = "AWS/EC2"
-  period             = "60"
-  statistic          = "Average"
-  threshold          = "1100000"
-#   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-#   ok_actions         = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data = "ignore"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name_short}-${local.environment}-database-ec2-write-ops"
-    }
-  )
-}
-
 
 resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
 
@@ -288,7 +236,7 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
   namespace          = "System/Linux"
   period             = "60"
   statistic          = "Average"
-  threshold          = "50"
+  threshold          = local.application_data.accounts[local.environment].database_ec2_swap_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
 #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
 #   treat_missing_data = ""
@@ -324,3 +272,41 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
 #     }
 #   )
 # }
+
+################################
+### CloudWatch Dashboard
+################################
+
+data "template_file" "dashboard_ha" {
+  count = contains(["development", "testing"], local.environment) ? 0 : 1
+  template = file("${path.module}/dashboard_ha.tpl")
+
+  # TODO Update the local variables to reference the correct alarms once they are created
+  vars = {
+    aws_region = "eu_west_2"
+  }
+}
+
+data "template_file" "dashboard_no_ha" {
+  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  template = file("${path.module}/dashboard_no_ha.tpl")
+
+  # TODO Update the local variables to reference the correct alarms once they are created
+  vars = {
+    aws_region                   = "eu-west-2"
+    dashboard_refresh_period    = 60
+    database_instance_id        = aws_instance.database.id
+    database_cpu_alarm            = aws_cloudwatch_metric_alarm.database_cpu.arn
+    database_status_check_alarm = aws_cloudwatch_metric_alarm.database_ec2_status_check.arn
+    cm_status_check_alarm = aws_cloudwatch_metric_alarm.cm_ec2_status_check.arn
+    app1_status_check_alarm = aws_cloudwatch_metric_alarm.app1_ec2_status_check.arn
+    elb_request_count_alarm = aws_cloudwatch_metric_alarm.elb_request_count.arn
+    efs_data_read_alarm = aws_cloudwatch_metric_alarm.efs_data_read.arn
+    efs_data_write_alarm = aws_cloudwatch_metric_alarm.efs_data_write.arn
+  }
+}
+
+resource "aws_cloudwatch_dashboard" "dashboard" {
+  dashboard_name = "${upper(local.application_name_short)}-Monitoring-Dashboard"
+  dashboard_body = contains(["development", "testing"], local.environment) ? data.template_file.dashboard_no_ha[0].rendered : data.template_file.dashboard_ha[0].rendered
+}
