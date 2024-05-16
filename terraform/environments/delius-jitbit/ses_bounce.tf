@@ -84,10 +84,16 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
   statement {
     actions = [
       "dynamodb:PutItem",
-      "dynamodb:GetItem",
-      "kms:Decrypt"
+      "dynamodb:GetItem"
     ]
     resources = [aws_dynamodb_table.bounce_email_notification.arn]
+  }
+
+  statement {
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = [data.aws_kms_key.general_shared.arn]
   }
 }
 
