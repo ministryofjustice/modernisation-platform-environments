@@ -44,13 +44,33 @@ def handler(event, context):
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    response = table.update_item(
-        Key={"email_ticket_id": f"{source}|{jitbit_ticket_id}"},
-        UpdateExpression="SET #count = if_not_exists(#count, :initial) + :increment, expiresAt = :ttl",
-        ExpressionAttributeNames={"#count": "count"},
-        ExpressionAttributeValues={":increment": 1, ":initial": 0, ":ttl": ttl},
-        ReturnValues="ALL_NEW",  # Optionally, specify which attributes to return after the update
-    )
+    try:
+        response = table.update_item(
+          Key={"email_ticket_id": f"{source}|{jitbit_ticket_id}"},
+          UpdateExpression="SET #count = if_not_exists(#count, :initial) + :increment, expiresAt = if_not_exists(expiresAt, :ttl)",
+          ExpressionAttributeNames={"#count": "count"},
+          ExpressionAttributeValues={
+              ":increment": 1,
+              ":initial": 0,
+              ":ttl": ttl,
+              ":current_timestamp": int(time.time()),
+          },
+          ConditionExpression="attribute_not_exists(expiresAt) OR expiresAt > :current_timestamp",
+          ReturnValues="ALL_NEW",
+      )
+    except dynamodb.meta.client.exceptions.ConditionalCheckFailedException:
+        print("DynamoDB conditional check result - record is expired")
+        # if the record is expired then we need to reset the count and the ttl
+        response = table.update_item(
+            Key={"email_ticket_id": f"{source}|{jitbit_ticket_id}"},
+            UpdateExpression="SET #count = :initial, expiresAt = :ttl",
+            ExpressionAttributeNames={"#count": "count"},
+            ExpressionAttributeValues={
+                ":initial": 0,
+                ":ttl": ttl
+            },
+            ReturnValues="ALL_NEW",
+        )
 
     print(response)
 
@@ -61,10 +81,10 @@ def handler(event, context):
     rate_limit_warning_message = ""
     # if the count is not none and greater than the rate limit then exit
     if response.get("Attributes") is not None and response.get("Attributes").get("count") > int(rate_limit):
-        print(f"Rate limit exceeded for {source} and {jitbit_ticket_id}")
+        print(f"Rate limit exceeded for {source} on ticket id {jitbit_ticket_id}")
         return None
     # if the count is not none and 1 less than the rate limit
-    elif response.get("Attributes") is not None and response.get("Attributes").get("count") == int(rate_limit) - 1:
+    elif response.get("Attributes") is not None and int(response.get("Attributes").get("count")) == int(rate_limit) - 1:
         rate_limit_warning_message = f"""  <p>
                                     <strong>RATE LIMIT WARNING:</strong>
                                     <br>
@@ -74,7 +94,7 @@ def handler(event, context):
                                     </p>
                                 </p>
                             """
-    elif response.get("Items") is not None and response.get("Items")[0].get("count") == int(rate_limit):
+    elif response.get("Attributes") is not None and int(response.get("Attributes").get("count")) == int(rate_limit):
         rate_limit_warning_message = f"""  <p>
                                     <strong>RATE LIMIT WARNING:</strong>
                                     <br>
