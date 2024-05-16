@@ -39,7 +39,7 @@ locals {
           user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
         })
         instance = merge(local.defaults_bods_ec2.instance, {
-          instance_type = "t3.large"
+          instance_type = "m4.xlarge"
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         # volumes are a direct copy of BODS in NCR
