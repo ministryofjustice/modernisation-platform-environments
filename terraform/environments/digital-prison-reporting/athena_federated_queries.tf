@@ -8,7 +8,7 @@ module "athena_federated_query_connector_oracle" {
 
   spill_bucket_name                     = module.s3_working_bucket.bucket_id
   connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
-  connector_jar_bucket_key              = "third-party/athena-connectors/athena-oracle-2022.47.1.jar"
+  connector_jar_bucket_key              = "third-party/athena-connectors/athena-oracle-2022.47.1-2.jar"
   nomis_credentials_secret_arn          = aws_secretsmanager_secret.nomis_athena_federated.arn
   project_prefix                        = local.project
   account_id                            = local.account_id
