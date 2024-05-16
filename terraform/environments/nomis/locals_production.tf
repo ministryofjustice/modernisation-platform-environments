@@ -190,9 +190,9 @@ locals {
 
       # NOT-ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.weblogic_ec2, {
-        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 2
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
+          desired_capacity = 1
+          max_size         = 8
         })
         ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
