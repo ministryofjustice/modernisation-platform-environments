@@ -125,7 +125,7 @@ resource "aws_cloudwatch_log_group" "bounce_email_notification" {
 resource "aws_dynamodb_table" "bounce_email_notification" {
   name           = "bounce_email_notification"
   billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "email"
+  hash_key       = "email_ticket_id"
 
   server_side_encryption {
     enabled = true
