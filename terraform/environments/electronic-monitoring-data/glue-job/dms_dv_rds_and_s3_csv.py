@@ -288,9 +288,11 @@ if __name__ == "__main__":
 
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
     else:
-        rds_sqlserver_tbls_str = args["rds_sqlserver_tbls"]
-        LOGGER.info(f"""Given specific tables: {rds_sqlserver_tbls_str}, {type(rds_sqlserver_tbls_str)}""")
-        filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & set([rds_sqlserver_tbls_str]))
+        LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
+        given_rds_sqlserver_tbls_str = args["rds_sqlserver_tbls"]
+        given_rds_sqlserver_tbls_list = list(given_rds_sqlserver_tbls_str)
+        LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
+        filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & set(given_rds_sqlserver_tbls_list))
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
         for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
