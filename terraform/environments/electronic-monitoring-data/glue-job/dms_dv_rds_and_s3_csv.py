@@ -289,7 +289,7 @@ if __name__ == "__main__":
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
     else:
         LOGGER.info(f"""Given specific tables: {args["rds_sqlserver_tbls"]}, {type(args["rds_sqlserver_tbls"])}""")
-        filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & set(args["rds_sqlserver_tbls"]))
+        filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & {args["rds_sqlserver_tbls"]})
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
         for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
