@@ -6,6 +6,7 @@ See <https://github.com/ministryofjustice/modernisation-platform-configuration-m
 for ansible code for mounting on linux server (filesystems role).
 
 EFS is expensive. Use Single-AZ solution for non-production environments to save cost.
+Opt in or out of Modernisation Platform backup using `backup` tag.
 
 ## Security Groups
 

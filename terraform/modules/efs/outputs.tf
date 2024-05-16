@@ -3,11 +3,6 @@ output "access_points" {
   value       = aws_efs_access_point.this
 }
 
-output "backup_policy" {
-  description = "aws_efs_backup_policy output if created, null otherwise"
-  value       = length(aws_efs_backup_policy.this) != 0 ? aws_efs_backup_policy.this[0] : null
-}
-
 output "file_system" {
   description = "aws_efs_file_system resource output"
   value       = aws_efs_file_system.this

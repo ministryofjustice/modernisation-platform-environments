@@ -10,7 +10,7 @@
 # Keypair for ec2-user
 #------------------------------------------------------------------------------
 resource "aws_key_pair" "ec2-user-complete" {
-  key_name   = "ec2-user"
+  key_name   = "ec2-user-complete"
   public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
   tags       = { Name = "${local.application_name}-ec2-user-complete" }
 }
@@ -27,7 +27,7 @@ locals {
   # This local is used by the module variable "instance".  
   instance_complete = {
     disable_api_termination      = false
-    key_name                     = try(aws_key_pair.ec2-user.key_name)
+    key_name                     = try(aws_key_pair.ec2-user-complete.key_name)
     monitoring                   = false
     metadata_options_http_tokens = "required"
     vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
@@ -142,7 +142,7 @@ locals {
 
 }
 
-# This item is used to combine emultiple policy documents though for this example only one policy document is created.
+# This item is used to combine multiple policy documents though for this example only one policy document is created.
 data "aws_iam_policy_document" "ec2_complete_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ec2_complete_policy.json
@@ -151,6 +151,8 @@ data "aws_iam_policy_document" "ec2_complete_common_combined" {
 
 # This policy document is added as an example. Note that the module does not support access via AWS Session Manager.
 data "aws_iam_policy_document" "ec2_complete_policy" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356
   statement {
     sid    = "AllowSSMAccess"
     effect = "Allow"
@@ -236,10 +238,14 @@ resource "aws_security_group_rule" "complete_egress_traffic" {
 ##### IAM Policies #####
 
 # Creates a single managed policy using the combined policy documents.
+resource "random_id" "ec2_complete_common_policy" {
+  byte_length = 4
+}
+
 resource "aws_iam_policy" "ec2_complete_common_policy" {
-  name        = "ec2-common-policy"
+  name        = "${random_id.ec2_complete_common_policy.dec}-ec2-common-policy"
   path        = "/"
   description = "Common policy for all ec2 instances"
   policy      = data.aws_iam_policy_document.ec2_common_combined.json
-  tags        = { Name = "ec2-common-policy" }
+  tags        = { Name = "${random_id.ec2_common_policy.dec}-ec2-common-policy" }
 }
