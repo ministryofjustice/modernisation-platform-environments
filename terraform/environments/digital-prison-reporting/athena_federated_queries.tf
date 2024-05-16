@@ -16,7 +16,7 @@ module "athena_federated_query_connector_oracle" {
   vpc_id                                = data.aws_vpc.shared.id
   subnet_id                             = data.aws_subnet.private_subnets_a.id
   connection_string_nomis               = local.connection_string_nomis
-  lambda_memory_allocation_mb           = 3000
+  lambda_memory_allocation_mb           = 800
   lambda_timeout_seconds                = 900
   lambda_reserved_concurrent_executions = 20
   connector_log_level                   = "debug"
