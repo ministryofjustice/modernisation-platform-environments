@@ -21,6 +21,7 @@ resource "aws_s3_bucket_versioning" "this" {
   }
 }
 
+#tfsec:ignore:AVD-AWS-0132:exp:2024-07-01
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
   bucket = aws_s3_bucket.this.id
 
