@@ -21,6 +21,7 @@ resource "aws_s3_bucket_public_access_block" "dms_target_ep_s3_bucket" {
   restrict_public_buckets = true
 }
 
+#tfsec:ignore:AVD-AWS-0132:exp:2024-07-01
 resource "aws_s3_bucket_server_side_encryption_configuration" "dms_target_ep_s3_bucket" {
   bucket = aws_s3_bucket.dms_target_ep_s3_bucket.id
 

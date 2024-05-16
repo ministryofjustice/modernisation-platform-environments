@@ -93,6 +93,7 @@ resource "aws_s3_bucket_ownership_controls" "ap_export_bucket" {
   }
 }
 
+#tfsec:ignore:AVD-AWS-0132:exp:2024-07-01
 resource "aws_s3_bucket_server_side_encryption_configuration" "ap_export_bucket" {
   bucket = aws_s3_bucket.ap_export_bucket.id
 

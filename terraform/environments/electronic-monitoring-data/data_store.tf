@@ -24,9 +24,10 @@ resource "aws_s3_bucket" "data_store" {
   tags = local.tags
 }
 
+#tfsec:ignore:AVD-AWS-0132:exp:2024-07-01
 resource "aws_s3_bucket_server_side_encryption_configuration" "data_store" {
   bucket = aws_s3_bucket.data_store.id
-  #tfsec:ignore:AVD-AWS-0132:exp:2024-07-01
+
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"

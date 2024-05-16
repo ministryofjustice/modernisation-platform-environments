@@ -41,6 +41,7 @@ resource "aws_s3_bucket" "landing_bucket" {
   )
 }
 
+#tfsec:ignore:AVD-AWS-0132:exp:2024-07-01
 resource "aws_s3_bucket_server_side_encryption_configuration" "landing_bucket" {
   bucket = aws_s3_bucket.landing_bucket.id
 

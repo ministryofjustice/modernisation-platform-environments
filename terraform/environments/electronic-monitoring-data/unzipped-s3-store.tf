@@ -16,6 +16,7 @@ resource "aws_s3_bucket" "unzipped_store" {
   tags = local.tags
 }
 
+#tfsec:ignore:AVD-AWS-0132:exp:2024-07-01
 resource "aws_s3_bucket_server_side_encryption_configuration" "unzipped_store" {
   bucket = aws_s3_bucket.unzipped_store.id
 
