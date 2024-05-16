@@ -7,6 +7,13 @@ resource "aws_sesv2_email_identity" "jitbit" {
   configuration_set_name = aws_sesv2_configuration_set.jitbit_ses_configuration_set.configuration_set_name
 }
 
+resource "aws_sesv2_email_identity_mail_from_attributes" "example" {
+  email_identity = aws_sesv2_email_identity.jitbit.email_identity
+
+  behavior_on_mx_failure = "USE_DEFAULT_VALUE"
+  mail_from_domain       = "mail.${aws_sesv2_email_identity.example.jitbit.email_identity}"
+}
+
 resource "aws_route53_record" "jitbit_amazonses_dkim_record" {
   provider = aws.core-vpc
   count    = local.is-production ? 0 : 3
