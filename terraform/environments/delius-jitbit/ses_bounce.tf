@@ -124,10 +124,5 @@ resource "aws_dynamodb_table" "bounce_email_notification" {
     type = "S"
   }
 
-  attribute {
-    name = "ticket_id"
-    type = "S"
-  }
-
   tags = local.tags
 }
