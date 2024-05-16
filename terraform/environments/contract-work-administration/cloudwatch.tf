@@ -79,7 +79,7 @@ resource "aws_cloudwatch_metric_alarm" "elb_target_response_time" {
   alarm_description   = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received. Triggered if response is longer than 1s."
   comparison_operator = "GreaterThanThreshold"
   dimensions = {
-    LoadBalancer = aws_lb.external.name
+    LoadBalancer = aws_lb.external.arn_suffix
   }
   evaluation_periods = "1"
   metric_name        = "TargetResponseTime"
@@ -104,7 +104,7 @@ resource "aws_cloudwatch_metric_alarm" "elb_request_count" {
   alarm_description   = "ELB Request Count Too High"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    LoadBalancer = aws_lb.external.name
+    LoadBalancer = aws_lb.external.arn_suffix
   }
   evaluation_periods = "5"
   metric_name        = "RequestCount"
