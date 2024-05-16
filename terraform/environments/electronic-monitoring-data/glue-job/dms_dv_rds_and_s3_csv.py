@@ -16,6 +16,31 @@ from pyspark.sql import DataFrame
 
 # ===============================================================================
 
+sc = SparkContext.getOrCreate()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+
+LOGGER = glueContext.get_logger()
+
+# ===============================================================================
+
+def resolve_args(args_list):
+    LOGGER.info(f">> Resolving Argument Variables: START")
+    available_args_list = []
+    for item in args_list:
+        try:
+            args = getResolvedOptions(
+                sys.argv, [f'{item}']
+            )
+            available_args_list.append(item)
+        except Exception as e:
+            LOGGER.info(f"WARNING: Missing argument, {e}")
+    LOGGER.info(f"AVAILABLE arguments: {available_args_list}")
+    LOGGER.info(">> Resolving Argument Variables: COMPLETE")
+    return available_args_list
+
+# ===============================================================================
+
 # Organise capturing input parameters.
 DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_db_host_ep",
@@ -28,23 +53,9 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 
 OPTIONAL_INPUTS = ['rds_sqlserver_dbs', 'rds_sqlserver_tbls']
 
-for e in OPTIONAL_INPUTS:
-    if ('--{}'.format(e) in sys.argv):
-        DEFAULT_INPUTS_LIST.append(e)
+AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
 
-args = getResolvedOptions(sys.argv, DEFAULT_INPUTS_LIST)
-
-for e in OPTIONAL_INPUTS:
-    if not ('--{}'.format(e) in sys.argv):
-        args[f"{e}"] = None
-
-# ------------------------------
-
-sc = SparkContext.getOrCreate()
-glueContext = GlueContext(sc)
-spark = glueContext.spark_session
-
-LOGGER = glueContext.get_logger()
+args = getResolvedOptions(sys.argv, AVAILABLE_ARGS_LIST)
 LOGGER.info(f"""args = \n{args}""")
 # ------------------------------
 
@@ -257,8 +268,8 @@ if __name__ == "__main__":
 
     catalog_table_s3_full_path = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
-    LOGGER.info(f"""Given database(s): {args["rds_sqlserver_dbs"]}""")
-    rds_sqlserver_db_list = get_rds_database_list(args["rds_sqlserver_dbs"])
+    LOGGER.info(f"""Given database(s): {args.get("rds_sqlserver_dbs", None)}""")
+    rds_sqlserver_db_list = get_rds_database_list(args.get("rds_sqlserver_dbs", None))
     LOGGER.info(f"""Using database(s): {rds_sqlserver_db_list}""")
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_list)
@@ -307,5 +318,5 @@ if __name__ == "__main__":
                                                  })
 
     df_dv_output.unpersist()
-    
+
     job.commit()
