@@ -11,7 +11,7 @@ resource "aws_sesv2_email_identity_mail_from_attributes" "example" {
   email_identity = aws_sesv2_email_identity.jitbit.email_identity
 
   behavior_on_mx_failure = "USE_DEFAULT_VALUE"
-  mail_from_domain       = "mail.${aws_sesv2_email_identity.example.jitbit.email_identity}"
+  mail_from_domain       = "mail.${aws_sesv2_email_identity.jitbit.email_identity}"
 }
 
 resource "aws_route53_record" "jitbit_amazonses_dkim_record" {
@@ -52,6 +52,46 @@ resource "aws_route53_record" "jitbit_amazonses_dmarc_record_prod" {
   type     = "TXT"
   ttl      = "600"
   records  = ["v=DMARC1; p=none;"]
+}
+
+resource "aws_route53_record" "jitbit_amazonses_mail_from_txt_record" {
+  count    = local.is-production ? 0 : 1
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "mail.${aws_sesv2_email_identity.jitbit.email_identity}"
+  type     = "TXT"
+  ttl      = "600"
+  records  = ["v=spf1 include:amazonses.com ~all"]
+}
+
+resource "aws_route53_record" "jitbit_amazonses_mail_from_txt_record_prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
+  name     = "mail.${aws_sesv2_email_identity.jitbit.email_identity}"
+  type     = "TXT"
+  ttl      = "600"
+  records  = ["v=spf1 include:amazonses.com ~all"]
+}
+
+resource "aws_route53_record" "jitbit_amazonses_mail_from_mx_record" {
+  count    = local.is-production ? 0 : 1
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "mail.${aws_sesv2_email_identity.jitbit.email_identity}"
+  type     = "MX"
+  ttl      = "600"
+  records  = ["10 feedback-smtp.eu-west-2.amazonses.com"]
+}
+
+resource "aws_route53_record" "jitbit_amazonses_mail_from_mx_record_prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
+  name     = "mail.${aws_sesv2_email_identity.jitbit.email_identity}"
+  type     = "MX"
+  ttl      = "600"
+  records  = ["10 feedback-smtp.eu-west-2.amazonses.com"]
 }
 
 #####################
