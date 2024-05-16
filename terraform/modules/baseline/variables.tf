@@ -411,7 +411,6 @@ variable "efs" {
         }))
       }))
     })), {})
-    backup_policy_status = optional(string)
     file_system = object({
       availability_zone_name          = optional(string)
       kms_key_id                      = optional(string, "general")

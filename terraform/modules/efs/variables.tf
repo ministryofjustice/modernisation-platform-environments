@@ -18,12 +18,6 @@ variable "access_points" {
   default = {}
 }
 
-variable "backup_policy_status" {
-  description = "optionally set to ENABLED or DISABLED to create aws_efs_backup_policy resource"
-  type        = string
-  default     = null
-}
-
 variable "file_system" {
   description = "aws_efs_file_system resource params"
   type = object({
