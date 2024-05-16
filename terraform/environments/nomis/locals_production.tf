@@ -118,6 +118,11 @@ locals {
 
     baseline_secretsmanager_secrets = {
       "/oracle/weblogic/prod"     = local.weblogic_secretsmanager_secrets
+      "/oracle/database/PDCNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/PDNDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/PDTRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/PDCNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/PDMIS"    = local.database_mis_secretsmanager_secrets
       "/oracle/database/PCNOM"    = local.database_nomis_secretsmanager_secrets
       "/oracle/database/PCNOMHA"  = local.database_secretsmanager_secrets
       "/oracle/database/PNDH"     = local.database_secretsmanager_secrets
