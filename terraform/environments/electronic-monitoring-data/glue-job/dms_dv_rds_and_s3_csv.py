@@ -312,12 +312,12 @@ if __name__ == "__main__":
     if args.get("rds_sqlserver_tbls", None) is None:
         for db in rds_sqlserver_db_list:
             if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                    f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={db}'''
-                                    ):
+                                       f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={db}'''
+                                       ):
                 LOGGER.info(f"""Purging S3-path: {catalog_table_s3_full_path}/database_name={db}""")
-                glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={db}""", 
-                                        options={"retentionPeriod": 0}
-                                        )
+                glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={db}""",
+                                          options={"retentionPeriod": 0}
+                                          )
     
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
     LOGGER.info(f"""Writing Dataframe to {catalog_table_s3_full_path}/""")
