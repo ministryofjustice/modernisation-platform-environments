@@ -1,3 +1,5 @@
+#See ELM-1949 for all ignored checks below
+#tfsec:ignore:AVD-AWS-0086:exp:2024-07-01 tfsec:ignore:AVD-AWS-0087:exp:2024-07-01 tfsec:ignore:AVD-AWS-0091:exp:2024-07-01 tfsec:ignore:AVD-AWS-0093:exp:2024-07-01
 resource "aws_s3_bucket" "dms_dv_parquet_s3_bucket" {
   #checkov:skip=CKV_AWS_144:Unsure of policy on this yet, should be covered by module - See ELM-1949
   #checkov:skip=CKV_AWS_145:Decide on a KMS key for encryption, should be covered by moudle - See ELM-1949
@@ -37,12 +39,13 @@ resource "aws_s3_bucket_policy" "dms_dv_parquet_s3_bucket" {
 }
 
 # -------------------------------------------------------------------
-
+#See ELM-1949 for all ignored checks below
+#tfsec:ignore:AVD-AWS-0086:exp:2024-07-01 tfsec:ignore:AVD-AWS-0087:exp:2024-07-01 tfsec:ignore:AVD-AWS-0091:exp:2024-07-01 tfsec:ignore:AVD-AWS-0093:exp:2024-07-01
 resource "aws_s3_bucket" "dms_dv_glue_job_s3_bucket" {
-  #checkov:skip=CKV_AWS_144:Unsure of policy on this yet, should be covered by module - See ELM-1949
-  #checkov:skip=CKV_AWS_145:Decide on a KMS key for encryption, should be covered by moudle - See ELM-1949
-  #checkov:skip=CKV_AWS_18:AWS Access Logging should be enabled on S3 buckets, should be covered by module - See ELM-1949
-  #checkov:skip=CKV_AWS_21:AWS S3 Object Versioning should be enabled on S3 buckets, should be covered by module - See ELM-1949
+  #checkov:skip=CKV_AWS_144:Unsure of policy on this yet, should be covered by module
+  #checkov:skip=CKV_AWS_145:Decide on a KMS key for encryption, should be covered by moudle
+  #checkov:skip=CKV_AWS_18:AWS Access Logging should be enabled on S3 buckets, should be covered by module
+  #checkov:skip=CKV_AWS_21:AWS S3 Object Versioning should be enabled on S3 buckets, should be covered by module
   bucket_prefix = "glue-jobs-py-scripts-"
 }
 

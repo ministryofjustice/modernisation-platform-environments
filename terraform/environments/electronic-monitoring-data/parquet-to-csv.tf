@@ -1,3 +1,5 @@
+#See ELM-1949 for all ignored checks below
+#tfsec:ignore:AVD-AWS-0086:exp:2024-07-01 tfsec:ignore:AVD-AWS-0087:exp:2024-07-01 tfsec:ignore:AVD-AWS-0091:exp:2024-07-01 tfsec:ignore:AVD-AWS-0093:exp:2024-07-01
 resource "aws_s3_bucket" "glue-jobs" {
   #checkov:skip=CKV_AWS_144:Unsure of policy on this yet, should be covered by module - See ELM-1949
   #checkov:skip=CKV_AWS_145:Decide on a KMS key for encryption, should be covered by moudle - See ELM-1949
@@ -13,7 +15,8 @@ resource "aws_s3_object" "parquet-to-csv-job" {
   etag   = filemd5("glue-job/parquet_to_csv.py")
 }
 
-
+#See ELM-1949 for all ignored checks below
+#tfsec:ignore:AVD-AWS-0086:exp:2024-07-01 tfsec:ignore:AVD-AWS-0087:exp:2024-07-01 tfsec:ignore:AVD-AWS-0091:exp:2024-07-01 tfsec:ignore:AVD-AWS-0093:exp:2024-07-01
 resource "aws_s3_bucket" "csv-output-bucket" {
   #checkov:skip=CKV_AWS_144:Unsure of policy on this yet, should be covered by module - See ELM-1949
   #checkov:skip=CKV_AWS_145:Decide on a KMS key for encryption, should be covered by moudle - See ELM-1949
