@@ -36,6 +36,13 @@ resource "aws_lambda_function" "bounce_email_notification" {
   handler          = "bounce_email_notification.handler"
   source_code_hash = data.archive_file.lambda_function_payload_bounce_email_notification.output_base64sha256
 
+  environment {
+    variables = {
+      RATE_LIMIT = 5
+      DYNAMODB_TABLE = aws_dynamodb_table.bounce_email_notification.name
+    }
+  }
+
   lifecycle {
     replace_triggered_by = [aws_iam_role.lambda_bounce_email_notification]
   }
@@ -102,10 +109,6 @@ resource "aws_dynamodb_table" "bounce_email_notification" {
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "email"
 
-  tags_all = {
-    "name" = "value"
-  }
-
   server_side_encryption {
     enabled = true
     kms_key_arn = data.aws_kms_key.general_shared.arn
@@ -118,6 +121,11 @@ resource "aws_dynamodb_table" "bounce_email_notification" {
 
   attribute {
     name = "email"
+    type = "S"
+  }
+
+  attribute {
+    name = "ticket_id"
     type = "S"
   }
 
