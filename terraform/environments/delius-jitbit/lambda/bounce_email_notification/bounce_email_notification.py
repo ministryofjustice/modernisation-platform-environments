@@ -47,12 +47,20 @@ def handler(event, context):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # add the record to the dynamodb table
-    table.put_item(
-        Item={
-            "ticket_id": jitbit_ticket_id,
-            "email": source,
-            "expiresAt": ttl
-        }
+    # table.put_item(
+    #     Item={
+    #         "email": source,
+    #         "ticket_id": jitbit_ticket_id,
+    #         "count": 1,
+    #         "expiresAt": ttl
+    #     }
+    # )
+    table.update_item(
+        Key={"email_ticket_id": f"{source}|{jitbit_ticket_id}"},
+        UpdateExpression="SET #count = if_not_exists(#count, :initial) + :increment, expiresAt = :ttl",
+        ExpressionAttributeNames={"#count": "count"},
+        ExpressionAttributeValues={":increment": 1, ":initial": 0, ":ttl": ttl},
+        ReturnValues="ALL_NEW",  # Optionally, specify which attributes to return after the update
     )
     # search for the count of email + ticket_id in the table
     response = table.query(
@@ -60,20 +68,39 @@ def handler(event, context):
         FilterExpression=Attr('ticket_id').eq(jitbit_ticket_id)
     )
 
+    print(response.get('Items')[0])
+
+    print(f"Rate limit: {rate_limit}")
+
+    print(f"Rate limit count: {response.get('Items')[0].get('count')}")
+
+    rate_limit_warning_message = ""
     # if the count is not none and greater than the rate limit then exit
-    if response.get("Item") is not None and response.get("Item").get("count") > rate_limit:
+    if response.get("Items") is not None and response.get("Items")[0].get("count") > int(rate_limit):
         print(f"Rate limit exceeded for {source} and {jitbit_ticket_id}")
         return None
     # if the count is not none and 1 less than the rate limit
-    elif response.get("Item") is not None and response.get("Item").get("count") == rate_limit - 1:
+    elif response.get("Items") is not None and response.get("Items")[0].get("count") == int(rate_limit) - 1:
         rate_limit_warning_message = f"""  <p>
                                     <strong>RATE LIMIT WARNING:</strong>
                                     <br>
                                     <p>
-                                        The rate limit of {rate_limit} has been reached for the email address <strong>{source}</strong> and ticket ID <strong>{jitbit_ticket_id}</strong>. Further notifications will not be sent until the rate limit has been reset.
+                                        The rate limit of {rate_limit} will be reached for the email address <strong>{source}</strong> and ticket ID <strong>{jitbit_ticket_id}</strong> on the next notification.
+                                        Further notifications will not be sent until the rate limit has been reset.
                                     </p>
                                 </p>
                             """
+    elif response.get("Items") is not None and response.get("Items")[0].get("count") == int(rate_limit):
+        rate_limit_warning_message = f"""  <p>
+                                    <strong>RATE LIMIT WARNING:</strong>
+                                    <br>
+                                    <p>
+                                        The rate limit of {rate_limit} has been reached for the email address <strong>{source}</strong> and ticket ID <strong>{jitbit_ticket_id}</strong>.
+                                        Further notifications will not be sent until the rate limit has been reset.
+                                    </p>
+                                </p>
+                            """
+
     bounced_recipients_message = ""
     for bounced_recipient in bounced_recipients:
         bounced_recipients_message += f"""  <p>

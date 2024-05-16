@@ -36,6 +36,8 @@ resource "aws_lambda_function" "bounce_email_notification" {
   handler          = "bounce_email_notification.handler"
   source_code_hash = data.archive_file.lambda_function_payload_bounce_email_notification.output_base64sha256
 
+  timeout = 6
+
   environment {
     variables = {
       RATE_LIMIT = 5
@@ -136,7 +138,7 @@ resource "aws_dynamodb_table" "bounce_email_notification" {
   }
 
   attribute {
-    name = "email"
+    name = "email_ticket_id"
     type = "S"
   }
 
@@ -154,7 +156,8 @@ resource "aws_dynamodb_resource_policy" "bounce_email_notification" {
         },
         Action = [
           "dynamodb:PutItem",
-          "dynamodb:GetItem"
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem"
         ],
         Resource = aws_dynamodb_table.bounce_email_notification.arn
       }
