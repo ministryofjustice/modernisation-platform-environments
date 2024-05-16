@@ -85,6 +85,7 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
     actions = [
       "dynamodb:PutItem",
       "dynamodb:GetItem"
+      "kms:Decrypt"
     ]
     resources = [aws_dynamodb_table.bounce_email_notification.arn]
   }
@@ -141,7 +142,9 @@ resource "aws_dynamodb_resource_policy" "bounce_email_notification" {
     Statement = [
       {
         Effect = "Allow",
-        Principal = aws_iam_role.lambda_bounce_email_notification.arn,
+        Principal = {
+          AWS = aws_iam_role.lambda_bounce_email_notification.arn
+        },
         Action = [
           "dynamodb:PutItem",
           "dynamodb:GetItem"
