@@ -94,6 +94,9 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--enable-spark-ui"                  = "true"
     "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
     "--enable-metrics"                   = ""
+    "--conf"                             = "spark.driver.memory=6g"
+    "--executor-cores"                   = 16
+    "--df_coalesce_paartition_count"     = 16
   }
 
   connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
