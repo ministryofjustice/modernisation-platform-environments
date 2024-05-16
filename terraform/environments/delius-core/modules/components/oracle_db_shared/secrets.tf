@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "delius_core_application_passwords" {
       identifiers = ["arn:aws:iam::${local.mis_account_id}:role/instance-role-delius-mis-${var.env_name}-mis-db-1"]
     }
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["*"]
+    resources = [aws_secretsmanager_secret.delius_core_application_passwords.arn]
   }
 }
 
