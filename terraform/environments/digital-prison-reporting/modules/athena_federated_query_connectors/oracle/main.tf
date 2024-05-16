@@ -51,11 +51,10 @@ resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
 
   environment {
     variables = {
-      nomis_connection_string         = var.connection_string_nomis
-      default                         = var.connection_string_nomis
-      spill_bucket                    = var.spill_bucket_name
-      spill_prefix                    = var.spill_bucket_prefix
-      ATHENA_FEDERATION_SDK_LOG_LEVEL = var.connector_log_level
+      nomis_connection_string = var.connection_string_nomis
+      default                 = var.connection_string_nomis
+      spill_bucket            = var.spill_bucket_name
+      spill_prefix            = var.spill_bucket_prefix
     }
   }
 }

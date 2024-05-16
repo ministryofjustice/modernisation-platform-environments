@@ -70,9 +70,3 @@ variable "lambda_reserved_concurrent_executions" {
   type        = number
   description = "Amount of reserved concurrent executions for the Connector lambda function. A value of 0 disables the lambda from being triggered and -1 removes any concurrency limitations"
 }
-
-variable "connector_log_level" {
-  type        = string
-  default     = "warn"
-  description = "Log level for the connector"
-}
