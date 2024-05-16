@@ -95,3 +95,25 @@ resource "aws_cloudwatch_log_group" "bounce_email_notification" {
 
   tags = local.tags
 }
+
+
+resource "aws_dynamodb_table" "bounce_email_notification" {
+  name           = "bounce_email_notification"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "email"
+
+  read_capacity = 2
+  write_capacity = 2
+
+  ttl {
+    attribute_name = "expireAt"
+    enabled = true
+  }
+
+  attribute {
+    name = "email"
+    type = "S"
+  }
+
+  tags = local.tags
+}
