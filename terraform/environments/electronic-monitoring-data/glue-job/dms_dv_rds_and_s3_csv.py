@@ -1,6 +1,5 @@
 import sys
 import boto3
-import time
 from logging import getLogger
 
 from awsglue.transforms import *
@@ -34,7 +33,7 @@ def resolve_args(args_list):
             )
             available_args_list.append(item)
         except Exception as e:
-            LOGGER.info(f"WARNING: Missing argument, {e}")
+            LOGGER.warn(f"WARNING: Missing argument, {e}")
     LOGGER.info(f"AVAILABLE arguments: {available_args_list}")
     LOGGER.info(">> Resolving Argument Variables: COMPLETE")
     return available_args_list
@@ -56,7 +55,7 @@ OPTIONAL_INPUTS = ['rds_sqlserver_dbs', 'rds_sqlserver_tbls']
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
 
 args = getResolvedOptions(sys.argv, AVAILABLE_ARGS_LIST)
-LOGGER.info(f"""args = \n{args}""")
+
 # ------------------------------
 
 job = Job(glueContext)
@@ -81,10 +80,9 @@ PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
 GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
 
-# ===================================================================================================
+# ===============================================================================
 # USER-DEFINED-FUNCTIONS
 # ----------------------
-
 
 def get_rds_db_jdbc_url(in_rds_db_name=None):
     if in_rds_db_name is None:
@@ -167,7 +165,6 @@ def get_rds_dataframe(in_rds_db_name, in_table_name):
                                        "driver": RDS_DB_INSTANCE_DRIVER})
 
 # -------------------------------------------------------------------------
-
 
 def check_s3_path_if_exists(in_bucket_name, in_folder_path):
     result = S3_CLIENT.list_objects(
@@ -273,7 +270,6 @@ if __name__ == "__main__":
     LOGGER.info(f"""Using database(s): {rds_sqlserver_db_list}""")
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_list)
-    LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime,
@@ -285,23 +281,33 @@ if __name__ == "__main__":
     
     df_dv_output = spark.sql(sql_select_str)
 
-    for db_dbo_tbl in rds_sqlserver_db_tbl_list:
-        rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
+    if args.get("rds_sqlserver_tbls", None) is None:
+        LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
+        for db_dbo_tbl in rds_sqlserver_db_tbl_list:
+            rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-        df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
+            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
+    else:
+        filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & set(args["rds_sqlserver_tbls"]))
+        LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
+        for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
+            rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
+
+            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
     df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition("database_name")
 
-    for db in rds_sqlserver_db_list:
-        if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                   f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={db}'''
-                                   ):
-            LOGGER.info(f"""Purging S3-path: {catalog_table_s3_full_path}/database_name={db}""")
-            glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={db}""", 
-                                      options={"retentionPeriod": 0}
-                                      )
+    if args.get("rds_sqlserver_tbls", None) is None:
+        for db in rds_sqlserver_db_list:
+            if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
+                                    f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={db}'''
+                                    ):
+                LOGGER.info(f"""Purging S3-path: {catalog_table_s3_full_path}/database_name={db}""")
+                glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={db}""", 
+                                        options={"retentionPeriod": 0}
+                                        )
     
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
     LOGGER.info(f"""Writing Dataframe to {catalog_table_s3_full_path}/""")
