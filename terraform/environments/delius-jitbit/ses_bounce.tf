@@ -80,6 +80,14 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
     ]
     resources = ["arn:aws:logs:*:*:*"]
   }
+  
+  statement {
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:GetItem"
+    ]
+    resources = [aws_dynamodb_table.bounce_email_notification.arn]
+  }
 }
 
 resource "aws_lambda_permission" "sns_bounce_email_notification" {
