@@ -4,6 +4,7 @@ import json
 import time
 from datetime import datetime
 from botocore.exceptions import ClientError
+from boto3.dynamodb.conditions import Key, Attr
 
 
 def handler(event, context):
@@ -54,11 +55,9 @@ def handler(event, context):
         }
     )
     # search for the count of email + ticket_id in the table
-    response = table.get_item(
-        Key={
-            "ticket_id": jitbit_ticket_id,
-            "email": source
-        }
+    response = table.query(
+        KeyConditionExpression=Key('email').eq(source),
+        FilterExpression=Attr('ticket_id').eq(jitbit_ticket_id)
     )
 
     # if the count is not none and greater than the rate limit then exit
