@@ -126,3 +126,21 @@ resource "aws_dynamodb_table" "bounce_email_notification" {
 
   tags = local.tags
 }
+
+resource "aws_dynamodb_resource_policy" "bounce_email_notification" {
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = aws_iam_role.lambda_bounce_email_notification.arn,
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem"
+        ],
+        Resource = aws_dynamodb_table.bounce_email_notification.arn
+      }
+    ]
+  })
+  resource_arn = aws_dynamodb_table.bounce_email_notification.arn
+}

@@ -46,7 +46,7 @@ def handler(event, context):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # add the record to the dynamodb table
-    dynamodb.put_item(
+    table.put_item(
         Item={
             "ticket_id": jitbit_ticket_id,
             "email": source,
