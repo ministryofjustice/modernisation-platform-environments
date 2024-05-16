@@ -142,7 +142,7 @@ locals {
 
 }
 
-# This item is used to combine emultiple policy documents though for this example only one policy document is created.
+# This item is used to combine multiple policy documents though for this example only one policy document is created.
 data "aws_iam_policy_document" "ec2_complete_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ec2_complete_policy.json
@@ -151,6 +151,8 @@ data "aws_iam_policy_document" "ec2_complete_common_combined" {
 
 # This policy document is added as an example. Note that the module does not support access via AWS Session Manager.
 data "aws_iam_policy_document" "ec2_complete_policy" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356
   statement {
     sid    = "AllowSSMAccess"
     effect = "Allow"

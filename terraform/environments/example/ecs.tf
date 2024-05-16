@@ -4,13 +4,13 @@
 
 
 module "ecs-cluster" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.3.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=b00647922a9204a99b023ac884440162e2b51b66" #v4.3.0
   name        = local.ecs_application_name
   tags = local.tags
 }
 
 module "service" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v4.3.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=b00647922a9204a99b023ac884440162e2b51b66" #v4.3.0
 
   container_definitions = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   cluster_arn           = module.ecs-cluster.ecs_cluster_arn
@@ -113,7 +113,7 @@ locals {
 
 # Load balancer build using the module
 module "ecs_lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v4.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=6f59e1ce47df66bc63ee9720b7c58993d1ee64ee" #v4.0.0
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module

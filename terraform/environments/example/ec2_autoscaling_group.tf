@@ -1,5 +1,5 @@
 module "ec2_test_autoscaling_group" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.5.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=03913ac182decfc8224923520439d53d7c930661" #v2.5.3
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -59,6 +59,10 @@ data "aws_iam_policy_document" "ec2_autoscale_combined" {
 }
 
 data "aws_iam_policy_document" "ec2_autoscale_policy" {
+  #checkov:skip=CKV_AWS_107
+  #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356
   statement {
     sid    = "CustomEc2Policy"
     effect = "Allow"

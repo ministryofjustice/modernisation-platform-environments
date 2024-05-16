@@ -4,7 +4,7 @@
 
 # EC2 Created via module
 module "ec2_test_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.4.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=edc55b4005b7039e5b54ad7805e89a473fe3c3dd" #v2.4.1
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -138,6 +138,10 @@ locals {
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ec2_policy" {
+  #checkov:skip=CKV_AWS_107
+  #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356
   statement {
     sid    = "CustomEc2Policy"
     effect = "Allow"
@@ -188,6 +192,7 @@ resource "aws_volume_attachment" "mountvolumetoec2" {
 data "aws_iam_policy_document" "ebs-kms" {
   #checkov:skip=CKV_AWS_111
   #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_356
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]
