@@ -259,9 +259,10 @@ if __name__ == "__main__":
 
     LOGGER.info(f"""Given database(s): {args["rds_sqlserver_dbs"]}""")
     rds_sqlserver_db_list = get_rds_database_list(args["rds_sqlserver_dbs"])
-    LOGGER.info(f"""Using databases {rds_sqlserver_db_list}""")
+    LOGGER.info(f"""Using database(s): {rds_sqlserver_db_list}""")
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_list)
+    LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime,
@@ -305,4 +306,6 @@ if __name__ == "__main__":
                                                      'pageSize': 1048576
                                                  })
 
+    df_dv_output.unpersist()
+    
     job.commit()
