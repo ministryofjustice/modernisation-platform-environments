@@ -32,7 +32,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      tt-onr-bods-1-a = merge(local.defaults_bods_ec2, {
+      t2-onr-bods-1-a = merge(local.defaults_bods_ec2, {
         config = merge(local.defaults_bods_ec2.config, {
           availability_zone             = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
