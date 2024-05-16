@@ -102,8 +102,14 @@ resource "aws_dynamodb_table" "bounce_email_notification" {
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "email"
 
-  read_capacity = 2
-  write_capacity = 2
+  tags_all = {
+    "name" = "value"
+  }
+
+  server_side_encryption {
+    enabled = true
+    kms_key_arn = data.aws_kms_key.general_shared.arn
+  }
 
   ttl {
     attribute_name = "expireAt"
