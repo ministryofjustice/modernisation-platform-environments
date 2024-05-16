@@ -19,7 +19,15 @@
       "app_ami_id": "ami-035cecbff25e0d91e",
       "app_instance_type": "m4.xlarge",
       "ebs_app_size": "200",
-      "cwa_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC92LfXDL43cbcigHidm0PIm2gxZa82nu6F/p8XTMbCZzD6NJKgzA5voB/htRuK8FVlhYf89TXDeiabLBJgH9666W99m/Su3Tn4YX2NcOshKelVMt6cQIRdRv35s2nhPl+a6lVE2JxeK8hmkrrSAs4h1JoUQeK//SeVTzLQz2SOe9v0l3yB8EN0hGt/0VyOyMkP5KHxywvBQd0hA3k/1zTadtCWkh0YcGO0kYo7uQ6rG1joeKCYZFYjw7H8bgx1DyrB0+baRqxkwfCw+YdynKXLK4IvakjBuNfybrs8qnmTKUZx8nb9ALKM6D9vZ1my/zi0GxQaK9nStgwp7Dqkz96n8B0riuyMK6TPIhoGebSdcVZWmyYAEeMzcf6yOLZkIgKw42hxgjZ+m9GE8FgWU0XDFf50FlACcR/KXBmNu0mskzoD3kDkssVfVeIUpfi/yluMtEmHeLLVIudNPLe96g8GnYEpjRc3fxoRjUCk/U0qrjQG/LDcoSsQuKI76PvcLnc= vincent.cheung@MJ004609"
+      "cwa_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC92LfXDL43cbcigHidm0PIm2gxZa82nu6F/p8XTMbCZzD6NJKgzA5voB/htRuK8FVlhYf89TXDeiabLBJgH9666W99m/Su3Tn4YX2NcOshKelVMt6cQIRdRv35s2nhPl+a6lVE2JxeK8hmkrrSAs4h1JoUQeK//SeVTzLQz2SOe9v0l3yB8EN0hGt/0VyOyMkP5KHxywvBQd0hA3k/1zTadtCWkh0YcGO0kYo7uQ6rG1joeKCYZFYjw7H8bgx1DyrB0+baRqxkwfCw+YdynKXLK4IvakjBuNfybrs8qnmTKUZx8nb9ALKM6D9vZ1my/zi0GxQaK9nStgwp7Dqkz96n8B0riuyMK6TPIhoGebSdcVZWmyYAEeMzcf6yOLZkIgKw42hxgjZ+m9GE8FgWU0XDFf50FlACcR/KXBmNu0mskzoD3kDkssVfVeIUpfi/yluMtEmHeLLVIudNPLe96g8GnYEpjRc3fxoRjUCk/U0qrjQG/LDcoSsQuKI76PvcLnc= vincent.cheung@MJ004609",
+      "efs_data_write_alarm_threshold": "1100000",
+      "efs_data_read_alarm_threshold": "1100000",
+      "database_cpu_alarm_threshold": "95",
+      "elb_target_response_time_alarm_threshold": "1",
+      "elb_request_count_alarm_threshold": "1000",
+      "status_check_alarm_threshold": "1",
+      "database_ec2_swap_alarm_threshold": "50"
+
     },
     "test": {
       "example_var": "test-data"
