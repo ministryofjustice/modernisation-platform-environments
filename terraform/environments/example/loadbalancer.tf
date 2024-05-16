@@ -79,6 +79,9 @@ resource "aws_lb_target_group" "target_group" {
   }
 
   tags = { Name = "${local.application_name}-tg-${local.environment}" }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Link target group to the EC2 instance on port 80
@@ -88,7 +91,7 @@ resource "aws_lb_target_group_attachment" "develop" {
   port             = 80
 }
 
-# Load blancer listener
+# Load balancer listener
 resource "aws_lb_listener" "external" {
   load_balancer_arn = aws_lb.external.arn
   port              = local.application_data.accounts[local.environment].server_port

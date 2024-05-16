@@ -14,7 +14,7 @@ module "service" {
 
   container_definitions = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   cluster_arn           = module.ecs-cluster.ecs_cluster_arn
-  name                      = "${local.ecs_application_name}-task_definition_volume"
+  name                  = "${local.ecs_application_name}-task_definition_volume"
 
   task_cpu    = local.application_data.accounts[local.environment].container_cpu
   task_memory = local.application_data.accounts[local.environment].container_memory
@@ -39,7 +39,7 @@ module "service" {
     data.aws_subnet.private_subnets_c.id
   ]
 
-  security_groups = []
+  security_groups = [aws_security_group.cluster_ec2.id]
 
   ignore_changes = false
 
@@ -133,13 +133,17 @@ module "ecs_lb_access_logs_enabled" {
   idle_timeout               = 60
 }
 
+resource "random_id" "ecs_target_group" {
+  byte_length = 4
+}
+
 //# Create the target group
 resource "aws_lb_target_group" "ecs_target_group" {
-  name                 = "${local.ecs_application_name}-tg-mlb-${local.environment}"
+  name                 = "${local.ecs_application_name}-tg-ecs-${random_id.ecs_target_group.hex}"
   port                 = local.application_data.accounts[local.environment].server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
   stickiness {
@@ -155,6 +159,11 @@ resource "aws_lb_target_group" "ecs_target_group" {
     unhealthy_threshold = "2"
     matcher             = "200-499"
     timeout             = "5"
+  }
+
+  tags = local.tags
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
