@@ -84,7 +84,7 @@ resource "aws_cloudwatch_metric_alarm" "elb_target_response_time" {
   evaluation_periods = "1"
   metric_name        = "TargetResponseTime"
   namespace          = "AWS/ApplicationELB"
-  period             = "60"
+  period             = 60
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].elb_target_response_time_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]

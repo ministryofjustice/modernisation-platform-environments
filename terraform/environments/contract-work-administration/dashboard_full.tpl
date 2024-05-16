@@ -582,7 +582,7 @@
                                 "title": "Concurrent Manager Status Check Failed",
                                 "annotations": {
                                         "alarms": [
-                                                "cm_status_check_alarm"
+                                                "${cm_status_check_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
@@ -604,7 +604,7 @@
                                 "title": "App Server 1 Status Check Failed",
                                 "annotations": {
                                         "alarms": [
-                                                "app1_status_check_alarm"
+                                                "${app1_status_check_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
