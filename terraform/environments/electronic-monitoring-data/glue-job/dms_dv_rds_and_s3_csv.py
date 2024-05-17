@@ -48,7 +48,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "parquet_output_bucket_name",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
-                       "persist_union_df"
+                       "persist_union_df",
+                       "df_parquet_repartition"
                        ]
 
 OPTIONAL_INPUTS = ["rds_sqlserver_dbs", 
@@ -216,6 +217,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
     total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, 
                                                  f"{rds_db_name}/dbo/{rds_tbl_name}"
                                                  )
+    total_files = 1 if total_files < 1 else total_files
 
     df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(total_files)
     LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] size --> {df_rds_temp.rdd.getNumPartitions()}""")
@@ -320,6 +322,10 @@ if __name__ == "__main__":
     """.strip()
     
     df_dv_output = spark.sql(sql_select_str)
+
+    if df_dv_output.rdd.getNumPartitions() == 1:
+        df_dv_output = df_dv_output.repartition(int(args["df_parquet_repartition"]))
+
     LOGGER.info(f"""Dataframe-'df_dv_output' created with partition size --> {df_dv_output.rdd.getNumPartitions()}""")
 
     if args.get("rds_sqlserver_tbls", None) is None:
