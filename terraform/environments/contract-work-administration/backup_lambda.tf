@@ -1,3 +1,9 @@
+locals {
+  create_db_snapshots_script_prefix = "dbsnapshot"
+  delete_db_snapshots_script_prefix = "deletesnapshots"
+  db_connect_script_prefix = "dbconnect"
+}
+
 ##################################
 ### IAM Role for BackUp Lambda
 ##################################
@@ -83,18 +89,35 @@ resource "aws_s3_bucket" "backup_lambda" {
   )
 }
 
-resource "aws_s3_object" "provision_files" {
+resource "aws_s3_object" "create_db_snapshots" {
   bucket       = aws_s3_bucket.backup_lambda.id
-  for_each     = fileset("./zipfiles/", "**")
-  key          = each.value
-  source       = "./zipfiles/${each.value}"
-  content_type = each.value
+  key          = "${local.create_db_snapshots_script_prefix}.zip"
+  source       = data.archive_file.create_db_snapshots.output_path
 }
+
+resource "aws_s3_object" "delete_db_snapshots" {
+  bucket       = aws_s3_bucket.backup_lambda.id
+  key          = "${local.delete_db_snapshots_script_prefix}.zip"
+  source       = data.archive_file.delete_db_snapshots.output_path
+}
+
+resource "aws_s3_object" "connect_db" {
+  bucket       = aws_s3_bucket.backup_lambda.id
+  key          = "${local.db_connect_script_prefix}.zip"
+  source       = data.archive_file.connect_db.output_path
+}
+
+resource "aws_s3_object" "nodejs" {
+  bucket       = aws_s3_bucket.backup_lambda.id
+  key          = "nodejs.zip"
+  source       = "zipfiles/nodejs.zip"
+}
+
 
 # This delays the creation of resource 
 resource "time_sleep" "wait_for_provision_files" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.provision_files]
+  depends_on      = [aws_s3_object.create_db_snapshots, aws_s3_object.delete_db_snapshots, aws_s3_object.connect_db, aws_s3_object.nodejs]
 }
 
 resource "aws_s3_bucket_ownership_controls" "backup_lambda" {
@@ -153,21 +176,20 @@ resource "aws_security_group" "backup_lambda" {
 
 data "archive_file" "create_db_snapshots" {
   type        = "zip"
-  source_file = "scripts/dbconnect.js"
-  output_path = "dbsnapshot.zip"
+  source_file = "scripts/${local.create_db_snapshots_script_prefix}.js"
+  output_path = "zipfiles/${local.create_db_snapshots_script_prefix}.zip"
 }
 
 data "archive_file" "delete_db_snapshots" {
   type        = "zip"
-  source_file = "scripts/deletesnapshots.py"
-  output_path = "deletesnapshots.zip"
-
+  source_file = "scripts/${local.delete_db_snapshots_script_prefix}.py"
+  output_path = "zipfiles/${local.delete_db_snapshots_script_prefix}.zip"
 }
 
 data "archive_file" "connect_db" {
   type        = "zip"
-  source_file = "scripts/dbconnect.js"
-  output_path = "local.dbconnect_output_path"
+  source_file = "scripts/${local.db_connect_script_prefix}.js"
+  output_path = "zipfiles/${local.db_connect_script_prefix}.zip"
 }
 
 resource "aws_lambda_layer_version" "backup_lambda" {
@@ -191,7 +213,7 @@ resource "aws_lambda_function" "create_db_snapshots" {
   runtime          = "nodejs18.x"
   layers           = [aws_lambda_layer_version.backup_lambda.arn]
   s3_bucket        = aws_s3_bucket.backup_lambda.id
-  s3_key           = "dbsnapshot.zip"
+  s3_key           = "${local.create_db_snapshots_script_prefix}.zip"
   memory_size      = 128
   timeout          = 900
   depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
@@ -220,7 +242,7 @@ resource "aws_lambda_function" "delete_db_snapshots" {
   source_code_hash = data.archive_file.delete_db_snapshots.output_base64sha256
   runtime          = "python3.8"
   s3_bucket        = aws_s3_bucket.backup_lambda.id
-  s3_key           = "deletesnapshots.zip"
+  s3_key           = "${local.delete_db_snapshots_script_prefix}.zip"
   memory_size      = 3000
   timeout          = 900
   depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
@@ -245,7 +267,7 @@ resource "aws_lambda_function" "connect_db" {
   runtime          = "nodejs18.x"
   layers           = [aws_lambda_layer_version.backup_lambda.arn]
   s3_bucket        = aws_s3_bucket.backup_lambda.id
-  s3_key           = "dbconnect.zip"
+  s3_key           = "${local.db_connect_script_prefix}.zip"
   memory_size      = 128
   timeout          = 900
   depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
