@@ -180,7 +180,7 @@ locals {
           ]
         },
         {
-          sid = "AllowS3ReadWrite"
+          sid    = "AllowS3ReadWrite"
           effect = "Allow"
           actions = [
             "s3:GetObject",
