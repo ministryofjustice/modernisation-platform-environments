@@ -189,7 +189,7 @@ locals {
             "s3:ListBucket",
           ]
           resources = [
-            "arn:aws:s3:${var.environment.region}:${var.environment.account_id}:*",
+            "arn:aws:s3:::*",
           ]
         }
       ]
