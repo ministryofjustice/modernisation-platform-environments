@@ -330,10 +330,17 @@ if __name__ == "__main__":
 
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
+
+        LOGGER.info(f"""persist_union_df: {args["persist_union_df"]}, type({args["persist_union_df"]})""")
+
         for db_dbo_tbl in rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
+            if args["persist_union_df"] == 'false':
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
+            else:
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
+
     else:
         LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
 
