@@ -18,6 +18,10 @@ data "aws_iam_policy_document" "backup_lambda" {
 resource "aws_iam_role" "backup_lambda" {
   name               = "${local.application_name_short}-backup-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.backup_lambda.json
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-backup-lambda-role" }
+  )
 }
 
 resource "aws_iam_policy" "backup_lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
@@ -140,6 +144,11 @@ resource "aws_security_group" "backup_lambda" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-backup-lambda-security-group" }
+  )
 }
 
 data "archive_file" "create_db_snapshots" {
@@ -158,9 +167,8 @@ data "archive_file" "delete_db_snapshots" {
 data "archive_file" "connect_db" {
   type        = "zip"
   source_file = "scripts/dbconnect.js"
-  output_path = "dbconnect.zip"
+  output_path = "local.dbconnect_output_path"
 }
-
 
 resource "aws_lambda_layer_version" "backup_lambda" {
   layer_name   = "SSHNodeJSLayer"
@@ -195,7 +203,7 @@ resource "aws_lambda_function" "create_db_snapshots" {
   }
   vpc_config {
     security_group_ids = [aws_security_group.backup_lambda.id]
-    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
   tags = merge(
     local.tags,
@@ -213,27 +221,19 @@ resource "aws_lambda_function" "delete_db_snapshots" {
   runtime          = "python3.8"
   s3_bucket        = aws_s3_bucket.backup_lambda.id
   s3_key           = "deletesnapshots.zip"
-  memory_size      = 1024
+  memory_size      = 3000
   timeout          = 900
   depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 
-
-  environment {
-    variables = {
-      LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
-
-    }
-  }
   vpc_config {
     security_group_ids = [aws_security_group.backup_lambda.id]
-    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
   tags = merge(
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-lambda-delete-snapshots" }
   )
 }
-
 
 resource "aws_lambda_function" "connect_db" {
 
@@ -260,7 +260,7 @@ resource "aws_lambda_function" "connect_db" {
   }
   vpc_config {
     security_group_ids = [aws_security_group.backup_lambda.id]
-    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
   tags = merge(
     local.tags,
