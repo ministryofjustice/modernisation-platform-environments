@@ -471,6 +471,8 @@ locals {
                   host_header = {
                     values = [
                       "maintenance.production.nomis.service.justice.gov.uk",
+                      "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                      "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
                       "c.nomis.service.justice.gov.uk",
                       "c.nomis.az.justice.gov.uk",
                     ]
