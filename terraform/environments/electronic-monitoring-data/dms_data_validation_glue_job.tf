@@ -92,6 +92,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--df_rds_repartition"               = ""
     "--df_csv_coalesce_partition"        = ""
     "--df_csv_repartition"               = ""
+    "--persist_union_df"                 = "false"
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
