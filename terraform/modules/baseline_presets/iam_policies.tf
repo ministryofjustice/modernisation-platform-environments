@@ -186,6 +186,7 @@ locals {
             "s3:GetObject",
             "s3:PutObject",
             "s3:DeleteObject",
+            "s3:ListBucket",
           ]
           resources = [
             "arn:aws:s3:${var.environment.region}:${var.environment.account_id}:*",
