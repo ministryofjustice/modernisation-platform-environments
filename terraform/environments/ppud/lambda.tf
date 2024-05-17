@@ -224,7 +224,8 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process[0].function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.terminate_cpu_process[0].arn
+# source_arn    = aws_cloudwatch_event_rule.terminate_cpu_process[0].arn
+  source_arn    = arn:aws:cloudwatch:eu-west-2:075585660276:alarm:CPU-High-i-0b5c31ecda24ebc04
 }
 
 # Lambda functions to terminate cpu process
@@ -236,6 +237,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process" {
   role          = aws_iam_role.lambda_role_terminate_cpu_process[0].arn
   handler       = "terminate_cpu_process.lambda_handler"
   runtime       = "python3.12"
+  timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process]
 }
 
