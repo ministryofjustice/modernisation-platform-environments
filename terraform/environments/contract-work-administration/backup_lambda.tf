@@ -142,6 +142,26 @@ resource "aws_security_group" "backup_lambda" {
   }
 }
 
+data "archive_file" "create_db_snapshots" {
+  type        = "zip"
+  source_file = "scripts/dbconnect.js"
+  output_path = "dbsnapshot.zip"
+}
+
+data "archive_file" "delete_db_snapshots" {
+  type        = "zip"
+  source_file = "scripts/deletesnapshots.py"
+  output_path = "deletesnapshots.zip"
+
+}
+
+data "archive_file" "connect_db" {
+  type        = "zip"
+  source_file = "scripts/dbconnect.js"
+  output_path = "dbconnect.zip"
+}
+
+
 resource "aws_lambda_layer_version" "backup_lambda" {
   layer_name   = "SSHNodeJSLayer"
   description  = "A layer to add ssh libs to lambda"
@@ -159,7 +179,7 @@ resource "aws_lambda_function" "create_db_snapshots" {
   function_name    = "snapshotDBFunction"
   role             = aws_iam_role.backup_lambda.arn
   handler          = "snapshot/dbsnapshot.handler"
-  source_code_hash = filebase64sha256("zipfiles/dbsnapshot.zip")
+  source_code_hash = data.archive_file.create_db_snapshots.output_base64sha256
   runtime          = "nodejs18.x"
   layers           = [aws_lambda_layer_version.backup_lambda.arn]
   s3_bucket        = aws_s3_bucket.backup_lambda.id
@@ -189,7 +209,7 @@ resource "aws_lambda_function" "delete_db_snapshots" {
   function_name    = "deletesnapshotFunction"
   role             = aws_iam_role.backup_lambda.arn
   handler          = "deletesnapshots.lambda_handler"
-  source_code_hash = filebase64sha256("zipfiles/deletesnapshots.zip")
+  source_code_hash = data.archive_file.delete_db_snapshots.output_base64sha256
   runtime          = "python3.8"
   s3_bucket        = aws_s3_bucket.backup_lambda.id
   s3_key           = "deletesnapshots.zip"
@@ -221,7 +241,7 @@ resource "aws_lambda_function" "connect_db" {
   function_name    = "connectDBFunction"
   role             = aws_iam_role.backup_lambda.arn
   handler          = "ssh/dbconnect.handler"
-  source_code_hash = filebase64sha256("zipfiles/dbconnect.zip")
+  source_code_hash = data.archive_file.connect_db.output_base64sha256
   runtime          = "nodejs18.x"
   layers           = [aws_lambda_layer_version.backup_lambda.arn]
   s3_bucket        = aws_s3_bucket.backup_lambda.id
