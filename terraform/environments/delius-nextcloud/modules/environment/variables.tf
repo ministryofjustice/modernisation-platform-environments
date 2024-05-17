@@ -40,3 +40,9 @@ variable "environments_in_account" {
   type    = list(string)
   default = []
 }
+
+variable "sns_topic_name" {
+  description = "SNS topic name"
+  type        = string
+  default     = "delius-nextcloud-alarms-topic"
+}
