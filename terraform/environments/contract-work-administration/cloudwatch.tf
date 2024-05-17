@@ -248,6 +248,94 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
   )
 }
 
+
+########################################
+### (Manual)
+########################################
+
+
+resource "aws_cloudwatch_metric_alarm" "database_ec2_memory" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-ec2-memory"
+  alarm_description   = "Average EC2 memory usage exceeds the predefined threshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    InstanceId = aws_instance.database.id
+  }
+  evaluation_periods = "5"
+  metric_name        = "mem_used_percent"
+  namespace          = "CustomScript"
+  period             = "60"
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_ec2_memory_alarm_threshold
+#   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-ec2-memory"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_rx_packet_errors" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-rx-packet-errors"
+  alarm_description   = "Number of RX Packet Errors Over Threshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    InstanceId = aws_instance.database.id
+  }
+  evaluation_periods = "5"
+  metric_name        = "net_err_in"
+  namespace          = "CustomScript"
+  period             = "300"
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_rx_packet_errors_alarm_threshold
+#   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-rx-packet-errors"
+    }
+  )
+}
+
+
+resource "aws_cloudwatch_metric_alarm" "database_oradata_read" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oradata-read"
+  alarm_description   = "EBS Oradata Volume - Reads too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oradata"
+    ImageId = aws_instance.database.ami
+    InstanceId = aws_instance.database.id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oradata_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = "5"
+  metric_name        = "volume_reads_oradata"
+  namespace          = "CustomScript"
+  period             = "300"
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_oradata_read_alarm_threshold
+#   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oradata-read"
+    }
+  )
+}
+
+
 # resource "aws_cloudwatch_metric_alarm" "" {
 
 #   alarm_name          = "${local.application_name_short}-${local.environment}-"
@@ -272,6 +360,8 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
 #     }
 #   )
 # }
+
+
 
 ################################
 ### CloudWatch Dashboard

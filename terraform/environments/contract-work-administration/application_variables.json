@@ -26,8 +26,10 @@
       "elb_target_response_time_alarm_threshold": "1",
       "elb_request_count_alarm_threshold": "1000",
       "status_check_alarm_threshold": "1",
-      "database_ec2_swap_alarm_threshold": "50"
-
+      "database_ec2_swap_alarm_threshold": "50",
+      "database_ec2_memory_alarm_threshold": "95",
+      "database_rx_packet_errors_alarm_threshold": "100",
+      "database_oradata_read_alarm_threshold": "160000"
     },
     "test": {
       "example_var": "test-data"

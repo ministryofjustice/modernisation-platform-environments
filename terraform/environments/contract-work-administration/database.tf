@@ -288,7 +288,7 @@ resource "aws_ebs_volume" "oradata" {
 }
 
 resource "aws_volume_attachment" "oradata" {
-  device_name = "/dev/sdf"
+  device_name = "/dev/sd${local.oradata_device_name_letter}"
   volume_id   = aws_ebs_volume.oradata.id
   instance_id = aws_instance.database.id
 }
@@ -312,7 +312,7 @@ resource "aws_ebs_volume" "oracle" {
 }
 
 resource "aws_volume_attachment" "oracle" {
-  device_name = "/dev/sdj"
+  device_name = "/dev/sd${local.oracle_device_name_letter}"
   volume_id   = aws_ebs_volume.oracle.id
   instance_id = aws_instance.database.id
 }
@@ -337,7 +337,7 @@ resource "aws_ebs_volume" "oraarch" {
 }
 
 resource "aws_volume_attachment" "oraarch" {
-  device_name = "/dev/sdg"
+  device_name = "/dev/sd${local.oraarch_device_name_letter}"
   volume_id   = aws_ebs_volume.oraarch.id
   instance_id = aws_instance.database.id
 }
@@ -361,7 +361,7 @@ resource "aws_ebs_volume" "oratmp" {
 }
 
 resource "aws_volume_attachment" "oratmp" {
-  device_name = "/dev/sdh"
+  device_name = "/dev/sd${local.oratmp_device_name_letter}"
   volume_id   = aws_ebs_volume.oratmp.id
   instance_id = aws_instance.database.id
 }
@@ -386,7 +386,7 @@ resource "aws_ebs_volume" "oraredo" {
 }
 
 resource "aws_volume_attachment" "oraredo" {
-  device_name = "/dev/sdi"
+  device_name = "/dev/sd${local.oraredo_device_name_letter}"
   volume_id   = aws_ebs_volume.oraredo.id
   instance_id = aws_instance.database.id
 }
@@ -411,7 +411,7 @@ resource "aws_ebs_volume" "share" {
 }
 
 resource "aws_volume_attachment" "share" {
-  device_name = "/dev/sdk"
+  device_name = "/dev/sd${local.share_device_name_letter}"
   volume_id   = aws_ebs_volume.share.id
   instance_id = aws_instance.database.id
 }
