@@ -296,7 +296,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process" {
       "arn:aws:ssm:eu-west-2:075585660276:*",
       "arn:aws:cloudwatch:eu-west-2:075585660276:*",
       "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
-      "arn:aws:lambda:eu-west-2:075585660276:*"
+      "arn:aws:lambda:eu-west-2:075585660276:*",
+      "arn:aws:ec2:eu-west-2:075585660276:instance/i-0b5c31ecda24ebc04"
       ]
    }
  ]
