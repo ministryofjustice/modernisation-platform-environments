@@ -89,35 +89,18 @@ resource "aws_s3_bucket" "backup_lambda" {
   )
 }
 
-resource "aws_s3_object" "create_db_snapshots" {
+resource "aws_s3_object" "provision_files" {
   bucket       = aws_s3_bucket.backup_lambda.id
-  key          = "${local.create_db_snapshots_script_prefix}.zip"
-  source       = data.archive_file.create_db_snapshots.output_path
+  for_each     = fileset("./zipfiles/", "**")
+  key          = each.value
+  source       = "./zipfiles/${each.value}" 
+  content_type = each.value
 }
-
-resource "aws_s3_object" "delete_db_snapshots" {
-  bucket       = aws_s3_bucket.backup_lambda.id
-  key          = "${local.delete_db_snapshots_script_prefix}.zip"
-  source       = data.archive_file.delete_db_snapshots.output_path
-}
-
-resource "aws_s3_object" "connect_db" {
-  bucket       = aws_s3_bucket.backup_lambda.id
-  key          = "${local.db_connect_script_prefix}.zip"
-  source       = data.archive_file.connect_db.output_path
-}
-
-resource "aws_s3_object" "nodejs" {
-  bucket       = aws_s3_bucket.backup_lambda.id
-  key          = "nodejs.zip"
-  source       = "zipfiles/nodejs.zip"
-}
-
 
 # This delays the creation of resource 
 resource "time_sleep" "wait_for_provision_files" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.create_db_snapshots, aws_s3_object.delete_db_snapshots, aws_s3_object.connect_db, aws_s3_object.nodejs]
+  depends_on      = [aws_s3_object.provision_files]
 }
 
 resource "aws_s3_bucket_ownership_controls" "backup_lambda" {
