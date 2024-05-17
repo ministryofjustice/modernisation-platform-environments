@@ -12,7 +12,7 @@ def handler(event, context):
     table = dynamodb.Table(os.environ["DYNAMODB_TABLE"])
 
     # generate ttl 840 minutes from now (840 minutes is the typical retry period for mail servers)
-    ttl = int(time.time()) + 840 * 60
+    ttl = int(time.time()) + int(os.environ.get("TTL", "840")) * 60
     # this rate limit is per the ttl delta defined above
     rate_limit = os.environ["RATE_LIMIT"]
 
