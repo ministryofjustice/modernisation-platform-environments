@@ -408,7 +408,7 @@ module "claims_management_decisions" {
 module "consumer_credit_appeals" {
   is_ftp_app                        = true
   source                            = "./modules/tribunal_ftp"
-  app_name                          = "ftp-consumer-credit-appeals"
+  app_name                          = "ftp-consumer-credit"
   app_url                           = "consumercreditappeals"
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
