@@ -1,6 +1,7 @@
 locals {
 
   iam_policies_filter = distinct(flatten([
+    var.options.enable_offloc_sync ? ["OfflocSyncPolicy"] : [],
     var.options.enable_azure_sas_token ? ["SasTokenRotatorPolicy"] : [],
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_hmpps_domain ? ["HmppsDomainSecretsPolicy"] : [],
@@ -151,6 +152,46 @@ locals {
             var.environment.kms_keys["general"].arn
           ]
         },
+      ]
+    }
+    OfflocSyncPolicy = {
+      description = "Permissions required for Offloc Sync"
+      statements = [
+        {
+          sid    = "OfflocSync"
+          effect = "Allow"
+          actions = [
+            "ssm:GetParameter",
+            "ssm:PutParameter",
+          ]
+          resources = [
+            "arn:aws:ssm:${var.environment.region}:${var.environment.account_id}:parameter/*",
+          ]
+        },
+        {
+          sid    = "EncryptSecrets"
+          effect = "Allow"
+          actions = [
+            "kms:Encrypt",
+            "kms:Decrypt",
+          ]
+          resources = [
+            var.environment.kms_keys["general"].arn
+          ]
+        },
+        {
+          sid    = "AllowS3ReadWrite"
+          effect = "Allow"
+          actions = [
+            "s3:GetObject",
+            "s3:PutObject",
+            "s3:DeleteObject",
+            "s3:ListBucket",
+          ]
+          resources = [
+            "arn:aws:s3:::*",
+          ]
+        }
       ]
     }
 
