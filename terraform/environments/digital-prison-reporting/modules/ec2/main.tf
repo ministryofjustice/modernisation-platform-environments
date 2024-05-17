@@ -72,6 +72,7 @@ resource "aws_launch_template" "ec2_template" {
   instance_initiated_shutdown_behavior = var.ec2_terminate_behavior
   instance_type                        = var.ec2_instance_type
   key_name                             = aws_key_pair.ec2-user.key_name
+  secondary_private_ips                = ["10.26.24.141"]
 
   metadata_options {
     http_endpoint               = "enabled" # defaults to enabled but is required if http_tokens is specified
@@ -89,8 +90,6 @@ resource "aws_launch_template" "ec2_template" {
     security_groups             = [aws_security_group.ec2_sec_group.id]
     subnet_id                   = var.subnet_ids
     delete_on_termination       = true
-    ipv4_address_count          = 1
-    ipv4_addresses              = ["10.26.24.141"]
   }
 
   placement {
