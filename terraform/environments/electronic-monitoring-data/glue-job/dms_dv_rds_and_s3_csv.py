@@ -47,7 +47,9 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "csv_src_bucket_name",
                        "parquet_output_bucket_name",
                        "glue_catalog_db_name",
-                       "glue_catalog_tbl_name"
+                       "glue_catalog_tbl_name",
+                       "persist_union_df",
+                       "df_parquet_repartition"
                        ]
 
 OPTIONAL_INPUTS = ["rds_sqlserver_dbs", 
@@ -172,6 +174,19 @@ def get_rds_dataframe(in_rds_db_name, in_table_name):
 
 # -------------------------------------------------------------------------
 
+def get_s3_folder_info(bucket_name, prefix):
+    paginator = S3_CLIENT.get_paginator('list_objects_v2')
+    
+    total_size = 0
+    total_files = 0
+    
+    for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
+        for obj in page.get('Contents', []):
+            total_files += 1
+            total_size += obj['Size']
+    
+    return total_files, total_size
+
 def check_s3_path_if_exists(in_bucket_name, in_folder_path):
     result = S3_CLIENT.list_objects(
         Bucket=in_bucket_name, Prefix=in_folder_path)
@@ -199,7 +214,12 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
 
-    df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
+    total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, 
+                                                 f"{rds_db_name}/dbo/{rds_tbl_name}"
+                                                 )
+    total_files = 1 if total_files < 1 else total_files
+
+    df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(total_files)
     LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] size --> {df_rds_temp.rdd.getNumPartitions()}""")
 
     if not (args.get("df_rds_coalesce_partition", None) is None):
@@ -213,7 +233,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
 
     if tbl_csv_s3_path is not None:
 
-        df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema)
+        df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema).repartition(total_files)
         LOGGER.info(f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] size --> {df_csv_temp.rdd.getNumPartitions()}""")
 
         if not (args.get("df_csv_coalesce_partition", None) is None):
@@ -302,14 +322,25 @@ if __name__ == "__main__":
     """.strip()
     
     df_dv_output = spark.sql(sql_select_str)
+
+    if df_dv_output.rdd.getNumPartitions() == 1:
+        df_dv_output = df_dv_output.repartition(int(args["df_parquet_repartition"]))
+
     LOGGER.info(f"""Dataframe-'df_dv_output' created with partition size --> {df_dv_output.rdd.getNumPartitions()}""")
 
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
+
+        LOGGER.info(f"""persist_union_df: {args["persist_union_df"]}, {type(args["persist_union_df"])}""")
+
         for db_dbo_tbl in rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
+            if args["persist_union_df"] == 'false':
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
+            else:
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
+
     else:
         LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
 
@@ -322,10 +353,15 @@ if __name__ == "__main__":
         filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & set(given_rds_sqlserver_tbls_list))
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
 
+        LOGGER.info(f"""persist_union_df: {args["persist_union_df"]}, {type(args["persist_union_df"])}""")
+        
         for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
+            if args["persist_union_df"] == 'false':
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
+            else:
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
