@@ -19,7 +19,7 @@ output "edw_db_secret" {
 
 resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
   secret_id                  = aws_secretsmanager_secret.edw_db_ec2_root_secret.id
-  rotation_lambda_arn        = data.aws_secretsmanager_secret.edw_db_ec2_root_secret.arn
+  # rotation_lambda_arn        = data.aws_secretsmanager_secret.edw_db_ec2_root_secret.arn
   rotate_immediately = true
   rotation_rules {
     automatically_after_days = 28
