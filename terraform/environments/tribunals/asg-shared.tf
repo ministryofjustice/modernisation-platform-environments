@@ -232,6 +232,7 @@ resource "aws_security_group" "cluster_ec2" {
       module.ahmlr.tribunals_lb_sc_id,
       module.charity_tribunal_decisions.tribunals_lb_sc_id, module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp,
       module.claims_management_decisions.tribunals_lb_sc_id, module.claims_management_decisions.tribunals_lb_sc_id_sftp,
+      module.consumer_credit_appeals.tribunals_lb_sc_id, module.consumer_credit_appeals.tribunals_lb_sc_id_sftp
     ]
   }
 

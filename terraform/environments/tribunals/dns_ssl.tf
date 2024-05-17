@@ -203,6 +203,30 @@ resource "aws_route53_record" "external_claims_management_sftp" {
   ttl             = 60
 }
 
+resource "aws_route53_record" "external_consumer_credit_appeals" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "claimsmanagement.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.consumer_credit_appeals.tribunals_lb.dns_name
+    zone_id                = module.consumer_credit_appeals.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_consumer_credit_appeals_sftp" {
+  allow_overwrite = true
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "sftp.consumercreditappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type            = "CNAME"
+
+  records         = [module.consumer_credit_appeals.tribunals_lb_ftp[0].dns_name]
+  ttl             = 60
+}
+
 # Define a wildcard ACM certificate for sandbox/dev
 resource "aws_acm_certificate" "external" {
   domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
