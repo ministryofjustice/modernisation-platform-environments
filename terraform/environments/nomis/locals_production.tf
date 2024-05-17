@@ -191,16 +191,18 @@ locals {
       # NOT-ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.weblogic_ec2, {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
-          desired_capacity = 1
+          desired_capacity = 8
           max_size         = 8
         })
         ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
-
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2ProdWeblogicPolicy",
           ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "r4.2xlarge"
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
