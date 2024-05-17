@@ -27,7 +27,12 @@ resource "aws_cloudwatch_event_target" "create_db_snapshots" {
 resource "aws_cloudwatch_event_rule" "delete_db_snapshots" {
   name                = "${local.application_name_short}-${local.environment}-delete-db-snapshots"
   description         = "Delete snapshots over 35 days old"
-  schedule_expression = "cron(10 02 ? * MON-FRI *)"
+  schedule_expression = "cron(10 2 ? * MON-FRI *)"
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-delete-db-snapshots" }
+  )
 }
 
 resource "aws_lambda_permission" "delete_db_snapshots" {
