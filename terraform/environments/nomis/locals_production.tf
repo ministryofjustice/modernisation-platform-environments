@@ -338,6 +338,7 @@ locals {
           nomis-environment = "prod"
           description       = "Production databases for AUDIT/MIS"
           oracle-sids       = ""
+          misload-dbname    = "PDMIS"
         })
       })
 
@@ -368,6 +369,7 @@ locals {
           nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
           oracle-sids       = "DRMIS"
+          misload-dbname    = "DRMIS"
         })
       })
 
