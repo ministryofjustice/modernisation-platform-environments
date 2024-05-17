@@ -101,7 +101,7 @@ locals {
       "/offloc" = {
         parameters = {
           offloc_bucket_name = {
-            description = "The name of the offloc upload bucket"
+            description          = "The name of the offloc upload bucket"
             value_s3_bucket_name = "offloc-upload"
           }
         }
