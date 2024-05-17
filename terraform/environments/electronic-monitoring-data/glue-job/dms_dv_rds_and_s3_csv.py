@@ -331,7 +331,7 @@ if __name__ == "__main__":
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
 
-        LOGGER.info(f"""persist_union_df: {args["persist_union_df"]}, type({args["persist_union_df"]})""")
+        LOGGER.info(f"""persist_union_df: {args["persist_union_df"]}, {type(args["persist_union_df"])}""")
 
         for db_dbo_tbl in rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
@@ -353,7 +353,7 @@ if __name__ == "__main__":
         filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & set(given_rds_sqlserver_tbls_list))
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
 
-        LOGGER.info(f"""persist_union_df: {args["persist_union_df"]}, type({args["persist_union_df"]})""")
+        LOGGER.info(f"""persist_union_df: {args["persist_union_df"]}, {type(args["persist_union_df"])}""")
         
         for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
