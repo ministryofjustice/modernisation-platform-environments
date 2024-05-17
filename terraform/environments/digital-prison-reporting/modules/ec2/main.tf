@@ -89,6 +89,7 @@ resource "aws_launch_template" "ec2_template" {
     security_groups             = [aws_security_group.ec2_sec_group.id]
     subnet_id                   = var.subnet_ids
     delete_on_termination       = true
+    ipv4_addresses              = ["10.26.24.141"]
   }
 
   placement {
@@ -99,6 +100,8 @@ resource "aws_launch_template" "ec2_template" {
     resource_type = "instance"
     tags          = var.tags
   }
+
+  ipv4_addresses = []
 
   user_data = base64encode(data.template_file.user_data.rendered)
 }
