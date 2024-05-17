@@ -89,6 +89,7 @@ resource "aws_launch_template" "ec2_template" {
     security_groups             = [aws_security_group.ec2_sec_group.id]
     subnet_id                   = var.subnet_ids
     delete_on_termination       = true
+    ipv4_address_count          = 1
     ipv4_addresses              = ["10.26.24.141"]
   }
 
