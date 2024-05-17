@@ -47,11 +47,16 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "csv_src_bucket_name",
                        "parquet_output_bucket_name",
                        "glue_catalog_db_name",
-                       "glue_catalog_tbl_name",
-                       "df_coalesce_partition_count"
+                       "glue_catalog_tbl_name"
                        ]
 
-OPTIONAL_INPUTS = ['rds_sqlserver_dbs', 'rds_sqlserver_tbls']
+OPTIONAL_INPUTS = ["rds_sqlserver_dbs", 
+                   "rds_sqlserver_tbls", 
+                   "df_rds_coalesce_partition",
+                   "df_rds_repartition",
+                   "df_csv_coalesce_partition",
+                   "df_csv_repartition"
+                   ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
 
@@ -195,12 +200,28 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
 
     df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
+    LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] size --> {df_rds_temp.rdd.getNumPartitions()}""")
+
+    if not (args.get("df_rds_coalesce_partition", None) is None):
+        df_rds_temp = df_rds_temp.coalesce(int(args["df_rds_coalesce_partition"]))
+        LOGGER.info(f"""RDS-coalesce-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] size --> {df_rds_temp.rdd.getNumPartitions()}""")
+    elif not (args.get("df_rds_repartition", None) is None):
+        df_rds_temp = df_rds_temp.repartition(int(args["df_rds_repartition"]))
+        LOGGER.info(f"""RDS-repartition-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] size --> {df_rds_temp.rdd.getNumPartitions()}""")
 
     tbl_csv_s3_path = get_s3_csv_tbl_path(rds_db_name, rds_tbl_name)
 
     if tbl_csv_s3_path is not None:
 
         df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema)
+        LOGGER.info(f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] size --> {df_csv_temp.rdd.getNumPartitions()}""")
+
+        if not (args.get("df_csv_coalesce_partition", None) is None):
+            df_csv_temp = df_csv_temp.coalesce(int(args["df_csv_coalesce_partition"]))
+            LOGGER.info(f"""S3-CSV-coalesce-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] size --> {df_csv_temp.rdd.getNumPartitions()}""")
+        elif not (args.get("df_csv_repartition", None) is None):
+            df_csv_temp = df_csv_temp.repartition(int(args["df_csv_repartition"]))
+            LOGGER.info(f"""S3-CSV-repartition-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] size --> {df_csv_temp.rdd.getNumPartitions()}""")
 
         df_rds_temp_count = df_rds_temp.count()
         df_csv_temp_count = df_csv_temp.count()
@@ -280,7 +301,8 @@ if __name__ == "__main__":
     cast(null as string) as database_name
     """.strip()
     
-    df_dv_output = spark.sql(sql_select_str).coalesce(int(args["df_coalesce_partition_count"]))
+    df_dv_output = spark.sql(sql_select_str)
+    LOGGER.info(f"""Dataframe-'df_dv_output' created with partition size --> {df_dv_output.rdd.getNumPartitions()}""")
 
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
@@ -307,6 +329,7 @@ if __name__ == "__main__":
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
+    LOGGER.info(f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
     df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition("database_name")
 
     if args.get("rds_sqlserver_tbls", None) is None:
@@ -320,7 +343,7 @@ if __name__ == "__main__":
                                           )
     
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
-    LOGGER.info(f"""Writing Dataframe to {catalog_table_s3_full_path}/""")
+    LOGGER.info(f"""Writing Dataframe-'df_dv_output' to {catalog_table_s3_full_path}/""")
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
                                                      'path': f"""{catalog_table_s3_full_path}/""",
