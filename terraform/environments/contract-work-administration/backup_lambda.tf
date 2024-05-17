@@ -150,6 +150,7 @@ resource "aws_lambda_layer_version" "backup_lambda" {
   s3_key       = "nodejs.zip"
 
   compatible_runtimes = ["nodejs18.x"]
+  depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 }
 
 resource "aws_lambda_function" "create_db_snapshots" {
@@ -165,7 +166,7 @@ resource "aws_lambda_function" "create_db_snapshots" {
   s3_key           = "dbsnapshot.zip"
   memory_size      = 128
   timeout          = 900
-  depends_on       = [time_sleep.wait_for_provision_files] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
+  depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 
   environment {
     variables = {
@@ -194,7 +195,7 @@ resource "aws_lambda_function" "delete_db_snapshots" {
   s3_key           = "deletesnapshots.zip"
   memory_size      = 1024
   timeout          = 900
-  depends_on       = [time_sleep.wait_for_provision_files] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
+  depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 
 
   environment {
@@ -227,7 +228,7 @@ resource "aws_lambda_function" "connect_db" {
   s3_key           = "dbconnect.zip"
   memory_size      = 128
   timeout          = 900
-  depends_on       = [time_sleep.wait_for_provision_files] #This resource will create (at least) 300 seconds after aws_s3_object.provision_files
+  depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 
 
 
