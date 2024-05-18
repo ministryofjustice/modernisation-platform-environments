@@ -292,11 +292,11 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 3750, throughput = 750 }
-          flash = { total_size = 1000 }
+          data  = { total_size = 4000, iops = 12000, throughput = 750 }
+          flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge" # needs to be resized to r6i.4xlarge
+          instance_type = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
@@ -382,11 +382,11 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 6000 }
-          flash = { total_size = 1000 }
+          data  = { total_size = 6000, iops = 12000, throughput = 750 }
+          flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          instance_type = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
