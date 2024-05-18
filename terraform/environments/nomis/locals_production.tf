@@ -21,7 +21,7 @@ locals {
   # config for load balancer maintenance rule
   production_lb_maintenance_message = {
     maintenance_title   = "Prison-NOMIS Maintenance Window"
-    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again after 22:00"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again after 00:00"
   }
 
   # baseline config
