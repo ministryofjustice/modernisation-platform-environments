@@ -238,8 +238,8 @@ locals {
         })
         tags = merge(local.xtag_ec2.tags, {
           nomis-environment    = "prod"
-          oracle-db-hostname-a = "pnomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "pnomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
           ndh-ems-hostname     = "pd-ems.ndh.nomis.service.justice.gov.uk"
         })
