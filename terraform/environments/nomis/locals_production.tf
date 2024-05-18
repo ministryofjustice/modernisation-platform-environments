@@ -222,6 +222,29 @@ locals {
     }
 
     baseline_ec2_instances = {
+      prod-nomis-xtag-a = merge(local.xtag_ec2, {
+        # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        config = merge(local.xtag_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2ProdWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
+          args = merge(local.xtag_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.xtag_ec2.tags, {
+          nomis-environment    = "prod"
+          oracle-db-hostname-a = "pnomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "pnomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PCNOM"
+          ndh-ems-hostname     = "pd-ems.ndh.nomis.service.justice.gov.uk"
+        })
+      })
+
       prod-nomis-db-1-a = merge(local.database_ec2, {
         # cloudwatch_metric_alarms = set once commissioned
         config = merge(local.database_ec2.config, {
