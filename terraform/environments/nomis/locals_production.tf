@@ -158,13 +158,13 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      # ACTIVE (blue deployment)
+      # NOT-ACTIVE (blue deployment)
       prod-nomis-web-a = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 2
-          max_size         = 2
+          desired_capacity = 0
+          max_size         = 0
         })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -188,13 +188,13 @@ locals {
         })
       })
 
-      # NOT-ACTIVE (green deployment)
+      # ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.weblogic_ec2, {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
           desired_capacity = 8
           max_size         = 8
         })
-        ## cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
@@ -246,7 +246,12 @@ locals {
       })
 
       prod-nomis-db-1-a = merge(local.database_ec2, {
-        # cloudwatch_metric_alarms = set once commissioned
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
+          local.database_ec2_cloudwatch_metric_alarms.nomis_batch,
+        )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "${local.region}a"
@@ -268,7 +273,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
           description       = "Production databases for CNOM and NDH"
-          oracle-sids       = ""
+          oracle-sids       = "PDCNOM PDNDH PDTRDAT"
         })
       })
       prod-nomis-db-1-b = merge(local.database_ec2, {
@@ -306,12 +311,6 @@ locals {
       })
 
       prod-nomis-db-2 = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms.standard,
-          local.database_ec2_cloudwatch_metric_alarms.db_connected,
-          local.database_ec2_cloudwatch_metric_alarms.connectivity_test,
-          local.database_ec2_cloudwatch_metric_alarms.nomis_batch,
-        )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
@@ -338,7 +337,12 @@ locals {
       })
 
       prod-nomis-db-2-a = merge(local.database_ec2, {
-        # cloudwatch_metric_alarms = set once commissioned
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
+          local.database_ec2_cloudwatch_metric_alarms.misload,
+        )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "${local.region}a"
@@ -360,7 +364,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
           description       = "Production databases for AUDIT/MIS"
-          oracle-sids       = ""
+          oracle-sids       = "PDCNMAUD PDMIS"
           misload-dbname    = "PDMIS"
         })
       })
@@ -369,6 +373,7 @@ locals {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
           local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.connectivity_test,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -389,18 +394,15 @@ locals {
           instance_type = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
-          nomis-environment = "prod"
-          description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          oracle-sids       = "DRMIS"
-          misload-dbname    = "DRMIS"
+          nomis-environment  = "prod"
+          description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+          oracle-sids        = "DRMIS"
+          misload-dbname     = "DRMIS"
+          connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
         })
       })
 
       prod-nomis-db-3 = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms.standard,
-          local.database_ec2_cloudwatch_metric_alarms.db_connected,
-        )
         config = merge(local.database_ec2.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
@@ -440,8 +442,8 @@ locals {
 
           https = merge(local.weblogic_lb_listeners.https, {
             alarm_target_group_names = [
-              "prod-nomis-web-a-http-7777",
-              # "prod-nomis-web-b-http-7777",
+              # "prod-nomis-web-a-http-7777",
+              "prod-nomis-web-b-http-7777",
             ]
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
