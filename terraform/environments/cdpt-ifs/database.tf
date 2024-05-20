@@ -67,8 +67,24 @@ resource "aws_kms_key" "rds" {
 
 resource "aws_kms_alias" "rds-kms-alias" {
   name          = "alias/rds"
-  target_key_id = aws_kms_key.rds.arn
+  target_key_id = aws_kms_key.rds.key_id
 }
+
+data "aws_iam_policy_document" "rds-kms" {
+  statement {
+    sid       = "Enable IAM User Permissions"
+    effect    = "Allow"
+    actions   = [
+      "kms:*"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    resources = [
+      aws_kms_key.rds.arn
+    ]
+  }
 
 data "aws_iam_policy_document" "rds-kms" {
   statement {
@@ -80,12 +96,14 @@ data "aws_iam_policy_document" "rds-kms" {
       "kms:GenerateDataKey*",
       "kms:DescribeKey"
     ]
-    resources = [
-      "*"
-    ]
+
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
+
+    resources = [
+      aws_kms_key.rds.arn
+    ]
   }
 }
