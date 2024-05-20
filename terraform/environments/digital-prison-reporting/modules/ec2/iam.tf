@@ -209,6 +209,26 @@ data "aws_iam_policy_document" "glue-access" {
   }
 }
 
+## EC2 Generic Role
+resource "aws_iam_policy" "generic" {
+  name        = "${var.name}-generic-policy"
+  description = "AWS Generic Policy for EC2 Agent"
+  path        = "/"
+
+  policy = data.aws_iam_policy_document.generic.json
+}
+
+data "aws_iam_policy_document" "generic" {
+  statement {
+    actions = [
+      "ec2:*",
+    ]
+    resources = [
+      "arn:aws:ec2:${var.region}:${var.account}:instance/*"
+    ]
+  }
+}
+
 ## Dynamo Access Policy
 resource "aws_iam_policy" "dynamodb-access" {
   name        = "${var.name}-dynamodb-access"
