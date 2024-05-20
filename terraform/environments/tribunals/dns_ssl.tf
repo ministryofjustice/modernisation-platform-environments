@@ -227,6 +227,150 @@ resource "aws_route53_record" "external_consumer_credit_appeals_sftp" {
   ttl             = 60
 }
 
+resource "aws_route53_record" "external_estate_agent_appeals" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "estateagentappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.estate_agent_appeals.tribunals_lb.dns_name
+    zone_id                = module.estate_agent_appeals.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_estate_agent_appeals_sftp" {
+  allow_overwrite = true
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "sftp.estateagentappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type            = "CNAME"
+
+  records         = [module.estate_agent_appeals.tribunals_lb_ftp[0].dns_name]
+  ttl             = 60
+}
+
+resource "aws_route53_record" "external_primary_health_lists" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "primaryhealthlists.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.primary_health_lists.tribunals_lb.dns_name
+    zone_id                = module.primary_health_lists.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_primary_health_lists_sftp" {
+  allow_overwrite = true
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "sftp.primaryhealthlists.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type            = "CNAME"
+
+  records         = [module.primary_health_lists.tribunals_lb_ftp[0].dns_name]
+  ttl             = 60
+}
+
+resource "aws_route53_record" "external_siac" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "siac.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.siac.tribunals_lb.dns_name
+    zone_id                = module.siac.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_siac_sftp" {
+  allow_overwrite = true
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "sftp.siac.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type            = "CNAME"
+
+  records         = [module.siac.tribunals_lb_ftp[0].dns_name]
+  ttl             = 60
+}
+
+resource "aws_route53_record" "external_sscs_venue_pages" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "sscsvenues.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.sscs_venue_pages.tribunals_lb.dns_name
+    zone_id                = module.sscs_venue_pages.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_sscs_venue_pages_sftp" {
+  allow_overwrite = true
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "sftp.sscsvenues.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type            = "CNAME"
+
+  records         = [module.sscs_venue_pages.tribunals_lb_ftp[0].dns_name]
+  ttl             = 60
+}
+
+resource "aws_route53_record" "external_tax_chancery_decisions" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "taxchancerydecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.tax_chancery_decisions.tribunals_lb.dns_name
+    zone_id                = module.tax_chancery_decisions.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_tax_chancery_decisions_sftp" {
+  allow_overwrite = true
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "sftp.taxchancerydecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type            = "CNAME"
+
+  records         = [module.tax_chancery_decisions.tribunals_lb_ftp[0].dns_name]
+  ttl             = 60
+}
+
+resource "aws_route53_record" "external_tax_tribunal_decisions" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "taxtribunaldecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.tax_tribunal_decisions.tribunals_lb.dns_name
+    zone_id                = module.tax_tribunal_decisions.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_tax_tribunal_decisions_sftp" {
+  allow_overwrite = true
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "sftp.taxtribunaldecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type            = "CNAME"
+
+  records         = [module.tax_tribunal_decisions.tribunals_lb_ftp[0].dns_name]
+  ttl             = 60
+}
+
 # Define a wildcard ACM certificate for sandbox/dev
 resource "aws_acm_certificate" "external" {
   domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
