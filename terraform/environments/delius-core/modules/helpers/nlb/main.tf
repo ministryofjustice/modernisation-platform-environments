@@ -65,7 +65,7 @@ resource "aws_lb_target_group" "this" {
 
   deregistration_delay = var.deregistration_delay
 
-  target_type          = "ip"
+  target_type = "ip"
 
   health_check {
     healthy_threshold   = 5

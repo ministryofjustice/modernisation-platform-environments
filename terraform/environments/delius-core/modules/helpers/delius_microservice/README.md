@@ -18,9 +18,9 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_container_definition"></a> [container\_definition](#module\_container\_definition) | git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container | v4.2.1 |
+| <a name="module_container_definition"></a> [container\_definition](#module\_container\_definition) | git::<https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container> | v4.2.1 |
 | <a name="module_ecs_policies"></a> [ecs\_policies](#module\_ecs\_policies) | ../ecs_policies | n/a |
-| <a name="module_ecs_service"></a> [ecs\_service](#module\_ecs\_service) | git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service | v4.2.1 |
+| <a name="module_ecs_service"></a> [ecs\_service](#module\_ecs\_service) | git::<https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service> | v4.2.1 |
 
 ## Resources
 
