@@ -1,8 +1,6 @@
 locals {
-  nomis_host                = (local.environment == "dev") ? "10.26.24.29" : jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  connection_string_nomis   = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis_athena_federated.name}}@${local.nomis_host}:1521:CNOMT3"
-  bodimis_host              = (local.environment == "dev") ? "10.26.24.29" : jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  connection_string_bodimis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis_athena_federated.name}}@${local.bodimis_host}:1521:CNOMT3"
+  nomis_host              = (local.environment == "dev") ? "10.26.24.29" : jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
+  connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis_athena_federated.name}}@${local.nomis_host}:1521:CNOMT3"
 }
 
 module "athena_federated_query_connector_oracle" {
@@ -22,8 +20,7 @@ module "athena_federated_query_connector_oracle" {
   lambda_reserved_concurrent_executions = 20
 
   connection_strings = {
-    nomis   = local.connection_string_nomis
-    bodimis = local.connection_string_bodimis
+    nomis = local.connection_string_nomis
   }
 }
 
@@ -31,17 +28,6 @@ module "athena_federated_query_connector_oracle" {
 resource "aws_athena_data_catalog" "nomis_catalog" {
   name        = "nomis"
   description = "NOMIS Athena data catalog"
-  type        = "LAMBDA"
-
-  parameters = {
-    "function" = module.athena_federated_query_connector_oracle.lambda_function_arn
-  }
-}
-
-# Adds an Athena data source / catalog for BODIMIS
-resource "aws_athena_data_catalog" "bodimis_catalog" {
-  name        = "bodimis"
-  description = "BODIMIS Athena data catalog"
   type        = "LAMBDA"
 
   parameters = {
