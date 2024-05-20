@@ -1,5 +1,6 @@
 module "vpc_flow_logs_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
   version = "3.0.0"
@@ -41,6 +42,7 @@ module "vpc_flow_logs_kms" {
 
 module "eks_cluster_logs_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
   version = "3.0.0"
@@ -82,6 +84,7 @@ module "eks_cluster_logs_kms" {
 
 module "ebs_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
   version = "2.2.1"
