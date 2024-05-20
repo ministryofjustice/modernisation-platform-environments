@@ -38,11 +38,18 @@ resource "aws_s3_bucket" "dms_dv_glue_job_s3_bucket" {
   bucket_prefix = "glue-jobs-py-scripts-"
 }
 
+# resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
+#   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+#   key    = "dms_dv_rds_and_s3_csv.py"
+#   source = "glue-job/dms_dv_rds_and_s3_csv.py"
+#   etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv.py")
+# }
+
 resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-  key    = "dms_dv_rds_and_s3_csv.py"
-  source = "glue-job/dms_dv_rds_and_s3_csv.py"
-  etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv.py")
+  key    = "dms_dv_rds_and_s3_csv_table.py"
+  source = "glue-job/dms_dv_rds_and_s3_csv_table.py"
+  etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv_table.py")
 }
 
 resource "aws_s3_object" "catalog_dv_table_glue_job_s3_object" {
