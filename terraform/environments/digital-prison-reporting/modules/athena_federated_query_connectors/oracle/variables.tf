@@ -49,9 +49,9 @@ variable "nomis_credentials_secret_arn" {
   description = "The ARN of the Secret Manager secret containing NOMIS credentials"
 }
 
-variable "connection_string_nomis" {
-  type        = string
-  description = "The Athena Federated Query connection string for NOMIS (a JDBC connection string with an additional prefix)"
+variable "connection_strings" {
+  type        = map(string)
+  description = "A map of the Athena Federated Query connection strings. Cannot be empty. The 1st element will be the default connection string for the connector."
 }
 
 variable "lambda_memory_allocation_mb" {
