@@ -193,9 +193,9 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
 }
 
-##################################################
-# Lambda Function to Terminate MS Word Processes
-##################################################
+######################################################
+# Lambda Function to Terminate MS Word Processes - DEV
+######################################################
 
 # Eventbridge rules to terminate cpu process
 
@@ -247,4 +247,60 @@ data "archive_file" "zip_the_terminate_cpu_process_code_dev" {
   type        = "zip"
   source_dir  = "${path.module}/terminate_cpu_process/"
   output_path = "${path.module}/terminate_cpu_process/terminate_cpu_process_dev.zip"
+}
+
+######################################################
+# Lambda Function to Terminate MS Word Processes - UAT
+######################################################
+
+# Eventbridge rules to terminate cpu process
+
+resource "aws_cloudwatch_event_rule" "terminate_cpu_process_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  name          = "terminate_cpu_process_uat"
+  description   = "Terminates a CPU process uat"
+  event_pattern = <<EOF
+{
+  "source": ["aws.ec2"],
+  "detail-type": ["EC2 Instance High CPU Utilisation"]
+  }
+EOF
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_terminate_cpu_process_uat" {
+  count     = local.is-preproduction == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.terminate_cpu_process_uat[0].name
+  target_id = "terminate_cpu_process_uat"
+  arn       = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_uat[0].arn
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_uat[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.terminate_cpu_process_uat[0].arn
+}
+
+# Lambda functions to terminate cpu process
+
+resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  filename      = "${path.module}/terminate_cpu_process/terminate_cpu_process_uat.zip"
+  function_name = "terminate_cpu_process_uat"
+  role          = aws_iam_role.lambda_role_terminate_cpu_process_uat[0].arn
+  handler       = "terminate_cpu_process_uat.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 300
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_uat]
+}
+
+# Archive the zip file
+
+data "archive_file" "zip_the_terminate_cpu_process_code_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  type        = "zip"
+  source_dir  = "${path.module}/terminate_cpu_process/"
+  output_path = "${path.module}/terminate_cpu_process/terminate_cpu_process_uat.zip"
 }
