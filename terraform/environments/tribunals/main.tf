@@ -523,7 +523,7 @@ module "sscs_venue_pages" {
 module "tax_chancery_decisions" {
   is_ftp_app                        = true
   source                            = "./modules/tribunal_ftp"
-  app_name                          = "ftp-tax-chancery-decisions"
+  app_name                          = "ftp-tax-chancery"
   app_url                           = "taxchancerydecisions"
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
@@ -546,7 +546,7 @@ module "tax_chancery_decisions" {
 module "tax_tribunal_decisions" {
   is_ftp_app                        = true
   source                            = "./modules/tribunal_ftp"
-  app_name                          = "ftp-tax-tribunal-decisions"
+  app_name                          = "ftp-tax-tribunal"
   app_url                           = "taxtribunaldecisions"
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
