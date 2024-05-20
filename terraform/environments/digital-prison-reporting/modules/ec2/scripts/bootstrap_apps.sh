@@ -88,6 +88,16 @@ chmod -R 777 /opt/kinesis
 
 # Configure MP -> NOMIS Connectivity, for Development Env Workaround
 if [ ${environment} = "development" ]; then
+
+# Add Secondary IP
+# Get the Network Interface ID
+interface_id=`aws ec2 describe-network-interfaces --region eu-west-2  --filters Name=attachment.instance-id,Values=$(aws sts get-caller-identity --query UserId --output text | cut -d : -f 2) --query "NetworkInterfaces[0].NetworkInterfaceId" --output text`
+echo "___Interface ID: $interface_id"
+
+sleep 300
+# Add Secondary IP
+aws ec2 assign-private-ip-addresses --network-interface-id $interface_id --private-ip-addresses ${static_ip}
+
 # Install KUBECTL Libs
 ## Download Libs
 curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.1/2023-04-19/bin/linux/amd64/kubectl
@@ -143,7 +153,7 @@ EOF
 
 ## Add Permissions and Execute the Forwarder
 chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
-fi   
+fi
 
 # Start Stream at Start of the EC2 
 sudo chkconfig aws-kinesis-agent on

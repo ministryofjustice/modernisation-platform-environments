@@ -8,6 +8,12 @@ variable "env" {
   description = "Current Environment"
 }
 
+variable "static_private_ip" {
+  type        = string
+  default     = ""
+  description = "Static Private IP"
+}
+
 variable "aws_region" {
   type        = string
   default     = ""
