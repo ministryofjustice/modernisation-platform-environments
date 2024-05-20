@@ -3,6 +3,7 @@
 #tfsec:ignore:avd-aws-0104 - Currently no requirement to lock down egress traffic from EKS cluster
 module "eks" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
   version = "20.10.0"
@@ -73,7 +74,7 @@ module "eks" {
           iops                  = 3000
           throughput            = 150
           encrypted             = true
-          kms_key_id            = module.ebs_kms_key.key_arn
+          kms_key_id            = module.ebs_kms.key_arn
           delete_on_termination = true
         }
       }

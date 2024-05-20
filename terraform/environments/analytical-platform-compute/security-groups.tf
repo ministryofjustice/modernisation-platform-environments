@@ -1,5 +1,6 @@
 module "vpc_endpoints_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/security-group/aws"
   version = "5.1.2"
