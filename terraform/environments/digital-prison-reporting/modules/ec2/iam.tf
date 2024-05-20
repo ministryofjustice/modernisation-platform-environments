@@ -275,6 +275,11 @@ data "aws_iam_policy_document" "dynamo-access" {
   }
 }
 
+resource "aws_iam_role_policy_attachment" "generic" {
+  role       = aws_iam_role.kinesis-agent-instance-role.name
+  policy_arn = aws_iam_policy.generic.arn
+}
+
 resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
   name = "${var.name}-profile"
   role = aws_iam_role.kinesis-agent-instance-role.name
