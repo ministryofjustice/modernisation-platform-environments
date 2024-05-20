@@ -86,7 +86,6 @@ data "aws_iam_policy_document" "rds-kms" {
     ]
   }
 
-data "aws_iam_policy_document" "rds-kms" {
   statement {
     effect    = "Allow"
     actions   = [
