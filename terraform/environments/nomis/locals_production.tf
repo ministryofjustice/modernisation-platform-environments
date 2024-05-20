@@ -265,7 +265,8 @@ locals {
           flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
@@ -294,7 +295,8 @@ locals {
           flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
@@ -352,7 +354,8 @@ locals {
           flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
@@ -384,7 +387,8 @@ locals {
           flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment  = "prod"

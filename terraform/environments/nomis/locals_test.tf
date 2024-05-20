@@ -415,6 +415,9 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+        })
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS database"
@@ -444,6 +447,9 @@ locals {
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data  = { total_size = 700 }
           flash = { total_size = 50 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t1"
@@ -498,6 +504,9 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+        })
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t2"
           description         = "T2 NOMIS database"
@@ -548,6 +557,9 @@ locals {
         ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
           data  = { total_size = 2500 }
           flash = { total_size = 500 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "t3"
