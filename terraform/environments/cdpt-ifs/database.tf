@@ -62,7 +62,7 @@ resource "aws_security_group" "db" {
 resource "aws_kms_key" "rds" {
   description         = "Encryption key for rds"
   enable_key_rotation = true
-  
+  policy = data.aws_iam_policy_document.rds-kms.json  
 }
 
 resource "aws_kms_alias" "rds-kms-alias" {
