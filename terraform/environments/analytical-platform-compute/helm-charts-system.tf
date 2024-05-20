@@ -11,3 +11,19 @@ resource "helm_release" "kyverno" {
     )
   ]
 }
+
+resource "helm_release" "aws_cloudwatch_metrics" {
+  name       = "aws-cloudwatch-metrics"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-cloudwatch-metrics"
+  version    = "0.0.11"
+  namespace  = kubernetes_namespace.amazon_cloudwatch.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/amazon-cloudwatch-metrics/values.yml.tftpl",
+      {
+        cluster_name = module.eks.cluster_name
+      }
+    )
+  ]
+}
