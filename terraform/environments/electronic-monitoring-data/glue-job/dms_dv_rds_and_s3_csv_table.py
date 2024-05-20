@@ -344,7 +344,7 @@ if __name__ == "__main__":
 
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
         
-            write_parquet_to_s3(df_dv_output, rds_db_name, rds_tbl_name)
+            write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
 
     else:
         LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
@@ -364,6 +364,6 @@ if __name__ == "__main__":
 
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
 
-            write_parquet_to_s3(df_dv_output, rds_db_name, rds_tbl_name)
+            write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
 
     job.commit()
