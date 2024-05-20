@@ -149,7 +149,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
   connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv.py"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv_table.py"
   }
 
   tags = merge(
