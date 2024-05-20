@@ -26,4 +26,6 @@ resource "helm_release" "aws_cloudwatch_metrics" {
       }
     )
   ]
+
+  depends_on = [module.aws_cloudwatch_metrics_pod_identity]
 }
