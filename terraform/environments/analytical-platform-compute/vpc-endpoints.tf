@@ -101,6 +101,7 @@ module "vpc_endpoints" {
         { Name = format("%s-secretsmanager", module.vpc.name) }
       )
     },
+    /* Removing temporary ...
     aps = {
       service             = "aps"
       service_type        = "Interface"
@@ -119,6 +120,7 @@ module "vpc_endpoints" {
         { Name = format("%s-aps-workspaces", module.vpc.name) }
       )
     },
+    */
     /* Gateways */
     s3 = {
       service      = "s3"
