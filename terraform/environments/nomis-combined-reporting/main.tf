@@ -97,7 +97,7 @@ module "baseline" {
   sns_topics = merge(
     module.baseline_presets.sns_topics,
     local.baseline_sns_topics,
-    lookup(local.baseline_environment_config, "baseline_sns_topics", {})
+    lookup(local.environment_config, "baseline_sns_topics", {})
   )
   ssm_parameters = merge(
     module.baseline_presets.ssm_parameters,
