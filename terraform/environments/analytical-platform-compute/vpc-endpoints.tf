@@ -101,6 +101,25 @@ module "vpc_endpoints" {
         { Name = format("%s-secretsmanager", module.vpc.name) }
       )
     },
+    aps = {
+      service             = "aps"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-aps", module.vpc.name) }
+      )
+    },
+    aps-workspaces = {
+      service             = "aps-workspaces"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-aps", module.vpc.name) }
+      )
+    },
+    }
     /* Gateways */
     s3 = {
       service      = "s3"
