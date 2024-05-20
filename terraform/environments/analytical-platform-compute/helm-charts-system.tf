@@ -36,12 +36,6 @@ resource "helm_release" "aws_cloudwatch_metrics" {
   depends_on = [module.aws_cloudwatch_metrics_pod_identity]
 }
 
-/*
-  Similarly to aws-cloudwatch-metrics, aws-for-fluent-bit doesn't support IMDSv2
-  Therefore for this to work properly, I've set hostNetwork to true in src/helm/aws/values.yml.tftpl
-  The DaemonSet uses the node role to which has arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy attached
-  The Helm chart also doesn't have support for IRSA, so a EKS Pod Identity has been been made ready to use module.aws_for_fluent_bit_pod_identity
-*/
 resource "helm_release" "aws_for_fluent_bit" {
   name       = "aws-for-fluent-bit"
   repository = "https://aws.github.io/eks-charts"
