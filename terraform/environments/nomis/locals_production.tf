@@ -117,8 +117,8 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/oracle/weblogic/prod"     = local.weblogic_secretsmanager_secrets
-      "/oracle/database/PCNOM"    = local.database_weblogic_secretsmanager_secrets # weblogic oracle-db-name set to PCNOM
+      "/oracle/weblogic/prod"  = local.weblogic_secretsmanager_secrets
+      "/oracle/database/PCNOM" = local.database_weblogic_secretsmanager_secrets # weblogic oracle-db-name set to PCNOM
       # PROD ACTIVE
       "/oracle/database/PDCNOM"   = local.database_secretsmanager_secrets
       "/oracle/database/PDNDH"    = local.database_secretsmanager_secrets
@@ -276,11 +276,7 @@ locals {
       prod-nomis-db-1-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
-          local.database_ec2_cloudwatch_metric_alarms.db_connected, {
-            high-memory-usage = merge(local.database_ec2_cloudwatch_metric_alarms.standard["high-memory-usage"], {
-              threshold = "99" # Sandhya confirmed this is OK while in DR mode
-            })
-          }
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
