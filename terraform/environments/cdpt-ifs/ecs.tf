@@ -334,10 +334,7 @@ resource "aws_security_group" "cluster_ec2" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    cidr_blocks     = [
-                      data.aws_vpc.shared.cidr_block,
-                      "10.26.49.43/32"
-                      ]
+    cidr_blocks     = ["0.0.0.0/0"]
   }
 
   tags = merge(
