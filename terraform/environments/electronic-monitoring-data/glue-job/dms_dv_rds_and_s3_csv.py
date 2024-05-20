@@ -225,28 +225,28 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
     total_files = 1 if total_files < 1 else total_files
 
     df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(total_files)
-    LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] size --> {df_rds_temp.rdd.getNumPartitions()}""")
+    LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partition(s) --> {df_rds_temp.rdd.getNumPartitions()}""")
 
     if not (args.get("df_rds_coalesce_partition", None) is None):
         df_rds_temp = df_rds_temp.coalesce(int(args["df_rds_coalesce_partition"]))
-        LOGGER.info(f"""RDS-coalesce-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] size --> {df_rds_temp.rdd.getNumPartitions()}""")
+        LOGGER.info(f"""RDS-coalesce-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partition(s) --> {df_rds_temp.rdd.getNumPartitions()}""")
     elif not (args.get("df_rds_repartition", None) is None):
         df_rds_temp = df_rds_temp.repartition(int(args["df_rds_repartition"]))
-        LOGGER.info(f"""RDS-repartition-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] size --> {df_rds_temp.rdd.getNumPartitions()}""")
+        LOGGER.info(f"""RDS-repartition-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partition(s) --> {df_rds_temp.rdd.getNumPartitions()}""")
 
     tbl_csv_s3_path = get_s3_csv_tbl_path(rds_db_name, rds_tbl_name)
 
     if tbl_csv_s3_path is not None:
 
         df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema).repartition(total_files)
-        LOGGER.info(f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] size --> {df_csv_temp.rdd.getNumPartitions()}""")
+        LOGGER.info(f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partition(s) --> {df_csv_temp.rdd.getNumPartitions()}""")
 
         if not (args.get("df_csv_coalesce_partition", None) is None):
             df_csv_temp = df_csv_temp.coalesce(int(args["df_csv_coalesce_partition"]))
-            LOGGER.info(f"""S3-CSV-coalesce-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] size --> {df_csv_temp.rdd.getNumPartitions()}""")
+            LOGGER.info(f"""S3-CSV-coalesce-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partition(s) --> {df_csv_temp.rdd.getNumPartitions()}""")
         elif not (args.get("df_csv_repartition", None) is None):
             df_csv_temp = df_csv_temp.repartition(int(args["df_csv_repartition"]))
-            LOGGER.info(f"""S3-CSV-repartition-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] size --> {df_csv_temp.rdd.getNumPartitions()}""")
+            LOGGER.info(f"""S3-CSV-repartition-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partition(s) --> {df_csv_temp.rdd.getNumPartitions()}""")
 
         df_rds_temp_count = df_rds_temp.count()
         df_csv_temp_count = df_csv_temp.count()
@@ -331,7 +331,7 @@ if __name__ == "__main__":
     if df_dv_output.rdd.getNumPartitions() == 1:
         df_dv_output = df_dv_output.repartition(int(args["df_parquet_repartition"]))
 
-    LOGGER.info(f"""Dataframe-'df_dv_output' created with partition size --> {df_dv_output.rdd.getNumPartitions()}""")
+    LOGGER.info(f"""Dataframe-'df_dv_output' created with partition partition(s) --> {df_dv_output.rdd.getNumPartitions()}""")
 
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
@@ -352,7 +352,7 @@ if __name__ == "__main__":
         given_rds_sqlserver_tbls_str = args["rds_sqlserver_tbls"]
         LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
 
-        given_rds_sqlserver_tbls_list = list(given_rds_sqlserver_tbls_str)
+        given_rds_sqlserver_tbls_list = [e.strip().strip("'") for e in given_rds_sqlserver_tbls_str.split(",")]
         LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
         filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & set(given_rds_sqlserver_tbls_list))
