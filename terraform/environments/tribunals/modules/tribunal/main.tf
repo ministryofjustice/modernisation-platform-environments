@@ -18,9 +18,6 @@ locals {
   }))
   app_container_definition = templatefile("container_definition.json", {
     app_name = "${local.app}"
-    #ecr_url             = "mcr.microsoft.com/dotnet/framework/aspnet:4.8"
-    #docker_image_tag    = "latest" 
-    #sentry_env          = local.environment
     awslogs-group              = "${local.app}-ecs-log-group"
     supportEmail               = "${var.application_data.support_email}"
     supportTeam                = "${var.application_data.support_team}"
@@ -110,8 +107,8 @@ resource "aws_secretsmanager_secret_version" "app_db_credentials_version" {
   secret_string = <<EOF
 {
   "username": "${local.app_db_login_name}",
-  "password": "${random_password.app_new_password.result}",  
-  "host": "${local.app_rds_url}",  
+  "password": "${random_password.app_new_password.result}",
+  "host": "${local.app_rds_url}",
   "database_name": "${local.app_db_name}"
 }
 EOF

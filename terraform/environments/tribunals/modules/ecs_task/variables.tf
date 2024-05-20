@@ -55,13 +55,13 @@ variable "server_port" {
   description = "The port the containers will be listening on"
 }
 
-variable "lb_listener" {  
+variable "lb_listener" {
 }
 
-variable "cluster_id" {  
+variable "cluster_id" {
 }
 
-variable "cluster_name" {  
+variable "cluster_name" {
 }
 
 variable "is_ftp_app" {

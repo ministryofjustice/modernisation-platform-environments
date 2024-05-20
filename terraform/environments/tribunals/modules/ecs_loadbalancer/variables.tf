@@ -8,16 +8,16 @@ variable "tags_common" {
   description = "Common tags to be used by all resources"
 }
 
-variable "vpc_shared_id" {  
+variable "vpc_shared_id" {
 }
 
-variable "application_data" {   
+variable "application_data" {
 }
 
-variable "subnets_shared_public_ids" {  
+variable "subnets_shared_public_ids" {
 }
 
-variable "aws_acm_certificate_external" {  
+variable "aws_acm_certificate_external" {
 }
 
 variable "is_ftp_app" {

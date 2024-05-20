@@ -1,5 +1,4 @@
 resource "aws_dms_endpoint" "target" {
-  #depends_on    = [var.target_db_instance]
   database_name = var.target_database_name
   endpoint_id   = var.target_endpoint_id
   endpoint_type = "target"
@@ -25,8 +24,6 @@ resource "aws_dms_endpoint" "source" {
 }
 
 resource "aws_dms_replication_task" "migration-task" {
- # depends_on = [null_resource.setup_target_rds_security_group, aws_db_instance.rdsdb, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tribunals_replication_instance]
-
   migration_type            = "full-load"
   replication_instance_arn  = var.replication_instance_arn
   replication_task_id       = var.replication_task_id
