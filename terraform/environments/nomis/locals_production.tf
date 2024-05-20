@@ -21,7 +21,7 @@ locals {
   # config for load balancer maintenance rule
   production_lb_maintenance_message = {
     maintenance_title   = "Prison-NOMIS Maintenance Window"
-    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again after 00:00"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
   # baseline config
@@ -118,18 +118,15 @@ locals {
 
     baseline_secretsmanager_secrets = {
       "/oracle/weblogic/prod"     = local.weblogic_secretsmanager_secrets
-      "/oracle/database/PDCNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/PCNOM"    = local.database_weblogic_secretsmanager_secrets # weblogic oracle-db-name set to PCNOM
+      # PROD ACTIVE
+      "/oracle/database/PDCNOM"   = local.database_secretsmanager_secrets
       "/oracle/database/PDNDH"    = local.database_secretsmanager_secrets
       "/oracle/database/PDTRDAT"  = local.database_secretsmanager_secrets
       "/oracle/database/PDCNMAUD" = local.database_secretsmanager_secrets
       "/oracle/database/PDMIS"    = local.database_mis_secretsmanager_secrets
-      "/oracle/database/PCNOM"    = local.database_nomis_secretsmanager_secrets
-      "/oracle/database/PCNOMHA"  = local.database_secretsmanager_secrets
-      "/oracle/database/PNDH"     = local.database_secretsmanager_secrets
-      "/oracle/database/PTRDAT"   = local.database_secretsmanager_secrets
-      "/oracle/database/PCNMAUD"  = local.database_secretsmanager_secrets
-      "/oracle/database/PMIS"     = local.database_mis_secretsmanager_secrets
-      "/oracle/database/DRCNOM"   = local.database_nomis_secretsmanager_secrets
+      # PROD STANDBY
+      "/oracle/database/DRCNOM"   = local.database_secretsmanager_secrets
       "/oracle/database/DRNDH"    = local.database_secretsmanager_secrets
       "/oracle/database/DRTRDAT"  = local.database_secretsmanager_secrets
       "/oracle/database/DRCNMAUD" = local.database_secretsmanager_secrets
@@ -442,7 +439,7 @@ locals {
 
           https = merge(local.weblogic_lb_listeners.https, {
             alarm_target_group_names = [
-              # "prod-nomis-web-a-http-7777",
+              # "prod-nomis-web-a-http-7777",
               "prod-nomis-web-b-http-7777",
             ]
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
