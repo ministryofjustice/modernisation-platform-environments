@@ -12,6 +12,12 @@ resource "helm_release" "kyverno" {
   ]
 }
 
+/*
+  There is an ongoing issue with aws-cloudwatch-metrics as it doesn't properly support IMDSv2 (https://github.com/aws/amazon-cloudwatch-agent/issues/1101)
+  Therefor for this to work properly, I've set hostNetwork to true in src/helm/amazon-cloudwatch-metrics/values.yml.tftpl
+  The DaemonSet uses the node role to which has arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy attached
+  The Helm chart also doesn't have support for IRSA, so a EKS Pod Identity has been been made ready to use module.aws_cloudwatch_metrics_pod_identity
+*/
 resource "helm_release" "aws_cloudwatch_metrics" {
   name       = "aws-cloudwatch-metrics"
   repository = "https://aws.github.io/eks-charts"
@@ -28,4 +34,24 @@ resource "helm_release" "aws_cloudwatch_metrics" {
   ]
 
   depends_on = [module.aws_cloudwatch_metrics_pod_identity]
+}
+
+resource "helm_release" "aws_for_fluent_bit" {
+  name       = "aws-for-fluent-bit"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-for-fluent-bit"
+  version    = "0.1.33"
+  namespace  = kubernetes_namespace.amazon_cloudwatch.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/aws-for-fluent-bit/values.yml.tftpl",
+      {
+        aws_region                = data.aws_region.current.name
+        cluster_name              = module.eks.cluster_name
+        cloudwatch_log_group_name = module.eks_log_group.name
+      }
+    )
+  ]
+
+  depends_on = [helm_release.gatekeeper]
 }
