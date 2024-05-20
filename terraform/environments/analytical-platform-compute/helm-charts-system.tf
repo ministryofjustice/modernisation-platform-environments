@@ -42,22 +42,23 @@ resource "helm_release" "aws_cloudwatch_metrics" {
   The DaemonSet uses the node role to which has arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy attached
   The Helm chart also doesn't have support for IRSA, so a EKS Pod Identity has been been made ready to use module.aws_for_fluent_bit_pod_identity
 */
-# resource "helm_release" "aws_for_fluent_bit" {
-#   name       = "aws-for-fluent-bit"
-#   repository = "https://aws.github.io/eks-charts"
-#   chart      = "aws-for-fluent-bit"
-#   version    = "0.1.33"
-#   namespace  = kubernetes_namespace.amazon_cloudwatch.metadata[0].name
-#   values = [
-#     templatefile(
-#       "${path.module}/src/helm/aws-for-fluent-bit/values.yml.tftpl",
-#       {
-#         aws_region                = data.aws_region.current.name
-#         cluster_name              = module.eks.cluster_name
-#         cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
-#       }
-#     )
-#   ]
+resource "helm_release" "aws_for_fluent_bit" {
+  name       = "aws-for-fluent-bit"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-for-fluent-bit"
+  version    = "0.1.33"
+  namespace  = kubernetes_namespace.amazon_cloudwatch.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/aws-for-fluent-bit/values.yml.tftpl",
+      {
+        aws_region                = data.aws_region.current.name
+        cluster_name              = module.eks.cluster_name
+        cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
+        eks_role_arn              = module.aws_for_fluent_bit_iam_role.iam_role_arn
+      }
+    )
+  ]
 
-#   depends_on = [module.aws_for_fluent_bit_pod_identity]
-# }
+  depends_on = [module.aws_for_fluent_bit_iam_role]
+}
