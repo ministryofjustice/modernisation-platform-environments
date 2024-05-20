@@ -326,7 +326,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment  = "prod"
           description        = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
-          oracle-sids        = "CNMAUD"
+          oracle-sids        = ""
           connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
         })
       })
@@ -393,7 +393,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment  = "prod"
           description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          oracle-sids        = "DRMIS"
+          oracle-sids        = "DRMIS DRCNMAUD"
           misload-dbname     = "DRMIS"
           connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
         })
@@ -420,7 +420,7 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
           description       = "Production NOMIS HA database to replace Azure PDPDL00062"
-          oracle-sids       = "PCNOMHA"
+          oracle-sids       = ""
         })
       })
     }
