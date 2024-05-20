@@ -72,12 +72,12 @@ if __name__ == "__main__":
 
     table_ddl_create = f'''
     CREATE EXTERNAL TABLE `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
-    `run_datetime` timestamp, 
-    `full_table_name` string, 
+    `run_datetime` timestamp,
     `json_row` string, 
     `validation_msg` string)
     PARTITIONED BY ( 
-        `database_name` string)
+        `database_name` string
+        `full_table_name` string)
     ROW FORMAT SERDE 
         'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' 
     STORED AS INPUTFORMAT 

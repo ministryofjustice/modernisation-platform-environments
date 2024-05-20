@@ -217,10 +217,10 @@ def process_dv_for_table(rds_db_name, rds_tbl_name):
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime,
-    cast(null as string) as full_table_name, 
     cast(null as string) as json_row,
     cast(null as string) as validation_msg,
-    cast(null as string) as database_name
+    cast(null as string) as database_name,
+    cast(null as string) as full_table_name
     """.strip()
     
     df_dv_output = spark.sql(sql_select_str).repartition(default_repartition_factor)
@@ -245,10 +245,10 @@ def process_dv_for_table(rds_db_name, rds_tbl_name):
             
             if df_rds_csv_subtract_row_count == 0:
                 df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                                  f"""'{db_dbo_tbl}' as full_table_name""",
                                                   "'' as json_row",
                                                   f"""'{rds_tbl_name} - Validated.' as validation_msg""",
-                                                  f"""'{rds_db_name}' as database_name"""
+                                                  f"""'{rds_db_name}' as database_name""",
+                                                  f"""'{db_dbo_tbl}' as full_table_name"""
                                                   )
 
                 df_dv_output = df_dv_output.union(df_temp)
@@ -259,10 +259,10 @@ def process_dv_for_table(rds_db_name, rds_tbl_name):
                             .limit(100))
 
                 df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
-                                             f"""'{db_dbo_tbl}' as full_table_name""",
                                              "json_row",
                                              f""" "'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as validation_msg""",
-                                             f"""'{rds_db_name}' as database_name"""
+                                             f"""'{rds_db_name}' as database_name""",
+                                             f"""'{db_dbo_tbl}' as full_table_name"""
                                              )
 
                 df_dv_output = df_dv_output.union(df_temp)
@@ -271,19 +271,19 @@ def process_dv_for_table(rds_db_name, rds_tbl_name):
             
         else:
             df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                              f"""'{db_dbo_tbl}' as full_table_name""",
                                               "'' as json_row",
                                               f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_csv_temp_count} MISMATCHED !' as validation_msg""",
-                                              f"""'{rds_db_name}' as database_name"""
+                                              f"""'{rds_db_name}' as database_name""",
+                                              f"""'{db_dbo_tbl}' as full_table_name"""
                                               )
 
             df_dv_output = df_dv_output.union(df_temp)
     else:
         df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                          f"""'{db_dbo_tbl}' as full_table_name""",
                                           "'' as json_row",
                                           f"""'No S3-csv folder path exists for the given {rds_db_name} - {rds_tbl_name}' as validation_msg""",
-                                          f"""'{rds_db_name}' as database_name"""
+                                          f"""'{rds_db_name}' as database_name""",
+                                          f"""'{db_dbo_tbl}' as full_table_name"""
                                           )
 
         df_dv_output = df_dv_output.union(df_temp)
