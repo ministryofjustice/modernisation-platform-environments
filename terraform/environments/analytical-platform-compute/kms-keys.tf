@@ -51,6 +51,37 @@ module "managed_prometheus_kms" {
   description             = "AMP KMS key"
   enable_default_policy   = true
   deletion_window_in_days = 7
+  key_statements = [
+    {
+      sid = "AllowAmazonManagedPrometheus"
+      actions = [
+        "kms:DescribeKey",
+        "kms:CreateGrant",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["aps.${data.aws_region.current.name}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:CallerAccount"
+          values   = ["${data.aws_caller_identity.current.account_id}"]
+        }
+      ]
+    }
+  ]
 
   tags = local.tags
 }
@@ -62,7 +93,7 @@ module "managed_prometheus_logs_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.0.0"
 
-  aliases                 = ["managed-prometheus"]
+  aliases                 = ["managed-prometheus-logs"]
   description             = "AMP logs KMS key"
   enable_default_policy   = true
   deletion_window_in_days = 7
@@ -88,7 +119,7 @@ module "managed_prometheus_logs_kms" {
         {
           test     = "ArnEquals"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.vpc_flow_log_cloudwatch_log_group_name_prefix}*"]
+          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.amp_cloudwatch_log_group_name}/*"]
         }
       ]
     }
