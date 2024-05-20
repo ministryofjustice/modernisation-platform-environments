@@ -270,6 +270,9 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+        })
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "dev"
           description         = "syscon nomis dev and qa databases"
@@ -287,7 +290,8 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
+          disable_api_termination = true
+          instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -316,7 +320,8 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
+          disable_api_termination = true
+          instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -345,7 +350,8 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
+          disable_api_termination = true
+          instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -381,8 +387,9 @@ locals {
           "/dev/sdc" = { label = "app", size = 100, type = "gp3" } # /u02
         }
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t3.medium"
-          vpc_security_group_ids = ["private-web"]
+          disable_api_termination = true
+          instance_type           = "t3.medium"
+          vpc_security_group_ids  = ["private-web"]
           tags = {
             backup-plan = "daily-and-weekly"
           }

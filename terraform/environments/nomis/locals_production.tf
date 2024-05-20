@@ -21,7 +21,7 @@ locals {
   # config for load balancer maintenance rule
   production_lb_maintenance_message = {
     maintenance_title   = "Prison-NOMIS Maintenance Window"
-    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again after 00:00"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
   # baseline config
@@ -117,19 +117,16 @@ locals {
     }
 
     baseline_secretsmanager_secrets = {
-      "/oracle/weblogic/prod"     = local.weblogic_secretsmanager_secrets
-      "/oracle/database/PDCNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/weblogic/prod"  = local.weblogic_secretsmanager_secrets
+      "/oracle/database/PCNOM" = local.database_weblogic_secretsmanager_secrets # weblogic oracle-db-name set to PCNOM
+      # PROD ACTIVE
+      "/oracle/database/PDCNOM"   = local.database_secretsmanager_secrets
       "/oracle/database/PDNDH"    = local.database_secretsmanager_secrets
       "/oracle/database/PDTRDAT"  = local.database_secretsmanager_secrets
       "/oracle/database/PDCNMAUD" = local.database_secretsmanager_secrets
       "/oracle/database/PDMIS"    = local.database_mis_secretsmanager_secrets
-      "/oracle/database/PCNOM"    = local.database_nomis_secretsmanager_secrets
-      "/oracle/database/PCNOMHA"  = local.database_secretsmanager_secrets
-      "/oracle/database/PNDH"     = local.database_secretsmanager_secrets
-      "/oracle/database/PTRDAT"   = local.database_secretsmanager_secrets
-      "/oracle/database/PCNMAUD"  = local.database_secretsmanager_secrets
-      "/oracle/database/PMIS"     = local.database_mis_secretsmanager_secrets
-      "/oracle/database/DRCNOM"   = local.database_nomis_secretsmanager_secrets
+      # PROD STANDBY
+      "/oracle/database/DRCNOM"   = local.database_secretsmanager_secrets
       "/oracle/database/DRNDH"    = local.database_secretsmanager_secrets
       "/oracle/database/DRTRDAT"  = local.database_secretsmanager_secrets
       "/oracle/database/DRCNMAUD" = local.database_secretsmanager_secrets
@@ -223,7 +220,7 @@ locals {
 
     baseline_ec2_instances = {
       prod-nomis-xtag-a = merge(local.xtag_ec2, {
-        # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
           availability_zone = "${local.region}a"
@@ -268,7 +265,8 @@ locals {
           flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
@@ -279,11 +277,7 @@ locals {
       prod-nomis-db-1-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
-          local.database_ec2_cloudwatch_metric_alarms.db_connected, {
-            high-memory-usage = merge(local.database_ec2_cloudwatch_metric_alarms.standard["high-memory-usage"], {
-              threshold = "99" # Sandhya confirmed this is OK while in DR mode
-            })
-          }
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -301,7 +295,8 @@ locals {
           flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
@@ -359,7 +354,8 @@ locals {
           flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "prod"
@@ -391,7 +387,8 @@ locals {
           flash = { total_size = 1000, iops = 5000, throughput = 500 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment  = "prod"
@@ -442,7 +439,7 @@ locals {
 
           https = merge(local.weblogic_lb_listeners.https, {
             alarm_target_group_names = [
-              # "prod-nomis-web-a-http-7777",
+              # "prod-nomis-web-a-http-7777",
               "prod-nomis-web-b-http-7777",
             ]
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on

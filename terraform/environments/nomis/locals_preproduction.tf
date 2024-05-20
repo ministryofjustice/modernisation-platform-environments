@@ -214,7 +214,8 @@ locals {
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
@@ -243,12 +244,13 @@ locals {
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
           description       = "Disaster-Recovery/High-Availability pre-production database for CNOMPP"
-          oracle-sids       = "" # TODO
+          oracle-sids       = "PPCNOMHA"
         })
       })
 
@@ -274,7 +276,8 @@ locals {
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
