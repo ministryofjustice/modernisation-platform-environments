@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "rds-kms" {
       "kms:DescribeKey"
     ]
     resources = [
-      aws_kms_key.rds.arn
+      "*"
     ]
     principals {
       type        = "AWS"
