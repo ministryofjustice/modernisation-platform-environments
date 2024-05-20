@@ -335,7 +335,7 @@ if __name__ == "__main__":
         for db_dbo_tbl in rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
+            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
         
             write_parquet_to_s3(df_dv_output, catalog_table_s3_full_path)
 
@@ -355,7 +355,7 @@ if __name__ == "__main__":
         for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
+            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
 
             write_parquet_to_s3(df_dv_output, catalog_table_s3_full_path)
 
