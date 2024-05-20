@@ -48,10 +48,10 @@ resource "helm_release" "aws_for_fluent_bit" {
       {
         aws_region                = data.aws_region.current.name
         cluster_name              = module.eks.cluster_name
-        cloudwatch_log_group_name = module.eks_log_group.name
+        cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
       }
     )
   ]
 
-  depends_on = [helm_release.gatekeeper]
+  depends_on = [module.aws_for_fluent_bit_pod_identity]
 }
