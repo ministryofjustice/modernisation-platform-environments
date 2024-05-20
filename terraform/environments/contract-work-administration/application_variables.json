@@ -27,7 +27,6 @@
       "elb_request_count_alarm_threshold": "1000",
       "status_check_alarm_threshold": "1",
       "database_ec2_swap_alarm_threshold": "50"
-
     },
     "test": {
       "example_var": "test-data"

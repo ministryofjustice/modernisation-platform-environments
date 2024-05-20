@@ -2,7 +2,7 @@ locals {
 
   # baseline config
   preproduction_config = {
-    
+
     # Instance Type Defaults for preproduction
     # instance_type_defaults = {
     #   web = "m6i.xlarge" # 4 vCPUs, 16GB RAM x 2 instances

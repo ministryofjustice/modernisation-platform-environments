@@ -200,9 +200,9 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
 # Eventbridge rules to terminate cpu process
 
 resource "aws_cloudwatch_event_rule" "terminate_cpu_process" {
-  count               = local.is-development == true ? 1 : 0
-  name                = "terminate_cpu_process"
-  description         = "Terminates a CPU process"
+  count         = local.is-development == true ? 1 : 0
+  name          = "terminate_cpu_process"
+  description   = "Terminates a CPU process"
   event_pattern = <<EOF
 {
   "source": ["aws.ec2"],

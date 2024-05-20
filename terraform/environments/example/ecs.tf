@@ -5,8 +5,8 @@
 
 module "ecs-cluster" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=b00647922a9204a99b023ac884440162e2b51b66" #v4.3.0
-  name        = local.ecs_application_name
-  tags = local.tags
+  name   = local.ecs_application_name
+  tags   = local.tags
 }
 
 module "service" {

@@ -162,8 +162,8 @@ locals {
   }
 
   dms_config_dev = {
-    replication_instance_class   = "dms.t3.medium"
-    engine_version               = "3.5.1"
+    replication_instance_class = "dms.t3.medium"
+    engine_version             = "3.5.1"
   }
 
   bastion_config_dev = {
