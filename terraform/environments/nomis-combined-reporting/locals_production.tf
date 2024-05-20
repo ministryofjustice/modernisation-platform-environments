@@ -48,6 +48,11 @@ locals {
 
     baseline_ec2_instances = {
       pd-ncr-db-1-a = merge(local.database_ec2_default, {
+        cloudwatch_metric_alarms = merge(
+          local.database_cloudwatch_metric_alarms.standard,
+          local.database_cloudwatch_metric_alarms.db_connected,
+          local.database_cloudwatch_metric_alarms.db_backup,
+        )
         config = merge(local.database_ec2_default.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
@@ -98,11 +103,16 @@ locals {
         tags = merge(local.database_ec2_default.tags, {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
-          oracle-sids                          = ""
+          oracle-sids                          = "PDBIPSYS PDBIPAUD"
           instance-scheduling                  = "skip-scheduling"
         })
       })
       pd-ncr-db-1-b = merge(local.database_ec2_default, {
+        # TODO: comment in when commissioned
+        # cloudwatch_metric_alarms = merge(
+        #   local.database_cloudwatch_metric_alarms.standard,
+        #   local.database_cloudwatch_metric_alarms.db_connected,
+        # )
         config = merge(local.database_ec2_default.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
