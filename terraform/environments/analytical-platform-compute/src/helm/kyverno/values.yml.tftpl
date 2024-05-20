@@ -8,5 +8,8 @@ cleanupController:
 reportsController:
   replicas: 2
 
-config.resourceFiltersExcludeNamespaces:
-  - kube-system
+config:
+  resourceFiltersExcludeNamespaces:
+    - kube-system
+    - amazon-cloudwatch
+    - amazon-guardduty
