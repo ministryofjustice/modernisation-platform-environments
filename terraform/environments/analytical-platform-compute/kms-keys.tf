@@ -77,7 +77,7 @@ module "managed_prometheus_kms" {
         {
           test     = "StringEquals"
           variable = "kms:CallerAccount"
-          values   = ["${data.aws_caller_identity.current.account_id}"]
+          values   = [data.aws_caller_identity.current.account_id]
         }
       ]
     }
