@@ -51,7 +51,7 @@ module "eks" {
       service_account_role_arn = module.efs_csi_driver_iam_role.iam_role_arn
     }
     aws-guardduty-agent = {
-      most_recent = local.environment_configuration.eks_cluster_addon_versions.aws_guardduty_agent
+      addon_version = local.environment_configuration.eks_cluster_addon_versions.aws_guardduty_agent
     }
     eks-pod-identity-agent = {
       addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
