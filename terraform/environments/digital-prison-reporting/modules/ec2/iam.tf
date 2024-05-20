@@ -200,10 +200,13 @@ resource "aws_iam_policy" "generic" {
 data "aws_iam_policy_document" "generic" {
   statement {
     actions = [
-      "ec2:*",
+      "ec2:Describe*",
+      "ec2:Get*",
+      "ec2:List*",  
+      "ec2:AssignPrivateIpAddresses",
     ]
     resources = [
-      "arn:aws:ec2:${var.region}:${var.account}:instance/*"
+      "*"
     ]
   }
 
