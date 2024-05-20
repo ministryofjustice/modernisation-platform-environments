@@ -1,7 +1,12 @@
 locals {
-  business_unit                        = var.networking[0].business-unit
-  region                               = "eu-west-2"
-  baseline_environment_presets_options = local.environment_baseline_presets_options[local.environment]
+  business_unit = var.networking[0].business-unit
+  region        = "eu-west-2"
+  environment_presets = {
+    development   = local.development_baseline_presets_options
+    test          = local.test_baseline_presets_options
+    preproduction = local.preproduction_baseline_presets_options
+    production    = local.production_baseline_presets_options
+  }
   environment_configs = {
     development   = local.development_config
     test          = local.test_config
@@ -100,7 +105,8 @@ locals {
       iam_policies = module.baseline_presets.s3_iam_policies
     }
   }
-  environment_config = local.environment_configs[local.environment]
+  environment_config                   = local.environment_configs[local.environment]
+  environment_baseline_presets_options = local.environment_presets[local.environment]
 
   baseline_secretsmanager_secrets = {}
 }

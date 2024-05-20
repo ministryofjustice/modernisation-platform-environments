@@ -108,7 +108,7 @@ module "baseline_presets" {
 
   options = merge(
     local.baseline_presets_options,
-    local.baseline_environment_presets_options,
+    local.environment_baseline_presets_options,
   )
 }
 module "environment" {
