@@ -1,4 +1,16 @@
 locals {
+
+  # baseline presets config
+  preproduction_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
+      }
+    }
+  }
+
   preproduction_config = {
     baseline_s3_buckets = {
       ncr-db-backup-bucket = {
