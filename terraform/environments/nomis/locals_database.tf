@@ -12,6 +12,11 @@ locals {
       weblogic-passwords = { description = "passwords available to weblogic servers" }
     }
   }
+  database_weblogic_secretsmanager_secrets = {
+    secrets = {
+      weblogic-passwords = { description = "passwords available to weblogic servers" }
+    }
+  }
   database_mis_secretsmanager_secrets = {
     secrets = {
       passwords      = { description = "database passwords" }
