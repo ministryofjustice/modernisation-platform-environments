@@ -116,10 +116,9 @@ module "vpc_endpoints" {
       private_dns_enabled = true
       tags = merge(
         local.tags,
-        { Name = format("%s-aps", module.vpc.name) }
+        { Name = format("%s-aps-workspaces", module.vpc.name) }
       )
     },
-    }
     /* Gateways */
     s3 = {
       service      = "s3"
@@ -133,7 +132,7 @@ module "vpc_endpoints" {
         local.tags,
         { Name = format("%s-s3", local.application_name) }
       )
-    },
+    }
   }
 
   tags = local.tags

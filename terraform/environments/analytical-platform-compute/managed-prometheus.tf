@@ -11,8 +11,10 @@
 
 resource "aws_prometheus_workspace" "main" {
   alias       = local.amp_workspace_alias
-  kms_key_arn = module.managed_prometheus_kms.kms_key_arn
+  kms_key_arn = module.managed_prometheus_kms.key_arn
   logging_configuration {
     log_group_arn = "${module.managed_prometheus_log_group.cloudwatch_log_group_arn}:*"
   }
+
+  tags = local.tags
 }
