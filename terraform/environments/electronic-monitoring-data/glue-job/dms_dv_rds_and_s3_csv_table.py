@@ -352,7 +352,7 @@ if __name__ == "__main__":
         given_rds_sqlserver_tbls_str = args["rds_sqlserver_tbls"]
         LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
 
-        given_rds_sqlserver_tbls_list = given_rds_sqlserver_tbls_str.split(",")
+        given_rds_sqlserver_tbls_list = [e.strip().strip("'") for e in given_rds_sqlserver_tbls_str.split(",")]
         LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
         filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list if tbl in rds_sqlserver_db_tbl_list]
