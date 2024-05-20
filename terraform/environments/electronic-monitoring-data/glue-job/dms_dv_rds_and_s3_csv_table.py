@@ -292,21 +292,30 @@ def process_dv_for_table(rds_db_name, rds_tbl_name):
 
     return df_dv_output
 
-def write_parquet_to_s3(df_dv_output, catalog_table_s3_full_path):
+def write_parquet_to_s3(df_dv_output, database, table):
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
 
     LOGGER.info(f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
     
-    df_dv_output = df_dv_output.repartition("database_name")
+    df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
 
+    catalog_table_s3_full_path = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
+
+    if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
+                                       f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={table}'''
+                                       ):
+                LOGGER.info(f"""Purging S3-path: {catalog_table_s3_full_path}/database_name={database}/full_table_name={table}""")
+                glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={database}/full_table_name={table}""",
+                                          options={"retentionPeriod": 0}
+                                          )
     
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
     
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
                                                      'path': f"""{catalog_table_s3_full_path}/""",
-                                                     "partitionKeys": ["database_name"]
+                                                     "partitionKeys": ["database_name", "full_table_name"]
                                                  },
                                                  format_options={
                                                      'useGlueParquetWriter': True,
@@ -320,8 +329,6 @@ def write_parquet_to_s3(df_dv_output, catalog_table_s3_full_path):
 
 
 if __name__ == "__main__":
-
-    catalog_table_s3_full_path = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
     LOGGER.info(f"""Given database(s): {args.get("rds_sqlserver_dbs", None)}""")
     rds_sqlserver_db_list = get_rds_database_list(args.get("rds_sqlserver_dbs", None))
@@ -337,7 +344,7 @@ if __name__ == "__main__":
 
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
         
-            write_parquet_to_s3(df_dv_output, catalog_table_s3_full_path)
+            write_parquet_to_s3(df_dv_output, rds_db_name, rds_tbl_name)
 
     else:
         LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
@@ -357,6 +364,6 @@ if __name__ == "__main__":
 
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
 
-            write_parquet_to_s3(df_dv_output, catalog_table_s3_full_path)
+            write_parquet_to_s3(df_dv_output, rds_db_name, rds_tbl_name)
 
     job.commit()
