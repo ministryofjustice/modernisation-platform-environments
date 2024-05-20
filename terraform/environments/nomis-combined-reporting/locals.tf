@@ -98,6 +98,7 @@ locals {
   baseline_rds_instances            = {}
   baseline_route53_resolvers        = {}
   baseline_route53_zones            = { "${local.environment}.reporting.nomis.service.justice.gov.uk" = {} }
+  baseline_sns_topics               = {}
   baseline_ssm_parameters           = {}
   baseline_s3_buckets = {
     s3-bucket = {
