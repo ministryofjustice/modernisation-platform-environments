@@ -220,7 +220,7 @@ locals {
 
     baseline_ec2_instances = {
       prod-nomis-xtag-a = merge(local.xtag_ec2, {
-        # cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
           availability_zone = "${local.region}a"
