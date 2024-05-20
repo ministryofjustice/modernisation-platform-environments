@@ -332,8 +332,6 @@ if __name__ == "__main__":
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
 
-        LOGGER.info(f"""checkpoint_union_df: {args["checkpoint_union_df"]}, {type(args["checkpoint_union_df"])}""")
-
         for db_dbo_tbl in rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
