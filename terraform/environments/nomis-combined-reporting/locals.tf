@@ -13,7 +13,7 @@ locals {
     preproduction = local.preproduction_config
     production    = local.production_config
   }
-  baseline_preset_options = {
+  baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
