@@ -199,10 +199,10 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
 
 # Eventbridge rules to terminate cpu process
 
-resource "aws_cloudwatch_event_rule" "terminate_cpu_process" {
+resource "aws_cloudwatch_event_rule" "terminate_cpu_process_dev" {
   count         = local.is-development == true ? 1 : 0
-  name          = "terminate_cpu_process"
-  description   = "Terminates a CPU process"
+  name          = "terminate_cpu_process_dev"
+  description   = "Terminates a CPU process development"
   event_pattern = <<EOF
 {
   "source": ["aws.ec2"],
@@ -211,40 +211,40 @@ resource "aws_cloudwatch_event_rule" "terminate_cpu_process" {
 EOF
 }
 
-resource "aws_cloudwatch_event_target" "trigger_lambda_terminate_cpu_process" {
+resource "aws_cloudwatch_event_target" "trigger_lambda_terminate_cpu_process_dev" {
   count     = local.is-development == true ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.terminate_cpu_process[0].name
-  target_id = "terminate_cpu_process"
-  arn       = aws_lambda_function.terraform_lambda_func_terminate_cpu_process[0].arn
+  rule      = aws_cloudwatch_event_rule.terminate_cpu_process_dev[0].name
+  target_id = "terminate_cpu_process_dev"
+  arn       = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_dev[0].arn
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process" {
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_dev" {
   count         = local.is-development == true ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process[0].function_name
+  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_dev[0].function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.terminate_cpu_process[0].arn
+  source_arn    = aws_cloudwatch_event_rule.terminate_cpu_process_dev[0].arn
 }
 
 # Lambda functions to terminate cpu process
 
-resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process" {
+resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {
   count         = local.is-development == true ? 1 : 0
-  filename      = "${path.module}/terminate_cpu_process/terminate_cpu_process.zip"
-  function_name = "terminate_cpu_process"
-  role          = aws_iam_role.lambda_role_terminate_cpu_process[0].arn
-  handler       = "terminate_cpu_process.lambda_handler"
+  filename      = "${path.module}/terminate_cpu_process/terminate_cpu_process_dev.zip"
+  function_name = "terminate_cpu_process_dev"
+  role          = aws_iam_role.lambda_role_terminate_cpu_process_dev[0].arn
+  handler       = "terminate_cpu_process_dev.lambda_handler"
   runtime       = "python3.12"
   timeout       = 300
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process]
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_dev]
 }
 
 # Archive the zip file
 
-data "archive_file" "zip_the_terminate_cpu_process_code" {
+data "archive_file" "zip_the_terminate_cpu_process_code_dev" {
   count       = local.is-development == true ? 1 : 0
   type        = "zip"
   source_dir  = "${path.module}/terminate_cpu_process/"
-  output_path = "${path.module}/terminate_cpu_process/terminate_cpu_process.zip"
+  output_path = "${path.module}/terminate_cpu_process/terminate_cpu_process_dev.zip"
 }

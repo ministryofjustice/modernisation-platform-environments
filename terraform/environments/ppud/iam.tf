@@ -254,9 +254,9 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_alarm_suppressio
 # IAM Role & Policy for Lambda Terminate CPU Process
 ####################################################
 
-resource "aws_iam_role" "lambda_role_terminate_cpu_process" {
+resource "aws_iam_role" "lambda_role_terminate_cpu_process_dev" {
   count              = local.is-development == true ? 1 : 0
-  name               = "PPUD_Lambda_Function_Role_Terminate_CPU_Process"
+  name               = "PPUD_Lambda_Function_Role_Terminate_CPU_Process_Dev"
   assume_role_policy = <<EOF
 {
  "Version": "2012-10-17",
@@ -274,11 +274,11 @@ resource "aws_iam_role" "lambda_role_terminate_cpu_process" {
 EOF
 }
 
-resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process" {
+resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process_dev" {
   count       = local.is-development == true ? 1 : 0
-  name        = "aws_iam_policy_for_terraform_aws_lambda_role_terminate_cpu_process"
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_terminate_cpu_process_dev"
   path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role terminate cpu processes"
+  description = "AWS IAM Policy for managing aws lambda role terminate cpu processes development"
   policy      = <<EOF
 {
  "Version": "2012-10-17",
@@ -305,10 +305,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process" {
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_dev" {
   count      = local.is-development == true ? 1 : 0
-  role       = aws_iam_role.lambda_role_terminate_cpu_process[0].name
-  policy_arn = aws_iam_policy.iam_policy_for_lambda_terminate_cpu_process[0].arn
+  role       = aws_iam_role.lambda_role_terminate_cpu_process_dev[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_terminate_cpu_process_dev[0].arn
 }
 
 ###################
