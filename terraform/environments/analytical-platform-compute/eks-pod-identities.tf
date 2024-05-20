@@ -53,7 +53,7 @@ module "aws_for_fluent_bit_pod_identity" {
     eks = {
       cluster_name    = module.eks.cluster_name
       namespace       = kubernetes_namespace.amazon_cloudwatch.metadata[0].name
-      service_account = "aws-cloudwatch-metrics"
+      service_account = "aws-for-fluent-bit"
     }
   }
 
