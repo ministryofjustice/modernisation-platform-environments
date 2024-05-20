@@ -42,13 +42,14 @@ def resolve_args(args_list):
 
 # Organise capturing input parameters.
 DEFAULT_INPUTS_LIST = ["JOB_NAME",
+                       "script_bucket_name",
                        "rds_db_host_ep",
                        "rds_db_pwd",
                        "csv_src_bucket_name",
                        "parquet_output_bucket_name",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
-                       "persist_union_df",
+                       "checkpoint_union_df",
                        "df_parquet_repartition"
                        ]
 
@@ -87,6 +88,10 @@ PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 
 GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
 GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
+
+# ===============================================================================
+
+sc.setCheckpointDir(f"""s3://{args['script_bucket_name']}/checkpoint_dir""")
 
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
@@ -331,15 +336,15 @@ if __name__ == "__main__":
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
 
-        LOGGER.info(f"""persist_union_df: {args["persist_union_df"]}, {type(args["persist_union_df"])}""")
+        LOGGER.info(f"""checkpoint_union_df: {args["checkpoint_union_df"]}, {type(args["checkpoint_union_df"])}""")
 
         for db_dbo_tbl in rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            if args["persist_union_df"] == 'false':
-                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
+            if args["checkpoint_union_df"] == 'true':
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).checkpoint()
             else:
-                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
 
     else:
         LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
@@ -353,15 +358,15 @@ if __name__ == "__main__":
         filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & set(given_rds_sqlserver_tbls_list))
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
 
-        LOGGER.info(f"""persist_union_df: {args["persist_union_df"]}, {type(args["persist_union_df"])}""")
+        LOGGER.info(f"""checkpoint_union_df: {args["checkpoint_union_df"]}, {type(args["checkpoint_union_df"])}""")
         
         for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            if args["persist_union_df"] == 'false':
-                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
+            if args["checkpoint_union_df"] == 'true':
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).checkpoint()
             else:
-                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).persist()
+                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
 
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")

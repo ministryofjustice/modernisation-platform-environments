@@ -80,6 +80,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
   role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
   glue_version = "4.0"
   default_arguments = {
+    "--script_bucket_name"               = "${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}"
     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
     "--rds_sqlserver_dbs"                = ""
@@ -93,7 +94,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--df_csv_coalesce_partition"        = ""
     "--df_csv_repartition"               = ""
     "--df_parquet_repartition"           = 4
-    "--persist_union_df"                 = "false"
+    "--checkpoint_union_df"              = "true"
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
@@ -101,7 +102,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
     "--enable-metrics"                   = "true"
     "--enable-auto-scaling"              = "true"
-    "--conf"                             = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=2g --conf spark.shuffle.sort.io.plugin.class=com.amazonaws.spark.shuffle.io.cloud.ChopperPlugin --conf spark.shuffle.storage.path=s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/shuffle_file_dir"
+    "--conf"                             = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=2g"
   }
 
   connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
