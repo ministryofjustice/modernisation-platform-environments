@@ -90,7 +90,13 @@ chmod -R 777 /opt/kinesis
 if [ ${environment} = "development" ]; then
 
 # Add Secondary IP
-aws ec2 assign-private-ip-addresses --network-interface-id eni-0a167c7f4287cd176 --private-ip-addresses 10.26.24.41
+# Get the Network Interface ID
+interface_id=`aws ec2 describe-network-interfaces --region eu-west-2  --filters Name=attachment.instance-id,Values=$(aws sts get-caller-identity --query UserId --output text | cut -d : -f 2) --query "NetworkInterfaces[0].NetworkInterfaceId" --output text`
+echo "___Interface ID: $interface_id"
+
+sleep 300
+# Add Secondary IP
+aws ec2 assign-private-ip-addresses --network-interface-id ${interface_id} --private-ip-addresses 10.26.24.201
 
 # Install KUBECTL Libs
 ## Download Libs
