@@ -49,16 +49,11 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "parquet_output_bucket_name",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
-                       "checkpoint_union_df",
-                       "df_parquet_repartition"
+                       "rds_sqlserver_dbs"
                        ]
 
-OPTIONAL_INPUTS = ["rds_sqlserver_dbs", 
-                   "rds_sqlserver_tbls", 
-                   "df_rds_coalesce_partition",
-                   "df_rds_repartition",
-                   "df_csv_coalesce_partition",
-                   "df_csv_repartition"
+OPTIONAL_INPUTS = [
+                   "rds_sqlserver_tbls"
                    ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -88,10 +83,6 @@ PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 
 GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
 GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
-
-# ===============================================================================
-
-sc.setCheckpointDir(f"""s3://{args['script_bucket_name']}/checkpoint_dir""")
 
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
@@ -217,36 +208,32 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 # ===================================================================================================
 
-def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
+def process_dv_for_table(rds_db_name, rds_tbl_name):
 
     total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, 
                                                  f"{rds_db_name}/dbo/{rds_tbl_name}"
                                                  )
-    total_files = 1 if total_files < 1 else total_files
+    default_repartition_factor = 4 if total_files <= 1 else total_files * 4
 
-    df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(total_files)
-    LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partition(s) --> {df_rds_temp.rdd.getNumPartitions()}""")
+    sql_select_str = f"""
+    select cast(null as timestamp) as run_datetime,
+    cast(null as string) as json_row,
+    cast(null as string) as validation_msg,
+    cast(null as string) as database_name,
+    cast(null as string) as full_table_name
+    """.strip()
+    
+    df_dv_output = spark.sql(sql_select_str).repartition(default_repartition_factor)
 
-    if not (args.get("df_rds_coalesce_partition", None) is None):
-        df_rds_temp = df_rds_temp.coalesce(int(args["df_rds_coalesce_partition"]))
-        LOGGER.info(f"""RDS-coalesce-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partition(s) --> {df_rds_temp.rdd.getNumPartitions()}""")
-    elif not (args.get("df_rds_repartition", None) is None):
-        df_rds_temp = df_rds_temp.repartition(int(args["df_rds_repartition"]))
-        LOGGER.info(f"""RDS-repartition-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partition(s) --> {df_rds_temp.rdd.getNumPartitions()}""")
+    df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
+    LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
 
     tbl_csv_s3_path = get_s3_csv_tbl_path(rds_db_name, rds_tbl_name)
 
     if tbl_csv_s3_path is not None:
 
-        df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema).repartition(total_files)
-        LOGGER.info(f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partition(s) --> {df_csv_temp.rdd.getNumPartitions()}""")
-
-        if not (args.get("df_csv_coalesce_partition", None) is None):
-            df_csv_temp = df_csv_temp.coalesce(int(args["df_csv_coalesce_partition"]))
-            LOGGER.info(f"""S3-CSV-coalesce-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partition(s) --> {df_csv_temp.rdd.getNumPartitions()}""")
-        elif not (args.get("df_csv_repartition", None) is None):
-            df_csv_temp = df_csv_temp.repartition(int(args["df_csv_repartition"]))
-            LOGGER.info(f"""S3-CSV-repartition-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partition(s) --> {df_csv_temp.rdd.getNumPartitions()}""")
+        df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema).repartition(default_repartition_factor)
+        LOGGER.info(f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_csv_temp.rdd.getNumPartitions()}""")
 
         df_rds_temp_count = df_rds_temp.count()
         df_csv_temp_count = df_csv_temp.count()
@@ -258,10 +245,10 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
             
             if df_rds_csv_subtract_row_count == 0:
                 df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                                  f"""'{db_dbo_tbl}' as full_table_name""",
                                                   "'' as json_row",
                                                   f"""'{rds_tbl_name} - Validated.' as validation_msg""",
-                                                  f"""'{rds_db_name}' as database_name"""
+                                                  f"""'{rds_db_name}' as database_name""",
+                                                  f"""'{db_dbo_tbl}' as full_table_name"""
                                                   )
 
                 df_dv_output = df_dv_output.union(df_temp)
@@ -269,13 +256,13 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
                 df_temp = (df_subtract
                             .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
                             .selectExpr("json_row")
-                            .limit(1000))
+                            .limit(100))
 
                 df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
-                                             f"""'{db_dbo_tbl}' as full_table_name""",
                                              "json_row",
                                              f""" "'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_csv_subtract_row_count} row-count !" as validation_msg""",
-                                             f"""'{rds_db_name}' as database_name"""
+                                             f"""'{rds_db_name}' as database_name""",
+                                             f"""'{db_dbo_tbl}' as full_table_name"""
                                              )
 
                 df_dv_output = df_dv_output.union(df_temp)
@@ -284,19 +271,19 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
             
         else:
             df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                              f"""'{db_dbo_tbl}' as full_table_name""",
                                               "'' as json_row",
                                               f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_csv_temp_count} MISMATCHED !' as validation_msg""",
-                                              f"""'{rds_db_name}' as database_name"""
+                                              f"""'{rds_db_name}' as database_name""",
+                                              f"""'{db_dbo_tbl}' as full_table_name"""
                                               )
 
             df_dv_output = df_dv_output.union(df_temp)
     else:
         df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                          f"""'{db_dbo_tbl}' as full_table_name""",
                                           "'' as json_row",
                                           f"""'No S3-csv folder path exists for the given {rds_db_name} - {rds_tbl_name}' as validation_msg""",
-                                          f"""'{rds_db_name}' as database_name"""
+                                          f"""'{rds_db_name}' as database_name""",
+                                          f"""'{db_dbo_tbl}' as full_table_name"""
                                           )
 
         df_dv_output = df_dv_output.union(df_temp)
@@ -305,12 +292,43 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output):
 
     return df_dv_output
 
+def write_parquet_to_s3(df_dv_output, database, table):
+    df_dv_output = df_dv_output.dropDuplicates()
+    df_dv_output = df_dv_output.where("run_datetime is not null")
+
+    LOGGER.info(f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
+    
+    df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
+
+    catalog_table_s3_full_path = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
+
+    if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
+                                       f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={table}'''
+                                       ):
+                LOGGER.info(f"""Purging S3-path: {catalog_table_s3_full_path}/database_name={database}/full_table_name={table}""")
+                glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={database}/full_table_name={table}""",
+                                          options={"retentionPeriod": 0}
+                                          )
+    
+    dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
+    
+    glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
+                                                 connection_options={
+                                                     'path': f"""{catalog_table_s3_full_path}/""",
+                                                     "partitionKeys": ["database_name", "full_table_name"]
+                                                 },
+                                                 format_options={
+                                                     'useGlueParquetWriter': True,
+                                                     'compression': 'snappy', 
+                                                     'blockSize': 13421773, 
+                                                     'pageSize': 1048576
+                                                 })
+    LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} validation report written to -> {catalog_table_s3_full_path}/""")
+
 # ===================================================================================================
 
 
 if __name__ == "__main__":
-
-    catalog_table_s3_full_path = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
     LOGGER.info(f"""Given database(s): {args.get("rds_sqlserver_dbs", None)}""")
     rds_sqlserver_db_list = get_rds_database_list(args.get("rds_sqlserver_dbs", None))
@@ -318,33 +336,15 @@ if __name__ == "__main__":
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_list)
 
-    sql_select_str = f"""
-    select cast(null as timestamp) as run_datetime,
-    cast(null as string) as full_table_name, 
-    cast(null as string) as json_row,
-    cast(null as string) as validation_msg,
-    cast(null as string) as database_name
-    """.strip()
-    
-    df_dv_output = spark.sql(sql_select_str)
-
-    if df_dv_output.rdd.getNumPartitions() == 1:
-        df_dv_output = df_dv_output.repartition(int(args["df_parquet_repartition"]))
-
-    LOGGER.info(f"""Dataframe-'df_dv_output' created with partition partition(s) --> {df_dv_output.rdd.getNumPartitions()}""")
-
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
-
-        LOGGER.info(f"""checkpoint_union_df: {args["checkpoint_union_df"]}, {type(args["checkpoint_union_df"])}""")
 
         for db_dbo_tbl in rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            if args["checkpoint_union_df"] == 'true':
-                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).checkpoint()
-            else:
-                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
+            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
+        
+            write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
 
     else:
         LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
@@ -355,48 +355,15 @@ if __name__ == "__main__":
         given_rds_sqlserver_tbls_list = [e.strip().strip("'") for e in given_rds_sqlserver_tbls_str.split(",")]
         LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
-        filtered_rds_sqlserver_db_tbl_list = list(set(rds_sqlserver_db_tbl_list) & set(given_rds_sqlserver_tbls_list))
-        LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
+        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list if tbl in rds_sqlserver_db_tbl_list]
 
-        LOGGER.info(f"""checkpoint_union_df: {args["checkpoint_union_df"]}, {type(args["checkpoint_union_df"])}""")
+        LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
         
         for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            if args["checkpoint_union_df"] == 'true':
-                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output).checkpoint()
-            else:
-                df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, df_dv_output)
+            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
 
-    df_dv_output = df_dv_output.dropDuplicates()
-    df_dv_output = df_dv_output.where("run_datetime is not null")
-    LOGGER.info(f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
-    df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition("database_name")
-
-    if args.get("rds_sqlserver_tbls", None) is None:
-        for db in rds_sqlserver_db_list:
-            if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                       f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={db}'''
-                                       ):
-                LOGGER.info(f"""Purging S3-path: {catalog_table_s3_full_path}/database_name={db}""")
-                glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={db}""",
-                                          options={"retentionPeriod": 0}
-                                          )
-    
-    dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
-    LOGGER.info(f"""Writing Dataframe-'df_dv_output' to {catalog_table_s3_full_path}/""")
-    glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
-                                                 connection_options={
-                                                     'path': f"""{catalog_table_s3_full_path}/""",
-                                                     "partitionKeys": ["database_name"]
-                                                 },
-                                                 format_options={
-                                                     'useGlueParquetWriter': True,
-                                                     'compression': 'snappy', 
-                                                     'blockSize': 13421773, 
-                                                     'pageSize': 1048576
-                                                 })
-
-    df_dv_output.unpersist()
+            write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
 
     job.commit()
