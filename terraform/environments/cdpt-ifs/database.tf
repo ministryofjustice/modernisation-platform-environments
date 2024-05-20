@@ -17,7 +17,7 @@ resource "aws_db_instance" "database" {
   db_subnet_group_name      = aws_db_subnet_group.db.id
   final_snapshot_identifier = "final-snapshot-${formatdate("YYYYMMDDhhmmss", timestamp())}"
   publicly_accessible       = false
-  storage_encrypted         = true
+  storage_encrypted         = false
 }
 
 resource "aws_db_instance_role_association" "database" {
@@ -73,8 +73,16 @@ resource "aws_kms_alias" "rds-kms-alias" {
 data "aws_iam_policy_document" "rds-kms" {
   statement {
     effect    = "Allow"
-    actions   = ["kms:*"]
-    resources = ["*"]
+    actions   = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [
+      aws_kms_key.rds.arn
+    ]
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
