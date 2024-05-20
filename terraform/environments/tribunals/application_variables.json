@@ -1,7 +1,6 @@
 {
   "accounts": {
     "development": {
-      "moj_ip": "81.134.202.29/32",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "db_identifier": "tribunals-db-dev",
@@ -39,7 +38,6 @@
       "example_var": "test-data"
     },
     "preproduction": {
-      "moj_ip": "81.134.202.29/32",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "db_identifier": "tribunals-db-preprod",
@@ -74,7 +72,6 @@
       "instance_type": "t3.medium"
     },
     "production": {
-      "moj_ip": "81.134.202.29/32",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "db_identifier": "tribunals-db-prod",
