@@ -96,7 +96,7 @@ echo "___Interface ID: $interface_id"
 
 sleep 300
 # Add Secondary IP
-aws ec2 assign-private-ip-addresses --network-interface-id $interface_id --private-ip-addresses 10.26.24.201
+aws ec2 assign-private-ip-addresses --network-interface-id $interface_id --private-ip-addresses ${static_ip}
 
 # Install KUBECTL Libs
 ## Download Libs
