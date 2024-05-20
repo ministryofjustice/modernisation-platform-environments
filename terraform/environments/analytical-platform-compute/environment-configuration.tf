@@ -6,8 +6,14 @@ locals {
   vpc_flow_log_cloudwatch_log_group_retention_in_days = 400
   vpc_flow_log_max_aggregation_interval               = 60
 
+  /* AMP */
+  amp_workspace_alias                        = "${local.application_name}-${local.environment}"
+  amp_cloudwatch_log_group_name              = "/aws/amp/${local.amp_workspace_alias}"
+  amp_cloudwatch_log_group_retention_in_days = 400
+
   /* EKS */
   eks_cluster_name                           = "${local.application_name}-${local.environment}"
+  eks_cloudwatch_log_group_name              = "/aws/eks/${local.eks_cluster_name}/logs"
   eks_cloudwatch_log_group_retention_in_days = 400
 
 
