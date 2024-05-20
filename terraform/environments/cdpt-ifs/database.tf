@@ -72,37 +72,12 @@ resource "aws_kms_alias" "rds-kms-alias" {
 
 data "aws_iam_policy_document" "rds-kms" {
   statement {
-    sid       = "Enable IAM User Permissions"
     effect    = "Allow"
-    actions   = [
-      "kms:*"
-    ]
+    actions   = ["kms:*"]
+    resources = ["*"]
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
-    resources = [
-      aws_kms_key.rds.arn
-    ]
-  }
-
-  statement {
-    effect    = "Allow"
-    actions   = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey"
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-
-    resources = [
-      aws_kms_key.rds.arn
-    ]
   }
 }
