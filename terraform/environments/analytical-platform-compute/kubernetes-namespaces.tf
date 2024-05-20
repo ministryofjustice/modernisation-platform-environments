@@ -3,3 +3,9 @@ resource "kubernetes_namespace" "kyverno" {
     name = "kyverno"
   }
 }
+
+resource "kubernetes_namespace" "amazon_cloudwatch" {
+  metadata {
+    name = "amazon-cloudwatch"
+  }
+}
