@@ -51,7 +51,11 @@ variable "nomis_credentials_secret_arn" {
 
 variable "connection_strings" {
   type        = map(string)
-  description = "A map of the Athena Federated Query connection strings. Cannot be empty. The 1st element will be the default connection string for the connector."
+  description = "A map of the catalog name to Athena Federated Query connection strings. Cannot be empty. The 1st element will be the default connection string for the connector."
+  # E.g. The following will configure the my_catalog catalog to use the provided connection string
+  # connection_strings {
+  #     my_catalog = "oracle:jdbc:...."
+  # }
 }
 
 variable "lambda_memory_allocation_mb" {

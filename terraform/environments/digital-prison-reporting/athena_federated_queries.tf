@@ -19,6 +19,7 @@ module "athena_federated_query_connector_oracle" {
   lambda_timeout_seconds                = local.federated_query_lambda_timeout_seconds
   lambda_reserved_concurrent_executions = local.federated_query_lambda_concurrent_executions
 
+  # A map that links catalog names to database connection strings
   connection_strings = {
     nomis = local.connection_string_nomis
   }
