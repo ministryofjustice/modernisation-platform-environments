@@ -73,7 +73,9 @@ data "aws_iam_policy_document" "dms_dv_athena_iam_policy_document" {
       "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:workgroup/primary",
       "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:datacatalog/dms_data_validation/*",
       "arn:aws:athena:eu-west-2:800964199911:workgroup/primary",
-      "arn:aws:athena:eu-west-2:800964199911:datacatalog/dms_data_validation/*"
+      "arn:aws:athena:eu-west-2:800964199911:datacatalog/dms_data_validation/*",
+      "arn:aws:athena:eu-west-2:976799291502:workgroup/primary",
+      "arn:aws:athena:eu-west-2:976799291502:datacatalog/dms_data_validation/*"
     ]
   }
 }
