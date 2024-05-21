@@ -240,7 +240,8 @@ resource "aws_security_group" "cluster_ec2" {
       module.siac.tribunals_lb_sc_id, module.siac.tribunals_lb_sc_id_sftp,
       module.sscs_venue_pages.tribunals_lb_sc_id, module.sscs_venue_pages.tribunals_lb_sc_id_sftp,
       module.tax_chancery_decisions.tribunals_lb_sc_id, module.tax_chancery_decisions.tribunals_lb_sc_id_sftp,
-      module.tax_tribunal_decisions.tribunals_lb_sc_id, module.tax_tribunal_decisions.tribunals_lb_sc_id_sftp
+      module.tax_tribunal_decisions.tribunals_lb_sc_id, module.tax_tribunal_decisions.tribunals_lb_sc_id_sftp,
+      module.ftp-admin-appeals.tribunals_lb_sc_id, module.ftp-admin-appeals.tribunals_lb_sc_id_sftp
     ]
   }
 

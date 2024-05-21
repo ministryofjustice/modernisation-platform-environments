@@ -371,6 +371,32 @@ resource "aws_route53_record" "external_tax_tribunal_decisions_sftp" {
   ttl             = 60
 }
 
+/////////
+
+resource "aws_route53_record" "external_ftp_admin_appeals" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "administrativeappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk/decisions"
+  type    = "A"
+
+  alias {
+    name                   = module.ftp-admin-appeals.tribunals_lb.dns_name
+    zone_id                = module.ftp-admin-appeals.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_admin_appeals_sftp" {
+  allow_overwrite = true
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "sftp.administrativeappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk/decisions"
+  type            = "CNAME"
+
+  records         = [module.ftp-admin-appeals.tribunals_lb_ftp[0].dns_name]
+  ttl             = 60
+}
+
 # Define a wildcard ACM certificate for sandbox/dev
 resource "aws_acm_certificate" "external" {
   domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"

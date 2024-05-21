@@ -134,13 +134,22 @@ resource "aws_security_group" "ecs_service" {
     to_port     = 80
     protocol    = "tcp"
     description = "Allow traffic on port 80 from load balancer"
-    security_groups = [module.appeals.tribunals_lb_sc_id, module.ahmlr.tribunals_lb_sc_id,
-      module.care_standards.tribunals_lb_sc_id, module.cicap.tribunals_lb_sc_id,
-      module.charity_tribunal_decisions.tribunals_lb_sc_id, module.claims_management_decisions.tribunals_lb_sc_id,
-      module.consumer_credit_appeals.tribunals_lb_sc_id, module.estate_agent_appeals.tribunals_lb_sc_id,
-      module.primary_health_lists.tribunals_lb_sc_id, module.primary_health_lists.tribunals_lb_sc_id,
-      module.siac.tribunals_lb_sc_id, module.sscs_venue_pages.tribunals_lb_sc_id,
-      module.tax_chancery_decisions.tribunals_lb_sc_id, module.tax_tribunal_decisions.tribunals_lb_sc_id
+    security_groups = [
+      module.appeals.tribunals_lb_sc_id,
+      module.ahmlr.tribunals_lb_sc_id,
+      module.care_standards.tribunals_lb_sc_id,
+      module.cicap.tribunals_lb_sc_id,
+      module.charity_tribunal_decisions.tribunals_lb_sc_id,
+      module.claims_management_decisions.tribunals_lb_sc_id,
+      module.consumer_credit_appeals.tribunals_lb_sc_id,
+      module.estate_agent_appeals.tribunals_lb_sc_id,
+      module.primary_health_lists.tribunals_lb_sc_id,
+      module.primary_health_lists.tribunals_lb_sc_id,
+      module.siac.tribunals_lb_sc_id,
+      module.sscs_venue_pages.tribunals_lb_sc_id,
+      module.tax_chancery_decisions.tribunals_lb_sc_id,
+      module.tax_tribunal_decisions.tribunals_lb_sc_id,
+      module.ftp-admin-appeals.tribunals_lb_sc_id
     ]
   }
 
