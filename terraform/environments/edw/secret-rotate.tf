@@ -142,6 +142,6 @@ resource "aws_iam_role" "edw_lambda_function_execution_role" {
 
 resource "aws_lambda_permission" "edw_rotate_secret_function_permission" {
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.edw_edw_rotate_secret_function.function_name
+  function_name = aws_lambda_function.edw_rotate_secret_function.function_name
   principal     = "secretsmanager.amazonaws.com"
 }
