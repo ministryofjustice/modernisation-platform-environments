@@ -84,6 +84,8 @@ PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
 GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
 
+CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
+
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
 # ----------------------
@@ -300,13 +302,11 @@ def write_parquet_to_s3(df_dv_output, database, table):
     
     df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
 
-    catalog_table_s3_full_path = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
-
     if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                        f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={table}'''
                                        ):
-                LOGGER.info(f"""Purging S3-path: {catalog_table_s3_full_path}/database_name={database}/full_table_name={table}""")
-                glueContext.purge_s3_path(f"""{catalog_table_s3_full_path}/database_name={database}/full_table_name={table}""",
+                LOGGER.info(f"""Purging S3-path: {CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""")
+                glueContext.purge_s3_path(f"""{CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""",
                                           options={"retentionPeriod": 0}
                                           )
     
@@ -314,7 +314,7 @@ def write_parquet_to_s3(df_dv_output, database, table):
     
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
-                                                     'path': f"""{catalog_table_s3_full_path}/""",
+                                                     'path': f"""{CATALOG_TABLE_S3_FULL_PATH}/""",
                                                      "partitionKeys": ["database_name", "full_table_name"]
                                                  },
                                                  format_options={
@@ -323,7 +323,7 @@ def write_parquet_to_s3(df_dv_output, database, table):
                                                      'blockSize': 13421773, 
                                                      'pageSize': 1048576
                                                  })
-    LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} validation report written to -> {catalog_table_s3_full_path}/""")
+    LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} validation report written to -> {CATALOG_TABLE_S3_FULL_PATH}/""")
 
 # ===================================================================================================
 
@@ -341,6 +341,12 @@ if __name__ == "__main__":
 
         for db_dbo_tbl in rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
+
+            if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
+                                       f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}'''
+                                       ):
+                LOGGER.info(f"""Already exists, Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
+                continue
 
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
         
