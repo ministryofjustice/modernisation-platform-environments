@@ -3,8 +3,7 @@
 //   DB in backup mode
 // - Call Oracle SQL scripts as Oracle user
 //
-//   version: 0.1
-//   auth: phil h
+//   version: 1.0 (for migration to MP)
 /////////////////////////////////////////////////////////////////////
 
 const SSH = require("simple-ssh");
@@ -14,7 +13,7 @@ const AWS = require("aws-sdk");
 const ssm = new AWS.SSM({ apiVersion: "2014-11-06" });
 
 // Environment variables
-const pem = "MGMT_EC2_KEY_DEFAULT";
+const pem = "EC2_SSH_KEY";
 const username = "ec2-user";
 
 //Set date format
@@ -89,24 +88,30 @@ async function connSSH(action, appname) {
 
         ssh
           .exec(
-            'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
-              "\n" +
-              "alter system switch logfile;" +
-              "\n" +
-              "alter system switch logfile;" +
-              "\n" +
-              "alter database begin backup;" +
-              "\n" +
-              "exit;" +
-              "\n" +
-              'EOFUM"',
+            // 'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
+            //   "\n" +
+            //   "alter system switch logfile;" +
+            //   "\n" +
+            //   "alter system switch logfile;" +
+            //   "\n" +
+            //   "alter database begin backup;" +
+            //   "\n" +
+            //   "exit;" +
+            //   "\n" +
+            //   'EOFUM"',
+            'sudo bash -c "echo \'Hello World\' > /home/ec2-user/lambda_test_begin.txt"',
             {
               pty: true,
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log(stdout);
-                console.log(stderr);
+                console.log("standard output: " + stdout);
+                console.log("standard error: " + stderr);
+                if (code == 0) {
+                  resolve(code, stdout, stderr);
+                } else {
+                  reject();
+                }
               },
             }
           )
@@ -116,24 +121,30 @@ async function connSSH(action, appname) {
 
         ssh
           .exec(
-            'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
-              "\n" +
-              "alter database end backup;" +
-              "\n" +
-              "alter system switch logfile;" +
-              "\n" +
-              "alter system switch logfile;" +
-              "\n" +
-              "exit;" +
-              "\n" +
-              'EOFUM"',
+            // 'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
+            //   "\n" +
+            //   "alter database end backup;" +
+            //   "\n" +
+            //   "alter system switch logfile;" +
+            //   "\n" +
+            //   "alter system switch logfile;" +
+            //   "\n" +
+            //   "exit;" +
+            //   "\n" +
+            //   'EOFUM"',
+            'sudo bash -c "echo \'Hello World again\' > /home/ec2-user/lambda_test_end.txt"',
             {
               pty: true,
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log(stdout);
-                console.log(stderr);
+                console.log("standard output: " + stdout);
+                console.log("standard error: " + stderr);
+                if (code == 0) {
+                  resolve(code, stdout, stderr);
+                } else {
+                  reject();
+                }
               },
             }
           )
@@ -142,20 +153,10 @@ async function connSSH(action, appname) {
     });
     try {
       await prom;
-
-      const response = {
-        statusCode: 200,
-      };
-
-      console.log(`[+] Completed DB alter state: ${action} ==>> ` + address);
-      console.log("[+] Returned response: " + response);
-
       ssh.end();
-
-      return response;
+      console.log(`[+] Completed DB alter state: ${action} ==>> ` + address);
     } catch (e) {
-      console.log(e);
-      context.fail();
+      throw new Error("SSH Exec did not run successfully on the database.");
     }
   }
 }
@@ -167,7 +168,6 @@ exports.handler = async (event, context) => {
 
     context.done();
   } catch (error) {
-    console.error(error);
-    context.fail();
+    throw new Error(error);
   }
 };
