@@ -123,22 +123,22 @@ resource "aws_lambda_function" "edw_rotate_secret_function" {
 #     ]
 #   })
   
-  inline_policy {
-    name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-policy"
+#   inline_policy {
+#     name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-policy"
 
-    policy = templatefile("lambda-execution-policy.json", {
-      AWS_ACCOUNT_ID = local.application_data.accounts[local.environment].aws_account_id
-      FUNCTION_NAME  = local.application_data.accounts[local.environment].lambda_function_name
-    })
-  }
+#     policy = templatefile("lambda-execution-policy.json", {
+#       AWS_ACCOUNT_ID = local.application_data.accounts[local.environment].aws_account_id
+#       FUNCTION_NAME  = local.application_data.accounts[local.environment].lambda_function_name
+#     })
+#   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-edw-lambda-execution-role"
-    }
-  ) 
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}-edw-lambda-execution-role"
+#     }
+#   ) 
+# }
 
 resource "aws_lambda_permission" "edw_rotate_secret_function_permission" {
   action        = "lambda:InvokeFunction"
