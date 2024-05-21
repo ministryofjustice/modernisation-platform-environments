@@ -28,7 +28,16 @@
       "edw_sg_inbound_count" : "1",
       "edw_management_cidr": "10.200.0.0/20",
       "edw_bastion_ssh_cidr": "10.202.0.0/20",
-      "mp_domain_name": "modernisation-platform.service.justice.gov.uk"
+      "mp_domain_name": "modernisation-platform.service.justice.gov.uk",
+      "lambda_function_inline_code_filename": "index.py",
+      "lambda_function_name": "system-root-password-rotation",
+      "lambda_function_description": "Rotate AWS Secrets Manager Secret Value",
+      "lambda_function_handler": "index.lambda_handler",
+      "lambda_function_runtime": "python3.8",
+      "lambda_function_timeout": "300",
+      "aws_account_id": "local.environment_management.account_ids[terraform.workspace]",
+      "secret_rotation_frequency_days": "28",
+      "secret_id_suffix_length": "3"
     },
     "test": {
       "example_var": "test-data"
