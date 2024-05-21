@@ -211,12 +211,8 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 # ===================================================================================================
 
-def process_dv_for_table(rds_db_name, rds_tbl_name):
+def process_dv_for_table(rds_db_name, rds_tbl_name, input_repartition_factor):
 
-    total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, 
-                                                 f"{rds_db_name}/dbo/{rds_tbl_name}"
-                                                 )
-    input_repartition_factor = int(args["repartition_factor"])
     default_repartition_factor = input_repartition_factor if total_files <= 1 else total_files * input_repartition_factor
 
     sql_select_str = f"""
@@ -237,7 +233,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name):
     if tbl_csv_s3_path is not None:
 
         df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema).repartition(default_repartition_factor)
-        LOGGER.info(f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_csv_temp.rdd.getNumPartitions()}""")
+        LOGGER.info(f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_csv_temp.rdd.getNumPartitions()}, {total_size} bytes""")
 
         df_rds_temp_count = df_rds_temp.count()
         df_csv_temp_count = df_csv_temp.count()
@@ -344,13 +340,19 @@ if __name__ == "__main__":
         for db_dbo_tbl in rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
+            total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, f"{rds_db_name}/dbo/{rds_tbl_name}")
+
             if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                        f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}'''
                                        ):
                 LOGGER.info(f"""Already exists, Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
                 continue
-
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
+            elif total_size/1024/1024 > 999:
+                LOGGER.info(f"""Size greaterthan 1GB ({total_size} bytes), Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
+                continue
+            
+            input_repartition_factor = int(args["repartition_factor"])
+            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, input_repartition_factor)
         
             write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
 
