@@ -85,7 +85,7 @@ data "archive_file" "lambda_inline_code" {
 resource "aws_lambda_function" "rotate_secret_function" {
   function_name = local.application_data.accounts[local.environment].lambda_function_name
   description   = local.application_data.accounts[local.environment].lambda_function_description
-  role          = aws_iam_role.edw_lambda_function_execution_role.arn
+  role          = aws_iam_role.lambda_function_execution_role.arn
   handler       = local.application_data.accounts[local.environment].lambda_function_handler
   runtime       = local.application_data.accounts[local.environment].lambda_function_runtime
   timeout       = local.application_data.accounts[local.environment].lambda_function_timeout
@@ -107,7 +107,7 @@ resource "aws_lambda_function" "rotate_secret_function" {
   ) 
 }
 
-resource "aws_iam_role" "edw_lambda_function_execution_role" {
+resource "aws_iam_role" "lambda_function_execution_role" {
   name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-role"
 
   assume_role_policy = jsonencode({
