@@ -2,32 +2,71 @@
 ### AWS SECRETS MANAGER SECRETS ###
 ##################################
 
-resource "aws_secretsmanager_secret" "edw_db_secret" {
-  name        = "${local.application_name}/app/db-master-password"
-  description = "EDW DB Password"
+
+######## db secret
+
+resource "random_string" "db-master-pass-string" {
+  length  = 32 # as per rotated string
+  special = true
+}
+
+resource "aws_secretsmanager_secret" "db-master-password" {
+  name        = "${local.application_name}/app/db-master-password-"
+  description = "EDW DB EC2 Root Password"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-db-master-password"
+    }
+  ) 
+}
+
+resource "aws_secretsmanager_secret_version" "edw_db_master_password_version" {
+  secret_id     = aws_secretsmanager_secret.db-master-password.id
+  secret_string = random_string.db-master-pass-string.result
+}
+
+
+######## db ec2 root secret
+
+resource "random_string" "edw-root-secret_id_suffix" {
+  length  = local.application_data.accounts[local.environment].secret_id_suffix_length
+  special = false
+}
+
+resource "random_string" "edw-initial_root_secret_value" {
+  length  = 32 # as per rotated string
+  special = true
 }
 
 resource "aws_secretsmanager_secret" "edw_db_ec2_root_secret" {
-  name        = "${local.application_name}/app/db-EC2-root-password"
+  name        = "${local.application_name}/app/db-EC2-root-password-${random_string.edw-root-secret_id_suffix.result}"
   description = "EDW DB EC2 Root Password"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-system-root-password"
+    }
+  ) 
 }
 
-data "aws_secretsmanager_secret_version" "current" {
-  secret_id = aws_secretsmanager_secret.edw_db_secret.id
-}
-
-output "edw_db_secret" {
-  value = jsondecode(data.aws_secretsmanager_secret_version.current.secret_string)["db-master-password"]
+resource "aws_secretsmanager_secret_version" "edw_db_ec2_root_password_version" {
+  secret_id     = aws_secretsmanager_secret.edw_db_ec2_root_secret.id
+  secret_string = random_string.edw-initial_root_secret_value.result
 }
 
 resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
   secret_id                  = aws_secretsmanager_secret.edw_db_ec2_root_secret.id
   rotation_lambda_arn        = aws_lambda_function.rotate_secret_function.arn
   rotate_immediately = true
+
   rotation_rules {
     automatically_after_days = local.application_data.accounts[local.environment].secret_rotation_frequency_days
   }
 }
+
 
 ###########################
 ### AWS LAMBDA FUNCTION ###
