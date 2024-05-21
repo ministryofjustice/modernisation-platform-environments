@@ -10,7 +10,7 @@ data "aws_acm_certificate" "equip_cert" {
   most_recent = true
 }
 
-#Load balancer needs to be publically accessible
+#Load balancer needs to be publicly accessible
 #tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "citrix_alb" {
 
