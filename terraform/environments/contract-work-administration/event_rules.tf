@@ -46,5 +46,4 @@ resource "aws_lambda_permission" "delete_db_snapshots" {
 resource "aws_cloudwatch_event_target" "delete_db_snapshots" {
   rule  = aws_cloudwatch_event_rule.delete_db_snapshots.name
   arn   = aws_lambda_function.delete_db_snapshots.arn
-  input = jsonencode({ "appname" : "${local.database_ec2_name}" })
 }
