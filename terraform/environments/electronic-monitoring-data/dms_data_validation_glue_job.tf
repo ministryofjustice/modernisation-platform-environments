@@ -40,16 +40,16 @@ resource "aws_s3_bucket" "dms_dv_glue_job_s3_bucket" {
 
 # resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
 #   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-#   key    = "dms_dv_rds_and_s3_csv.py"
-#   source = "glue-job/dms_dv_rds_and_s3_csv.py"
-#   etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv.py")
+#   key    = "dms_dv_rds_and_s3_csv_checkpoint.py"
+#   source = "glue-job/dms_dv_rds_and_s3_csv_checkpoint.py"
+#   etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv_checkpoint.py")
 # }
 
 resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-  key    = "dms_dv_rds_and_s3_csv_table.py"
-  source = "glue-job/dms_dv_rds_and_s3_csv_table.py"
-  etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv_table.py")
+  key    = "dms_dv_rds_and_s3_csv_write.py"
+  source = "glue-job/dms_dv_rds_and_s3_csv_write.py"
+  etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv_write.py")
 }
 
 resource "aws_s3_object" "catalog_dv_table_glue_job_s3_object" {
@@ -115,7 +115,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 #   connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
 #   command {
 #     python_version  = "3"
-#     script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv.py"
+#     script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv_checkpoint.py"
 #   }
 
 #   tags = merge(
@@ -156,7 +156,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
   connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv_table.py"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv_write.py"
   }
 
   tags = merge(
