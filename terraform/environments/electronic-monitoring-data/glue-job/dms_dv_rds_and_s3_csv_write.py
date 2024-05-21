@@ -215,7 +215,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name):
     total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, 
                                                  f"{rds_db_name}/dbo/{rds_tbl_name}"
                                                  )
-    default_repartition_factor = 4 if total_files <= 1 else total_files * 4
+    default_repartition_factor = 4 if total_files <= 1 else total_files * 8
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime,
