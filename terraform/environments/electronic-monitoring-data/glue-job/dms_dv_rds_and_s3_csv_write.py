@@ -49,7 +49,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "parquet_output_bucket_name",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
-                       "rds_sqlserver_dbs"
+                       "rds_sqlserver_dbs",
+                       "repartition_factor"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -215,7 +216,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name):
     total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, 
                                                  f"{rds_db_name}/dbo/{rds_tbl_name}"
                                                  )
-    default_repartition_factor = 4 if total_files <= 1 else total_files * 8
+    input_repartition_factor = int(args["repartition_factor"])
+    default_repartition_factor = input_repartition_factor if total_files <= 1 else total_files * input_repartition_factor
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime,
@@ -225,7 +227,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name):
     cast(null as string) as full_table_name
     """.strip()
     
-    df_dv_output = spark.sql(sql_select_str).repartition(default_repartition_factor)
+    df_dv_output = spark.sql(sql_select_str).repartition(input_repartition_factor)
 
     df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
     LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
