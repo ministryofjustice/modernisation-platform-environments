@@ -4,6 +4,18 @@ locals {
   db_connect_script_prefix = "dbconnect"
 }
 
+resource "aws_ssm_parameter" "ssh_key" {
+  name        = "EC2_SSH_KEY" # This needs to match the name supplied to the dbconnect.js script
+  description = "SSH Key used by Lambda function to access database instance for backup. Value is updated manually."
+  type        = "SecureString"
+  value       = "Placeholder"
+
+  tags = merge(
+    local.tags,
+    { Name = "EC2_SSH_KEY" }
+  )
+}
+
 ##################################
 ### IAM Role for BackUp Lambda
 ##################################
@@ -133,6 +145,31 @@ resource "aws_s3_bucket_versioning" "backup_lambda" {
   }
 }
 
+#####################################
+### Provision scripts to S3 bucket
+#####################################
+
+## When Terraform Init and Plan is ran as part of the pipeline, the zip files will be created, which will be picked up by aws_s3_object.provision_files in the Terraform Apply to send to the S3 bucket
+## Thus no need to add the zip files manually to the zipfiles directory except for nodejs.zip
+
+data "archive_file" "create_db_snapshots" {
+  type        = "zip"
+  source_file = "scripts/${local.create_db_snapshots_script_prefix}.js"
+  output_path = "zipfiles/${local.create_db_snapshots_script_prefix}.zip"
+}
+
+data "archive_file" "delete_db_snapshots" {
+  type        = "zip"
+  source_file = "scripts/${local.delete_db_snapshots_script_prefix}.py"
+  output_path = "zipfiles/${local.delete_db_snapshots_script_prefix}.zip"
+}
+
+data "archive_file" "connect_db" {
+  type        = "zip"
+  source_file = "scripts/${local.db_connect_script_prefix}.js"
+  output_path = "zipfiles/${local.db_connect_script_prefix}.zip"
+}
+
 
 ######################################
 ### Lambda Resources
@@ -155,24 +192,6 @@ resource "aws_security_group" "backup_lambda" {
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-backup-lambda-security-group" }
   )
-}
-
-data "archive_file" "create_db_snapshots" {
-  type        = "zip"
-  source_file = "scripts/${local.create_db_snapshots_script_prefix}.js"
-  output_path = "zipfiles/${local.create_db_snapshots_script_prefix}.zip"
-}
-
-data "archive_file" "delete_db_snapshots" {
-  type        = "zip"
-  source_file = "scripts/${local.delete_db_snapshots_script_prefix}.py"
-  output_path = "zipfiles/${local.delete_db_snapshots_script_prefix}.zip"
-}
-
-data "archive_file" "connect_db" {
-  type        = "zip"
-  source_file = "scripts/${local.db_connect_script_prefix}.js"
-  output_path = "zipfiles/${local.db_connect_script_prefix}.zip"
 }
 
 resource "aws_lambda_layer_version" "backup_lambda" {
