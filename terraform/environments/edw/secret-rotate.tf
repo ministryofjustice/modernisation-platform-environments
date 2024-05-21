@@ -5,27 +5,27 @@
 
 # ######## db secret
 
-# resource "random_string" "db-master-pass-string" {
-#   length  = 32 # as per rotated string
-#   special = true
-# }
+resource "random_string" "db-master-pass-string" {
+  length  = 32 # as per rotated string
+  special = true
+}
 
-# resource "aws_secretsmanager_secret" "db-master-password" {
-#   name        = "${local.application_name}/app/db-master-password-"
-#   description = "EDW DB EC2 Root Password"
+resource "aws_secretsmanager_secret" "db-master-password" {
+  name        = "${local.application_name}/app/db-master-password-"
+  description = "EDW DB EC2 Root Password"
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}-db-master-password"
-#     }
-#   ) 
-# }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-db-master-password"
+    }
+  ) 
+}
 
-# resource "aws_secretsmanager_secret_version" "edw_db_master_password_version" {
-#   secret_id     = aws_secretsmanager_secret.db-master-password.id
-#   secret_string = random_string.db-master-pass-string.result
-# }
+resource "aws_secretsmanager_secret_version" "edw_db_master_password_version" {
+  secret_id     = aws_secretsmanager_secret.db-master-password.id
+  secret_string = random_string.db-master-pass-string.result
+}
 
 
 # ######## db ec2 root secret
