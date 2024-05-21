@@ -24,3 +24,29 @@ module "eks_cluster_logs_kms_access_iam_policy" {
 
   policy = data.aws_iam_policy_document.eks_cluster_logs_kms_access.json
 }
+
+data "aws_iam_policy_document" "amazon_prometheus_proxy" {
+  statement {
+    sid    = "AllowAPS"
+    effect = "Allow"
+    actions = [
+      "aps:RemoteWrite",
+      "aps:GetSeries",
+      "aps:GetLabels",
+      "aps:GetMetricMetadata"
+    ]
+    resources = [aws_prometheus_workspace.main.arn]
+  }
+}
+
+module "amazon_prometheus_proxy_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.39.0"
+
+  name_prefix = "amazon-prometheus-proxy"
+
+  policy = data.aws_iam_policy_document.amazon_prometheus_proxy.json
+}
