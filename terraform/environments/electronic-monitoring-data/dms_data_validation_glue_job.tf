@@ -138,6 +138,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
     "--rds_sqlserver_dbs"                = ""
     "--rds_sqlserver_tbls"               = ""
+    "--repartition_factor"               = 8
     "--csv_src_bucket_name"              = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"             = "${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}"
