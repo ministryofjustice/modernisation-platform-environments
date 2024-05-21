@@ -29,16 +29,6 @@ resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
   }
 }
 
-
-resource "aws_secretsmanager_secret_rotation" "system_root_password_rotation" {
-  secret_id           = aws_secretsmanager_secret.system_root_password.id
-  rotation_lambda_arn = aws_lambda_function.rotate_secret_function.arn
-
-  rotation_rules {
-    automatically_after_days = local.application_data.accounts[local.environment].secret_rotation_frequency_days
-  }
-}
-
 ###########################
 ### AWS LAMBDA FUNCTION ###
 ###########################
