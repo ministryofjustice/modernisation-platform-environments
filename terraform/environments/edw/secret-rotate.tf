@@ -59,7 +59,7 @@ resource "aws_secretsmanager_secret_version" "edw_db_ec2_root_password_version" 
 
 resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
   secret_id                  = aws_secretsmanager_secret.edw_db_ec2_root_secret.id
-  rotation_lambda_arn        = aws_lambda_function.rotate_secret_function.arn
+  rotation_lambda_arn        = aws_lambda_function.edw_rotate_secret_function.arn
   rotate_immediately = true
 
   rotation_rules {
@@ -82,10 +82,10 @@ data "archive_file" "lambda_inline_code" {
   }
 }
 
-resource "aws_lambda_function" "rotate_secret_function" {
+resource "aws_lambda_function" "edw_rotate_secret_function" {
   function_name = local.application_data.accounts[local.environment].lambda_function_name
   description   = local.application_data.accounts[local.environment].lambda_function_description
-  role          = aws_iam_role.lambda_function_execution_role.arn
+  role          = aws_iam_role.edw_lambda_function_execution_role.arn
   handler       = local.application_data.accounts[local.environment].lambda_function_handler
   runtime       = local.application_data.accounts[local.environment].lambda_function_runtime
   timeout       = local.application_data.accounts[local.environment].lambda_function_timeout
@@ -107,7 +107,7 @@ resource "aws_lambda_function" "rotate_secret_function" {
   ) 
 }
 
-resource "aws_iam_role" "lambda_function_execution_role" {
+resource "aws_iam_role" "edw_lambda_function_execution_role" {
   name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-role"
 
   assume_role_policy = jsonencode({
@@ -140,8 +140,8 @@ resource "aws_iam_role" "lambda_function_execution_role" {
   ) 
 }
 
-resource "aws_lambda_permission" "rotate_secret_function_permission" {
+resource "aws_lambda_permission" "edw_rotate_secret_function_permission" {
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rotate_secret_function.function_name
+  function_name = aws_lambda_function.edw_edw_rotate_secret_function.function_name
   principal     = "secretsmanager.amazonaws.com"
 }

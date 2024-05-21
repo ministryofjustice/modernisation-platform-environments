@@ -79,7 +79,8 @@ resource "aws_instance" "edw_db_instance" {
   ami                    = local.application_data.accounts[local.environment].edw_ec2_ami_id
   instance_type          = local.application_data.accounts[local.environment].edw_ec2_instance_type
   iam_instance_profile   = aws_iam_instance_profile.edw_ec2_instance_profile.id
-  key_name               = local.application_data.accounts[local.environment].edw_ssh_key_name
+  # ADD AFTER BASTION
+  # key_name               = local.application_data.accounts[local.environment].edw_ssh_key_name
   subnet_id              = data.aws_subnet.private_subnets_a.id
   security_groups        = [aws_security_group.edw_db_security_group.id]
   user_data = base64encode(templatefile("edw-ec2-user-data.sh", {
