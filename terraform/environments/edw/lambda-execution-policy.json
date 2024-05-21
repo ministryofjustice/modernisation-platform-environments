@@ -1,35 +1,35 @@
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "logs:CreateLogGroup",
-      "Resource": "arn:aws:logs:eu-west-2:${AWS_ACCOUNT_ID}:*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
-      "Resource": ["arn:aws:logs:eu-west-2:${AWS_ACCOUNT_ID}:log-group:/aws/lambda/${FUNCTION_NAME}:*"]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:CreateSecret",
-        "secretsmanager:ListSecrets",
-        "secretsmanager:DescribeSecret",
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:PutSecretValue",
-        "secretsmanager:UpdateSecretVersionStage",
-        "secretsmanager:GetRandomPassword",
-        "lambda:InvokeFunction"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "GenerateARandomStringToExecuteRotation",
-      "Effect": "Allow",
-      "Action": ["secretsmanager:GetRandomPassword"],
-      "Resource": "*"
-    }
-  ]
-}
+// {
+//   "Version": "2012-10-17",
+//   "Statement": [
+//     {
+//       "Effect": "Allow",
+//       "Action": "logs:CreateLogGroup",
+//       "Resource": "arn:aws:logs:eu-west-2:${AWS_ACCOUNT_ID}:*"
+//     },
+//     {
+//       "Effect": "Allow",
+//       "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+//       "Resource": ["arn:aws:logs:eu-west-2:${AWS_ACCOUNT_ID}:log-group:/aws/lambda/${FUNCTION_NAME}:*"]
+//     },
+//     {
+//       "Effect": "Allow",
+//       "Action": [
+//         "secretsmanager:CreateSecret",
+//         "secretsmanager:ListSecrets",
+//         "secretsmanager:DescribeSecret",
+//         "secretsmanager:GetSecretValue",
+//         "secretsmanager:PutSecretValue",
+//         "secretsmanager:UpdateSecretVersionStage",
+//         "secretsmanager:GetRandomPassword",
+//         "lambda:InvokeFunction"
+//       ],
+//       "Resource": "*"
+//     },
+//     {
+//       "Sid": "GenerateARandomStringToExecuteRotation",
+//       "Effect": "Allow",
+//       "Action": ["secretsmanager:GetRandomPassword"],
+//       "Resource": "*"
+//     }
+//   ]
+// }
