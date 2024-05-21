@@ -297,7 +297,7 @@ locals {
     db_name  = "nomis"
     password = "placeholder"
     user     = "placeholder"
-    endpoint = "0.0.0.0"
+    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
     port     = "1521"
   }
 
