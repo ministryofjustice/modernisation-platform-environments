@@ -197,37 +197,14 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
 # Lambda Function to Terminate MS Word Processes - DEV
 ######################################################
 
-# Eventbridge rules to terminate cpu process
-
-resource "aws_cloudwatch_event_rule" "terminate_cpu_process_dev" {
-  count         = local.is-development == true ? 1 : 0
-  name          = "terminate_cpu_process_dev"
-  description   = "Terminates a CPU process development"
-  event_pattern = <<EOF
-{
-  "source": ["aws.ec2"],
-  "detail-type": ["EC2 Instance High CPU Utilisation"]
-  }
-EOF
-}
-
-resource "aws_cloudwatch_event_target" "trigger_lambda_terminate_cpu_process_dev" {
-  count     = local.is-development == true ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.terminate_cpu_process_dev[0].name
-  target_id = "terminate_cpu_process_dev"
-  arn       = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_dev[0].arn
-}
-
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_dev" {
   count         = local.is-development == true ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_dev[0].function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.terminate_cpu_process_dev[0].arn
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:*"
 }
-
-# Lambda functions to terminate cpu process
 
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {
   count         = local.is-development == true ? 1 : 0
