@@ -211,7 +211,7 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 # ===================================================================================================
 
-def process_dv_for_table(rds_db_name, rds_tbl_name, input_repartition_factor):
+def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor):
 
     default_repartition_factor = input_repartition_factor if total_files <= 1 else total_files * input_repartition_factor
 
@@ -352,7 +352,7 @@ if __name__ == "__main__":
                 continue
             
             input_repartition_factor = int(args["repartition_factor"])
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, input_repartition_factor)
+            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor)
         
             write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
 
@@ -372,7 +372,10 @@ if __name__ == "__main__":
         for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name)
+            total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, f"{rds_db_name}/dbo/{rds_tbl_name}")
+            
+            input_repartition_factor = int(args["repartition_factor"])
+            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor)
 
             write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
 
