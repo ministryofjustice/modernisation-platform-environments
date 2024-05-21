@@ -23,7 +23,7 @@ resource "helm_release" "aws_cloudwatch_metrics" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-cloudwatch-metrics"
   version    = "0.0.11"
-  namespace  = kubernetes_namespace.amazon_cloudwatch.metadata[0].name
+  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/aws-cloudwatch-metrics/values.yml.tftpl",
@@ -41,7 +41,7 @@ resource "helm_release" "aws_for_fluent_bit" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-for-fluent-bit"
   version    = "0.1.33"
-  namespace  = kubernetes_namespace.amazon_cloudwatch.metadata[0].name
+  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/aws-for-fluent-bit/values.yml.tftpl",

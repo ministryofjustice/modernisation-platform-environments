@@ -18,7 +18,7 @@ module "aws_cloudwatch_metrics_pod_identity" {
   associations = {
     eks = {
       cluster_name    = module.eks.cluster_name
-      namespace       = kubernetes_namespace.amazon_cloudwatch.metadata[0].name
+      namespace       = kubernetes_namespace.aws_observability.metadata[0].name
       service_account = "aws-cloudwatch-metrics"
     }
   }

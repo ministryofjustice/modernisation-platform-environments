@@ -4,8 +4,8 @@ resource "kubernetes_namespace" "kyverno" {
   }
 }
 
-resource "kubernetes_namespace" "amazon_cloudwatch" {
+resource "kubernetes_namespace" "aws_observability" {
   metadata {
-    name = "amazon-cloudwatch"
+    name = "aws-observability"
   }
 }
