@@ -107,21 +107,21 @@ resource "aws_lambda_function" "edw_rotate_secret_function" {
   ) 
 }
 
-resource "aws_iam_role" "edw_lambda_function_execution_role" {
-  name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-role"
+# resource "aws_iam_role" "edw_lambda_function_execution_role" {
+#   name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-role"
 
-  assume_role_policy = jsonencode({
-    Version: "2008-10-17"
-    Statement: [
-        {
-        Effect: "Allow"
-        Principal: {
-            Service: "lambda.amazonaws.com"
-        },
-        Action: "sts:AssumeRole"
-        }
-    ]
-  })
+#   assume_role_policy = jsonencode({
+#     Version: "2008-10-17"
+#     Statement: [
+#         {
+#         Effect: "Allow"
+#         Principal: {
+#             Service: "lambda.amazonaws.com"
+#         },
+#         Action: "sts:AssumeRole"
+#         }
+#     ]
+#   })
   
   inline_policy {
     name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-policy"
