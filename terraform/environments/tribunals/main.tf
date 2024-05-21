@@ -570,7 +570,7 @@ module "ftp-admin-appeals" {
   is_ftp_app                        = true
   source                            = "./modules/tribunal_ftp"
   app_name                          = "ftp-admin-appeals"
-  app_url                           = "administrativeappeals"
+  app_url                           = "administrativeappealsdecisions"
   environment                       = local.environment
   application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
