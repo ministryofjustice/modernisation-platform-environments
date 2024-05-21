@@ -72,40 +72,40 @@ resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
 ### AWS LAMBDA FUNCTION ###
 ###########################
 
-data "archive_file" "lambda_inline_code" {
-  type        = "zip"
-  output_path = "${replace(local.application_data.accounts[local.environment].lambda_function_inline_code_filename, "py", "zip")}"
+# data "archive_file" "lambda_inline_code" {
+#   type        = "zip"
+#   output_path = "${replace(local.application_data.accounts[local.environment].lambda_function_inline_code_filename, "py", "zip")}"
 
-  source {
-    filename = local.application_data.accounts[local.environment].lambda_function_inline_code_filename
-    content  = file("${local.application_data.accounts[local.environment].lambda_function_inline_code_filename}")
-  }
-}
+#   source {
+#     filename = local.application_data.accounts[local.environment].lambda_function_inline_code_filename
+#     content  = file("${local.application_data.accounts[local.environment].lambda_function_inline_code_filename}")
+#   }
+# }
 
-resource "aws_lambda_function" "edw_rotate_secret_function" {
-  function_name = local.application_data.accounts[local.environment].lambda_function_name
-  description   = local.application_data.accounts[local.environment].lambda_function_description
-  role          = aws_iam_role.edw_lambda_function_execution_role.arn
-  handler       = local.application_data.accounts[local.environment].lambda_function_handler
-  runtime       = local.application_data.accounts[local.environment].lambda_function_runtime
-  timeout       = local.application_data.accounts[local.environment].lambda_function_timeout
+# resource "aws_lambda_function" "edw_rotate_secret_function" {
+#   function_name = local.application_data.accounts[local.environment].lambda_function_name
+#   description   = local.application_data.accounts[local.environment].lambda_function_description
+#   role          = aws_iam_role.edw_lambda_function_execution_role.arn
+#   handler       = local.application_data.accounts[local.environment].lambda_function_handler
+#   runtime       = local.application_data.accounts[local.environment].lambda_function_runtime
+#   timeout       = local.application_data.accounts[local.environment].lambda_function_timeout
 
-  filename         = data.archive_file.lambda_inline_code.output_path
-  source_code_hash = data.archive_file.lambda_inline_code.output_base64sha256 # hash ensures that changes to inline code are always picked up by a plan/apply
+#   filename         = data.archive_file.lambda_inline_code.output_path
+#   source_code_hash = data.archive_file.lambda_inline_code.output_base64sha256 # hash ensures that changes to inline code are always picked up by a plan/apply
 
-  environment {
-    variables = {
-      SECRETS_MANAGER_ENDPOINT = "https://secretsmanager.eu-west-2.amazonaws.com"
-    }
-  }
+#   environment {
+#     variables = {
+#       SECRETS_MANAGER_ENDPOINT = "https://secretsmanager.eu-west-2.amazonaws.com"
+#     }
+#   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-edw-secret-rotate-function"
-    }
-  ) 
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}-edw-secret-rotate-function"
+#     }
+#   ) 
+# }
 
 # resource "aws_iam_role" "edw_lambda_function_execution_role" {
 #   name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-role"
@@ -140,8 +140,8 @@ resource "aws_lambda_function" "edw_rotate_secret_function" {
 #   ) 
 # }
 
-resource "aws_lambda_permission" "edw_rotate_secret_function_permission" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.edw_rotate_secret_function.function_name
-  principal     = "secretsmanager.amazonaws.com"
-}
+# resource "aws_lambda_permission" "edw_rotate_secret_function_permission" {
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.edw_rotate_secret_function.function_name
+#   principal     = "secretsmanager.amazonaws.com"
+# }
