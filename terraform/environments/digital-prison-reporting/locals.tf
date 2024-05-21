@@ -50,6 +50,11 @@ locals {
   datamart_username = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
   datamart_password = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
 
+  # Athena Federated Query
+  federated_query_lambda_memory_mb             = local.application_data.accounts[local.environment].athena_federated_query_lambda_memory_mb
+  federated_query_lambda_timeout_seconds       = local.application_data.accounts[local.environment].athena_federated_query_lambda_timeout_seconds
+  federated_query_lambda_concurrent_executions = local.application_data.accounts[local.environment].athena_federated_query_lambda_concurrent_executions
+
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
   glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
