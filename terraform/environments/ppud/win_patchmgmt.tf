@@ -28,7 +28,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
     }
     patch_filter {
       key    = "MSRC_SEVERITY"
-      values = ["Critical", "Important", "Moderate", "Low"]
+      values = ["Critical", "Important", "Moderate", "Low", "Unspecified"]
     }
   }
 
