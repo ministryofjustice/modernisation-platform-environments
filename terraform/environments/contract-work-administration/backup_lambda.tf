@@ -14,6 +14,11 @@ resource "aws_ssm_parameter" "ssh_key" {
     local.tags,
     { Name = "EC2_SSH_KEY" }
   )
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
 }
 
 ##################################
