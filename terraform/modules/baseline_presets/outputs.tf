@@ -109,6 +109,11 @@ output "kms_grants" {
   }
 }
 
+output "oam_links" {
+  description = "Map of oam_links to create depending on options provided"
+  value       = local.oam_links
+}
+
 output "route53_resolver_rules" {
   description = "Map of route53 resolver rules depending on options provided"
   value       = local.route53_resolver_rules

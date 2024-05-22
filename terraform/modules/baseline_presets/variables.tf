@@ -17,6 +17,7 @@ variable "options" {
     backup_plan_weekly_delete_after              = optional(number, 28)
     cloudwatch_log_groups                        = optional(list(string))
     cloudwatch_metric_alarms_default_actions     = optional(list(string))
+    cloudwatch_metric_oam_links                  = optional(list(string)) # list of account names
     enable_application_environment_wildcard_cert = optional(bool, false)
     enable_azure_sas_token                       = optional(bool, false)
     enable_offloc_sync                           = optional(bool, false)
