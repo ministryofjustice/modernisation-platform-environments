@@ -107,6 +107,7 @@ locals {
 
   baseline_oam_sinks = {
     "CloudWatchMetricOamSink" = {
+      resource_types = ["AWS::CloudWatch::Metric"]
       source_account_names = [
         "corporate-staff-rostering-${local.environment}",
         "hmpps-domain-services-${local.environment}",
