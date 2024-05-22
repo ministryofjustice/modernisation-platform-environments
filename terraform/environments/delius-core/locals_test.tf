@@ -12,6 +12,7 @@ locals {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     homepage_path                          = "/"
+    has_mis_environment                    = false
   }
 
   ldap_config_test = {
