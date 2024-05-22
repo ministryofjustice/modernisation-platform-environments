@@ -1,3 +1,4 @@
+/////////////////////////////////////////////////////////////////////
 // CWA automated backup script
 // - Makes call to lambda which connects to EC2 instance and put
 //   DB in backup mode
@@ -108,7 +109,7 @@ async function connSSH(action, appname) {
                 console.log("standard output: " + stdout);
                 console.log("standard error: " + stderr);
                 if (code == 0) {
-                  resolve(code, stdout, stderr);
+                  resolve();
                 } else {
                   reject();
                 }
@@ -141,7 +142,7 @@ async function connSSH(action, appname) {
                 console.log("standard output: " + stdout);
                 console.log("standard error: " + stderr);
                 if (code == 0) {
-                  resolve(code, stdout, stderr);
+                  resolve();
                 } else {
                   reject();
                 }
@@ -156,7 +157,7 @@ async function connSSH(action, appname) {
       ssh.end();
       console.log(`[+] Completed DB alter state: ${action} ==>> ` + address);
     } catch (e) {
-      throw new Error("SSH Exec did not run successfully on the database.");
+      throw new Error("SSH Exec did not run successfully on the database. " + e);
     }
   }
 }
