@@ -29,7 +29,12 @@ locals {
   db_config_dev = {
     instance_type  = "r6i.xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
-    standby_count  = 2
+
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
+
+    standby_count = 2
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
@@ -127,12 +132,12 @@ locals {
       container_cpu    = 1024
     }
 
-    user_management = {
+    umt = {
       image_tag                        = "5.7.6"
       container_port                   = 8080
       container_memory                 = 4096
       container_cpu                    = 1024
-      elasticache_version              = "6.0"
+      elasticache_version              = "6.2"
       elasticache_node_type            = "cache.t3.small"
       elasticache_port                 = 6379
       elasticache_parameter_group_name = "default.redis6.x"
@@ -154,6 +159,11 @@ locals {
       image_tag      = "5.7.6"
       container_port = 80
     }
+  }
+
+  dms_config_dev = {
+    replication_instance_class = "dms.t3.medium"
+    engine_version             = "3.5.1"
   }
 
   bastion_config_dev = {

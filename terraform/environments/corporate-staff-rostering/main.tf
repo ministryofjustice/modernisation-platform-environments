@@ -122,6 +122,7 @@ module "baseline" {
   )
 
   secretsmanager_secrets = merge(
+    module.baseline_presets.secretsmanager_secrets,
     local.baseline_secretsmanager_secrets,
     lookup(local.baseline_environment_config, "baseline_secretsmanager_secrets", {})
   )

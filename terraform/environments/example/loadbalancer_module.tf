@@ -1,6 +1,6 @@
 # Load balancer build using the module
 module "lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v4.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=6f59e1ce47df66bc63ee9720b7c58993d1ee64ee" #v4.0.0
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
@@ -13,11 +13,11 @@ module "lb_access_logs_enabled" {
   public_subnets             = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
   loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
   loadbalancer_egress_rules  = local.loadbalancer_egress_rules
-  tags                       = local.tags
   account_number             = local.environment_management.account_ids[terraform.workspace]
   region                     = "eu-west-2"
   enable_deletion_protection = false
   idle_timeout               = 60
+  tags                       = {}
 }
 
 # Create the target group

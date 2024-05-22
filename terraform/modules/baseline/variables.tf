@@ -242,6 +242,7 @@ variable "ec2_autoscaling_groups" {
         special = optional(bool)
       }))
       value = optional(string)
+      tags  = optional(map(string), {})
     })))
     lb_target_groups = optional(map(object({
       port                 = optional(number)
@@ -410,7 +411,6 @@ variable "efs" {
         }))
       }))
     })), {})
-    backup_policy_status = optional(string)
     file_system = object({
       availability_zone_name          = optional(string)
       kms_key_id                      = optional(string, "general")
@@ -1098,7 +1098,8 @@ variable "ssm_parameters" {
         length  = number
         special = optional(bool)
       }))
-      value = optional(string)
+      value                = optional(string)
+      value_s3_bucket_name = optional(string) # lookup from module.s3_bucket
     }))
   }))
   default = {}

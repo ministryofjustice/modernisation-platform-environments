@@ -3,14 +3,15 @@
     "development": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": true,
-      "scale_down_kinesis_agent": false,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 3,
       "lambda_log_retention_in_days": 3,
       "dms_log_retention_in_days": 3,
       "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
       "reporting_hub_spark_driver_mem": "2g",
@@ -178,19 +179,25 @@
           }
         }
       },
+      "biprws": {
+        "enable": true,
+        "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
+        "endpoint_type": "domain_name"
+      },
       "setup_cw_insights": true
     },
     "test": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": false,
-      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 3,
       "lambda_log_retention_in_days": 3,
       "dms_log_retention_in_days": 3,
       "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
       "reporting_hub_spark_driver_mem": "2g",
@@ -358,19 +365,25 @@
           }
         }
       },
+      "biprws": {
+        "enable": true,
+        "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
+        "endpoint_type": "domain_name"
+      },
       "setup_cw_insights": false
     },
     "preproduction": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": false,
-      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 7,
       "lambda_log_retention_in_days": 7,
       "dms_log_retention_in_days": 14,
       "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
       "reporting_hub_spark_driver_mem": "2g",
@@ -540,19 +553,25 @@
           }
         }
       },
+      "biprws": {
+        "enable": true,
+        "endpoint": "https://reporting.preprod.nomis.az.justice.gov.uk",
+        "endpoint_type": "load_balancer"
+      },
       "setup_cw_insights": false
     },
     "production": {
       "project_short_id": "dpr",
       "create_database": true,
-      "deploy_operational_database": false,
-      "scale_down_kinesis_agent": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_log_retention_in_days": 7,
       "lambda_log_retention_in_days": 7,
       "dms_log_retention_in_days": 14,
       "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
       "reporting_hub_spark_driver_mem": "26g",
@@ -719,6 +738,11 @@
             "period": 60
           }
         }
+      },
+      "biprws": {
+        "enable": false,
+        "endpoint": "placeholder",
+        "endpoint_type": "load_balancer"
       },
       "setup_cw_insights": false
     }

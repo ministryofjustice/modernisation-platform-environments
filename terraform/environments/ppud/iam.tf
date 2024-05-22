@@ -250,6 +250,127 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_alarm_suppressio
   policy_arn = aws_iam_policy.iam_policy_for_lambda_alarm_suppression[0].arn
 }
 
+##########################################################
+# IAM Role & Policy for Lambda Terminate CPU Process - DEV
+##########################################################
+
+resource "aws_iam_role" "lambda_role_terminate_cpu_process_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Terminate_CPU_Process_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_terminate_cpu_process_dev"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role terminate cpu processes development"
+  policy      = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+        "ssm:SendCommand",
+        "ssm:GetCommandInvocation",
+        "ec2:DescribeInstances",
+        "lambda:InvokeAsync",
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+      "arn:aws:ssm:eu-west-2:075585660276:*",
+      "arn:aws:cloudwatch:eu-west-2:075585660276:*",
+      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
+      "arn:aws:lambda:eu-west-2:075585660276:*",
+      "arn:aws:ec2:eu-west-2:075585660276:instance/i-0b5c31ecda24ebc04"
+      ]
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_dev" {
+  count      = local.is-development == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_terminate_cpu_process_dev[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_terminate_cpu_process_dev[0].arn
+}
+
+##########################################################
+# IAM Role & Policy for Lambda Terminate CPU Process - UAT
+##########################################################
+
+resource "aws_iam_role" "lambda_role_terminate_cpu_process_uat" {
+  count              = local.is-preproduction == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Terminate_CPU_Process_UAT"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_terminate_cpu_process_uat"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role terminate cpu processes uat"
+  policy      = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+        "ssm:SendCommand",
+        "ssm:GetCommandInvocation",
+        "ec2:DescribeInstances",
+        "lambda:InvokeAsync",
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+      "arn:aws:ssm:eu-west-2:172753231260:*",
+      "arn:aws:cloudwatch:eu-west-2:172753231260:*",
+      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
+      "arn:aws:lambda:eu-west-2:172753231260:*",
+      "arn:aws:ec2:eu-west-2:172753231260:instance/i-0c687c72e4bc46755"
+      ]
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_uat" {
+  count      = local.is-preproduction == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_terminate_cpu_process_uat[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_terminate_cpu_process_uat[0].arn
+}
 
 ###################
 # SNS IAM Policies

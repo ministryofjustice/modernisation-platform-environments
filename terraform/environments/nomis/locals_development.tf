@@ -15,6 +15,11 @@ locals {
     }
   }
 
+  # config for load balancer maintenance rule
+  development_lb_maintenance_message = {
+    maintenance_title   = "Prison-NOMIS Maintenance Window"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+  }
 
   # baseline config
   development_config = {
@@ -54,7 +59,7 @@ locals {
     baseline_iam_policies = {
       Ec2DevWeblogicPolicy = {
         description = "Permissions required for dev Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -66,11 +71,11 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/weblogic-*",
             ]
           }
-        ]
+        ])
       }
       Ec2Qa11GWeblogicPolicy = {
         description = "Permissions required for QA11G Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -82,11 +87,11 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/weblogic-*",
             ]
           }
-        ]
+        ])
       }
       Ec2Qa11RWeblogicPolicy = {
         description = "Permissions required for QA11R Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -98,7 +103,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/weblogic-*",
             ]
           }
-        ]
+        ])
       }
     }
 
@@ -265,6 +270,9 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+        })
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "dev"
           description         = "syscon nomis dev and qa databases"
@@ -282,7 +290,8 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
+          disable_api_termination = true
+          instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -311,7 +320,8 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
+          disable_api_termination = true
+          instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -340,7 +350,8 @@ locals {
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
+          disable_api_termination = true
+          instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -376,8 +387,9 @@ locals {
           "/dev/sdc" = { label = "app", size = 100, type = "gp3" } # /u02
         }
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t3.medium"
-          vpc_security_group_ids = ["private-web"]
+          disable_api_termination = true
+          instance_type           = "t3.medium"
+          vpc_security_group_ids  = ["private-web"]
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -431,6 +443,8 @@ locals {
           http = local.weblogic_lb_listeners.http
 
           https = merge(local.weblogic_lb_listeners.https, {
+            # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
+            # weblogic servers can alter priorities to enable maintenance message
             rules = {
               dev-nomis-web-a-http-7777 = {
                 priority = 100
@@ -477,6 +491,27 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.development_lb_maintenance_message)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.development.nomis.service.justice.gov.uk",
+                      "c-dev.development.nomis.service.justice.gov.uk",
+                      "c-qa11g.development.nomis.service.justice.gov.uk",
+                      "c-qa11r.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
@@ -500,6 +535,7 @@ locals {
           { name = "qa11r", type = "CNAME", ttl = "300", records = ["dev-nomis-db-1-a.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "private" },
           # dev
           { name = "dev-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "dev-nomis-web-b", type = "A", lbs_map_key = "private" },

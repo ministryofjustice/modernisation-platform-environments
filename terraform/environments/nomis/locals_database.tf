@@ -12,6 +12,11 @@ locals {
       weblogic-passwords = { description = "passwords available to weblogic servers" }
     }
   }
+  database_weblogic_secretsmanager_secrets = {
+    secrets = {
+      weblogic-passwords = { description = "passwords available to weblogic servers" }
+    }
+  }
   database_mis_secretsmanager_secrets = {
     secrets = {
       passwords      = { description = "database passwords" }
@@ -121,7 +126,6 @@ locals {
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type                = "r6i.xlarge"
-      disable_api_termination      = true
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
       vpc_security_group_ids       = ["data-db"]

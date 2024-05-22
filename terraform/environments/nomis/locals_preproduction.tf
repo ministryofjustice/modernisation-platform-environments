@@ -18,6 +18,12 @@ locals {
     }
   }
 
+  # config for load balancer maintenance rule
+  preproduction_lb_maintenance_message = {
+    maintenance_title   = "Prison-NOMIS Maintenance Window"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+  }
+
   # baseline config
   preproduction_config = {
 
@@ -96,7 +102,7 @@ locals {
       }
       Ec2PreprodWeblogicPolicy = {
         description = "Permissions required for Preprod Weblogic EC2s"
-        statements = [
+        statements = concat(local.weblogic_iam_policy_statements, [
           {
             effect = "Allow"
             actions = [
@@ -109,7 +115,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/weblogic-*",
             ]
           }
-        ]
+        ])
       }
     }
 
@@ -208,7 +214,8 @@ locals {
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
@@ -237,12 +244,13 @@ locals {
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
           description       = "Disaster-Recovery/High-Availability pre-production database for CNOMPP"
-          oracle-sids       = "" # TODO
+          oracle-sids       = "PPCNOMHA"
         })
       })
 
@@ -268,7 +276,8 @@ locals {
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
@@ -314,47 +323,70 @@ locals {
         listeners = {
           http = local.weblogic_lb_listeners.http
 
-          https = merge(
-            local.weblogic_lb_listeners.https, {
-              alarm_target_group_names = [
-                "preprod-nomis-web-a-http-7777",
-                # "preprod-nomis-web-b-http-7777",
-              ]
-              rules = {
-                preprod-nomis-web-a-http-7777 = {
-                  priority = 200
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "preprod-nomis-web-a-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
-                        "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
-                        "c.preproduction.nomis.az.justice.gov.uk",
-                        "c.preproduction.nomis.service.justice.gov.uk",
-                        "c.pp-nomis.az.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
-                preprod-nomis-web-b-http-7777 = {
-                  priority = 400
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "preprod-nomis-web-b-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
-                        "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
+          https = merge(local.weblogic_lb_listeners.https, {
+            alarm_target_group_names = [
+              "preprod-nomis-web-a-http-7777",
+              # "preprod-nomis-web-b-http-7777",
+            ]
+            # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
+            # weblogic servers can alter priorities to enable maintenance message
+            rules = {
+              preprod-nomis-web-a-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "preprod-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
+                      "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                      "c.preproduction.nomis.az.justice.gov.uk",
+                      "c.preproduction.nomis.service.justice.gov.uk",
+                      "c.pp-nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
               }
+              preprod-nomis-web-b-http-7777 = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "preprod-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
+                      "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.preproduction_lb_maintenance_message)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.preproduction.nomis.service.justice.gov.uk",
+                      "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                      "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
+                      "c.preproduction.nomis.service.justice.gov.uk",
+                      "c.pp-nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
           })
         }
       }
@@ -363,6 +395,7 @@ locals {
     baseline_route53_zones = {
       "preproduction.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },

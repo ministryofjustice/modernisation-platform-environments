@@ -4,7 +4,7 @@
 
 # EC2 Created via module
 module "ec2_test_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.4.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=edc55b4005b7039e5b54ad7805e89a473fe3c3dd" #v2.4.1
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -31,7 +31,7 @@ module "ec2_test_instance" {
   region                   = local.region
   availability_zone        = local.availability_zone_1
   subnet_id                = module.environment.subnet["private"][local.availability_zone_1].id
-  tags                     = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  tags                     = merge(local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup       = local.environment_management.account_ids
   cloudwatch_metric_alarms = {}
 }
@@ -41,9 +41,7 @@ resource "aws_security_group" "example_ec2_sg" {
   name        = "example_ec2_sg"
   description = "Controls access to EC2"
   vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags        = { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
 }
 
 resource "aws_security_group_rule" "ingress_traffic" {
@@ -99,24 +97,21 @@ resource "aws_instance" "develop" {
     volume_size = 20
     encrypted   = true
   }
-  tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags       = { Name = lower(format("ec2-%s-%s-example", local.application_name, local.environment)) }
   depends_on = [aws_security_group.example_ec2_sg]
 }
 
 # create single managed policy
+resource "random_id" "ec2_common_policy" {
+  byte_length = 4
+}
+
 resource "aws_iam_policy" "ec2_common_policy" {
-  name        = "ec2-common-policy"
+  name        = "${random_id.ec2_common_policy.dec}-ec2-common-policy"
   path        = "/"
   description = "Common policy for all ec2 instances"
   policy      = data.aws_iam_policy_document.ec2_common_combined.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-common-policy"
-    },
-  )
+  tags        = { Name = "${random_id.ec2_common_policy.dec}-ec2-common-policy" }
 }
 
 # combine ec2-common policy documents
@@ -143,6 +138,10 @@ locals {
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ec2_policy" {
+  #checkov:skip=CKV_AWS_107
+  #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356
   statement {
     sid    = "CustomEc2Policy"
     effect = "Allow"
@@ -159,12 +158,7 @@ data "aws_iam_policy_document" "ec2_policy" {
 resource "aws_key_pair" "ec2-user" {
   key_name   = "ec2-user"
   public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-user"
-    },
-  )
+  tags       = { Name = "ec2-user" }
 }
 
 # Volumes built for use by EC2.
@@ -172,13 +166,7 @@ resource "aws_kms_key" "ec2" {
   description         = "Encryption key for EBS"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.ebs-kms.json
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-ebs-kms"
-    }
-  )
+  tags                = { Name = "${local.application_name}-ebs-kms" }
 }
 
 resource "aws_ebs_volume" "ebs_volume" {
@@ -188,9 +176,7 @@ resource "aws_ebs_volume" "ebs_volume" {
   throughput        = 200
   encrypted         = true
   kms_key_id        = aws_kms_key.ec2.arn
-  tags = {
-    Name = "ebs-data-volume"
-  }
+  tags              = { Name = "ebs-data-volume" }
 
   depends_on = [aws_instance.develop, aws_kms_key.ec2]
 }
@@ -206,6 +192,7 @@ resource "aws_volume_attachment" "mountvolumetoec2" {
 data "aws_iam_policy_document" "ebs-kms" {
   #checkov:skip=CKV_AWS_111
   #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_356
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]

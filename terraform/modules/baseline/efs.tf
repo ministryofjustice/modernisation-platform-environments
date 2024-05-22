@@ -26,8 +26,7 @@ module "efs" {
 
   source = "../../modules/efs"
 
-  access_points        = each.value.access_points
-  backup_policy_status = each.value.backup_policy_status
+  access_points = each.value.access_points
   file_system = merge(each.value.file_system, {
     kms_key_id = try(var.environment.kms_keys[each.value.file_system.kms_key_id].arn, each.value.file_system.kms_key_id)
   })

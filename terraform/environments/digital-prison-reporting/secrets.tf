@@ -14,10 +14,32 @@ resource "aws_secretsmanager_secret" "nomis" {
   )
 }
 
+# Nomis Source Secrets in format required by Athena Federated Query
+resource "aws_secretsmanager_secret" "nomis_athena_federated" {
+  name = "external/${local.project}-nomis-secrets-athena-federated-query"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-nomis-source-secrets-athena-federated-query"
+      Resource_Type = "Secrets"
+    }
+  )
+}
+
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "nomis" {
   secret_id     = aws_secretsmanager_secret.nomis.id
   secret_string = jsonencode(local.nomis_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "nomis_athena_federated" {
+  secret_id     = aws_secretsmanager_secret.nomis_athena_federated.id
+  secret_string = jsonencode(local.nomis_secrets_placeholder_athena_federated)
 
   lifecycle {
     ignore_changes = [secret_string, ]
@@ -138,6 +160,41 @@ module "sonatype_registry_secrets" {
       Jira           = "DPR2-69"
       Resource_Type  = "Secret"
       Name           = "${local.project}-sonatype-registry-${local.environment}"
+    }
+  )
+}
+
+# BO biprws Secrets
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "biprws" {
+  count = local.enable_biprws_secrets ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.biprws[0].id
+  secret_string = jsonencode(local.biprws_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+
+  depends_on = [aws_secretsmanager_secret.biprws]
+}
+
+# DPS Source Secrets
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret" "biprws" {
+  count = local.enable_biprws_secrets ? 1 : 0
+
+  name = "external/busobj-converter/biprws"
+
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/busobj-converter/biprws"
+      Resource_Type = "Secrets"
+      Source        = "NART"
+      Jira          = "DPR2-527"
     }
   )
 }

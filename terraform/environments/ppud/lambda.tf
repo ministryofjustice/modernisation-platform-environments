@@ -192,3 +192,69 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   runtime       = "python3.12"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
 }
+
+######################################################
+# Lambda Function to Terminate MS Word Processes - DEV
+######################################################
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_dev[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:*"
+}
+
+resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {
+  count         = local.is-development == true ? 1 : 0
+  filename      = "${path.module}/terminate_cpu_process/terminate_cpu_process_dev.zip"
+  function_name = "terminate_cpu_process_dev"
+  role          = aws_iam_role.lambda_role_terminate_cpu_process_dev[0].arn
+  handler       = "terminate_cpu_process_dev.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 300
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_dev]
+}
+
+# Archive the zip file
+
+data "archive_file" "zip_the_terminate_cpu_process_code_dev" {
+  count       = local.is-development == true ? 1 : 0
+  type        = "zip"
+  source_dir  = "${path.module}/terminate_cpu_process/"
+  output_path = "${path.module}/terminate_cpu_process/terminate_cpu_process_dev.zip"
+}
+
+######################################################
+# Lambda Function to Terminate MS Word Processes - UAT
+######################################################
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_uat[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:172753231260:alarm:*"
+}
+
+resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  filename      = "${path.module}/terminate_cpu_process/terminate_cpu_process_uat.zip"
+  function_name = "terminate_cpu_process_uat"
+  role          = aws_iam_role.lambda_role_terminate_cpu_process_uat[0].arn
+  handler       = "terminate_cpu_process_uat.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 300
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_uat]
+}
+
+# Archive the zip file
+
+data "archive_file" "zip_the_terminate_cpu_process_code_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  type        = "zip"
+  source_dir  = "${path.module}/terminate_cpu_process/"
+  output_path = "${path.module}/terminate_cpu_process/terminate_cpu_process_uat.zip"
+}

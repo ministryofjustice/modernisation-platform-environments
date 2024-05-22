@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "business_unit_kms_key_access" {
 }
 
 resource "aws_iam_policy" "business_unit_kms_key_access" {
-  name   = format("%s-delius-db-business_unit_kms_key_access_policy", var.env_name)
+  name   = "${var.env_name}-${var.db_suffix}-business-unit-kms-key-access-policy"
   path   = "/"
   policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
 }
@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "core_shared_services_bucket_access" {
 }
 
 resource "aws_iam_policy" "core_shared_services_bucket_access" {
-  name   = format("%s-delius-db-core_shared_services_bucket_access_policy", var.env_name)
+  name   = "${var.env_name}-${var.db_suffix}-core-shared-services-bucket-access-policy"
   path   = "/"
   policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
 }
@@ -99,7 +99,7 @@ data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
 }
 
 resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
-  name   = format("%s-delius-db-allow_access_to_ssm_parameter_store", var.env_name)
+  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ssm-parameter-store-access"
   path   = "/"
   policy = data.aws_iam_policy_document.allow_access_to_ssm_parameter_store.json
 }
@@ -110,7 +110,7 @@ resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
 #}
 
 resource "aws_iam_policy" "ec2_access_for_ansible" {
-  name   = format("%s-delius-db-ec2_access_for_ansible", var.env_name)
+  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ansible-ec2-access"
   path   = "/"
   policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
 }
@@ -138,7 +138,6 @@ resource "aws_iam_policy" "ec2_access_for_ansible" {
 #  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 #}
 
-
 data "aws_iam_policy_document" "db_access_to_secrets_manager" {
   statement {
     sid = "DbAccessToSecretsManager"
@@ -158,10 +157,28 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
   }
 }
 
-resource "aws_iam_policy" "db_access_to_secrets_manager" {
-  name   = "${var.env_name}-delius-db-allow-access-secrets-manager"
-  policy = data.aws_iam_policy_document.db_access_to_secrets_manager.json
+data "aws_iam_policy_document" "allow_access_to_delius_application_passwords" {
+  statement {
+    sid = "DbAccessToDeliusSecretsManager"
+    actions = ["secretsmanager:GetSecretValue"]
+    effect = "Allow"
+    resources = [
+      "arn:aws:secretsmanager:*:${local.delius_account_id}:secret:delius-core-${var.env_name}-oracle-db-application-passwords-*"
+    ]
+  }
 }
+
+data "aws_iam_policy_document" "combined_policy_documents" {
+  source_policy_documents = flatten([
+    data.aws_iam_policy_document.db_access_to_secrets_manager.json,
+    var.db_suffix == "mis-db" ? [data.aws_iam_policy_document.allow_access_to_delius_application_passwords.json] : []])
+}
+
+resource "aws_iam_policy" "db_access_to_secrets_manager" {
+  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-secrets-manager-access"
+  policy = data.aws_iam_policy_document.combined_policy_documents.json
+}
+
 
 #resource "aws_iam_role_policy_attachment" "db_access_to_secrets_manager" {
 #  role       = aws_iam_role.db_ec2_instance_iam_role.name
@@ -222,13 +239,13 @@ data "aws_iam_policy_document" "instance_ssm" {
 }
 
 resource "aws_iam_policy" "instance_ssm" {
-  name   = "${var.env_name}-delius-db-allow-access-ssm"
+  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ssm-access"
   policy = data.aws_iam_policy_document.instance_ssm.json
 }
 
 # new IAM role OEM setup to allow ec2s to access secrets manager and kms keys
 resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
-  name = "EC2OracleEnterpriseManagementSecretsRole"
+  name = "EC2OracleEnterpriseManagementSecretsRole-${var.db_suffix}"
 
   assume_role_policy = <<EOF
 {
@@ -242,7 +259,7 @@ resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
       "Action": "sts:AssumeRole",
       "Condition": {
         "ForAnyValue:ArnLike": {
-          "aws:PrincipalArn": "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.env_name}-delius-db-*"
+          "aws:PrincipalArn": "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-*"
         }
       }
     }
@@ -272,7 +289,7 @@ data "aws_iam_policy_document" "OracleEnterpriseManagementSecretsPolicyDocument"
 }
 
 resource "aws_iam_policy" "OracleEnterpriseManagementSecretsPolicy" {
-  name   = "OracleEnterpriseManagementSecretsPolicy"
+  name   = "OracleEnterpriseManagementSecretsPolicy-${var.db_suffix}"
   policy = data.aws_iam_policy_document.OracleEnterpriseManagementSecretsPolicyDocument.json
 }
 

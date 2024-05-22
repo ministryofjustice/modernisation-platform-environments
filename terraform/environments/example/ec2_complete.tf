@@ -10,14 +10,9 @@
 # Keypair for ec2-user
 #------------------------------------------------------------------------------
 resource "aws_key_pair" "ec2-user-complete" {
-  key_name   = "ec2-user"
+  key_name   = "ec2-user-complete"
   public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-ec2-user-complete"
-    },
-  )
+  tags       = { Name = "${local.application_name}-ec2-user-complete" }
 }
 
 # This locals block contains variables required to create ec2 instances using the module.
@@ -32,7 +27,7 @@ locals {
   # This local is used by the module variable "instance".  
   instance_complete = {
     disable_api_termination      = false
-    key_name                     = try(aws_key_pair.ec2-user.key_name)
+    key_name                     = try(aws_key_pair.ec2-user-complete.key_name)
     monitoring                   = false
     metadata_options_http_tokens = "required"
     vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
@@ -147,7 +142,7 @@ locals {
 
 }
 
-# This item is used to combine emultiple policy documents though for this example only one policy document is created.
+# This item is used to combine multiple policy documents though for this example only one policy document is created.
 data "aws_iam_policy_document" "ec2_complete_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ec2_complete_policy.json
@@ -156,6 +151,8 @@ data "aws_iam_policy_document" "ec2_complete_common_combined" {
 
 # This policy document is added as an example. Note that the module does not support access via AWS Session Manager.
 data "aws_iam_policy_document" "ec2_complete_policy" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356
   statement {
     sid    = "AllowSSMAccess"
     effect = "Allow"
@@ -199,7 +196,7 @@ module "ec2_complete_instance" {
   business_unit                 = local.comp_business_unit
   environment                   = local.environment
   region                        = local.comp_region
-  tags                          = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  tags                          = merge(local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup            = local.environment_management.account_ids
   user_data_raw                 = try(each.value.user_data, "")
   cloudwatch_metric_alarms      = {}
@@ -213,9 +210,7 @@ resource "aws_security_group" "complete_example_ec2_sg" {
   name        = "complete_ec2_sg"
   description = "Ingress and Egress Access Controls for EC2"
   vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
-  )
+  tags        = { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
 }
 
 resource "aws_security_group_rule" "complete_ingress_traffic" {
@@ -243,15 +238,14 @@ resource "aws_security_group_rule" "complete_egress_traffic" {
 ##### IAM Policies #####
 
 # Creates a single managed policy using the combined policy documents.
+resource "random_id" "ec2_complete_common_policy" {
+  byte_length = 4
+}
+
 resource "aws_iam_policy" "ec2_complete_common_policy" {
-  name        = "ec2-common-policy"
+  name        = "${random_id.ec2_complete_common_policy.dec}-ec2-common-policy"
   path        = "/"
   description = "Common policy for all ec2 instances"
   policy      = data.aws_iam_policy_document.ec2_common_combined.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-common-policy"
-    },
-  )
+  tags        = { Name = "${random_id.ec2_common_policy.dec}-ec2-common-policy" }
 }

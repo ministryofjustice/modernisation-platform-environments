@@ -1,4 +1,16 @@
 locals {
+
+  # baseline presets config
+  preproduction_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
+      }
+    }
+  }
+
   preproduction_config = {
     baseline_s3_buckets = {
       ncr-db-backup-bucket = {
@@ -27,10 +39,12 @@ locals {
       "/ec2/ncr-web/lsast"        = local.web_secretsmanager_secrets
       "/oracle/database/PPBIPSYS" = local.database_secretsmanager_secrets
       "/oracle/database/PPBIPAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/PPBISYS"  = local.database_secretsmanager_secrets
+      "/oracle/database/PPBIAUD"  = local.database_secretsmanager_secrets
     }
 
     baseline_efs = {
-      bip = {
+      pp-ncr-sap-share = {
         access_points = {
           root = {
             posix_user = {
@@ -47,7 +61,6 @@ locals {
             }
           }
         }
-        backup_policy_status = "DISABLED"
         file_system = {
           availability_zone_name = "eu-west-2a"
           lifecycle_policy = {
@@ -59,6 +72,9 @@ locals {
           availability_zones = ["eu-west-2a"]
           security_groups    = ["bip"]
         }]
+        tags = {
+          backup = "false"
+        }
       }
     }
 
@@ -151,7 +167,7 @@ locals {
       ### PREPROD
 
       pp-ncr-cms-a = merge(local.bip_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
@@ -159,7 +175,7 @@ locals {
           ])
         })
         instance = merge(local.bip_ec2_default.instance, {
-          instance_type = "c5.4xlarge",
+          instance_type = "m6i.xlarge",
         })
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform CMS installation and configurations"
@@ -170,7 +186,7 @@ locals {
         })
       })
       pp-ncr-cms-b = merge(local.bip_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
           availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
@@ -178,7 +194,7 @@ locals {
           ])
         })
         instance = merge(local.bip_ec2_default.instance, {
-          instance_type = "c5.4xlarge",
+          instance_type = "m6i.xlarge",
         })
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform CMS installation and configurations"
@@ -189,7 +205,7 @@ locals {
         })
       })
       pp-ncr-processing-1-a = merge(local.bip_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
@@ -197,7 +213,7 @@ locals {
           ])
         })
         instance = merge(local.bip_ec2_default.instance, {
-          instance_type = "c5.4xlarge",
+          instance_type = "m6i.4xlarge",
         })
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform installation and configurations"
@@ -208,7 +224,7 @@ locals {
         })
       })
       pp-ncr-web-admin-a = merge(local.web_ec2_default, {
-        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
@@ -216,7 +232,7 @@ locals {
           ])
         })
         instance = merge(local.web_ec2_default.instance, {
-          instance_type = "r7i.large",
+          instance_type = "r6i.large",
         })
         tags = merge(local.web_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform web-tier admin installation and configurations"
@@ -225,7 +241,7 @@ locals {
         })
       })
       pp-ncr-web-1-a = merge(local.web_ec2_default, {
-        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
@@ -233,7 +249,7 @@ locals {
           ])
         })
         instance = merge(local.web_ec2_default.instance, {
-          instance_type = "r7i.large",
+          instance_type = "r6i.xlarge",
         })
         tags = merge(local.web_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
@@ -242,7 +258,7 @@ locals {
         })
       })
       pp-ncr-web-2-b = merge(local.web_ec2_default, {
-        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
           availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
@@ -250,7 +266,7 @@ locals {
           ])
         })
         instance = merge(local.web_ec2_default.instance, {
-          instance_type = "r7i.xlarge",
+          instance_type = "r6i.xlarge",
         })
         tags = merge(local.web_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
@@ -259,11 +275,14 @@ locals {
         })
       })
       pp-ncr-etl-a = merge(local.etl_ec2_default, {
-        cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.etl_ec2_default.config, {
           instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          instance_type = "m6i.2xlarge",
         })
         tags = merge(local.etl_ec2_default.tags, {
           description                          = "PreProd SAP BI Platform ETL installation and configurations"

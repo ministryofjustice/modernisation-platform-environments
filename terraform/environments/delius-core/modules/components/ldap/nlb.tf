@@ -18,4 +18,6 @@ module "nlb" {
   vpc_id              = var.account_config.shared_vpc_id
   zone_id             = var.account_config.route53_inner_zone_info.zone_id
   mp_application_name = var.account_info.application_name
+
+  deregistration_delay = "15"
 }

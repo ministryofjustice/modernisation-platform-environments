@@ -1,4 +1,6 @@
 resource "aws_security_group" "vpc_endpoints" {
+  #checkov:skip=CKV2_AWS_5
+
   description = "Security Group for controlling all VPC endpoint traffic"
   name        = format("%s-vpc-endpoint-sg", local.application_name)
   vpc_id      = module.vpc.vpc_id
@@ -11,6 +13,7 @@ resource "aws_security_group" "transfer_server" {
   vpc_id      = module.vpc.vpc_id
 }
 
+#tfsec:ignore:avd-aws-0104 - The security group is attached to the resource
 module "definition_upload_lambda_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 

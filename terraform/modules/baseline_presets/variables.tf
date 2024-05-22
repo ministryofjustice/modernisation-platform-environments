@@ -19,6 +19,7 @@ variable "options" {
     cloudwatch_metric_alarms_default_actions     = optional(list(string))
     enable_application_environment_wildcard_cert = optional(bool, false)
     enable_azure_sas_token                       = optional(bool, false)
+    enable_offloc_sync                           = optional(bool, false)
     enable_backup_plan_daily_and_weekly          = optional(bool, false)
     enable_business_unit_kms_cmks                = optional(bool, false)
     enable_hmpps_domain                          = optional(bool, false)
