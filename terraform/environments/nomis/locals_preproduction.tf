@@ -62,6 +62,44 @@ locals {
     }
 
     baseline_iam_policies = {
+      Ec2LsastDatabasePolicy = {
+        description = "Permissions required for Lsast Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::nomis-db-backup-bucket*",
+              "arn:aws:s3:::nomis-audit-archives*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
+            ]
+          }
+        ]
+      }
       Ec2PreprodDatabasePolicy = {
         description = "Permissions required for Preprod Database EC2s"
         statements = [
@@ -193,6 +231,37 @@ locals {
 
 
     baseline_ec2_instances = {
+      lsast-nomis-db-1-a = merge(local.database_ec2, {
+        #cloudwatch_metric_alarms = merge(
+        #  local.database_ec2_cloudwatch_metric_alarms.standard,
+        #  local.database_ec2_cloudwatch_metric_alarms.db_connected,
+        #)
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2LsastDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 5000 }
+          flash = { total_size = 500 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "lsast"
+          description       = "lsast database for CNOM and MIS"
+          oracle-sids       = ""
+        })
+      })
+
       preprod-nomis-db-1-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
@@ -403,6 +472,15 @@ locals {
       }
       "preproduction.nomis.service.justice.gov.uk" = {
         records = [
+          { name = "lsnomis", type = "CNAME", ttl = "300", records = ["lsnomis-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "lsnomis-a", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsnomis-b", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsor", type = "CNAME", ttl = "300", records = ["lsor-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "lsor-a", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsor-b", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsmis", type = "CNAME", ttl = "300", records = ["lsmis-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "lsmis-a", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsmis-b", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppnomis", type = "CNAME", ttl = "300", records = ["ppnomis-a.preproduction.nomis.service.justice.gov.uk"] },
           { name = "ppnomis-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppnomis-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
