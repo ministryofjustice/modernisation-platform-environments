@@ -1,5 +1,5 @@
 
-####### EC2 Role #######..
+####### EC2 Role #######...
 resource "aws_iam_role" "edw_ec2_role" {
   name               = "${local.application_name}-ec2-role"
   assume_role_policy = jsonencode({
