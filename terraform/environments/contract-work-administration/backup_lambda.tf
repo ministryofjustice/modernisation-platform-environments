@@ -1,20 +1,20 @@
-# locals {
-#   create_db_snapshots_script_prefix = "dbsnapshot"
-#   delete_db_snapshots_script_prefix = "deletesnapshots"
-#   db_connect_script_prefix = "dbconnect"
-# }
+locals {
+  create_db_snapshots_script_prefix = "dbsnapshot"
+  delete_db_snapshots_script_prefix = "deletesnapshots"
+  db_connect_script_prefix = "dbconnect"
+}
 
-# resource "aws_ssm_parameter" "ssh_key" {
-#   name        = "EC2_SSH_KEY" # This needs to match the name supplied to the dbconnect.js script
-#   description = "SSH Key used by Lambda function to access database instance for backup. Value is updated manually."
-#   type        = "SecureString"
-#   value       = "Placeholder"
+resource "aws_ssm_parameter" "ssh_key" {
+  name        = "EC2_SSH_KEY" # This needs to match the name supplied to the dbconnect.js script
+  description = "SSH Key used by Lambda function to access database instance for backup. Value is updated manually."
+  type        = "SecureString"
+  value       = "Placeholder"
 
-#   tags = merge(
-#     local.tags,
-#     { Name = "EC2_SSH_KEY" }
-#   )
-# }
+  tags = merge(
+    local.tags,
+    { Name = "EC2_SSH_KEY" }
+  )
+}
 
 # ##################################
 # ### IAM Role for BackUp Lambda
