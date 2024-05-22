@@ -58,7 +58,4 @@ locals {
   }
 
   oracle_backup_bucket_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
-
-  has_mis_environment = lookup(var.environment_config, "has_mis_environment", false) != null
-
 }
