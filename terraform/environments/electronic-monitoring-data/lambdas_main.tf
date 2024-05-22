@@ -36,8 +36,9 @@ resource "aws_lambda_function" "create_athena_external_tables" {
 
     environment {
       variables = {
-        SECRET_NAME = aws_secretsmanager_secret.db_password.name_prefix
+        SECRET_NAME = aws_secretsmanager_secret.db_glue_connection.name
         DB_NAME = "test"
+        S3_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.name
       }
     }
 }

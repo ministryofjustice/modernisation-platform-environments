@@ -62,7 +62,13 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
         effect = "Allow"
         actions = [
             "glue:GetConnection",
-            "glue:GetTables"
+            "glue:GetTables",
+            "glue:GetDatabase",
+            "glue:GetDatabases",
+            "glue:CreateTable",
+            "glue:DeleteTable",
+            "glue:CreateDatabase",
+            "glue:DeleteDatabase"
         ]
         resources = ["*"]
     }
