@@ -106,7 +106,8 @@ resource "aws_s3_object" "provision_files" {
   for_each     = fileset("./zipfiles/", "**")
   key          = each.value
   source       = "./zipfiles/${each.value}" 
-  content_type = each.value
+  content_type = "application/zip"
+  source_hash  = filemd5("./zipfiles/${each.value}")
 }
 
 # This delays the creation of resource 
@@ -200,6 +201,7 @@ resource "aws_lambda_layer_version" "backup_lambda" {
   license_info = "Apache-2.0"
   s3_bucket    = aws_s3_bucket.backup_lambda.id
   s3_key       = "nodejs.zip"
+  source_code_hash = filebase64sha256("zipfiles/nodejs.zip")
 
   compatible_runtimes = ["nodejs18.x"]
   depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
