@@ -165,7 +165,7 @@ resource "aws_ebs_volume" "dbf01" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-# snapshot_id       = len(local.application_data.accounts[local.environment].dbf01_snapshot_id) > 0 : local.application_data.accounts[local.environment].dbf01_snapshot_id ? null
+  snapshot_id       = len(local.application_data.accounts[local.environment].dbf01_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf01_snapshot_id : null
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf01
   type              = "io2"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf01
@@ -191,7 +191,7 @@ resource "aws_ebs_volume" "dbf02" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-# snapshot_id       = len(local.application_data.accounts[local.environment].dbf02_snapshot_id) > 0 : local.application_data.accounts[local.environment].dbf02_snapshot_id ? null
+# snapshot_id       = len(local.application_data.accounts[local.environment].dbf02_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf02_snapshot_id : null
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf02
   type              = "io2"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf02
@@ -217,7 +217,7 @@ resource "aws_ebs_volume" "dbf03" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-# snapshot_id       = len(local.application_data.accounts[local.environment].dbf03_snapshot_id) > 0 : local.application_data.accounts[local.environment].dbf03_snapshot_id ? null
+# snapshot_id       = len(local.application_data.accounts[local.environment].dbf03_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf03_snapshot_id : null
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf03
   type              = "io2"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf03
