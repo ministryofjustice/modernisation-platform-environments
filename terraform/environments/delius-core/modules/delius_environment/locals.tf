@@ -37,4 +37,10 @@ locals {
     "217.138.45.110/32", # Unilink AOVPN
   ]
   all_ingress_ips = concat(local.globalprotect_ips, local.unilink_ips)
+
+  secret_prefix           = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
+  application_secret_name = "${local.secret_prefix}-application-passwords"
+  mis_account_id          = var.platform_vars.environment_management.account_ids[join("-", ["delius-mis", var.account_info.mp_environment])]
+
+  has_mis_environment = lookup(var.environment_config, "has_mis_environment", false) != null
 }
