@@ -39,7 +39,8 @@ data "aws_iam_policy_document" "redshift_dataapi" {
         "redshift-data:ListTables",
         "redshift-data:DescribeTable",
         "redshift-data:ListSchemas",
-        "redshift-data:ListDatabases"
+        "redshift-data:ListDatabases",
+        "redshift-data:ExecuteStatement"
     ]
     resources = [
       "arn:aws:redshift:${local.account_region}:${local.account_id}:cluster:*"
