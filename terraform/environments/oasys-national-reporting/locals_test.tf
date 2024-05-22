@@ -32,24 +32,6 @@ locals {
     }
 
     baseline_ec2_instances = {
-      t2-onr-bods-1-a = merge(local.defaults_bods_ec2, {
-        config = merge(local.defaults_bods_ec2.config, {
-          availability_zone             = "${local.region}a"
-          ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
-        })
-        instance = merge(local.defaults_bods_ec2.instance, {
-          instance_type = "m4.xlarge"
-        })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        # volumes are a direct copy of BODS in NCR
-        ebs_volumes = merge(local.defaults_bods_ec2.ebs_volumes, {
-          "/dev/sda1" = { type = "gp3", size = 100 }
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-          "/dev/sdc"  = { type = "gp3", size = 100 }
-          "/dev/sds"  = { type = "gp3", size = 100 }
-        })
-      })
       t2-onr-boe-1-a = merge(local.defaults_boe_ec2, {
         config = merge(local.defaults_boe_ec2.config, {
           instance_profile_policies = setunion(local.defaults_boe_ec2.config.instance_profile_policies, [
