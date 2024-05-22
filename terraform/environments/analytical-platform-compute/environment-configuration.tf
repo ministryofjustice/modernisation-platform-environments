@@ -6,8 +6,14 @@ locals {
   vpc_flow_log_cloudwatch_log_group_retention_in_days = 400
   vpc_flow_log_max_aggregation_interval               = 60
 
+  /* AMP */
+  amp_workspace_alias                        = "${local.application_name}-${local.environment}"
+  amp_cloudwatch_log_group_name              = "/aws/amp/${local.amp_workspace_alias}"
+  amp_cloudwatch_log_group_retention_in_days = 400
+
   /* EKS */
   eks_cluster_name                           = "${local.application_name}-${local.environment}"
+  eks_cloudwatch_log_group_name              = "/aws/eks/${local.eks_cluster_name}/logs"
   eks_cloudwatch_log_group_retention_in_days = 400
 
 
@@ -33,9 +39,11 @@ locals {
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.30.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.2-eksbuild.1"
+        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
         vpc_cni                = "v1.18.1-eksbuild.3"
-        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
       }
 
       /* Observability Platform */
@@ -63,9 +71,11 @@ locals {
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.30.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.2-eksbuild.1"
+        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
         vpc_cni                = "v1.18.1-eksbuild.3"
-        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
       }
 
       /* Observability Platform */
@@ -93,9 +103,11 @@ locals {
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.30.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.2-eksbuild.1"
+        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
         vpc_cni                = "v1.18.1-eksbuild.3"
-        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
       }
 
       /* Observability Platform */

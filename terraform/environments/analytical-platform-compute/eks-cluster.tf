@@ -3,6 +3,7 @@
 #tfsec:ignore:avd-aws-0104 - Currently no requirement to lock down egress traffic from EKS cluster
 module "eks" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
   version = "20.10.0"
@@ -33,11 +34,24 @@ module "eks" {
   }
 
   cluster_addons = {
+    /* Core Networking */
     coredns = {
       addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
     }
     kube-proxy = {
       addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
+    }
+    /* AWS */
+    aws-ebs-csi-driver = {
+      addon_version            = local.environment_configuration.eks_cluster_addon_versions.aws_ebs_csi_driver
+      service_account_role_arn = module.ebs_csi_driver_iam_role.iam_role_arn
+    }
+    aws-efs-csi-driver = {
+      addon_version            = local.environment_configuration.eks_cluster_addon_versions.aws_efs_csi_driver
+      service_account_role_arn = module.efs_csi_driver_iam_role.iam_role_arn
+    }
+    aws-guardduty-agent = {
+      addon_version = local.environment_configuration.eks_cluster_addon_versions.aws_guardduty_agent
     }
     eks-pod-identity-agent = {
       addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
@@ -45,12 +59,6 @@ module "eks" {
     vpc-cni = {
       addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
       service_account_role_arn = module.vpc_cni_iam_role.iam_role_arn
-    }
-    # amazon-cloudwatch-observability = {
-    #   most_recent = true
-    # }
-    aws-guardduty-agent = {
-      most_recent = true
     }
   }
 
@@ -60,27 +68,33 @@ module "eks" {
     platform            = "bottlerocket"
     metadata_options = {
       http_endpoint               = "enabled"
-      http_put_response_hop_limit = 1 /* This stop pods inheriting the nodes IAM role https://aws.github.io/aws-eks-best-practices/security/docs/iam/#restrict-access-to-the-instance-profile-assigned-to-the-worker-node */
+      http_put_response_hop_limit = 1
       http_tokens                 = "required"
       instance_metadata_tags      = "enabled"
     }
 
     block_device_mappings = {
-      xvda = {
-        device_name = "/dev/xvda"
+      xvdb = {
+        device_name = "/dev/xvdb"
         ebs = {
-          volume_size = 100
+          volume_size           = 100
+          volume_type           = "gp3"
+          iops                  = 3000
+          throughput            = 150
+          encrypted             = true
+          kms_key_id            = module.ebs_kms.key_arn
+          delete_on_termination = true
         }
       }
     }
 
     iam_role_additional_policies = {
-      AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-      CloudWatchAgentServerPolicy  = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+      AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+      EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
     }
   }
 
-  // TODO: Review these settings
   eks_managed_node_groups = {
     general = {
       min_size       = 1
