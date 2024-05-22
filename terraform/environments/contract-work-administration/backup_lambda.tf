@@ -152,23 +152,23 @@
 # ## When Terraform Init and Plan is ran as part of the pipeline, the zip files will be created, which will be picked up by aws_s3_object.provision_files in the Terraform Apply to send to the S3 bucket
 # ## Thus no need to add the zip files manually to the zipfiles directory except for nodejs.zip
 
-# data "archive_file" "create_db_snapshots" {
-#   type        = "zip"
-#   source_file = "scripts/${local.create_db_snapshots_script_prefix}.js"
-#   output_path = "zipfiles/${local.create_db_snapshots_script_prefix}.zip"
-# }
+data "archive_file" "create_db_snapshots" {
+  type        = "zip"
+  source_file = "scripts/${local.create_db_snapshots_script_prefix}.js"
+  output_path = "zipfiles/${local.create_db_snapshots_script_prefix}.zip"
+}
 
-# data "archive_file" "delete_db_snapshots" {
-#   type        = "zip"
-#   source_file = "scripts/${local.delete_db_snapshots_script_prefix}.py"
-#   output_path = "zipfiles/${local.delete_db_snapshots_script_prefix}.zip"
-# }
+data "archive_file" "delete_db_snapshots" {
+  type        = "zip"
+  source_file = "scripts/${local.delete_db_snapshots_script_prefix}.py"
+  output_path = "zipfiles/${local.delete_db_snapshots_script_prefix}.zip"
+}
 
-# data "archive_file" "connect_db" {
-#   type        = "zip"
-#   source_file = "scripts/${local.db_connect_script_prefix}.js"
-#   output_path = "zipfiles/${local.db_connect_script_prefix}.zip"
-# }
+data "archive_file" "connect_db" {
+  type        = "zip"
+  source_file = "scripts/${local.db_connect_script_prefix}.js"
+  output_path = "zipfiles/${local.db_connect_script_prefix}.zip"
+}
 
 
 # ######################################
