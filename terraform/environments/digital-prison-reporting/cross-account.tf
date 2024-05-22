@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "redshift_dataapi" {
 resource "aws_iam_policy" "redshift_dataapi_cross_policy" {
   name        = "dpr-redshift-policy"
   description = "Extra Policy for AWS Redshift"
-  policy      = data.aws_iam_policy_document.redshift_dataapi_cross_policy.json
+  policy      = data.aws_iam_policy_document.redshift_dataapi.json
 }
 
 # Redshift DataAPI Role/Policy Attachement
