@@ -1,6 +1,41 @@
 # OAM = AWS CloudWatch Observability Access Manager
 # Create a link in the account which sends metrics
 # Create a sink in the account which receive metrics
+#
+# STEP 1.
+# First create a sink in the account that will receive metrics.
+# Set `source_account_names` to the list of accounts to give permissions to
+#   oam_sinks = {
+#     "CloudWatchMetricOamSink" = {
+#       resource_types = ["AWS::CloudWatch::Metric"]
+#       source_account_names = [
+#         "corporate-staff-rostering-${local.environment}",
+#         "hmpps-domain-services-${local.environment}",
+#         "nomis-${local.environment}",
+#       ]
+#     }
+#   }
+#
+# STEP 2.
+# Create a placeholder SSM parameter in the account which sends metrics containing the sink id.
+# Use the baseline_presets module `cloudwatch_metric_oam_links_ssm_parameters` option.
+# For example:
+#   cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
+# to create an /oam/hmpps-oem-${local.environment} ssm parameter
+#
+# STEP 3.
+# Populate SSM parameter with the sink identifier
+#   environment=development
+#   application=nomis
+#   arn=$(aws oam list-sinks --profile "hmpps-oem-$environment" | jq -r '.Items[] | select(.Name=="CloudWatchMetricOamSink").Arn')
+#   aws ssm put-parameter --name "/oam/hmpps-oem-$environment" --type "SecureString" --data-type "text" --value "$arn" --profile "$application-$environment" --overwrite
+#
+# STEP 4.
+# Create the oam link and policy in the account which sends metrics.
+# Use the baseline_presets module `cloudwatch_metric_oam_links` option.
+# For example:
+#   cloudwatch_metric_oam_links = ["hmpps-oem-${local.environment}"]
+# to create required eam_links and iam_roles
 
 resource "aws_oam_link" "this" {
   for_each = var.oam_links
