@@ -147,7 +147,7 @@ locals {
           from_port   = 0
           to_port     = 0
           protocol    = -1
-          security_groups ["web"]
+          security_groups = ["web"]
         }
         all-within-subnet = {
           description = "Allow all ingress to self"
