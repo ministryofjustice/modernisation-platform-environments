@@ -447,7 +447,7 @@ locals {
           oracle-sids                          = ""
           instance-scheduling                  = "skip-scheduling"
         })
-      }
+      })
     }
     baseline_lbs = {
       private = {
