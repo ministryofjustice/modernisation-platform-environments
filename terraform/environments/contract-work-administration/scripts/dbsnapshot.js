@@ -302,11 +302,14 @@ exports.handler = async (event, context) => {
   } catch (error) {
     throw new Error(error);
   }
-  try{
-    console.log("Operating outside of Hotbackup mode");
-    await invokeLambdaFinal(appname);
-    console.log("Snapshots Complete");
-  } catch (error) {
-    throw new Error(error);
-  }
+  //////////////////////////////////
+  // Unsure why this part is required to take a second set of oraarch and oraredo snapshots, thus disabling it for now
+  //////////////////////////////////
+  // try{
+  //   console.log("Operating outside of Hotbackup mode");
+  //   await invokeLambdaFinal(appname);
+  //   console.log("Snapshots Complete");
+  // } catch (error) {
+  //   throw new Error(error);
+  // }
 };

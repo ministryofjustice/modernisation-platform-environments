@@ -89,18 +89,17 @@ async function connSSH(action, appname) {
 
         ssh
           .exec(
-            // 'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
-            //   "\n" +
-            //   "alter system switch logfile;" +
-            //   "\n" +
-            //   "alter system switch logfile;" +
-            //   "\n" +
-            //   "alter database begin backup;" +
-            //   "\n" +
-            //   "exit;" +
-            //   "\n" +
-            //   'EOFUM"',
-            'sudo bash -c "echo \'Hello World\' > /home/ec2-user/lambda_test_begin.txt"',
+            'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
+              "\n" +
+              "alter system switch logfile;" +
+              "\n" +
+              "alter system switch logfile;" +
+              "\n" +
+              "alter database begin backup;" +
+              "\n" +
+              "exit;" +
+              "\n" +
+              'EOFUM"',
             {
               pty: true,
               out: console.log.bind(console),
@@ -122,18 +121,17 @@ async function connSSH(action, appname) {
 
         ssh
           .exec(
-            // 'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
-            //   "\n" +
-            //   "alter database end backup;" +
-            //   "\n" +
-            //   "alter system switch logfile;" +
-            //   "\n" +
-            //   "alter system switch logfile;" +
-            //   "\n" +
-            //   "exit;" +
-            //   "\n" +
-            //   'EOFUM"',
-            'sudo bash -c "echo \'Hello World again\' > /home/ec2-user/lambda_test_end.txt"',
+            'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
+              "\n" +
+              "alter database end backup;" +
+              "\n" +
+              "alter system switch logfile;" +
+              "\n" +
+              "alter system switch logfile;" +
+              "\n" +
+              "exit;" +
+              "\n" +
+              'EOFUM"',
             {
               pty: true,
               out: console.log.bind(console),
