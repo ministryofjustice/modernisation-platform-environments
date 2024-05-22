@@ -56,7 +56,6 @@ module "reload_pipeline" {
             "Arguments" : {
               "--dpr.file.transfer.source.bucket" : var.s3_curated_bucket_id,
               "--dpr.file.transfer.destination.bucket" : var.s3_temp_reload_bucket_id,
-              "--dpr.file.transfer.retention.days" : "0",
               "--dpr.file.transfer.delete.copied.files" : "false",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
@@ -143,7 +142,6 @@ module "reload_pipeline" {
             "Arguments" : {
               "--dpr.file.transfer.source.bucket" : var.s3_raw_bucket_id,
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
-              "--dpr.file.transfer.retention.days" : "0",
               "--dpr.file.transfer.delete.copied.files" : "true",
               "--dpr.allowed.s3.file.extensions" : ".parquet",
               "--dpr.config.key" : var.domain

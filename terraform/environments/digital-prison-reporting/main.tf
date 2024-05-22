@@ -300,17 +300,18 @@ module "glue_s3_file_transfer_job" {
   )
 
   arguments = {
-    "--extra-jars"                            = local.glue_jobs_latest_jar_location
-    "--extra-files"                           = local.shared_log4j_properties_path
-    "--class"                                 = "uk.gov.justice.digital.job.S3FileTransferJob"
-    "--dpr.aws.region"                        = local.account_region
-    "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
-    "--dpr.file.transfer.source.bucket"       = module.s3_raw_bucket.bucket_id
-    "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
-    "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
-    "--dpr.file.transfer.delete.copied.files" = true,
-    "--dpr.allowed.s3.file.extensions"        = "*",
-    "--dpr.log.level"                         = local.glue_job_common_log_level
+    "--extra-jars"                                = local.glue_jobs_latest_jar_location
+    "--extra-files"                               = local.shared_log4j_properties_path
+    "--class"                                     = "uk.gov.justice.digital.job.S3FileTransferJob"
+    "--dpr.aws.region"                            = local.account_region
+    "--dpr.config.s3.bucket"                      = module.s3_glue_job_bucket.bucket_id,
+    "--dpr.file.transfer.source.bucket"           = module.s3_raw_bucket.bucket_id
+    "--dpr.file.transfer.destination.bucket"      = module.s3_raw_archive_bucket.bucket_id
+    "--dpr.file.transfer.retention.period.amount" = tostring(local.scheduled_s3_file_transfer_retention_period_amount)
+    "--dpr.file.transfer.retention.period.unit"   = tostring(local.scheduled_s3_file_transfer_retention_period_unit)
+    "--dpr.file.transfer.delete.copied.files"     = true,
+    "--dpr.allowed.s3.file.extensions"            = "*",
+    "--dpr.log.level"                             = local.glue_job_common_log_level
   }
 
   depends_on = [
