@@ -23,14 +23,13 @@ LOGGER = glueContext.get_logger()
 
 # ===============================================================================
 
+
 def resolve_args(args_list):
     LOGGER.info(f">> Resolving Argument Variables: START")
     available_args_list = []
     for item in args_list:
         try:
-            args = getResolvedOptions(
-                sys.argv, [f'{item}']
-            )
+            args = getResolvedOptions(sys.argv, [f'{item}'])
             available_args_list.append(item)
         except Exception as e:
             LOGGER.warn(f"WARNING: Missing argument, {e}")
@@ -39,6 +38,7 @@ def resolve_args(args_list):
     return available_args_list
 
 # ===============================================================================
+
 
 # Organise capturing input parameters.
 DEFAULT_INPUTS_LIST = ["JOB_NAME",
@@ -50,12 +50,13 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
                        "rds_sqlserver_dbs",
-                       "repartition_factor"
+                       "repartition_factor",
+                       "max_table_size_mb"
                        ]
 
 OPTIONAL_INPUTS = [
-                   "rds_sqlserver_tbls"
-                   ]
+    "rds_sqlserver_tbls"
+]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
 
@@ -91,6 +92,7 @@ CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATA
 # USER-DEFINED-FUNCTIONS
 # ----------------------
 
+
 def get_rds_db_jdbc_url(in_rds_db_name=None):
     if in_rds_db_name is None:
         return f"""jdbc:sqlserver://{RDS_DB_HOST_ENDPOINT}:{RDS_DB_PORT};"""
@@ -117,7 +119,7 @@ def get_rds_database_list(in_rds_databases):
         WHERE name IN ({rds_db_str})
         """.strip()
         sql_sys_databases = sql_sys_databases_2
-    
+
     LOGGER.info(f"""Using SQL Statement >>>\n{sql_sys_databases}""")
     df_rds_sys = (spark.read.format("jdbc")
                             .option("url", get_rds_db_jdbc_url())
@@ -156,10 +158,9 @@ def get_rds_db_tbl_list(in_rds_sqlserver_db_list):
             F.concat(rds_sqlserver_db_tbls.table_catalog,
                      F.lit('_'), rds_sqlserver_db_tbls.table_schema,
                      F.lit('_'), rds_sqlserver_db_tbls.table_name).alias("full_table_name")
+            )
         )
-        )
-        rds_db_tbl_temp_list = rds_db_tbl_temp_list + \
-            [row[0] for row in rds_sqlserver_db_tbls.collect()]
+        rds_db_tbl_temp_list = rds_db_tbl_temp_list + [row[0] for row in rds_sqlserver_db_tbls.collect()]
 
     return rds_db_tbl_temp_list
 
@@ -173,22 +174,23 @@ def get_rds_dataframe(in_rds_db_name, in_table_name):
 
 # -------------------------------------------------------------------------
 
+
 def get_s3_folder_info(bucket_name, prefix):
     paginator = S3_CLIENT.get_paginator('list_objects_v2')
-    
+
     total_size = 0
     total_files = 0
-    
+
     for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
         for obj in page.get('Contents', []):
             total_files += 1
             total_size += obj['Size']
-    
+
     return total_files, total_size
 
+
 def check_s3_path_if_exists(in_bucket_name, in_folder_path):
-    result = S3_CLIENT.list_objects(
-        Bucket=in_bucket_name, Prefix=in_folder_path)
+    result = S3_CLIENT.list_objects(Bucket=in_bucket_name, Prefix=in_folder_path)
     exists = False
     if 'Contents' in result:
         exists = True
@@ -211,9 +213,11 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 
 # ===================================================================================================
 
+
 def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor):
 
-    default_repartition_factor = input_repartition_factor if total_files <= 1 else total_files * input_repartition_factor
+    default_repartition_factor = input_repartition_factor if total_files <= 1 \
+                                    else total_files * input_repartition_factor
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime,
@@ -222,18 +226,22 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
     cast(null as string) as database_name,
     cast(null as string) as full_table_name
     """.strip()
-    
+
     df_dv_output = spark.sql(sql_select_str).repartition(input_repartition_factor)
 
     df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
-    LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
+
+    LOGGER.info(
+        f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
 
     tbl_csv_s3_path = get_s3_csv_tbl_path(rds_db_name, rds_tbl_name)
 
     if tbl_csv_s3_path is not None:
 
         df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema).repartition(default_repartition_factor)
-        LOGGER.info(f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_csv_temp.rdd.getNumPartitions()}, {total_size} bytes""")
+
+        LOGGER.info(
+            f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_csv_temp.rdd.getNumPartitions()}, {total_size} bytes""")
 
         df_rds_temp_count = df_rds_temp.count()
         df_csv_temp_count = df_csv_temp.count()
@@ -242,7 +250,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
 
             df_subtract = df_rds_temp.subtract(df_csv_temp).persist()
             df_rds_csv_subtract_row_count = df_subtract.count()
-            
+
             if df_rds_csv_subtract_row_count == 0:
                 df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                   "'' as json_row",
@@ -254,9 +262,9 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                 df_dv_output = df_dv_output.union(df_temp)
             else:
                 df_temp = (df_subtract
-                            .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
-                            .selectExpr("json_row")
-                            .limit(100))
+                           .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
+                           .selectExpr("json_row")
+                           .limit(100))
 
                 df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
                                              "json_row",
@@ -268,7 +276,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                 df_dv_output = df_dv_output.union(df_temp)
 
             df_subtract.unpersist()
-            
+
         else:
             df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                               "'' as json_row",
@@ -287,29 +295,32 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                           )
 
         df_dv_output = df_dv_output.union(df_temp)
-    
+
     LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
 
     return df_dv_output
+
 
 def write_parquet_to_s3(df_dv_output, database, table):
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
 
-    LOGGER.info(f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
-    
+    LOGGER.info(
+        f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
+
     df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
 
     if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                       f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={table}'''
-                                       ):
-                LOGGER.info(f"""Purging S3-path: {CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""")
-                glueContext.purge_s3_path(f"""{CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""",
-                                          options={"retentionPeriod": 0}
-                                          )
-    
+                               f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={table}'''
+                               ):
+        LOGGER.info(f"""Purging S3-path: {CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""")
+
+        glueContext.purge_s3_path(f"""{CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""",
+                                  options={"retentionPeriod": 0}
+                                  )
+
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
-    
+
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
                                                      'path': f"""{CATALOG_TABLE_S3_FULL_PATH}/""",
@@ -317,8 +328,8 @@ def write_parquet_to_s3(df_dv_output, database, table):
                                                  },
                                                  format_options={
                                                      'useGlueParquetWriter': True,
-                                                     'compression': 'snappy', 
-                                                     'blockSize': 13421773, 
+                                                     'compression': 'snappy',
+                                                     'blockSize': 13421773,
                                                      'pageSize': 1048576
                                                  })
     LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} validation report written to -> {CATALOG_TABLE_S3_FULL_PATH}/""")
@@ -345,36 +356,47 @@ if __name__ == "__main__":
             if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                        f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}'''
                                        ):
-                LOGGER.info(f"""Already exists, Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
+                LOGGER.info(
+                    f"""Already exists, Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
                 continue
-            elif total_size/1024/1024 > 999:
-                LOGGER.info(f"""Size greaterthan 1GB ({total_size} bytes), Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
+
+            elif total_size/1024/1024 > int(args["max_table_size_mb"]):
+                LOGGER.info(
+                    f"""Size greaterthan {args["max_table_size_mb"]}MB ({total_size} bytes), Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
                 continue
-            
+
             input_repartition_factor = int(args["repartition_factor"])
+
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor)
-        
+
             write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
 
     else:
         LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
 
         given_rds_sqlserver_tbls_str = args["rds_sqlserver_tbls"]
-        LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
+
+        LOGGER.info(
+            f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
 
         given_rds_sqlserver_tbls_list = [e.strip().strip("'") for e in given_rds_sqlserver_tbls_str.split(",")]
-        LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
-        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list if tbl in rds_sqlserver_db_tbl_list]
+        LOGGER.info(
+            f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
+
+        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list \
+                                              if tbl in rds_sqlserver_db_tbl_list]
 
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
-        
+
         for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
 
-            total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, f"{rds_db_name}/dbo/{rds_tbl_name}")
-            
+            total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME, 
+                                                         f"{rds_db_name}/dbo/{rds_tbl_name}")
+
             input_repartition_factor = int(args["repartition_factor"])
+
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor)
 
             write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
