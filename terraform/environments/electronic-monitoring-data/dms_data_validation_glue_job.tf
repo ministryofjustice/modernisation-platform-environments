@@ -152,7 +152,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
     "--enable-metrics"                   = "true"
     "--enable-auto-scaling"              = "true"
-    "--conf"                             = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=1g spark.sql.adaptive.enabled=true --conf spark.sql.adaptive.coalescePartitions.enabled=true --conf spark.sql.adaptive.skewJoin.enabled=true"
+    "--conf"                             = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=1g --conf spark.sql.adaptive.enabled=true --conf spark.sql.adaptive.coalescePartitions.enabled=true --conf spark.sql.adaptive.skewJoin.enabled=true"
   }
 
   connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
