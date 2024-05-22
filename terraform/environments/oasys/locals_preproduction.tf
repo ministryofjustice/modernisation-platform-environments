@@ -74,8 +74,8 @@ locals {
               "s3:RestoreObject",
             ]
             resources = [
-              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
-              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*/*",
+              "arn:aws:s3:::prod-oasys-db-backup-bucket*",
+              "arn:aws:s3:::prod-oasys-db-backup-bucket*/*",
             ]
           },
           {
@@ -119,7 +119,7 @@ locals {
     }
 
     baseline_ec2_instances = {
-      "pp-${local.application_name}-db-a" = merge(local.database_a, {
+      "pp-oasys-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
@@ -134,67 +134,6 @@ locals {
           oracle-sids         = "PPBIPINF PPOASYS"
         })
       })
-
-      # "pp-${local.application_name}-db-b" = merge(local.database_b, {
-      #   config = merge(local.database_b.config, {
-      #     instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
-      #       "Ec2PreprodDatabasePolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.database_b.instance, {
-      #     instance_type = "r6i.2xlarge"
-      #   })
-      #   ebs_volumes = {
-      #     "/dev/sdb" = { # /u01
-      #       size  = 100
-      #       label = "app"
-      #       type  = "gp3"
-      #     }
-      #     "/dev/sdc" = { # /u02
-      #       size  = 500
-      #       label = "app"
-      #       type  = "gp3"
-      #     }
-      #     "/dev/sde" = { # DATA01
-      #       label = "data"
-      #       size  = 2000
-      #       type  = "gp3"
-      #     }
-      #     "/dev/sdf" = { # DATA02
-      #       label = "data"
-      #       size  = 2000
-      #       type  = "gp3"
-      #     }
-      #     "/dev/sdj" = { # FLASH01
-      #       label = "flash"
-      #       type  = "gp3"
-      #       size  = 200
-      #     }
-      #     "/dev/sds" = {
-      #       label = "swap"
-      #       type  = "gp3"
-      #       size  = 2
-      #     }
-      #   }
-      #   ebs_volume_config = {
-      #     data = {
-      #       iops       = 3000 # min 3000
-      #       type       = "gp3"
-      #       throughput = 125
-      #       total_size = 200
-      #     }
-      #     flash = {
-      #       iops       = 3000 # min 3000
-      #       type       = "gp3"
-      #       throughput = 125
-      #       total_size = 50
-      #     }
-      #   }
-      #   tags = merge(local.database_b.tags, {
-      #     bip-db-name = "PPBIPINF"
-      #     oracle-sids = "PPBIPINF PPOASYS"
-      #   })
-      # })
 
       "pp-onr-db-a" = merge(local.database_onr_a, {
         config = merge(local.database_onr_a.config, {
@@ -216,7 +155,7 @@ locals {
         })
       })
 
-      "pp-${local.application_name}-bip-a" = merge(local.bip_a, {
+      "pp-oasys-bip-a" = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
           instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
             "Ec2PreprodBipPolicy",
@@ -233,12 +172,12 @@ locals {
 
 
     baseline_ec2_autoscaling_groups = {
-      "pp-${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(local.webserver_a.config, {
+      "pp-oasys-web-a" = merge(local.webserver, {
+        config = merge(local.webserver.config, {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-pp/"
           iam_resource_names_prefix = "ec2-web-pp"
-          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
             "Ec2PreprodWebPolicy",
           ])
         })
@@ -251,7 +190,7 @@ locals {
             recurrence       = "0 19 * * Mon-Fri"
           }
         }
-        tags = merge(local.webserver_a.tags, {
+        tags = merge(local.webserver.tags, {
           oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
           oracle-db-sid      = "PPOASYS" # "OASPROD"
         })
@@ -261,7 +200,7 @@ locals {
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
     # if making changes, comment out the listeners that use the cert, edit the cert, recreate the listeners
     baseline_acm_certificates = {
-      "pp_${local.application_name}_cert" = {
+      "pp_oasys_cert" = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
         domain_name = "pp.oasys.service.justice.gov.uk"
@@ -274,7 +213,7 @@ locals {
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
-          description = "cert for ${local.application_name} ${local.environment} domains"
+          description = "cert for oasys ${local.environment} domains"
         }
       }
     }
@@ -299,7 +238,7 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["pp_${local.application_name}_cert"]
+            certificate_names_or_arns = ["pp_oasys_cert"]
             default_action = {
               type = "fixed-response"
               fixed_response = {
@@ -310,14 +249,14 @@ locals {
             }
             # default_action = {
             #   type              = "forward"
-            #   target_group_name = "pp-${local.application_name}-web-a-pb-http-8080"
+            #   target_group_name = "pp-oasys-web-a-pb-http-8080"
             # }
             rules = {
               pp-web-http-8080 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pp-${local.application_name}-web-a-pb-http-8080"
+                  target_group_name = "pp-oasys-web-a-pb-http-8080"
                 }]
                 conditions = [
                   {
@@ -331,22 +270,6 @@ locals {
                   }
                 ]
               }
-              # pp-web-b-http-8080 = {
-              #   priority = 200
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "pp-${local.application_name}-web-b-pb-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "pp-b.oasys.service.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
             }
           }
         }
@@ -367,7 +290,7 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["pp_${local.application_name}_cert"]
+            certificate_names_or_arns = ["pp_oasys_cert"]
             default_action = {
               type = "redirect"
               redirect = {
@@ -387,14 +310,14 @@ locals {
             # }
             # default_action = {
             #   type              = "forward"
-            #   target_group_name = "pp-${local.application_name}-web-a-pv-http-8080"
+            #   target_group_name = "pp-oasys-web-a-pv-http-8080"
             # }
             rules = {
               pp-web-http-8080 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pp-${local.application_name}-web-a-pv-http-8080"
+                  target_group_name = "pp-oasys-web-a-pv-http-8080"
                 }]
                 conditions = [
                   {
@@ -409,22 +332,6 @@ locals {
                   }
                 ]
               }
-              # pp-web-b-http-8080 = {
-              #   priority = 200
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "pp-${local.application_name}-web-b-pv-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "pp-b-int.oasys.service.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
             }
           }
         }
@@ -435,38 +342,24 @@ locals {
       #
       # public
       #
-      # "${local.application_name}.service.justice.gov.uk" = {
-      #   lb_alias_records = [
-      # { name = "pp",    type = "A", lbs_map_key = "public" }, #    pp.oasys.service.justice.gov.uk 
-      # { name = "db.pp", type = "A", lbs_map_key = "public" }, # db.pp.oasys.service.justice.gov.uk
-      #   ]
-      # }
-      (module.environment.domains.public.business_unit_environment) = { # hmpps-preproduction.modernisation-platform.service.justice.gov.uk
+      "hmpps-preproduction.modernisation-platform.service.justice.gov.uk" = { 
         records = [
-          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.pp.oasys", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
-        # lb_alias_records = [
-        #   { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },     # pp.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk
-        #   { name = "web.pp.${local.application_name}", type = "A", lbs_map_key = "public" }, # web.pp.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk
-        #   { name = "db.pp.${local.application_name}", type = "A", lbs_map_key = "public" },
-        # ]
       }
       #
       # internal/private
       #
-      (module.environment.domains.internal.business_unit_environment) = { # hmpps-preproduction.modernisation-platform.internal
-        vpc = {                                                           # this makes it a private hosted zone
+      "hmpps-preproduction.modernisation-platform.internal" = {
+        vpc = {  # this makes it a private hosted zone
           id = module.environment.vpc.id
         }
         records = [
-          # { name = "db.pp.${local.application_name}", type = "A", ttl = "3600", records = ["10.40.40.133"] }, # for azure 
-          { name = "db.pp.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] }, # for aws
-          { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },                         # for aws
+          { name = "db.pp.oasys", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },
+          { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },
         ]
         lb_alias_records = [
-          # { name = "pp.${local.application_name}", type = "A", lbs_map_key = "public" },
-          # { name = "web.pp.${local.application_name}", type = "A", lbs_map_key = "public" },
         ]
       }
     }
