@@ -1,5 +1,5 @@
 # CloudWatch Observability Access Manager
-# The sink ID is stored in an SSM parameter
+# See baseline module oam.tf for documentation
 
 locals {
   oam_links = {
