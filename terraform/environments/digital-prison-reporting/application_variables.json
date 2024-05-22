@@ -86,6 +86,7 @@
       "create_glue_registries": false,
       "setup_s3_buckets": true,
       "create_glue_connections": false,
+      "kinesis_agent_autoscale": false,
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
