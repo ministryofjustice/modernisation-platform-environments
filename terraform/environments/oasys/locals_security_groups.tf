@@ -36,7 +36,6 @@ locals {
     https_internal = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       "10.0.0.0/8",
-      # module.ip_addresses.azure_studio_hosting_cidrs.prod,
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
@@ -70,7 +69,6 @@ locals {
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https_internal = flatten([
       "10.0.0.0/8",
-      # module.ip_addresses.azure_studio_hosting_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     https_external = flatten([
@@ -261,9 +259,7 @@ locals {
           to_port     = "22"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.ssh
-          security_groups = [
-            # "bastion-linux",
-          ]
+          security_groups = []
         }
         http8080 = {
           description = "Allow http 8080 ingress"
@@ -273,9 +269,7 @@ locals {
           cidr_blocks = local.security_group_cidrs.oracle_db
           security_groups = [
             "private_lb",
-            # "private-jumpserver",
             "private_web",
-            # "bastion-linux",
           ]
         }
         oracle1521 = {
@@ -288,7 +282,6 @@ locals {
             "private_lb",
             "bip",
             "private_web",
-            # "bastion-linux",
           ]
         }
         oracle3872 = {
