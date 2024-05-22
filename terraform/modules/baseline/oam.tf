@@ -40,7 +40,7 @@
 resource "aws_oam_link" "this" {
   for_each = var.oam_links
 
-  label_template  = each.key
+  label_template  = each.value.label_template
   resource_types  = each.value.resource_types
   sink_identifier = aws_ssm_parameter.placeholder[each.value.sink_identifier_ssm_parameter_name].value
 

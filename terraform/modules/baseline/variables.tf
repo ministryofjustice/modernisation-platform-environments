@@ -827,6 +827,7 @@ variable "kms_grants" {
 variable "oam_links" {
   description = "map of aws_oam_link resources to create where the map key is the label_template and tag.Name"
   type = map(object({
+    label_template                     = string
     resource_types                     = list(string) # e.g. ["AWS::CloudWatch::Metric"]
     sink_identifier_ssm_parameter_name = string
   }))
