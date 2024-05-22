@@ -40,16 +40,16 @@ resource "aws_s3_bucket" "dms_dv_glue_job_s3_bucket" {
 
 # resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
 #   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-#   key    = "dms_dv_rds_and_s3_csv.py"
-#   source = "glue-job/dms_dv_rds_and_s3_csv.py"
-#   etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv.py")
+#   key    = "dms_dv_rds_and_s3_csv_checkpoint.py"
+#   source = "glue-job/dms_dv_rds_and_s3_csv_checkpoint.py"
+#   etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv_checkpoint.py")
 # }
 
 resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-  key    = "dms_dv_rds_and_s3_csv_table.py"
-  source = "glue-job/dms_dv_rds_and_s3_csv_table.py"
-  etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv_table.py")
+  key    = "dms_dv_rds_and_s3_csv_write.py"
+  source = "glue-job/dms_dv_rds_and_s3_csv_write.py"
+  etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv_write.py")
 }
 
 resource "aws_s3_object" "catalog_dv_table_glue_job_s3_object" {
@@ -109,13 +109,13 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 #     "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
 #     "--enable-metrics"                   = "true"
 #     "--enable-auto-scaling"              = "true"
-#     "--conf"                             = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=2g"
+#     "--conf"                             = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=1g spark.sql.adaptive.enabled=true --conf spark.sql.adaptive.coalescePartitions.enabled=true --conf spark.sql.adaptive.skewJoin.enabled=true"
 #   }
 
 #   connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
 #   command {
 #     python_version  = "3"
-#     script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv.py"
+#     script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv_checkpoint.py"
 #   }
 
 #   tags = merge(
@@ -138,6 +138,8 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
     "--rds_sqlserver_dbs"                = ""
     "--rds_sqlserver_tbls"               = ""
+    "--repartition_factor"               = 8
+    "--max_table_size_mb"                = 2000
     "--csv_src_bucket_name"              = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"             = "${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}"
@@ -150,13 +152,13 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
     "--enable-metrics"                   = "true"
     "--enable-auto-scaling"              = "true"
-    "--conf"                             = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=1g"
+    "--conf"                             = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=1g --conf spark.sql.adaptive.enabled=true --conf spark.sql.adaptive.coalescePartitions.enabled=true --conf spark.sql.adaptive.skewJoin.enabled=true"
   }
 
   connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv_table.py"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv_write.py"
   }
 
   tags = merge(
