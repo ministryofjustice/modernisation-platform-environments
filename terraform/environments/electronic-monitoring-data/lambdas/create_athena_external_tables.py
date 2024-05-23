@@ -62,7 +62,18 @@ def handler(event, context):
     engine = create_engine("mssql+pyodbc://", creator=lambda: conn)
     sqlc = SQLAlchemyConverter(engine)
     metadata_list = sqlc.generate_to_meta_list(schema="dbo")
+
+    created_tables = []
     for meta in metadata_list:
         meta.file_format = "csv"
-        create_glue_database(meta)
-    return "done"
+        boto_dict = create_glue_database(meta)
+        created_tables.append(boto_dict["TableInput"]["Name"])
+
+    result = {
+        "status": "success",
+        "message": f"Created {len(created_tables)} tables in Glue",
+        "created_tables": created_tables,
+    }
+
+    logger.info(result)
+    return result
