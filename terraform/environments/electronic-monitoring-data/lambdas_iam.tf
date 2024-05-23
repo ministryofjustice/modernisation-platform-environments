@@ -45,18 +45,14 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
             actions   = ["secretsmanager:GetSecretValue"]
             resources = [aws_secretsmanager_secret_version.db_glue_connection.arn]
         }
-    # statement {
-    #         sid       = "RDSDataServiceAccess"
-    #         effect    = "Allow"
-    #         actions   = [
-    #             "rds-data:BatchExecuteStatement",
-    #             "rds-data:BeginTransaction",
-    #             "rds-data:CommitTransaction",
-    #             "rds-data:ExecuteStatement",
-    #             "rds-data:RollbackTransaction"
-    #         ]
-    #         resources = ["arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:cluster:prod"]
-    #     }
+    statement {
+            sid       = "TriggerLambda"
+            effect    = "Allow"
+            actions   = [
+                "lambda:InvokeFunction"
+            ]
+            resources = [aws_lambda_function.create_athena_external_table.arn]
+        }
 
     statement {
         effect = "Allow"
