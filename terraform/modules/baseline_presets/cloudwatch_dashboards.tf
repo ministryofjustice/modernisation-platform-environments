@@ -2,6 +2,18 @@ locals {
 
   cloudwatch_dashboard_widgets = {
 
+    EC2GraphedMetricsHeading = {
+      type   = "text"
+      x      = 0
+      y      = 0
+      width  = 24
+      height = 1
+      properties = {
+        markdown   = "## EC2 Graphed Metrics"
+        background = "solid"
+      }
+    }
+
     EC2CPUUtil = {
       type   = "metric"
       x      = 0
@@ -15,7 +27,9 @@ locals {
         title   = "Top 5 instances by highest CPU Utilization %"
         stat    = "Maximum"
         metrics = [
-          [{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 5", "label" : "", "id" : "q1" }]
+          ["AWS/EC2", "CPUUtilization", "InstanceId", "*", { "id" : "m1", "visible" : false }],
+
+          #[{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 5", "label" : "", "id" : "q1" }]
         ]
       }
     }
@@ -215,18 +229,6 @@ locals {
       }
     }
 
-    EC2GraphedMetricsHeading = {
-      type   = "text"
-      x      = 0
-      y      = 0
-      width  = 24
-      height = 1
-      properties = {
-        markdown   = "## EC2 Graphed Metrics"
-        background = "solid"
-      }
-    }
-
     EBSGraphedMetricsHeading = {
       type   = "text"
       x      = 0
@@ -243,6 +245,7 @@ locals {
 
   cloudwatch_dashboards = {
     "CloudWatch-Default" = {
+      periodOverride = "auto"
       widgets = [
         local.cloudwatch_dashboard_widgets.EC2CPUUtil,
         local.cloudwatch_dashboard_widgets.EC2MemoryUtil,
