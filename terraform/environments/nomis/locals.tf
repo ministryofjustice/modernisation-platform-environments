@@ -28,6 +28,7 @@ locals {
     enable_ec2_self_provision                    = true
     enable_ec2_oracle_enterprise_managed_server  = true
     enable_ec2_user_keypair                      = true
+    cloudwatch_dashboards                        = ["CloudWatch-Default"]
     cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
     cloudwatch_metric_oam_links_ssm_parameters   = ["hmpps-oem-${local.environment}"]
     #cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
