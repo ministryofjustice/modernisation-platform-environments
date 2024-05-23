@@ -24,13 +24,23 @@ locals {
         view    = "timeSeries"
         stacked = false
         region  = "eu-west-2"
-        title   = "Top 5 instances by highest CPU Utilization %"
+        title   = "Top instances by highest CPU Utilization %"
         stat    = "Maximum"
         metrics = [
-          ["AWS/EC2", "CPUUtilization", "InstanceId", "*", { "id" : "m1", "visible" : false }],
-
-          #[{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 5", "label" : "", "id" : "q1" }]
+          [{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 20", "label" : "", "id" : "q1" }]
         ]
+        annotations = {
+          horizontal = [
+            {
+              visible = true,
+              color   = "#9467bd"
+              label   = "Alarm threshold"
+              value   = 95
+              fill    = above
+              yAxis   = right
+            }
+          ]
+        }
       }
     }
 
@@ -41,13 +51,13 @@ locals {
       width  = 6
       height = 8
       properties = {
-        view    = "bar"
+        view    = "timeSeries"
         stacked = false
         region  = "eu-west-2"
         title   = "EC2 Memory Utilization %"
         stat    = "Maximum"
         metrics = [
-          [{ "expression" : "SELECT MAX(mem_used_percent) FROM SCHEMA(CWAgent, InstanceId,name,server_type) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
+          [{ "expression" : "SELECT MAX(mem_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
         ]
       }
     }
@@ -66,6 +76,24 @@ locals {
         stat    = "Maximum"
         metrics = [
           [{ "expression" : "SELECT MAX(disk_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    EC2CPUIOWait = {
+      type   = "metric"
+      x      = 13
+      y      = 1
+      width  = 6
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "EC2 Disk Used %"
+        stat    = "Maximum"
+        metrics = [
+          [{ "expression" : "SELECT MAX(cpu_usage_iowait) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
         ]
       }
     }
@@ -246,6 +274,7 @@ locals {
   cloudwatch_dashboards = {
     "CloudWatch-Default" = {
       periodOverride = "auto"
+      start          = "-PT6H"
       widgets = [
         local.cloudwatch_dashboard_widgets.EC2CPUUtil,
         local.cloudwatch_dashboard_widgets.EC2MemoryUtil,
