@@ -29,6 +29,8 @@ locals {
     enable_ec2_oracle_enterprise_managed_server  = true
     enable_ec2_user_keypair                      = true
     cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
+    cloudwatch_metric_oam_links_ssm_parameters   = ["hmpps-oem-${local.environment}"]
+    #cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
     }
@@ -61,6 +63,8 @@ locals {
   baseline_key_pairs                = {}
   baseline_kms_grants               = {}
   baseline_lbs                      = {}
+  baseline_oam_links                = {}
+  baseline_oam_sinks                = {}
   baseline_route53_resolvers        = {}
 
   baseline_route53_zones = {

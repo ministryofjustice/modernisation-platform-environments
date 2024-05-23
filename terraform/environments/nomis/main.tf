@@ -138,6 +138,17 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_lbs", {})
   )
 
+  oam_links = merge(
+    module.baseline_presets.oam_links,
+    local.baseline_oam_links,
+    lookup(local.baseline_environment_config, "baseline_oam_links", {})
+  )
+
+  oam_sinks = merge(
+    local.baseline_oam_sinks,
+    lookup(local.baseline_environment_config, "baseline_oam_sinks", {})
+  )
+
   route53_resolvers = merge(
     module.baseline_presets.route53_resolvers,
     local.baseline_route53_resolvers,
@@ -177,17 +188,6 @@ module "baseline" {
     local.baseline_ssm_parameters,
     lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
   )
-}
-
-module "cross_account_cloudwatch" {
-  source      = "../../modules/cross_account_cloudwatch"
-  environment = module.environment
-  options = merge(
-    local.cloudwatch_monitoring_options,
-    local.cloudwatch_local_environment_monitoring_options,
-  )
-  monitoring_account_id = lookup(local.cloudwatch_local_environment_monitoring_options, "monitoring_account_id", "")
-  source_account_ids    = lookup(local.cloudwatch_local_environment_monitoring_options, "source_account_ids", [])
 }
 
 module "cloudwatch" {

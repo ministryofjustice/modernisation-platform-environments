@@ -104,8 +104,25 @@ locals {
   baseline_key_pairs                = {}
   baseline_kms_grants               = {}
   baseline_lbs                      = {}
-  baseline_route53_resolvers        = {}
-  baseline_route53_zones            = {}
+
+  baseline_oam_sinks = {
+    "CloudWatchMetricOamSink" = {
+      resource_types = ["AWS::CloudWatch::Metric"]
+      source_account_names = [
+        "corporate-staff-rostering-${local.environment}",
+        "hmpps-domain-services-${local.environment}",
+        "nomis-${local.environment}",
+        "nomis-combined-reporting-${local.environment}",
+        "nomis-data-hub-${local.environment}",
+        "oasys-${local.environment}",
+        "oasys-national-reporting-${local.environment}",
+        "planetfm-${local.environment}",
+      ]
+    }
+  }
+
+  baseline_route53_resolvers = {}
+  baseline_route53_zones     = {}
 
   baseline_s3_buckets = {
     s3-bucket = {
