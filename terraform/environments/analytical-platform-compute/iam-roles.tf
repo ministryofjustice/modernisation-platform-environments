@@ -127,3 +127,24 @@ module "cluster_autoscaler_iam_role" {
 
   tags = local.tags
 }
+
+module "external_dns_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.39.1"
+
+  role_name_prefix              = "external-dns"
+  attach_external_dns_policy    = true
+  external_dns_hosted_zone_arns = [module.route53_zones.route53_zone_zone_arn[local.environment_configuration.route53_zone]]
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:external-dns"]
+    }
+  }
+
+  tags = local.tags
+}
