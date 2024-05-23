@@ -138,6 +138,17 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_lbs", {})
   )
 
+  oam_links = merge(
+    module.baseline_presets.oam_links,
+    local.baseline_oam_links,
+    lookup(local.baseline_environment_config, "baseline_oam_links", {})
+  )
+
+  oam_sinks = merge(
+    local.baseline_oam_sinks,
+    lookup(local.baseline_environment_config, "baseline_oam_sinks", {})
+  )
+
   route53_resolvers = merge(
     module.baseline_presets.route53_resolvers,
     local.baseline_route53_resolvers,

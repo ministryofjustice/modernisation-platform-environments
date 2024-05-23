@@ -84,6 +84,16 @@ output "lbs" {
   }
 }
 
+output "oam_links" {
+  description = "map of aws_oam_link resources corresponding to var.oam_links"
+  value       = aws_oam_link.this
+}
+
+output "oam_sinks" {
+  description = "map of aws_oam_sink resources corresponding to var.oam_sinks"
+  value       = aws_oam_sink.this
+}
+
 output "route53_resolvers_security_group" {
   description = "security group used for route53 resolvers"
   value       = length(aws_security_group.route53_resolver) != 0 ? aws_security_group.route53_resolver[0] : null
