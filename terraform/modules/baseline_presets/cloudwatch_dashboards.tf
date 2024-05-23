@@ -2,10 +2,148 @@ locals {
 
   cloudwatch_dashboard_widgets = {
 
-    EC2GraphedMetricsHeading = {
+    LoadBalancerGraphedMetricsHeading = {
       type   = "text"
       x      = 0
       y      = 0
+      width  = 24
+      height = 1
+      properties = {
+        markdown   = "## LoadBalancer Graphed Metrics"
+        background = "solid"
+      }
+    }
+
+    LoadBalancerRequestCount = {
+      type   = "metric"
+      x      = 0
+      y      = 1
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Sum LoadBalancer Requests"
+        stat    = "Sum"
+        metrics = [
+          [{ "expression" : "SELECT SUM(RequestCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    LoadBalancerHTTP4XXsCount = {
+      type   = "metric"
+      x      = 8
+      y      = 1
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Sum LoadBalancer HTTP 4XXs"
+        stat    = "Sum"
+        metrics = [
+          [{ "expression" : "SELECT SUM(HTTPCode_ELB_4XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    LoadBalancerHTTP5XXsCount = {
+      type   = "metric"
+      x      = 16
+      y      = 1
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Sum LoadBalancer HTTP 5XXs"
+        stat    = "Sum"
+        metrics = [
+          [{ "expression" : "SELECT SUM(HTTPCode_ELB_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    LoadBalancerUnhealthyTargets = {
+      type   = "metric"
+      x      = 0
+      y      = 9
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Max LoadBalancer Unhealthy Targets"
+        stat    = "Maximum"
+        metrics = [
+          [{ "expression" : "SELECT MAX(UnHealthyHostCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    LoadBalancerAverageTargetResponseTime = {
+      type   = "metric"
+      x      = 8
+      y      = 9
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Average LoadBalancer Target Response Time"
+        stat    = "Average"
+        metrics = [
+          [{ "expression" : "SELECT AVG(TargetResponseTime) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    LoadBalancerMaximumTargetResponseTime = {
+      type   = "metric"
+      x      = 16
+      y      = 9
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Max LoadBalancer Target Response Time"
+        stat    = "Maximum"
+        metrics = [
+          [{ "expression" : "SELECT MAX(TargetResponseTime) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    ACMCertificateDaysToExpiry = {
+      type   = "metric"
+      x      = 0
+      y      = 17
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Min ACM Certificate Days To Expiry"
+        stat    = "Minimum"
+        metrics = [
+          [{ "expression" : "SELECT MIN(DaysToExpiry) FROM SCHEMA(\"AWS/CertificateManager\", CertificateArn) GROUP BY CertificateArn ORDER BY MIN() DESC", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    EC2GraphedMetricsHeading = {
+      type   = "text"
+      x      = 0
+      y      = 25
       width  = 24
       height = 1
       properties = {
@@ -14,47 +152,108 @@ locals {
       }
     }
 
-    EC2CPUUtil = {
+    EC2CPUUtilization = {
       type   = "metric"
       x      = 0
-      y      = 1
-      width  = 7
+      y      = 26
+      width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
         stacked = false
         region  = "eu-west-2"
-        title   = "Top instances by highest CPU Utilization %"
+        title   = "Max EC2 CPU Utilization %"
         stat    = "Maximum"
         metrics = [
-          [{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 20", "label" : "", "id" : "q1" }]
+          [{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
         ]
-        annotations = {
-          horizontal = [
-            {
-              visible = true
-              color   = "#9467bd"
-              label   = "Alarm threshold"
-              value   = 95
-              fill    = "above"
-              yAxis   = "right"
-            }
-          ]
-        }
       }
     }
 
-    EC2MemoryUtil = {
+    EC2InstanceStatus = {
       type   = "metric"
-      x      = 7
-      y      = 1
-      width  = 6
+      x      = 8
+      y      = 26
+      width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
         stacked = false
         region  = "eu-west-2"
-        title   = "EC2 Memory Utilization %"
+        title   = "EC2 Instance Status"
+        stat    = "Maximum"
+        metrics = [
+          [{ "expression" : "SELECT MAX(StatusCheckFailed_Instance)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    EC2SystemStatus = {
+      type   = "metric"
+      x      = 16
+      y      = 26
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "EC2 System Status"
+        stat    = "Maximum"
+        metrics = [
+          [{ "expression" : "SELECT MAX(StatusCheckFailed_Instance)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 20", "label" : "", "id" : "q1" }],
+          [{ "expression" : "SELECT MAX(StatusCheckFailed_System)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 20", "label" : "", "id" : "q1" }]
+        ]
+      }
+    }
+
+    EC2WindowsMemoryUtilization = {
+      type   = "metric"
+      x      = 0
+      y      = 34
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Max EC2 Windows Memory Utilization %"
+        stat    = "Maximum"
+        metrics = [
+          [{ "expression" : "SELECT MAX(Memory % Committed Bytes In Use) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
+        ]
+      }
+    }
+
+    EC2WindowsDiskFree = {
+      type   = "metric"
+      x      = 8
+      y      = 34
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Min EC2 Windows Disk Free %"
+        stat    = "Minimum"
+        metrics = [
+          [{ "expression" : "SELECT MIN(DISK_FREE) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MIN() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
+        ]
+      }
+    }
+
+    EC2LinuxMemoryUtilization = {
+      type   = "metric"
+      x      = 0
+      y      = 42
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Max EC2 Linux Memory Utilization %"
         stat    = "Maximum"
         metrics = [
           [{ "expression" : "SELECT MAX(mem_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
@@ -62,17 +261,17 @@ locals {
       }
     }
 
-    EC2DiskUsed = {
+    EC2LinuxDiskUsed = {
       type   = "metric"
-      x      = 13
-      y      = 1
-      width  = 6
+      x      = 8
+      y      = 42
+      width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
         stacked = false
         region  = "eu-west-2"
-        title   = "EC2 Disk Used %"
+        title   = "Max EC2 Linux Disk Used %"
         stat    = "Maximum"
         metrics = [
           [{ "expression" : "SELECT MAX(disk_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
@@ -80,17 +279,17 @@ locals {
       }
     }
 
-    EC2CPUIOWait = {
+    EC2LinuxCPUIOWait = {
       type   = "metric"
-      x      = 13
-      y      = 1
-      width  = 6
+      x      = 16
+      y      = 42
+      width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
         stacked = false
         region  = "eu-west-2"
-        title   = "EC2 Disk Used %"
+        title   = "Max EC2 Linux CPU Usage IOWait %"
         stat    = "Maximum"
         metrics = [
           [{ "expression" : "SELECT MAX(cpu_usage_iowait) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
@@ -98,66 +297,24 @@ locals {
       }
     }
 
-    LoadBalancerTargetResponseTime = {
-      type   = "metric"
+    EBSGraphedMetricsHeading = {
+      type   = "text"
       x      = 0
-      y      = 10
-      width  = 7
-      height = 8
+      y      = 43
+      width  = 24
+      height = 1
       properties = {
-        view    = "timeSeries"
-        stacked = true
-        region  = "eu-west-2"
-        title   = "LoadBalancer Target Response Time"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(TargetResponseTime) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer,TargetGroup) GROUP BY TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
-        ]
-      }
-    }
-
-    LoadBalancerRequestCount = {
-      type   = "metric"
-      x      = 7
-      y      = 10
-      width  = 6
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = true
-        region  = "eu-west-2"
-        title   = "LoadBalancer Request Count"
-        stat    = "Sum"
-        metrics = [
-          [{ "expression" : "SELECT COUNT(RequestCount) FROM \"AWS/ApplicationELB\" GROUP BY LoadBalancer ORDER BY COUNT() DESC", "label" : "", "id" : "q1" }]
-        ]
-      }
-    }
-
-    LoadBalancerHTTP5XXsCount = {
-      type   = "metric"
-      x      = 13
-      y      = 10
-      width  = 6
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = true
-        region  = "eu-west-2"
-        title   = "LoadBalancer HTTP 5XXs Count"
-        stat    = "Sum"
-        metrics = [
-          [{ "expression" : "SELECT COUNT(HTTPCode_ELB_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", AvailabilityZone,LoadBalancer,TargetGroup) GROUP BY LoadBalancer ORDER BY COUNT() DESC", "label" : "", "id" : "q1" }]
-        ]
+        markdown   = "## EBS Volume Graphed Metrics"
+        background = "solid"
       }
     }
 
     EBSVolumeDiskIOPS = {
       type   = "metric"
       x      = 0
-      y      = 19
-      width  = 12
-      height = 6
+      y      = 44
+      width  = 8
+      height = 8
       properties = {
         view    = "timeSeries"
         stacked = false
@@ -168,18 +325,18 @@ locals {
           [{ "expression" : "m1/PERIOD(m1)", "label" : "Read IOPs", "id" : "e1" }],
           [{ "expression" : "m2/PERIOD(m2)", "label" : "Write IOPs", "id" : "e2" }],
           [{ "expression" : "e1+e2", "label" : "Total IOPs", "id" : "e3" }],
-          ["AWS/EBS", "VolumeReadOps", "VolumeId", "*", { "id" : "m1", "visible" : false }],
-          ["AWS/EBS", "VolumeWriteOps", "VolumeId", "*", { "id" : "m2", "visible" : false }]
+          ["AWS/EBS", "VolumeReadOps", "*", { "id" : "m1", "visible" : false }],
+          ["AWS/EBS", "VolumeWriteOps", "*", { "id" : "m2", "visible" : false }]
         ]
       }
     }
 
     EBSVolumeDiskThroughput = {
       type   = "metric"
-      x      = 0
-      y      = 25
-      width  = 12
-      height = 6
+      x      = 8
+      y      = 44
+      width  = 8
+      height = 8
       properties = {
         view    = "timeSeries"
         stacked = false
@@ -195,99 +352,35 @@ locals {
         ]
       }
     }
-
-    AllEBSVolumeStats = {
-      type   = "explorer"
-      x      = 0
-      y      = 31
-      width  = 24
-      height = 15
-      properties = {
-        region = "eu-west-2"
-        title  = "All EBS Volume Stats"
-        stat   = "Sum"
-        widgetOptions = {
-          view          = "timeSeries"
-          stacked       = false
-          rowsPerPage   = 50
-          widgetsPerRow = 2
-        }
-        labels = [
-          { key : "application", value : "${var.environment.application_name}" }
-        ]
-        metrics = [
-          {
-            "metricName" : "VolumeReadBytes",
-            "resourceType" : "AWS::EC2::Volume",
-            "stat" : "Sum"
-          },
-          {
-            "metricName" : "VolumeWriteBytes",
-            "resourceType" : "AWS::EC2::Volume",
-            "stat" : "Sum"
-          },
-          {
-            "metricName" : "VolumeIdleTime",
-            "resourceType" : "AWS::EC2::Volume",
-            "stat" : "Average"
-          },
-          {
-            "metricName" : "VolumeReadOps",
-            "resourceType" : "AWS::EC2::Volume",
-            "stat" : "Sum"
-          },
-          {
-            "metricName" : "VolumeWriteOps",
-            "resourceType" : "AWS::EC2::Volume",
-            "stat" : "Sum"
-          }
-        ]
-      }
-    }
-
-    LBGraphedMetricsHeading = {
-      type   = "text"
-      x      = 0
-      y      = 9
-      width  = 24
-      height = 1
-      properties = {
-        markdown   = "## LoadBalancer Graphed Metrics"
-        background = "solid"
-      }
-    }
-
-    EBSGraphedMetricsHeading = {
-      type   = "text"
-      x      = 0
-      y      = 18
-      width  = 24
-      height = 1
-      properties = {
-        markdown   = "## EBS Volume Graphed Metrics"
-        background = "solid"
-      }
-    }
-
   }
+
 
   cloudwatch_dashboards = {
     "CloudWatch-Default" = {
       periodOverride = "auto"
       start          = "-PT3H"
       widgets = [
-        local.cloudwatch_dashboard_widgets.EC2CPUUtil,
-        local.cloudwatch_dashboard_widgets.EC2MemoryUtil,
-        local.cloudwatch_dashboard_widgets.EC2DiskUsed,
-        local.cloudwatch_dashboard_widgets.LoadBalancerTargetResponseTime,
+        local.cloudwatch_dashboard_widgets.LoadBalancerGraphedMetricsHeading,
         local.cloudwatch_dashboard_widgets.LoadBalancerRequestCount,
+        local.cloudwatch_dashboard_widgets.LoadBalancerHTTP4XXsCount,
         local.cloudwatch_dashboard_widgets.LoadBalancerHTTP5XXsCount,
+        local.cloudwatch_dashboard_widgets.LoadBalancerUnhealthyTargets,
+        local.cloudwatch_dashboard_widgets.LoadBalancerAverageTargetResponseTime,
+        local.cloudwatch_dashboard_widgets.LoadBalancerMaximumTargetResponseTime,
+        local.cloudwatch_dashboard_widgets.ACMCertificateDaysToExpiry,
+        local.cloudwatch_dashboard_widgets.EC2GraphedMetricsHeading,
+        local.cloudwatch_dashboard_widgets.EC2CPUUtilization,
+        local.cloudwatch_dashboard_widgets.EC2InstanceStatus,
+        local.cloudwatch_dashboard_widgets.EC2SystemStatus,
+
+        local.cloudwatch_dashboard_widgets.EC2WindowsMemoryUtilization,
+        local.cloudwatch_dashboard_widgets.EC2WindowsDiskFree,
+        local.cloudwatch_dashboard_widgets.EC2LinuxMemoryUtilization,
+        local.cloudwatch_dashboard_widgets.EC2LinuxDiskUsed,
+        local.cloudwatch_dashboard_widgets.EC2LinuxCPUIOWait,
+        local.cloudwatch_dashboard_widgets.EBSGraphedMetricsHeading,
         local.cloudwatch_dashboard_widgets.EBSVolumeDiskIOPS,
         local.cloudwatch_dashboard_widgets.EBSVolumeDiskThroughput,
-        local.cloudwatch_dashboard_widgets.AllEBSVolumeStats,
-        local.cloudwatch_dashboard_widgets.LBGraphedMetricsHeading,
-        local.cloudwatch_dashboard_widgets.EC2GraphedMetricsHeading,
-        local.cloudwatch_dashboard_widgets.EBSGraphedMetricsHeading,
       ]
     }
   }
