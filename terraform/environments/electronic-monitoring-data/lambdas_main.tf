@@ -66,7 +66,7 @@ resource "aws_lambda_function" "create_athena_external_table" {
       aws_lambda_layer_version.create_external_athena_tables_layer.arn
       ]
     source_code_hash = data.archive_file.create_athena_external_table.output_base64sha256
-    # depends_on    = [aws_cloudwatch_log_group.create_athena_external_tables_lambda]
+    depends_on    = [aws_cloudwatch_log_group.create_athena_external_table_lambda]
     timeout = 200
     runtime = "python3.11"
     vpc_config {

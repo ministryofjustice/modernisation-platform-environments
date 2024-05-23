@@ -40,7 +40,7 @@ def create_glue_table(metadata):
 
 
 def handler(event, context):
-    meta = Metadata.from_dict(event)
+    meta = Metadata.from_dict(eval(event["Body"]["Payload"]))
     boto_dict = create_glue_table(meta)
     table_name = boto_dict["TableInput"]["Name"]
     result = {

@@ -1,6 +1,5 @@
 import awswrangler as wr
 from mojap_metadata.converters.sqlalchemy_converter import SQLAlchemyConverter
-from mojap_metadata.converters.glue_converter import GlueConverter, GlueConverterOptions
 from sqlalchemy import create_engine
 import os
 from logging import getLogger
@@ -40,27 +39,6 @@ def create_glue_database():
     wr.catalog.create_database(name=db_sem_name, exist_ok=True)
 
 
-def create_glue_table(metadata):
-    table_name = metadata.name
-    logger.info(f"Table Name: {table_name}")
-    try:
-        # Delete table
-        wr.catalog.delete_table_if_exists(database=db_sem_name, table=table_name)
-        logger.info(f"Delete table {table_name} in database {db_sem_name}")
-    except s3.exceptions.from_code("EntityNotFoundException"):
-        logger.info(f"Database '{db_sem_name}' table '{table_name}' does not exist")
-    options = GlueConverterOptions()
-    options.csv.skip_header = True
-    gc = GlueConverter(options)
-    boto_dict = gc.generate_from_meta(
-        metadata,
-        database_name=db_sem_name,
-        table_location=f"s3://{db_path}/{table_name}",
-    )
-    glue_client.create_table(**boto_dict)
-    return boto_dict
-
-
 def handler(event, context):
     conn = get_rds_connection()
     engine = create_engine("mssql+pyodbc://", creator=lambda: conn)
@@ -70,13 +48,17 @@ def handler(event, context):
     created_tables = []
     for meta in metadata_list:
         meta.file_format = "csv"
-        meta_dict = meta.to_dict()
-        lambda_client.invoke(
+        meta_dict = str(meta.to_dict())
+        response = lambda_client.invoke(
             FunctionName="create_athena_external_table",
             InvocationType="Event",
             Payload=meta_dict,
         )
-        created_tables.append(meta.name)
+        if response.StatusCode == 200:
+            created_tables.append(meta.name)
+        else:
+            logger.error("didnt work")
+            raise Exception
 
     result = {
         "status": "success",
