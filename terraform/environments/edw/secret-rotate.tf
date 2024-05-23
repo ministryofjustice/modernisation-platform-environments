@@ -69,7 +69,7 @@ resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
 
 
 # ##########################
-# ## AWS LAMBDA FUNCTION ###
+# ## AWS LAMBDA FUNCTION ### .
 # ##########################
 
 data "archive_file" "lambda_inline_code" {
