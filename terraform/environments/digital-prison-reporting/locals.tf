@@ -239,9 +239,10 @@ locals {
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
   # s3 transfer
-  scheduled_s3_file_transfer_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_days
-  scheduled_s3_file_transfer_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_schedule
-  enable_s3_file_transfer_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
+  scheduled_s3_file_transfer_retention_period_amount = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_amount
+  scheduled_s3_file_transfer_retention_period_unit   = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_unit
+  scheduled_s3_file_transfer_schedule                = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_schedule
+  enable_s3_file_transfer_trigger                    = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
 
   # step function notification lambda
   step_function_notification_lambda_handler = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
