@@ -56,7 +56,7 @@ module "oracle_db_primary" {
   subnet_id          = var.account_config.ordered_private_subnet_ids[count.index % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, count.index % 3, "a")}"
 
-  tags = local.tags
+  tags = merge(local.tags, { "Patch Group" = "oracle_db_patchgroup" })
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.db_config.ansible_user_data_config
@@ -104,7 +104,7 @@ module "oracle_db_standby" {
   environment_config = var.environment_config
   subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_primary)) % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_primary)) % 3, "a")}"
-  tags               = local.tags
+  tags = merge(local.tags, { "Patch Group" = "oracle_db_patchgroup" })
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.db_config.ansible_user_data_config
