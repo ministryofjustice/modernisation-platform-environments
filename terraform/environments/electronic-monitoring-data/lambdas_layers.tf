@@ -34,5 +34,5 @@ resource "aws_lambda_layer_version" "mojap_metadata_layer" {
     filename            = local.mojap_metadata.layer_zip_path
     layer_name          = local.mojap_metadata.layer_name
     compatible_runtimes = ["python3.11"]
-    # source_code_hash = filesha1(local.mojap_metadata.layer_zip_path)
+    source_code_hash = filesha1(local.mojap_metadata.layer_zip_path)
 }
