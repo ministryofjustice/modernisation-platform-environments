@@ -170,10 +170,12 @@ resource "aws_glue_job" "dms_dv_glue_job" {
 
 }
 resource "aws_glue_job" "catalog_dv_table_glue_job" {
-  name         = "catalog-dv-table-glue-job"
-  description  = "Python script uses Boto3-Athena-Client to run sql-statements"
-  role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
-  glue_version = "4.0"
+  name              = "catalog-dv-table-glue-job"
+  description       = "Python script uses Boto3-Athena-Client to run sql-statements"
+  role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
   default_arguments = {
     "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"             = "${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}"
