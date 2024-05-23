@@ -22,7 +22,7 @@ resource "aws_lambda_layer_version" "create_external_athena_tables_layer" {
 # --------------------------------------------------------------------------------------------------
 locals {
   mojap_metadata = {
-    layer_zip_name    = "mojap_metadata.zip"
+    layer_zip_name    = "mojap_metadata_v2.zip"
     layer_name        = "mojap_metadata"
     requirements_name = "mojap_metadata_requirements.txt"
     requirements_path = "${local.layer_path}/${local.requirements_name}"
