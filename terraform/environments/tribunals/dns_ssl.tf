@@ -371,8 +371,6 @@ resource "aws_route53_record" "external_tax_tribunal_decisions_sftp" {
   ttl             = 60
 }
 
-/////////
-
 resource "aws_route53_record" "external_ftp_admin_appeals" {
   provider = aws.core-vpc 
   zone_id = data.aws_route53_zone.external.zone_id
