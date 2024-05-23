@@ -75,4 +75,6 @@ resource "helm_release" "amazon_prometheus_proxy" {
       }
     )
   ]
+
+  depends_on = [module.amazon_prometheus_proxy_iam_role]
 }

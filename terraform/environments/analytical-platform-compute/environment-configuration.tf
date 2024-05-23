@@ -39,9 +39,9 @@ locals {
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.30.0-eksbuild.1"
+        aws_ebs_csi_driver     = "v1.31.0-eksbuild.1"
         aws_efs_csi_driver     = "v2.0.2-eksbuild.1"
-        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
+        aws_guardduty_agent    = "v1.6.1-eksbuild.1"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
         vpc_cni                = "v1.18.1-eksbuild.3"
       }
@@ -71,9 +71,9 @@ locals {
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.30.0-eksbuild.1"
+        aws_ebs_csi_driver     = "v1.31.0-eksbuild.1"
         aws_efs_csi_driver     = "v2.0.2-eksbuild.1"
-        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
+        aws_guardduty_agent    = "v1.6.1-eksbuild.1"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
         vpc_cni                = "v1.18.1-eksbuild.3"
       }
@@ -103,9 +103,9 @@ locals {
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.29.3-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.30.0-eksbuild.1"
+        aws_ebs_csi_driver     = "v1.31.0-eksbuild.1"
         aws_efs_csi_driver     = "v2.0.2-eksbuild.1"
-        aws_guardduty_agent    = "v1.5.0-eksbuild.1"
+        aws_guardduty_agent    = "v1.6.1-eksbuild.1"
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
         vpc_cni                = "v1.18.1-eksbuild.3"
       }
