@@ -30,7 +30,7 @@ locals {
     enable_ec2_user_keypair                      = true
     cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
     cloudwatch_metric_oam_links_ssm_parameters   = ["hmpps-oem-${local.environment}"]
-    cloudwatch_metric_oam_links                  = ["hmpps-oem-${local.environment}"]
+    #cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
     }
