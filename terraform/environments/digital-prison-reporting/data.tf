@@ -16,6 +16,19 @@ data "aws_secretsmanager_secret_version" "nomis" {
   depends_on = [aws_secretsmanager_secret.nomis]
 }
 
+# Nomis Source Secrets in format required by Athena Federated Query
+data "aws_secretsmanager_secret" "nomis_athena_federated" {
+  name = aws_secretsmanager_secret.nomis_athena_federated.id
+
+  depends_on = [aws_secretsmanager_secret_version.nomis_athena_federated]
+}
+
+data "aws_secretsmanager_secret_version" "nomis_athena_federated" {
+  secret_id = data.aws_secretsmanager_secret.nomis_athena_federated.id
+
+  depends_on = [aws_secretsmanager_secret.nomis_athena_federated]
+}
+
 # Source DataMart Secrets
 data "aws_secretsmanager_secret" "datamart" {
   name = aws_secretsmanager_secret.redshift.id
