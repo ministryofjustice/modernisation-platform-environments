@@ -44,7 +44,7 @@ module "dms_dev" {
   account_config = local.account_config
   account_info   = local.account_info
   tags           = local.tags
-  env_name       = "dev" # change me
+  env_name       = "dev"
   dms_config     = local.dms_config_dev
 
   providers = {

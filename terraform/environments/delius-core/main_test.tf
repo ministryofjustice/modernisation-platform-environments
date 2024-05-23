@@ -44,7 +44,7 @@ module "dms_test" {
   account_config = local.account_config
   account_info   = local.account_info
   tags           = local.tags
-  env_name       = "test" # change me
+  env_name       = "test"
   dms_config     = local.dms_config_test
 
   providers = {
