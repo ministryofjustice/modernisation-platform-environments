@@ -39,6 +39,12 @@ def create_glue_database(metadata):
     wr.catalog.create_database(name=db_sem_name, exist_ok=True)
     table_name = metadata.name
     logger.info(f"Table Name: {table_name}")
+    try:
+        # Delete table
+        wr.catalog.delete_table_if_exists(database=db_sem_name, table=table_name)
+        logger.info(f"Delete table {table_name} in database {db_sem_name}")
+    except s3.exceptions.from_code("EntityNotFoundException"):
+        logger.info(f"Database '{db_sem_name}' table '{table_name}' does not exist")
     options = GlueConverterOptions()
     options.csv.skip_header = True
     gc = GlueConverter(options)
