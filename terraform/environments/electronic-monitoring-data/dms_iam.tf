@@ -82,33 +82,3 @@ resource "aws_iam_role" "dms_vpc_role" {
 }
 
 # -------------------------------------------------------------
-
-resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
-  name               = "dms-dv-glue-job-tf"
-  assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole",
-    "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
-  ]
-  inline_policy {
-    name   = "DV-S3-Policies"
-    policy = data.aws_iam_policy_document.dms_dv_s3_iam_policy_document.json
-  }
-
-  inline_policy {
-    name   = "DV-Athena-Policies"
-    policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Resource_Type = "Role having Glue-Job execution policies",
-    }
-  )
-  lifecycle {
-    create_before_destroy = false
-  }
-}
-
-# -------------------------------------------------------------
