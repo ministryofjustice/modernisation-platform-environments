@@ -5,6 +5,9 @@ locals {
 
   other_log_retention_in_days = local.application_data.accounts[local.environment].other_log_retention_in_days
 
+  # Kinesis Agent
+  kinesis_agent_autoscale = local.application_data.accounts[local.environment].kinesis_agent_autoscale
+
   # glue_db                       = local.application_data.accounts[local.environment].glue_db_name
   # glue_db_data_domain           = local.application_data.accounts[local.environment].glue_db_data_domain
   description             = local.application_data.accounts[local.environment].db_description
