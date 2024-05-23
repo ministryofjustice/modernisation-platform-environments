@@ -32,12 +32,12 @@ locals {
         annotations = {
           horizontal = [
             {
-              visible = true,
+              visible = true
               color   = "#9467bd"
               label   = "Alarm threshold"
               value   = 95
-              fill    = above
-              yAxis   = right
+              fill    = "above"
+              yAxis   = "right"
             }
           ]
         }
@@ -274,7 +274,7 @@ locals {
   cloudwatch_dashboards = {
     "CloudWatch-Default" = {
       periodOverride = "auto"
-      start          = "-PT6H"
+      start          = "-PT3H"
       widgets = [
         local.cloudwatch_dashboard_widgets.EC2CPUUtil,
         local.cloudwatch_dashboard_widgets.EC2MemoryUtil,
