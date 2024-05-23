@@ -3,6 +3,7 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
+
   environment_config_test = {
     migration_environment_private_cidr     = ["10.162.8.0/22", "10.162.4.0/22", "10.162.0.0/22"]
     migration_environment_db_cidr          = ["10.162.14.0/25", "10.162.13.0/24", "10.162.12.0/24"]
@@ -30,6 +31,9 @@ locals {
   db_config_test = {
     instance_type  = "r6i.xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
     standby_count  = 0
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
