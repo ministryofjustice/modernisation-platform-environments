@@ -3,9 +3,9 @@ locals {
   cloudwatch_dashboard_widgets = {
 
     LoadBalancerGraphedMetricsHeading = {
-      type   = "text"
-      x      = 0
-      y      = 0
+      type = "text"
+      #x      = 0
+      #y      = 0
       width  = 24
       height = 1
       properties = {
@@ -15,14 +15,14 @@ locals {
     }
 
     LoadBalancerRequestCount = {
-      type   = "metric"
-      x      = 0
-      y      = 1
+      type = "metric"
+      #x      = 0
+      #y      = 1
       width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
-        stacked = false
+        stacked = true
         region  = "eu-west-2"
         title   = "Sum LoadBalancer Requests"
         stat    = "Sum"
@@ -33,14 +33,14 @@ locals {
     }
 
     LoadBalancerHTTP4XXsCount = {
-      type   = "metric"
-      x      = 8
-      y      = 1
+      type = "metric"
+      #x      = 8
+      #y      = 1
       width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
-        stacked = false
+        stacked = true
         region  = "eu-west-2"
         title   = "Sum LoadBalancer HTTP 4XXs"
         stat    = "Sum"
@@ -51,14 +51,14 @@ locals {
     }
 
     LoadBalancerHTTP5XXsCount = {
-      type   = "metric"
-      x      = 16
-      y      = 1
+      type = "metric"
+      #x      = 16
+      #y      = 1
       width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
-        stacked = false
+        stacked = true
         region  = "eu-west-2"
         title   = "Sum LoadBalancer HTTP 5XXs"
         stat    = "Sum"
@@ -69,14 +69,14 @@ locals {
     }
 
     LoadBalancerUnhealthyTargets = {
-      type   = "metric"
-      x      = 0
-      y      = 9
+      type = "metric"
+      #x      = 0
+      #y      = 9
       width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
-        stacked = false
+        stacked = true
         region  = "eu-west-2"
         title   = "Max LoadBalancer Unhealthy Targets"
         stat    = "Maximum"
@@ -87,9 +87,9 @@ locals {
     }
 
     LoadBalancerAverageTargetResponseTime = {
-      type   = "metric"
-      x      = 8
-      y      = 9
+      type = "metric"
+      #x      = 8
+      #y      = 9
       width  = 8
       height = 8
       properties = {
@@ -105,9 +105,9 @@ locals {
     }
 
     LoadBalancerMaximumTargetResponseTime = {
-      type   = "metric"
-      x      = 16
-      y      = 9
+      type = "metric"
+      #x      = 16
+      #y      = 9
       width  = 8
       height = 8
       properties = {
@@ -123,9 +123,9 @@ locals {
     }
 
     ACMCertificateDaysToExpiry = {
-      type   = "metric"
-      x      = 0
-      y      = 17
+      type = "metric"
+      #x      = 0
+      #y      = 17
       width  = 8
       height = 8
       properties = {
@@ -141,9 +141,9 @@ locals {
     }
 
     EC2GraphedMetricsHeading = {
-      type   = "text"
-      x      = 0
-      y      = 25
+      type = "text"
+      #x      = 0
+      #y      = 25
       width  = 24
       height = 1
       properties = {
@@ -153,9 +153,9 @@ locals {
     }
 
     EC2CPUUtilization = {
-      type   = "metric"
-      x      = 0
-      y      = 26
+      type = "metric"
+      #x      = 0
+      #y      = 26
       width  = 8
       height = 8
       properties = {
@@ -171,14 +171,14 @@ locals {
     }
 
     EC2InstanceStatus = {
-      type   = "metric"
-      x      = 8
-      y      = 26
+      type = "metric"
+      #x      = 8
+      #y      = 26
       width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
-        stacked = false
+        stacked = true
         region  = "eu-west-2"
         title   = "EC2 Instance Status"
         stat    = "Maximum"
@@ -189,14 +189,14 @@ locals {
     }
 
     EC2SystemStatus = {
-      type   = "metric"
-      x      = 16
-      y      = 26
+      type = "metric"
+      #x      = 16
+      #y      = 26
       width  = 8
       height = 8
       properties = {
         view    = "timeSeries"
-        stacked = false
+        stacked = true
         region  = "eu-west-2"
         title   = "EC2 System Status"
         stat    = "Maximum"
@@ -208,9 +208,9 @@ locals {
     }
 
     EC2WindowsMemoryUtilization = {
-      type   = "metric"
-      x      = 0
-      y      = 34
+      type = "metric"
+      #x      = 0
+      #y      = 34
       width  = 8
       height = 8
       properties = {
@@ -226,9 +226,9 @@ locals {
     }
 
     EC2WindowsDiskFree = {
-      type   = "metric"
-      x      = 8
-      y      = 34
+      type = "metric"
+      #x      = 8
+      #y      = 34
       width  = 8
       height = 8
       properties = {
@@ -244,9 +244,9 @@ locals {
     }
 
     EC2LinuxMemoryUtilization = {
-      type   = "metric"
-      x      = 0
-      y      = 42
+      type = "metric"
+      #x      = 0
+      #y      = 42
       width  = 8
       height = 8
       properties = {
@@ -262,9 +262,9 @@ locals {
     }
 
     EC2LinuxDiskUsed = {
-      type   = "metric"
-      x      = 8
-      y      = 42
+      type = "metric"
+      #x      = 8
+      #y      = 42
       width  = 8
       height = 8
       properties = {
@@ -280,9 +280,9 @@ locals {
     }
 
     EC2LinuxCPUIOWait = {
-      type   = "metric"
-      x      = 16
-      y      = 42
+      type = "metric"
+      #x      = 16
+      #y      = 42
       width  = 8
       height = 8
       properties = {
@@ -298,9 +298,9 @@ locals {
     }
 
     EBSGraphedMetricsHeading = {
-      type   = "text"
-      x      = 0
-      y      = 43
+      type = "text"
+      #x      = 0
+      #y      = 43
       width  = 24
       height = 1
       properties = {
@@ -310,9 +310,9 @@ locals {
     }
 
     EBSVolumeDiskIOPS = {
-      type   = "metric"
-      x      = 0
-      y      = 44
+      type = "metric"
+      #x      = 0
+      #y      = 44
       width  = 8
       height = 8
       properties = {
@@ -332,9 +332,9 @@ locals {
     }
 
     EBSVolumeDiskThroughput = {
-      type   = "metric"
-      x      = 8
-      y      = 44
+      type = "metric"
+      #x      = 8
+      #y      = 44
       width  = 8
       height = 8
       properties = {
