@@ -161,11 +161,6 @@ locals {
     }
   }
 
-  dms_config_test = {
-    replication_instance_class = "dms.t3.micro"
-    engine_version             = "3.5.1"
-  }
-
   bastion_config_test = {
     business_unit           = local.vpc_name
     subnet_set              = local.subnet_set

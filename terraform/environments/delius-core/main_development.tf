@@ -28,7 +28,6 @@ module "environment_dev" {
 
   ldap_config = local.ldap_config_dev
   db_config   = local.db_config_dev
-  dms_config  = local.dms_config_dev
 
   delius_microservice_configs = local.delius_microservices_configs_dev
 
