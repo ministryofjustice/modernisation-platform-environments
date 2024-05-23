@@ -79,6 +79,12 @@ variable "bastion_linux" {
   default = null
 }
 
+variable "cloudwatch_dashboards" {
+  description = "map of cloudwatch dashboards where key is the dashboard name and value is the dashboard in hcl format for jsonencode()"
+  type        = map(any) # see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html
+  default     = {}
+}
+
 variable "cloudwatch_log_groups" {
   description = "set of cloudwatch log groups to create where the key is the name of the group"
   type = map(object({

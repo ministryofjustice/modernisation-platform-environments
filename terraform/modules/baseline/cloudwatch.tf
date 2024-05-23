@@ -25,6 +25,13 @@ locals {
   )
 }
 
+resource "aws_cloudwatch_dashboard" "this" {
+  for_each = var.cloudwatch_dashboards
+
+  dashboard_name = each.key
+  dashboard_body = jsonencode(each.value)
+}
+
 resource "aws_cloudwatch_log_group" "this" {
   for_each = var.cloudwatch_log_groups
 

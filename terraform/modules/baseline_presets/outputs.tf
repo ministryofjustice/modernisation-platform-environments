@@ -14,6 +14,18 @@ output "backup_plans" {
   }
 }
 
+output "cloudwatch_dashboard_widgets" {
+  description = "Map of common cloudwatch dashboard widgets"
+  value       = local.cloudwatch_dashboard_widgets
+}
+
+output "cloudwatch_dashboards" {
+  description = "Map of common cloudwatch dashboards"
+  value = var.options.cloudwatch_dashboards != null ? {
+    for key, value in local.cloudwatch_dashboards : key => value if contains(var.options.cloudwatch_dashboards, key)
+  } : {}
+}
+
 output "cloudwatch_log_groups" {
   description = "Map of log groups"
 
