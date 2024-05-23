@@ -145,14 +145,3 @@ module "baseline" {
   )
 }
 
-module "cross_account_cloudwatch" {
-  source      = "../../modules/cross_account_cloudwatch"
-  environment = module.environment
-  options = merge(
-    local.cloudwatch_monitoring_options,
-    local.cloudwatch_local_environment_monitoring_options,
-  )
-  monitoring_account_id              = module.environment.account_ids.corporate-staff-rostering-production
-  source_account_ids                 = [module.environment.account_ids.planetfm-production]
-  monitoring_account_sink_identifier = "arn:aws:oam:eu-west-2:${module.environment.account_ids.corporate-staff-rostering-production}:sink/c78e5972-8464-4244-949f-872b726bc563"
-}
