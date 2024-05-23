@@ -16,6 +16,7 @@ DB_NAME = os.environ.get("DB_NAME")
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
 
 db_path = f"{S3_BUCKET_NAME}/{DB_NAME}/dbo"
+db_sem_name = f"{DB_NAME}_semantic_layer"
 
 
 def get_rds_connection():
@@ -30,19 +31,21 @@ def create_glue_database(metadata):
     # Try to delete the database
     try:
         # Delete database
-        wr.catalog.delete_database(name=DB_NAME)
-        logger.info(f"Delete database {DB_NAME}")
+        wr.catalog.delete_database(name=db_sem_name)
+        logger.info(f"Delete database {db_sem_name}")
     # Handle case where database doesn't exist
     except s3.exceptions.from_code("EntityNotFoundException"):
-        logger.info(f"Database '{DB_NAME}' does not exist")
-    wr.catalog.create_database(name=DB_NAME, exist_ok=True)
+        logger.info(f"Database '{db_sem_name}' does not exist")
+    wr.catalog.create_database(name=db_sem_name, exist_ok=True)
     table_name = metadata.name
     logger.info(f"Table Name: {table_name}")
     options = GlueConverterOptions()
     options.csv.skip_header = True
     gc = GlueConverter(options)
     boto_dict = gc.generate_from_meta(
-        metadata, database_name=DB_NAME, table_location=f"s3://{db_path}/{table_name}"
+        metadata,
+        database_name=db_sem_name,
+        table_location=f"s3://{db_path}/{table_name}",
     )
     glue_client.create_table(**boto_dict)
     return boto_dict
