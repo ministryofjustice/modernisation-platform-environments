@@ -314,6 +314,7 @@ locals {
   nomis_secrets_placeholder_athena_federated = {
     username = "placeholder"
     password = "placeholder"
+    sid      = "placeholder"
   }
 
   # DPS Secrets PlaceHolder
