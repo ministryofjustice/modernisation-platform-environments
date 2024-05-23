@@ -374,7 +374,7 @@ resource "aws_route53_record" "external_tax_tribunal_decisions_sftp" {
 resource "aws_route53_record" "external_ftp_admin_appeals" {
   provider = aws.core-vpc 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "adminappeals.reports.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "adminappealsreports.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
@@ -388,7 +388,7 @@ resource "aws_route53_record" "external_admin_appeals_sftp" {
   allow_overwrite = true
   provider        = aws.core-vpc
   zone_id         = data.aws_route53_zone.external.zone_id
-  name            = "sftp.adminappeals.reports.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name            = "sftp.adminappealsreports.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
   records         = [module.ftp-admin-appeals.tribunals_lb_ftp[0].dns_name]
