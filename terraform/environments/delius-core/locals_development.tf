@@ -3,6 +3,7 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
+
   environment_config_dev = {
     migration_environment_private_cidr     = ["10.162.32.0/22", "10.162.36.0/22", "10.162.40.0/22"]
     migration_environment_db_cidr          = ["10.162.44.0/24", "10.162.45.0/24", "10.162.46.0/25"]
@@ -159,11 +160,6 @@ locals {
       image_tag      = "5.7.6"
       container_port = 80
     }
-  }
-
-  dms_config_dev = {
-    replication_instance_class = "dms.t3.medium"
-    engine_version             = "3.5.1"
   }
 
   bastion_config_dev = {
