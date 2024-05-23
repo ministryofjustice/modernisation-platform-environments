@@ -325,8 +325,8 @@ locals {
           [{ "expression" : "m1/PERIOD(m1)", "label" : "Read IOPs", "id" : "e1" }],
           [{ "expression" : "m2/PERIOD(m2)", "label" : "Write IOPs", "id" : "e2" }],
           [{ "expression" : "e1+e2", "label" : "Total IOPs", "id" : "e3" }],
-          ["AWS/EBS", "VolumeReadOps", "*", { "id" : "m1", "visible" : false }],
-          ["AWS/EBS", "VolumeWriteOps", "*", { "id" : "m2", "visible" : false }]
+          ["AWS/EBS", "VolumeReadOps", "VolumeId", "*", { "id" : "m1", "visible" : false }],
+          ["AWS/EBS", "VolumeWriteOps", "VolumeId", "*", { "id" : "m2", "visible" : false }]
         ]
       }
     }
