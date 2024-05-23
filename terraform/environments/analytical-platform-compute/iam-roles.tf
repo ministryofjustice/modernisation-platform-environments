@@ -3,7 +3,7 @@ module "vpc_cni_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.39.0"
+  version = "5.39.1"
 
   role_name_prefix      = "vpc-cni"
   attach_vpc_cni_policy = true
@@ -24,7 +24,7 @@ module "ebs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.39.0"
+  version = "5.39.1"
 
   role_name_prefix      = "ebs-csi-driver"
   attach_ebs_csi_policy = true
@@ -44,7 +44,7 @@ module "efs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.39.0"
+  version = "5.39.1"
 
   role_name_prefix      = "efs-csi-driver"
   attach_efs_csi_policy = true
@@ -64,7 +64,7 @@ module "aws_for_fluent_bit_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.39.0"
+  version = "5.39.1"
 
   role_name_prefix = "aws-for-fluent-bit"
 
@@ -88,7 +88,7 @@ module "amazon_prometheus_proxy_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.39.0"
+  version = "5.39.1"
 
   role_name_prefix = "amazon-prometheus-proxy"
 
@@ -100,6 +100,28 @@ module "amazon_prometheus_proxy_iam_role" {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
+    }
+  }
+
+  tags = local.tags
+}
+
+module "cluster_autoscaler_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.39.1"
+
+  role_name_prefix = "cluster-autoscaler"
+
+  attach_cluster_autoscaler_policy = true
+  cluster_autoscaler_cluster_names = [module.eks.cluster_name]
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:cluster-autoscaler"]
     }
   }
 
