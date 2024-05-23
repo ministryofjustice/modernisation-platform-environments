@@ -1,5 +1,6 @@
 /* Policy */
 resource "helm_release" "kyverno" {
+  /* https://artifacthub.io/packages/helm/kyverno/kyverno */
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
@@ -21,6 +22,7 @@ resource "helm_release" "kyverno" {
   The Helm chart also doesn't have support for IRSA, so a EKS Pod Identity has been been made ready to use module.aws_cloudwatch_metrics_pod_identity
 */
 resource "helm_release" "aws_cloudwatch_metrics" {
+  /* https://artifacthub.io/packages/helm/aws/aws-cloudwatch-metrics */
   name       = "aws-cloudwatch-metrics"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-cloudwatch-metrics"
@@ -39,6 +41,7 @@ resource "helm_release" "aws_cloudwatch_metrics" {
 }
 
 resource "helm_release" "aws_for_fluent_bit" {
+  /* https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit */
   name       = "aws-for-fluent-bit"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-for-fluent-bit"
@@ -60,6 +63,7 @@ resource "helm_release" "aws_for_fluent_bit" {
 }
 
 resource "helm_release" "amazon_prometheus_proxy" {
+  /* https://artifacthub.io/packages/helm/prometheus-community/prometheus */
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "prometheus"
@@ -75,4 +79,28 @@ resource "helm_release" "amazon_prometheus_proxy" {
       }
     )
   ]
+
+  depends_on = [module.amazon_prometheus_proxy_iam_role]
+}
+
+/* Cluster */
+resource "helm_release" "cluster_autoscaler" {
+  /* https://artifacthub.io/packages/helm/cluster-autoscaler/cluster-autoscaler */
+  name       = "cluster-autoscaler"
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart      = "cluster-autoscaler"
+  version    = "9.37.0"
+  namespace  = "kube-system"
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/cluster-autoscaler/values.yml.tftpl",
+      {
+        aws_region   = data.aws_region.current.name
+        cluster_name = module.eks.cluster_name
+        eks_role_arn = module.cluster_autoscaler_iam_role.iam_role_arn
+      }
+    )
+  ]
+  depends_on = [module.cluster_autoscaler_iam_role]
 }
