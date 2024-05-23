@@ -1,6 +1,6 @@
 locals {
     lambda_path = "lambdas"
-    db_name = "g4s_cap_dw"
+    db_name = local.is-production ? "g4s_cap_dw" : "test"
 }
 # ------------------
 # Zip Files
