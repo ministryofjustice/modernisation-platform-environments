@@ -31,6 +31,7 @@ locals {
     length(local.account_names_for_account_ids_ssm_parameter) != 0 ? ["account"] : [],
     var.options.enable_azure_sas_token ? ["/azure"] : [],
     var.options.enable_ec2_cloud_watch_agent && fileexists(local.cloud_watch_windows_filename) ? ["cloud-watch-config"] : [],
+    try(length(var.options.cloudwatch_metric_oam_links_ssm_parameters), 0) != 0 ? ["/oam"] : [],
   ])
 
   ssm_parameters = {
@@ -51,6 +52,14 @@ locals {
     "/azure" = {
       parameters = {
         sas_token = { description = "database backup storage account read-only sas token" }
+      }
+    }
+
+    "/oam" = {
+      parameters = {
+        for oam_link in coalesce(var.options.cloudwatch_metric_oam_links_ssm_parameters, []) : oam_link => {
+          description = "oam sink_identifier to use in aws_oam_link resource"
+        }
       }
     }
 
