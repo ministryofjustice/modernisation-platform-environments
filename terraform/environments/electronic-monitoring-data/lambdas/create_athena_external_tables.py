@@ -8,6 +8,7 @@ import boto3
 
 s3 = boto3.client("s3")
 glue_client = boto3.client("glue")
+lambda_client = boto3.client("lambda")
 
 logger = getLogger(__name__)
 
@@ -27,7 +28,7 @@ def get_rds_connection():
     return con_sqlserver
 
 
-def create_glue_database(metadata):
+def create_glue_database():
     # Try to delete the database
     try:
         # Delete database
@@ -37,6 +38,9 @@ def create_glue_database(metadata):
     except s3.exceptions.from_code("EntityNotFoundException"):
         logger.info(f"Database '{db_sem_name}' does not exist")
     wr.catalog.create_database(name=db_sem_name, exist_ok=True)
+
+
+def create_glue_table(metadata):
     table_name = metadata.name
     logger.info(f"Table Name: {table_name}")
     try:
@@ -62,16 +66,21 @@ def handler(event, context):
     engine = create_engine("mssql+pyodbc://", creator=lambda: conn)
     sqlc = SQLAlchemyConverter(engine)
     metadata_list = sqlc.generate_to_meta_list(schema="dbo")
-
+    create_glue_database()
     created_tables = []
     for meta in metadata_list:
         meta.file_format = "csv"
-        boto_dict = create_glue_database(meta)
-        created_tables.append(boto_dict["TableInput"]["Name"])
+        meta_dict = meta.to_dict()
+        lambda_client.invoke(
+            FunctionName="create_athena_external_table",
+            InvocationType="Event",
+            Payload=meta_dict,
+        )
+        created_tables.append(meta.name)
 
     result = {
         "status": "success",
-        "message": f"Created {len(created_tables)} tables in Glue",
+        "message": f"Triggered {len(created_tables)} tables for creation in lambda",
         "created_tables": created_tables,
     }
 
