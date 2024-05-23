@@ -32,6 +32,9 @@ locals {
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
 
+      /* Route53 */
+      route53_zone = "compute.development.analytical-platform.service.justice.gov.uk"
+
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
       eks_cluster_version = "1.29"
@@ -64,6 +67,9 @@ locals {
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
 
+      /* Route53 */
+      route53_zone = "compute.test.analytical-platform.service.justice.gov.uk"
+
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.29"
@@ -95,6 +101,9 @@ locals {
       vpc_enable_nat_gateway     = true
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
+
+      /* Route53 */
+      route53_zone = "compute.analytical-platform.service.justice.gov.uk"
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
