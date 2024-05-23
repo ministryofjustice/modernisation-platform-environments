@@ -54,8 +54,8 @@ locals {
           os-type     = "Linux"
           component   = "ndh"
           environment = "development"
-          startup     = "0 8 * * *"
-          shutdown    = "0 20 * * *" 
+          flexi-startup     = "8am"
+          flexi-shutdown    = "6pm" 
         }
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }
@@ -88,8 +88,8 @@ locals {
           os-type     = "Linux"
           component   = "ndh"
           environment = "development"
-          startup     = "30 8 * * *"
-          shutdown    = "30 20 * * *" 
+          flexi-startup     = "9am"
+          flexi-shutdown    = "7pm" 
         }
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }
