@@ -106,7 +106,7 @@ module "amazon_prometheus_proxy_iam_role" {
   tags = local.tags
 }
 
-module "cluster_autoscaler_role" {
+module "cluster_autoscaler_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
