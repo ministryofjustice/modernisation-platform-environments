@@ -130,7 +130,7 @@ module "vpc_endpoints" {
       ])
       tags = merge(
         local.tags,
-        { Name = format("%s-s3", local.application_name) }
+        { Name = format("%s-s3", module.vpc.name) }
       )
     }
   }
