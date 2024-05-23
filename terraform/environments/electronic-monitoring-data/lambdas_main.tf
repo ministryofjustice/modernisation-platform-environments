@@ -1,6 +1,6 @@
 locals {
     lambda_path = "lambdas"
-    db_name = "test"
+    db_name = "g4s_cap_dw"
 }
 # ------------------
 # Zip Files
