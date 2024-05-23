@@ -4,7 +4,7 @@ locals {
 
     LoadBalancerGraphedMetricsHeading = {
       type = "text"
-      #x      = 0
+      x      = 0
       #y      = 0
       width  = 24
       height = 1
@@ -16,7 +16,7 @@ locals {
 
     LoadBalancerRequestCount = {
       type = "metric"
-      #x      = 0
+      x      = 0
       #y      = 1
       width  = 8
       height = 8
@@ -34,7 +34,7 @@ locals {
 
     LoadBalancerHTTP4XXsCount = {
       type = "metric"
-      #x      = 8
+      x      = 8
       #y      = 1
       width  = 8
       height = 8
@@ -52,7 +52,7 @@ locals {
 
     LoadBalancerHTTP5XXsCount = {
       type = "metric"
-      #x      = 16
+      x      = 16
       #y      = 1
       width  = 8
       height = 8
@@ -70,7 +70,7 @@ locals {
 
     LoadBalancerUnhealthyTargets = {
       type = "metric"
-      #x      = 0
+      x      = 0
       #y      = 9
       width  = 8
       height = 8
@@ -88,7 +88,7 @@ locals {
 
     LoadBalancerAverageTargetResponseTime = {
       type = "metric"
-      #x      = 8
+      x      = 8
       #y      = 9
       width  = 8
       height = 8
@@ -106,7 +106,7 @@ locals {
 
     LoadBalancerMaximumTargetResponseTime = {
       type = "metric"
-      #x      = 16
+      x      = 16
       #y      = 9
       width  = 8
       height = 8
@@ -124,7 +124,7 @@ locals {
 
     ACMCertificateDaysToExpiry = {
       type = "metric"
-      #x      = 0
+      x      = 0
       #y      = 17
       width  = 8
       height = 8
@@ -142,7 +142,7 @@ locals {
 
     EC2GraphedMetricsHeading = {
       type = "text"
-      #x      = 0
+      x      = 0
       #y      = 25
       width  = 24
       height = 1
@@ -154,7 +154,7 @@ locals {
 
     EC2CPUUtilization = {
       type = "metric"
-      #x      = 0
+      x      = 0
       #y      = 26
       width  = 8
       height = 8
@@ -172,7 +172,7 @@ locals {
 
     EC2InstanceStatus = {
       type = "metric"
-      #x      = 8
+      x      = 8
       #y      = 26
       width  = 8
       height = 8
@@ -190,7 +190,7 @@ locals {
 
     EC2SystemStatus = {
       type = "metric"
-      #x      = 16
+      x      = 16
       #y      = 26
       width  = 8
       height = 8
@@ -207,45 +207,9 @@ locals {
       }
     }
 
-    EC2WindowsMemoryUtilization = {
-      type = "metric"
-      #x      = 0
-      #y      = 34
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Max EC2 Windows Memory Utilization %"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(Memory % Committed Bytes In Use) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
-        ]
-      }
-    }
-
-    EC2WindowsDiskFree = {
-      type = "metric"
-      #x      = 8
-      #y      = 34
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Min EC2 Windows Disk Free %"
-        stat    = "Minimum"
-        metrics = [
-          [{ "expression" : "SELECT MIN(DISK_FREE) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MIN() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
-        ]
-      }
-    }
-
     EC2LinuxMemoryUtilization = {
       type = "metric"
-      #x      = 0
+      x      = 0
       #y      = 42
       width  = 8
       height = 8
@@ -263,7 +227,7 @@ locals {
 
     EC2LinuxDiskUsed = {
       type = "metric"
-      #x      = 8
+      x      = 8
       #y      = 42
       width  = 8
       height = 8
@@ -281,7 +245,7 @@ locals {
 
     EC2LinuxCPUIOWait = {
       type = "metric"
-      #x      = 16
+      x      = 16
       #y      = 42
       width  = 8
       height = 8
@@ -297,9 +261,46 @@ locals {
       }
     }
 
+    EC2WindowsMemoryUtilization = {
+      type = "metric"
+      x      = 0
+      #y      = 34
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Max EC2 Windows Memory Utilization %"
+        stat    = "Maximum"
+        metrics = [
+          [{ "expression" : "SELECT MAX(Memory % Committed Bytes In Use) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
+        ]
+      }
+    }
+
+    EC2WindowsDiskFree = {
+      type = "metric"
+      x      = 8
+      #y      = 34
+      width  = 8
+      height = 8
+      properties = {
+        view    = "timeSeries"
+        stacked = false
+        region  = "eu-west-2"
+        title   = "Min EC2 Windows Disk Free %"
+        stat    = "Minimum"
+        metrics = [
+          [{ "expression" : "SELECT MIN(DISK_FREE) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MIN() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
+        ]
+      }
+    }
+
+
     EBSGraphedMetricsHeading = {
       type = "text"
-      #x      = 0
+      x      = 0
       #y      = 43
       width  = 24
       height = 1
@@ -311,7 +312,7 @@ locals {
 
     EBSVolumeDiskIOPS = {
       type = "metric"
-      #x      = 0
+      x      = 0
       #y      = 44
       width  = 8
       height = 8
@@ -333,7 +334,7 @@ locals {
 
     EBSVolumeDiskThroughput = {
       type = "metric"
-      #x      = 8
+      x      = 8
       #y      = 44
       width  = 8
       height = 8
