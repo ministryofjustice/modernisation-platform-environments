@@ -36,19 +36,3 @@ module "environment_dev" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 }
-
-module "dms_dev" {
-  count  = local.is-development ? 1 : 0
-
-  source         = "./modules/components/dms"
-  account_config = local.account_config
-  account_info   = local.account_info
-  tags           = local.tags
-  env_name       = "dev"
-  dms_config     = local.dms_config_dev
-
-  providers = {
-    aws                    = aws
-    aws.bucket-replication = aws
-  }
-}

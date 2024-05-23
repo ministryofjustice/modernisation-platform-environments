@@ -36,19 +36,3 @@ module "environment_test" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 }
-
-module "dms_test" {
-  count  = local.is-test ? 1 : 0
-
-  source         = "./modules/components/dms"
-  account_config = local.account_config
-  account_info   = local.account_info
-  tags           = local.tags
-  env_name       = "test"
-  dms_config     = local.dms_config_test
-
-  providers = {
-    aws                    = aws
-    aws.bucket-replication = aws
-  }
-}
