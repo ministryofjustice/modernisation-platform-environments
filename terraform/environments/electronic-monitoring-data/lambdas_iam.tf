@@ -71,9 +71,9 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
             "glue:DeleteDatabase"
         ]
         resources = [
-            "arn:aws:glue:eu-west-2:${local.modernisation_platform_account_id}:datacatalog/",
-            "arn:aws:glue:eu-west-2:${local.modernisation_platform_account_id}:database/${local.db_name}_semantic_layer",
-            "arn:aws:glue:eu-west-2:${local.modernisation_platform_account_id}:table/${local.db_name}_semantic_layer/*"
+            "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog",
+            "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/${local.db_name}_semantic_layer",
+            "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/${local.db_name}_semantic_layer/*"
         ]
     }
 }
