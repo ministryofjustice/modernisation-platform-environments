@@ -835,9 +835,9 @@ locals {
         local.cloudwatch_dashboard_widgets.lb.load-balancer-active-connections,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-new-connections,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-connection-errors,
-        local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
+        #local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
-        local.cloudwatch_dashboard_widgets.acm.cert-expires-soon,
+        #local.cloudwatch_dashboard_widgets.acm.cert-expires-soon,
       ]
     }
     network_lb = {
