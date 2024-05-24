@@ -177,11 +177,13 @@ resource "aws_lb_listener_rule" "admin_access" {
     path_pattern {
       values = ["*/Admin*", "*/admin*"]
     }
+  }
+
+  condition {
     http_header {
       http_header_name = "X-Forwarded-For"
       values           = ["194.33.19.0/24", "109.154.193.219/32", "82.1.119.170/32"]
     }
-
   }
 }
 
@@ -196,6 +198,9 @@ resource "aws_lb_listener_rule" "secure_access" {
     path_pattern {
       values = ["*/Secure*", "*/secure*"]
     }
+  }
+
+  condition {
     http_header {
       http_header_name = "X-Forwarded-For"
       values           = ["194.33.19.0/24", "109.154.193.219/32", "82.1.119.170/32"]
