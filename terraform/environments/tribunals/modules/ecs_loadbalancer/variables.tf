@@ -23,3 +23,6 @@ variable "aws_acm_certificate_external" {
 variable "is_ftp_app" {
   description = "Determines if it is an ftp app or not"
 }
+
+variable "waf_arn" {
+}

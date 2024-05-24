@@ -6,6 +6,7 @@ locals {
   source_db_url                = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
   source_db_user               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   source_db_password           = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
+  waf_arn                      = "${aws_wafv2_web_acl.tribunals_web_acl.arn}"
 }
 
 module "appeals" {
@@ -42,6 +43,7 @@ module "appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "JudgmentFiles"
+  waf_arn                           = local.waf_arn
 }
 
 module "ahmlr" {
@@ -77,6 +79,7 @@ module "ahmlr" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Judgments"
+  waf_arn                           = local.waf_arn
 }
 
 module "care_standards" {
@@ -112,6 +115,7 @@ module "care_standards" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Judgments"
+  waf_arn                           = local.waf_arn
 }
 
 module "cicap" {
@@ -147,6 +151,7 @@ module "cicap" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "CaseFiles"
+  waf_arn                           = local.waf_arn
 }
 
 module "employment_appeals" {
@@ -182,6 +187,7 @@ module "employment_appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Public/Upload"
+  waf_arn                           = local.waf_arn
 }
 
 module "finance_and_tax" {
@@ -217,6 +223,7 @@ module "finance_and_tax" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "JudgmentFiles"
+  waf_arn                           = local.waf_arn
 }
 
 module "immigration_services" {
@@ -252,6 +259,7 @@ module "immigration_services" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "JudgmentFiles"
+  waf_arn                           = local.waf_arn
 }
 
 module "information_tribunal" {
@@ -287,6 +295,7 @@ module "information_tribunal" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "DBFiles"
+  waf_arn                           = local.waf_arn
 }
 
 module "lands_tribunal" {
@@ -322,6 +331,7 @@ module "lands_tribunal" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "JudgmentFiles"
+  waf_arn                           = local.waf_arn
 }
 
 module "transport" {
@@ -357,6 +367,7 @@ module "transport" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "JudgmentFiles"
+  waf_arn                           = local.waf_arn
 }
 
 module "charity_tribunal_decisions" {
