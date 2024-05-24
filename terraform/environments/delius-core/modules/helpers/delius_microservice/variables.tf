@@ -520,3 +520,9 @@ variable "frontend_lb_arn_suffix" {
   description = "Used by alarms"
   type        = string
 }
+
+variable "extra_task_role_policies" {
+  description = "A map of data \"aws_iam_policy_document\" objects, keyed by name, to attach to the task role"
+  type        = map(any)
+  default     = {}
+}

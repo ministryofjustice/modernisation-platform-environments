@@ -1,5 +1,5 @@
 module "nextcloud_efs" {
-  for_each = toset(["html", "custom_apps", "config", "data", "themes"])
+  for_each = toset(["data"])
 
   source = "../../../../delius-core/modules/helpers/efs"
 
