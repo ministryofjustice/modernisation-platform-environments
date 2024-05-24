@@ -191,6 +191,7 @@ resource "aws_iam_role_policy" "app_task" {
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
           "ecr:*",
           "iam:*",
           "ec2:*"
