@@ -138,6 +138,11 @@ resource "aws_lb_listener" "tribunals_lb" {
   }
 }
 
+resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+  resource_arn = aws_lb.tribunals_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
+}
+
 resource "aws_lb_listener" "tribunals_lb_ftp" {
   count             = var.is_ftp_app ? 1 : 0
   load_balancer_arn = aws_lb.tribunals_lb_ftp[0].arn
