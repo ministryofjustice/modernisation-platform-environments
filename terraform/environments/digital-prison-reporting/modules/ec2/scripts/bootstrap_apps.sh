@@ -37,8 +37,8 @@ echo "assumeyes=1" >> /etc/yum.conf
 # Update all packages
 sudo yum -y update
 
-# Setup YUM install Depedencies
-sudo yum -y install aws-kinesis-agent wget unzip jq
+# Setup YUM install Kinesis Agent
+sudo yum -y install aws-kinesis-agent wget unzip
 
 # Setup Oracle Client Tools
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-basic-21.8.0.0.0-1.x86_64.rpm
@@ -98,6 +98,14 @@ sleep 300
 # Add Secondary IP
 aws ec2 assign-private-ip-addresses --network-interface-id $interface_id --private-ip-addresses ${static_ip}
 
+# Get Secrets
+cp_k8s_server=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_server)
+cp_k8s_cert_auth=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_certificate_auth)
+cp_k8s_cluster_name=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_name)
+cp_k8s_cluster_context=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_context)
+cp_k8s_cluster_token=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_token)
+
+echo "SERVER_NAME....$cp_k8s_server"
 # Install KUBECTL Libs
 ## Download Libs
 curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.1/2023-04-19/bin/linux/amd64/kubectl
@@ -111,22 +119,22 @@ cat <<EOF > $kubeconfig
 apiVersion: v1
 clusters:
 - cluster:
-    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeE1EWXlPREUyTXprMU5sb1hEVE14TURZeU5qRTJNemsxTmxvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTDNZCk9jcWxuVUdZTGR6TFlZTFcyOHVVWk1QdGE3TWJTK09EbTh4RWNXNlRVMXoyeFovcUNwSUhRS0VGelk2SWJwVSsKaHB0Z2VrRnNKQllEc2pjRjhRSTNPSkFaMFVjMXpNaXo1TFE2ZU1pOENsbmRMYnk4NWRNLzliRGZ0T1dlMDVqcQpYSENmYW9RNWR0Y3NCbWplWFAzbm1ZZGRJcTBiRUZZMTJiQjkvOTRLRVJSdnp4U3oxNkg5VkJwdzA3UVArTFRTCnRKT2JjWWlzcEFSTXJUVTlZa1pVS1lJT2FUYnBqRHhHVGdMNm1EaWNSdHlQeU9admx0MUFSTFR3NUpBVG42WUYKaXNCMkt5cHA2Q05DNDVoaFVpU05vZE9vaUcxNVRpNU5WeWM5azQ4eTFqZWExZ0kzTnM0VGFpQXRxNEhPTHR3NQpML2RqMEFRTTJIalZlVG90TVJVQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFHUCs2RTZCMDVNSmxFZ04zcEJkRUxEa29yakEKMGJ0SmR2S1lEakkyWTE0cGtSMFlacXZjT2Zkd0tOM1VuL2FYblllT21xNFExdHRpMUZQRDR6MTE0TFU4VjBTcwo3Q080azE5NzNMVGxValRGTVZNNHZoZXlXc0JLRzJxZW10TGhkVjJGSDh1Y2lDZnVWd0hNb3lQTmJJdktCSVFOCnFIS08wclU0bElpSzVrcEdydXBZYWRIV3pLL0VMTlk5alZtelJxcXpGQ3lmVjJuWGZJK2xrbXFUOGN5Y0FWbS8KOExSQjhnK1dhTGxLQThydWMzYmZIWUJNZ2J1ZkpzYTVaU3lGd2dkNlNua0dta1c2KzBERklRUVAweEl5ajRaWgpFL1JxL0QyNE5zK2ZNc3lxWVRUQ21rRktUdTJENzJvQllUdmt5bnQ3Rjh3a0gwSWRiK1MxMXNxUVdCcz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-    server: https://DF366E49809688A3B16EEC29707D8C09.gr7.eu-west-2.eks.amazonaws.com
-  name: live.cloud-platform.service.justice.gov.uk
+    certificate-authority-data: $cp_k8s_cert_auth
+    server: $cp_k8s_server
+  name: $cp_k8s_cluster_name
 contexts:
 - context:
-    cluster: live.cloud-platform.service.justice.gov.uk
+    cluster: $cp_k8s_cluster_name
     namespace: dpr-nomis-port-forwarder
     user: nomis-port-forwarder-migrated
-  name: live.cloud-platform.service.justice.gov.uk
-current-context: live.cloud-platform.service.justice.gov.uk
+  name: $cp_k8s_cluster_name
+current-context: $cp_k8s_cluster_context
 kind: Config
 preferences: {}
 users:
 - name: nomis-port-forwarder-migrated
   user:
-    token: eyJhbGciOiJSUzI1NiIsImtpZCI6IlBiS0MzZGN6a1IwbFljNkNOd1dVODY2OXQzLW0tOWRKZ1dpNEdRTG9LOUkifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkcHItbm9taXMtcG9ydC1mb3J3YXJkZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoibm9taXMtcG9ydC1mb3J3YXJkZXItbWlncmF0ZWQtdG9rZW4tMDEtMDEtMjAwMCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJub21pcy1wb3J0LWZvcndhcmRlci1taWdyYXRlZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjdjOGIyMTllLTJmNGEtNDI4Yi1iYzdiLWU0N2IxNjkzZGZiZCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkcHItbm9taXMtcG9ydC1mb3J3YXJkZXI6bm9taXMtcG9ydC1mb3J3YXJkZXItbWlncmF0ZWQifQ.R0Y9kVzeTE-Bcd4twHNNWFffGvin1yayjtdeQSjNVmQBD42vazcEwbr8H3F5i2A5wW8j5Tk_IYzD7Zby26zyIiu_DF8DXe-bERQEHFa-A6pyygnGQPdWcDlZSklGAHBmUmQH5rKTqKDVfFW8gpP58h8zP3L518pBW6eGi-3GTeJH1pNL7sAVwAaKEmbHWqMScCir7G22MCFYwlVyUTarueFGLxR0fId4y2eHFCarlSBkKSS48ewC9WGCp2knJRZURwdZmlSGGO2mAT4Lqq06ZrIHwe_LUYc8hsWcVSGxqPwhdrHCmIcmhXKz6NMEwFpR6KNoRBBAHziCgurJQHzdKA
+    token: $cp_k8s_cluster_token
 EOF
 
 # Configure Kubernetes Cluster for CP
