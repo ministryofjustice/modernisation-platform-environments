@@ -111,7 +111,7 @@ resource "aws_iam_role" "edw_lambda_function_execution_role" {
   name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-role"
 
   assume_role_policy = jsonencode({
-    Version: "2008-10-17"
+    Version: "2012-10-17"
     Statement: [
         {
         Effect: "Allow"
