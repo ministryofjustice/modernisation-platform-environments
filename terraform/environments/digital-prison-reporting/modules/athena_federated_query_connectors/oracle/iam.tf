@@ -89,9 +89,7 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
         "Action" : [
           "secretsmanager:GetSecretValue"
         ],
-        "Resource" : [
-          var.nomis_credentials_secret_arn
-        ],
+        "Resource" : var.credentials_secret_arns,
         "Effect" : "Allow"
       },
       {

@@ -44,9 +44,9 @@ variable "spill_bucket_prefix" {
   description = "The key prefix in the spill S3 bucket to use for writing data that spills from the Connector Lambda's memory"
 }
 
-variable "nomis_credentials_secret_arn" {
-  type        = string
-  description = "The ARN of the Secret Manager secret containing NOMIS credentials"
+variable "credentials_secret_arns" {
+  type        = list(string)
+  description = "The ARNs of the Secret Manager secrets containing the database credentials in the connection strings so the lambda can access them"
 }
 
 variable "connection_strings" {

@@ -1,7 +1,7 @@
 locals {
   nomis_host              = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
   nomis_service_name      = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
-  connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis_athena_federated.name}}@//${local.nomis_host}:1521/${local.nomis_service_name}"
+  connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis.name}}@//${local.nomis_host}:1521/${local.nomis_service_name}"
 }
 
 module "athena_federated_query_connector_oracle" {
@@ -10,7 +10,7 @@ module "athena_federated_query_connector_oracle" {
   connector_jar_bucket_key              = "third-party/athena-connectors/athena-oracle-2022.47.1.jar"
   connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
   spill_bucket_name                     = module.s3_working_bucket.bucket_id
-  nomis_credentials_secret_arn          = aws_secretsmanager_secret.nomis_athena_federated.arn
+  credentials_secret_arns                = [aws_secretsmanager_secret.nomis.arn]
   project_prefix                        = local.project
   account_id                            = local.account_id
   region                                = local.account_region
