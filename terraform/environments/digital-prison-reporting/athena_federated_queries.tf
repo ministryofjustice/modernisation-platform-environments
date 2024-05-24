@@ -1,7 +1,7 @@
 locals {
   nomis_host              = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  nomis_sid               = try(jsondecode(data.aws_secretsmanager_secret_version.nomis_athena_federated.secret_string)["sid"], "")
-  connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis_athena_federated.name}}@${local.nomis_host}:1521:${local.nomis_sid}"
+  nomis_service_name      = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
+  connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis_athena_federated.name}}@//${local.nomis_host}:1521/${local.nomis_service_name}"
 }
 
 module "athena_federated_query_connector_oracle" {
