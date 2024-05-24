@@ -2,6 +2,7 @@
 resource "aws_secretsmanager_secret" "support_email_account" {
   name        = "support_email_account"
   description = "email address of the support account for cw alerts"
+  recovery_window_in_days = local.is-production ? 30 : 0
 }
 
 # Use a default dummy address just for creation. Will require to be populated manually.
