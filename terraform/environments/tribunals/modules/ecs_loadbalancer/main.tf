@@ -180,8 +180,7 @@ resource "aws_lb_listener_rule" "admin_access" {
   }
 
   condition {
-    http_header {
-      http_header_name = "X-Forwarded-For"
+    source_ip {
       values           = ["194.33.19.0/24", "109.154.193.219/32", "82.1.119.170/32"]
     }
   }
