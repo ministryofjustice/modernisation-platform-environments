@@ -16,7 +16,7 @@ module "oracle_db_shared" {
   platform_vars      = var.platform_vars
   env_name           = var.env_name
   tags               = local.tags
-  public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
+  public_keys        = local.db_public_key_data.keys[var.env_name]
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
