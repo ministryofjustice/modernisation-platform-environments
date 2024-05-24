@@ -3,11 +3,11 @@ locals {
   # add header widget and calculate x, y positions
   cloudwatch_dashboards = {
     for key, value in var.cloudwatch_dashboards : key => {
-      periodOverride = value.periodOverride
-      start          = value.start
-      widgets = flatten([value.widgets, [
-        for widget_group in value.widget_groups : [
-          widget_group.header_markdown == null ? [] : [{
+      periodOverride = lookup(value, "periodOverride", null)
+      start          = lookup(value, "start", null)
+      widgets = flatten([lookup(value, "widgets", []), [
+        for widget_group in lookup(value, "widget_groups", []) : [
+          lookup(widget_group, "header_markdown", null) == null ? [] : [{
             type   = "text"
             width  = 24
             height = 1
@@ -19,7 +19,7 @@ locals {
             }
           }],
           [
-            for i in range(length(widget_group.widgets)) : merge(coalesce(widget_group.widgets[i], {}), {
+            for i in range(length(widget_group.widgets)) : merge(widget_group.widgets[i], {
               width  = widget_group.width
               height = widget_group.height
               x      = i * widget_group.width % 24

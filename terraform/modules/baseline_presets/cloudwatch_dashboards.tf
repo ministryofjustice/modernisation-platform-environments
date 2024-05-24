@@ -5,7 +5,6 @@ locals {
   ])
 
   cloudwatch_dashboard_widgets = {
-
     acm = {
       cert-expires-soon = {
         type = "metric"
@@ -797,7 +796,7 @@ locals {
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
         null,
-        null
+        null,
       ]
     }
     ec2_oracle_db_with_backup = {
@@ -856,7 +855,7 @@ locals {
     "CloudWatch-Default" = {
       periodOverride = "auto"
       start          = "-PT3H"
-      widgets_groups = [
+      widget_groups = [
         for group in coalesce(var.options.cloudwatch_dashboard_default_widget_groups, []) :
         local.cloudwatch_dashboard_widget_groups[group]
       ]

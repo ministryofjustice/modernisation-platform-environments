@@ -23,6 +23,15 @@ output "bastion_linux" {
   value       = length(module.bastion_linux) == 1 ? module.bastion_linux[0] : null
 }
 
+output "cloudwatch_dashboards_debug" {
+  value = local.cloudwatch_dashboards
+}
+
+output "cloudwatch_dashboards" {
+  description = "map of aws_cloudwatch_dashboards resources"
+  value       = aws_cloudwatch_dashboard.this
+}
+
 output "cloudwatch_log_groups" {
   description = "map of aws_cloudwatch_log_group resources"
   value       = aws_cloudwatch_log_group.this
