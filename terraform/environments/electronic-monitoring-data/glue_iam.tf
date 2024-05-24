@@ -131,9 +131,16 @@ resource "aws_iam_policy" "glue_user_restricted_notebook_service_role_iam_policy
             }
         },
         {
+            "Sid": "PolicyStatementToAllowUserToListRoles",
+            "Effect": "Allow",
+            "Action": ["iam:ListRoles"],
+            "Resource": "*"
+        },
+        {
             "Sid": "NotebookPassRole",
             "Effect": "Allow",
             "Action": [
+                "iam:GetRole",
                 "iam:PassRole"
             ],
             "Resource": [
