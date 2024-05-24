@@ -305,16 +305,11 @@ locals {
   nomis_secrets_placeholder = {
     db_name  = "nomis"
     password = "placeholder"
+    # We need to duplicate the username with 'user' and 'username' keys
     user     = "placeholder"
+    username = "placeholder"
     endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
     port     = "1521"
-  }
-
-  # Nomis Secrets PlaceHolder in Athena Federated Query format
-  nomis_secrets_placeholder_athena_federated = {
-    username = "placeholder"
-    password = "placeholder"
-    sid      = "placeholder"
   }
 
   # DPS Secrets PlaceHolder
