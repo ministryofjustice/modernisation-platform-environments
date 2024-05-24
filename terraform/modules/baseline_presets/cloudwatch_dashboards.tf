@@ -277,7 +277,7 @@ locals {
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 service-status-error-os-layer"
-          stat    = "Maxiumum"
+          stat    = "Maximum"
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_service_status_os_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
@@ -307,7 +307,7 @@ locals {
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 service-status-error-app-layer"
-          stat    = "Maxiumum"
+          stat    = "Maximum"
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_service_status_app_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
@@ -337,7 +337,7 @@ locals {
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 connectivity-test-all-failed"
-          stat    = "Maxiumum"
+          stat    = "Maximum"
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_connectivity_test_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
@@ -367,7 +367,7 @@ locals {
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 textfile-monitoring-metric-error"
-          stat    = "Maxiumum"
+          stat    = "Maximum"
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
@@ -395,7 +395,7 @@ locals {
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 textfile-monitoring-metric-not-updated"
-          stat    = "Maxiumum"
+          stat    = "Maximum"
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_seconds) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
@@ -426,7 +426,7 @@ locals {
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 oracle-db-disconnected"
-          stat    = "Maxiumum"
+          stat    = "Maximum"
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_oracle_db_connected_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
@@ -456,7 +456,7 @@ locals {
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 oracle-db-rman-backup-error"
-          stat    = "Maxiumum"
+          stat    = "Maximum"
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_rman_backup_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
@@ -484,7 +484,7 @@ locals {
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 oracle-db-rman-backup-did-not-run"
-          stat    = "Maxiumum"
+          stat    = "Maximum"
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_rman_backup_seconds) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
