@@ -55,5 +55,5 @@ module "config_bucket" {
     }
   ]
 
-  tags = local.tags
+  tags = var.tags
 }
