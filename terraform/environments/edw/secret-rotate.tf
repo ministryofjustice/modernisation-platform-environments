@@ -122,23 +122,70 @@ resource "aws_iam_role" "edw_lambda_function_execution_role" {
         }
     ]
   })
-  
-  inline_policy {
-    name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-policy"
+ } 
 
-    policy = templatefile("lambda-execution-policy.json", {
-      AWS_ACCOUNT_ID = local.application_data.accounts[local.environment].aws_account_id
-      FUNCTION_NAME  = local.application_data.accounts[local.environment].lambda_function_name
-    })
-  }
-
+resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = "${local.application_data.accounts[local.environment].lambda_function_name}-Policy"
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-edw-lambda-execution-role"
+      Name = "${local.application_name}-edw-secret-rotate-function"
     }
   ) 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+        ],
+        Resource = [
+          "arn:aws:logs:${local.application_data.accounts[local.environment].edw_region}:${local.application_data.accounts[local.environment].aws_account_id}:*",
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ],
+        Resource = [
+          "arn:aws:logs:${local.application_data.accounts[local.environment].edw_region}:${local.application_data.accounts[local.environment].aws_account_id}:log-group:/aws/lambda/${local.application_data.accounts[local.environment].lambda_function_name}:*",
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:CreateSecret",
+          "secretsmanager:ListSecrets",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:PutSecretValue",
+          "secretsmanager:UpdateSecretVersionStage",
+          "secretsmanager:GetRandomPassword",
+          "lambda:InvokeFunction",
+        ],
+        Resource = "*"
+      },
+      {
+        Sid    = "GenerateARandomStringToExecuteRotation",
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetRandomPassword",
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+
 }
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy" {
+  role       = aws_iam_role.edw_lambda_function_execution_role.name
+  policy_arn = aws_iam_policy.edw_lambda_function_execution_role_policy.arn
+}
+
 
 resource "aws_lambda_permission" "rotate_secret_function_permission" {
   action        = "lambda:InvokeFunction"
