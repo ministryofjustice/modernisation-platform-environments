@@ -225,23 +225,3 @@ resource "aws_lb_listener_rule" "admin_secure_fixed_response" {
     }
   }
 }
-
-resource "aws_lb_listener_rule" "default_response" {
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 999
-
-  action {
-    type             = "fixed-response"
-    fixed_response {
-      content_type = "text/html"
-      message_body = ""
-      status_code  = "404"
-    }
-  }
-
-  condition {
-    path_pattern {
-      values = ["/Admin*", "/admin*", "/Secure*", "/secure*"]
-    }
-  }
-}
