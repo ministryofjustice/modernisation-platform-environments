@@ -54,7 +54,7 @@ module "umt" {
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
   alb_listener_rule_paths            = ["/umt"]
 
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-user-management-ecr-repo:${var.delius_microservice_configs.umt.image_tag}"
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-user-management:${var.delius_microservice_configs.umt.image_tag}"
 
   platform_vars = var.platform_vars
   tags          = var.tags
