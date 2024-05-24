@@ -133,30 +133,21 @@ resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:i
     }
   ) 
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+    "Version": "2012-10-17",
+    "Statement": [
       {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogGroup",
-        ],
-        Resource = [
-          "arn:aws:logs:eu-west-2:${local.application_data.accounts[local.environment].aws_account_id}:*",
-        ]
+        "Effect": "Allow",
+        "Action": "logs:CreateLogGroup",
+        "Resource": "arn:aws:logs:eu-west-2:${local.application_data.accounts[local.environment].aws_account_id}:*"
       },
       {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-        ],
-        Resource = [
-          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:log-group:/aws/lambda/${local.application_data.accounts[local.environment].lambda_function_name}:*",
-        ]
+        "Effect": "Allow",
+        "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+        "Resource": ["arn:aws:logs:eu-west-2:${local.application_data.accounts[local.environment].aws_account_id}:log-group:/aws/lambda/${local.application_data.accounts[local.environment].lambda_function_name}:*"]
       },
       {
-        Effect = "Allow",
-        Action = [
+        "Effect": "Allow",
+        "Action": [
           "secretsmanager:CreateSecret",
           "secretsmanager:ListSecrets",
           "secretsmanager:DescribeSecret",
@@ -164,17 +155,15 @@ resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:i
           "secretsmanager:PutSecretValue",
           "secretsmanager:UpdateSecretVersionStage",
           "secretsmanager:GetRandomPassword",
-          "lambda:InvokeFunction",
+          "lambda:InvokeFunction"
         ],
-        Resource = "*"
+        "Resource": "*"
       },
       {
-        Sid    = "GenerateARandomStringToExecuteRotation",
-        Effect = "Allow",
-        Action = [
-          "secretsmanager:GetRandomPassword",
-        ],
-        Resource = "*"
+        "Sid": "GenerateARandomStringToExecuteRotation",
+        "Effect": "Allow",
+        "Action": ["secretsmanager:GetRandomPassword"],
+        "Resource": "*" 
       }
     ]
   })
