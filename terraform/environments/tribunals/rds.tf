@@ -33,7 +33,21 @@ resource "aws_security_group" "sqlserver_db_sc" {
   name        = "sqlserver_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
-  
+
+  ingress {
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
+    description = "Allows Mateusz to access RDS"
+    cidr_blocks = ["82.1.119.170/32"]
+  }
+  ingress {
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
+    description = "Allows Matt to access RDS"
+    cidr_blocks = ["109.154.193.219/32"]
+  }
   ingress {
     from_port   = 1433
     to_port     = 1433
