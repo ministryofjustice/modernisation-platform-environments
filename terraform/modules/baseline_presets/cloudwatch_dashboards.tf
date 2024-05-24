@@ -17,15 +17,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MIN(DaysToExpiry) FROM SCHEMA(\"AWS/CertificateManager\", CertificateArn) GROUP BY CertificateArn  ORDER BY MIN() ASC", "id" : "q1", "label" : "" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.acm.cert-expires-soon.threshold
-                fill  = "below"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.acm.cert-expires-soon.threshold
+          #    fill  = "below"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -48,15 +46,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.ec2.cpu-utilization-high.threshold
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2.cpu-utilization-high.threshold
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -76,15 +72,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(StatusCheckFailed_Instance)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = 1
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -104,15 +98,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(StatusCheckFailed_System)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 20", "label" : "", "id" : "q1" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = 1
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -135,15 +127,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MIN(DISK_FREE) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MIN() ASC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.ec2_cwagent_windows.free-disk-space-low.threshold
-                fill  = "below"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_cwagent_windows.free-disk-space-low.threshold
+          #    fill  = "below"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -163,15 +153,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(Memory % Committed Bytes In Use) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.ec2_cwagent_windows.high-memory-usage.threshold
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_cwagent_windows.high-memory-usage.threshold
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -194,15 +182,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(disk_used_percent) FROM SCHEMA(CWAgent, InstanceId, device, fstype, name, path, server_type) GROUP BY InstanceId, path ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.free-disk-space-low.threshold
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.free-disk-space-low.threshold
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -222,15 +208,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(mem_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.high-memory-usage.threshold
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.high-memory-usage.threshold
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -250,15 +234,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(cpu_usage_iowait) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.cpu-iowait-high.threshold
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.cpu-iowait-high.threshold
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -281,15 +263,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_service_status_os_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = 1
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -311,15 +291,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_service_status_app_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = 1
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -341,15 +319,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_connectivity_test_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = 1
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -371,15 +347,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = 1
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -399,15 +373,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_seconds) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated.threshold
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated.threshold
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -430,15 +402,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_oracle_db_connected_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = 1
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -460,15 +430,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_rman_backup_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = 1
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -488,15 +456,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_rman_backup_seconds) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run.threshold
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run.threshold
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -640,13 +606,11 @@ locals {
             [{ "expression" : "SELECT MAX(UnHealthyHostCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
           ]
           #annotations = {
-          #  horizontal = [
-          #    {
-          #      label = "Alarm Threshold"
-          #      value = local.cloudwatch_metric_alarms.lb.unhealthy-load-balancer-host.threshold
-          #      fill  = "above"
-          #    }
-          #  ]
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.lb.unhealthy-load-balancer-host.threshold
+          #    fill  = "above"
+          #  }]
           #}
           yAxis = {
             left = {
@@ -689,15 +653,13 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(UnHealthyHostCount) FROM SCHEMA(\"AWS/NetworkELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.network_lb.unhealthy-network-load-balancer-host.threshold
-                fill  = "above"
-              }
-            ]
-          }
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.network_lb.unhealthy-network-load-balancer-host.threshold
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
@@ -837,7 +799,7 @@ locals {
         local.cloudwatch_dashboard_widgets.lb.load-balancer-connection-errors,
         local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
-        #local.cloudwatch_dashboard_widgets.acm.cert-expires-soon,
+        local.cloudwatch_dashboard_widgets.acm.cert-expires-soon,
       ]
     }
     network_lb = {
