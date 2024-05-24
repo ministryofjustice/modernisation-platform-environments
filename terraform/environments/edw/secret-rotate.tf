@@ -141,7 +141,7 @@ resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:i
           "logs:CreateLogGroup",
         ],
         Resource = [
-          "arn:aws:logs:${local.application_data.accounts[local.environment].edw_region}:${local.application_data.accounts[local.environment].aws_account_id}:*",
+          "arn:aws:logs:eu-west-2:${local.application_data.accounts[local.environment].aws_account_id}:*",
         ]
       },
       {
@@ -151,7 +151,7 @@ resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:i
           "logs:PutLogEvents",
         ],
         Resource = [
-          "arn:aws:logs:${local.application_data.accounts[local.environment].edw_region}:${local.application_data.accounts[local.environment].aws_account_id}:log-group:/aws/lambda/${local.application_data.accounts[local.environment].lambda_function_name}:*",
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:log-group:/aws/lambda/${local.application_data.accounts[local.environment].lambda_function_name}:*",
         ]
       },
       {
@@ -178,7 +178,6 @@ resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:i
       }
     ]
   })
-
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy" {
