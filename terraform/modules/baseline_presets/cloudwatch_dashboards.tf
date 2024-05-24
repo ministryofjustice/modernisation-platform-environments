@@ -639,21 +639,21 @@ locals {
           metrics = [
             [{ "expression" : "SELECT MAX(UnHealthyHostCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
           ]
-          annotations = {
-            horizontal = [
-              {
-                label = "Alarm Threshold"
-                value = local.cloudwatch_metric_alarms.lb.unhealthy-load-balancer-host.threshold
-                fill  = "above"
-              }
-            ]
-          }
-          #yAxis = {
-          #  left = {
-          #    showUnits = false,
-          #    label     = "host count"
-          #  }
+          #annotations = {
+          #  horizontal = [
+          #    {
+          #      label = "Alarm Threshold"
+          #      value = local.cloudwatch_metric_alarms.lb.unhealthy-load-balancer-host.threshold
+          #      fill  = "above"
+          #    }
+          #  ]
           #}
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "host count"
+            }
+          }
         }
       }
       load-balancer-target-response-time = {
