@@ -1,387 +1,864 @@
 locals {
 
+  cloudwatch_dashboards_filter = flatten([
+    var.options.cloudwatch_dashboard_default_widget_groups != null ? ["CloudWatch-Default"] : []
+  ])
+
   cloudwatch_dashboard_widgets = {
 
-    LoadBalancerGraphedMetricsHeading = {
-      type = "text"
-      x      = 0
-      #y      = 0
-      width  = 24
-      height = 1
-      properties = {
-        markdown   = "## LoadBalancer Graphed Metrics"
-        background = "solid"
+    acm = {
+      cert-expires-soon = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ACM cert-expires-soon"
+          stat    = "Minimum"
+          metrics = [
+            [{ "expression" : "SELECT MIN(DaysToExpiry) FROM SCHEMA(\"AWS/CertificateManager\", CertificateArn) GROUP BY CertificateArn  ORDER BY MIN() ASC", "id" : "q1", "label" : "" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.acm.cert-expires-soon.threshold
+                fill  = "below"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "days"
+            }
+          }
+        }
       }
     }
 
-    LoadBalancerRequestCount = {
-      type = "metric"
-      x      = 0
-      #y      = 1
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = true
-        region  = "eu-west-2"
-        title   = "Sum LoadBalancer Requests"
-        stat    = "Sum"
-        metrics = [
-          [{ "expression" : "SELECT SUM(RequestCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q1" }]
-        ]
+    ec2 = {
+      cpu-utilization-high = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 cpu-utilization-high"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.ec2.cpu-utilization-high.threshold
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "%"
+            }
+          }
+        }
+      }
+      instance-status-check-failed = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 instance-status-check-failed"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(StatusCheckFailed_Instance)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = 1
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error code"
+            }
+          }
+        }
+      }
+      system-status-check-failed = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 system-status-check-failed"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(StatusCheckFailed_System)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 20", "label" : "", "id" : "q1" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = 1
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error code"
+            }
+          }
+        }
       }
     }
 
-    LoadBalancerHTTP4XXsCount = {
-      type = "metric"
-      x      = 8
-      #y      = 1
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = true
-        region  = "eu-west-2"
-        title   = "Sum LoadBalancer HTTP 4XXs"
-        stat    = "Sum"
-        metrics = [
-          [{ "expression" : "SELECT SUM(HTTPCode_ELB_4XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }]
-        ]
+    ec2_cwagent_windows = {
+      free-disk-space-low = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Windows free-disk-space-low"
+          stat    = "Minimum"
+          metrics = [
+            [{ "expression" : "SELECT MIN(DISK_FREE) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MIN() ASC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.ec2_cwagent_windows.free-disk-space-low.threshold
+                fill  = "below"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "disk free %"
+            }
+          }
+        }
+      }
+      high-memory-usage = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Windows high-memory-usage"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(Memory % Committed Bytes In Use) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.ec2_cwagent_windows.high-memory-usage.threshold
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "%"
+            }
+          }
+        }
       }
     }
 
-    LoadBalancerHTTP5XXsCount = {
-      type = "metric"
-      x      = 16
-      #y      = 1
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = true
-        region  = "eu-west-2"
-        title   = "Sum LoadBalancer HTTP 5XXs"
-        stat    = "Sum"
-        metrics = [
-          [{ "expression" : "SELECT SUM(HTTPCode_ELB_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }]
-        ]
+    ec2_cwagent_linux = {
+      free-disk-space-low = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Linux free-disk-space-low"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(disk_used_percent) FROM SCHEMA(CWAgent, InstanceId, device, fstype, name, path, server_type) GROUP BY InstanceId, path ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.free-disk-space-low.threshold
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "disk used %"
+            }
+          }
+        }
+      }
+      high-memory-usage = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Linux high-memory-usage"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(mem_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.high-memory-usage.threshold
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "%"
+            }
+          }
+        }
+      }
+      cpu-iowait-high = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Linux cpu-iowait-high"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(cpu_usage_iowait) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.cpu-iowait-high.threshold
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "%"
+            }
+          }
+        }
       }
     }
 
-    LoadBalancerUnhealthyTargets = {
-      type = "metric"
-      x      = 0
-      #y      = 9
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = true
-        region  = "eu-west-2"
-        title   = "Max LoadBalancer Unhealthy Targets"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(UnHealthyHostCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
-        ]
+    ec2_instance_cwagent_collectd_service_status_os = {
+      service-status-error-os-layer = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 service-status-error-os-layer"
+          stat    = "Maxiumum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(collectd_service_status_os_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = 1
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error code"
+            }
+          }
+        }
+      }
+    }
+    ec2_instance_cwagent_collectd_service_status_app = {
+      service-status-error-app-layer = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 service-status-error-app-layer"
+          stat    = "Maxiumum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(collectd_service_status_app_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = 1
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error code"
+            }
+          }
+        }
+      }
+    }
+    ec2_instance_cwagent_collectd_connectivity_test = {
+      connectivity-test-all-failed = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 connectivity-test-all-failed"
+          stat    = "Maxiumum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(collectd_connectivity_test_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = 1
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error code"
+            }
+          }
+        }
+      }
+    }
+    ec2_instance_cwagent_collectd_textfile_monitoring = {
+      textfile-monitoring-metric-error = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 textfile-monitoring-metric-error"
+          stat    = "Maxiumum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = 1
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error code"
+            }
+          }
+        }
+      }
+      textfile-monitoring-metric-not-updated = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 textfile-monitoring-metric-not-updated"
+          stat    = "Maxiumum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_seconds) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated.threshold
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "seconds"
+            }
+          }
+        }
       }
     }
 
-    LoadBalancerAverageTargetResponseTime = {
-      type = "metric"
-      x      = 8
-      #y      = 9
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Average LoadBalancer Target Response Time"
-        stat    = "Average"
-        metrics = [
-          [{ "expression" : "SELECT AVG(TargetResponseTime) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
-        ]
+    ec2_instance_cwagent_collectd_oracle_db_connected = {
+      oracle-db-disconnected = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 oracle-db-disconnected"
+          stat    = "Maxiumum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(collectd_oracle_db_connected_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = 1
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error code"
+            }
+          }
+        }
+      }
+    }
+    ec2_instance_cwagent_collectd_oracle_db_backup = {
+      oracle-db-rman-backup-error = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 oracle-db-rman-backup-error"
+          stat    = "Maxiumum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_rman_backup_value) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = 1
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error code"
+            }
+          }
+        }
+      }
+      oracle-db-rman-backup-did-not-run = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 oracle-db-rman-backup-did-not-run"
+          stat    = "Maxiumum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(collectd_textfile_monitoring_rman_backup_seconds) FROM SCHEMA(CWAgent, InstanceId, type, type_instance) GROUP BY InstanceId, type, type_instance ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run.threshold
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "seconds"
+            }
+          }
+        }
       }
     }
 
-    LoadBalancerMaximumTargetResponseTime = {
-      type = "metric"
-      x      = 16
-      #y      = 9
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Max LoadBalancer Target Response Time"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(TargetResponseTime) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
-        ]
+    lb = {
+      load-balancer-requests = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ALB load-balancer-request"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SELECT SUM(RequestCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }],
+            [{ "expression" : "SELECT SUM(RequestCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "request count"
+            }
+          }
+        }
+      }
+      load-balancer-http-4XXs = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ALB load-balancer-http-4XXs"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SELECT SUM(HTTPCode_ELB_4XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }],
+            [{ "expression" : "SELECT SUM(HTTPCode_Target_4XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error count"
+            }
+          }
+        }
+      }
+      load-balancer-http-5XXs = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ALB load-balancer-http-5XXs"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SELECT SUM(HTTPCode_ELB_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }],
+            [{ "expression" : "SELECT SUM(HTTPCode_Target_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error count"
+            }
+          }
+        }
+      }
+      load-balancer-active-connections = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ALB load-balancer-active-connections"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(ActiveConnectionCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "connection count"
+            }
+          }
+        }
+      }
+      load-balancer-new-connections = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ALB load-balancer-new-connections"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SELECT SUM(NewConnectionCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "connection count"
+            }
+          }
+        }
+      }
+      load-balancer-connection-errors = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ALB load-balancer-connection-errors"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SELECT SUM(TargetConnectionErrorCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }],
+            [{ "expression" : "SELECT SUM(RejectedConnectionCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
+            [{ "expression" : "SELECT SUM(TargetTLSNegotiationErrorCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q3" }],
+            [{ "expression" : "SELECT SUM(ClientTLSNegotiationErrorCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q4" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error count"
+            }
+          }
+        }
+      }
+      unhealthy-load-balancer-host = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "ALB unhealthy-load-balancer-host"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(UnHealthyHostCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.lb.unhealthy-load-balancer-host.threshold
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "host count"
+            }
+          }
+        }
+      }
+      load-balancer-target-response-time = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "load-balancer-target-response-time"
+          stat    = "Average"
+          metrics = [
+            [{ "expression" : "SELECT AVG(TargetResponseTime) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY AVG() DESC", "label" : "", "id" : "q1" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "seconds"
+            }
+          }
+        }
       }
     }
 
-    ACMCertificateDaysToExpiry = {
-      type = "metric"
-      x      = 0
-      #y      = 17
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Min ACM Certificate Days To Expiry"
-        stat    = "Minimum"
-        metrics = [
-          [{ "expression" : "SELECT MIN(DaysToExpiry) FROM SCHEMA(\"AWS/CertificateManager\", CertificateArn) GROUP BY CertificateArn ORDER BY MIN() DESC", "label" : "", "id" : "q1" }]
-        ]
+    network_lb = {
+      unhealthy-network-load-balancer-host = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB unhealthy-network-load-balancer-host"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SELECT MAX(UnHealthyHostCount) FROM SCHEMA(\"AWS/NetworkELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC", "label" : "", "id" : "q1" }],
+          ]
+          annotations = {
+            horizontal = [
+              {
+                label = "Alarm Threshold"
+                value = local.cloudwatch_metric_alarms.network_lb.unhealthy-network-load-balancer-host.threshold
+                fill  = "above"
+              }
+            ]
+          }
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "host count"
+            }
+          }
+        }
       }
     }
 
-    EC2GraphedMetricsHeading = {
-      type = "text"
-      x      = 0
-      #y      = 25
-      width  = 24
-      height = 1
-      properties = {
-        markdown   = "## EC2 Graphed Metrics"
-        background = "solid"
-      }
-    }
-
-    EC2CPUUtilization = {
-      type = "metric"
-      x      = 0
-      #y      = 26
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Max EC2 CPU Utilization %"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(CPUUtilization)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
-        ]
-      }
-    }
-
-    EC2InstanceStatus = {
-      type = "metric"
-      x      = 8
-      #y      = 26
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = true
-        region  = "eu-west-2"
-        title   = "EC2 Instance Status"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(StatusCheckFailed_Instance)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
-        ]
-      }
-    }
-
-    EC2SystemStatus = {
-      type = "metric"
-      x      = 16
-      #y      = 26
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = true
-        region  = "eu-west-2"
-        title   = "EC2 System Status"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(StatusCheckFailed_Instance)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 20", "label" : "", "id" : "q1" }],
-          [{ "expression" : "SELECT MAX(StatusCheckFailed_System)\nFROM SCHEMA(\"AWS/EC2\", InstanceId)\nGROUP BY InstanceId\nORDER BY MAX() DESC\nLIMIT 20", "label" : "", "id" : "q1" }]
-        ]
-      }
-    }
-
-    EC2LinuxMemoryUtilization = {
-      type = "metric"
-      x      = 0
-      #y      = 42
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Max EC2 Linux Memory Utilization %"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(mem_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
-        ]
-      }
-    }
-
-    EC2LinuxDiskUsed = {
-      type = "metric"
-      x      = 8
-      #y      = 42
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Max EC2 Linux Disk Used %"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(disk_used_percent) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
-        ]
-      }
-    }
-
-    EC2LinuxCPUIOWait = {
-      type = "metric"
-      x      = 16
-      #y      = 42
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Max EC2 Linux CPU Usage IOWait %"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(cpu_usage_iowait) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1" }]
-        ]
-      }
-    }
-
-    EC2WindowsMemoryUtilization = {
-      type = "metric"
-      x      = 0
-      #y      = 34
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Max EC2 Windows Memory Utilization %"
-        stat    = "Maximum"
-        metrics = [
-          [{ "expression" : "SELECT MAX(Memory % Committed Bytes In Use) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MAX() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
-        ]
-      }
-    }
-
-    EC2WindowsDiskFree = {
-      type = "metric"
-      x      = 8
-      #y      = 34
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "Min EC2 Windows Disk Free %"
-        stat    = "Minimum"
-        metrics = [
-          [{ "expression" : "SELECT MIN(DISK_FREE) FROM SCHEMA(CWAgent, InstanceId) GROUP BY InstanceId ORDER BY MIN() DESC", "label" : "", "id" : "q1", "yAxis" : "left" }]
-        ]
-      }
-    }
-
-
-    EBSGraphedMetricsHeading = {
-      type = "text"
-      x      = 0
-      #y      = 43
-      width  = 24
-      height = 1
-      properties = {
-        markdown   = "## EBS Volume Graphed Metrics"
-        background = "solid"
-      }
-    }
-
-    EBSVolumeDiskIOPS = {
-      type = "metric"
-      x      = 0
-      #y      = 44
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "EBS Volumes Total IOPs"
-        stat    = "Sum"
-        metrics = [
-          [{ "expression" : "m1/PERIOD(m1)", "label" : "Read IOPs", "id" : "e1" }],
-          [{ "expression" : "m2/PERIOD(m2)", "label" : "Write IOPs", "id" : "e2" }],
-          [{ "expression" : "e1+e2", "label" : "Total IOPs", "id" : "e3" }],
-          ["AWS/EBS", "VolumeReadOps", "VolumeId", "*", { "id" : "m1", "visible" : false }],
-          ["AWS/EBS", "VolumeWriteOps", "VolumeId", "*", { "id" : "m2", "visible" : false }]
-        ]
-      }
-    }
-
-    EBSVolumeDiskThroughput = {
-      type = "metric"
-      x      = 8
-      #y      = 44
-      width  = 8
-      height = 8
-      properties = {
-        view    = "timeSeries"
-        stacked = false
-        region  = "eu-west-2"
-        title   = "EBS Volumes Throughput"
-        stat    = "Sum"
-        metrics = [
-          [{ "expression" : "SELECT SUM(VolumeWriteBytes)\nFROM SCHEMA(\"AWS/EBS\", VolumeId)\nGROUP BY VolumeId\nORDER BY SUM() DESC\nLIMIT 10", "label" : "VolumeWriteBytes", "id" : "m3", "stat" : "Sum", "visible" : false }],
-          [{ "expression" : "SELECT SUM(VolumeReadBytes) FROM SCHEMA(\"AWS/EBS\", VolumeId) GROUP BY VolumeId ORDER BY SUM() DESC LIMIT 10", "label" : "VolumeReadBytes", "id" : "m4", "stat" : "Sum", "visible" : false }],
-          [{ "expression" : "(m4/(1024*1024))/PERIOD(m4)", "label" : "MB Read Per Second", "id" : "e4" }],
-          [{ "expression" : "(m3/(1024*1024))/PERIOD(m3)", "label" : "MB Write Per Second", "id" : "e5" }],
-          [{ "expression" : "e4+e5", "label" : "Total Consumed MB/s", "id" : "e6" }]
-        ]
-      }
-    }
   }
 
+  cloudwatch_dashboard_widget_groups = {
+    acm = {
+      header_markdown = "## ACM"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.acm.cert-expires-soon,
+        null,
+        null,
+      ]
+    }
+    ec2_windows_only = {
+      header_markdown = "## EC2"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
+        null,
+      ]
+    }
+    ec2_linux_only = {
+      header_markdown = "## EC2"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+      ]
+    }
+    ec2_linux_and_windows = {
+      header_markdown = "## EC2"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
+        null,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+      ]
+    }
+    ec2_service_status = {
+      width  = 8
+      height = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+        null,
+      ]
+    }
+    ec2_service_status_with_connectivity_test = {
+      width  = 8
+      height = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_connectivity_test.connectivity-test-all-failed,
+      ]
+    }
+    ec2_textfile_monitoring = {
+      width  = 8
+      height = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-error,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated,
+        null,
+      ]
+    }
+    ec2_oracle_db = {
+      width  = 8
+      height = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+        null,
+        null
+      ]
+    }
+    ec2_oracle_db_with_backup = {
+      width  = 8
+      height = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-error,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run,
+      ]
+    }
+    lb = {
+      header_markdown = "## ALB"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-requests,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-http-4XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-http-5XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-active-connections,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-new-connections,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-connection-errors,
+        local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
+        null,
+      ]
+    }
+    lb_with_acm = {
+      header_markdown = "## ALB"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-requests,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-http-4XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-http-5XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-active-connections,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-new-connections,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-connection-errors,
+        local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
+        local.cloudwatch_dashboard_widgets.acm.cert-expires-soon,
+      ]
+    }
+    network_lb = {
+      width  = 8
+      height = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.network_lb.unhealthy-network-load-balancer-host,
+        null,
+        null,
+      ]
+    }
+  }
 
   cloudwatch_dashboards = {
     "CloudWatch-Default" = {
       periodOverride = "auto"
       start          = "-PT3H"
-      widgets = [
-        local.cloudwatch_dashboard_widgets.LoadBalancerGraphedMetricsHeading,
-        local.cloudwatch_dashboard_widgets.LoadBalancerRequestCount,
-        local.cloudwatch_dashboard_widgets.LoadBalancerHTTP4XXsCount,
-        local.cloudwatch_dashboard_widgets.LoadBalancerHTTP5XXsCount,
-        local.cloudwatch_dashboard_widgets.LoadBalancerUnhealthyTargets,
-        local.cloudwatch_dashboard_widgets.LoadBalancerAverageTargetResponseTime,
-        local.cloudwatch_dashboard_widgets.LoadBalancerMaximumTargetResponseTime,
-        local.cloudwatch_dashboard_widgets.ACMCertificateDaysToExpiry,
-        local.cloudwatch_dashboard_widgets.EC2GraphedMetricsHeading,
-        local.cloudwatch_dashboard_widgets.EC2CPUUtilization,
-        local.cloudwatch_dashboard_widgets.EC2InstanceStatus,
-        local.cloudwatch_dashboard_widgets.EC2SystemStatus,
-
-        local.cloudwatch_dashboard_widgets.EC2WindowsMemoryUtilization,
-        local.cloudwatch_dashboard_widgets.EC2WindowsDiskFree,
-        local.cloudwatch_dashboard_widgets.EC2LinuxMemoryUtilization,
-        local.cloudwatch_dashboard_widgets.EC2LinuxDiskUsed,
-        local.cloudwatch_dashboard_widgets.EC2LinuxCPUIOWait,
-        local.cloudwatch_dashboard_widgets.EBSGraphedMetricsHeading,
-        local.cloudwatch_dashboard_widgets.EBSVolumeDiskIOPS,
-        local.cloudwatch_dashboard_widgets.EBSVolumeDiskThroughput,
+      widgets_groups = [
+        for group in coalesce(var.options.cloudwatch_dashboard_default_widget_groups, []) :
+        local.cloudwatch_dashboard_widget_groups[group]
       ]
     }
   }

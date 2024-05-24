@@ -1,4 +1,36 @@
 locals {
+
+  # add header widget and calculate x, y positions
+  cloudwatch_dashboards = {
+    for key, value in var.cloudwatch_dashboards : key => {
+      periodOverride = value.periodOverride
+      start          = value.start
+      widgets = flatten([value.widgets, [
+        for widget_group in value.widget_groups : [
+          widget_group.header_markdown == null ? [] : [{
+            type   = "text"
+            width  = 24
+            height = 1
+            x      = 0
+            y      = 0
+            properties = {
+              markdown   = widget_group.header_markdown
+              background = "solid"
+            }
+          }],
+          [
+            for i in range(length(widget_group.widgets)) : merge(coalesce(widget_group.widgets[i], {}), {
+              width  = widget_group.width
+              height = widget_group.height
+              x      = i * widget_group.width % 24
+              y      = 0
+            }) if widget_group.widgets[i] != null
+          ]
+        ]
+      ]])
+    }
+  }
+
   cloudwatch_metric_alarms_list_by_dimension_list = flatten([
     for alarm_key, alarm_value in var.cloudwatch_metric_alarms : [
       for dimension_value in alarm_value.split_by_dimension.dimension_values : [{
@@ -26,7 +58,7 @@ locals {
 }
 
 resource "aws_cloudwatch_dashboard" "this" {
-  for_each = var.cloudwatch_dashboards
+  for_each = local.cloudwatch_dashboards
 
   dashboard_name = each.key
   dashboard_body = jsonencode(each.value)
