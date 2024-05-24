@@ -20,6 +20,6 @@ resource "aws_macie2_classification_job" "example" {
       ]
     }
   }
-  job_status = "CANCELLED"
+  job_status = "USER_PAUSED"
   depends_on = [aws_macie2_account.example]
 }
