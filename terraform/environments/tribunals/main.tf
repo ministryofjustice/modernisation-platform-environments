@@ -391,6 +391,7 @@ module "charity_tribunal_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "documents"
+  waf_arn                           = local.waf_arn
 }
 
 module "claims_management_decisions" {
@@ -414,6 +415,7 @@ module "claims_management_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
 }
 
 module "consumer_credit_appeals" {
@@ -437,6 +439,7 @@ module "consumer_credit_appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
 }
 
 module "estate_agent_appeals" {
@@ -460,6 +463,7 @@ module "estate_agent_appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
 }
 
 module "primary_health_lists" {
@@ -483,6 +487,7 @@ module "primary_health_lists" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
 }
 
 module "siac" {
@@ -506,6 +511,7 @@ module "siac" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
 }
 
 module "sscs_venue_pages" {
@@ -529,6 +535,7 @@ module "sscs_venue_pages" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
 }
 
 module "tax_chancery_decisions" {
@@ -552,6 +559,7 @@ module "tax_chancery_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
 }
 
 module "tax_tribunal_decisions" {
@@ -575,6 +583,7 @@ module "tax_tribunal_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
 }
 
 module "ftp-admin-appeals" {
@@ -598,4 +607,5 @@ module "ftp-admin-appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
 }
