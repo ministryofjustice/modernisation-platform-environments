@@ -95,6 +95,7 @@ resource "aws_sesv2_configuration_set" "jitbit_ses_configuration_set" {
 
   suppression_options {
     suppressed_reasons = [
+      "BOUNCE",
       "COMPLAINT"
     ]
   }
