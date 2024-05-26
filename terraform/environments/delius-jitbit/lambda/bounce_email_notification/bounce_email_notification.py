@@ -23,6 +23,8 @@ def handler(event, context):
     common_headers = mail.get("commonHeaders")
     headers = mail.get("headers")
 
+    from_address = os.environ.get("FROM_ADDRESS")
+
     print(headers)
 
     jitbit_ticket_id_arr = list(
@@ -126,7 +128,7 @@ def handler(event, context):
 
     try:
         email = ses.send_email(
-            FromEmailAddress=source,
+            FromEmailAddress=from_address,
             Destination={"ToAddresses": [reply_to]},
             ReplyToAddresses=[reply_to],
             Content={

@@ -42,6 +42,7 @@ resource "aws_lambda_function" "bounce_email_notification" {
     variables = {
       RATE_LIMIT = 5
       DYNAMODB_TABLE = aws_dynamodb_table.bounce_email_notification.name
+      FROM_ADDRESS = "bounce-notification@${aws_sesv2_email_identity.jitbit.email_identity}"
     }
   }
 
