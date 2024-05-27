@@ -254,11 +254,11 @@ locals {
           cidr_blocks = local.security_group_cidrs.icmp
         }
         ssh = {
-          description = "Allow ssh ingress"
-          from_port   = "22"
-          to_port     = "22"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.ssh
+          description     = "Allow ssh ingress"
+          from_port       = "22"
+          to_port         = "22"
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.ssh
           security_groups = []
         }
         http8080 = {

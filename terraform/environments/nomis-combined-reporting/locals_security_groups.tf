@@ -143,10 +143,10 @@ locals {
       description = "Security group for bip"
       ingress = {
         all-from-web = {
-          description = "Allow all ingress from web"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
+          description     = "Allow all ingress from web"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
           security_groups = ["web"]
         }
         all-within-subnet = {

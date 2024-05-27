@@ -586,7 +586,7 @@ locals {
       # internal/private
       #
       "hmpps-test.modernisation-platform.internal" = {
-        vpc = {  # this makes it a private hosted zone
+        vpc = { # this makes it a private hosted zone
           id = module.environment.vpc.id
         }
         records = [

@@ -159,9 +159,9 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
 
 data "aws_iam_policy_document" "allow_access_to_delius_application_passwords" {
   statement {
-    sid = "DbAccessToDeliusSecretsManager"
+    sid     = "DbAccessToDeliusSecretsManager"
     actions = ["secretsmanager:GetSecretValue"]
-    effect = "Allow"
+    effect  = "Allow"
     resources = [
       "arn:aws:secretsmanager:*:${local.delius_account_id}:secret:delius-core-${var.env_name}-oracle-db-application-passwords-*"
     ]
@@ -171,7 +171,7 @@ data "aws_iam_policy_document" "allow_access_to_delius_application_passwords" {
 data "aws_iam_policy_document" "combined_policy_documents" {
   source_policy_documents = flatten([
     data.aws_iam_policy_document.db_access_to_secrets_manager.json,
-    var.db_suffix == "mis-db" ? [data.aws_iam_policy_document.allow_access_to_delius_application_passwords.json] : []])
+  var.db_suffix == "mis-db" ? [data.aws_iam_policy_document.allow_access_to_delius_application_passwords.json] : []])
 }
 
 resource "aws_iam_policy" "db_access_to_secrets_manager" {
