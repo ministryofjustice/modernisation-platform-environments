@@ -2,6 +2,7 @@ locals {
   production_config = {
     baseline_secretsmanager_secrets = {
       "/ndh/pd" = local.ndh_secretsmanager_secrets
+      "/ndh/dr" = local.ndh_secretsmanager_secrets
     }
     baseline_iam_policies = {
       Ec2pdPolicy = {
