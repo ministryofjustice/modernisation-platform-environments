@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "ebs_backup" {
-  bucket = "tribunals-ebs-backup"
+  bucket = "tribunals-ebs-backup-${local.environment}"
 }
 
 resource "aws_s3_bucket_policy" "backup_bucket_policy" {

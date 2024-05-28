@@ -397,7 +397,7 @@ resource "aws_route53_record" "external_admin_appeals_sftp" {
 
 # Define a wildcard ACM certificate for sandbox/dev
 resource "aws_acm_certificate" "external" {
-  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
