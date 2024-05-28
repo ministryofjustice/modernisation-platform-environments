@@ -209,12 +209,12 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_dev.zip"
-  function_name = "terminate_cpu_process_dev"
-  role          = aws_iam_role.lambda_role_terminate_cpu_process_dev[0].arn
+  function_name = "terminate_cpu_process"
+  role          = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
   handler       = "terminate_cpu_process_dev.lambda_handler"
   runtime       = "python3.12"
   timeout       = 300
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_dev]
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
 }
 
 # Archive the zip file
@@ -242,7 +242,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat" {
   count         = local.is-preproduction == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_uat.zip"
-  function_name = "terminate_cpu_process_uat"
+  function_name = "terminate_cpu_process"
   role          = aws_iam_role.lambda_role_terminate_cpu_process_uat[0].arn
   handler       = "terminate_cpu_process_uat.lambda_handler"
   runtime       = "python3.12"
@@ -309,11 +309,11 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev"
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/send_cpu_notification_dev.zip"
   function_name = "send_cpu_notification"
-  role          = aws_iam_role.lambda_role_send_cpu_notification_dev[0].arn
+  role          = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
   handler       = "send_cpu_notification_dev.lambda_handler"
   runtime       = "python3.12"
   timeout       = 300
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_send_cpu_notification_to_lambda_role_send_cpu_notification_dev]
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
 }
 
 # Archive the zip file
