@@ -5,7 +5,7 @@ module "s3_bucket_config" {
     aws.bucket-replication = aws
   }
 
-  bucket_name     = "${var.env_name}-config"
+  bucket_prefix     = "${var.env_name}-config"
   versioning_enabled = true
   sse_algorithm      = "AES256"
   # Useful guide - https://aws.amazon.com/blogs/storage/how-to-use-aws-datasync-to-migrate-data-between-amazon-s3-buckets/

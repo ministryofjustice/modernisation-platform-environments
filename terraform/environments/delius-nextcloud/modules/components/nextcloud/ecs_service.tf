@@ -72,7 +72,7 @@ module "nextcloud_service" {
   rds_allocated_storage    = 500
   rds_username             = "misnextcloud"
   rds_port                 = 3306
-  rds_parameter_group_name = "default.mariadb10.6"
+  rds_parameter_group_name = "default.mariadb10.5"
   rds_license_model        = "general-public-license"
   snapshot_identifier      = "rds-090524-shared-key"
 
