@@ -88,6 +88,8 @@ GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
 
 CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
+NVL_DTYPE_DICT = {'string':"''", 'int':0, 'double':0, 'float':0, 'boolean':False}
+
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
 # ----------------------
@@ -172,6 +174,48 @@ def get_rds_dataframe(in_rds_db_name, in_table_name):
                                        "password": RDS_DB_INSTANCE_PWD,
                                        "driver": RDS_DB_INSTANCE_DRIVER})
 
+def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name):
+    sql_statement = f"""SELECT column_name, data_type, is_nullable 
+    FROM information_schema.columns
+    WHERE table_name='{in_tbl_name}'
+    """
+    # ORDER BY ordinal_position
+    return (spark.read.format("jdbc")
+            .option("url", get_rds_db_jdbc_url(in_rds_db_name))
+            .option("query", sql_statement)
+            .option("user", RDS_DB_INSTANCE_USER)
+            .option("password", RDS_DB_INSTANCE_PWD)
+            .option("driver", RDS_DB_INSTANCE_DRIVER)
+            .load()
+            )
+
+def get_rds_tbl_col_attr_dict(df_col_stats):
+    key_col = 'column_name'; value_col = 'is_nullable'
+    return df_col_stats.select(key_col, value_col).rdd.map(lambda row: (row[key_col], row[value_col])).collectAsMap()
+
+def get_dtype(in_rds_df, in_col_name):
+    return [dtype for name, dtype in in_rds_df.dtypes if name == in_col_name][0]
+
+def get_dtypes_dict(in_rds_df):
+    return {name:dtype for name, dtype in in_rds_df.dtypes}
+
+def get_nvl_select_list(in_rds_df, in_rds_db_name, in_rds_tbl_name):
+    df_col_attr = get_rds_tbl_col_attributes(in_rds_db_name, in_rds_tbl_name)
+    df_col_attr_dict = get_rds_tbl_col_attr_dict(df_col_attr)
+    # print(df_col_attr_dict)
+    df_col_dtype_dict = get_dtypes_dict(in_rds_df)
+    # print(df_col_dtype_dict)
+    
+    temp_select_list = list()
+    for colmn in in_rds_df.columns:
+        if df_col_attr_dict[colmn] == 'YES':
+            temp_select_list.append(f"""nvl({colmn}, {NVL_DTYPE_DICT[df_col_dtype_dict[colmn]]}) as {colmn}""")
+            # print(f"F.nvl(df_rds.{colmn}, {NVL_DTYPE_DICT[df_col_dtype_dict[colmn]]})")
+        else:
+            temp_select_list.append(colmn)
+            # print(colmn)
+    return temp_select_list
+
 # -------------------------------------------------------------------------
 
 
@@ -210,6 +254,8 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
         return spark.read.csv(in_csv_tbl_s3_folder_path, 
                               header="true", 
                               schema=in_rds_df_schema,
+                              enforceSchema=True,
+                              nullValue="null",
                               mode="FAILFAST")
     except Exception as err:
         LOGGER.error(err)
@@ -232,27 +278,28 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
 
     df_dv_output = spark.sql(sql_select_str).repartition(input_repartition_factor)
 
-    df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
-
-    LOGGER.info(
-        f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
-
     tbl_csv_s3_path = get_s3_csv_tbl_path(rds_db_name, rds_tbl_name)
 
     if tbl_csv_s3_path is not None:
 
+        df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
+        df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
+
+        LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
+    
         df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema).repartition(default_repartition_factor)
+        df_csv_temp_t1 = df_csv_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         LOGGER.info(
             f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_csv_temp.rdd.getNumPartitions()}, {total_size} bytes""")
 
-        df_rds_temp_count = df_rds_temp.count()
-        df_csv_temp_count = df_csv_temp.count()
+        df_rds_temp_count = df_rds_temp_t1.count()
+        df_csv_temp_count = df_csv_temp_t1.count()
 
         if df_rds_temp_count == df_csv_temp_count:
 
-            df_subtract = df_rds_temp.subtract(df_csv_temp).persist()
-            df_rds_csv_subtract_row_count = df_subtract.count()
+            df_subtract_t1 = df_rds_temp_t1.subtract(df_csv_temp_t1)
+            df_rds_csv_subtract_row_count = df_subtract_t1.count()
 
             if df_rds_csv_subtract_row_count == 0:
                 df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
@@ -264,7 +311,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
 
                 df_dv_output = df_dv_output.union(df_temp)
             else:
-                df_temp = (df_subtract
+                df_temp = (df_subtract_t1
                            .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
                            .selectExpr("json_row")
                            .limit(100))
@@ -278,8 +325,6 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
 
                 df_dv_output = df_dv_output.union(df_temp)
 
-            df_subtract.unpersist()
-
         else:
             df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                               "'' as json_row",
@@ -289,6 +334,9 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                               )
 
             df_dv_output = df_dv_output.union(df_temp)
+        
+        df_rds_temp_t1.unpersist()
+        df_csv_temp_t1.unpersist()
     else:
         df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                           "'' as json_row",
