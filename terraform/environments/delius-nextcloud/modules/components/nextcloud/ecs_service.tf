@@ -10,7 +10,7 @@ module "nextcloud_service" {
 
   target_group_protocol_version = "HTTP1"
 
-  container_image = "nextcloud:latest"
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-nextcloud:latest"
   container_port_config = [
     {
       containerPort = "80"
