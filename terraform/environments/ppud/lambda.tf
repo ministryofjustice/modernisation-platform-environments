@@ -259,6 +259,39 @@ data "archive_file" "zip_the_terminate_cpu_process_code_uat" {
   output_path = "${path.module}/lambda_scripts/terminate_cpu_process_uat.zip"
 }
 
+#######################################################
+# Lambda Function to Terminate MS Word Processes - PROD
+#######################################################
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_prod[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:*"
+}
+
+resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_prod" {
+  count         = local.is-production == true ? 1 : 0
+  filename      = "${path.module}/lambda_scripts/terminate_cpu_process_prod.zip"
+  function_name = "terminate_cpu_process"
+  role          = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_prod[0].arn
+  handler       = "terminate_cpu_process_prod.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 300
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
+}
+
+# Archive the zip file
+
+data "archive_file" "zip_the_terminate_cpu_process_code_prod" {
+  count       = local.is-production == true ? 1 : 0
+  type        = "zip"
+  source_dir  = "${path.module}/lambda_scripts/"
+  output_path = "${path.module}/lambda_scripts/terminate_cpu_process_prod.zip"
+}
+
 ################################################
 # Lambda Function to send CPU notification - DEV
 ################################################
@@ -323,5 +356,38 @@ data "archive_file" "zip_the_send_cpu_notification_code_uat" {
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/send_cpu_notification_uat.zip"
+}
+
+#################################################
+# Lambda Function to send CPU notification - PROD
+#################################################
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notification_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_prod[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:*"
+}
+
+resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod" {
+  count         = local.is-production == true ? 1 : 0
+  filename      = "${path.module}/lambda_scripts/send_cpu_notification_prod.zip"
+  function_name = "send_cpu_notification"
+  role          = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_prod[0].arn
+  handler       = "send_cpu_notification_prod.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 300
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
+}
+
+# Archive the zip file
+
+data "archive_file" "zip_the_send_cpu_notification_code_prod" {
+  count       = local.is-production == true ? 1 : 0
+  type        = "zip"
+  source_dir  = "${path.module}/lambda_scripts/"
+  output_path = "${path.module}/lambda_scripts/send_cpu_notification_prod.zip"
 }
 
