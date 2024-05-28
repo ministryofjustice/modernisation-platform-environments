@@ -8,7 +8,7 @@ locals {
     migration_environment_db_cidr          = ["10.160.44.0/24", "10.160.45.0/24", "10.160.46.0/25"]
     migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"
-    migration_environment_short_name       = "test"
+    migration_environment_short_name       = "pre-prod"
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/preprod/ec2-user.pub")
     homepage_path                          = "/"
