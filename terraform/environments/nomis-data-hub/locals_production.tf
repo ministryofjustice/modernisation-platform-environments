@@ -6,7 +6,7 @@ locals {
     }
     baseline_iam_policies = {
       Ec2pdPolicy = {
-        description = "Permissions required for PD EC2s"
+        description = "Permissions required for PD/DR EC2s"
         statements = [
           {
             effect = "Allow"
@@ -15,19 +15,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ndh/pd/*",
-            ]
-          }
-        ]
-      }
-      Ec2drPolicy = {
-        description = "Permissions required for DR EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-            ]
-            resources = [
               "arn:aws:secretsmanager:*:*:secret:/ndh/dr/*",
             ]
           }
@@ -66,7 +53,7 @@ locals {
         config = merge(local.ndh_app_a.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2drPolicy",
+            "Ec2pdPolicy",
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
@@ -78,7 +65,7 @@ locals {
         config = merge(local.ndh_ems_a.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2drPolicy",
+            "Ec2pdPolicy",
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
