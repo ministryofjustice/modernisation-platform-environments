@@ -210,7 +210,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev"
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_dev.zip"
   function_name = "terminate_cpu_process"
-  role          = aws_iam_role.lambda_role_terminate_cpu_process_dev[0].arn
+  role          = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
   handler       = "terminate_cpu_process_dev.lambda_handler"
   runtime       = "python3.12"
   timeout       = 300
@@ -309,7 +309,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev"
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/send_cpu_notification_dev.zip"
   function_name = "send_cpu_notification"
-  role          = aws_iam_role.lambda_role_send_cpu_notification_dev[0].arn
+  role          = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
   handler       = "send_cpu_notification_dev.lambda_handler"
   runtime       = "python3.12"
   timeout       = 300
