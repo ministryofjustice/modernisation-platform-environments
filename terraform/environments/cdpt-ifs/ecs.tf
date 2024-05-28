@@ -46,11 +46,6 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
 EOF
 }
 
-resource "aws_cloudwatch_log_group" "application_log_group" {
-  name              = "/ecs/${local.application_name}-logs"
-  retention_in_days = 30
-}
-
 resource "aws_cloudwatch_log_group" "deployment_logs" {
   name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
@@ -103,7 +98,7 @@ resource "aws_ecs_task_definition" "ifs_task_definition" {
       logConfiguration = {
         logDriver = "awslogs",
         options = {
-          awslogs-group         = "/ecs/${local.application_name}-logs",
+          awslogs-group         = "${local.application_name}-ecs",
           awslogs-region        = "eu-west-2",
           awslogs-stream-prefix = local.application_name
         }
@@ -188,10 +183,8 @@ resource "aws_iam_role_policy" "app_task" {
      {
        "Effect": "Allow",
         "Action": [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-          "logs:DescribeLogStreams",
           "ecr:*",
           "iam:*",
           "ec2:*"
