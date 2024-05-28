@@ -1,9 +1,3 @@
-# Use `s3-db-restore-dir` tag to trigger a restore from backup. See
-# https://github.com/ministryofjustice/modernisation-platform-configuration-management/blob/main/ansible/roles/db-restore
-#
-# Use `fixngo-connection-target` tag to monitor connectivity to a target in FixNGo.  See
-# https://github.com/ministryofjustice/modernisation-platform-configuration-management/tree/main/ansible/roles/oracle-db-monitoring
-
 locals {
 
   database_nomis_secretsmanager_secrets = {
