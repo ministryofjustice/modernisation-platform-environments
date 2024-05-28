@@ -18,7 +18,7 @@ module "s3_bucket_config" {
     principals = {
       type = "AWS"
       identifiers = [
-          module.ecs_service.task_role_arn,
+          module.nextcloud_service.task_role_arn,
       ]
     }
   }]
