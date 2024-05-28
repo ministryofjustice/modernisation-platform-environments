@@ -1,4 +1,4 @@
-module "config_bucket" {
+module "s3_bucket_config" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   providers = {
@@ -9,22 +9,19 @@ module "config_bucket" {
   versioning_enabled = true
   sse_algorithm      = "AES256"
   # Useful guide - https://aws.amazon.com/blogs/storage/how-to-use-aws-datasync-to-migrate-data-between-amazon-s3-buckets/
-#   bucket_policy_v2 = [{
-#     effect = "Allow"
-#     actions = [
-#       "s3:GetBucketLocation",
-#       "s3:ListBucket",
-#       "s3:GetObject",
-#       "s3:ListMultipartUploadParts",
-#       "s3:PutObject"
-#     ]
-#     principals = {
-#       type = "AWS"
-#       identifiers = [
-
-#       ]
-#     }
-#   }]
+  bucket_policy_v2 = [{
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject"
+    ]
+    principals = {
+      type = "AWS"
+      identifiers = [
+          module.ecs_service.task_role_arn,
+      ]
+    }
+  }]
 
   ownership_controls = "BucketOwnerEnforced" # Disable all S3 bucket ACL
 

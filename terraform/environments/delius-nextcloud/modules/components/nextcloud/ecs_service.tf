@@ -59,7 +59,11 @@ module "nextcloud_service" {
   alb_listener_rule_paths            = ["/"]
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
   microservice_lb                    = aws_alb.nextcloud
-  name                               = "nextcloud-poc"
+  name                               = "nextcloud"
+
+  extra_task_role_policies = {
+    "S3_BUCKET_CONFIG" = data.aws_iam_policy_document.s3_bucket_config
+  }
 
   create_rds               = true
   rds_engine               = "mariadb"
@@ -96,6 +100,7 @@ module "nextcloud_service" {
     REDIS_PASSWORD            = "password"
     NEXTCLOUD_ADMIN_USER      = "admin"
     NEXTCLOUD_TRUSTED_DOMAINS = aws_route53_record.nextcloud_external.fqdn
+    S3_BUCKET_CONFIG  = module.s3_bucket_config.bucket.id
   }
   container_vars_env_specific = {}
 
@@ -131,4 +136,21 @@ resource "aws_secretsmanager_secret_version" "nextcloud_admin_password" {
 resource "random_password" "nextcloud_admin_password" {
   length  = 32
   special = true
+}
+
+
+data "aws_iam_policy_document" "s3_bucket_config" {
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.account_info.id}:role/${var.env_name}-nextcloud-ecs-task"]
+    }
+
+    resources = [module.s3_bucket_config.bucket.arn]
+  }
 }
