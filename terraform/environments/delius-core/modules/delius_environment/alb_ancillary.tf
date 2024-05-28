@@ -40,7 +40,7 @@ resource "aws_lb" "delius_core_ancillary" {
   # checkov:skip=CKV_AWS_91
   # checkov:skip=CKV2_AWS_28
 
-  name               = "${var.app_name}-${var.env_name}-ancilliary-alb"
+  name               = "${var.env_name}-ancilliary-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ancillary_alb_security_group.id]
