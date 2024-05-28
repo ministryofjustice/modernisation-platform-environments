@@ -243,11 +243,11 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat"
   count         = local.is-preproduction == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_uat.zip"
   function_name = "terminate_cpu_process"
-  role          = aws_iam_role.lambda_role_terminate_cpu_process_uat[0].arn
+  role          = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].arn
   handler       = "terminate_cpu_process_uat.lambda_handler"
   runtime       = "python3.12"
   timeout       = 300
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_uat]
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
 }
 
 # Archive the zip file
@@ -257,39 +257,6 @@ data "archive_file" "zip_the_terminate_cpu_process_code_uat" {
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/terminate_cpu_process_uat.zip"
-}
-
-################################################
-# Lambda Function to send CPU notification - UAT
-################################################
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notification_uat" {
-  count         = local.is-preproduction == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_uat[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:172753231260:alarm:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat" {
-  count         = local.is-preproduction == true ? 1 : 0
-  filename      = "${path.module}/lambda_scripts/send_cpu_notification_uat.zip"
-  function_name = "send_cpu_notification"
-  role          = aws_iam_role.lambda_role_send_cpu_notification_uat[0].arn
-  handler       = "send_cpu_notification_uat.lambda_handler"
-  runtime       = "python3.12"
-  timeout       = 300
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_send_cpu_notification_to_lambda_role_send_cpu_notification_uat]
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_send_cpu_notification_code_uat" {
-  count       = local.is-preproduction == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/send_cpu_notification_uat.zip"
 }
 
 ################################################
@@ -324,3 +291,37 @@ data "archive_file" "zip_the_send_cpu_notification_code_dev" {
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/send_cpu_notification_dev.zip"
 }
+
+################################################
+# Lambda Function to send CPU notification - UAT
+################################################
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notification_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_uat[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:172753231260:alarm:*"
+}
+
+resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  filename      = "${path.module}/lambda_scripts/send_cpu_notification_uat.zip"
+  function_name = "send_cpu_notification"
+  role          = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].arn
+  handler       = "send_cpu_notification_uat.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 300
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
+}
+
+# Archive the zip file
+
+data "archive_file" "zip_the_send_cpu_notification_code_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  type        = "zip"
+  source_dir  = "${path.module}/lambda_scripts/"
+  output_path = "${path.module}/lambda_scripts/send_cpu_notification_uat.zip"
+}
+
