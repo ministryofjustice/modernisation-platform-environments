@@ -254,9 +254,9 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_alarm_suppressio
 # IAM Role & Policy for Lambda Terminate CPU Process - DEV
 ##########################################################
 
-resource "aws_iam_role" "lambda_role_terminate_cpu_process_dev" {
+resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_dev" {
   count              = local.is-development == true ? 1 : 0
-  name               = "PPUD_Lambda_Function_Role_Terminate_CPU_Process_Dev"
+  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Invoke_Lambda_Dev"
   assume_role_policy = <<EOF
 {
  "Version": "2012-10-17",
@@ -274,11 +274,11 @@ resource "aws_iam_role" "lambda_role_terminate_cpu_process_dev" {
 EOF
 }
 
-resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process_dev" {
+resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
   count       = local.is-development == true ? 1 : 0
-  name        = "aws_iam_policy_for_terraform_aws_lambda_role_terminate_cpu_process_dev"
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_dev"
   path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role terminate cpu processes development"
+  description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda development"
   policy      = <<EOF
 {
  "Version": "2012-10-17",
@@ -297,7 +297,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process_dev" {
       "arn:aws:cloudwatch:eu-west-2:075585660276:*",
       "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
       "arn:aws:lambda:eu-west-2:075585660276:*",
-      "arn:aws:ec2:eu-west-2:075585660276:instance/i-0b5c31ecda24ebc04"
+      "arn:aws:ec2:eu-west-2:075585660276:*"
       ]
    }
  ]
@@ -305,16 +305,17 @@ resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process_dev" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_dev" {
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev" {
   count      = local.is-development == true ? 1 : 0
-  role       = aws_iam_role.lambda_role_terminate_cpu_process_dev[0].name
-  policy_arn = aws_iam_policy.iam_policy_for_lambda_terminate_cpu_process_dev[0].arn
+  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_dev[0].arn
 }
 
 ##########################################################
 # IAM Role & Policy for Lambda Send CPU Notification - DEV
 ##########################################################
 
+/* 
 resource "aws_iam_role" "lambda_role_send_cpu_notification_dev" {
   count              = local.is-development == true ? 1 : 0
   name               = "PPUD_Lambda_Function_Role_Send_CPU_Notification_Dev"
@@ -371,6 +372,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_send_cpu_notific
   role       = aws_iam_role.lambda_role_send_cpu_notification_dev[0].name
   policy_arn = aws_iam_policy.iam_policy_for_lambda_send_cpu_notification_dev[0].arn
 }
+*/
 
 ##########################################################
 # IAM Role & Policy for Lambda Terminate CPU Process - UAT
