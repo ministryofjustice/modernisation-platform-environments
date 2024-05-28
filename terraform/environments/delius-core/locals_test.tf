@@ -13,6 +13,7 @@ locals {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/test/ec2-user.pub")
     homepage_path                          = "/"
+    has_mis_environment                    = false
   }
 
   ldap_config_test = {
@@ -34,11 +35,7 @@ locals {
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
-    standby_count  = 0
-
-    instance_policies = {
-      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
-    }
+    standby_count = 0
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
