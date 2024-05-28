@@ -23,4 +23,3 @@ foreach ($identity in $identities) {
 # Restart IIS to apply any changes
 Restart-Service -Name "W3SVC"
 
-</powershell>
