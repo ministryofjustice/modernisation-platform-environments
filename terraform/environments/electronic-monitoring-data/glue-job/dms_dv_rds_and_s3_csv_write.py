@@ -288,7 +288,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
         LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
     
         df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, df_rds_temp.schema).repartition(default_repartition_factor)
-        df_csv_temp_t1 = df_csv_temp.selectExpr(*get_nvl_select_list(df_csv_temp, rds_db_name, rds_tbl_name)).cache()
+        df_csv_temp_t1 = df_csv_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         LOGGER.info(
             f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_csv_temp.rdd.getNumPartitions()}, {total_size} bytes""")
