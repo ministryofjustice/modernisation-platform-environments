@@ -90,7 +90,8 @@ module "nextcloud_service" {
   db_ingress_security_groups = [aws_security_group.cluster.id]
 
   rds_endpoint_environment_variable         = "MYSQL_HOST"
-  rds_password_secret_variable = "RDS_SECRET"
+  rds_password_secret_variable = "MYSQL_PASSWORD"
+  rds_user_secret_variable     = "MYSQL_USER"
   elasticache_endpoint_environment_variable = "REDIS_HOST"
 
   container_vars_default = {

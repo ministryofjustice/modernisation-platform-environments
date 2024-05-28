@@ -51,7 +51,13 @@ variable "rds_endpoint_environment_variable" {
 }
 
 variable "rds_password_secret_variable" {
-  description = "Secret variable to store the rds secretsmanager arn"
+  description = "Secret variable to store the rds secretsmanager arn password"
+  type        = string
+  default     = ""
+}
+
+variable "rds_user_secret_variable" {
+  description = "Secret variable to store the rds secretsmanager arn username"
   type        = string
   default     = ""
 }
