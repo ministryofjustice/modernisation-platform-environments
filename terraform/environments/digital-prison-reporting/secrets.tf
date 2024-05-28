@@ -198,3 +198,38 @@ resource "aws_secretsmanager_secret" "biprws" {
     }
   )
 }
+
+# CP k8s Token
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "cp_k8s_secrets" {
+  count = local.enable_cp_k8s_secrets ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.cp_k8s_secrets[0].id
+  secret_string = jsonencode(local.cp_k8s_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+
+  depends_on = [aws_secretsmanager_secret.cp_k8s_secrets]
+}
+
+# DPS Source Secrets
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret" "cp_k8s_secrets" {
+  count = local.enable_cp_k8s_secrets ? 1 : 0
+
+  name = "external/cloud_platform/k8s_auth"
+
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/cloud_platform/k8s_auth"
+      Resource_Type = "Secrets"
+      Source        = "CP"
+      Jira          = "DPR2-768"
+    }
+  )
+}

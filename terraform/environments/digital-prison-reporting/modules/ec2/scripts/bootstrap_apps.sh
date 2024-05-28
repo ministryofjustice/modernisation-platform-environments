@@ -99,11 +99,11 @@ sleep 300
 aws ec2 assign-private-ip-addresses --network-interface-id $interface_id --private-ip-addresses ${static_ip}
 
 # Get Secrets
-cp_k8s_server=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_server)
-cp_k8s_cert_auth=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_certificate_auth)
-cp_k8s_cluster_name=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_name)
-cp_k8s_cluster_context=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_context)
-cp_k8s_cluster_token=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_secrets | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_token)
+cp_k8s_server=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_server)
+cp_k8s_cert_auth=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_certificate_auth)
+cp_k8s_cluster_name=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_name)
+cp_k8s_cluster_context=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_context)
+cp_k8s_cluster_token=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_token)
 
 echo "SERVER_NAME....$cp_k8s_server"
 # Install KUBECTL Libs
