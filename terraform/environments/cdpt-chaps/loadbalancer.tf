@@ -25,6 +25,7 @@ resource "aws_lb" "chaps_lb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.chaps_lb_sc.id]
   subnets            = data.aws_subnets.shared-public.ids
+  idle_timeout       = 400
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
@@ -47,7 +48,6 @@ resource "aws_lb_target_group" "chaps_target_group" {
     timeout             = "10"
   }
 
-  idle_timeout		= 300
 }
 
 resource "aws_lb_listener" "https_listener" {
