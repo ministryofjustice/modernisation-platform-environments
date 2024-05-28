@@ -3,23 +3,21 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
-
-  environment_config_test = {
-    migration_environment_private_cidr     = ["10.162.8.0/22", "10.162.4.0/22", "10.162.0.0/22"]
-    migration_environment_db_cidr          = ["10.162.14.0/25", "10.162.13.0/24", "10.162.12.0/24"]
-    migration_environment_full_name        = "del-test"
+  environment_config_preprod = {
+    migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/22"]
+    migration_environment_db_cidr          = ["10.160.44.0/24", "10.160.45.0/24", "10.160.46.0/25"]
+    migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"
-    migration_environment_short_name       = "test"
+    migration_environment_short_name       = "pre-prod"
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
-    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/test/ec2-user.pub")
+    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/preprod/ec2-user.pub")
     homepage_path                          = "/"
-    has_mis_environment                    = false
   }
 
-  ldap_config_test = {
+  ldap_config_preprod = {
     name                        = "ldap"
     encrypted                   = true
-    migration_source_account_id = "728765553488"
+    migration_source_account_id = "010587221707"
     migration_lambda_role       = "ldap-data-migration-lambda-role"
     efs_throughput_mode         = "bursting"
     efs_provisioned_throughput  = null
@@ -29,7 +27,7 @@ locals {
   }
 
 
-  db_config_test = {
+  db_config_preprod = {
     instance_type  = "r6i.xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
     instance_policies = {
@@ -70,7 +68,7 @@ locals {
     }
   }
 
-  delius_microservices_configs_test = {
+  delius_microservices_configs_preprod = {
     gdpr_ui = {
       image_tag      = "REPLACE"
       container_port = 80
@@ -162,7 +160,7 @@ locals {
     }
   }
 
-  bastion_config_test = {
+  bastion_config_preprod = {
     business_unit           = local.vpc_name
     subnet_set              = local.subnet_set
     environment             = local.environment
