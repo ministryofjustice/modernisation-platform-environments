@@ -1,36 +1,4 @@
 locals {
-
-  # add header widget and calculate x, y positions
-  cloudwatch_dashboards = {
-    for key, value in var.cloudwatch_dashboards : key => {
-      periodOverride = lookup(value, "periodOverride", null)
-      start          = lookup(value, "start", null)
-      widgets = flatten([lookup(value, "widgets", []), [
-        for widget_group in lookup(value, "widget_groups", []) : [
-          lookup(widget_group, "header_markdown", null) == null ? [] : [{
-            type   = "text"
-            width  = 24
-            height = 1
-            x      = 0
-            y      = 0
-            properties = {
-              markdown   = widget_group.header_markdown
-              background = "solid"
-            }
-          }],
-          [
-            for i in range(length(widget_group.widgets)) : merge(widget_group.widgets[i], {
-              width  = widget_group.width
-              height = widget_group.height
-              x      = i * widget_group.width % 24
-              y      = 0
-            }) if widget_group.widgets[i] != null
-          ]
-        ]
-      ]])
-    }
-  }
-
   cloudwatch_metric_alarms_list_by_dimension_list = flatten([
     for alarm_key, alarm_value in var.cloudwatch_metric_alarms : [
       for dimension_value in alarm_value.split_by_dimension.dimension_values : [{
@@ -57,11 +25,15 @@ locals {
   )
 }
 
-resource "aws_cloudwatch_dashboard" "this" {
-  for_each = local.cloudwatch_dashboards
+module "cloudwatch_dashboard" {
+  for_each = var.cloudwatch_dashboards
+
+  source = "../../modules/cloudwatch_dashboard"
 
   dashboard_name = each.key
-  dashboard_body = jsonencode(each.value)
+  periodOverride = each.value.periodOverride
+  start          = each.value.start
+  widget_groups  = each.value.widget_groups
 }
 
 resource "aws_cloudwatch_log_group" "this" {
