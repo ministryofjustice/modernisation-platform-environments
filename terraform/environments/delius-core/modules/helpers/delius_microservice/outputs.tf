@@ -13,3 +13,20 @@ output "rds_password_secret_arn" {
 output "task_role_arn" {
   value = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_role.name}"
 }
+
+output "elasticache_endpoint" {
+  value = var.create_elasticache ? aws_elasticache_cluster.this[0].cache_nodes[0].address : null  
+}
+
+output "elasticache_port" {
+  value = var.create_elasticache ? aws_elasticache_cluster.this[0].port : null
+}
+
+
+output "rds_endpoint" {
+  value = var.create_rds ? aws_db_instance.this[0].address : null
+}
+
+output "rds_port" {
+  value = var.create_rds ? aws_db_instance.this[0].port : null
+}

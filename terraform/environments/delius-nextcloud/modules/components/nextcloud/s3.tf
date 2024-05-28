@@ -78,7 +78,7 @@ data "aws_ssm_parameter" "nextcloud_secret" {
 resource "aws_s3_object" "config" {
   bucket = module.s3_bucket_config.bucket.id
   key    = "config"
-  source = templatefile("${path.module}/templates/nextcloud-conf.json",
+  source = templatefile("${path.module}/templates/nextcloud-conf.json.tftpl",
     {
       nextcloud_passwordsalt = random_password.nextcloud_password_salt.result,
       nextcloud_secret = data.aws_ssm_parameter.nextcloud_secret.value,
@@ -90,13 +90,21 @@ resource "aws_s3_object" "config" {
       mail = {
         server = "replace"
         from_address = "replace"
-        mail_domain = "replace"
+        domain = "replace"
       }
       nextcloud_s01ldap_agent_password = "replace"
       fileshare_user_base = "replace"
       standard_user_base = "replace"
       fs_group_prefix = "replace"
       ldap_host = "ldap.dev.delius-core.hmpps-development.modernisation-platform.internal"
+      pwm_url = "pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
+
+      fileshare_base_groups = "replace"
+      fileshare_user_base = "replace"
+      standard_user_base = "replace"
+
+      ldap_user = "cn=admin,ou=Users,dc=moj,dc=com"
+      nextcloud_s01ldap_agent_password = "replace"
     }
   )
 }
