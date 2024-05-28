@@ -88,7 +88,7 @@ GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
 
 CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
 
-NVL_DTYPE_DICT = {'string':"''", 'int':0, 'double':0, 'float':0, 'boolean':False}
+NVL_DTYPE_DICT = {'string':"''", 'int':0, 'double':0, 'float':0, 'boolean':False, 'smallint':0}
 
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
