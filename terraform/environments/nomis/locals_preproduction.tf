@@ -256,6 +256,44 @@ locals {
     }
 
     iam_policies = {
+      Ec2LsastDatabasePolicy = {
+        description = "Permissions required for Lsast Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::nomis-db-backup-bucket*",
+              "arn:aws:s3:::nomis-audit-archives*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
+            ]
+          }
+        ]
+      }
       Ec2PreprodDatabasePolicy = {
         description = "Permissions required for Preprod Database EC2s"
         statements = [
