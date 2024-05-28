@@ -67,6 +67,8 @@ module "baseline" {
   #   lookup(local.baseline_environment_config, "baseline_bastion_linux", {})
   # )
 
+  cloudwatch_dashboards = module.baseline_presets.cloudwatch_dashboards
+
   cloudwatch_metric_alarms = merge(
     local.baseline_cloudwatch_metric_alarms,
     lookup(local.baseline_environment_config, "baseline_cloudwatch_metric_alarms", {})
@@ -187,14 +189,5 @@ module "baseline" {
     module.baseline_presets.ssm_parameters,
     local.baseline_ssm_parameters,
     lookup(local.baseline_environment_config, "baseline_ssm_parameters", {}),
-  )
-}
-
-module "cloudwatch" {
-  source      = "../../modules/cloudwatch"
-  environment = module.environment
-  options = merge(
-    local.cloudwatch_monitoring_options,
-    local.cloudwatch_local_environment_monitoring_options,
   )
 }
