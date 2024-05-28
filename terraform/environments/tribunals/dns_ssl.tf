@@ -1,7 +1,12 @@
 # ACM certificate validation
+# resource "aws_acm_certificate_validation" "external" {
+#   certificate_arn = aws_acm_certificate.external.arn
+#   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+# }
+
 resource "aws_acm_certificate_validation" "external" {
-  certificate_arn = aws_acm_certificate.external.arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+  certificate_arn         = aws_acm_certificate.external.arn
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
 # One route53 record required for each domain listed in the external certificate
