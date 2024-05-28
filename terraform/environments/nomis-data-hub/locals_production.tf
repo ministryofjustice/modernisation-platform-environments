@@ -6,7 +6,7 @@ locals {
     }
     baseline_iam_policies = {
       Ec2pdPolicy = {
-        description = "Permissions required for PD/DR EC2s"
+        description = "Permissions required for PD EC2s"
         statements = [
           {
             effect = "Allow"
