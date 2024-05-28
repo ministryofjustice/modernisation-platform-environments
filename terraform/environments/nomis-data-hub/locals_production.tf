@@ -2,10 +2,11 @@ locals {
   production_config = {
     baseline_secretsmanager_secrets = {
       "/ndh/pd" = local.ndh_secretsmanager_secrets
+      "/ndh/dr" = local.ndh_secretsmanager_secrets
     }
     baseline_iam_policies = {
       Ec2pdPolicy = {
-        description = "Permissions required for PD EC2s"
+        description = "Permissions required for PD/DR EC2s"
         statements = [
           {
             effect = "Allow"
@@ -14,6 +15,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ndh/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/ndh/dr/*",
             ]
           }
         ]
@@ -47,7 +49,7 @@ locals {
           nomis-data-hub-environment = "pd"
         })
       })
-      pd-ndh-app-b = merge(local.ndh_app_a, {
+      dr-ndh-app-b = merge(local.ndh_app_a, {
         config = merge(local.ndh_app_a.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
@@ -56,10 +58,10 @@ locals {
         })
         tags = merge(local.ndh_app_a.tags, {
           os-type                    = "Linux"
-          nomis-data-hub-environment = "pd"
+          nomis-data-hub-environment = "dr"
         })
       })
-      pd-ndh-ems-b = merge(local.ndh_ems_a, {
+      dr-ndh-ems-b = merge(local.ndh_ems_a, {
         config = merge(local.ndh_ems_a.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
@@ -68,7 +70,7 @@ locals {
         })
         tags = merge(local.ndh_ems_a.tags, {
           os-type                    = "Linux"
-          nomis-data-hub-environment = "pd"
+          nomis-data-hub-environment = "dr"
         })
       })
     }

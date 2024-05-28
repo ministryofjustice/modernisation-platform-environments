@@ -37,11 +37,11 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
-      eks_cluster_version = "1.29"
+      eks_cluster_version = "1.30"
       eks_node_version    = "1.20.0-fcf71a47"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
-        kube_proxy             = "v1.29.3-eksbuild.2"
+        kube_proxy             = "v1.30.0-eksbuild.3"
         aws_ebs_csi_driver     = "v1.31.0-eksbuild.1"
         aws_efs_csi_driver     = "v2.0.2-eksbuild.1"
         aws_guardduty_agent    = "v1.6.1-eksbuild.1"
@@ -72,11 +72,11 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
-      eks_cluster_version = "1.29"
+      eks_cluster_version = "1.30"
       eks_node_version    = "1.20.0-fcf71a47"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
-        kube_proxy             = "v1.29.3-eksbuild.2"
+        kube_proxy             = "v1.30.0-eksbuild.3"
         aws_ebs_csi_driver     = "v1.31.0-eksbuild.1"
         aws_efs_csi_driver     = "v2.0.2-eksbuild.1"
         aws_guardduty_agent    = "v1.6.1-eksbuild.1"
@@ -107,11 +107,11 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
-      eks_cluster_version = "1.29"
+      eks_cluster_version = "1.30"
       eks_node_version    = "1.20.0-fcf71a47"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
-        kube_proxy             = "v1.29.3-eksbuild.2"
+        kube_proxy             = "v1.30.0-eksbuild.3"
         aws_ebs_csi_driver     = "v1.31.0-eksbuild.1"
         aws_efs_csi_driver     = "v2.0.2-eksbuild.1"
         aws_guardduty_agent    = "v1.6.1-eksbuild.1"

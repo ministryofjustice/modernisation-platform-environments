@@ -106,3 +106,9 @@ variable "enable_platform_backups" {
   type        = bool
   default     = null
 }
+
+variable "db_suffix" {
+  description = "identifier to append to name e.g. dsd, boe"
+  type        = string
+  default     = "db"
+}
