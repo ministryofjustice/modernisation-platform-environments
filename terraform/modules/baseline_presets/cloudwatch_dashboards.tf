@@ -82,7 +82,7 @@ locals {
           yAxis = {
             left = {
               showUnits = false,
-              label     = "error code"
+              label     = "exitcode"
             }
           }
         }
@@ -108,7 +108,7 @@ locals {
           yAxis = {
             left = {
               showUnits = false,
-              label     = "error code"
+              label     = "exitcode"
             }
           }
         }
@@ -273,7 +273,7 @@ locals {
           yAxis = {
             left = {
               showUnits = false,
-              label     = "error code"
+              label     = "exitcode"
             }
           }
         }
@@ -301,7 +301,7 @@ locals {
           yAxis = {
             left = {
               showUnits = false,
-              label     = "error code"
+              label     = "exitcode"
             }
           }
         }
@@ -329,7 +329,7 @@ locals {
           yAxis = {
             left = {
               showUnits = false,
-              label     = "error code"
+              label     = "exitcode"
             }
           }
         }
@@ -357,7 +357,7 @@ locals {
           yAxis = {
             left = {
               showUnits = false,
-              label     = "error code"
+              label     = "exitcode"
             }
           }
         }
@@ -412,7 +412,7 @@ locals {
           yAxis = {
             left = {
               showUnits = false,
-              label     = "error code"
+              label     = "exitcode"
             }
           }
         }
@@ -440,7 +440,7 @@ locals {
           yAxis = {
             left = {
               showUnits = false,
-              label     = "error code"
+              label     = "exitcode"
             }
           }
         }
@@ -484,7 +484,6 @@ locals {
           stat    = "Sum"
           metrics = [
             [{ "expression" : "SELECT SUM(RequestCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }],
-            [{ "expression" : "SELECT SUM(RequestCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
           ]
           yAxis = {
             left = {
@@ -504,7 +503,6 @@ locals {
           stat    = "Sum"
           metrics = [
             [{ "expression" : "SELECT SUM(HTTPCode_ELB_4XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }],
-            [{ "expression" : "SELECT SUM(HTTPCode_Target_4XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
           ]
           yAxis = {
             left = {
@@ -524,6 +522,62 @@ locals {
           stat    = "Sum"
           metrics = [
             [{ "expression" : "SELECT SUM(HTTPCode_ELB_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error count"
+            }
+          }
+        }
+      }
+      load-balancer-target-group-requests = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ALB load-balancer-requests"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SELECT SUM(RequestCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "request count"
+            }
+          }
+        }
+      }
+      load-balancer-target-group-http-4XXs = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ALB load-balancer-http-4XXs"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SELECT SUM(HTTPCode_Target_4XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error count"
+            }
+          }
+        }
+      }
+      load-balancer-target-group-http-5XXs = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ALB load-balancer-http-5XXs"
+          stat    = "Sum"
+          metrics = [
             [{ "expression" : "SELECT SUM(HTTPCode_Target_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
           ]
           yAxis = {
@@ -572,24 +626,21 @@ locals {
           }
         }
       }
-      load-balancer-connection-errors = {
+      load-balancer-target-connection-errors = {
         type = "metric"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
-          title   = "ALB load-balancer-connection-errors"
+          title   = "ALB load-balancer-target-connection-errors"
           stat    = "Sum"
           metrics = [
             [{ "expression" : "SELECT SUM(TargetConnectionErrorCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q1" }],
-            [{ "expression" : "SELECT SUM(RejectedConnectionCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q2" }],
-            [{ "expression" : "SELECT SUM(TargetTLSNegotiationErrorCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q3" }],
-            [{ "expression" : "SELECT SUM(ClientTLSNegotiationErrorCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC", "label" : "", "id" : "q4" }],
           ]
           yAxis = {
             left = {
               showUnits = false,
-              label     = "error count"
+              label     = "connection errors"
             }
           }
         }
@@ -778,9 +829,12 @@ locals {
         local.cloudwatch_dashboard_widgets.lb.load-balancer-requests,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-http-4XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-http-5XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-requests,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-4XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-5XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-active-connections,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-new-connections,
-        local.cloudwatch_dashboard_widgets.lb.load-balancer-connection-errors,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-connection-errors,
         local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
         null,
@@ -794,9 +848,12 @@ locals {
         local.cloudwatch_dashboard_widgets.lb.load-balancer-requests,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-http-4XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-http-5XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-requests,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-4XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-5XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-active-connections,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-new-connections,
-        local.cloudwatch_dashboard_widgets.lb.load-balancer-connection-errors,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-connection-errors,
         local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
         local.cloudwatch_dashboard_widgets.acm.cert-expires-soon,
