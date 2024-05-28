@@ -37,7 +37,7 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
-      eks_cluster_version = "1.29"
+      eks_cluster_version = "1.30"
       eks_node_version    = "1.20.0-fcf71a47"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
