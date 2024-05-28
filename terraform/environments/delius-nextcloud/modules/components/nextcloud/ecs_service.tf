@@ -145,12 +145,6 @@ data "aws_iam_policy_document" "s3_bucket_config" {
       "s3:ListBucket",
       "s3:GetObject"
     ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.account_info.id}:role/${var.env_name}-nextcloud-ecs-task"]
-    }
-
     resources = [module.s3_bucket_config.bucket.arn]
   }
 }
