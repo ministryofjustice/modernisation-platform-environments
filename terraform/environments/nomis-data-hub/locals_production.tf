@@ -18,6 +18,20 @@ locals {
           }
         ]
       }
+      Ec2drPolicy = {
+        description = "Permissions required for DR EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/ndh/dr/*",
+            ]
+          }
+        ]
+      }
     }
     baseline_ec2_instances = {
       production-management-server-2022 = merge(local.management_server_2022, {
@@ -47,30 +61,30 @@ locals {
           nomis-data-hub-environment = "pd"
         })
       })
-      pd-ndh-app-b = merge(local.ndh_app_a, {
-        config = merge(local.ndh_app_a.config, {
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2pdPolicy",
-          ])
-        })
-        tags = merge(local.ndh_app_a.tags, {
-          os-type                    = "Linux"
-          nomis-data-hub-environment = "pd"
-        })
-      })
-      pd-ndh-ems-b = merge(local.ndh_ems_a, {
-        config = merge(local.ndh_ems_a.config, {
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2pdPolicy",
-          ])
-        })
-        tags = merge(local.ndh_ems_a.tags, {
-          os-type                    = "Linux"
-          nomis-data-hub-environment = "pd"
-        })
-      })
+      #  dr-ndh-app-b = merge(local.ndh_app_a, {
+      #    config = merge(local.ndh_app_a.config, {
+      #      availability_zone = "eu-west-2b"
+      #      instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
+      #        "Ec2drPolicy",
+      #      ])
+      #    })
+      #    tags = merge(local.ndh_app_a.tags, {
+      #      os-type                    = "Linux"
+      #      nomis-data-hub-environment = "dr"
+      #    })
+      #  })
+      #  dr-ndh-ems-b = merge(local.ndh_ems_a, {
+      #    config = merge(local.ndh_ems_a.config, {
+      #      availability_zone = "eu-west-2b"
+      #      instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
+      #        "Ec2drPolicy",
+      #      ])
+      #    })
+      #    tags = merge(local.ndh_ems_a.tags, {
+      #      os-type                    = "Linux"
+      #      nomis-data-hub-environment = "dr"
+      #    })
+      #  })
     }
     #when changing the ems entries in prod or t2, also stop and start xtag to reconnect it.
     baseline_route53_zones = {
