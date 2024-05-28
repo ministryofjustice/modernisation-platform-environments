@@ -96,7 +96,6 @@ module "nextcloud_service" {
 
   container_vars_default = {
     MYSQL_DATABASE            = "nextcloud"
-    MYSQL_USER                = "misnextcloud"
     REDIS_PORT                = "6379"
     REDIS_PASSWORD            = "password"
     NEXTCLOUD_ADMIN_USER      = "admin"
