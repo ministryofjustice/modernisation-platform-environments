@@ -123,6 +123,8 @@ module "nextcloud_service" {
     aws.core-network-services = aws.core-network-services
   }
 
+  ignore_changes_service_task_definition = false
+
 }
 
 resource "aws_secretsmanager_secret" "nextcloud_admin_password" {
