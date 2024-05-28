@@ -66,7 +66,7 @@ variable "backups" {
 variable "bastion_linux" {
   description = "set this if you want a bastion linux created"
   type = object({
-    public_key_data         = map(string)
+    public_key_data         = optional(map(string)) # if this is not set, bastion is not created
     allow_ssh_commands      = optional(bool, true)
     bucket_name             = optional(string, "bastion")
     log_auto_clean          = optional(string, "Enabled")
@@ -76,7 +76,9 @@ variable "bastion_linux" {
     extra_user_data_content = optional(string, "")
     tags                    = optional(map(string), {})
   })
-  default = null
+  default = {
+    public_key_data = null
+  }
 }
 
 # see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html
