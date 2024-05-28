@@ -13,9 +13,9 @@ locals {
       observability_platform = "development"
 
       /* Image Versions */
-      scan_image_version     = "0.0.5"
-      transfer_image_version = "0.0.10"
-      notify_image_version   = "0.0.11"
+      scan_image_version     = "0.0.6"
+      transfer_image_version = "0.0.11"
+      notify_image_version   = "0.0.12"
 
       /* Target Buckets */
       target_buckets = ["mojap-land-dev"]
