@@ -72,12 +72,12 @@ module "nextcloud_service" {
   rds_allocated_storage    = 500
   rds_username             = "misnextcloud"
   rds_port                 = 3306
-  rds_parameter_group_name = "default.mariadb10.5"
+  rds_parameter_group_name = "default.mariadb10.6"
   rds_license_model        = "general-public-license"
   snapshot_identifier      = "rds-090524-shared-key"
 
-  rds_allow_major_version_upgrade = false
-  rds_apply_immediately           = false
+  rds_allow_major_version_upgrade = true
+  rds_apply_immediately           = true
 
   create_elasticache               = true
   elasticache_engine               = "redis"
