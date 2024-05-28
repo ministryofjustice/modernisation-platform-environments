@@ -46,6 +46,8 @@ resource "aws_lb_target_group" "chaps_target_group" {
     matcher             = "200-499"
     timeout             = "10"
   }
+
+  idle_timeout		= 300
 }
 
 resource "aws_lb_listener" "https_listener" {
