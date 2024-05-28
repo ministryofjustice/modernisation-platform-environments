@@ -243,11 +243,11 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat"
   count         = local.is-preproduction == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_uat.zip"
   function_name = "terminate_cpu_process"
-  role          = aws_iam_role.lambda_role_terminate_cpu_process_uat[0].arn
+  role          = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].arn
   handler       = "terminate_cpu_process_uat.lambda_handler"
   runtime       = "python3.12"
   timeout       = 300
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process_uat]
+  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
 }
 
 # Archive the zip file
