@@ -54,3 +54,49 @@ module "s3_bucket_config" {
 
   tags = var.tags
 }
+
+
+resource "random_password" "nextcloud_password_salt" {
+  length = 16
+}
+
+resource "aws_ssm_parameter" "nextcloud_secret" {
+  name  = "/${var.env_name}/nextcloud/secret"
+  type  = "SecureString"
+  value = "replace_me"
+  lifecycle {
+    ignore_changes = [ 
+      value
+     ]
+  }
+}
+
+data "aws_ssm_parameter" "nextcloud_secret" {
+  name = aws_ssm_parameter.nextcloud_secret.name
+}
+
+resource "aws_s3_object" "config" {
+  bucket = module.s3_bucket_config.bucket.id
+  key    = "config"
+  source = templatefile("${path.module}/templates/nextcloud-conf.json",
+    {
+      nextcloud_passwordsalt = random_password.nextcloud_passwordsalt.result,
+      nextcloud_secret = data.aws_ssm_parameter.nextcloud_secret.value,
+      nextcloud_id = "nextcloud",
+      redis = {
+        host = module.nextcloud_service.elasticache_endpoint
+        port = module.nextcloud_service.elasticache_port
+      },
+      mail = {
+        server = "replace"
+        from_address = "replace"
+        mail_domain = "replace"
+      }
+      nextcloud_s01ldap_agent_password = "replace"
+      fileshare_user_base = "replace"
+      standard_user_base = "replace"
+      fs_group_prefix = "replace"
+      ldap_host = "ldap.dev.delius-core.hmpps-development.modernisation-platform.internal"
+    }
+  )
+}
