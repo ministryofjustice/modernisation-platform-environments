@@ -113,7 +113,7 @@ locals {
         #)
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2LsastDatabasePolicy",
           ])
