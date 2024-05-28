@@ -83,7 +83,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   depends_on = [module.amazon_prometheus_proxy_iam_role]
 }
 
-/* Cluster */
+/* Cluster Autoscaler */
 resource "helm_release" "cluster_autoscaler" {
   /* https://artifacthub.io/packages/helm/cluster-autoscaler/cluster-autoscaler */
   name       = "cluster-autoscaler"
@@ -103,4 +103,25 @@ resource "helm_release" "cluster_autoscaler" {
     )
   ]
   depends_on = [module.cluster_autoscaler_iam_role]
+}
+
+/* External DNS */
+resource "helm_release" "external_dns" {
+  /* https://artifacthub.io/packages/helm/external-dns/external-dns */
+  name       = "external-dns"
+  repository = "https://kubernetes-sigs.github.io/external-dns"
+  chart      = "external-dns"
+  version    = "1.14.4"
+  namespace  = "kube-system"
+  values = [
+    templatefile(
+      "${path.module}/src/helm/external-dns/values.yml.tftpl",
+      {
+        domain_filter = local.environment_configuration.route53_zone
+        eks_role_arn  = module.external_dns_iam_role.iam_role_arn
+        txt_owner_id  = module.eks.cluster_name
+      }
+    )
+  ]
+  depends_on = [module.external_dns_iam_role]
 }
