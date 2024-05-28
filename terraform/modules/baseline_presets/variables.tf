@@ -15,6 +15,7 @@ variable "options" {
   type = object({
     backup_plan_daily_delete_after               = optional(number, 7)
     backup_plan_weekly_delete_after              = optional(number, 28)
+    cloudwatch_dashboard_default_widget_groups   = optional(list(string))
     cloudwatch_log_groups                        = optional(list(string))
     cloudwatch_metric_alarms_default_actions     = optional(list(string))
     cloudwatch_metric_oam_links_ssm_parameters   = optional(list(string))

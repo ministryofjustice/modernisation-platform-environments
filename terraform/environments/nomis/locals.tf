@@ -28,8 +28,15 @@ locals {
     enable_ec2_self_provision                    = true
     enable_ec2_oracle_enterprise_managed_server  = true
     enable_ec2_user_keypair                      = true
-    cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
-    cloudwatch_metric_oam_links_ssm_parameters   = ["hmpps-oem-${local.environment}"]
+    cloudwatch_dashboard_default_widget_groups = [
+      "lb_expression",
+      "ec2_linux_only_expression",
+      "ec2_service_status_expression",
+      "ec2_textfile_monitoring_expression",
+      "ec2_oracle_db_with_backup_expression",
+    ]
+    cloudwatch_metric_alarms_default_actions   = ["dso_pagerduty"]
+    cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
     #cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
