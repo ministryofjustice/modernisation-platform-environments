@@ -80,7 +80,7 @@ resource "aws_s3_object" "config" {
   key    = "config"
   source = templatefile("${path.module}/templates/nextcloud-conf.json",
     {
-      nextcloud_passwordsalt = random_password.nextcloud_passwordsalt.result,
+      nextcloud_passwordsalt = random_password.nextcloud_password_salt.result,
       nextcloud_secret = data.aws_ssm_parameter.nextcloud_secret.value,
       nextcloud_id = "nextcloud",
       redis = {
