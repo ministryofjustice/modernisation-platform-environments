@@ -330,6 +330,16 @@ locals {
     endpoint_type    = local.application_data.accounts[local.environment].biprws.endpoint_type
   }
 
+  # cp_k8s_secrets_placeholder
+  enable_cp_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_k8s_secrets
+  cp_k8s_secrets_placeholder = {
+    cloud_platform_k8s_token = "placeholder"
+    cloud_platform_certificate_auth  = "placeholder"
+    cloud_platform_k8s_server = "https://DF366E49809688A3B16EEC29707D8C09.gr7.eu-west-2.eks.amazonaws.com"
+    cloud_platform_k8s_cluster_name = "live.cloud-platform.service.justice.gov.uk"
+    cloud_platform_k8s_cluster_context = "live.cloud-platform.service.justice.gov.uk"
+  }
+
   sonatype_secrets_placeholder = {
     user     = "placeholder"
     password = "placeholder"

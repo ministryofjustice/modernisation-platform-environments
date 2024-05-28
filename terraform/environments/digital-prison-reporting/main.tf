@@ -953,7 +953,7 @@ module "ec2_kinesis_agent" {
   aws_region                  = local.account_region
   ec2_terminate_behavior      = "terminate"
   associate_public_ip_address = false
-  static_private_ip           = "10.26.24.202" # Used for Dev as a Secondary IP
+  static_private_ip           = "10.26.24.201" # Used for Dev as a Secondary IP
   ebs_optimized               = true
   monitoring                  = true
   ebs_size                    = 20
