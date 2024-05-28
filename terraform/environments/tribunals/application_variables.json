@@ -1,16 +1,102 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "db_identifier": "tribunals-db-dev",
+      "engine": "sqlserver-se",
+      "engine_version": "15.00.4198.2.v1",
+      "instance_class": "db.m5.large",
+      "username": "admin",
+      "dms_source_db": "ec2-34-243-192-28.eu-west-1.compute.amazonaws.com",
+      "curserver": "DEVELOPMENT",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "server_port_3": "22",
+      "lb_listener_protocol_3": "TCP",
+      "ami_image_id": "ami-0d20b6fc5007adcb3",
+      "task_definition_volume": "tribunals",
+      "server_port": 8080,
+      "app_count": 1,
+      "appscaling_min_capacity": 1,
+      "appscaling_max_capacity": 2,
+      "ec2_scaling_cpu_threshold": 75,
+      "ec2_scaling_mem_threshold": 61,
+      "ecs_scaling_cpu_threshold": 80,
+      "ecs_scaling_mem_threshold": 80
     },
     "test": {
       "example_var": "test-data"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "db_identifier": "tribunals-db-preprod",
+      "engine": "sqlserver-se",
+      "engine_version": "15.00.4198.2.v1",
+      "instance_class": "db.m5.large",
+      "username": "admin",
+      "dms_source_db": "ec2-34-243-192-28.eu-west-1.compute.amazonaws.com",
+      "curserver": "PREPRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "server_port_3": "22",
+      "lb_listener_protocol_3": "TCP",
+      "ami_image_id": "ami-0d20b6fc5007adcb3",
+      "task_definition_volume": "tribunals",
+      "server_port": 8080,
+      "app_count": 1,
+      "appscaling_min_capacity": 1,
+      "appscaling_max_capacity": 6,
+      "ecs_scaling_cpu_threshold": 80,
+      "ecs_scaling_mem_threshold": 80
     },
     "production": {
-      "example_var": "production-data"
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "db_identifier": "tribunals-db-prod",
+      "engine": "sqlserver-se",
+      "engine_version": "15.00.4198.2.v1",
+      "instance_class": "db.m5.large",
+      "username": "admin",
+      "dms_source_db": "ec2-34-243-192-28.eu-west-1.compute.amazonaws.com",
+      "curserver": "PRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "server_port_3": "22",
+      "lb_listener_protocol_3": "TCP",
+      "ami_image_id": "ami-0d233dc36193b1c63",
+      "task_definition_volume": "tribunals",
+      "server_port": 8080,
+      "app_count": 2,
+      "appscaling_min_capacity": 2,
+      "appscaling_max_capacity": 6,
+      "ecs_scaling_cpu_threshold": 80,
+      "ecs_scaling_mem_threshold": 80
+    }
+  },
+  "ec2_sg_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
     }
   }
 }
