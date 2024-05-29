@@ -5,7 +5,7 @@ locals {
   ])
 
   cloudwatch_dashboard_widgets = {
-    ec2_expression = {
+    ec2 = {
       cpu-utilization-high = {
         type = "metric"
         properties = {
@@ -86,7 +86,7 @@ locals {
       }
     }
 
-    ec2_cwagent_windows_expression = {
+    ec2_cwagent_windows = {
       free-disk-space-low = {
         type = "metric"
         properties = {
@@ -141,7 +141,7 @@ locals {
       }
     }
 
-    ec2_cwagent_linux_expression = {
+    ec2_cwagent_linux = {
       free-disk-space-low = {
         type = "metric"
         properties = {
@@ -222,7 +222,7 @@ locals {
       }
     }
 
-    ec2_instance_cwagent_collectd_service_status_os_expression = {
+    ec2_instance_cwagent_collectd_service_status_os = {
       service-status-error-os-layer = {
         type = "metric"
         properties = {
@@ -250,7 +250,7 @@ locals {
         }
       }
     }
-    ec2_instance_cwagent_collectd_service_status_app_expression = {
+    ec2_instance_cwagent_collectd_service_status_app = {
       service-status-error-app-layer = {
         type = "metric"
         properties = {
@@ -278,7 +278,7 @@ locals {
         }
       }
     }
-    ec2_instance_cwagent_collectd_connectivity_test_expression = {
+    ec2_instance_cwagent_collectd_connectivity_test = {
       connectivity-test-all-failed = {
         type = "metric"
         properties = {
@@ -306,7 +306,7 @@ locals {
         }
       }
     }
-    ec2_instance_cwagent_collectd_textfile_monitoring_expression = {
+    ec2_instance_cwagent_collectd_textfile_monitoring = {
       textfile-monitoring-metric-error = {
         type = "metric"
         properties = {
@@ -361,7 +361,7 @@ locals {
       }
     }
 
-    ec2_instance_cwagent_collectd_oracle_db_connected_expression = {
+    ec2_instance_cwagent_collectd_oracle_db_connected = {
       oracle-db-disconnected = {
         type = "metric"
         properties = {
@@ -389,7 +389,7 @@ locals {
         }
       }
     }
-    ec2_instance_cwagent_collectd_oracle_db_backup_expression = {
+    ec2_instance_cwagent_collectd_oracle_db_backup = {
       oracle-db-rman-backup-error = {
         type = "metric"
         properties = {
@@ -444,7 +444,7 @@ locals {
       }
     }
 
-    lb_expression = {
+    lb = {
       load-balancer-requests = {
         type = "metric"
         properties = {
@@ -663,7 +663,7 @@ locals {
       }
     }
 
-    network_lb_expression = {
+    network_lb = {
       unhealthy-network-load-balancer-host = {
         type = "metric"
         properties = {
@@ -695,117 +695,117 @@ locals {
   }
 
   cloudwatch_dashboard_widget_groups = {
-    ec2_windows_only_expression = {
+    ec2_windows_only = {
       header_markdown = "## EC2"
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_expression.cpu-utilization-high,
-        local.cloudwatch_dashboard_widgets.ec2_expression.instance-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2_expression.system-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows_expression.free-disk-space-low,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows_expression.high-memory-usage,
+        local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
         null,
       ]
     }
-    ec2_linux_only_expression = {
+    ec2_linux_only = {
       header_markdown = "## EC2"
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_expression.cpu-utilization-high,
-        local.cloudwatch_dashboard_widgets.ec2_expression.instance-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2_expression.system-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux_expression.free-disk-space-low,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux_expression.high-memory-usage,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux_expression.cpu-iowait-high,
+        local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
       ]
     }
-    ec2_linux_and_windows_expression = {
+    ec2_linux_and_windows = {
       header_markdown = "## EC2"
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_expression.cpu-utilization-high,
-        local.cloudwatch_dashboard_widgets.ec2_expression.instance-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2_expression.system-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows_expression.free-disk-space-low,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows_expression.high-memory-usage,
+        local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
         null,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux_expression.free-disk-space-low,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux_expression.high-memory-usage,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux_expression.cpu-iowait-high,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
       ]
     }
-    ec2_service_status_expression = {
+    ec2_service_status = {
       width  = 8
       height = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os_expression.service-status-error-os-layer,
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app_expression.service-status-error-app-layer,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
         null,
       ]
     }
-    ec2_service_status_with_connectivity_test_expression = {
+    ec2_service_status_with_connectivity_test = {
       width  = 8
       height = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os_expression.service-status-error-os-layer,
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app_expression.service-status-error-app-layer,
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_connectivity_test_expression.connectivity-test-all-failed,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_connectivity_test.connectivity-test-all-failed,
       ]
     }
-    ec2_textfile_monitoring_expression = {
+    ec2_textfile_monitoring = {
       width  = 8
       height = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring_expression.textfile-monitoring-metric-error,
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring_expression.textfile-monitoring-metric-not-updated,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-error,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated,
         null,
       ]
     }
-    ec2_oracle_db_expression = {
+    ec2_oracle_db = {
       width  = 8
       height = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected_expression.oracle-db-disconnected,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
         null,
         null,
       ]
     }
-    ec2_oracle_db_with_backup_expression = {
+    ec2_oracle_db_with_backup = {
       width  = 8
       height = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected_expression.oracle-db-disconnected,
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup_expression.oracle-db-rman-backup-error,
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup_expression.oracle-db-rman-backup-did-not-run,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-error,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run,
       ]
     }
-    lb_expression = {
+    lb = {
       header_markdown = "## ALB"
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-requests,
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-http-4XXs,
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-http-5XXs,
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-target-group-requests,
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-target-group-http-4XXs,
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-target-group-http-5XXs,
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-active-connections,
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-new-connections,
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-target-connection-errors,
-        local.cloudwatch_dashboard_widgets.lb_expression.unhealthy-load-balancer-host,
-        local.cloudwatch_dashboard_widgets.lb_expression.load-balancer-target-response-time,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-requests,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-http-4XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-http-5XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-requests,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-4XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-5XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-active-connections,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-new-connections,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-connection-errors,
+        local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
         null,
       ]
     }
-    network_lb_expression = {
+    network_lb = {
       width  = 8
       height = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.network_lb_expression.unhealthy-network-load-balancer-host,
+        local.cloudwatch_dashboard_widgets.network_lb.unhealthy-network-load-balancer-host,
         null,
         null,
       ]

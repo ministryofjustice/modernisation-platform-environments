@@ -21,11 +21,11 @@ locals {
   baseline_presets_all_environments = {
     options = {
       cloudwatch_dashboard_default_widget_groups = [
-        "lb_expression",
-        "ec2_linux_only_expression",
-        "ec2_service_status_expression",
-        "ec2_textfile_monitoring_expression",
-        "ec2_oracle_db_with_backup_expression",
+        "lb",
+        "ec2_linux_only",
+        "ec2_service_status",
+        "ec2_textfile_monitoring",
+        "ec2_oracle_db_with_backup",
       ]
       cloudwatch_metric_alarms_default_actions    = ["dso_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters  = ["hmpps-oem-${local.environment}"]
