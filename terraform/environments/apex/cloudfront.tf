@@ -100,7 +100,7 @@ resource "random_password" "cloudfront" {
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  name        = "cloudfront-secret-${upper(local.application_name)}-${formatdate("DDMMMYYYY", timestamp())}"
+  name        = "cloudfront-secret-${upper(local.application_name)}"
   description = "Secret to be shared between ALB and CloudFront"
   tags = merge(
     local.tags,
@@ -330,3 +330,5 @@ resource "aws_acm_certificate_validation" "cloudfront" {
   certificate_arn         = aws_acm_certificate.cloudfront.arn
   validation_record_fqdns = [local.cloudfront_domain_name_main[0], local.cloudfront_domain_name_sub[0]]
 }
+
+
