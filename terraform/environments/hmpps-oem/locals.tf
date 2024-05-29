@@ -1,49 +1,35 @@
 locals {
-  baseline_presets_environments_specific = {
-    development   = local.baseline_presets_development
-    test          = local.baseline_presets_test
-    preproduction = local.baseline_presets_preproduction
-    production    = local.baseline_presets_production
+  business_unit = var.networking[0].business-unit
+  region        = "eu-west-2"
+
+  environment_baseline_presets_options = {
+    development   = local.development_baseline_presets_options
+    test          = local.test_baseline_presets_options
+    preproduction = local.preproduction_baseline_presets_options
+    production    = local.production_baseline_presets_options
   }
-  baseline_presets_environment_specific = local.baseline_presets_environments_specific[local.environment]
-
-  baseline_environments_specific = {
-    development   = local.baseline_development
-    test          = local.baseline_test
-    preproduction = local.baseline_preproduction
-    production    = local.baseline_production
+  environment_configs = {
+    development   = local.development_config
+    test          = local.test_config
+    preproduction = local.preproduction_config
+    production    = local.production_config
   }
-  baseline_environment_specific = local.baseline_environments_specific[local.environment]
+  baseline_environment_presets_options = local.environment_baseline_presets_options[local.environment]
+  baseline_environment_config          = local.environment_configs[local.environment]
 
-  baseline_presets_all_environments = {
-    options = {
-      cloudwatch_dashboard_default_widget_groups = [
-        "lb_expression",
-        "ec2_linux_only_expression",
-        "ec2_service_status_expression",
-        "ec2_textfile_monitoring_expression",
-        "ec2_oracle_db_with_backup_expression",
-      ]
-#      enable_azure_sas_token                      = true
-      enable_backup_plan_daily_and_weekly         = true
-      enable_business_unit_kms_cmks               = true
-      enable_image_builder                        = true
-      enable_ec2_cloud_watch_agent                = true
-      enable_ec2_reduced_ssm_policy               = true
-      enable_ec2_self_provision                   = true
-      enable_ec2_oracle_enterprise_managed_server = true
-      enable_ec2_user_keypair                     = true
-      enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
-      db_backup_s3                                 = true # adds db backup buckets
-       
-#      iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-#      iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-#      route53_resolver_rules = {
-#        outbound-data-and-private-subnets = ["azure-fixngo-domain"]
-#      }
-#      s3_iam_policies = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    }
-
+  baseline_presets_options = {
+    enable_application_environment_wildcard_cert = false
+    enable_backup_plan_daily_and_weekly          = true
+    enable_business_unit_kms_cmks                = true
+    enable_image_builder                         = true
+    enable_ec2_cloud_watch_agent                 = true
+    enable_ec2_self_provision                    = true
+    enable_ec2_reduced_ssm_policy                = true
+    enable_ec2_user_keypair                      = true
+    enable_ec2_oracle_enterprise_managed_server  = true # the oem manager manages itself, so it needs all of these permissions too
+    enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
+    db_backup_s3                                 = true # adds db backup buckets
+    cloudwatch_metric_alarms_default_actions     = null # don't alarm by default as we use this account to aggregate alarms
     route53_resolver_rules = {
       # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
     }
@@ -54,23 +40,129 @@ locals {
     # sns_topics are defined in locals_${environment}.tf
   }
 
-  baseline_all_environments = {
-    cloudwatch_log_groups = merge(
-      local.weblogic_cloudwatch_log_groups,
-      local.database_cloudwatch_log_groups,
-    )
+  baseline_acm_certificates              = {}
+  baseline_backup_plans                  = {}
+  baseline_cloudwatch_log_groups         = {}
+  baseline_cloudwatch_log_metric_filters = {}
+  baseline_cloudwatch_metric_alarms      = {}
+  baseline_ec2_autoscaling_groups        = {}
+  baseline_ec2_instances                 = {}
+  baseline_iam_policies = {
+    Ec2OracleEnterpriseManagerPolicy = {
+      description = "Permissions required for Oracle Enterprise Manager"
+      statements = [
+        {
+          sid    = "S3ListLocation"
+          effect = "Allow"
+          actions = [
+            "s3:ListAllMyBuckets",
+            "s3:GetBucketLocation",
+          ]
+          resources = [
+            "arn:aws:s3:::*"
+          ]
+        },
+        {
+          sid    = "SecretsmanagerReadWriteOracleOem"
+          effect = "Allow"
+          actions = [
+            "secretsmanager:GetSecretValue",
+            "secretsmanager:PutSecretValue",
+          ]
+          resources = [
+            "arn:aws:secretsmanager:*:*:secret:/oracle/*",
+          ]
+        },
+        {
+          sid    = "SSMReadAccountIdsOracle"
+          effect = "Allow"
+          actions = [
+            "ssm:GetParameter",
+            "ssm:GetParameters",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/account_ids",
+            "arn:aws:ssm:*:*:parameter/oracle/*",
+          ]
+        },
+        {
+          sid    = "SSMWriteOracle"
+          effect = "Allow"
+          actions = [
+            "ssm:PutParameter",
+            "ssm:PutParameters",
+          ]
+          resources = [
+            "arn:aws:ssm:*:*:parameter/oracle/*",
+          ]
+        }
+      ]
+    }
+  }
+  baseline_iam_roles                = {}
+  baseline_iam_service_linked_roles = {}
+  baseline_key_pairs                = {}
+  baseline_kms_grants               = {}
+  baseline_lbs                      = {}
 
-    s3_buckets = {
-      s3-bucket = {
-        iam_policies = module.baseline_presets.s3_iam_policies
+  baseline_oam_sinks = {
+    "CloudWatchMetricOamSink" = {
+      resource_types = ["AWS::CloudWatch::Metric"]
+      source_account_names = [
+        "corporate-staff-rostering-${local.environment}",
+        "hmpps-domain-services-${local.environment}",
+        "nomis-${local.environment}",
+        "nomis-combined-reporting-${local.environment}",
+        "nomis-data-hub-${local.environment}",
+        "oasys-${local.environment}",
+        "oasys-national-reporting-${local.environment}",
+        "planetfm-${local.environment}",
+      ]
+    }
+  }
+
+  baseline_route53_resolvers = {}
+  baseline_route53_zones     = {}
+
+  baseline_s3_buckets = {
+    s3-bucket = {
+      iam_policies = module.baseline_presets.s3_iam_policies
+    }
+  }
+
+  baseline_secretsmanager_secrets = {}
+
+  baseline_ssm_parameters = {
+    "/ansible" = {
+      parameters = {
+        ssm_bucket = {
+          description = "Ansible S3 bucket"
+          value       = module.baseline.s3_buckets["s3-bucket"].bucket.bucket
+        }
       }
     }
+  }
 
-    security_groups = {
-      private-lb         = local.security_groups.private_lb
-      private-web        = local.security_groups.private_web
-      private-jumpserver = local.security_groups.private_jumpserver
-      data-db            = local.security_groups.data_db
-    }
+  baseline_security_groups = {
+    data-oem = local.security_groups.data_oem
+  }
+
+  baseline_sns_topics = {}
+
+  environment_cloudwatch_monitoring_options = {
+    development   = local.development_cloudwatch_monitoring_options
+    test          = local.test_cloudwatch_monitoring_options
+    preproduction = local.preproduction_cloudwatch_monitoring_options
+    production    = local.production_cloudwatch_monitoring_options
+  }
+
+  cloudwatch_local_environment_monitoring_options = local.environment_cloudwatch_monitoring_options[local.environment]
+
+  cloudwatch_monitoring_options = {
+    enable_cloudwatch_monitoring_account    = false
+    enable_cloudwatch_cross_account_sharing = false
+    enable_cloudwatch_dashboard             = false
+    monitoring_account_id                   = {}
+    source_account_ids                      = {}
   }
 }
