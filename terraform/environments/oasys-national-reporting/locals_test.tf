@@ -4,9 +4,9 @@ locals {
   test_config = {
 
     baseline_secretsmanager_secrets = {
-      "/ec2/onr-web/test"        = local.web_secretsmanager_secrets
-      "/ec2/onr-boe/t2"          = local.boe_secretsmanager_secrets
       "/ec2/onr-bods/t2"         = local.bods_secretsmanager_secrets
+      "/ec2/onr-boe/t2"          = local.boe_secretsmanager_secrets
+      "/ec2/onr-web/t2"          = local.web_secretsmanager_secrets
       "/oracle/database/T2BOSYS" = local.database_secretsmanager_secrets
       "/oracle/database/T2BOAUD" = local.database_secretsmanager_secrets
 
@@ -23,8 +23,9 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/test/*",
               "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-bods/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
@@ -68,7 +69,7 @@ locals {
       })
     }
     baseline_ec2_autoscaling_groups = {
-      test-web-asg = merge(local.defaults_web_ec2, {
+      t2-test-web-asg = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
             "Ec2SecretPolicy",
@@ -87,6 +88,9 @@ locals {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = merge(local.defaults_boe_ec2.tags, {
+          oasys-national-reporting-environment = "t2"
+        })
       })
       # TODO: this is just for testing, remove when not needed
       t2-test-boe-asg = merge(local.defaults_boe_ec2, {
