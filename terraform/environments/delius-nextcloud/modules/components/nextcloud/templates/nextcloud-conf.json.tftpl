@@ -1,0 +1,324 @@
+{
+    "system": {
+        "passwordsalt": "${nextcloud_passwordsalt}",
+        "secret": "${nextcloud_secret}",
+        "forwarded_for_headers": [
+            "HTTP_X_FORWARDED_FOR"
+        ],
+        "installed": true,
+        "instanceid": "${nextcloud_id}",
+        "lost_password_link": "https:\/\/${pwm_url}\/public\/forgottenpassword",
+        "session_lifetime": "43200",
+        "session_keepalive": false,
+        "ldapIgnoreNamingRules": false,
+        "ldapProviderFactory": "OCA\\User_LDAP\\LDAPProviderFactory",
+        "forcessl": true,
+        "loglevel": 1,
+        "trashbin_retention_obligation": "30, 32",
+        "overwriteprotocol": "https",
+        "memcache.distributed": "\\OC\\Memcache\\Redis",
+        "memcache.locking": "\\OC\\Memcache\\Redis",
+        "filelocking.enabled": "true",
+        "redis": {
+            "host": "${redis["host"]}",
+            "port": "{redis["port"]}",
+            "timeout": "1.5"
+        },
+        "csrf.disabled": "false",
+        "filesystem_check_changes": "1",
+        "mail_smtpmode": "smtp",
+        "mail_smtphost": "${mail["server"]}",
+        "mail_sendmailmode": "smtp",
+        "mail_smtpport": "25",
+        "mail_from_address": "${mail["from_address"]}",
+        "mail_domain": "${mail["domain"]}",
+        "auth.webauthn.enabled": false,
+        "maintenance": false
+    },
+    "apps": {
+        "accessibility": {
+            "enabled": "yes",
+            "installed_version": "1.6.0",
+            "types": ""
+        },
+        "activity": {
+            "enabled": "yes",
+            "installed_version": "2.13.1",
+            "types": "filesystem"
+        },
+        "cloud_federation_api": {
+            "enabled": "yes",
+            "installed_version": "1.3.0",
+            "types": "filesystem"
+        },
+        "comments": {
+            "enabled": "yes",
+            "installed_version": "1.10.0",
+            "types": "logging"
+        },
+        "contactsinteraction": {
+            "enabled": "yes",
+            "installed_version": "1.1.0",
+            "types": "dav"
+        },
+        "core": {
+            "enterpriseLogoChecked": "yes",
+            "installedat": "1570694511.5532",
+            "lastcron": "1603042772",
+            "lastupdatedat": "0",
+            "oc.integritycheck.checker": "[]",
+            "public_files": "files_sharing\/public.php",
+            "public_webdav": "dav\/appinfo\/v1\/publicwebdav.php",
+            "scss.variables": "c56f3e52ca21a32ed9fd299f482ae5be",
+            "shareapi_allow_public_upload": "no",
+            "shareapi_default_permission_cancreate": "yes",
+            "shareapi_default_permissions": "31",
+            "vendor": "nextcloud"
+        },
+        "dashboard": {
+            "enabled": "no",
+            "installed_version": "7.0.0",
+            "types": ""
+        },
+        "dav": {
+            "buildCalendarReminderIndex": "yes",
+            "buildCalendarSearchIndex": "yes",
+            "enabled": "yes",
+            "installed_version": "1.16.0",
+            "regeneratedBirthdayCalendarsForYearFix": "yes",
+            "types": "filesystem"
+        },
+        "federatedfilesharing": {
+            "enabled": "yes",
+            "installed_version": "1.10.1",
+            "types": ""
+        },
+        "federation": {
+            "enabled": "yes",
+            "installed_version": "1.10.1",
+            "types": "authentication"
+        },
+        "files": {
+            "cronjob_scan_files": "500",
+            "default_quota": "5 GB",
+            "enabled": "yes",
+            "installed_version": "1.15.0",
+            "types": "filesystem"
+        },
+        "files_pdfviewer": {
+            "enabled": "yes",
+            "installed_version": "2.0.1",
+            "types": ""
+        },
+        "files_rightclick": {
+            "enabled": "yes",
+            "installed_version": "0.17.0",
+            "types": ""
+        },
+        "files_sharing": {
+            "enabled": "yes",
+            "installed_version": "1.12.0",
+            "types": "filesystem"
+        },
+        "files_texteditor": {
+            "enabled": "yes",
+            "installed_version": "2.8.0",
+            "types": ""
+        },
+        "files_trashbin": {
+            "enabled": "yes",
+            "installed_version": "1.10.1",
+            "types": "filesystem,dav"
+        },
+        "files_versions": {
+            "enabled": "yes",
+            "installed_version": "1.13.0",
+            "types": "filesystem,dav"
+        },
+        "files_videoplayer": {
+            "enabled": "yes",
+            "installed_version": "1.9.0",
+            "types": ""
+        },
+        "firstrunwizard": {
+            "enabled": "yes",
+            "installed_version": "2.9.0",
+            "types": "logging"
+        },
+        "gallery": {
+            "enabled": "yes",
+            "installed_version": "18.4.0",
+            "types": ""
+        },
+        "logreader": {
+            "enabled": "yes",
+            "installed_version": "2.5.0",
+            "types": ""
+        },
+        "lookup_server_connector": {
+            "enabled": "yes",
+            "installed_version": "1.8.0",
+            "types": "authentication"
+        },
+        "nextcloud_announcements": {
+            "enabled": "yes",
+            "installed_version": "1.9.0",
+            "pub_date": "Thu, 24 Oct 2019 00:00:00 +0200",
+            "types": "logging"
+        },
+        "notifications": {
+            "enabled": "yes",
+            "installed_version": "2.8.0",
+            "types": "logging"
+        },
+        "oauth2": {
+            "enabled": "yes",
+            "installed_version": "1.8.0",
+            "types": "authentication"
+        },
+        "password_policy": {
+            "enabled": "yes",
+            "installed_version": "1.10.1",
+            "types": "authentication"
+        },
+        "photos": {
+            "enabled": "yes",
+            "installed_version": "1.2.0",
+            "types": ""
+        },
+        "privacy": {
+            "enabled": "yes",
+            "fullDiskEncryptionEnabled": "1",
+            "installed_version": "1.4.0",
+            "readableLocation": "gb",
+            "types": ""
+        },
+        "provisioning_api": {
+            "enabled": "yes",
+            "installed_version": "1.10.0",
+            "types": "prevent_group_restriction"
+        },
+        "recommendations": {
+            "enabled": "yes",
+            "installed_version": "0.8.0",
+            "types": ""
+        },
+        "serverinfo": {
+            "enabled": "yes",
+            "installed_version": "1.10.0",
+            "types": ""
+        },
+        "settings": {
+            "enabled": "yes",
+            "installed_version": "1.2.0",
+            "types": ""
+        },
+        "sharebymail": {
+            "enabled": "yes",
+            "enforcePasswordProtection": "yes",
+            "installed_version": "1.10.0",
+            "types": "filesystem"
+        },
+        "support": {
+            "SwitchUpdaterServerHasRun": "yes",
+            "enabled": "yes",
+            "installed_version": "1.3.0",
+            "types": "session"
+        },
+        "survey_client": {
+            "enabled": "yes",
+            "installed_version": "1.8.0",
+            "types": ""
+        },
+        "systemtags": {
+            "enabled": "yes",
+            "installed_version": "1.10.0",
+            "types": "logging"
+        },
+        "text": {
+            "enabled": "yes",
+            "installed_version": "3.1.0",
+            "types": "dav"
+        },
+        "theming": {
+            "backgroundMime": "backgroundColor",
+            "cachebuster": "2",
+            "enabled": "yes",
+            "installed_version": "1.11.0",
+            "types": "logging"
+        },
+        "twofactor_backupcodes": {
+            "enabled": "yes",
+            "installed_version": "1.9.0",
+            "types": ""
+        },
+        "twofactor_totp": {
+            "enabled": "yes",
+            "installed_version": "5.0.0",
+            "types": ""
+        },
+        "updatenotification": {
+            "core": "18.0.10.2",
+            "enabled": "yes",
+            "files_rightclick": "0.15.1",
+            "files_texteditor": "2.11.0",
+            "installed_version": "1.10.0",
+            "types": "",
+            "update_check_errors": "0"
+        },
+        "user_ldap": {
+            "cleanUpJobOffset": "0",
+            "enabled": "yes",
+            "installed_version": "1.10.2",
+            "s01_lastChange": "1589607346",
+            "s01has_memberof_filter_support": "1",
+            "s01ldap_agent_password": "${nextcloud_s01ldap_agent_password}",
+            "s01ldap_base": "${fileshare_user_base}\n${standard_user_base}",
+            "s01ldap_base_groups": "${fileshare_base_groups}",
+            "s01ldap_base_users": "${standard_user_base}",
+            "s01ldap_cache_ttl": "600",
+            "s01ldap_configuration_active": "1",
+            "s01ldap_display_name": "cn",
+            "s01ldap_dn": "${ldap_user}",
+            "s01ldap_email_attr": "mail",
+            "s01ldap_experienced_admin": "0",
+            "s01ldap_group_filter": "(|(cn=${fs_group_prefix}-WMT-RW)(cn=${fs_group_prefix}-CFO-R)(cn=${fs_group_prefix}-BENCH-DEBS-R)(cn=${fs_group_prefix}-BENCH-DEBS-RW)(cn=${fs_group_prefix}-BGSW-DEBS-RW)(cn=${fs_group_prefix}-CGM-DEBS-RW)(cn=${fs_group_prefix}-CL-DEBS-R)(cn=${fs_group_prefix}-CL-DEBS-RW)(cn=${fs_group_prefix}-DDC-DEBS-R)(cn=${fs_group_prefix}-DDC-DEBS-RW)(cn=${fs_group_prefix}-DLNR-DEBS-R)(cn=${fs_group_prefix}-DLNR-DEBS-RW)(cn=${fs_group_prefix}-DTV-DEBS-R)(cn=${fs_group_prefix}-DTV-DEBS-RW)(cn=${fs_group_prefix}-EPP-NPS-R)(cn=${fs_group_prefix}-EPP-NPS-RW)(cn=${fs_group_prefix}-Essex-DEBS-R)(cn=${fs_group_prefix}-Essex-DEBS-RW)(cn=${fs_group_prefix}-HLNY-DEBS-R)(cn=${fs_group_prefix}-HLNY-DEBS-RW)(cn=${fs_group_prefix}-Hampshire-DEBS-RW)(cn=${fs_group_prefix}-KSS-DEBS-RW)(cn=${fs_group_prefix}-LONDON-DEBS-R)(cn=${fs_group_prefix}-LONDON-DEBS-RW)(cn=${fs_group_prefix}-London-NPS-R)(cn=${fs_group_prefix}-London-NPS-RW)(cn=${fs_group_prefix}-MISC-DEBS-R)(cn=${fs_group_prefix}-MISC-DEBS-RW)(cn=${fs_group_prefix}-Merseyside-DEBS-RW)(cn=${fs_group_prefix}-NS-DEBS-R)(cn=${fs_group_prefix}-NS-DEBS-RW)(cn=${fs_group_prefix}-Northumbria-DEBS-RW)(cn=${fs_group_prefix}-PPAS-NPS-R)(cn=${fs_group_prefix}-PPAS-NPS-RW)(cn=${fs_group_prefix}-SWM-DEBS-R)(cn=${fs_group_prefix}-SWM-DEBS-RW)(cn=${fs_group_prefix}-South-Yorkshire-DEBS-R)(cn=${fs_group_prefix}-South-Yorkshire-DEBS-RW)(cn=${fs_group_prefix}-Thames-DEBS-R)(cn=${fs_group_prefix}-Thames-DEBS-RW)(cn=${fs_group_prefix}-WWM-DEBS-RW)(cn=${fs_group_prefix}-Wales-DEBS-RW)(cn=${fs_group_prefix}-Wales-NPS-R)(cn=${fs_group_prefix}-Wales-NPS-RW)(cn=${fs_group_prefix}-West-Yorkshire-DEBS-R)(cn=${fs_group_prefix}-West-Yorkshire-DEBS-RW)(cn=${fs_group_prefix}-MIS-R)(cn=${fs_group_prefix}-N50-GreaterManchester-NPS-R)(cn=${fs_group_prefix}-N50-GreaterManchester-NPS-RW)(cn=${fs_group_prefix}-N51-NorthWest-NPS-R)(cn=${fs_group_prefix}-N51-NorthWest-NPS-RW)(cn=${fs_group_prefix}-N52-WestMidlands-NPS-R)(cn=${fs_group_prefix}-N52-WestMidlands-NPS-RW)(cn=${fs_group_prefix}-N53-EastMidlands-NPS-R)(cn=${fs_group_prefix}-N53-EastMidlands-NPS-RW)(cn=${fs_group_prefix}-N54-NorthEast-NPS-R)(cn=${fs_group_prefix}-N54-NorthEast-NPS-RW)(cn=${fs_group_prefix}-N55-YorkshireandHumberside-NPS-R)(cn=${fs_group_prefix}-N55-YorkshireandHumberside-NPS-RW)(cn=${fs_group_prefix}-N56-EastofEngland-NPS-R)(cn=${fs_group_prefix}-N56-EastofEngland-NPS-RW)(cn=${fs_group_prefix}-N57-KentSurreyandSussex-NPS-R)(cn=${fs_group_prefix}-N57-KentSurreyandSussex-NPS-RW)(cn=${fs_group_prefix}-N58-SouthWest-NPS-R)(cn=${fs_group_prefix}-N58-SouthWest-NPS-RW)(cn=${fs_group_prefix}-N59-SouthCentral-NPS-R)(cn=${fs_group_prefix}-N59-SouthCentral-NPS-RW)(cn=${fs_group_prefix}-N03-Wales-NPS-R)(cn=${fs_group_prefix}-N03-Wales-NPS-RW)(cn=${fs_group_prefix}-N07-London-NPS-R)(cn=${fs_group_prefix}-N07-London-NPS-RW)(cn=${fs_group_prefix}-IDC-NPS-R)(cn=${fs_group_prefix}-IDC-NPS-RW)(cn=${fs_group_prefix}-NSD-NPS-R)(cn=${fs_group_prefix}-NSD-NPS-RW)(cn=${fs_group_prefix}-NDST-UPW-Reports-R)(cn=${fs_group_prefix}-NDST-UPW-Reports-RW)(cn=${fs_group_prefix}-NDST-UPW-Reports-Seetec-R)(cn=${fs_group_prefix}-NDST-UPW-Reports-Seetec-RW))",
+            "s01ldap_group_filter_mode": "1",
+            "s01ldap_group_member_assoc_attribute": "member",
+            "s01ldap_groupfilter_groups": "${fs_group_prefix}-BENCH-DEBS-R\n${fs_group_prefix}-BENCH-DEBS-RW\n${fs_group_prefix}-BGSW-DEBS-RW\n${fs_group_prefix}-CFO-R\n${fs_group_prefix}-CGM-DEBS-RW\n${fs_group_prefix}-CL-DEBS-R\n${fs_group_prefix}-CL-DEBS-RW\n${fs_group_prefix}-DDC-DEBS-R\n${fs_group_prefix}-DDC-DEBS-RW\n${fs_group_prefix}-DLNR-DEBS-R\n${fs_group_prefix}-DLNR-DEBS-RW\n${fs_group_prefix}-DTV-DEBS-R\n${fs_group_prefix}-DTV-DEBS-RW\n${fs_group_prefix}-Essex-DEBS-R\n${fs_group_prefix}-Essex-DEBS-RW\n${fs_group_prefix}-HLNY-DEBS-R\n${fs_group_prefix}-HLNY-DEBS-RW\n${fs_group_prefix}-Hampshire-DEBS-RW\n${fs_group_prefix}-KSS-DEBS-RW\n${fs_group_prefix}-LONDON-DEBS-R\n${fs_group_prefix}-LONDON-DEBS-RW\n${fs_group_prefix}-Merseyside-DEBS-RW\n${fs_group_prefix}-NS-DEBS-R\n${fs_group_prefix}-NS-DEBS-RW\n${fs_group_prefix}-Northumbria-DEBS-RW\n${fs_group_prefix}-SWM-DEBS-R\n${fs_group_prefix}-SWM-DEBS-RW\n${fs_group_prefix}-South-Yorkshire-DEBS-R\n${fs_group_prefix}-South-Yorkshire-DEBS-RW\n${fs_group_prefix}-Thames-DEBS-R\n${fs_group_prefix}-Thames-DEBS-RW\n${fs_group_prefix}-WMT-RW\n${fs_group_prefix}-WWM-DEBS-RW\n${fs_group_prefix}-Wales-DEBS-RW\n${fs_group_prefix}-West-Yorkshire-DEBS-R\n${fs_group_prefix}-West-Yorkshire-DEBS-RW\n${fs_group_prefix}-N50-GreaterManchester-NPS-R\n${fs_group_prefix}-N50-GreaterManchester-NPS-RW\n${fs_group_prefix}-N51-NorthWest-NPS-R\n${fs_group_prefix}-N51-NorthWest-NPS-RW\n${fs_group_prefix}-N52-WestMidlands-NPS-R\n${fs_group_prefix}-N52-WestMidlands-NPS-RW\n${fs_group_prefix}-N53-EastMidlands-NPS-R\n${fs_group_prefix}-N53-EastMidlands-NPS-RW\n${fs_group_prefix}-N54-NorthEast-NPS-R\n${fs_group_prefix}-N54-NorthEast-NPS-RW\n${fs_group_prefix}-N55-YorkshireandHumberside-NPS-R\n${fs_group_prefix}-N55-YorkshireandHumberside-NPS-RW\n${fs_group_prefix}-N56-EastofEngland-NPS-R\n${fs_group_prefix}-N56-EastofEngland-NPS-RW\n${fs_group_prefix}-N57-KentSurreyandSussex-NPS-R\n${fs_group_prefix}-N57-KentSurreyandSussex-NPS-RW\n${fs_group_prefix}-N58-SouthWest-NPS-R\n${fs_group_prefix}-N58-SouthWest-NPS-RW\n${fs_group_prefix}-N59-SouthCentral-NPS-R\n${fs_group_prefix}-N59-SouthCentral-NPS-RW\n${fs_group_prefix}-N03-Wales-NPS-R\n${fs_group_prefix}-N03-Wales-NPS-RW\n${fs_group_prefix}-N07-London-NPS-R\n${fs_group_prefix}-N07-London-NPS-RW\n${fs_group_prefix}-IDC-NPS-R\n${fs_group_prefix}-IDC-NPS-RW\n${fs_group_prefix}-NSD-NPS-R\n${fs_group_prefix}-NSD-NPS-RW\n${fs_group_prefix}-NDST-UPW-Reports-R\n${fs_group_prefix}-NDST-UPW-Reports-RW\n${fs_group_prefix}-NDST-UPW-Reports-Seetec-R\n${fs_group_prefix}-NDST-UPW-Reports-Seetec-RW",
+            "s01ldap_groupfilter_objectclass": "",
+            "s01ldap_host": "${ldap_host}",
+            "s01ldap_login_filter": "(&(&(|(objectclass=inetOrgPerson)))(|(mailPrimaryAddress=%uid)(mail=%uid)))",
+            "s01ldap_login_filter_mode": "1",
+            "s01ldap_loginfilter_attributes": "",
+            "s01ldap_loginfilter_email": "1",
+            "s01ldap_loginfilter_username": "0",
+            "s01ldap_port": "389",
+            "s01ldap_user_filter_mode": "1",
+            "s01ldap_userfilter_groups": "",
+            "s01ldap_userfilter_objectclass": "inetOrgPerson",
+            "s01ldap_userlist_filter": "(&(|(objectclass=inetOrgPerson)))",
+            "types": "authentication"
+        },
+        "user_status": {
+            "enabled": "yes",
+            "installed_version": "1.0.0",
+            "types": ""
+        },
+        "viewer": {
+            "enabled": "yes",
+            "installed_version": "1.4.0",
+            "types": ""
+        },
+        "weather_status": {
+            "enabled": "yes",
+            "installed_version": "1.0.0",
+            "types": ""
+        },
+        "workflowengine": {
+            "enabled": "yes",
+            "installed_version": "2.2.0",
+            "types": "filesystem"
+        }
+    }
+}
