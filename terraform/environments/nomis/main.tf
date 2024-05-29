@@ -1,31 +1,6 @@
-# Standard main.tf that can be used for all baseline module applications.
-# Avoid putting application specific resources here.
-
-# What is baseline module?
-#
-# Ideally, all application environments are identical and same set of
-# terraform works for all environments.
-# Unfortunately, for many applications there are differences between
-# environments. For example, a test account containing multiple environments.
-#
-# One way of solving this is to use "for_each" on the terraform resources
-# and use different variables for each environment. That is what baseline
-# does - it is a module containing a "for_each" of each key resource.
-#
-# A standard set of pre-canned for-each variables is defined in the
-# "baseline_presets" module. For example, resources to allow
-# core-shared-services-production access.
-#
-# "merge" is used to combine resources that are common to all environments,
-# defined within locals_baseline.tf, and environment specific resources,
-# defined within locals_development.tf, locals_test.tf and so on.
-#
-# Circular Dependencies. Care needs to be taken when referencing
-# resource ids within baseline, e.g. you cannot take a resource ID
-# from baseline output, and pass it back into baseline.
-# To solve this, there are resource ID lookups within the baseline
-# module, e.g. pass in a target group name to a load balancer
-# and it will lookup the target group ID/ARN.
+# Majority of resources created by baseline module.
+# See common settings in locals.tf and environment specific settings in
+# locals_development.tf, locals_test.tf etc.
 
 module "ip_addresses" {
   source = "../../modules/ip_addresses"
