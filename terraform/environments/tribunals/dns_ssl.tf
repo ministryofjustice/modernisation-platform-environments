@@ -434,6 +434,7 @@ output "acm_certificate_validation_route53" {
 
 //////////////////////////////
 
+// ACM Public Certificate
 resource "aws_acm_certificate" "external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
@@ -457,7 +458,7 @@ resource "aws_acm_certificate_validation" "external" {
 
 // Route53 DNS records for certificate validation
 resource "aws_route53_record" "external_validation" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
 
   allow_overwrite = true
   name            = local.domain_name_main[0]
