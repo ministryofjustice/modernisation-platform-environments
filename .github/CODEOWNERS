@@ -17,7 +17,6 @@
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-apps-and-tools @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-compute @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/data-platform-labs @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
@@ -43,7 +42,7 @@
 /terraform/environments/ncas @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-combined-reporting @ministryofjustice/csr-application-support @ministryofjustice/national-applications-reporting-team @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-data-hub @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
-/terraform/environments/nomis @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/syscon-nomis @ministryofjustice/modernisation-platform
+/terraform/environments/nomis @ministryofjustice/csr-application-support @ministryofjustice/nomis-access @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/syscon-nomis @ministryofjustice/modernisation-platform
 /terraform/environments/oas @ministryofjustice/laa-aws-infrastructure @ministryofjustice/oas-migration @ministryofjustice/modernisation-platform
 /terraform/environments/oasys-national-reporting @ministryofjustice/national-applications-reporting-team @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/oasys @ministryofjustice/oasys-operator @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
