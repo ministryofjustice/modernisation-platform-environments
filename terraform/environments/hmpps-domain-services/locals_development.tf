@@ -107,6 +107,7 @@ locals {
           ami         = "hmpps_rhel_8_5"
           os-type     = "Linux"
           component   = "test"
+          server-type = "hmpps-domain-services"
         }
       }
     }
