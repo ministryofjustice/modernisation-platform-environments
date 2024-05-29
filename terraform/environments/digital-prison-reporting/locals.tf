@@ -166,6 +166,7 @@ locals {
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
   s3_read_access_policy  = "${local.project}_s3_read_policy"
+  s3_read_write_policy  = "${local.project}_s3_read_write_policy"
   apigateway_get_policy  = "${local.project}_apigateway_get_policy"
   invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
 
