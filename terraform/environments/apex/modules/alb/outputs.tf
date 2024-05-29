@@ -23,3 +23,13 @@ output "security_group" {
 output "load_balancer" {
   value = aws_lb.loadbalancer
 }
+
+output "load_balancer_arn" {
+  description = "Output ALB DNS name for CloudFront reference"
+  value       = aws_lb.loadbalancer.dns_name
+}
+
+output "load_balancer_id" {
+  description = "Output ALB id for CloudFront reference"
+  value       = aws_lb.loadbalancer.id
+}
