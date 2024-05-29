@@ -8,6 +8,13 @@ locals {
 
   baseline_presets_production = {
     options = {
+      cloudwatch_dashboard_default_widget_groups = [
+        "lb",
+        "ec2_linux_only",
+        "ec2_oracle_db_with_backup",
+        "ec2_service_status_with_connectivity_test",
+        "ec2_textfile_monitoring",
+      ]
       sns_topics = {
         pagerduty_integrations = {
           dso_pagerduty               = "nomis_alarms"
