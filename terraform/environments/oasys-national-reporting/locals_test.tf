@@ -67,6 +67,21 @@ locals {
           oasys-national-reporting-environment = "t2"
         })
       })
+      # t2-onr-web-1-a = merge(local.defaults_web_ec2, {
+      #   config = merge(local.defaults_web_ec2.config, {
+      #     instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #     availability_zone = "${local.region}a"
+      #   })
+      #   instance = merge(local.defaults_web_ec2.instance, {
+      #     instance_type = "m4.large"
+      #   })
+      #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #   tags = merge(local.defaults_web_ec2.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #   })
+      # })
     }
     baseline_ec2_autoscaling_groups = {
       t2-test-web-asg = merge(local.defaults_web_ec2, {
@@ -81,7 +96,7 @@ locals {
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "onr/dsos-2730/ansible-base"
+            branch = "onr/DSOS-2731/onr-web-silent-install"
           })
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
@@ -104,11 +119,6 @@ locals {
           instance_type = "m4.xlarge"
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        # user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-        #     branch = "onr/DSOS-2682/onr-boe-install"
-        #   })
-        # })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
