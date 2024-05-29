@@ -11,7 +11,7 @@ locals {
         "lb",
         "ec2_linux_only",
         "ec2_oracle_db_with_backup",
-        "ec2_service_status_with_connectivity_test",
+        "ec2_service_status",
         "ec2_textfile_monitoring",
       ]
       enable_observability_platform_monitoring = true

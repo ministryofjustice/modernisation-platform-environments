@@ -288,7 +288,7 @@ locals {
           description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
           oracle-sids        = "DRMIS DRCNMAUD"
           misload-dbname     = "DRMIS"
-          connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
+          connectivity-tests = "10.40.0.133:53 10.40.129.79:22"
         })
       })
     }
