@@ -170,130 +170,130 @@ locals {
 
       ### PREPROD
 
-      # pp-ncr-cms-a = merge(local.bip_ec2_default, {
-      #   #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
-      #   config = merge(local.bip_ec2_default.config, {
-      #     availability_zone = "${local.region}a"
-      #     instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_ec2_default.instance, {
-      #     instance_type = "m6i.xlarge",
-      #   })
-      #   tags = merge(local.bip_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform CMS installation and configurations"
-      #     nomis-combined-reporting-environment = "pp"
-      #     type                                 = "management"
-      #     node                                 = "1"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
-      # pp-ncr-cms-b = merge(local.bip_ec2_default, {
-      #   #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
-      #   config = merge(local.bip_ec2_default.config, {
-      #     availability_zone = "${local.region}b"
-      #     instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_ec2_default.instance, {
-      #     instance_type = "m6i.xlarge",
-      #   })
-      #   tags = merge(local.bip_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform CMS installation and configurations"
-      #     nomis-combined-reporting-environment = "pp"
-      #     type                                 = "management"
-      #     node                                 = "2"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
-      # pp-ncr-processing-1-a = merge(local.bip_ec2_default, {
-      #   # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
-      #   config = merge(local.bip_ec2_default.config, {
-      #     availability_zone = "${local.region}a"
-      #     instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_ec2_default.instance, {
-      #     instance_type = "m6i.4xlarge",
-      #   })
-      #   tags = merge(local.bip_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform installation and configurations"
-      #     nomis-combined-reporting-environment = "pp"
-      #     type                                 = "processing"
-      #     node                                 = "3"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
-      # pp-ncr-web-admin-a = merge(local.web_ec2_default, {
-      #   # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
-      #   config = merge(local.web_ec2_default.config, {
-      #     availability_zone = "${local.region}a"
-      #     instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.web_ec2_default.instance, {
-      #     instance_type = "r6i.large",
-      #   })
-      #   tags = merge(local.web_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform web-tier admin installation and configurations"
-      #     nomis-combined-reporting-environment = "pp"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
-      # pp-ncr-web-1-a = merge(local.web_ec2_default, {
-      #   # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
-      #   config = merge(local.web_ec2_default.config, {
-      #     availability_zone = "${local.region}a"
-      #     instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.web_ec2_default.instance, {
-      #     instance_type = "r6i.xlarge",
-      #   })
-      #   tags = merge(local.web_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform web-tier installation and configurations"
-      #     nomis-combined-reporting-environment = "pp"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
-      # pp-ncr-web-2-b = merge(local.web_ec2_default, {
-      #   # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
-      #   config = merge(local.web_ec2_default.config, {
-      #     availability_zone = "${local.region}b"
-      #     instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.web_ec2_default.instance, {
-      #     instance_type = "r6i.xlarge",
-      #   })
-      #   tags = merge(local.web_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform web-tier installation and configurations"
-      #     nomis-combined-reporting-environment = "pp"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
-      # pp-ncr-etl-a = merge(local.etl_ec2_default, {
-      #   # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
-      #   config = merge(local.etl_ec2_default.config, {
-      #     instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PPReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.web_ec2_default.instance, {
-      #     instance_type = "m6i.2xlarge",
-      #   })
-      #   tags = merge(local.etl_ec2_default.tags, {
-      #     description                          = "PreProd SAP BI Platform ETL installation and configurations"
-      #     nomis-combined-reporting-environment = "pp"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
+      pp-ncr-cms-a = merge(local.bip_ec2_default, {
+        #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.bip_ec2_default.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "m6i.xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform CMS installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          type                                 = "management"
+          node                                 = "1"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
+      pp-ncr-cms-b = merge(local.bip_ec2_default, {
+        #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.bip_ec2_default.config, {
+          availability_zone = "${local.region}b"
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "m6i.xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform CMS installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          type                                 = "management"
+          node                                 = "2"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
+      pp-ncr-processing-1-a = merge(local.bip_ec2_default, {
+        # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.bip_ec2_default.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "m6i.4xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          type                                 = "processing"
+          node                                 = "3"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
+      pp-ncr-web-admin-a = merge(local.web_ec2_default, {
+        # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.web_ec2_default.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          instance_type = "r6i.large",
+        })
+        tags = merge(local.web_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform web-tier admin installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
+      pp-ncr-web-1-a = merge(local.web_ec2_default, {
+        # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.web_ec2_default.config, {
+          availability_zone = "${local.region}a"
+          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          instance_type = "r6i.xlarge",
+        })
+        tags = merge(local.web_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform web-tier installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
+      pp-ncr-web-2-b = merge(local.web_ec2_default, {
+        # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.web_ec2_default.config, {
+          availability_zone = "${local.region}b"
+          instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          instance_type = "r6i.xlarge",
+        })
+        tags = merge(local.web_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform web-tier installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
+      pp-ncr-etl-a = merge(local.etl_ec2_default, {
+        # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.etl_ec2_default.config, {
+          instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.web_ec2_default.instance, {
+          instance_type = "m6i.2xlarge",
+        })
+        tags = merge(local.etl_ec2_default.tags, {
+          description                          = "PreProd SAP BI Platform ETL installation and configurations"
+          nomis-combined-reporting-environment = "pp"
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
       pp-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
           local.database_cloudwatch_metric_alarms.standard,
@@ -449,95 +449,95 @@ locals {
         })
       })
     }
-    # baseline_lbs = {
-    #   private = {
-    #     internal_lb                      = true
-    #     enable_delete_protection         = false
-    #     load_balancer_type               = "application"
-    #     idle_timeout                     = 3600
-    #     security_groups                  = ["lb"]
-    #     subnets                          = module.environment.subnets["private"].ids
-    #     enable_cross_zone_load_balancing = true
+    baseline_lbs = {
+      private = {
+        internal_lb                      = true
+        enable_delete_protection         = false
+        load_balancer_type               = "application"
+        idle_timeout                     = 3600
+        security_groups                  = ["lb"]
+        subnets                          = module.environment.subnets["private"].ids
+        enable_cross_zone_load_balancing = true
 
-    #     instance_target_groups = {
-    #       pp-ncr-web = {
-    #         port     = 7777
-    #         protocol = "HTTP"
-    #         health_check = {
-    #           enabled             = true
-    #           path                = "/"
-    #           healthy_threshold   = 3
-    #           unhealthy_threshold = 5
-    #           timeout             = 5
-    #           interval            = 30
-    #           matcher             = "200-399"
-    #           port                = 7777
-    #         }
-    #         stickiness = {
-    #           enabled = true
-    #           type    = "lb_cookie"
-    #         }
-    #         attachments = [
-    #           { ec2_instance_name = "pp-ncr-web-1-a" },
-    #           { ec2_instance_name = "pp-ncr-web-2-b" },
-    #         ]
-    #       }
-    #     }
-    #     listeners = {
-    #       http = {
-    #         port     = 80
-    #         protocol = "HTTP"
+        instance_target_groups = {
+          pp-ncr-web = {
+            port     = 7777
+            protocol = "HTTP"
+            health_check = {
+              enabled             = true
+              path                = "/"
+              healthy_threshold   = 3
+              unhealthy_threshold = 5
+              timeout             = 5
+              interval            = 30
+              matcher             = "200-399"
+              port                = 7777
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+            attachments = [
+              { ec2_instance_name = "pp-ncr-web-1-a" },
+              { ec2_instance_name = "pp-ncr-web-2-b" },
+            ]
+          }
+        }
+        listeners = {
+          http = {
+            port     = 80
+            protocol = "HTTP"
 
-    #         default_action = {
-    #           type = "redirect"
-    #           redirect = {
-    #             port        = 443
-    #             protocol    = "HTTPS"
-    #             status_code = "HTTP_301"
-    #           }
-    #         }
-    #       }
-    #       https = {
-    #         port                      = 443
-    #         protocol                  = "HTTPS"
-    #         ssl_policy                = "ELBSecurityPolicy-2016-08"
-    #         certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
-    #         default_action = {
-    #           type = "fixed-response"
-    #           fixed_response = {
-    #             content_type = "text/plain"
-    #             message_body = "Not implemented"
-    #             status_code  = "501"
-    #           }
-    #         }
-    #         rules = {
-    #           pp-ncr-web = {
-    #             priority = 4580
-    #             actions = [{
-    #               type              = "forward"
-    #               target_group_name = "pp-ncr-web"
-    #             }]
-    #             conditions = [{
-    #               host_header = {
-    #                 values = [
-    #                   "preproduction.reporting.nomis.service.justice.gov.uk"
-    #                 ]
-    #               }
-    #             }]
-    #           }
-    #         }
-    #       }
-    #     }
-    #   }
-    # }
+            default_action = {
+              type = "redirect"
+              redirect = {
+                port        = 443
+                protocol    = "HTTPS"
+                status_code = "HTTP_301"
+              }
+            }
+          }
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+              pp-ncr-web = {
+                priority = 4580
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-ncr-web"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "preproduction.reporting.nomis.service.justice.gov.uk"
+                    ]
+                  }
+                }]
+              }
+            }
+          }
+        }
+      }
+    }
     baseline_route53_zones = {
       "preproduction.reporting.nomis.service.justice.gov.uk" = {
         records = [
           { name = "db", type = "CNAME", ttl = "3600", records = ["pp-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          #{ name = "admin", type = "CNAME", ttl = "3600", records = ["pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "admin", type = "CNAME", ttl = "3600", records = ["pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          #{ name = "", type = "A", lbs_map_key = "private" }, # preproduction.reporting.nomis.service.justice.gov.uk
+          { name = "", type = "A", lbs_map_key = "private" }, # preproduction.reporting.nomis.service.justice.gov.uk
         ]
       }
       "lsast.reporting.nomis.service.justice.gov.uk" = {
