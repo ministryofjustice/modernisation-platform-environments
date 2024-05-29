@@ -195,9 +195,9 @@ resource "aws_cloudfront_distribution" "external" {
   default_cache_behavior {
     target_origin_id = module.alb.load_balancer_id
     smooth_streaming = lookup(local.cloudfront_default_cache_behavior, "smooth_streaming", null)
-    min_ttl          = lookup(local.cloudfront_default_cache_behavior.value, "min_ttl", null)
-    default_ttl      = lookup(local.cloudfront_default_cache_behavior.value, "default_ttl", null)
-    max_ttl          = lookup(local.cloudfront_default_cache_behavior.value, "max_ttl", null)
+    min_ttl          = lookup(local.cloudfront_default_cache_behavior, "min_ttl", null)
+    default_ttl      = lookup(local.cloudfront_default_cache_behavior, "default_ttl", null)
+    max_ttl          = lookup(local.cloudfront_default_cache_behavior, "max_ttl", null)
     allowed_methods  = lookup(local.cloudfront_default_cache_behavior, "allowed_methods", null)
     cached_methods   = lookup(local.cloudfront_default_cache_behavior, "cached_methods", null)
     forwarded_values {
