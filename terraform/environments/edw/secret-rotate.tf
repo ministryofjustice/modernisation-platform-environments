@@ -141,7 +141,7 @@ resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:i
           "logs:CreateLogGroup",
         ],
         Resource = [
-          "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*",
+          "arn:aws:logs:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:*",
         ]
       },
       {
@@ -151,7 +151,7 @@ resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:i
           "logs:PutLogEvents",
         ],
         Resource = [
-          "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/edw-edw-edw-system-root-password-rotation:*",
+          "arn:aws:logs:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.application_data.accounts[local.environment].lambda_function_name}:*",
         ]
       },
       {

@@ -35,7 +35,6 @@
       "lambda_function_handler": "index.lambda_handler",
       "lambda_function_runtime": "python3.8",
       "lambda_function_timeout": "300",
-      "aws_account_id": "local.environment_management.account_ids[terraform.workspace]",
       "secret_rotation_frequency_days": "28",
       "secret_id_suffix_length": "3"
     },
