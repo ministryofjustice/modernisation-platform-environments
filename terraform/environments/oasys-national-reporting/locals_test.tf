@@ -88,7 +88,7 @@ locals {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = merge(local.defaults_boe_ec2.tags, {
+        tags = merge(local.defaults_web_ec2.tags, {
           oasys-national-reporting-environment = "t2"
         })
       })
