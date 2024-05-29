@@ -33,3 +33,9 @@ output "load_balancer_id" {
   description = "Output ALB id for CloudFront reference"
   value       = aws_lb.loadbalancer.id
 }
+
+output "cloudfront_alb_secret" {
+  value       = data.aws_secretsmanager_secret_version.cloudfront.secret_string
+  description = "The secret between ALB and CloudFront"
+  sensitive   = true
+}

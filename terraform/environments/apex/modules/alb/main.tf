@@ -301,7 +301,7 @@ resource "random_password" "cloudfront" {
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
+  name        = "cloudfront-v1-secret-${var.application_name}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
 
