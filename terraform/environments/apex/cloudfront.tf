@@ -21,6 +21,7 @@ locals {
   }
 
   # Other cache behaviors are processed in the order in which they're listed in the CloudFront console or, if you're using the CloudFront API, the order in which they're listed in the DistributionConfig element for the distribution.
+  # The 3 TTL values are set to achieve the setting of 'Use origin cache headers' without a linked cache policy - see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution#cache-behavior-arguments
   cloudfront_ordered_cache_behavior = {
     "cache_behavior_0" = {
       smooth_streaming                 = false
@@ -209,7 +210,6 @@ resource "aws_cloudfront_distribution" "external" {
       }
     }
     viewer_protocol_policy = lookup(local.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
-    # The following 3 TTL values are set to achieve the setting of 'Use origin cache headers' without a linked cache policy - see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution#cache-behavior-arguments
   }
 
   dynamic "ordered_cache_behavior" {
