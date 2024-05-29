@@ -35,8 +35,7 @@ output "load_balancer_id" {
 }
 
 output "cloudfront_alb_secret" {
-  # value       = data.aws_secretsmanager_secret_version.cloudfront.secret_string
-  value = "dummy"
+  value       = data.aws_secretsmanager_secret_version.cloudfront.secret_string
   description = "The secret between ALB and CloudFront"
   sensitive   = true
 }
