@@ -1,14 +1,6 @@
-locals {
-  environment_short = {
-    "development"    = "development"
-    "preproduction"  = "preprod"
-    "production"     = "production"
-  }[local.environment]
-}
-
 # // Create one Route 53 record for each entry in the list of tribunals (assigned in platform_locals.tf)
 resource "aws_route53_record" "external_appeals" {
-  provider = aws.core-vpc 
+  provider = aws.core-vpc
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "administrativeappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
@@ -21,7 +13,7 @@ resource "aws_route53_record" "external_appeals" {
 }
 
 resource "aws_route53_record" "external_ahmlr" {
-  provider = aws.core-vpc 
+  provider = aws.core-vpc
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "landregistrationdivision.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
@@ -34,7 +26,7 @@ resource "aws_route53_record" "external_ahmlr" {
 }
 
 # resource "aws_route53_record" "external_care_standards" {
-#   provider = aws.core-vpc 
+#   provider = aws.core-vpc
 #   zone_id = data.aws_route53_zone.external.zone_id
 #   name    = "carestandards.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 #   type    = "A"
@@ -47,7 +39,7 @@ resource "aws_route53_record" "external_ahmlr" {
 # }
 
 # resource "aws_route53_record" "external_cicap" {
-#   provider = aws.core-vpc 
+#   provider = aws.core-vpc
 #   zone_id = data.aws_route53_zone.external.zone_id
 #   name    = "cicap.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 #   type    = "A"
@@ -60,7 +52,7 @@ resource "aws_route53_record" "external_ahmlr" {
 # }
 
 # resource "aws_route53_record" "external_eat" {
-#   provider = aws.core-vpc 
+#   provider = aws.core-vpc
 #   zone_id = data.aws_route53_zone.external.zone_id
 #   name    = "employmentappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 #   type    = "A"
@@ -73,7 +65,7 @@ resource "aws_route53_record" "external_ahmlr" {
 # }
 
 # resource "aws_route53_record" "external_ftt" {
-#   provider = aws.core-vpc 
+#   provider = aws.core-vpc
 #   zone_id = data.aws_route53_zone.external.zone_id
 #   name    = "financeandtax.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 #   type    = "A"
@@ -86,7 +78,7 @@ resource "aws_route53_record" "external_ahmlr" {
 # }
 
 # resource "aws_route53_record" "external_imset" {
-#   provider = aws.core-vpc 
+#   provider = aws.core-vpc
 #   zone_id = data.aws_route53_zone.external.zone_id
 #   name    = "immigrationservices.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 #   type    = "A"
@@ -99,7 +91,7 @@ resource "aws_route53_record" "external_ahmlr" {
 # }
 
 # resource "aws_route53_record" "external_it" {
-#   provider = aws.core-vpc 
+#   provider = aws.core-vpc
 #   zone_id = data.aws_route53_zone.external.zone_id
 #   name    = "informationrights.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 #   type    = "A"
@@ -331,7 +323,7 @@ resource "aws_route53_record" "external_tax_chancery_decisions_sftp" {
 }
 
 resource "aws_route53_record" "external_tax_tribunal_decisions" {
-  provider = aws.core-vpc 
+  provider = aws.core-vpc
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "taxtribunaldecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
@@ -355,7 +347,7 @@ resource "aws_route53_record" "external_tax_tribunal_decisions_sftp" {
 }
 
 resource "aws_route53_record" "external_ftp_admin_appeals" {
-  provider = aws.core-vpc 
+  provider = aws.core-vpc
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "adminappealsreports.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
@@ -378,10 +370,6 @@ resource "aws_route53_record" "external_admin_appeals_sftp" {
   ttl             = 60
 }
 
-output "acm_certificate_arn" {
-  value = aws_acm_certificate.external.arn
-}
-
 resource "aws_acm_certificate" "external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
@@ -396,8 +384,12 @@ resource "aws_acm_certificate" "external" {
   }
 }
 
+output "acm_certificate_arn" {
+  value = aws_acm_certificate.external.arn
+}
+
 resource "aws_route53_record" "external_validation" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
 
   allow_overwrite = true
   name            = local.domain_name_main[0]
