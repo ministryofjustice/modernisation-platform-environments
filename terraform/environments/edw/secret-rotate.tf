@@ -72,15 +72,15 @@ resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
 # ## AWS LAMBDA FUNCTION ###
 # ##########################
 
-data "archive_file" "lambda_inline_code" {
-  type        = "zip"
-  output_path = "${replace(local.application_data.accounts[local.environment].lambda_function_inline_code_filename, "py", "zip")}"
+# data "archive_file" "lambda_inline_code" {
+#   type        = "zip"
+#   output_path = "${replace(local.application_data.accounts[local.environment].lambda_function_inline_code_filename, "py", "zip")}"
 
-  source {
-    filename = local.application_data.accounts[local.environment].lambda_function_inline_code_filename
-    content  = file("${local.application_data.accounts[local.environment].lambda_function_inline_code_filename}")
-  }
-}
+#   source {
+#     filename = local.application_data.accounts[local.environment].lambda_function_inline_code_filename
+#     content  = file("${local.application_data.accounts[local.environment].lambda_function_inline_code_filename}")
+#   }
+# }
 
 # resource "aws_lambda_function" "rotate_secret_function" {
 #   function_name = local.application_data.accounts[local.environment].lambda_function_name
