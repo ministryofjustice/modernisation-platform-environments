@@ -140,6 +140,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "cloudfront" {
+  count = local.environment == "production" ? 1 : 0
   bucket = aws_s3_bucket.cloudfront.id
 
   rule {
