@@ -86,6 +86,15 @@ resource "aws_iam_policy" "s3_read_write_policy" {
       {
         "Effect" : "Allow",
         "Action" : [
+          "s3:ListBucket",
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${local.project}-*"
+        ]
+      }      
+      {
+        "Effect" : "Allow",
+        "Action" : [
           "s3:*Object",
         ],
         "Resource" : [
