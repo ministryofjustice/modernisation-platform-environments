@@ -37,11 +37,6 @@ module "environment_stage" {
   pagerduty_integration_key = local.pagerduty_integration_key
 }
 
-##
-# Modules for each environment 
-# Separate per environment to allow different versions
-##
-
 module "environment_preprod" {
   #  We're in preproduction account and pre-prod environment
   source = "./modules/delius_environment"
