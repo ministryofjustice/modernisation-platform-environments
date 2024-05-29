@@ -91,7 +91,7 @@ resource "aws_iam_policy" "s3_read_write_policy" {
         "Resource" : [
           "arn:aws:s3:::${local.project}-*"
         ]
-      }      
+      },      
       {
         "Effect" : "Allow",
         "Action" : [
