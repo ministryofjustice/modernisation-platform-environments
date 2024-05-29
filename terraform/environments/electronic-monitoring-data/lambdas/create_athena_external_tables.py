@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 import os
 from logging import getLogger
 import boto3
+import json
 
 s3 = boto3.client("s3")
 glue_client = boto3.client("glue")
@@ -48,12 +49,13 @@ def handler(event, context):
     created_tables = []
     for meta in metadata_list:
         meta.file_format = "csv"
-        meta_dict = str(meta.to_dict())
+        meta_dict = json.dumps(meta.to_dict())
         response = lambda_client.invoke(
             FunctionName="create_athena_external_table",
             InvocationType="Event",
             Payload=meta_dict,
         )
+        logger.info("Logged create_athena_external_table function.")
         if response.StatusCode == 200:
             created_tables.append(meta.name)
         else:
