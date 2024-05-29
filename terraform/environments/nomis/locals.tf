@@ -1,3 +1,6 @@
+# configuration common to all environments are defined here
+# environment specific configuration is in locals_development.tf, locals_test.tf etc.
+
 locals {
   baseline_presets_environments_specific = {
     development   = local.baseline_presets_development

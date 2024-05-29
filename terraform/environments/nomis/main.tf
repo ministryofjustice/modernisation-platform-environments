@@ -13,7 +13,7 @@
 # does - it is a module containing a "for_each" of each key resource.
 #
 # A standard set of pre-canned for-each variables is defined in the
-# "presets" module. For example, resources to allow
+# "baseline_presets" module. For example, resources to allow
 # core-shared-services-production access.
 #
 # "merge" is used to combine resources that are common to all environments,

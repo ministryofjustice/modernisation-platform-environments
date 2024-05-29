@@ -13,55 +13,37 @@ variable "ip_addresses" {
 variable "options" {
   description = "Map of options controlling what resources to return"
   type = object({
-    backup_plan_daily_delete_after               = optional(number, 7)
-    backup_plan_weekly_delete_after              = optional(number, 28)
-    cloudwatch_dashboard_default_widget_groups   = optional(list(string))
-    cloudwatch_log_groups                        = optional(list(string))
-    cloudwatch_metric_alarms_default_actions     = optional(list(string))
-    cloudwatch_metric_oam_links_ssm_parameters   = optional(list(string))
-    cloudwatch_metric_oam_links                  = optional(list(string))
-    enable_application_environment_wildcard_cert = optional(bool, false)
-    enable_azure_sas_token                       = optional(bool, false)
-    enable_offloc_sync                           = optional(bool, false)
-    enable_backup_plan_daily_and_weekly          = optional(bool, false)
-    enable_business_unit_kms_cmks                = optional(bool, false)
-    enable_hmpps_domain                          = optional(bool, false)
-    enable_image_builder                         = optional(bool, false)
-    enable_ec2_cloud_watch_agent                 = optional(bool, false)
-    enable_ec2_delius_dba_secrets_access         = optional(bool, false)
-    enable_ec2_self_provision                    = optional(bool, false)
-    enable_ec2_reduced_ssm_policy                = optional(bool, false)
-    enable_ec2_oracle_enterprise_managed_server  = optional(bool, false)
-    enable_ec2_user_keypair                      = optional(bool, false)
-    enable_shared_s3                             = optional(bool, false)
-    enable_observability_platform_monitoring     = optional(bool, false)
-    db_backup_s3                                 = optional(bool, false)
-    db_backup_more_permissions                   = optional(bool, false)
-    route53_resolver_rules                       = optional(map(list(string)), {})
-    iam_policies_filter                          = optional(list(string), [])
-    iam_policies_ec2_default                     = optional(list(string), [])
-    iam_policy_statements_ec2_default = optional(list(object({
-      sid       = optional(string, null)
-      effect    = string
-      actions   = list(string)
-      resources = list(string)
-      principals = optional(object({
-        type        = string
-        identifiers = list(string)
-      }))
-      conditions = optional(list(object({
-        test     = string
-        variable = string
-        values   = list(string)
-      })), [])
-    })), [])
-    s3_iam_policies = optional(list(string))
+    backup_plan_daily_delete_after               = optional(number, 7)             # override retention for daily + weekly backup plan
+    backup_plan_weekly_delete_after              = optional(number, 28)            # override retention for daily + weekly backup plan
+    cloudwatch_dashboard_default_widget_groups   = optional(list(string))          # create Cloudwatch-Default dashboard; list of map keys to filter local.cloudwatch_dashboard_widget_groups
+    cloudwatch_log_groups                        = optional(list(string))          # create cloudwatch log groups; list of map keys to filter local.cloudwatch_log_groups
+    cloudwatch_metric_alarms_default_actions     = optional(list(string))          # default alarm_action to apply to cloudwatch metrics returned by this module
+    cloudwatch_metric_oam_links_ssm_parameters   = optional(list(string))          # list of account names to send cloudwatch metrics to, creates placeholder SSM param for each
+    cloudwatch_metric_oam_links                  = optional(list(string))          # list of account names to send cloudwatch metrics to, creates oam link for each
+    enable_application_environment_wildcard_cert = optional(bool, false)           # create ACM cert with mod platform business unit
+    enable_azure_sas_token                       = optional(bool, false)           # create /azure SSM parameter and pipeline role
+    enable_offloc_sync                           = optional(bool, false)           # create role for offloc pipeline
+    enable_backup_plan_daily_and_weekly          = optional(bool, false)           # create backup plan with daily + weekly backups
+    enable_business_unit_kms_cmks                = optional(bool, false)           # create grant + policies for business unit KMS access
+    enable_hmpps_domain                          = optional(bool, false)           # create policy for accessing secrets in hmpps-domain account
+    enable_image_builder                         = optional(bool, false)           # create role for accessing AMIs in core-shared-services-production
+    enable_ec2_cloud_watch_agent                 = optional(bool, false)           # create EC2 policy for cloudwatch agent
+    enable_ec2_delius_dba_secrets_access         = optional(bool, false)           # create role for accessing secrets in delius account
+    enable_ec2_self_provision                    = optional(bool, false)           # create EC2 policy for ansible provisioning
+    enable_ec2_reduced_ssm_policy                = optional(bool, false)           # create standard AWS SSM policy minus ssm:GetParameter
+    enable_ec2_oracle_enterprise_managed_server  = optional(bool, false)           # create role for accessing secrets in hmpps-oem accounts
+    enable_ec2_user_keypair                      = optional(bool, false)           # create secret and key-pair for ec2-user
+    enable_shared_s3                             = optional(bool, false)           # create devtest and preprodprod S3 bucket
+    enable_observability_platform_monitoring     = optional(bool, false)           # create role for observability platform monitroing
+    db_backup_s3                                 = optional(bool, false)           # create db-backup S3 buckets
+    db_backup_more_permissions                   = optional(bool, false)           # additional permissions for db-backup S3 buckets
+    route53_resolver_rules                       = optional(map(list(string)), {}) # create route53 resolver rules; list of map keys to filter local.route53_resolver_rules_all
+    iam_policies_filter                          = optional(list(string), [])      # any policies to add from local.iam_policies which haven't been added automatically by the enable options
+    iam_policies_ec2_default                     = optional(list(string), [])      # any policies to add to the default EC2 policy which haven't been added automatically the above enable_ec2 options
+    s3_iam_policies                              = optional(list(string))          # create default iam policies for bucket access, list of map keys to filter local.s3_iam_policies
+
     sns_topics = optional(object({
-      pagerduty_integrations = optional(map(string), {})
-      emails                 = optional(map(string), {})
-      }), {
-      pagerduty_integrations = {}
-      emails                 = {}
-    })
+      pagerduty_integrations = optional(map(string), {}) # create sns topics where map key is name and value is modernisation platform pagerduty_integration_keys
+    }))
   })
 }
