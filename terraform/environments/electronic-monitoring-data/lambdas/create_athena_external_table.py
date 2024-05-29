@@ -1,7 +1,9 @@
 import awswrangler as wr
 from mojap_metadata.converters.glue_converter import GlueConverter, GlueConverterOptions
 from mojap_metadata import Metadata
-from logging import getLogger
+from aws_lambda_powertools import Logger
+from aws_lambda_powertools.utilities.typing import LambdaContext
+
 import os
 import boto3
 
@@ -9,7 +11,7 @@ s3 = boto3.client("s3")
 glue_client = boto3.client("glue")
 lambda_client = boto3.client("lambda")
 
-logger = getLogger(__name__)
+logger = Logger()
 
 DB_NAME = os.environ.get("DB_NAME")
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
@@ -39,8 +41,10 @@ def create_glue_table(metadata):
     return boto_dict
 
 
-def handler(event, context):
-    meta = Metadata.from_dict(eval(event["Body"]["Payload"]))
+@logger.inject_lambda_context
+def handler(event: dict, context: LambdaContext) -> str:
+    meta_dict = event["table_meta"]
+    meta = Metadata.from_dict(meta_dict)
     boto_dict = create_glue_table(meta)
     table_name = boto_dict["TableInput"]["Name"]
     result = {

@@ -6,27 +6,28 @@ locals {
 # Zip Files
 # ------------------
 
-data "archive_file" "create_athena_external_tables" {
+data "archive_file" "get_metadata_from_rds" {
     type = "zip"
-    source_file = "${local.lambda_path}/create_athena_external_tables.py"
-    output_path = "${local.lambda_path}/create_athena_external_tables.zip"
+    source_file = "${local.lambda_path}/get_metadata_from_rds.py"
+    output_path = "${local.lambda_path}/get_metadata_from_rds.zip"
 }
 
 # ------------------
 # Lambda Functions
 # ------------------
 
-resource "aws_lambda_function" "create_athena_external_tables" {
-    filename = "${local.lambda_path}/create_athena_external_tables.zip"
-    function_name = "create_athena_external_tables"
+resource "aws_lambda_function" "get_metadata_from_rds" {
+    filename = "${local.lambda_path}/get_metadata_from_rds.zip"
+    function_name = "get_metadata_from_rds"
     role = aws_iam_role.create_athena_external_tables_lambda.arn
-    handler = "create_athena_external_tables.handler"
+    handler = "get_metadata_from_rds.handler"
     layers = [
+      "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:69",
       "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python311:12",
       aws_lambda_layer_version.mojap_metadata_layer.arn,
       aws_lambda_layer_version.create_external_athena_tables_layer.arn
       ]
-    source_code_hash = data.archive_file.create_athena_external_tables.output_base64sha256
+    source_code_hash = data.archive_file.get_metadata_from_rds.output_base64sha256
     # depends_on    = [aws_cloudwatch_log_group.create_athena_external_tables_lambda]
     timeout = 200
     runtime = "python3.11"

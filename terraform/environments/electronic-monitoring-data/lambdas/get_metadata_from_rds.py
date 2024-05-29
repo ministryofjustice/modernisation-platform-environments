@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 import os
 import logging
 import boto3
-import json
 
 s3 = boto3.client("s3")
 glue_client = boto3.client("glue")
@@ -47,29 +46,12 @@ def handler(event, context):
     engine = create_engine("mssql+pyodbc://", creator=lambda: conn)
     sqlc = SQLAlchemyConverter(engine)
     metadata_list = sqlc.generate_to_meta_list(schema="dbo")
+    metadata_list = [meta.to_dict() for meta in metadata_list]
     create_glue_database()
-    created_tables = []
-    for meta in metadata_list:
-        meta.file_format = "csv"
-        meta_dict = json.dumps(meta.to_dict())
-        logger.info(f"Table name: {meta.name}")
-        try:
-            response = lambda_client.invoke(
-                FunctionName=LAMBDA_FUNCTION_ARN,
-                InvocationType="Event",
-                Payload=meta_dict,
-            )
-            logger.info("Logged create_athena_external_table function.")
-            if response["StatusCode"] == 202:
-                created_tables.append(meta.name)
-            else:
-                logger.error(f"Invocation failed for table: {meta.name}")
-        except Exception as e:
-            logger.error(f"Error invoking Lambda for table {meta.name}: {e}")
     result = {
         "status": "success",
-        "message": f"Triggered {len(created_tables)} tables for creation in lambda",
-        "created_tables": created_tables,
+        "message": f"Found {len(metadata_list)} tables",
+        "metadata_list": metadata_list,
     }
     logger.info(result)
     return result
