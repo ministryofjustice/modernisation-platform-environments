@@ -82,112 +82,112 @@ data "archive_file" "lambda_inline_code" {
   }
 }
 
-resource "aws_lambda_function" "rotate_secret_function" {
-  function_name = local.application_data.accounts[local.environment].lambda_function_name
-  description   = local.application_data.accounts[local.environment].lambda_function_description
-  role          = aws_iam_role.edw_lambda_function_execution_role.arn
-  handler       = local.application_data.accounts[local.environment].lambda_function_handler
-  runtime       = local.application_data.accounts[local.environment].lambda_function_runtime
-  timeout       = local.application_data.accounts[local.environment].lambda_function_timeout
+# resource "aws_lambda_function" "rotate_secret_function" {
+#   function_name = local.application_data.accounts[local.environment].lambda_function_name
+#   description   = local.application_data.accounts[local.environment].lambda_function_description
+#   role          = aws_iam_role.edw_lambda_function_execution_role.arn
+#   handler       = local.application_data.accounts[local.environment].lambda_function_handler
+#   runtime       = local.application_data.accounts[local.environment].lambda_function_runtime
+#   timeout       = local.application_data.accounts[local.environment].lambda_function_timeout
 
-  filename         = data.archive_file.lambda_inline_code.output_path
-  source_code_hash = data.archive_file.lambda_inline_code.output_base64sha256 # hash ensures that changes to inline code are always picked up by a plan/apply
+#   filename         = data.archive_file.lambda_inline_code.output_path
+#   source_code_hash = data.archive_file.lambda_inline_code.output_base64sha256 # hash ensures that changes to inline code are always picked up by a plan/apply
 
-  environment {
-    variables = {
-      SECRETS_MANAGER_ENDPOINT = "https://secretsmanager.eu-west-2.amazonaws.com"
-    }
-  }
+#   environment {
+#     variables = {
+#       SECRETS_MANAGER_ENDPOINT = "https://secretsmanager.eu-west-2.amazonaws.com"
+#     }
+#   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-edw-secret-rotate-function"
-    }
-  ) 
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}-edw-secret-rotate-function"
+#     }
+#   ) 
+# }
 
-resource "aws_iam_role" "edw_lambda_function_execution_role" {
-  name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-role"
+# resource "aws_iam_role" "edw_lambda_function_execution_role" {
+#   name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-role"
 
-  assume_role_policy = jsonencode({
-    Version: "2012-10-17"
-    Statement: [
-        {
-        Effect: "Allow"
-        Principal: {
-            Service: "lambda.amazonaws.com"
-        },
-        Action: "sts:AssumeRole"
-        }
-    ]
-  })
- } 
+#   assume_role_policy = jsonencode({
+#     Version: "2012-10-17"
+#     Statement: [
+#         {
+#         Effect: "Allow"
+#         Principal: {
+#             Service: "lambda.amazonaws.com"
+#         },
+#         Action: "sts:AssumeRole"
+#         }
+#     ]
+#   })
+#  } 
 
-resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = "${local.application_data.accounts[local.environment].lambda_function_name}-Policy"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-edw-secret-rotate-function"
-    }
-  ) 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogGroup",
-        ],
-        Resource = [
-          "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*",
-        ]
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-        ],
-        Resource = [
-          "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/edw-edw-system-root-password-rotation:*",
-        ]
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "secretsmanager:CreateSecret",
-          "secretsmanager:ListSecrets",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:PutSecretValue",
-          "secretsmanager:UpdateSecretVersionStage",
-          "secretsmanager:GetRandomPassword",
-          "lambda:InvokeFunction",
-        ],
-        Resource = "*"
-      },
-      {
-        Sid    = "GenerateARandomStringToExecuteRotation",
-        Effect = "Allow",
-        Action = [
-          "secretsmanager:GetRandomPassword",
-        ],
-        Resource = "*"
-      }
-    ]
-  })
-}
+# resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+#   name = "${local.application_data.accounts[local.environment].lambda_function_name}-Policy"
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}-edw-secret-rotate-function"
+#     }
+#   ) 
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Effect = "Allow",
+#         Action = [
+#           "logs:CreateLogGroup",
+#         ],
+#         Resource = [
+#           "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*",
+#         ]
+#       },
+#       {
+#         Effect = "Allow",
+#         Action = [
+#           "logs:CreateLogStream",
+#           "logs:PutLogEvents",
+#         ],
+#         Resource = [
+#           "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/edw-edw-system-root-password-rotation:*",
+#         ]
+#       },
+#       {
+#         Effect = "Allow",
+#         Action = [
+#           "secretsmanager:CreateSecret",
+#           "secretsmanager:ListSecrets",
+#           "secretsmanager:DescribeSecret",
+#           "secretsmanager:GetSecretValue",
+#           "secretsmanager:PutSecretValue",
+#           "secretsmanager:UpdateSecretVersionStage",
+#           "secretsmanager:GetRandomPassword",
+#           "lambda:InvokeFunction",
+#         ],
+#         Resource = "*"
+#       },
+#       {
+#         Sid    = "GenerateARandomStringToExecuteRotation",
+#         Effect = "Allow",
+#         Action = [
+#           "secretsmanager:GetRandomPassword",
+#         ],
+#         Resource = "*"
+#       }
+#     ]
+#   })
+# }
 
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy" {
-  role       = aws_iam_role.edw_lambda_function_execution_role.name
-  policy_arn = aws_iam_policy.edw_lambda_function_execution_role_policy.arn
-}
+# resource "aws_iam_role_policy_attachment" "attach_lambda_policy" {
+#   role       = aws_iam_role.edw_lambda_function_execution_role.name
+#   policy_arn = aws_iam_policy.edw_lambda_function_execution_role_policy.arn
+# }
 
 
-resource "aws_lambda_permission" "rotate_secret_function_permission" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rotate_secret_function.function_name
-  principal     = "secretsmanager.amazonaws.com"
-}
+# resource "aws_lambda_permission" "rotate_secret_function_permission" {
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.rotate_secret_function.function_name
+#   principal     = "secretsmanager.amazonaws.com"
+# }
