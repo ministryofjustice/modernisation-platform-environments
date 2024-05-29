@@ -109,7 +109,7 @@ resource "aws_s3_bucket" "cloudfront" {
 resource "aws_s3_bucket_ownership_controls" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
   rule {
-    object_ownership = "BucketOwnerPreferred"
+    object_ownership = local.environment == "production" ? "ObjectWriter": "BucketOwnerPreferred"
   }
 }
 
@@ -136,6 +136,21 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
     prevent_destroy = false
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "cloudfront" {
+  bucket = aws_s3_bucket.cloudfront.id
+
+  rule {
+    id = "delete-after-90days"
+
+    noncurrent_version_expiration {
+      newer_noncurrent_versions = 1
+      noncurrent_days = 90
+    }
+
+    status = "Enabled"
   }
 }
 
