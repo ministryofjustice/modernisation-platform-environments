@@ -22,6 +22,7 @@ locals {
     options = {
       cloudwatch_dashboard_default_widget_groups = [
         "lb",
+        "acm",
         "ec2_linux_only",
         "ec2_service_status",
         "ec2_textfile_monitoring",

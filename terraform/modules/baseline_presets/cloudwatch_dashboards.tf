@@ -5,6 +5,35 @@ locals {
   ])
 
   cloudwatch_dashboard_widgets = {
+    acm = {
+      cert-expires-soon = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "ACM cert-expires-soon"
+          period  = 43200
+          stat    = "Minimum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{AWS/CertificateManager} MetricName=\"DaysToExpiry\"','Minimum'),MIN,ASC)", "label" : "", "id" : "q1" }],
+          ]
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2.cpu-utilization-high.threshold
+          #    fill  = "above"
+          #  }]
+          #}
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "days"
+            }
+          }
+        }
+      }
+    }
     ec2 = {
       cpu-utilization-high = {
         type = "metric"
@@ -508,7 +537,7 @@ locals {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
-          title   = "ALB load-balancer-requests"
+          title   = "ALB load-balancer-target-group-requests"
           stat    = "Sum"
           metrics = [
             [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"RequestCount\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
@@ -527,7 +556,7 @@ locals {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
-          title   = "ALB load-balancer-http-4XXs"
+          title   = "ALB load-balancer-target-group-http-4XXs"
           stat    = "Sum"
           metrics = [
             [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"HTTPCode_Target_4XX_Count\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
@@ -546,7 +575,7 @@ locals {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
-          title   = "ALB load-balancer-http-5XXs"
+          title   = "ALB load-balancer-target-group-http-5XXs"
           stat    = "Sum"
           metrics = [
             [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"HTTPCode_Target_5XX_Count\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
@@ -695,6 +724,14 @@ locals {
   }
 
   cloudwatch_dashboard_widget_groups = {
+    acm = {
+      header_markdown = "## Certificate Manager"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.acm.cert-expires-soon,
+      ]
+    }
     ec2_windows_only = {
       header_markdown = "## EC2"
       width           = 8
@@ -783,7 +820,7 @@ locals {
       ]
     }
     lb = {
-      header_markdown = "## ALB"
+      header_markdown = "## Application ELB"
       width           = 8
       height          = 8
       widgets = [
@@ -802,8 +839,9 @@ locals {
       ]
     }
     network_lb = {
-      width  = 8
-      height = 8
+      header_markdown = "## Network ELB"
+      width           = 8
+      height          = 8
       widgets = [
         local.cloudwatch_dashboard_widgets.network_lb.unhealthy-network-load-balancer-host,
         null,
@@ -815,7 +853,7 @@ locals {
   cloudwatch_dashboards = {
     "CloudWatch-Default" = {
       periodOverride = "auto"
-      start          = "-PT3H"
+      start          = "-PT6H"
       widget_groups = [
         for group in coalesce(var.options.cloudwatch_dashboard_default_widget_groups, []) :
         local.cloudwatch_dashboard_widget_groups[group]
