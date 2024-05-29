@@ -53,23 +53,23 @@ def handler(event, context):
         meta.file_format = "csv"
         meta_dict = json.dumps(meta.to_dict())
         logger.info(f"Table name: {meta.name}")
-        response = lambda_client.invoke(
-            FunctionName=LAMBDA_FUNCTION_ARN,
-            InvocationType="Event",
-            Payload=meta_dict,
-        )
-        logger.info("Logged create_athena_external_table function.")
-        if response.StatusCode == 200:
-            created_tables.append(meta.name)
-        else:
-            logger.error("didnt work")
-            raise Exception
-
+        try:
+            response = lambda_client.invoke(
+                FunctionName=LAMBDA_FUNCTION_ARN,
+                InvocationType="Event",
+                Payload=meta_dict,
+            )
+            logger.info("Logged create_athena_external_table function.")
+            if response["StatusCode"] == 202:
+                created_tables.append(meta.name)
+            else:
+                logger.error(f"Invocation failed for table: {meta.name}")
+        except Exception as e:
+            logger.error(f"Error invoking Lambda for table {meta.name}: {e}")
     result = {
         "status": "success",
         "message": f"Triggered {len(created_tables)} tables for creation in lambda",
         "created_tables": created_tables,
     }
-
     logger.info(result)
     return result
