@@ -5,35 +5,6 @@ locals {
   ])
 
   cloudwatch_dashboard_widgets = {
-    acm = {
-      cert-expires-soon = {
-        type = "metric"
-        properties = {
-          view    = "timeSeries"
-          stacked = false
-          region  = "eu-west-2"
-          title   = "ACM cert-expires-soon"
-          period  = 43200
-          stat    = "Minimum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/CertificateManager} MetricName=\"DaysToExpiry\"','Minimum'),MIN,ASC)", "label" : "", "id" : "q1" }],
-          ]
-          #annotations = {
-          #  horizontal = [{
-          #    label = "Alarm Threshold"
-          #    value = local.cloudwatch_metric_alarms.ec2.cpu-utilization-high.threshold
-          #    fill  = "above"
-          #  }]
-          #}
-          yAxis = {
-            left = {
-              showUnits = false,
-              label     = "days"
-            }
-          }
-        }
-      }
-    }
     ec2 = {
       cpu-utilization-high = {
         type = "metric"
@@ -724,14 +695,6 @@ locals {
   }
 
   cloudwatch_dashboard_widget_groups = {
-    acm = {
-      header_markdown = "## Certificate Manager"
-      width           = 8
-      height          = 8
-      widgets = [
-        local.cloudwatch_dashboard_widgets.acm.cert-expires-soon,
-      ]
-    }
     ec2_windows_only = {
       header_markdown = "## EC2"
       width           = 8
