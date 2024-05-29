@@ -145,6 +145,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudfront" {
   rule {
     id = "delete-after-90days"
 
+    expiration {
+      days = 90
+    }
+
     noncurrent_version_expiration {
       newer_noncurrent_versions = 1
       noncurrent_days = 90
