@@ -2,7 +2,7 @@ import awswrangler as wr
 from mojap_metadata.converters.sqlalchemy_converter import SQLAlchemyConverter
 from sqlalchemy import create_engine
 import os
-from logging import getLogger
+import logging
 import boto3
 import json
 
@@ -10,11 +10,13 @@ s3 = boto3.client("s3")
 glue_client = boto3.client("glue")
 lambda_client = boto3.client("lambda")
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 SECRET_NAME = os.environ.get("SECRET_NAME")
 DB_NAME = os.environ.get("DB_NAME")
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
+LAMBDA_FUNCTION_ARN = os.environ.get("LAMBDA_FUNCTION_ARN")
 
 db_path = f"{S3_BUCKET_NAME}/{DB_NAME}/dbo"
 db_sem_name = f"{DB_NAME}_semantic_layer"
@@ -50,8 +52,9 @@ def handler(event, context):
     for meta in metadata_list:
         meta.file_format = "csv"
         meta_dict = json.dumps(meta.to_dict())
+        logger.info(f"Table name: {meta.name}")
         response = lambda_client.invoke(
-            FunctionName="create_athena_external_table",
+            FunctionName=LAMBDA_FUNCTION_ARN,
             InvocationType="Event",
             Payload=meta_dict,
         )

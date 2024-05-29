@@ -40,6 +40,7 @@ resource "aws_lambda_function" "create_athena_external_tables" {
         SECRET_NAME = aws_secretsmanager_secret.db_glue_connection.name
         DB_NAME = local.db_name
         S3_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
+        LAMBDA_FUNCTION_ARN = aws_lambda_function.create_athena_external_table.arn
       }
     }
 }
