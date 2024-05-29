@@ -8,6 +8,9 @@ locals {
 
   cloudfront_default_cache_behavior = {
     smooth_streaming                           = false
+    min_ttl                                    = 0
+    max_ttl                                    = 31536000
+    default_ttl                                = 86400
     allowed_methods                            = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods                             = ["HEAD", "GET"]
     forwarded_values_query_string              = true
@@ -23,6 +26,8 @@ locals {
       smooth_streaming                 = false
       path_pattern                     = "*.png"
       min_ttl                          = 0
+      max_ttl                          = 31536000
+      default_ttl                      = 86400
       allowed_methods                  = ["GET", "HEAD"]
       cached_methods                   = ["HEAD", "GET"]
       forwarded_values_query_string    = false
@@ -34,6 +39,8 @@ locals {
       smooth_streaming                 = false
       path_pattern                     = "*.jpg"
       min_ttl                          = 0
+      max_ttl                          = 31536000
+      default_ttl                      = 86400
       allowed_methods                  = ["GET", "HEAD"]
       cached_methods                   = ["HEAD", "GET"]
       forwarded_values_query_string    = false
@@ -45,6 +52,8 @@ locals {
       smooth_streaming                 = false
       path_pattern                     = "*.gif"
       min_ttl                          = 0
+      max_ttl                          = 31536000
+      default_ttl                      = 86400
       allowed_methods                  = ["GET", "HEAD"]
       cached_methods                   = ["HEAD", "GET"]
       forwarded_values_query_string    = false
@@ -56,6 +65,8 @@ locals {
       smooth_streaming                 = false
       path_pattern                     = "*.css"
       min_ttl                          = 0
+      max_ttl                          = 31536000
+      default_ttl                      = 86400
       allowed_methods                  = ["GET", "HEAD"]
       cached_methods                   = ["HEAD", "GET"]
       forwarded_values_query_string    = false
@@ -67,6 +78,8 @@ locals {
       smooth_streaming                 = false
       path_pattern                     = "*.js"
       min_ttl                          = 0
+      max_ttl                          = 31536000
+      default_ttl                      = 86400
       allowed_methods                  = ["GET", "HEAD"]
       cached_methods                   = ["HEAD", "GET"]
       forwarded_values_query_string    = false
@@ -182,6 +195,9 @@ resource "aws_cloudfront_distribution" "external" {
   default_cache_behavior {
     target_origin_id = module.alb.load_balancer_id
     smooth_streaming = lookup(local.cloudfront_default_cache_behavior, "smooth_streaming", null)
+    min_ttl          = lookup(local.cloudfront_default_cache_behavior.value, "min_ttl", null)
+    default_ttl      = lookup(local.cloudfront_default_cache_behavior.value, "default_ttl", null)
+    max_ttl          = lookup(local.cloudfront_default_cache_behavior.value, "max_ttl", null)
     allowed_methods  = lookup(local.cloudfront_default_cache_behavior, "allowed_methods", null)
     cached_methods   = lookup(local.cloudfront_default_cache_behavior, "cached_methods", null)
     forwarded_values {
@@ -193,6 +209,7 @@ resource "aws_cloudfront_distribution" "external" {
       }
     }
     viewer_protocol_policy = lookup(local.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
+    # The following 3 TTL values are set to achieve the setting of 'Use origin cache headers' without a linked cache policy - see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution#cache-behavior-arguments
   }
 
   dynamic "ordered_cache_behavior" {
