@@ -540,6 +540,11 @@ locals {
           { name = "", type = "A", lbs_map_key = "private" }, # preproduction.reporting.nomis.service.justice.gov.uk
         ]
       }
+      "lsast.reporting.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "db", type = "CNAME", ttl = "3600", records = ["ls-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+        ]
+      }
     }
   }
 }
