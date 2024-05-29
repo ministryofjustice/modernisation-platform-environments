@@ -185,6 +185,7 @@ locals {
           oracle-sids       = "PDCNOM PDNDH PDTRDAT"
         })
       })
+
       prod-nomis-db-1-b = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
@@ -213,32 +214,6 @@ locals {
           nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
           oracle-sids       = "DRCNOM DRNDH DRTRDAT"
-        })
-      })
-
-      prod-nomis-db-2 = merge(local.database_ec2, {
-        config = merge(local.database_ec2.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 3000, iops = 9000 }
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
-        })
-        instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment  = "prod"
-          description        = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
-          oracle-sids        = ""
-          connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
         })
       })
 
@@ -307,31 +282,6 @@ locals {
           oracle-sids        = "DRMIS DRCNMAUD"
           misload-dbname     = "DRMIS"
           connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
-        })
-      })
-
-      prod-nomis-db-3 = merge(local.database_ec2, {
-        config = merge(local.database_ec2.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 1000 }
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 3000, iops = 3750, throughput = 750 }
-          flash = { total_size = 500 }
-        })
-        instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment = "prod"
-          description       = "Production NOMIS HA database to replace Azure PDPDL00062"
-          oracle-sids       = ""
         })
       })
     }
