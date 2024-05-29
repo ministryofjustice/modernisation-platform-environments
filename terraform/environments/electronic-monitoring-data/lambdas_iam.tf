@@ -59,6 +59,7 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
         actions = [
             "glue:GetConnection",
             "glue:GetTables",
+            "glue:GetTable",
             "glue:GetDatabase",
             "glue:GetDatabases",
             "glue:CreateTable",
@@ -69,7 +70,9 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
         resources = [
             "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog",
             "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/${local.db_name}_semantic_layer",
-            "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/${local.db_name}_semantic_layer/*"
+            "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/${local.db_name}_semantic_layer/*",
+            "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:userDefinedFunction/${local.db_name}_semantic_layer/*"
+
         ]
     }
 }
