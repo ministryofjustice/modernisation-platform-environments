@@ -30,7 +30,7 @@ resource "aws_instance" "apex_db_instance" {
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   user_data_base64            = base64encode(local.instance-userdata)
 
