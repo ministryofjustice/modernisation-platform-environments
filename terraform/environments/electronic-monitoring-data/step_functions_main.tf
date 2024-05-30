@@ -1,7 +1,7 @@
 
 resource "aws_sfn_state_machine" "semantic_athena_layer" {
   name     = "semantic-athena-layer"
-  role_arn = aws_iam_role.step_functions_role
+  role_arn = aws_iam_role.step_functions_role.arn
 
   definition = <<EOF
 {
