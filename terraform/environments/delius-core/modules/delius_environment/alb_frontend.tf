@@ -27,7 +27,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_https_global_protect_allowlist" {
-  for_each          = toset(local.globalprotect_ips)
+  for_each          = toset(local.moj_ips)
   security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   description       = "access into delius core frontend alb over https"
   from_port         = "443"
@@ -37,7 +37,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_global_protect_allowlist" {
-  for_each          = toset(local.globalprotect_ips)
+  for_each          = toset(local.moj_ips)
   security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   description       = "access into delius core frontend alb over http (will redirect)"
   from_port         = "80"
