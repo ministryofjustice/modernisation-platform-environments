@@ -5,6 +5,7 @@ data "local_file" "userdata" {
 resource "aws_network_interface" "oas_eni" {
   subnet_id   = data.aws_subnet.private_subnets_a.id
   private_ips = ["10.26.56.108"]
+  security_groups = [aws_security_group.ec2.id]
 
   tags = merge(
     local.tags,
