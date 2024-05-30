@@ -107,6 +107,33 @@ locals {
           oasys-national-reporting-environment = "t2"
         })
       })
+      # IMPORTANT: this is just for testing at the moment
+      t2-rhel6-web-asg = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+          availability_zone = "${local.region}a"
+          ami_owner         = "374269020027"
+          ami_name          = "base_rhel_6_10_*"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m4.large"
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "onr/DSOS-2731/onr-web-silent-install"
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = merge(local.defaults_web_ec2.tags, {
+          ami                                  = "base_rhel_6_10"
+          oasys-national-reporting-environment = "t2"
+        })
+      })
       # TODO: this is just for testing, remove when not needed
       t2-test-boe-asg = merge(local.defaults_boe_ec2, {
         config = merge(local.defaults_boe_ec2.config, {
