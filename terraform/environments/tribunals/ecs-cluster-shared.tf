@@ -153,37 +153,37 @@ resource "aws_security_group" "ecs_service" {
   }
 }
 
-resource "aws_security_group" "ecs_service_sftp" {
-  name_prefix = "ecs-service-sg-sftp-"
-  vpc_id      = data.aws_vpc.shared.id
+# resource "aws_security_group" "ecs_service_sftp" {
+#   name_prefix = "ecs-service-sg-sftp-"
+#   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    description = "Allow traffic on port 22 from network load balancer"
-    security_groups = [
-      module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp, module.claims_management_decisions.tribunals_lb_sc_id_sftp
-    ]
-  }
+#   ingress {
+#     from_port   = 22
+#     to_port     = 22
+#     protocol    = "tcp"
+#     description = "Allow traffic on port 22 from network load balancer"
+#     security_groups = [
+#       module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp, module.claims_management_decisions.tribunals_lb_sc_id_sftp
+#     ]
+#   }
 
-  ingress {
-    from_port   = 10022
-    to_port     = 10022
-    protocol    = "tcp"
-    description = "Allow traffic on port 10022 from sftp network load balancers"
-    security_groups = [
-      module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp, module.claims_management_decisions.tribunals_lb_sc_id_sftp
-    ]
-  }
+#   ingress {
+#     from_port   = 10022
+#     to_port     = 10022
+#     protocol    = "tcp"
+#     description = "Allow traffic on port 10022 from sftp network load balancers"
+#     security_groups = [
+#       module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp, module.claims_management_decisions.tribunals_lb_sc_id_sftp
+#     ]
+#   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
 resource "aws_ecr_repository" "tribunals-ecr-repo" {
   name         = "tribunals-ecr-repo"
