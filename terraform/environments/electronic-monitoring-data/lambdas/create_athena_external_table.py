@@ -22,6 +22,7 @@ db_sem_name = f"{DB_NAME}_semantic_layer"
 
 def create_glue_table(metadata):
     table_name = metadata.name
+    metadata.file_format = "csv"
     logger.info(f"Table Name: {table_name}")
     try:
         # Delete table
@@ -43,9 +44,7 @@ def create_glue_table(metadata):
 
 @logger.inject_lambda_context
 def handler(event: dict, context: LambdaContext) -> str:
-    logger.info(event)
-    meta_dict = event["message"]
-    meta = Metadata.from_dict(meta_dict)
+    meta = Metadata.from_dict(event)
     boto_dict = create_glue_table(meta)
     table_name = boto_dict["TableInput"]["Name"]
     result = {
