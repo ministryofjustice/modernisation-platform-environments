@@ -144,3 +144,21 @@ resource "helm_release" "cert_manager" {
   ]
   depends_on = [module.cert_manager_iam_role]
 }
+
+resource "helm_release" "cert_manager_issuers" {
+  name      = "cert-manager-issuers"
+  chart     = "./src/helm/charts/cert-manager-issuers"
+  namespace = kubernetes_namespace.cert_manager.metadata[0].name
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/cert-manager-issuers/values.yml.tftpl",
+      {
+        acme_email               = "analytical-platform+compute-cert-manager@digital.justice.gov.uk"
+        aws_region               = data.aws_region.current.name
+        http_issuer_ingress_name = "default"
+      }
+    )
+  ]
+  depends_on = [helm_release.cert_manager]
+}
