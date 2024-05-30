@@ -25,15 +25,6 @@ resource "aws_instance" "oas_app_instance" {
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   user_data_replace_on_change = true
   user_data                   = base64encode(data.local_file.userdata.content)
-  # user_data                   = base64encode(templatefile("./userdata.sh", {
-  #   hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
-  #   ec2_image_id = "${local.application_data.accounts[local.environment].ec2amiid}"
-  #   ec2_instance_type = "${local.application_data.accounts[local.environment].ec2instancetype}"
-  #   application_name = "${local.application_name}"
-  # }))
-  # user_data = base64encode(templatefile("./userdata.sh", {
-  #   hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
-  # }))
 
 
 
