@@ -18,7 +18,7 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
       "ItemsPath": "$.metadata_list",
       "MaxConcurrency": 4, 
       "Iterator": {
-        "StartAt": "CreateGlueTable",
+        "StartAt": "CreateAthenaTable",
         "States": {
         "CreateAthenaTable": {
             "Type": "Task",
@@ -31,11 +31,10 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
                 }
             },
             "End": true
-        },
-      },
-      "End": true
-    }
+        }
+      }
+    },
+    "End": true
   }
-}
 EOF
 }
