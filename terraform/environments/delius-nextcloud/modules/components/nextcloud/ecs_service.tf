@@ -150,3 +150,18 @@ data "aws_iam_policy_document" "s3_bucket_config" {
     resources = [module.s3_bucket_config.bucket.arn]
   }
 }
+
+data "aws_iam_policy_document" "access_ldap_secret" {
+  statement {
+    sid = "DbAccessToSecretsManager"
+    actions = [
+      "ssm:GetParameter",
+      "kms:Decrypt"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:ssm:eu-west-2:${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:parameter/delius-core-${var.env_name}/LDAP_ADMIN_PASSWORD",
+    ]
+}
+
+}

@@ -37,7 +37,22 @@ resource "aws_ssm_parameter" "ldap_admin_password" {
     ]
   }
   tags = local.tags
+}
 
+resource "aws_ram_resource_share" "ldap_admin_password" {
+  name = format("/%s-%s/LDAP_ADMIN_PASSWORD", var.account_info.application_name, var.env_name)
+  allow_external_principals = true
+  tags = local.tags
+}
+
+resource "aws_ram_principal_association" "ldap_admin_password" {
+  principal = "${var.platform_vars.environment_management.account_ids[join("-", ["delius-nextcloud", var.account_info.mp_environment])]}"
+  resource_share_arn = aws_ram_resource_share.ldap_admin_password.arn
+}
+
+resource "aws_ram_resource_association" "ldap_admin_password" {
+  resource_share_arn = aws_ram_resource_share.ldap_admin_password.arn
+  resource_arn = aws_ssm_parameter.ldap_admin_password.arn
 }
 
 resource "aws_ssm_parameter" "oasys_user" {

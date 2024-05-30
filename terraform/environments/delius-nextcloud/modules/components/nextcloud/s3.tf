@@ -96,15 +96,14 @@ resource "aws_s3_object" "config" {
       fileshare_user_base = "replace"
       standard_user_base = "replace"
       fs_group_prefix = "replace"
-      ldap_host = "ldap.dev.delius-core.hmpps-development.modernisation-platform.internal"
-      pwm_url = "pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
+      ldap_host = "ldap.${var.env_name}.delius-core.hmpps-${var.account_info.mp_environment}.modernisation-platform.internal"
+      pwm_url = "pwm.${var.env_name}.delius-core.hmpps-${var.account_info.mp_environment}.modernisation-platform.service.justice.gov.uk"
 
       fileshare_base_groups = "replace"
       fileshare_user_base = "replace"
       standard_user_base = "replace"
 
       ldap_user = "cn=admin,ou=Users,dc=moj,dc=com"
-      nextcloud_s01ldap_agent_password = "replace"
     }
   )
 }
