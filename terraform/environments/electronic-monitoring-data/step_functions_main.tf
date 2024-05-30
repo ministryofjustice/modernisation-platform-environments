@@ -1,7 +1,7 @@
 
 resource "aws_sfn_state_machine" "semantic_athena_layer" {
   name     = "semantic-athena-layer"
-  role_arn = aws_iam_role.semantic_athena_layer.arn
+  role_arn = aws_iam_role.step_functions_role
 
   definition = <<EOF
 {
@@ -24,7 +24,7 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
             "Type": "Task",
             "Resource": "arn:aws:states:::lambda:invoke",
             "Parameters": {
-                "FunctionName": "${aws_lambda_function.create_external_athena_table.arn}",
+                "FunctionName": "${aws_lambda_function.create_athena_external_table.arn}",
                 "Payload": {
                     "ExecutionContext.$": "$$",
                     "table_meta": "$"
