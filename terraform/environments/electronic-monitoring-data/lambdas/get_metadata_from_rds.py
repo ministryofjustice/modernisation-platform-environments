@@ -14,10 +14,7 @@ logger.setLevel(logging.INFO)
 
 SECRET_NAME = os.environ.get("SECRET_NAME")
 DB_NAME = os.environ.get("DB_NAME")
-S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
-LAMBDA_FUNCTION_ARN = os.environ.get("LAMBDA_FUNCTION_ARN")
 
-db_path = f"{S3_BUCKET_NAME}/{DB_NAME}/dbo"
 db_sem_name = f"{DB_NAME}_semantic_layer"
 
 

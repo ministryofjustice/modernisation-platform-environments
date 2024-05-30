@@ -22,7 +22,6 @@ resource "aws_lambda_function" "get_metadata_from_rds" {
     role = aws_iam_role.create_athena_external_tables_lambda.arn
     handler = "get_metadata_from_rds.handler"
     layers = [
-      "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:69",
       "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python311:12",
       aws_lambda_layer_version.mojap_metadata_layer.arn,
       aws_lambda_layer_version.create_external_athena_tables_layer.arn
@@ -40,8 +39,6 @@ resource "aws_lambda_function" "get_metadata_from_rds" {
       variables = {
         SECRET_NAME = aws_secretsmanager_secret.db_glue_connection.name
         DB_NAME = local.db_name
-        S3_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
-        LAMBDA_FUNCTION_ARN = aws_lambda_function.create_athena_external_table.arn
       }
     }
 }
@@ -79,7 +76,6 @@ resource "aws_lambda_function" "create_athena_external_table" {
 
     environment {
       variables = {
-        SECRET_NAME = aws_secretsmanager_secret.db_glue_connection.name
         DB_NAME = local.db_name
         S3_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
       }
