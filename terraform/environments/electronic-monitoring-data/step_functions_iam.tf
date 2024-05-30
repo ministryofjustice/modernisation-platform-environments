@@ -68,22 +68,6 @@ resource "aws_iam_policy" "xray_policy" {
 }
 
 resource "aws_iam_role" "step_functions_role" {
-  name = "StepFunctionsExecutionRole"
-  assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : "states.amazonaws.com"
-        },
-        "Action" : "sts:AssumeRole"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role" "step_functions_role" {
   name               = "StepFunctionsExecutionRole"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
