@@ -90,7 +90,7 @@ resource "helm_release" "cluster_autoscaler" {
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
   version    = "9.37.0"
-  namespace  = "kube-system"
+  namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
 
   values = [
     templatefile(
@@ -112,7 +112,7 @@ resource "helm_release" "external_dns" {
   repository = "https://kubernetes-sigs.github.io/external-dns"
   chart      = "external-dns"
   version    = "1.14.4"
-  namespace  = "kube-system"
+  namespace  = kubernetes_namespace.external_dns.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/external-dns/values.yml.tftpl",
@@ -125,3 +125,21 @@ resource "helm_release" "external_dns" {
   ]
   depends_on = [module.external_dns_iam_role]
 }
+
+/* Cert Manager */
+# resource "helm_release" "cert_manager" {
+#   /* https://artifacthub.io/packages/helm/cert-manager/cert-manager */
+#   name       = "cert-manager"
+#   repository = "https://charts.jetstack.io"
+#   chart      = "cert-manager"
+#   version    = "v1.14.5"
+#   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/cert-manager/values.yml.tftpl",
+#       {
+#         eks_role_arn = module.cert_manager_role.iam_role_arn
+#       }
+#     )
+#   ]
+# }

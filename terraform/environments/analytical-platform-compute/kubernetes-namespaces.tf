@@ -9,3 +9,21 @@ resource "kubernetes_namespace" "aws_observability" {
     name = "aws-observability"
   }
 }
+
+resource "kubernetes_namespace" "cluster_autoscaler" {
+  metadata {
+    name = "cluster-autoscaler"
+  }
+}
+
+resource "kubernetes_namespace" "external_dns" {
+  metadata {
+    name = "external-dns"
+  }
+}
+
+resource "kubernetes_namespace" "cert_manager" {
+  metadata {
+    name = "cert-manager"
+  }
+}
