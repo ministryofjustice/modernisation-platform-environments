@@ -8,6 +8,9 @@ $ebsVolumeTag = "tribunals-all-storage"
 $tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","hmlands","lands-chamber", "ftp-admin-appeals", "ftp-tax-tribunal", "ftp-tax-chancery", "ftp-sscs-venues", "ftp-siac", "ftp-primary-health", "ftp-estate-agents", "ftp-consumer-credit", "ftp-claims-management", "ftp-charity-tribunals"
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
+$environmentName = ${environment_name}
+
+"Got environmentName " + $environmentName >> $logFile
 
 "Starting userdata execution" > $logFile
 
@@ -106,7 +109,7 @@ function MonitorAndSyncToS3 {
         $filePath = $event.FullPath
         $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
         "A file was created at $filePath. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-        aws s3 cp $filePath "s3://tribunals-ebs-backup/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+        aws s3 cp $filePath "s3://tribunals-ebs-backup-${environmentName}/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     }
 
     # Register the event
@@ -120,7 +123,7 @@ function MonitorAndSyncToS3 {
 
 function InitialSyncToS3 {
     "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-${environmentName} >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 }
 

@@ -178,7 +178,11 @@ resource "aws_launch_template" "tribunals-all-lt" {
     associate_public_ip_address = true
   }
 
-  user_data = filebase64("ec2-shared-user-data.sh")
+  # user_data = filebase64("ec2-shared-user-data.sh")
+
+  user_data = base64encode(templatefile("ec2-shared-user-data.tpl", {
+    environment_name = local.environment
+  }))
 }
 
 # Finally, create the Auto scaling group for the launch template
