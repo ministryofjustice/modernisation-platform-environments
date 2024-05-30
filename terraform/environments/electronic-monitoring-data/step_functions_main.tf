@@ -28,14 +28,15 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
                 "Payload": {
                     "ExecutionContext.$": "$$",
                     "table_meta": "$"
-                }
-            },
+                    }
+                },
             "End": true
+            }
         }
-      }
-    },
-    "End": true
-  }
+        },
+        "End": true
+        }   
+    }
 }
 EOF
 }
