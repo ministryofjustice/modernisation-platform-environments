@@ -15,7 +15,7 @@ resource "aws_network_interface" "oas_eni" {
 
 resource "aws_instance" "oas_app_instance" {
   ami                         = local.application_data.accounts[local.environment].ec2amiid
-  associate_public_ip_address = false
+  # associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
