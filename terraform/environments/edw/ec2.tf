@@ -52,7 +52,7 @@ resource "aws_iam_role" "edw_ec2_role" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-edw-db-instance-role"
+      Name = "${local.application_name}-db-instance-role"
     }
   )  
 }
@@ -68,7 +68,7 @@ resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-edw-db-instance-profile"
+      Name = "${local.application_name}-db-instance-profile"
     }
   )  
 }
@@ -95,12 +95,15 @@ resource "aws_instance" "edw_db_instance" {
     edw_ccms_ip = local.application_data.accounts[local.environment].edw_ccms_ip
   }))
 
+
   ebs_block_device {
     device_name = "/dev/sda1"
     volume_size = local.application_data.accounts[local.environment].edw_root_volume_size
+    tags = merge(
+      local.tags,
+      { "Name" = "${local.application_name}-root-volume" },
+    )
   }
-
-  # volumes {TO ADD}
 
   metadata_options {
     http_endpoint               = "enabled"
@@ -132,6 +135,12 @@ resource "aws_ebs_volume" "orahomeVolume" {
   }
 }
 
+resource "aws_volume_attachment" "orahomeVolume-attachment" {
+  device_name = "/dev/sdi"
+  volume_id   = aws_ebs_volume.orahomeVolume.id
+  instance_id = aws_instance.edw_db_instance.id
+}
+
 resource "aws_ebs_volume" "oratempVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OratempVolumeSize
@@ -141,6 +150,12 @@ resource "aws_ebs_volume" "oratempVolume" {
   tags = {
     Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraredo"
   }
+}
+
+resource "aws_volume_attachment" "oratempVolume-attachment" {
+  device_name = "/dev/sdj"
+  volume_id   = aws_ebs_volume.oratempVolume.id
+  instance_id = aws_instance.edw_db_instance.id
 }
 
 resource "aws_ebs_volume" "oradataVolume" {
@@ -154,6 +169,12 @@ resource "aws_ebs_volume" "oradataVolume" {
   }
 }
 
+resource "aws_volume_attachment" "oradataVolume-attachment" {
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.oradataVolume.id
+  instance_id = aws_instance.edw_db_instance.id
+}
+
 resource "aws_ebs_volume" "softwareVolume" {
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_SoftwareVolumeSize
@@ -163,6 +184,12 @@ resource "aws_ebs_volume" "softwareVolume" {
   tags = {
     Name = "${local.application_data.accounts[local.environment].edw_AppName}-software"
   }
+}
+
+resource "aws_volume_attachment" "softwareVolume-attachment" {
+  device_name = "/dev/sdg"
+  volume_id   = aws_ebs_volume.softwareVolume.id
+  instance_id = aws_instance.edw_db_instance.id
 }
 
 resource "aws_ebs_volume" "ArchiveVolume" {
@@ -175,6 +202,12 @@ resource "aws_ebs_volume" "ArchiveVolume" {
     Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraarch"
     "dlm:snapshot-with:volume-hourly-35-day-retention" = "yes"
   }
+}
+
+resource "aws_volume_attachment" "ArchiveVolume-attachment" {
+  device_name = "/dev/sdh"
+  volume_id   = aws_ebs_volume.ArchiveVolume.id
+  instance_id = aws_instance.edw_db_instance.id
 }
 
 
