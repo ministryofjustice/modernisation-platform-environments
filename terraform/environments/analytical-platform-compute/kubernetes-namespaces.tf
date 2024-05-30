@@ -33,3 +33,15 @@ resource "kubernetes_namespace" "ingress_nginx" {
     name = "ingress-nginx"
   }
 }
+
+resource "kubernetes_namespace" "actions_runners" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  metadata {
+    name = "actions-runners"
+    labels = {
+      "pod-security.kubernetes.io/enforce"         = "baseline"
+      "pod-security.kubernetes.io/enforce-version" = "v${local.environment_configuration.eks_cluster_version}"
+    }
+  }
+}
