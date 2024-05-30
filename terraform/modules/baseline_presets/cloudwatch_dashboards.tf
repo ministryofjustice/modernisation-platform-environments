@@ -151,7 +151,7 @@ locals {
           title   = "EC2 Linux free-disk-space-low"
           stat    = "Maximum"
           metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,device,fstype,name,path,server_type} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
           ]
           #annotations = {
           #  horizontal = [{
@@ -221,6 +221,62 @@ locals {
         }
       }
     }
+    ec2_instance_cwagent_linux = {
+      free-disk-space-low = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Instance Linux free-disk-space-low"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,device,fstype,name,path,server_type} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+          ]
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.free-disk-space-low.threshold
+          #    fill  = "above"
+          #  }]
+          #}
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "disk used %"
+            }
+          }
+        }
+      }
+    }
+    ec2_autoscaling_group_cwagent_linux = {
+      free-disk-space-low = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Autoscaling Group free-disk-space-low"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,device,fstype,name,path,server_type} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+          ]
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_cwagent_linux.free-disk-space-low.threshold
+          #    fill  = "above"
+          #  }]
+          #}
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "disk used %"
+            }
+          }
+        }
+      }
+    }
 
     ec2_instance_cwagent_collectd_service_status_os = {
       service-status-error-os-layer = {
@@ -229,10 +285,38 @@ locals {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "EC2 service-status-error-os-layer"
+          title   = "EC2 Instance service-status-error-os-layer"
           stat    = "Maximum"
           metrics = [
             [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_service_status_os_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+          ]
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "exitcode"
+            }
+          }
+        }
+      }
+    }
+    ec2_autoscaling_group_cwagent_collectd_service_status_os = {
+      service-status-error-os-layer = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 Autoscaling Group service-status-error-os-layer"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,type,type_instance} MetricName=\"collectd_service_status_os_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
           ]
           #annotations = {
           #  horizontal = [{
@@ -257,10 +341,38 @@ locals {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "EC2 service-status-error-app-layer"
+          title   = "EC2 Instance service-status-error-app-layer"
           stat    = "Maximum"
           metrics = [
             [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_service_status_app_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+          ]
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "exitcode"
+            }
+          }
+        }
+      }
+    }
+    ec2_autoscaling_group_cwagent_collectd_service_status_app = {
+      service-status-error-app-layer = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 Autoscaling Group service-status-error-app-layer"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,type,type_instance} MetricName=\"collectd_service_status_app_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
           ]
           #annotations = {
           #  horizontal = [{
@@ -285,7 +397,7 @@ locals {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "EC2 connectivity-test-all-failed"
+          title   = "EC2 Instance connectivity-test-all-failed"
           stat    = "Maximum"
           metrics = [
             [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_connectivity_test_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
@@ -313,7 +425,7 @@ locals {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "EC2 textfile-monitoring-metric-error"
+          title   = "EC2 Instance textfile-monitoring-metric-error"
           stat    = "Maximum"
           metrics = [
             [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
@@ -339,7 +451,7 @@ locals {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
-          title   = "EC2 textfile-monitoring-metric-not-updated"
+          title   = "EC2 Instance textfile-monitoring-metric-not-updated"
           stat    = "Maximum"
           metrics = [
             [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_seconds\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
@@ -695,67 +807,57 @@ locals {
   }
 
   cloudwatch_dashboard_widget_groups = {
-    ec2_windows_only = {
-      header_markdown = "## EC2"
+    ec2 = {
+      header_markdown = "## EC2 all instances"
       width           = 8
       height          = 8
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
         local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
         local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
-        null,
       ]
     }
-    ec2_linux_only = {
-      header_markdown = "## EC2"
+    ec2_windows = {
+      header_markdown = "## EC2 all Windows instances"
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
-        local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
+        null
+      ]
+    }
+    ec2_linux = {
+      header_markdown = "## EC2 all Linux instances"
+      width           = 8
+      height          = 8
+      widgets = [
         local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
         local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
         local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
       ]
     }
-    ec2_linux_and_windows = {
-      header_markdown = "## EC2"
+    ec2_autoscaling_group_linux = {
+      header_markdown = "## EC2 autoscaling group Linux instances"
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
-        local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
-        null,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
-        local.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+        local.cloudwatch_dashboard_widgets.ec2_autoscaling_group_cwagent_linux.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_autoscaling_group_cwagent_collectd_service_status_os.service-status-error-os-layer,
+        local.cloudwatch_dashboard_widgets.ec2_autoscaling_group_cwagent_collectd_service_status_app.service-status-error-app-layer,
       ]
     }
-    ec2_service_status = {
-      width  = 8
-      height = 8
+    ec2_instance_linux = {
+      header_markdown = "## EC2 standalone Linux instances"
+      width           = 8
+      height          = 8
       widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_linux.free-disk-space-low,
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
-        null,
       ]
     }
-    ec2_service_status_with_connectivity_test = {
-      width  = 8
-      height = 8
-      widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_connectivity_test.connectivity-test-all-failed,
-      ]
-    }
-    ec2_textfile_monitoring = {
+    ec2_instance_textfile_monitoring = {
       width  = 8
       height = 8
       widgets = [
@@ -764,7 +866,16 @@ locals {
         null,
       ]
     }
-    ec2_oracle_db = {
+    ec2_instance_textfile_monitoring_with_connectivity_test = {
+      width  = 8
+      height = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-error,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_connectivity_test.connectivity-test-all-failed,
+      ]
+    }
+    ec2_instance_oracle_db = {
       width  = 8
       height = 8
       widgets = [
@@ -773,7 +884,7 @@ locals {
         null,
       ]
     }
-    ec2_oracle_db_with_backup = {
+    ec2_instance_oracle_db_with_backup = {
       width  = 8
       height = 8
       widgets = [

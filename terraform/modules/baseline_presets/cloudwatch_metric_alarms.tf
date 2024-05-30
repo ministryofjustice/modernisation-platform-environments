@@ -285,8 +285,8 @@ locals {
     lb = {
       unhealthy-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        datapoints_to_alarm = "3"
+        evaluation_periods  = "1" # needs to be low to pick up issues in autoscaling groups
+        datapoints_to_alarm = "1"
         metric_name         = "UnHealthyHostCount"
         namespace           = "AWS/ApplicationELB"
         period              = "60"
