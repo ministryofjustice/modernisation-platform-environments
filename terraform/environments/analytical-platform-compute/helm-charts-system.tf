@@ -162,3 +162,20 @@ resource "helm_release" "cert_manager_issuers" {
   ]
   depends_on = [helm_release.cert_manager]
 }
+
+/* Ingress NGINX */
+resource "helm_release" "ingress_nginx_default_certificate" {
+  name      = "ingress-nginx-default-certificate"
+  chart     = "./src/helm/charts/ingress-nginx-default-certificate"
+  namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/ingress-nginx-default-certificate/values.yml.tftpl",
+      {
+        default_certificate_dns_name = "*.${local.environment_configuration.route53_zone}"
+      }
+    )
+  ]
+  depends_on = [helm_release.cert_manager_issuers]
+}
