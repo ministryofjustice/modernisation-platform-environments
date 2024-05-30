@@ -41,35 +41,6 @@ locals {
             }
           }
         },
-        "data-platform" = {
-          "identity_centre_team" = "data-platform"
-          "aws_accounts" = {
-            "data-platform-development" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = true
-            }
-            "data-platform-test" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = true
-            }
-            "data-platform-preproduction" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = true
-            }
-            "data-platform-apps-and-tools-development" = {
-              cloudwatch_enabled              = true
-              "prometheus_push_enabled"       = true
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = true
-            }
-          }
-        }
         "digital-studio-operations" = {
           "identity_centre_team" = "studio-webops"
           "aws_accounts" = {
@@ -88,7 +59,7 @@ locals {
           }
         }
       }
-      grafana_api_key_rotator_version = "1.0.3"
+      grafana_api_key_rotator_version = "1.0.5"
     }
     production = {
       tenant_configuration = {
@@ -116,30 +87,14 @@ locals {
             "analytical-platform-compute-production" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = true
-            }
-          }
-        },
-        "data-platform" = {
-          "identity_centre_team" = "data-platform"
-          "aws_accounts" = {
-            "data-platform-production" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = true
-            }
-            "data-platform-apps-and-tools-production" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
+              amazon_prometheus_query_enabled = true
+              amazon_prometheus_workspace_id  = "ws-257796b7-4aa4-4c18-b906-6dd21e95d7b73e"
               xray_enabled                    = true
             }
           }
         }
       }
-      grafana_api_key_rotator_version = "1.0.3"
+      grafana_api_key_rotator_version = "1.0.5"
     }
   }
 }
