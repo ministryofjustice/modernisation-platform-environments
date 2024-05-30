@@ -69,7 +69,7 @@ resource "aws_iam_policy" "xray_policy" {
 
 resource "aws_iam_role" "step_functions_role" {
   name               = "StepFunctionsExecutionRole"
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+  assume_role_policy = data.aws_iam_policy_document.assume_step_functions.json
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_invoke_policy" {
