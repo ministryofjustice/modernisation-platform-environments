@@ -36,5 +36,6 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
     },
     "End": true
   }
+}
 EOF
 }
