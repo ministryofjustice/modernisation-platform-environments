@@ -179,3 +179,22 @@ resource "helm_release" "ingress_nginx_default_certificate" {
   ]
   depends_on = [helm_release.cert_manager_issuers]
 }
+
+resource "helm_release" "ingress_nginx" {
+  /* https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx */
+  name       = "ingress-nginx"
+  repository = "https://kubernetes.github.io/ingress-nginx"
+  chart      = "ingress-nginx"
+  version    = "4.10.1"
+  namespace  = kubernetes_namespace.ingress_nginx.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/ingress-nginx/values.yml.tftpl",
+      {
+        default_ssl_certificate = "${kubernetes_namespace.ingress_nginx.metadata[0].name}/default-certificate"
+        ingress_hostname        = "ingress.${local.environment_configuration.route53_zone}"
+      }
+    )
+  ]
+  depends_on = [helm_release.ingress_nginx_default_certificate]
+}
