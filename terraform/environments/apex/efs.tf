@@ -31,6 +31,7 @@ resource "aws_kms_alias" "efs" {
 
 resource "aws_efs_file_system" "efs" {
   encrypted        = true
+  kms_key_id       = aws_kms_key.efs.arn
   performance_mode = "maxIO"
   throughput_mode  = "bursting"
 

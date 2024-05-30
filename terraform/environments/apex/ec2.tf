@@ -60,10 +60,9 @@ data "local_file" "cloudwatch_agent" {
 
 
 resource "aws_security_group" "ec2" {
-  name        = local.application_name
+  name        = "${local.application_name}-db-security-group"
   description = "APEX DB Server Security Group"
   vpc_id      = data.aws_vpc.shared.id
-
   # this ingress rule to be added after the ECS has been setup in MP
   # ingress {
   #   description = "database listener port access to ECS security group"
@@ -116,6 +115,12 @@ resource "aws_security_group" "ec2" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-db-security-group" }
+  )
+
 }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
