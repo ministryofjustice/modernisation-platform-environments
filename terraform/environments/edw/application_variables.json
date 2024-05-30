@@ -30,7 +30,7 @@
       "edw_bastion_ssh_cidr": "10.202.0.0/20",
       "mp_domain_name": "modernisation-platform.service.justice.gov.uk",
       "lambda_function_inline_code_filename": "index.py",
-      "lambda_function_name": "edw-edw-edw-system-root-password-rotation",
+      "lambda_function_name": "edw-system-root-password-rotation",
       "lambda_function_description": "Rotate AWS Secrets Manager Secret Value",
       "lambda_function_handler": "index.lambda_handler",
       "lambda_function_runtime": "python3.8",
