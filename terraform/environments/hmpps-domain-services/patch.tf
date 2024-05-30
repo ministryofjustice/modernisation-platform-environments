@@ -62,7 +62,7 @@ module "development" {
   tags = merge(
     local.tags,
     {
-      Name = "ssm-patching"
+      Name = "ssm-patching-devtest"
     },
   )
 }
