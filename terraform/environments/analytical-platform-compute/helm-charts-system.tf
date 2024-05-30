@@ -138,8 +138,9 @@ resource "helm_release" "cert_manager" {
     templatefile(
       "${path.module}/src/helm/cert-manager/values.yml.tftpl",
       {
-        eks_role_arn = module.cert_manager_role.iam_role_arn
+        eks_role_arn = module.cert_manager_iam_role.iam_role_arn
       }
     )
   ]
+  depends_on = [module.cert_manager_iam_role]
 }
