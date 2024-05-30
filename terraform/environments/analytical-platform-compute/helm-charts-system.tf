@@ -4,11 +4,11 @@ resource "helm_release" "kyverno" {
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
-  version    = "3.2.2"
+  version    = "3.2.3"
   namespace  = kubernetes_namespace.kyverno.metadata[0].name
   values = [
     templatefile(
-      "${path.module}/src/helm/kyverno/values.yml.tftpl",
+      "${path.module}/src/helm/values/kyverno/values.yml.tftpl",
       {}
     )
   ]
@@ -17,7 +17,7 @@ resource "helm_release" "kyverno" {
 /* AWS Observability */
 /*
   There is an ongoing issue with aws-cloudwatch-metrics as it doesn't properly support IMDSv2 (https://github.com/aws/amazon-cloudwatch-agent/issues/1101)
-  Therefore for this to work properly, I've set hostNetwork to true in src/helm/amazon-cloudwatch-metrics/values.yml.tftpl
+  Therefore for this to work properly, I've set hostNetwork to true in src/helm/values/amazon-cloudwatch-metrics/values.yml.tftpl
   The DaemonSet uses the node role to which has arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy attached
   The Helm chart also doesn't have support for IRSA, so a EKS Pod Identity has been been made ready to use module.aws_cloudwatch_metrics_pod_identity
 */
@@ -30,7 +30,7 @@ resource "helm_release" "aws_cloudwatch_metrics" {
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
-      "${path.module}/src/helm/aws-cloudwatch-metrics/values.yml.tftpl",
+      "${path.module}/src/helm/values/aws-cloudwatch-metrics/values.yml.tftpl",
       {
         cluster_name = module.eks.cluster_name
       }
@@ -49,7 +49,7 @@ resource "helm_release" "aws_for_fluent_bit" {
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
-      "${path.module}/src/helm/aws-for-fluent-bit/values.yml.tftpl",
+      "${path.module}/src/helm/values/aws-for-fluent-bit/values.yml.tftpl",
       {
         aws_region                = data.aws_region.current.name
         cluster_name              = module.eks.cluster_name
@@ -71,7 +71,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
-      "${path.module}/src/helm/amazon-prometheus-proxy/values.yml.tftpl",
+      "${path.module}/src/helm/values/amazon-prometheus-proxy/values.yml.tftpl",
       {
         aws_region       = data.aws_region.current.name
         eks_role_arn     = module.amazon_prometheus_proxy_iam_role.iam_role_arn
@@ -90,11 +90,11 @@ resource "helm_release" "cluster_autoscaler" {
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
   version    = "9.37.0"
-  namespace  = "kube-system"
+  namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
 
   values = [
     templatefile(
-      "${path.module}/src/helm/cluster-autoscaler/values.yml.tftpl",
+      "${path.module}/src/helm/values/cluster-autoscaler/values.yml.tftpl",
       {
         aws_region   = data.aws_region.current.name
         cluster_name = module.eks.cluster_name
@@ -112,10 +112,10 @@ resource "helm_release" "external_dns" {
   repository = "https://kubernetes-sigs.github.io/external-dns"
   chart      = "external-dns"
   version    = "1.14.4"
-  namespace  = "kube-system"
+  namespace  = kubernetes_namespace.external_dns.metadata[0].name
   values = [
     templatefile(
-      "${path.module}/src/helm/external-dns/values.yml.tftpl",
+      "${path.module}/src/helm/values/external-dns/values.yml.tftpl",
       {
         domain_filter = local.environment_configuration.route53_zone
         eks_role_arn  = module.external_dns_iam_role.iam_role_arn
@@ -124,4 +124,41 @@ resource "helm_release" "external_dns" {
     )
   ]
   depends_on = [module.external_dns_iam_role]
+}
+
+/* Cert Manager */
+resource "helm_release" "cert_manager" {
+  /* https://artifacthub.io/packages/helm/cert-manager/cert-manager */
+  name       = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager"
+  version    = "v1.14.5"
+  namespace  = kubernetes_namespace.cert_manager.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/cert-manager/values.yml.tftpl",
+      {
+        eks_role_arn = module.cert_manager_iam_role.iam_role_arn
+      }
+    )
+  ]
+  depends_on = [module.cert_manager_iam_role]
+}
+
+resource "helm_release" "cert_manager_issuers" {
+  name      = "cert-manager-issuers"
+  chart     = "./src/helm/charts/cert-manager-issuers"
+  namespace = kubernetes_namespace.cert_manager.metadata[0].name
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/cert-manager-issuers/values.yml.tftpl",
+      {
+        acme_email               = "analytical-platform+compute-cert-manager@digital.justice.gov.uk"
+        aws_region               = data.aws_region.current.name
+        http_issuer_ingress_name = "default"
+      }
+    )
+  ]
+  depends_on = [helm_release.cert_manager]
 }
