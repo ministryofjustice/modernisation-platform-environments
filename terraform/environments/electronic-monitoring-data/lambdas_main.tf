@@ -28,7 +28,8 @@ resource "aws_lambda_function" "get_metadata_from_rds" {
       ]
     source_code_hash = data.archive_file.get_metadata_from_rds.output_base64sha256
     # depends_on    = [aws_cloudwatch_log_group.create_athena_external_tables_lambda]
-    timeout = 200
+    timeout = 900
+    memory_size = 1024
     runtime = "python3.11"
     vpc_config {
       security_group_ids = [aws_security_group.lambda_db_security_group.id]
@@ -67,7 +68,8 @@ resource "aws_lambda_function" "create_athena_external_table" {
       ]
     source_code_hash = data.archive_file.create_athena_external_table.output_base64sha256
     depends_on    = [aws_cloudwatch_log_group.create_athena_external_table_lambda]
-    timeout = 200
+    timeout = 900
+    memory_size = 1024
     runtime = "python3.11"
     vpc_config {
       security_group_ids = [aws_security_group.lambda_db_security_group.id]
