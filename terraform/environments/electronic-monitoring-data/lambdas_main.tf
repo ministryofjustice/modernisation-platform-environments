@@ -63,6 +63,7 @@ resource "aws_lambda_function" "create_athena_external_table" {
     role = aws_iam_role.create_athena_external_tables_lambda.arn
     handler = "create_athena_external_table.handler"
     layers = [
+      "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:69",
       "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python311:12",
       aws_lambda_layer_version.mojap_metadata_layer.arn,
       aws_lambda_layer_version.create_external_athena_tables_layer.arn

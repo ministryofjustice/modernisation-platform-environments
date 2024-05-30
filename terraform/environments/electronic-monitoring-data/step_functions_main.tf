@@ -15,7 +15,7 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
     },
     "LoopThroughMetadataList": {
       "Type": "Map",
-      "ItemsPath": "$.metadata_list",
+      "ItemsPath": "$.metadata_list.metadata_list",
       "MaxConcurrency": 4, 
       "Iterator": {
         "StartAt": "CreateAthenaTable",
