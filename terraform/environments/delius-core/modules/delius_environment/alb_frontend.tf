@@ -36,15 +36,15 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   cidr_ipv4         = each.key # Global Protect VPN
 }
 
-resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_global_protect_allowlist" {
-  for_each          = toset(local.moj_ips)
-  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
-  description       = "access into delius core frontend alb over http (will redirect)"
-  from_port         = "80"
-  to_port           = "80"
-  ip_protocol       = "tcp"
-  cidr_ipv4         = each.key # Global Protect VPN
-}
+# resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_global_protect_allowlist" {
+#   for_each          = toset(local.moj_ips)
+#   security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+#   description       = "access into delius core frontend alb over http (will redirect)"
+#   from_port         = "80"
+#   to_port           = "80"
+#   ip_protocol       = "tcp"
+#   cidr_ipv4         = each.key # Global Protect VPN
+# }
 
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_frontend" {
