@@ -123,10 +123,10 @@ resource "aws_lb_target_group" "tribunals_target_group_sftp" {
 }
 
 resource "aws_lb_listener" "tribunals_lb" {
-  # depends_on = [
-  #   var.aws_acm_certificate_external
-  # ]
-  # certificate_arn   = var.aws_acm_certificate_external.arn
+  depends_on = [
+    var.aws_acm_certificate_external
+  ]
+  certificate_arn   = var.aws_acm_certificate_external.arn
   load_balancer_arn = aws_lb.tribunals_lb.arn
   port              = var.application_data.server_port_2
   protocol          = var.application_data.lb_listener_protocol_2
