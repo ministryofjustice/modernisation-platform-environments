@@ -181,7 +181,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
   # user_data = filebase64("ec2-shared-user-data.sh")
 
   user_data = base64encode(templatefile("ec2-shared-user-data.tpl", {
-    environment_name = local.environment
+    environmentName = local.environment
   }))
 }
 
