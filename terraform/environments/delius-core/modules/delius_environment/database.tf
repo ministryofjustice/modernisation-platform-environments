@@ -152,18 +152,6 @@ resource "aws_secretsmanager_secret_policy" "delius_core_application_passwords_p
   policy     = data.aws_iam_policy_document.delius_core_application_passwords_policy_doc[count.index].json
 }
 
-resource "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
-  count = local.has_mis_environment ? 1 : 0
-
-  secret_id     = aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].id
-  secret_string = "REPLACE"
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "db_access_to_secrets_manager" {
   count = local.has_mis_environment ? 1 : 0
   statement {
