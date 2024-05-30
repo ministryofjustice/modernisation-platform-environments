@@ -2,6 +2,16 @@ data "local_file" "userdata" {
   filename = "userdata.sh"
 }
 
+resource "aws_network_interface" "oas_eni" {
+  subnet_id   = data.aws_subnet.private_subnets_a.id
+  private_ips = ["10.26.56.108"]
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name} ENI" }
+  )
+}
+
 resource "aws_instance" "oas_app_instance" {
   ami                         = local.application_data.accounts[local.environment].ec2amiid
   associate_public_ip_address = false
@@ -10,7 +20,7 @@ resource "aws_instance" "oas_app_instance" {
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  # subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   user_data_replace_on_change = true
   user_data                   = base64encode(data.local_file.userdata.content)
@@ -23,6 +33,13 @@ resource "aws_instance" "oas_app_instance" {
   # user_data = base64encode(templatefile("./userdata.sh", {
   #   hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
   # }))
+
+
+
+  network_interface {
+    network_interface_id = aws_network_interface.oas_eni.id
+    device_index         = 0
+  }
 
   root_block_device {
     delete_on_termination = false
