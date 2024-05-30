@@ -48,7 +48,7 @@ module "ecs_loadbalancer" {
   vpc_shared_id                = var.vpc_shared_id
   application_data             = var.application_data
   subnets_shared_public_ids    = var.subnets_shared_public_ids
-  aws_acm_certificate_external = var.aws_acm_certificate_external
+  # aws_acm_certificate_external = var.aws_acm_certificate_external
   is_ftp_app                   = var.is_ftp_app
   waf_arn                      = var.waf_arn
 }
