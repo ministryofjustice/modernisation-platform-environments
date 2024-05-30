@@ -47,11 +47,11 @@ data "aws_iam_policy_document" "xray_policy" {
 data "aws_iam_policy_document" "assume_step_functions" {
   statement {
     effect = "Allow"
-    actions = ["sts:AssumeRole"]
     principals {
-        type = "Service"
-        identifiers = ["states.amazon.com"]
+      type = "Service"
+      identifiers = ["states.amazonaws.com"]
     }
+    actions = ["sts:AssumeRole"]
   }
 }
 
