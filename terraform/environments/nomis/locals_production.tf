@@ -13,6 +13,7 @@ locals {
         "ec2",
         "ec2_linux",
         "ec2_autoscaling_group_linux",
+        "ec2_instance_linux",
         "ec2_instance_oracle_db_with_backup",
         "ec2_instance_textfile_monitoring_with_connectivity_test",
       ]
