@@ -808,7 +808,7 @@ locals {
 
   cloudwatch_dashboard_widget_groups = {
     ec2 = {
-      header_markdown = "## EC2"
+      header_markdown = "## EC2 all instances"
       width           = 8
       height          = 8
       widgets = [
@@ -818,7 +818,7 @@ locals {
       ]
     }
     ec2_windows = {
-      header_markdown = "## EC2 Windows"
+      header_markdown = "## EC2 all Windows instances"
       width           = 8
       height          = 8
       widgets = [
@@ -828,7 +828,7 @@ locals {
       ]
     }
     ec2_linux = {
-      header_markdown = "## EC2 Linux"
+      header_markdown = "## EC2 all Linux instances"
       width           = 8
       height          = 8
       widgets = [
@@ -838,7 +838,7 @@ locals {
       ]
     }
     ec2_autoscaling_group_linux = {
-      header_markdown = "## EC2 Linux Autoscaling Group Instances"
+      header_markdown = "## EC2 autoscaling group Linux instances"
       width           = 8
       height          = 8
       widgets = [
@@ -848,7 +848,7 @@ locals {
       ]
     }
     ec2_instance_linux = {
-      header_markdown = "## EC2 Linux Standalone Instances"
+      header_markdown = "## EC2 standalone Linux instances"
       width           = 8
       height          = 8
       widgets = [
