@@ -91,13 +91,11 @@ if (-not $awsCliInstalled) {
     "AWS CLI is already installed." >> $monitorLogFile
 }
 
-# Retrieve the environmentName from the EC2 tags
-$environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
-"Instance Environment: $environmentName" >> $logFile
-
 $scriptContent = @'
 function MonitorAndSyncToS3 {
-  param([string]$environmentName)
+  $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
+  $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
+  "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
   "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
   # Create a FileSystemWatcher object
     $watcher = New-Object System.IO.FileSystemWatcher
@@ -125,15 +123,17 @@ function MonitorAndSyncToS3 {
 }
 
 function InitialSyncToS3 {
-    param($environmentName)
+    $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
+    $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
+  " Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
     "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-$environmentName >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 }
 
 # Call the functions using $environmentName
-InitialSyncToS3 -environmentName $environmentName
-MonitorAndSyncToS3 -environmentName $environmentName
+InitialSyncToS3
+MonitorAndSyncToS3
 '@
 
 Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
