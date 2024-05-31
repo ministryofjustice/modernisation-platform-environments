@@ -15,7 +15,7 @@ data "archive_file" "get_metadata_from_rds" {
 resource "aws_lambda_function" "get_metadata_from_rds" {
     filename = "${local.lambda_path}/get_metadata_from_rds.zip"
     function_name = "get_metadata_from_rds"
-    role = aws_iam_role.create_athena_external_tables_lambda.arn
+    role = aws_iam_role.get_metadata_from_rds.arn
     handler = "get_metadata_from_rds.handler"
     layers = [
       "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python311:12",
@@ -36,7 +36,7 @@ resource "aws_lambda_function" "get_metadata_from_rds" {
       variables = {
         SECRET_NAME = aws_secretsmanager_secret.db_glue_connection.name
         DB_NAME = local.db_name
-        METDATA_STORE_BUCKET = module.metadata-s3-bucket.bucket.name
+        METDATA_STORE_BUCKET = module.metadata-s3-bucket.bucket.id
       }
     }
 }
