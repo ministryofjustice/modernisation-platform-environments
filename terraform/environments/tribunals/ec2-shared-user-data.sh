@@ -107,7 +107,7 @@ function MonitorAndSyncToS3 {
     
     # Define the action to take when a file is created
     $action = {
-        param($source, $event)
+        param($source, $event, $environmentName)
         $filePath = $event.FullPath
         $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
         "A file was created at $filePath. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
