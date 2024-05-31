@@ -10,7 +10,7 @@ resource "aws_sns_topic" "jitbit_alerting" {
 resource "aws_sns_topic_subscription" "jitbit_pagerduty_subscription" {
   topic_arn = aws_sns_topic.jitbit_alerting.arn
   protocol  = "https"
-  endpoint  = "events.pagerduty.com/integration/${local.pagerduty_integration_key}/enqueue"
+  endpoint  = "https://events.pagerduty.com/integration/${local.pagerduty_integration_key}/enqueue"
 }
 
 
