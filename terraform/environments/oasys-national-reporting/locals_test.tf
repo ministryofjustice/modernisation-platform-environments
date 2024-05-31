@@ -119,6 +119,7 @@ locals {
         })
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m4.large"
+          metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
         })
         user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
