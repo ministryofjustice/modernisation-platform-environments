@@ -183,13 +183,6 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 #   user_data = data.template_file.user_data.rendered
 # }
 
-# data "template_file" "user_data" {
-#   template = "${filebase64("ec2-shared-user-data.sh")}"
-#   vars = {
-#     environmentName = "${local.environment}"
-#   }
-# }
-
 # # Finally, create the Auto scaling group for the launch template
 # resource "aws_autoscaling_group" "tribunals-all-asg" {
 #   vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
@@ -203,6 +196,13 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 #     version = "$Latest"
 #   }
 # }
+
+data "template_file" "user_data" {
+  template = "${filebase64("ec2-shared-user-data.sh")}"
+  vars = {
+    environmentName = "${local.environment}"
+  }
+}
 
 ###########################################################################
 
