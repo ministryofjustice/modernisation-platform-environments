@@ -63,6 +63,7 @@ module "nextcloud_service" {
 
   extra_task_role_policies = {
     "S3_BUCKET_CONFIG" = data.aws_iam_policy_document.s3_bucket_config
+    "access_ldap_secret" = data.aws_iam_policy_document.access_ldap_secret
   }
 
   create_rds               = true
