@@ -1,5 +1,3 @@
-export environmentName='${environmentName}'
-
 <powershell>
 $logFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
 $linkPath = "C:\ProgramData\docker\volumes\tribunals\"
@@ -10,8 +8,6 @@ $ebsVolumeTag = "tribunals-all-storage"
 $tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","hmlands","lands-chamber", "ftp-admin-appeals", "ftp-tax-tribunal", "ftp-tax-chancery", "ftp-sscs-venues", "ftp-siac", "ftp-primary-health", "ftp-estate-agents", "ftp-consumer-credit", "ftp-claims-management", "ftp-charity-tribunals"
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
-
-"Got environmentName = ${environmentName} ," + $env:environmentName > $logFile
 
 "Starting userdata execution" >> $logFile
 
@@ -95,6 +91,10 @@ if (-not $awsCliInstalled) {
     "AWS CLI is already installed." >> $monitorLogFile
 }
 
+# Retrieve the environmentName from the EC2 tags
+$environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
+"Instance Environment: $environmentName" >> $logFile
+
 $scriptContent = @'
 function MonitorAndSyncToS3 {
   param($environmentName)
@@ -130,8 +130,7 @@ function InitialSyncToS3 {
     "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 }
 
-# Call the function
-$environmentName = ${environmentName}
+# Call the functions using $environmentName
 InitialSyncToS3 -environmentName $environmentName
 MonitorAndSyncToS3 -environmentName $environmentName
 '@
