@@ -39,8 +39,8 @@ data "aws_secretsmanager_secret_version" "elasticache_default_user_password" {
 resource "aws_elasticache_user" "default" {
   count = var.create_elasticache ? 1 : 0
 
-  user_id       = "default"
-  user_name     = "default"
+  user_id       = var.name
+  user_name     = var.name
   access_string = "on ~* +@all"
   engine        = "REDIS"
 
@@ -50,23 +50,15 @@ resource "aws_elasticache_user" "default" {
   }
 }
 
-resource "aws_elasticache_user_group" "default" {
+resource "aws_elasticache_user_group" "app_default" {
   count = var.create_elasticache ? 1 : 0
 
   user_group_id = var.name
   engine        = "REDIS"
-  user_ids      = [aws_elasticache_user.default[0].id]
+  user_ids      = ["default", aws_elasticache_user.app_default[0].id]
   lifecycle {
     ignore_changes = [user_ids]
   }
-}
-
-
-resource "aws_elasticache_user_group_association" "default" {
-  count = var.create_elasticache ? 1 : 0
-
-  user_group_id = aws_elasticache_user_group.default[0].user_group_id
-  user_id       = aws_elasticache_user.default[0].user_id
 }
 
 
