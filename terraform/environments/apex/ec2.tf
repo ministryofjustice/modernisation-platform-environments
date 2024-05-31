@@ -1,6 +1,7 @@
 locals {
   instance-userdata = <<EOF
 #!/bin/bash
+# Trigger rebuild of EC2
 cd /tmp
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
