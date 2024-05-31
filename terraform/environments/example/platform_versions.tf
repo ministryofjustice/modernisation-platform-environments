@@ -9,7 +9,7 @@ terraform {
       source  = "hashicorp/http"
     }
     external = {
-      source = "hashicorp/external"
+      source  = "hashicorp/external"
       version = "~> 2.3"
     }
     random = {
