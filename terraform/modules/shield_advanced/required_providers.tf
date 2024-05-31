@@ -6,4 +6,5 @@ terraform {
       configuration_aliases = [aws.modernisation-platform]
     }
   }
+  required_version = "~> 1.5"
 }
