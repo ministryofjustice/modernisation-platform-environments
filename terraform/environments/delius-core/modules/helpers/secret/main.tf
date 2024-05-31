@@ -7,14 +7,17 @@ resource "aws_secretsmanager_secret" "this" {
 
 resource "aws_secretsmanager_secret_version" "this" {
   secret_id     = aws_secretsmanager_secret.this.id
-  secret_string = var.generate_random_password ? data.aws_secretsmanager_random_password.this[0].random_password : "replace-me"
+  secret_string = random_password.keepers.generate_random_password ? random_password.this.result : "replace-me"
 }
 
-data "aws_secretsmanager_random_password" "this" {
-  count = var.generate_random_password ? 1 : 0
-  password_length = 32
-  exclude_punctuation = true
-  exclude_numbers = true
+resource "random_password" "this" {
+  count  = var.generate_random_password ? 1 : 0
+  length = 32
+  special = true
+
+  keepers = {
+    generate_random_password = var.generate_random_password
+  }
 }
 
 
