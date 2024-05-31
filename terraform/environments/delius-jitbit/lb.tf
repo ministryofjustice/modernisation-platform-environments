@@ -51,11 +51,6 @@ resource "aws_security_group" "load_balancer_security_group" {
       "54.228.16.0/26",    # eu-west-1 Region
       "107.23.255.0/26",   # us-east-1 Region
       "54.243.31.192/26",  # us-east-1 Region
-      "195.59.75.0/24",    # ARK internet (DOM1)
-      "194.33.192.0/25",   # ARK internet (DOM1)
-      "194.33.193.0/25",   # ARK internet (DOM1)
-      "194.33.196.0/25",   # ARK internet (DOM1)
-      "194.33.197.0/25",   # ARK internet (DOM1)
       local.internal_security_group_cidrs
     ]))
 
