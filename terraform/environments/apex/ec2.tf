@@ -1,7 +1,6 @@
 locals {
   instance-userdata = <<EOF
 #!/bin/bash
-# Trigger rebuild of EC2
 cd /tmp
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
@@ -29,7 +28,7 @@ resource "aws_instance" "apex_db_instance" {
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
-  # vpc_security_group_ids      = [aws_security_group.database.id]
+  vpc_security_group_ids      = [aws_security_group.database.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
@@ -61,59 +60,59 @@ data "local_file" "cloudwatch_agent" {
 }
 
 
-# resource "aws_security_group" "database" {
-#   name        = "${local.application_name}-db-security-group"
-#   description = "APEX DB Server Security Group"
-#   vpc_id      = data.aws_vpc.shared.id
+resource "aws_security_group" "database" {
+  name        = "${local.application_name}-db-security-group"
+  description = "APEX DB Server Security Group"
+  vpc_id      = data.aws_vpc.shared.id
 
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-db-security-group" }
-#   )
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-db-security-group" }
+  )
 
-# }
+}
 
-# resource "aws_vpc_security_group_ingress_rule" "db_ecs" {
-#   security_group_id            = aws_security_group.database.id
-#   description                  = "Allow ECS to access database instance"
-#   referenced_security_group_id = module.apex-ecs.cluster_ec2_security_group_id
-#   from_port                    = 1521
-#   ip_protocol                  = "tcp"
-#   to_port                      = 1521
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_ecs" {
+  security_group_id            = aws_security_group.database.id
+  description                  = "Allow ECS to access database instance"
+  referenced_security_group_id = module.apex-ecs.cluster_ec2_security_group_id
+  from_port                    = 1521
+  ip_protocol                  = "tcp"
+  to_port                      = 1521
+}
 
-# resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
-#   security_group_id            = aws_security_group.database.id
-#   description                  = "Allow MP VPC (OAS) to access database instance"
-#   referenced_security_group_id = data.aws_vpc.shared.cidr_block
-#   from_port                    = 1521
-#   ip_protocol                  = "tcp"
-#   to_port                      = 1521
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
+  security_group_id            = aws_security_group.database.id
+  description                  = "Allow MP VPC (OAS) to access database instance"
+  referenced_security_group_id = data.aws_vpc.shared.cidr_block
+  from_port                    = 1521
+  ip_protocol                  = "tcp"
+  to_port                      = 1521
+}
 
-# resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
-#   security_group_id            = aws_security_group.database.id
-#   description                  = "Allow Lambda SSH access for backup snapshots"
-#   referenced_security_group_id = aws_security_group.lambdasg.id
-#   from_port                    = 22
-#   ip_protocol                  = "tcp"
-#   to_port                      = 22
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
+  security_group_id            = aws_security_group.database.id
+  description                  = "Allow Lambda SSH access for backup snapshots"
+  referenced_security_group_id = aws_security_group.lambdasg.id
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
 
-# resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
-#   security_group_id            = aws_security_group.database.id
-#   description                  = "Database listener port access to Workspaces"
-#   cidr_ipv4 = local.application_data.accounts[local.environment].workspace_cidr
-#   from_port                    = 1521
-#   ip_protocol                  = "tcp"
-#   to_port                      = 1521
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
+  security_group_id            = aws_security_group.database.id
+  description                  = "Database listener port access to Workspaces"
+  cidr_ipv4 = local.application_data.accounts[local.environment].workspace_cidr
+  from_port                    = 1521
+  ip_protocol                  = "tcp"
+  to_port                      = 1521
+}
 
-# resource "aws_vpc_security_group_egress_rule" "db_outbound" {
-#   security_group_id = aws_security_group.database.id
-#   cidr_ipv4   = "0.0.0.0/0"
-#   ip_protocol = "-1"
-# }
+resource "aws_vpc_security_group_egress_rule" "db_outbound" {
+  security_group_id = aws_security_group.database.id
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "-1"
+}
 
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
