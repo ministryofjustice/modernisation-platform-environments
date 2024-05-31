@@ -10,9 +10,9 @@ $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.l
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 $environmentName = ${environmentName}
 
-"Got environmentName " + $environmentName >> $logFile
+"Got environmentName " + $environmentName > $logFile
 
-"Starting userdata execution" > $logFile
+"Starting userdata execution" >> $logFile
 
 # Get the volumeid based on its tag
 $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
@@ -96,8 +96,9 @@ if (-not $awsCliInstalled) {
 
 $scriptContent = @'
 function MonitorAndSyncToS3 {
-    "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    # Create a FileSystemWatcher object
+  param($environmentName)
+  "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  # Create a FileSystemWatcher object
     $watcher = New-Object System.IO.FileSystemWatcher
     $watcher.Path = "D:\storage\tribunals\"
     $watcher.IncludeSubdirectories = $true
@@ -109,7 +110,7 @@ function MonitorAndSyncToS3 {
         $filePath = $event.FullPath
         $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
         "A file was created at $filePath. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-        aws s3 cp $filePath "s3://tribunals-ebs-backup-${environmentName}/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+        aws s3 cp $filePath "s3://tribunals-ebs-backup-$environmentName/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     }
 
     # Register the event
@@ -122,14 +123,16 @@ function MonitorAndSyncToS3 {
 }
 
 function InitialSyncToS3 {
+    param($environmentName)
     "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-${environmentName} >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-$environmentName >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 }
 
 # Call the function
-InitialSyncToS3
-MonitorAndSyncToS3
+$environmentName = ${environmentName}
+InitialSyncToS3 -environmentName $environmentName
+MonitorAndSyncToS3 -environmentName $environmentName
 '@
 
 Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
