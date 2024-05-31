@@ -52,23 +52,23 @@ resource "aws_security_group" "efs_product" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-# resource "aws_vpc_security_group_egress_rule" "efs_product_outbound" {
-#   security_group_id            = aws_security_group.efs_product.id
-#   description                  = "EFS Rule outbound for instance"
-#   referenced_security_group_id = aws_security_group.ec2.id
-#   from_port                    = 2049
-#   ip_protocol                  = "tcp"
-#   to_port                      = 2049
-# }
+resource "aws_vpc_security_group_egress_rule" "efs_product_outbound" {
+  security_group_id            = aws_security_group.efs_product.id
+  description                  = "EFS Rule outbound for instance"
+  referenced_security_group_id = aws_security_group.ec2.id
+  from_port                    = 2049
+  ip_protocol                  = "tcp"
+  to_port                      = 2049
+}
 
-# resource "aws_vpc_security_group_ingress_rule" "efs_product_inbound" {
-#   security_group_id            = aws_security_group.efs_product.id
-#   description                  = "EFS Rule inbound for instance"
-#   referenced_security_group_id = aws_security_group.ec2.id
-#   from_port                    = 2049
-#   ip_protocol                  = "tcp"
-#   to_port                      = 2049
-# }
+resource "aws_vpc_security_group_ingress_rule" "efs_product_inbound" {
+  security_group_id            = aws_security_group.efs_product.id
+  description                  = "EFS Rule inbound for instance"
+  referenced_security_group_id = aws_security_group.ec2.id
+  from_port                    = 2049
+  ip_protocol                  = "tcp"
+  to_port                      = 2049
+}
 
 resource "aws_efs_mount_target" "subnet_a" {
   file_system_id  = aws_efs_file_system.efs.id
