@@ -28,7 +28,7 @@ resource "aws_instance" "apex_db_instance" {
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
-  vpc_security_group_ids      = [aws_security_group.database.id]
+  # vpc_security_group_ids      = [aws_security_group.database.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
