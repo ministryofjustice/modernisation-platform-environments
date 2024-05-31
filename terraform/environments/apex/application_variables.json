@@ -16,7 +16,7 @@
       "u04_arch_size": "50",
       "u04_arch_snapshot": "snap-0bc63d7b569e9eb3b",
       "container_instance_type": "linux",
-      "ami_image_id": "ami-0a7fe1d4be64d0d0f",
+      "ami_image_id": "ami-0c1789b266d504ff3",
       "instance_type": "t3a.medium",
       "key_name": "",
       "ec2_desired_capacity": 1,
