@@ -156,14 +156,23 @@ data "aws_iam_policy_document" "s3_bucket_config" {
 
 data "aws_iam_policy_document" "access_ldap_secret" {
   statement {
-    sid = "DbAccessToSecretsManager"
+    sid = "AccessToSecretsManager"
     actions = [
-      "secretsmanager:GetSecretValue",
-      "kms:Decrypt"
+      "secretsmanager:GetSecretValue"
     ]
     effect = "Allow"
     resources = [
       "arn:aws:secretsmanager:eu-west-2:${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:secret:ldap-admin-password*"
+    ]
+  }
+  statement {
+    sid = "kms_access"
+    actions = [
+      "kms:Decrypt"
+    ]
+    effect = "Allow"
+    resources = [
+      var.account_config.kms_keys.general_shared
     ]
   }
 }
