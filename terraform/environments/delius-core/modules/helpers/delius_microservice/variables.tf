@@ -340,6 +340,18 @@ variable "elasticache_parameters" {
   default     = {}
 }
 
+variable "elasticache_password_secret_variable" {
+  description = "Secret variable to store the elasticache secretsmanager arn password"
+  type        = string
+  default     = ""
+}
+
+variable "elasticache_user_variable" {
+  description = "variable to store the elasticache username"
+  type        = string
+  default     = ""
+}
+
 variable "container_vars_default" {
   description = "Environment variables to pass to the container"
   type        = map(any)

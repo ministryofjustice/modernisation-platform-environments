@@ -50,6 +50,11 @@ locals {
 
   elasticache_env_vars = var.elasticache_endpoint_environment_variable != "" ? {
     (var.elasticache_endpoint_environment_variable) = aws_elasticache_cluster.this[0].cluster_address
+    (var.elasticache_user_variable) = var.name
+  } : {}
+
+  elasticache_secrets = var.elasticache_password_secret_variable != "" ? {
+    (var.elasticache_password_secret_variable) = module.elasticache_default_user_password.secret.arn
   } : {}
 
 }

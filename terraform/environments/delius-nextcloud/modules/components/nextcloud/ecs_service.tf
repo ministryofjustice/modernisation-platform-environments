@@ -94,11 +94,12 @@ module "nextcloud_service" {
   rds_password_secret_variable              = "MYSQL_PASSWORD"
   rds_user_secret_variable                  = "MYSQL_USER"
   elasticache_endpoint_environment_variable = "REDIS_HOST"
+  elasticache_user_variable                 = "REDIS_USER"
+  elasticache_password_secret_variable      = "REDIS_PASSWORD"
 
   container_vars_default = {
     MYSQL_DATABASE            = "nextcloud"
     REDIS_PORT                = "6379"
-    REDIS_PASSWORD            = "password"
     NEXTCLOUD_ADMIN_USER      = "admin"
     NEXTCLOUD_TRUSTED_DOMAINS = aws_route53_record.nextcloud_external.fqdn
     S3_BUCKET_CONFIG          = module.s3_bucket_config.bucket.id
