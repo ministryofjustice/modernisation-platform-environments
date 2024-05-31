@@ -51,7 +51,7 @@ resource "aws_iam_role" "this" {
   assume_role_policy = data.aws_iam_policy_document.assume_role[each.key].json
 
   tags = merge(local.tags, each.value.tags, {
-    Name = "each.key"
+    Name = each.key
   })
 }
 
@@ -69,6 +69,6 @@ resource "aws_iam_service_linked_role" "this" {
   custom_suffix    = each.value.custom_suffix
   description      = each.value.description
   tags = merge(local.tags, each.value.tags, {
-    Name = "each.key"
+    Name = each.key
   })
 }
