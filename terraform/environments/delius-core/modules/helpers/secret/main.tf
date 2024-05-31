@@ -5,6 +5,19 @@ resource "aws_secretsmanager_secret" "this" {
   tags        = var.tags
 }
 
+resource "aws_secretsmanager_secret_version" "this" {
+  secret_id     = aws_secretsmanager_secret.this.id
+  secret_string = var.generate_random_password ? data.aws_secretsmanager_random_password.this[0].random_password : "replace-me"
+}
+
+data "aws_secretsmanager_random_password" "this" {
+  count = var.generate_random_password ? 1 : 0
+  password_length = 32
+  exclude_punctuation = true
+  exclude_numbers = true
+}
+
+
 data "aws_iam_policy_document" "this" {
   count = length(var.allowed_account_ids) > 0 ? 1 : 0
   statement {

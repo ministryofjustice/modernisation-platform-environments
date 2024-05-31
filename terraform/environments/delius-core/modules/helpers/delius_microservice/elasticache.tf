@@ -23,7 +23,21 @@ resource "aws_elasticache_cluster" "this" {
   security_group_ids         = [aws_security_group.elasticache[0].id]
 }
 
+module "elasticache_default_user_password" {
+  source = "../secret" 
+  name = "${var.name}-elasticache-password"
+  description = "Elasticache Default User Password"
+  tags = var.tags
+  kms_key_id = var.account_config.kms_keys.general_shared
+}
+
+data "aws_secretsmanager_secret_version" "elasticache_default_user_password" {
+  secret_id = module.elasticache_default_user_password.secret.id
+}
+
 resource "aws_elasticache_user" "default" {
+  count = var.create_elasticache ? 1 : 0
+
   user_id       = var.name
   user_name     = var.name
   access_string = "on ~* +@all"
@@ -31,14 +45,16 @@ resource "aws_elasticache_user" "default" {
 
   authentication_mode {
     type      = "password"
-    passwords = [var.elasticache_default_user_password]
+    passwords = [data.aws_secretsmanager_secret_version.elasticache_default_user_password.secret_string]
   }
 }
 
 resource "aws_elasticache_user_group" "default" {
+  count = var.create_elasticache ? 1 : 0
+
   user_group_id = var.name
-  engine = "REDIS"
-  user_ids = [aws_elasticache_user.default.id]
+  engine        = "REDIS"
+  user_ids      = [aws_elasticache_user.default[0].id]
   lifecycle {
     ignore_changes = [user_ids]
   }
@@ -46,8 +62,10 @@ resource "aws_elasticache_user_group" "default" {
 
 
 resource "aws_elasticache_user_group_association" "default" {
-  user_group_id = aws_elasticache_user_group.default.user_group_id
-  user_id       = aws_elasticache_user.default.user_id
+  count = var.create_elasticache ? 1 : 0
+
+  user_group_id = aws_elasticache_user_group.default[0].user_group_id
+  user_id       = aws_elasticache_user.default[0].user_id
 }
 
 

@@ -20,3 +20,8 @@ variable "tags" {
   type = any
 }
 
+variable "generate_random_password" {
+  type    = bool
+  default = false
+}
+
