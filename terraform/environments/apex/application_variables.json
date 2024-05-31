@@ -30,7 +30,7 @@
       "ecs_scaling_mem_threshold": 80,
       "region": "eu-west-2",
       "docker_image_tag": "development",
-      "app_debug_enabled": "false",
+      "app_debug_enabled": "true",
       "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
       "server_port": 8080
     },
