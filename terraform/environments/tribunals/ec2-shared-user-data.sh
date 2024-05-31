@@ -97,7 +97,7 @@ $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$ins
 
 $scriptContent = @'
 function MonitorAndSyncToS3 {
-  param($environmentName)
+  param([string]$environmentName)
   "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
   # Create a FileSystemWatcher object
     $watcher = New-Object System.IO.FileSystemWatcher
@@ -111,6 +111,7 @@ function MonitorAndSyncToS3 {
         $filePath = $event.FullPath
         $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
         "A file was created at $filePath. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+        "aws s3 cp $filePath 's3://tribunals-ebs-backup-$environmentName/$relativePath'" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
         aws s3 cp $filePath "s3://tribunals-ebs-backup-$environmentName/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     }
 
