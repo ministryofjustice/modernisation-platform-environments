@@ -65,7 +65,7 @@ locals {
     ecr_url           = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/apex-ecr-repo"
     docker_image_tag  = local.application_data.accounts[local.environment].docker_image_tag
     region            = local.application_data.accounts[local.environment].region
-    app_db_url        = local.application_data.accounts[local.environment].app_db_url
+    app_db_url        = "${aws_route53_record.apex-db.fqdn}:1521:APEX"
     app_debug_enabled = local.application_data.accounts[local.environment].app_debug_enabled
     db_secret_arn     = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
   })
