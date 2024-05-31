@@ -23,6 +23,33 @@ resource "aws_elasticache_cluster" "this" {
   security_group_ids         = [aws_security_group.elasticache[0].id]
 }
 
+resource "aws_elasticache_user" "default" {
+  user_id       = var.name
+  user_name     = var.name
+  access_string = "on ~* +@all"
+  engine        = "REDIS"
+
+  authentication_mode {
+    type      = "password"
+    passwords = [var.elasticache_default_user_password]
+  }
+}
+
+resource "aws_elasticache_user_group" "default" {
+  user_group_id = var.name
+  engine = "REDIS"
+  user_ids = [aws_elasticache_user.default.id]
+  lifecycle {
+    ignore_changes = [user_ids]
+  }
+}
+
+
+resource "aws_elasticache_user_group_association" "default" {
+  user_group_id = aws_elasticache_user_group.default.user_group_id
+  user_id       = aws_elasticache_user.default.user_id
+}
+
 
 resource "aws_security_group" "elasticache" {
   count       = var.create_elasticache ? 1 : 0
