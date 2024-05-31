@@ -81,6 +81,15 @@ resource "aws_vpc_security_group_ingress_rule" "db_ecs" {
   to_port                      = 1521
 }
 
+resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
+  security_group_id            = aws_security_group.ec2.id
+  description                  = "Allow MP VPC (OAS) to access database instance"
+  referenced_security_group_id = data.aws_vpc.shared.cidr_block
+  from_port                    = 1521
+  ip_protocol                  = "tcp"
+  to_port                      = 1521
+}
+
 resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
   security_group_id            = aws_security_group.ec2.id
   description                  = "Allow Lambda SSH access for backup snapshots"
