@@ -19,7 +19,7 @@ logger.setLevel(logging.INFO)
 
 SECRET_NAME = os.environ.get("SECRET_NAME")
 DB_NAME = os.environ.get("DB_NAME")
-METDATA_STORE_BUCKET = os.environ.get("METDATA_STORE_BUCKET")
+METADATA_STORE_BUCKET = os.environ.get("METADATA_STORE_BUCKET")
 
 
 db_sem_name = f"{DB_NAME}_semantic_layer"
@@ -48,7 +48,7 @@ def create_glue_database():
 def write_meta_to_s3(meta):
     table_name = meta.name
     meta.to_json(
-        f"s3://{METDATA_STORE_BUCKET}/database={DB_NAME}/table_name={table_name}/metadata.json"
+        f"s3://{METADATA_STORE_BUCKET}/database={DB_NAME}/table_name={table_name}/metadata.json"
     )
 
 
