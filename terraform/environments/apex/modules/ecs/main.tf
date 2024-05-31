@@ -519,6 +519,7 @@ resource "aws_ecs_capacity_provider" "apex" {
       status          = "ENABLED"
       target_capacity = var.ecs_target_capacity
     }
+    managed_draining = "ENABLED"
   }
 }
 
