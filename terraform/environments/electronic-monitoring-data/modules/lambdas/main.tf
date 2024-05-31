@@ -12,7 +12,7 @@ resource "aws_kms_alias" "lambda_env_alias" {
 }
 
 resource "aws_signer_signing_profile" "example" {
-  name       = "${var.function_name}-signing-profile"
+  name = "${substr(replace(var.function_name, "-", "_"), 0, 50)}_signing_profile"
   platform_id = "AWSLambda-SHA384-ECDSA"
 }
 

@@ -12,10 +12,10 @@ data "archive_file" "get_metadata_from_rds" {
     output_path = "${local.lambda_path}/get_metadata_from_rds.zip"
 }
 
-module "get_metadata_from_rds" {
+module "get_metadata_from_rds_lambda" {
   source              = "./modules/lambdas"
   filename = "${local.lambda_path}/get_metadata_from_rds.zip"
-  function_name = "get_metadata_from_rds"
+  function_name = "get-metadata-from-rds"
   role_arn = aws_iam_role.get_metadata_from_rds.arn
   role_name = aws_iam_role.get_metadata_from_rds.name
   handler = "get_metadata_from_rds.handler"

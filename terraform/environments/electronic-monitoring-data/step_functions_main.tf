@@ -9,7 +9,7 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
   "States": {
     "GetMetadataList": {
       "Type": "Task",
-      "Resource": "${aws_lambda_function.get_metadata_from_rds.arn}",
+      "Resource": "${module.get_metadata_from_rds_lambda.lambda_function_arn}",
       "ResultPath": "$.metadata_list",
       "Next": "LoopThroughMetadataList"
     },
