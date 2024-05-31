@@ -39,7 +39,7 @@ data "aws_secretsmanager_secret_version" "elasticache_default_user_password" {
 resource "aws_elasticache_user" "default" {
   count = var.create_elasticache ? 1 : 0
 
-  user_id       = var.name
+  user_id       = "default"
   user_name     = var.name
   access_string = "on ~* +@all"
   engine        = "REDIS"
