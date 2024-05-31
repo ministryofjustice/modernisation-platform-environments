@@ -18,9 +18,9 @@ module "nextcloud_service" {
     }
   ]
 
-  desired_count                      = 3
-  deployment_maximum_percent         = "200"
-  deployment_minimum_healthy_percent = "100"
+  desired_count                      = 1
+  deployment_maximum_percent         = "100"
+  deployment_minimum_healthy_percent = "0"
 
   ecs_service_egress_security_group_ids = [
     for efs in module.nextcloud_efs : {
