@@ -129,7 +129,7 @@ locals {
       "/ansible" = {
         parameters = {
           ssm_bucket = {
-            description = "Ansible S3 bucket"
+            description          = "Ansible S3 bucket"
             value_s3_bucket_name = "s3-bucket"
           }
         }
