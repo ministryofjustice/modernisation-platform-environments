@@ -24,9 +24,17 @@ locals {
     mojo_arkf_internet_egress_exponential_e = "51.149.249.32/29"
     mojo_arkf_internet_egress_vodafone      = "194.33.248.0/29"
 
+
+    ark_dc_external_internet = [
+      "195.59.75.0/24",
+      "194.33.192.0/25",
+      "194.33.193.0/25",
+      "194.33.196.0/25",
+      "194.33.197.0/25"
+    ]
+
     # for devices connected to Prison Networks
     vodafone_wan_nicts_aggregate = "10.80.0.0/12"
-
     # For users without an MOJ Official device, e.g. private prisons
     mojo_azure_landing_zone = "10.192.0.0/16"
 
@@ -53,6 +61,7 @@ locals {
       local.moj_cidr.mojo_arkc_internet_egress_vodafone,
       local.moj_cidr.mojo_arkf_internet_egress_exponential_e,
       local.moj_cidr.mojo_arkf_internet_egress_vodafone,
+      local.moj_cidr.ark_dc_external_internet,
     ])
 
     trusted_moj_enduser_internal = [
