@@ -79,6 +79,13 @@ resource "aws_iam_role_policy_attachment" "lambda_xray_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_xray_policy.arn
 }
 
+resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
+  name              = "/aws/lambda/${var.function_name}"
+  retention_in_days = 400
+  kms_key_id = aws_kms_key.lambda_env_key.id
+}
+
+
 #checkov:skip=CKV_AWS_272
 resource "aws_lambda_function" "this" {
   filename         = var.filename
