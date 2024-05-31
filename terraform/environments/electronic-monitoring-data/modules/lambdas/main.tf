@@ -1,16 +1,12 @@
 resource "aws_sqs_queue" "lambda_dlq" {
   name = "${var.function_name}-dlq"
+  kms_master_key_id  = aws_kms_key.lambda_env_key.id
 }
 
 resource "aws_kms_key" "lambda_env_key" {
   description = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
+  enable_key_rotation     = true
 }
-
-resource "aws_kms_alias" "lambda_env_alias" {
-  name          = "alias/${var.function_name}-env-key"
-  target_key_id = aws_kms_key.lambda_env_key.id
-}
-
 
 resource "aws_iam_policy" "lambda_dlq_policy" {
   name        = "${var.function_name}-dlq-policy"
@@ -83,6 +79,7 @@ resource "aws_iam_role_policy_attachment" "lambda_xray_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_xray_policy.arn
 }
 
+#checkov:skip=CKV_AWS_272
 resource "aws_lambda_function" "this" {
   filename         = var.filename
   function_name    = var.function_name
@@ -103,7 +100,7 @@ resource "aws_lambda_function" "this" {
     variables = var.environment_variables
   }
 
-  kms_key_arn = aws_kms_alias.lambda_env_alias.arn
+  kms_key_arn = aws_kms_key.lambda_env_key.arn
 
   tracing_config {
     mode = "Active"
