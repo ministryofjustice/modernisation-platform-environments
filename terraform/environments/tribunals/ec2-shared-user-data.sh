@@ -1,3 +1,5 @@
+export environmentName='${environmentName}'
+
 <powershell>
 $logFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
 $linkPath = "C:\ProgramData\docker\volumes\tribunals\"
@@ -9,7 +11,7 @@ $tribunalNames = "appeals","transport","care-standards","cicap","employment-appe
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
-"Got environmentName = ${environmentName} ," + ${environmentName} > $logFile
+"Got environmentName = ${environmentName} ," + $env:environmentName > $logFile
 
 "Starting userdata execution" >> $logFile
 
