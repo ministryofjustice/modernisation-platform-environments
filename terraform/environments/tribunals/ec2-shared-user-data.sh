@@ -132,6 +132,8 @@ function InitialSyncToS3 {
 }
 
 # Call the functions using $environmentName
+$instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
+$environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
 InitialSyncToS3
 MonitorAndSyncToS3
 '@
