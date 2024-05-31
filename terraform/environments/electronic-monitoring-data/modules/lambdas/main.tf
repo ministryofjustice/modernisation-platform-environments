@@ -11,19 +11,6 @@ resource "aws_kms_alias" "lambda_env_alias" {
   target_key_id = aws_kms_key.lambda_env_key.id
 }
 
-resource "aws_signer_signing_profile" "example" {
-  name = "${substr(replace(var.function_name, "-", "_"), 0, 50)}_signing_profile"
-  platform_id = "AWSLambda-SHA384-ECDSA"
-}
-
-resource "aws_lambda_code_signing_config" "example" {
-  allowed_publishers {
-    signing_profile_version_arns = [aws_signer_signing_profile.example.arn]
-  }
-  policies {
-    untrusted_artifact_on_deployment = "Enforce"
-  }
-}
 
 resource "aws_iam_policy" "lambda_dlq_policy" {
   name        = "${var.function_name}-dlq-policy"
@@ -39,15 +26,6 @@ resource "aws_iam_policy" "lambda_dlq_policy" {
           "sqs:GetQueueUrl"
         ],
         Resource = aws_sqs_queue.lambda_dlq.arn
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "signer:StartSigningJob",
-          "signer:GetSigningProfile",
-          "signer:DescribeSigningJob"
-        ],
-        Resource = aws_signer_signing_profile.example.arn
       }
     ]
   })
