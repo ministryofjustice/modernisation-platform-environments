@@ -5,6 +5,7 @@ mojap metadata type and writes out the list of metadata for all tables in the da
 
 import awswrangler as wr
 from mojap_metadata.converters.sqlalchemy_converter import SQLAlchemyConverter
+from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from sqlalchemy import create_engine
 import os
 import logging
@@ -45,11 +46,23 @@ def create_glue_database():
     wr.catalog.create_database(name=db_sem_name, exist_ok=True)
 
 
+def upload_to_s3(local_filepath: str, s3_filepath: str) -> None:
+    s3 = boto3.client("s3")
+    bucket_name, key = s3_filepath[5:].split("/", 1)
+
+    try:
+        s3.upload_file(local_filepath, bucket_name, key)
+        logger.info(f"Successfully uploaded {local_filepath} to {s3_filepath}")
+    except (NoCredentialsError, PartialCredentialsError) as e:
+        logger.info(f"Error uploading to S3: {e}")
+
+
 def write_meta_to_s3(meta):
     table_name = meta.name
-    meta.to_json(
-        f"s3://{METADATA_STORE_BUCKET}/database={DB_NAME}/table_name={table_name}/metadata.json"
-    )
+    temp_path = "/tmp/temp.json"
+    s3_path = f"s3://{METADATA_STORE_BUCKET}/database={DB_NAME}/table_name={table_name}/metadata.json"
+    meta.to_json(temp_path)
+    upload_to_s3(temp_path, s3_path)
 
 
 def add_db_to_meta(meta):
