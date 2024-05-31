@@ -56,3 +56,16 @@ resource "aws_route53_record" "external_appeals" {
     evaluate_target_health = true
   }
 }
+
+resource "aws_route53_record" "external_ahmlr" {
+  provider = aws.core-vpc 
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "landregistrationdivision.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = module.ahmlr.tribunals_lb.dns_name
+    zone_id                = module.ahmlr.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
