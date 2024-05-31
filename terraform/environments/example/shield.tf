@@ -1,3 +1,4 @@
+/*
 module "shield" {
   source = "../../modules/shield_advanced"
   providers = {
@@ -10,4 +11,19 @@ module "shield" {
   }
   support_email = jsondecode(data.http.environments_file.response_body).tags.infrastructure-support
   tags          = local.tags
+}
+*/
+
+data "external" "shield_protections" {
+  program = [
+    "bash", "-c",
+    "aws shield list-protections --output json | jq -c '.Protections | map({(.Id): (. | tostring)}) | add'"
+  ]
+}
+
+locals {
+  shield_protections = tomap({
+    for k, v in data.external.shield_protections.result :
+    k => jsondecode(v)
+  })
 }
