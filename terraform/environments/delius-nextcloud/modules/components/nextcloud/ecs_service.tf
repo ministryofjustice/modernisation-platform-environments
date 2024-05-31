@@ -166,7 +166,7 @@ data "aws_iam_policy_document" "access_ldap_secret" {
     ]
   }
   statement {
-    sid = "kms_access"
+    sid = "kmsAccess"
     actions = [
       "kms:Decrypt"
     ]
