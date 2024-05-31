@@ -82,7 +82,6 @@ resource "aws_s3_object" "config" {
     {
       nextcloud_passwordsalt = random_password.nextcloud_password_salt.result,
       nextcloud_secret = data.aws_ssm_parameter.nextcloud_secret.value,
-      nextcloud_id = "nextcloud",
       redis = {
         host = module.nextcloud_service.elasticache_endpoint
         port = module.nextcloud_service.elasticache_port
@@ -92,16 +91,15 @@ resource "aws_s3_object" "config" {
         from_address = "replace"
         domain = "replace"
       }
-      nextcloud_s01ldap_agent_password = "replace"
-      fileshare_user_base = "replace"
-      standard_user_base = "replace"
-      fs_group_prefix = "replace"
+      fileshare_user_base = "ou=Users,dc=moj,dc=com"
+      standard_user_base = "ou=Users,dc=moj,dc=com"
+      fs_group_prefix = "delius"
       ldap_host = "ldap.${var.env_name}.delius-core.hmpps-${var.account_info.mp_environment}.modernisation-platform.internal"
       pwm_url = "pwm.${var.env_name}.delius-core.hmpps-${var.account_info.mp_environment}.modernisation-platform.service.justice.gov.uk"
 
-      fileshare_base_groups = "replace"
-      fileshare_user_base = "replace"
-      standard_user_base = "replace"
+      fileshare_base_groups = "ou=Groups,dc=moj,dc=com"
+      fileshare_user_base = "ou=Users,dc=moj,dc=com"
+      standard_user_base = "ou=Users,dc=moj,dc=com"
 
       ldap_user = "cn=admin,ou=Users,dc=moj,dc=com"
     }
