@@ -8,9 +8,8 @@ $ebsVolumeTag = "tribunals-all-storage"
 $tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","hmlands","lands-chamber", "ftp-admin-appeals", "ftp-tax-tribunal", "ftp-tax-chancery", "ftp-sscs-venues", "ftp-siac", "ftp-primary-health", "ftp-estate-agents", "ftp-consumer-credit", "ftp-claims-management", "ftp-charity-tribunals"
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
-$environmentName = ${environmentName}
 
-"Got environmentName " + $environmentName > $logFile
+"Got environmentName = ${environmentName} ," + ${environmentName} > $logFile
 
 "Starting userdata execution" >> $logFile
 
