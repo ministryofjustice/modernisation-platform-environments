@@ -41,7 +41,7 @@ resource "aws_ssm_parameter" "ldap_admin_password" {
 
 module "ldap_admin_password" {
   source = "../helpers/secret"
-  name  = "ldap_admin_password"
+  name  = "ldap-admin-password"
   description = "LDAP Admin Password"
   tags = var.tags
   kms_key_id = var.account_config.kms_keys.general_shared
