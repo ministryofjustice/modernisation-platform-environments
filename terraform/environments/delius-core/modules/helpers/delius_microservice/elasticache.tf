@@ -40,7 +40,7 @@ resource "aws_elasticache_user" "default" {
   count = var.create_elasticache ? 1 : 0
 
   user_id       = "default"
-  user_name     = var.name
+  user_name     = "default"
   access_string = "on ~* +@all"
   engine        = "REDIS"
 
