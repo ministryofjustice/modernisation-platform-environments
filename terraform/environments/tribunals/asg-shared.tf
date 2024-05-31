@@ -203,6 +203,13 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 #   }
 # }
 
+data "template_file" "user_data" {
+  template = "${filebase64("ec2-shared-user-data.sh")}"
+  vars = {
+    environmentName = "${local.environment}"
+  }
+}
+
 ###########################################################################
 
 
