@@ -65,3 +65,9 @@ variable "environment_variables" {
   description = "A map that defines environment variables for the Lambda function."
   type        = map(string)
 }
+
+variable "reserved_concurrent_executions" {
+  description = "The amount of reserved concurrent executions for the Lambda function."
+  type        = number
+  default     = 10
+}

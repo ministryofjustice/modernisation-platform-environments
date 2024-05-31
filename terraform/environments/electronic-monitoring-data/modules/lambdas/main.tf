@@ -109,5 +109,6 @@ resource "aws_lambda_function" "this" {
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_dlq.arn
   }
+  reserved_concurrent_executions = var.reserved_concurrent_executions
 
 }
