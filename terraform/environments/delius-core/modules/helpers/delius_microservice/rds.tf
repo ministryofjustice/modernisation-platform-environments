@@ -30,16 +30,15 @@ resource "aws_security_group" "db" {
     }
   )
 }
-''
+
 resource "aws_vpc_security_group_ingress_rule" "from_service" {
   count = var.create_rds ? 1 : 0
   security_group_id = aws_security_group.db[0].id
   from_port         = var.rds_port
   to_port           = var.rds_port
-  protocol          = "tcp"
+  ip_protocol          = "tcp"
   referenced_security_group_id = aws_security_group.ecs_service.id
   description       = "Allow RDS traffic from service"
-
 }
 
 resource "aws_db_subnet_group" "this" {
