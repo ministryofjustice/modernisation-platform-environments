@@ -64,40 +64,18 @@ resource "aws_security_group" "ec2" {
   name        = "${local.application_name}-db-security-group"
   description = "APEX DB Server Security Group"
   vpc_id      = data.aws_vpc.shared.id
-  # this ingress rule to be added after the ECS has been setup in MP
-  # ingress {
-  #   description = "database listener port access to ECS security group"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   security_groups = aws_security_group.<ECS_SG>.id #!Ref AppEcsSecurityGroup
-  # }
 
   ingress {
-    description = "database listener port access to lz non prod mgmt cidr"
+    description = "Database listener port access to Workspaces"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].lz_shared_nonprod_mgmt_vpc_cidr]
-  }
-  ingress {
-    description = "database listener port access to lz prod mgmt cidr"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].lz_shared_prod_mgmt_vpc_cidr]
+    cidr_blocks = [local.application_data.accounts[local.environment].workspace_cidr]
   }
   ingress {
     description = "database listener port access to MP development CIDR"
     from_port   = 1521
     to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
-  }
-  ingress {
-    description = "inbound ssh access for Lambda"
-    from_port   = 22
-    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
   }
@@ -122,6 +100,24 @@ resource "aws_security_group" "ec2" {
     { "Name" = "${local.application_name}-db-security-group" }
   )
 
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ecs_database" {
+  security_group_id            = aws_security_group.ec2.id
+  description                  = "Allow ECS to access database instance"
+  referenced_security_group_id = module.apex-ecs.cluster_ec2_security_group_id
+  from_port                    = 1521
+  ip_protocol                  = "tcp"
+  to_port                      = 1521
+}
+
+resource "aws_vpc_security_group_ingress_rule" "lambda" {
+  security_group_id            = aws_security_group.ec2.id
+  description                  = "Allow Lambda SSH access for backup snapshots"
+  referenced_security_group_id = aws_security_group.lambdasg.id
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
 }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
