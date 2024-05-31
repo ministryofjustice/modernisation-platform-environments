@@ -36,7 +36,7 @@ data "aws_secretsmanager_secret_version" "elasticache_default_user_password" {
   secret_id = module.elasticache_default_user_password.secret.id
 }
 
-resource "aws_elasticache_user" "default" {
+resource "aws_elasticache_user" "app_default" {
   count = var.create_elasticache ? 1 : 0
 
   user_id       = var.name

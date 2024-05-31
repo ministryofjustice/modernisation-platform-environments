@@ -7,7 +7,7 @@ resource "aws_secretsmanager_secret" "this" {
 
 resource "aws_secretsmanager_secret_version" "this" {
   secret_id     = aws_secretsmanager_secret.this.id
-  secret_string = random_password.keepers.generate_random_password ? random_password.this.result : "replace-me"
+  secret_string = random_password.this[0].keepers.generate_random_password ? random_password.this[0].result : "replace-me"
 }
 
 resource "random_password" "this" {
