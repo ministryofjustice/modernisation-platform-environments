@@ -11,7 +11,8 @@ locals {
   calculated_container_secrets = merge(
     var.container_secrets_default,
     var.container_secrets_env_specific,
-    local.rds_secrets
+    local.rds_secrets,
+    local.elasticache_secrets
   )
 
   calculated_container_secrets_list = flatten([
