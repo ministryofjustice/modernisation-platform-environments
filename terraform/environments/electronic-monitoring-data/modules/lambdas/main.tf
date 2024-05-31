@@ -14,7 +14,7 @@ resource "aws_kms_alias" "lambda_env_alias" {
 
 resource "aws_iam_policy" "lambda_dlq_policy" {
   name        = "${var.function_name}-dlq-policy"
-  description = "Policy for Lambda to use DLQ and Code Signing for ${var.function_name}"
+  description = "Policy for Lambda to use DLQ for ${var.function_name}"
   policy      = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -113,5 +113,4 @@ resource "aws_lambda_function" "this" {
     target_arn = aws_sqs_queue.lambda_dlq.arn
   }
 
-  code_signing_config_arn = aws_lambda_code_signing_config.example.arn
 }
