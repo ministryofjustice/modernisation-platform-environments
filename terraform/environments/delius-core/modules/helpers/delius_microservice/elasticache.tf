@@ -29,6 +29,7 @@ module "elasticache_default_user_password" {
   description = "Elasticache Default User Password"
   tags = var.tags
   kms_key_id = var.account_config.kms_keys.general_shared
+  generate_random_password = true
 }
 
 data "aws_secretsmanager_secret_version" "elasticache_default_user_password" {
