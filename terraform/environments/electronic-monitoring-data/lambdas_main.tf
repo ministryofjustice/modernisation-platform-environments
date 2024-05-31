@@ -2,19 +2,15 @@ locals {
     lambda_path = "lambdas"
     db_name = local.is-production ? "g4s_cap_dw" : "test"
 }
-# ------------------
-# Zip Files
-# ------------------
+# ------------------------------------------------------
+# Get Metadata from RDS Function
+# ------------------------------------------------------
 
 data "archive_file" "get_metadata_from_rds" {
     type = "zip"
     source_file = "${local.lambda_path}/get_metadata_from_rds.py"
     output_path = "${local.lambda_path}/get_metadata_from_rds.zip"
 }
-
-# ------------------
-# Lambda Functions
-# ------------------
 
 resource "aws_lambda_function" "get_metadata_from_rds" {
     filename = "${local.lambda_path}/get_metadata_from_rds.zip"
@@ -40,9 +36,15 @@ resource "aws_lambda_function" "get_metadata_from_rds" {
       variables = {
         SECRET_NAME = aws_secretsmanager_secret.db_glue_connection.name
         DB_NAME = local.db_name
+        METDATA_STORE_BUCKET = module.metadata-s3-bucket.bucket.name
       }
     }
 }
+
+
+# ------------------------------------------------------
+# Create Individual Athena Semantic Layer Function
+# ------------------------------------------------------
 
 
 data "archive_file" "create_athena_external_table" {
@@ -50,10 +52,6 @@ data "archive_file" "create_athena_external_table" {
     source_file = "${local.lambda_path}/create_athena_external_table.py"
     output_path = "${local.lambda_path}/create_athena_external_table.zip"
 }
-
-# ------------------
-# Lambda Functions
-# ------------------
 
 resource "aws_lambda_function" "create_athena_external_table" {
     filename = "${local.lambda_path}/create_athena_external_table.zip"

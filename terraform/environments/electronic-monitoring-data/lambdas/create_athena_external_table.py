@@ -1,3 +1,7 @@
+"""
+For a given table in a database, create a table in the glue catalog given metadata
+"""
+
 import awswrangler as wr
 from mojap_metadata.converters.glue_converter import GlueConverter, GlueConverterOptions
 from mojap_metadata import Metadata
