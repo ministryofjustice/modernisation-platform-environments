@@ -180,7 +180,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
 
   # user_data = filebase64("ec2-shared-user-data.sh")
 
-  user_data = data.template_file.user_data.rendered
+  user_data = filebase64(data.template_file.user_data.rendered)
 }
 
 data "template_file" "user_data" {
