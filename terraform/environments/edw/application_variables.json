@@ -63,13 +63,13 @@
       "edw_disk_device": "/dev/xvdf",
       "edw_disk_fs_type": "ext4",
       "edw_metric_supplied_by": "",
-      "edw_oracle_alerts_logmetroc_filter_pattern": '"ORA-"',
-      "edw_rman_logmetric_filter_pattern": "?ERRORs ?Errors ?errors ?ERROR ?Error ?error",
-      "edw_rman_arc_logmetric_filter_pattern": "?FAILURE ?Failure ?failure",
-      "edw_tbs_freespace_logmetric_filter_pattern": "ALERT",
-      "edw_pmon_status_logmetroc_filter_pattern": "DOWN",
-      "edw_cdc_status_logmetric_filter_pattern": '[APPLY_NAME, STATUS="DISABLED"]',
-      "edw_cdc_status_logmetric_filter_pattern2": '[SOURCE_NAME ,SOURCE_ENABLED="N"]'
+      "edw_oracle_alerts_logmetroc_pattern": ""ORA-"",
+      "edw_rman_logmetric_pattern": "?ERRORs ?Errors ?errors ?ERROR ?Error ?error",
+      "edw_rman_arc_logmetric_pattern": "?FAILURE ?Failure ?failure",
+      "edw_tbs_freespace_logmetric_pattern": "ALERT",
+      "edw_pmon_status_logmetroc_pattern": "DOWN",
+      "edw_cdc_status_logmetric_pattern": "[APPLY_NAME, STATUS="DISABLED"]",
+      "edw_cdc_status_logmetric_pattern2": "[SOURCE_NAME ,SOURCE_ENABLED="N"]"
     },
     "test": {
       "example_var": "test-data"

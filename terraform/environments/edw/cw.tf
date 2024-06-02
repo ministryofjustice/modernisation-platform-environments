@@ -188,10 +188,10 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmOracleAlerts" {
   ok_actions          = aws_sns_topic.edw_alerting_topic.arn
 }
 
-resource "aws_cloudwatch_metric_filter" "EDWLogsMetricFilterOracleAlerts" {
+resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterOracleAlerts" {
   name           = "EDWLogsMetricFilterOracleAlerts"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupNameOracleAlerts.name
-  filter_pattern = local.application_data.accounts[local.environment].edw_oracle_alerts_logmetroc_filter_pattern
+  pattern = local.application_data.accounts[local.environment].edw_oracle_alerts_logmetroc_pattern
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metrics_oracle_alerts}"
@@ -216,10 +216,10 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmTBSFreespace" {
   ok_actions    = aws_sns_topic.edw_alerting_topic.arn
 }
 
-resource "aws_cloudwatch_metric_filter" "EDWLogsMetricFilterTBSFreespace" {
+resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterTBSFreespace" {
   name           = "EDWLogsMetricFilterTBSFreespace"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupTBSFreespace.name
-  filter_pattern = local.application_data.accounts[local.environment].edw_tbs_freespace_logmetric_filter_pattern
+  pattern = local.application_data.accounts[local.environment].edw_tbs_freespace_logmetric_pattern
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metrics_tbs_freespace}"
@@ -244,10 +244,10 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmPMONstatus" {
   ok_actions    = aws_sns_topic.edw_alerting_topic.arn
 }
 
-resource "aws_cloudwatch_metric_filter" "EDWLogsMetricFilterPMONstatus" {
+resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterPMONstatus" {
   name           = "EDWLogsMetricFilterPMONstatus"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupPMONstatus.name
-  filter_pattern = local.application_data.accounts[local.environment].edw_pmon_status_logmetroc_filter_pattern
+  pattern = local.application_data.accounts[local.environment].edw_pmon_status_logmetroc_pattern
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_pmon_status}"
@@ -272,10 +272,10 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus" {
   ok_actions    = aws_sns_topic.edw_alerting_topic.arn
 }
 
-resource "aws_cloudwatch_metric_filter" "EDWLogsMetricFilterCDCstatus" {
+resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus" {
   name           = "EDWLogsMetricFilterCDCstatus"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupCDCstatus.name
-  filter_pattern = local.application_data.accounts[local.environment].edw_cdc_status_logmetric_filter_pattern
+  pattern = local.application_data.accounts[local.environment].edw_cdc_status_logmetric_pattern
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].local.application_data.accounts[local.environment].edw_log_metric_cdc_status}"
@@ -300,10 +300,10 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus2" {
   ok_actions    = aws_sns_topic.edw_alerting_topic.arn
 }
 
-resource "aws_cloudwatch_metric_filter" "EDWLogsMetricFilterCDCstatus2" {
+resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus2" {
   name           = "EDWLogsMetricFilterCDCstatus2"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupCDCstatus.name
-  filter_pattern = local.application_data.accounts[local.environment].edw_cdc_status_logmetric_filter_pattern2
+  pattern = local.application_data.accounts[local.environment].edw_cdc_status_logmetric_pattern2
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].local.application_data.accounts[local.environment].edw_log_metric_cdc_status2}"
@@ -328,10 +328,10 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanBackup" {
   ok_actions    = aws_sns_topic.edw_alerting_topic.arn
 }
 
-resource "aws_cloudwatch_metric_filter" "EDWLogsMetricFilterRmanBackup" {
+resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanBackup" {
   name           = "EDWLogsMetricFilterRmanBackup"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupRman.name
-  filter_pattern = local.application_data.accounts[local.environment].edw_rman_logmetric_filter_pattern
+  pattern = local.application_data.accounts[local.environment].edw_rman_logmetric_pattern
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].LogMetricNameRmanBackup}"
@@ -356,10 +356,10 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanArchBackup" {
   ok_actions    = aws_sns_topic.edw_alerting_topic.arn
 }
 
-resource "aws_cloudwatch_metric_filter" "EDWLogsMetricFilterRmanArchBackup" {
+resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanArchBackup" {
   name           = "EDWLogsMetricFilterRmanArchBackup"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupRmanArch.name
-  filter_pattern = local.application_data.accounts[local.environment].edw_rman_arc_logmetric_filter_pattern
+  pattern = local.application_data.accounts[local.environment].edw_rman_arc_logmetric_pattern
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_name_rman_arch_backup}"
