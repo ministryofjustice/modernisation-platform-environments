@@ -150,8 +150,8 @@ EOF
 resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = 400
-  kms_key_id = aws_kms_key.cloudwatch_env_key.id
-  depends_on = [aws_kms_key.lambda_env_key]
+  kms_key_id = aws_kms_key.cloudwatch_env_key.arn
+#   depends_on = [aws_kms_key.lambda_env_key]
 }
 
 
