@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
             actions   = [
                 "lambda:InvokeFunction"
             ]
-            resources = [aws_lambda_function.create_athena_external_table.arn]
+            resources = [module.create_athena_external_table.lambda_function_arn]
         }
 
     statement {

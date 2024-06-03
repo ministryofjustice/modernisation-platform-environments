@@ -66,7 +66,6 @@ module "create_athena_external_table" {
       aws_lambda_layer_version.create_external_athena_tables_layer.arn
       ]
     source_code_hash = data.archive_file.create_athena_external_table.output_base64sha256
-    depends_on    = [aws_cloudwatch_log_group.create_athena_external_table_lambda]
     timeout = 900
     memory_size = 1024
     runtime = "python3.11"
@@ -100,7 +99,6 @@ module "send_metadata_to_ap" {
     handler = "send_metadata_to_ap.handler"
     source_code_hash = data.archive_file.send_metadata_to_ap.output_base64sha256
     layers = null
-    depends_on    = [aws_cloudwatch_log_group.send_metadata_to_ap]
     timeout = 900
     memory_size = 1024
     runtime = "python3.11"
