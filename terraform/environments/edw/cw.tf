@@ -190,7 +190,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmOracleAlerts" {
 
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterOracleAlerts" {
   name           = "EDWLogsMetricFilterOracleAlerts"
-  log_group_name = aws_cloudwatch_log_group.EDWLogGroupNameOracleAlerts.name
+  log_group_name = aws_cloudwatch_log_group.EDWLogGroupOracleAlerts.name
   pattern = "'ORA-'"
 
   metric_transformation {
