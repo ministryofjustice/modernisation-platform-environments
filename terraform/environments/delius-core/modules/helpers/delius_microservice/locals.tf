@@ -29,7 +29,7 @@ locals {
     var.container_vars_env_specific,
     local.rds_env_vars,
     local.elasticache_endpoint_env_var,
-    elasticache_user_env_vars
+    local.elasticache_user_env_var
   )
 
   calculated_container_vars_list = flatten([
@@ -54,7 +54,7 @@ locals {
     (var.elasticache_endpoint_environment_variable) = aws_elasticache_cluster.this[0].cluster_address
   } : {}
 
-  elasticache_user_env_vars = var.elasticache_user_variable != "" ? {
+  elasticache_user_env_var = var.elasticache_user_variable != "" ? {
     (var.elasticache_user_variable) = var.name
   } : {}
 
