@@ -17,10 +17,13 @@ data "external" "shield_waf" {
 }
 
 locals {
-  shield_protections = tomap({
-    for k, v in data.external.shield_protections.result :
-    k => jsondecode(v)
-  })
+  shield_protections_json = {
+    for k, v in data.external.shield_protections.result : k => v
+  }
+
+  shield_protections = {
+    for k, v in local.shield_protections_json : k => jsondecode(v)
+  }
 }
 
 resource "aws_shield_drt_access_role_arn_association" "main" {
