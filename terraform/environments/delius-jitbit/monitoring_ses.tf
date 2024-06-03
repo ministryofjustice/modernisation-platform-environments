@@ -1,10 +1,10 @@
 resource "aws_cloudwatch_metric_alarm" "bounce_rate_over_warning_threshold" {
-  alarm_name          = "jitbit-rds-bounce-rate-threshold"
-  alarm_description   = "Triggers alarm if SES bounce rate crosses a threshold"
+  alarm_name          = "jitbit-ses-bounce-rate-warning-threshold"
+  alarm_description   = "Triggers alarm if SES bounce rate crosses a warning threshold"
   namespace           = "AWS/SES"
   metric_name         = "Reputation.BounceRate"
   statistic           = "Average"
-  period              = "60"
+  period              = "300"
   evaluation_periods  = "5"
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
@@ -21,12 +21,12 @@ resource "aws_cloudwatch_metric_alarm" "bounce_rate_over_warning_threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "bounce_rate_over_critical_threshold" {
-  alarm_name          = "jitbit-rds-bounce-rate-critical-threshold"
+  alarm_name          = "jitbit-ses-bounce-rate-critical-threshold"
   alarm_description   = "Triggers alarm if SES bounce rate crosses a critical threshold"
   namespace           = "AWS/SES"
   metric_name         = "Reputation.BounceRate"
   statistic           = "Average"
-  period              = "60"
+  period              = "300"
   evaluation_periods  = "5"
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
