@@ -1,0 +1,9 @@
+{
+  "keys": {
+    "development": {
+      "fani": ""
+    },
+    "preproduction": {},
+    "production": {}
+  }
+}
