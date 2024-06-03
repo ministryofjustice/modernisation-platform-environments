@@ -38,11 +38,11 @@ locals {
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
     module.ip_addresses.moj_cidrs.trusted_mojo_public, 
+    module.ip_addresses.moj_cidr.ark_dc_external_internet,
+    module.ip_addresses.moj_cidr.vodafone_dia_networks,
+    module.ip_addresses.moj_cidr.palo_alto_primsa_access_corporate,
+    module.ip_addresses.moj_cidr.digital_prisons,
     [
-      "20.49.214.199/32", # Azure Landing Zone Egress
-      "20.49.214.228/32", # Azure Landing Zone Egress
-      "20.26.11.71/32",   # Azure Landing Zone Egress
-      "20.26.11.108/32",  # Azure Landing Zone Egress
       # Route53 Healthcheck Access Cidrs
       # London Region not support yet, so metrics are not yet publised, can be enabled at later stage for Route53 endpoint monitor
       "15.177.0.0/18",     # GLOBAL Region
