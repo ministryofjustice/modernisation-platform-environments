@@ -101,6 +101,44 @@ resource "aws_s3_bucket_lifecycle_configuration" "chaps_lb_logs_lifecycle" {
   }
 }
 
+resource "aws_iam_role" "lb_logging_role" {
+  name = "lb-logging-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Principal = {
+          Service = "elasticloadbalancing.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "lb_logging_policy" {
+  name = "lb-logging-policy"
+  policy = jsonencode({
+    Version   = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ],
+        Resource = "${aws_s3_bucket.chaps_lb_logs.arn}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lb_logging_policy_attachment" {
+  role       = aws_iam_role.lb_logging_role.name
+  policy_arn = aws_iam_policy.elb_logging_policy.arn
+}
+ 
 resource "aws_s3_bucket_policy" "chaps_lb_logs_bucket_policy" {
   bucket = aws_s3_bucket.chaps_lb_logs.id
 
@@ -115,7 +153,7 @@ resource "aws_s3_bucket_policy" "chaps_lb_logs_bucket_policy" {
         Action   = [
           "s3:PutObject",
           "s3:PutObjectAcl"
-        ]
+        ],
         Resource = "${aws_s3_bucket.chaps_lb_logs.arn}/*"
         Condition = {
           StringEquals = {
