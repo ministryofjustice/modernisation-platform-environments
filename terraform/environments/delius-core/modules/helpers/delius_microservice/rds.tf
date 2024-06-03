@@ -18,6 +18,9 @@ resource "aws_security_group" "db" {
       Name = "${var.name}-${var.env_name}-db_security_group"
     }
   )
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
  resource "aws_vpc_security_group_ingress_rule" "rds_from_custom" {
