@@ -57,7 +57,7 @@ resource "aws_security_group" "jitbit_sandbox" {
 
   vpc_id      = data.aws_vpc.shared.id
   name        = format("hmpps-%s-%s-service", "sandbox", local.application_name)
-  description = "Security group for the ${local.application_name} service"
+  description = "Security group for the ${local.application_name} sandbox service"
   tags        = local.tags
 
   lifecycle {
@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "alb_sandbox" {
   from_port                = local.app_port
   to_port                  = local.app_port
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.load_balancer_security_group_sandbox[0].id
+  source_security_group_id = aws_security_group.load_balancer_security_group.id
   security_group_id        = aws_security_group.jitbit_sandbox[0].id
 }
 
