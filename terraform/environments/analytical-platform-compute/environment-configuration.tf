@@ -16,6 +16,8 @@ locals {
   eks_cloudwatch_log_group_name              = "/aws/eks/${local.eks_cluster_name}/logs"
   eks_cloudwatch_log_group_retention_in_days = 400
 
+  /* Kube Prometheus Stack */
+  prometheus_operator_crd_version = "v0.74.0"
 
   /* Environment Configuration */
   environment_configuration = local.environment_configurations[local.environment]

@@ -1,6 +1,10 @@
 ---
 namespaceOverride: aws-observability
 
+# These are handled by kubernetes_manifest.prometheus_operator_crds
+crds:
+  enabled: false
+
 defaultRules:
   create: false
 
