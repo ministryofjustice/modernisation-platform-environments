@@ -27,12 +27,8 @@ locals {
           flash = { total_size = 500 }
         })
         instance = merge(local.defaults_database_ec2.instance, {
-          tags = merge(local.defaults_database_ec2.instance.tags, {
-            instance-scheduling = null # TODO remove this 
-          })
         })
         tags = merge(local.defaults_database_ec2.tags, {
-          backup        = "false" # opt out of mod platform default backup plan TODO - apply to all
           pre-migration = "PDCDL00013"
           description   = "PD CSR Oracle primary DB server"
           ami           = "base_ol_8_5"
@@ -57,7 +53,6 @@ locals {
           flash = { total_size = 500 }
         })
         instance = merge(local.defaults_database_ec2.instance, {
-          disable_api_stop = true
         })
         tags = merge(local.defaults_database_ec2.tags, {
           pre-migration = "PDCDL00014"
@@ -350,7 +345,7 @@ locals {
     lbs = {
       r12 = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
@@ -527,7 +522,7 @@ locals {
       }
       r34 = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
@@ -703,7 +698,7 @@ locals {
       }
       r56 = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [

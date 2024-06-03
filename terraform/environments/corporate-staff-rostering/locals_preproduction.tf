@@ -27,13 +27,11 @@ locals {
           flash = { total_size = 100 }
         })
         instance = merge(local.defaults_database_ec2.instance, {
-          disable_api_stop = true
         })
         tags = merge(local.defaults_database_ec2.tags, {
           pre-migration = "PPCDL00019"
           description   = "PP CSR DB server"
           server-type   = "csr-db"
-          component     = "test" # should be data
           oracle-sids   = "PPIWFM"
         })
       })
@@ -178,7 +176,6 @@ locals {
           pre-migration = "PPCAW00015"
           description   = "Application Server Training A"
           ami           = "pp-csr-a-15-a"
-          component     = "trainingA"
         })
       })
 
@@ -200,7 +197,6 @@ locals {
           pre-migration = "PPCAW00016"
           description   = "Application Server Training B"
           ami           = "pp-csr-a-16-b"
-          component     = "trainingB"
         })
       })
 
@@ -343,7 +339,6 @@ locals {
           pre-migration = "PPCWW00003"
           description   = "Web Server Training A and B"
           ami           = "pp-csr-w-3-a"
-          component     = "trainingab"
         })
       })
 
@@ -365,7 +360,6 @@ locals {
           pre-migration = "PPCWW00004"
           description   = "Web Server Training A and B"
           ami           = "pp-csr-w-4-b"
-          component     = "trainingab"
         })
       })
     }
@@ -413,7 +407,7 @@ locals {
     lbs = {
       r12 = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
@@ -581,7 +575,7 @@ locals {
       }
       r34 = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
@@ -749,7 +743,7 @@ locals {
       }
       r56 = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
@@ -917,7 +911,7 @@ locals {
       }
       trainab = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [

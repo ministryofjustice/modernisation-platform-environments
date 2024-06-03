@@ -107,7 +107,7 @@ locals {
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       disable_api_termination = true
-      disable_api_stop        = true
+      disable_api_stop        = false
       monitoring              = true
       tags = {
         backup-plan         = "daily-and-weekly"
@@ -120,6 +120,7 @@ locals {
   defaults_database_ec2 = merge(local.defaults_ec2, {
     cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.database
     instance = merge(local.defaults_ec2.instance, {
+      disable_api_termination      = true
       disable_api_stop             = false
       instance_type                = "r6i.xlarge"
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
@@ -152,6 +153,7 @@ locals {
     user_data_cloud_init   = module.baseline_presets.ec2_instance.user_data_cloud_init.ansible
     tags = {
       ami         = "base_ol_8_5"
+      backup      = "false" # disable mod platform backup since we use our own policies
       os-type     = "Linux"
       component   = "data"
       server-type = "csr-db"
@@ -165,6 +167,7 @@ locals {
       vpc_security_group_ids = ["domain", "app", "jumpserver"]
     })
     tags = {
+      backup    = "false" # disable mod platform backup since we use our own policies
       os-type   = "Windows"
       component = "app"
     }
@@ -176,6 +179,7 @@ locals {
     })
     cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.web
     tags = {
+      backup    = "false" # disable mod platform backup since we use our own policies
       os-type   = "Windows"
       component = "web"
     }
