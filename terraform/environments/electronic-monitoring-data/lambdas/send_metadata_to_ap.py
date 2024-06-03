@@ -29,8 +29,8 @@ def handler(event, context):
     )
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
 
-    project_name = "electronic-monitoring"
-    destination_key = f"landing/{project_name}/metadata/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
+    project_name = "electronic-monitoring-metadata"
+    destination_key = f"landing/{project_name}/data/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
     logger.info(f"Copying to: {destination_bucket}, {destination_key}")
     # Specify from where file needs to be copied
     copy_object = {"Bucket": source_bucket_name, "Key": file_key}

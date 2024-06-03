@@ -113,8 +113,8 @@ module "send_metadata_to_ap" {
     }
 }
 
-resource "aws_lambda_permission" "em_ap_transfer_lambda" {
-  statement_id  = "AllowS3ObjectInvoke"
+resource "aws_lambda_permission" "send_metadata_to_ap" {
+  statement_id  = "AllowS3ObjectMetaInvoke"
   action        = "lambda:InvokeFunction"
   function_name = module.send_metadata_to_ap.lambda_function_arn
   principal     = "s3.amazonaws.com"
