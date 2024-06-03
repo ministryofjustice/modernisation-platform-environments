@@ -38,6 +38,10 @@ resource "aws_security_group" "load_balancer_security_group" {
       Name = "${local.application_name}-loadbalancer-security-group"
     }
   )
+
+  lifecycle {
+    create_before_destroy = true 
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule" {
