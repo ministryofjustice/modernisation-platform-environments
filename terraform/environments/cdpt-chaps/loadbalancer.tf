@@ -73,7 +73,7 @@ resource "aws_lb_listener" "https_listener" {
 }
 
 resource "aws_s3_bucket" "chaps_lb_logs" {
-  bucket = "chaps_lb_logs_bucket"
+  bucket = "chaps-lb-logs-bucket"
   acl = "private"
 
   versioning {
