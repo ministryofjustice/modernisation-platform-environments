@@ -74,7 +74,6 @@ resource "aws_lb_listener" "https_listener" {
 
 resource "aws_s3_bucket" "chaps_lb_logs" {
   bucket = "chaps-lb-logs-bucket"
-  object_lock_enabled_for_bucket = false
 }
 
 resource "aws_s3_bucket_versioning" "chaps_lb_logs_versioning" {
