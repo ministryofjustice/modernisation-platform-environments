@@ -75,8 +75,8 @@ locals {
     ahmlr = module.ahmlr
   }
   sftp_modules = {
-    charity = module.charity_tribunal_decisions
-    claims = module.claims_management_decisions
+    charity_tribunal_decisions = module.charity_tribunal_decisions
+    claims_management_decisions = module.claims_management_decisions
   }
 }
 
