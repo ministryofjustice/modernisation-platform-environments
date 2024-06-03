@@ -48,9 +48,9 @@ locals {
   baseline_all_environments = {
     cloudwatch_dashboards = {
       "hmpps-oem-${local.environment}" = {
+        account_name   = "hmpps-oem-${local.environment}"
         periodOverride = "auto"
         start          = "-PT6H"
-        accountId      = "module.environment.account_ids.hmpps-oem-${local.environment}"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
@@ -60,9 +60,9 @@ locals {
         ]
       }
       "nomis-${local.environment}" = {
+        account_name   = "nomis-${local.environment}"
         periodOverride = "auto"
         start          = "-PT6H"
-        accountId      = "module.environment.account_ids.nomis-${local.environment}"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
@@ -74,9 +74,9 @@ locals {
         ]
       }
       "corporate-staff-rostering-${local.environment}" = {
+        account_name   = "corporate-staff-rostering-${local.environment}"
         periodOverride = "auto"
         start          = "-PT6H"
-        accountId      = "module.environment.account_ids.corporate-staff-rostering-${local.environment}"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,

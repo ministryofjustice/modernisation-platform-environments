@@ -31,6 +31,7 @@ module "cloudwatch_dashboard" {
   source = "../../modules/cloudwatch_dashboard"
 
   dashboard_name = each.key
+  accountId      = each.value.account_name == null ? null : var.environment.account_ids[each.value.account_name]
   periodOverride = each.value.periodOverride
   start          = each.value.start
   widget_groups  = each.value.widget_groups
