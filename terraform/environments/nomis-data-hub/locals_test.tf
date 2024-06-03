@@ -97,7 +97,27 @@ locals {
       })
     }
 
+    baseline_ssm_parameters = {
+      "/offloc" = {
+        parameters = {
+          offloc_bucket_name = {
+            description          = "The name of the offloc upload bucket"
+            value_s3_bucket_name = "offloc-upload"
+          }
+        }
+      }
+    }
+
+
     baseline_s3_buckets = {
+
+      offloc-upload = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
 
       # the shared image builder bucket is just created in one account
       nomis-data-hub-software = {

@@ -25,6 +25,17 @@ locals {
   )
 }
 
+module "cloudwatch_dashboard" {
+  for_each = var.cloudwatch_dashboards
+
+  source = "../../modules/cloudwatch_dashboard"
+
+  dashboard_name = each.key
+  periodOverride = each.value.periodOverride
+  start          = each.value.start
+  widget_groups  = each.value.widget_groups
+}
+
 resource "aws_cloudwatch_log_group" "this" {
   for_each = var.cloudwatch_log_groups
 

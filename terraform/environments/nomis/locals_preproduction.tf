@@ -1,129 +1,49 @@
-# nomis-preproduction environment settings
 locals {
 
-  # cloudwatch monitoring config
-  preproduction_cloudwatch_monitoring_options = {}
+  lb_maintenance_message_preproduction = {
+    maintenance_title   = "Prison-NOMIS Maintenance Window"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+  }
 
-  # baseline presets config
-  preproduction_baseline_presets_options = {
-    sns_topics = {
-      pagerduty_integrations = {
-        dso_pagerduty               = "nomis_alarms"
-        dba_pagerduty               = "hmpps_shef_dba_low_priority"
-        dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
+  baseline_presets_preproduction = {
+    options = {
+      sns_topics = {
+        pagerduty_integrations = {
+          dso_pagerduty               = "nomis_alarms"
+          dba_pagerduty               = "hmpps_shef_dba_low_priority"
+          dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
+        }
       }
-    }
-    route53_resolver_rules = {
-      outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
+      route53_resolver_rules = {
+        outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
+      }
     }
   }
 
-  # baseline config
-  preproduction_config = {
+  # please keep resources in alphabetical order
+  baseline_preproduction = {
 
-    baseline_s3_buckets = {
-      nomis-audit-archives = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-        lifecycle_rule = [
-          module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
-        ]
-      }
-      nomis-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-      }
-    }
-
-    baseline_acm_certificates = {
+    acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
-        domain_name = module.environment.domains.public.modernisation_platform
+        domain_name = "modernisation-platform.service.justice.gov.uk"
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",
-          "*.${local.environment}.nomis.service.justice.gov.uk",
-          "*.${local.environment}.nomis.az.justice.gov.uk",
+          "*.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+          "*.preproduction.nomis.service.justice.gov.uk",
+          "*.preproduction.nomis.az.justice.gov.uk",
           "*.pp-nomis.az.justice.gov.uk",
           "*.lsast-nomis.az.justice.gov.uk",
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
-          description = "wildcard cert for nomis ${local.environment} domains"
+          description = "wildcard cert for nomis preproduction domains"
         }
       }
     }
 
-    baseline_iam_policies = {
-      Ec2PreprodDatabasePolicy = {
-        description = "Permissions required for Preprod Database EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "s3:GetBucketLocation",
-              "s3:GetObject",
-              "s3:GetObjectTagging",
-              "s3:ListBucket",
-            ]
-            resources = [
-              "arn:aws:s3:::nomis-db-backup-bucket*",
-              "arn:aws:s3:::nomis-audit-archives*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
-            ]
-          }
-        ]
-      }
-      Ec2PreprodWeblogicPolicy = {
-        description = "Permissions required for Preprod Weblogic EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/preprod/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/weblogic-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/weblogic-*",
-            ]
-          }
-        ]
-      }
-    }
-
-    baseline_secretsmanager_secrets = {
-      "/oracle/weblogic/preprod"  = local.weblogic_secretsmanager_secrets
-      "/oracle/database/PPCNOM"   = local.database_nomis_secretsmanager_secrets
-      "/oracle/database/PPCNOMHA" = local.database_secretsmanager_secrets
-      "/oracle/database/PPNDH"    = local.database_secretsmanager_secrets
-      "/oracle/database/PPTRDAT"  = local.database_secretsmanager_secrets
-      "/oracle/database/PPCNMAUD" = local.database_secretsmanager_secrets
-      "/oracle/database/PPMIS"    = local.database_mis_secretsmanager_secrets
-    }
-
-    baseline_ec2_autoscaling_groups = {
+    ec2_autoscaling_groups = {
       # ACTIVE (blue deployment)
       preprod-nomis-web-a = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
@@ -185,8 +105,38 @@ locals {
       preprod-nomis-client-a = local.jumpserver_ec2
     }
 
+    ec2_instances = {
+      lsast-nomis-db-1-a = merge(local.database_ec2, {
+        #cloudwatch_metric_alarms = merge(
+        #  local.database_ec2_cloudwatch_metric_alarms.standard,
+        #  local.database_ec2_cloudwatch_metric_alarms.db_connected,
+        #)
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2LsastDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 5000 }
+          flash = { total_size = 500 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "lsast"
+          description       = "lsast database for CNOM and MIS"
+          oracle-sids       = ""
+        })
+      })
 
-    baseline_ec2_instances = {
       preprod-nomis-db-1-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
@@ -194,7 +144,7 @@ locals {
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
@@ -208,7 +158,8 @@ locals {
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
@@ -223,7 +174,7 @@ locals {
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "${local.region}b"
+          availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
@@ -237,12 +188,13 @@ locals {
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
           description       = "Disaster-Recovery/High-Availability pre-production database for CNOMPP"
-          oracle-sids       = "" # TODO
+          oracle-sids       = "PPCNOMHA"
         })
       })
 
@@ -254,7 +206,7 @@ locals {
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
@@ -268,7 +220,8 @@ locals {
           flash = { total_size = 1000 }
         })
         instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "preprod"
@@ -282,7 +235,7 @@ locals {
         cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
             "Ec2PreprodWeblogicPolicy",
           ])
@@ -302,7 +255,103 @@ locals {
       })
     }
 
-    baseline_lbs = {
+    iam_policies = {
+      Ec2LsastDatabasePolicy = {
+        description = "Permissions required for Lsast Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::nomis-db-backup-bucket*",
+              "arn:aws:s3:::nomis-audit-archives*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
+            ]
+          }
+        ]
+      }
+      Ec2PreprodDatabasePolicy = {
+        description = "Permissions required for Preprod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::nomis-db-backup-bucket*",
+              "arn:aws:s3:::nomis-audit-archives*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
+            ]
+          }
+        ]
+      }
+      Ec2PreprodWeblogicPolicy = {
+        description = "Permissions required for Preprod Weblogic EC2s"
+        statements = concat(local.weblogic_iam_policy_statements, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/preprod/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/weblogic-*",
+            ]
+          }
+        ])
+      }
+    }
+
+    lbs = {
       private = {
         internal_lb              = true
         enable_delete_protection = false
@@ -314,55 +363,79 @@ locals {
         listeners = {
           http = local.weblogic_lb_listeners.http
 
-          https = merge(
-            local.weblogic_lb_listeners.https, {
-              alarm_target_group_names = [
-                "preprod-nomis-web-a-http-7777",
-                # "preprod-nomis-web-b-http-7777",
-              ]
-              rules = {
-                preprod-nomis-web-a-http-7777 = {
-                  priority = 200
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "preprod-nomis-web-a-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
-                        "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
-                        "c.preproduction.nomis.az.justice.gov.uk",
-                        "c.preproduction.nomis.service.justice.gov.uk",
-                        "c.pp-nomis.az.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
-                preprod-nomis-web-b-http-7777 = {
-                  priority = 400
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "preprod-nomis-web-b-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
-                        "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
+          https = merge(local.weblogic_lb_listeners.https, {
+            alarm_target_group_names = [
+              "preprod-nomis-web-a-http-7777",
+              # "preprod-nomis-web-b-http-7777",
+            ]
+            # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
+            # weblogic servers can alter priorities to enable maintenance message
+            rules = {
+              preprod-nomis-web-a-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "preprod-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
+                      "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                      "c.preproduction.nomis.az.justice.gov.uk",
+                      "c.preproduction.nomis.service.justice.gov.uk",
+                      "c.pp-nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
               }
+              preprod-nomis-web-b-http-7777 = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "preprod-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
+                      "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.preproduction.nomis.service.justice.gov.uk",
+                      "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                      "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
+                      "c.preproduction.nomis.service.justice.gov.uk",
+                      "c.pp-nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
           })
         }
       }
     }
 
-    baseline_route53_zones = {
+    route53_zones = {
       "preproduction.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
@@ -370,6 +443,15 @@ locals {
       }
       "preproduction.nomis.service.justice.gov.uk" = {
         records = [
+          { name = "lsnomis", type = "CNAME", ttl = "300", records = ["lsnomis-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "lsnomis-a", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsnomis-b", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsor", type = "CNAME", ttl = "300", records = ["lsor-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "lsor-a", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsor-b", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsmis", type = "CNAME", ttl = "300", records = ["lsmis-a.preproduction.nomis.service.justice.gov.uk"] },
+          { name = "lsmis-a", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "lsmis-b", type = "CNAME", ttl = "300", records = ["lsast-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppnomis", type = "CNAME", ttl = "300", records = ["ppnomis-a.preproduction.nomis.service.justice.gov.uk"] },
           { name = "ppnomis-a", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-a.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "ppnomis-b", type = "CNAME", ttl = "300", records = ["preprod-nomis-db-1-b.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
@@ -398,6 +480,33 @@ locals {
           { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
+    }
+
+    s3_buckets = {
+      nomis-audit-archives = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+        lifecycle_rule = [
+          module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
+        ]
+      }
+      nomis-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+      }
+    }
+
+    secretsmanager_secrets = {
+      "/oracle/database/LSCNOM" = local.database_secretsmanager_secrets
+      "/oracle/database/LSMIS"  = local.database_mis_secretsmanager_secrets
+
+      "/oracle/weblogic/preprod"  = local.weblogic_secretsmanager_secrets
+      "/oracle/database/PPCNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/PPCNOMHA" = local.database_secretsmanager_secrets
+      "/oracle/database/PPNDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/PPTRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/PPCNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/PPMIS"    = local.database_mis_secretsmanager_secrets
     }
   }
 }

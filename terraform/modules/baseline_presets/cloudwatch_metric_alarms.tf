@@ -101,12 +101,27 @@ locals {
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
+    ec2_instance_or_cwagent_stopped_windows = {
+      instance-or-cloudwatch-agent-stopped = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "CPU_IDLE"
+        period              = "60"
+        namespace           = "CWAgent"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
 
     ec2_cwagent_linux = {
       free-disk-space-low = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "60"
-        datapoints_to_alarm = "60"
+        evaluation_periods  = "15"
+        datapoints_to_alarm = "15"
         metric_name         = "disk_used_percent"
         namespace           = "CWAgent"
         period              = "60"
@@ -117,8 +132,8 @@ locals {
       }
       high-memory-usage = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "60"
-        datapoints_to_alarm = "60"
+        evaluation_periods  = "15"
+        datapoints_to_alarm = "15"
         metric_name         = "mem_used_percent"
         namespace           = "CWAgent"
         period              = "60"
@@ -139,7 +154,21 @@ locals {
         alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 3 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
-
+    }
+    ec2_instance_or_cwagent_stopped_linux = {
+      instance-or-cloudwatch-agent-stopped = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "cpu_usage_idle"
+        period              = "60"
+        namespace           = "CWAgent"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+      }
     }
 
     ec2_instance_cwagent_collectd_service_status_os = {
@@ -253,41 +282,11 @@ locals {
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
-    ec2_instance_or_cwagent_stopped_linux = {
-      instance-or-cloudwatch-agent-stopped = {
-        comparison_operator = "LessThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
-        metric_name         = "cpu_usage_idle"
-        period              = "60"
-        namespace           = "CWAgent"
-        statistic           = "SampleCount"
-        threshold           = "0"
-        treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
-        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
-      }
-    }
-    ec2_instance_or_cwagent_stopped_windows = {
-      instance-or-cloudwatch-agent-stopped = {
-        comparison_operator = "LessThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
-        metric_name         = "CPU_IDLE"
-        period              = "60"
-        namespace           = "CWAgent"
-        statistic           = "SampleCount"
-        threshold           = "0"
-        treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
-        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
-      }
-    }
     lb = {
       unhealthy-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        datapoints_to_alarm = "3"
+        evaluation_periods  = "1" # needs to be low to pick up issues in autoscaling groups
+        datapoints_to_alarm = "1"
         metric_name         = "UnHealthyHostCount"
         namespace           = "AWS/ApplicationELB"
         period              = "60"

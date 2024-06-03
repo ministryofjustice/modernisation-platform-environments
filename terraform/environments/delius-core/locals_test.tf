@@ -3,6 +3,7 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
+
   environment_config_test = {
     migration_environment_private_cidr     = ["10.162.8.0/22", "10.162.4.0/22", "10.162.0.0/22"]
     migration_environment_db_cidr          = ["10.162.14.0/25", "10.162.13.0/24", "10.162.12.0/24"]
@@ -12,6 +13,7 @@ locals {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     homepage_path                          = "/"
+    has_mis_environment                    = false
   }
 
   ldap_config_test = {
@@ -30,7 +32,10 @@ locals {
   db_config_test = {
     instance_type  = "r6i.xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
-    standby_count  = 0
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
+    standby_count = 0
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
@@ -128,22 +133,15 @@ locals {
       container_cpu    = 1024
     }
 
-    user_management = {
+    umt = {
       image_tag                        = "5.7.6"
       container_port                   = 8080
       container_memory                 = 4096
       container_cpu                    = 1024
-      elasticache_version              = "6.0"
+      elasticache_version              = "6.2"
       elasticache_node_type            = "cache.t3.small"
       elasticache_port                 = 6379
       elasticache_parameter_group_name = "default.redis6.x"
-    }
-
-    user_management_config_test = {
-      image_tag        = "5.7.6"
-      container_port   = 8080
-      container_memory = 4096
-      container_cpu    = 2048
     }
 
     pwm = {
@@ -163,7 +161,6 @@ locals {
       container_port = 80
     }
   }
-
 
   bastion_config_test = {
     business_unit           = local.vpc_name

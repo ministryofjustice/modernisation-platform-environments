@@ -14,6 +14,18 @@ output "backup_plans" {
   }
 }
 
+output "cloudwatch_dashboard_widgets" {
+  description = "Map of common cloudwatch dashboard widgets grouped by namespace"
+  value       = local.cloudwatch_dashboard_widgets
+}
+
+output "cloudwatch_dashboards" {
+  description = "Map of common cloudwatch dashboards"
+  value = {
+    for key, value in local.cloudwatch_dashboards : key => value if contains(local.cloudwatch_dashboards_filter, key)
+  }
+}
+
 output "cloudwatch_log_groups" {
   description = "Map of log groups"
 
@@ -107,6 +119,11 @@ output "kms_grants" {
   value = {
     for key, value in local.kms_grants : key => value if contains(local.kms_grants_filter, key)
   }
+}
+
+output "oam_links" {
+  description = "Map of oam_links to create depending on options provided"
+  value       = local.oam_links
 }
 
 output "route53_resolver_rules" {

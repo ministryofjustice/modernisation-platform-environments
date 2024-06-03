@@ -54,3 +54,24 @@ resource "grafana_data_source_permission" "xray" {
     permission = "Query"
   }
 }
+
+data "grafana_data_source" "amazon_prometheus" {
+  for_each = {
+    for name, account in var.aws_accounts : name => account if account.amazon_prometheus_query_enabled
+  }
+
+  name = "${each.key}-amp"
+}
+
+resource "grafana_data_source_permission" "amazon_prometheus" {
+  for_each = {
+    for name, account in var.aws_accounts : name => account if account.amazon_prometheus_query_enabled
+  }
+
+  datasource_id = data.grafana_data_source.amazon_prometheus[each.key].id
+
+  permissions {
+    team_id    = grafana_team.this.id
+    permission = "Query"
+  }
+}

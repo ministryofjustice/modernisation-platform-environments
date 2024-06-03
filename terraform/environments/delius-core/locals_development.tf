@@ -3,6 +3,7 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
+
   environment_config_dev = {
     migration_environment_private_cidr     = ["10.162.32.0/22", "10.162.36.0/22", "10.162.40.0/22"]
     migration_environment_db_cidr          = ["10.162.44.0/24", "10.162.45.0/24", "10.162.46.0/25"]
@@ -12,6 +13,7 @@ locals {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     homepage_path                          = "/"
+    has_mis_environment                    = true
   }
 
   ldap_config_dev = {
@@ -132,12 +134,12 @@ locals {
       container_cpu    = 1024
     }
 
-    user_management = {
-      image_tag                        = "5.7.6"
+    umt = {
+      image_tag                        = "dev"
       container_port                   = 8080
       container_memory                 = 4096
       container_cpu                    = 1024
-      elasticache_version              = "6.0"
+      elasticache_version              = "6.2"
       elasticache_node_type            = "cache.t3.small"
       elasticache_port                 = 6379
       elasticache_parameter_group_name = "default.redis6.x"

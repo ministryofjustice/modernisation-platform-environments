@@ -1,4 +1,16 @@
 locals {
+
+  # baseline presets config
+  preproduction_baseline_presets_options = {
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty               = "nomis_alarms"
+        dba_pagerduty               = "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
+      }
+    }
+  }
+
   preproduction_config = {
     baseline_s3_buckets = {
       ncr-db-backup-bucket = {
@@ -29,10 +41,14 @@ locals {
       "/oracle/database/PPBIPAUD" = local.database_secretsmanager_secrets
       "/oracle/database/PPBISYS"  = local.database_secretsmanager_secrets
       "/oracle/database/PPBIAUD"  = local.database_secretsmanager_secrets
+      "/oracle/database/LSBIPSYS" = local.database_secretsmanager_secrets
+      "/oracle/database/LSBIPAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/LSBISYS"  = local.database_secretsmanager_secrets
+      "/oracle/database/LSBIAUD"  = local.database_secretsmanager_secrets
     }
 
     baseline_efs = {
-      bip = {
+      pp-ncr-sap-share = {
         access_points = {
           root = {
             posix_user = {
@@ -49,7 +65,6 @@ locals {
             }
           }
         }
-        backup_policy_status = "DISABLED"
         file_system = {
           availability_zone_name = "eu-west-2a"
           lifecycle_policy = {
@@ -62,7 +77,7 @@ locals {
           security_groups    = ["bip"]
         }]
         tags = {
-          backup-plan = "daily-and-weekly"
+          backup = "false"
         }
       }
     }
@@ -112,8 +127,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*lsast/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/lsast*/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
           }
         ]
@@ -156,7 +171,7 @@ locals {
       ### PREPROD
 
       pp-ncr-cms-a = merge(local.bip_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
@@ -175,7 +190,7 @@ locals {
         })
       })
       pp-ncr-cms-b = merge(local.bip_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
           availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
@@ -194,7 +209,7 @@ locals {
         })
       })
       pp-ncr-processing-1-a = merge(local.bip_ec2_default, {
-        cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
@@ -213,7 +228,7 @@ locals {
         })
       })
       pp-ncr-web-admin-a = merge(local.web_ec2_default, {
-        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
@@ -230,7 +245,7 @@ locals {
         })
       })
       pp-ncr-web-1-a = merge(local.web_ec2_default, {
-        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
@@ -247,7 +262,7 @@ locals {
         })
       })
       pp-ncr-web-2-b = merge(local.web_ec2_default, {
-        cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
           availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
@@ -264,7 +279,7 @@ locals {
         })
       })
       pp-ncr-etl-a = merge(local.etl_ec2_default, {
-        cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms
+        # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.etl_ec2_default.config, {
           instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
@@ -374,25 +389,65 @@ locals {
       #   })
       # })
 
-      # lsast-ncr-db-1-a = merge(local.database_ec2_default, {
-      #   cloudwatch_metric_alarms = merge(
-      #     local.database_cloudwatch_metric_alarms.standard,
-      #     local.database_cloudwatch_metric_alarms.db_connected,
-      #     local.database_cloudwatch_metric_alarms.db_backup,
-      #   )
-      #   config = merge(local.database_ec2_default.config, {
-      #     instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
-      #       "Ec2LSASTDatabasePolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.database_ec2_default.tags, {
-      #     description                          = "LSAST NCR DATABASE"
-      #     nomis-combined-reporting-environment = "lsast"
-      #     oracle-sids                          = "LSASTBIPSYS LSASTBIPAUD"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
-
+      ls-ncr-db-1-a = merge(local.database_ec2_default, {
+        #cloudwatch_metric_alarms = merge(
+        #  local.database_cloudwatch_metric_alarms.standard,
+        #  local.database_cloudwatch_metric_alarms.db_connected,
+        #  local.database_cloudwatch_metric_alarms.db_backup,
+        #)
+        config = merge(local.database_ec2_default.config, {
+          instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
+            "Ec2LSASTDatabasePolicy",
+          ])
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            size  = 100
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            size  = 500
+            label = "app"
+            type  = "gp3"
+          }
+          "/dev/sde" = { # DATA01
+            label = "data"
+            size  = 500
+            type  = "gp3"
+          }
+          "/dev/sdj" = { # FLASH01
+            label = "flash"
+            type  = "gp3"
+            size  = 200
+          }
+          "/dev/sds" = {
+            label = "swap"
+            type  = "gp3"
+            size  = 4
+          }
+        }
+        ebs_volume_config = {
+          data = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 500
+          }
+          flash = {
+            iops       = 3000 # min 3000
+            type       = "gp3"
+            throughput = 125
+            total_size = 200
+          }
+        }
+        tags = merge(local.database_ec2_default.tags, {
+          description                          = "LSAST NCR DATABASE"
+          nomis-combined-reporting-environment = "lsast"
+          oracle-sids                          = ""
+          instance-scheduling                  = "skip-scheduling"
+        })
+      })
     }
     baseline_lbs = {
       private = {
@@ -483,6 +538,11 @@ locals {
         ]
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "private" }, # preproduction.reporting.nomis.service.justice.gov.uk
+        ]
+      }
+      "lsast.reporting.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "db", type = "CNAME", ttl = "3600", records = ["ls-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
     }

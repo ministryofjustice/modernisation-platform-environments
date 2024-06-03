@@ -71,6 +71,41 @@ resource "aws_iam_policy" "s3_read_access_policy" {
   })
 }
 
+# S3 Read Write Policy
+resource "aws_iam_policy" "s3_read_write_policy" {
+  name = local.s3_read_write_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "AllowUserToSeeBucketListInTheConsole",
+        "Action" : ["s3:ListAllMyBuckets", "s3:GetBucketLocation"],
+        "Effect" : "Allow",
+        "Resource" : ["arn:aws:s3:::*"]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ListBucket",
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${local.project}-*"
+        ]
+      },      
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:*Object",
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${local.project}-*/*",
+          "arn:aws:s3:::${local.project}-*"
+        ]
+      }
+    ]
+  })
+}
+
 # S3 All Object Actions Policy
 resource "aws_iam_policy" "s3_all_object_actions_policy" {
   name = local.s3_all_object_actions_policy
@@ -442,7 +477,7 @@ resource "aws_iam_policy" "redshift_spectrum_policy" {
 
 resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
   for_each = toset([
-    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.s3_read_access_policy.name}",
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.s3_read_write_policy.name}",
     "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.kms_read_access_policy.name}",
     "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.redshift_spectrum_policy.name}"
   ])

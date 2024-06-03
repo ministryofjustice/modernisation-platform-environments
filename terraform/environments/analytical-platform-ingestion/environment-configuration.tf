@@ -13,9 +13,9 @@ locals {
       observability_platform = "development"
 
       /* Image Versions */
-      scan_image_version     = "0.0.5"
-      transfer_image_version = "0.0.8"
-      notify_image_version   = "0.0.9"
+      scan_image_version     = "0.0.6"
+      transfer_image_version = "0.0.11"
+      notify_image_version   = "0.0.12"
 
       /* Target Buckets */
       target_buckets = ["mojap-land-dev"]
@@ -26,7 +26,7 @@ locals {
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
           ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBCv3JdWZ/2NGd8KKaeICIjqw5zwI2NtzQSWtvscfKZS lalitha.nagarur@digital.justice.gov.uk"
-          cidr_blocks           = ["213.121.161.124/32", "78.150.1.253/32"]
+          cidr_blocks           = ["213.121.161.124/32", "2.99.13.52/32", "78.150.12.143/32"]
           egress_bucket         = module.bold_egress_bucket.s3_bucket_id
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
@@ -44,9 +44,9 @@ locals {
       observability_platform = "production"
 
       /* Image Versions */
-      scan_image_version     = "0.0.5"
-      transfer_image_version = "0.0.8"
-      notify_image_version   = "0.0.9"
+      scan_image_version     = "0.0.6"
+      transfer_image_version = "0.0.11"
+      notify_image_version   = "0.0.12"
 
       /* Target Buckets */
       target_buckets = ["mojap-land"]

@@ -24,11 +24,6 @@ locals {
     baseline_s3_buckets     = {}
     baseline_ssm_parameters = {}
 
-    # baseline_bastion_linux = {
-    #   public_key_data = local.public_key_data.keys[local.environment]
-    #   tags            = local.tags
-    # }
-
     baseline_secretsmanager_secrets = {
       "/oracle/database/PDOASYS" = local.secretsmanager_secrets_oasys_db
       "/oracle/database/PROASYS" = local.secretsmanager_secrets_oasys_db
@@ -114,8 +109,8 @@ locals {
               "s3:RestoreObject",
             ]
             resources = [
-              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
-              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*/*",
+              "arn:aws:s3:::prod-oasys-db-backup-bucket*",
+              "arn:aws:s3:::prod-oasys-db-backup-bucket*/*",
             ]
           },
           {
@@ -158,8 +153,8 @@ locals {
               "s3:RestoreObject",
             ]
             resources = [
-              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*",
-              "arn:aws:s3:::prod-${local.application_name}-db-backup-bucket*/*",
+              "arn:aws:s3:::prod-oasys-db-backup-bucket*",
+              "arn:aws:s3:::prod-oasys-db-backup-bucket*/*",
             ]
           },
           {
@@ -221,34 +216,24 @@ locals {
     }
 
     baseline_ec2_instances = {
-      "pd-${local.application_name}-db-a" = merge(local.database_a, {
+      "pd-oasys-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-        #     branch = "oasys-no-tns"
-        #   })
-        # })
         tags = merge(local.database_a.tags, {
           bip-db-name = "PDBIPINF"
           oracle-sids = "PDBIPINF PDOASYS"
         })
       })
 
-      "pd-${local.application_name}-db-b" = merge(local.database_b, {
+      "pd-oasys-db-b" = merge(local.database_b, {
         config = merge(local.database_b.config, {
           instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        # user_data_cloud_init  = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-        #     branch = "oasys-no-tns"
-        #   })
-        # })
         tags = merge(local.database_b.tags, {
           bip-db-name = "PDBIPINF"
           oracle-sids = "PDBIPINF PDOASYS"
@@ -268,7 +253,7 @@ locals {
       })
 
 
-      "ptctrn-${local.application_name}-db-a" = merge(local.database_a, {
+      "ptctrn-oasys-db-a" = merge(local.database_a, {
         config = merge(local.database_a.config, {
           instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
             "Ec2PtcTrnDatabasePolicy",
@@ -319,14 +304,14 @@ locals {
           }
         }
         tags = merge(local.database_a.tags, {
-          description                             = "practice and training ${local.application_name} database"
-          "${local.application_name}-environment" = "ptctrn"
-          bip-db-name                             = "TRBIPINF"
-          oracle-sids                             = "PROASYS TROASYS TRBIPINF"
+          description       = "practice and training oasys database"
+          oasys-environment = "ptctrn"
+          bip-db-name       = "TRBIPINF"
+          oracle-sids       = "PROASYS TROASYS TRBIPINF"
         })
       })
 
-      "pd-${local.application_name}-bip-a" = merge(local.bip_a, {
+      "pd-oasys-bip-a" = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
           instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
             "Ec2ProdBipPolicy",
@@ -340,69 +325,69 @@ locals {
         })
       })
 
-      "trn-${local.application_name}-bip-a" = merge(local.bip_a, {
+      "trn-oasys-bip-a" = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
           instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
             "Ec2TrnBipPolicy",
           ])
         })
         tags = merge(local.bip_a.tags, {
-          bip-db-name                             = "TRBIPINF"
-          bip-db-hostname                         = "ptctrn-oasys-db-a"
-          oasys-db-name                           = "TROASYS"
-          oasys-db-hostname                       = "ptctrn-oasys-db-a"
-          "${local.application_name}-environment" = "trn"
+          bip-db-name       = "TRBIPINF"
+          bip-db-hostname   = "ptctrn-oasys-db-a"
+          oasys-db-name     = "TROASYS"
+          oasys-db-hostname = "ptctrn-oasys-db-a"
+          oasys-environment = "trn"
         })
       })
     }
 
 
     baseline_ec2_autoscaling_groups = {
-      "pd-${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(local.webserver_a.config, {
-          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+      "pd-oasys-web-a" = merge(local.webserver, {
+        config = merge(local.webserver.config, {
+          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
             "Ec2ProdWebPolicy",
           ])
         })
-        autoscaling_group = merge(local.webserver_a.autoscaling_group, {
+        autoscaling_group = merge(local.webserver.autoscaling_group, {
           desired_capacity = 4
           max_size         = 4
         })
-        tags = merge(local.webserver_a.tags, {
+        tags = merge(local.webserver.tags, {
           oracle-db-sid      = "PDOASYS"
           oracle-db-hostname = "db.oasys.hmpps-production.modernisation-platform.internal"
         })
       })
 
-      "ptc-${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(local.webserver_a.config, {
+      "ptc-oasys-web-a" = merge(local.webserver, {
+        config = merge(local.webserver.config, {
           ssm_parameters_prefix     = "ec2-web-ptc/"
           iam_resource_names_prefix = "ec2-web-ptc"
-          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
             "Ec2PtcWebPolicy",
           ])
         })
-        tags = merge(local.webserver_a.tags, {
-          description                             = "${local.environment} practice ${local.application_name} web"
-          "${local.application_name}-environment" = "ptc"
-          oracle-db-sid                           = "PROASYS"
-          oracle-db-hostname                      = "db.ptc.oasys.hmpps-production.modernisation-platform.internal"
+        tags = merge(local.webserver.tags, {
+          description        = "${local.environment} practice oasys web"
+          oasys-environment  = "ptc"
+          oracle-db-sid      = "PROASYS"
+          oracle-db-hostname = "db.ptc.oasys.hmpps-production.modernisation-platform.internal"
         })
       })
 
-      "trn-${local.application_name}-web-a" = merge(local.webserver_a, {
-        config = merge(local.webserver_a.config, {
+      "trn-oasys-web-a" = merge(local.webserver, {
+        config = merge(local.webserver.config, {
           ssm_parameters_prefix     = "ec2-web-trn/"
           iam_resource_names_prefix = "ec2-web-trn"
-          instance_profile_policies = concat(local.webserver_a.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
             "Ec2TrnWebPolicy",
           ])
         })
-        tags = merge(local.webserver_a.tags, {
-          description                             = "${local.environment} training ${local.application_name} web"
-          "${local.application_name}-environment" = "trn"
-          oracle-db-sid                           = "TROASYS"
-          oracle-db-hostname                      = "db.trn.oasys.hmpps-production.modernisation-platform.internal"
+        tags = merge(local.webserver.tags, {
+          description        = "${local.environment} training oasys web"
+          oasys-environment  = "trn"
+          oracle-db-sid      = "TROASYS"
+          oracle-db-hostname = "db.trn.oasys.hmpps-production.modernisation-platform.internal"
         })
       })
     }
@@ -410,7 +395,7 @@ locals {
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
     # if making changes, comment out the listeners that use the cert, edit the cert, recreate the listeners
     baseline_acm_certificates = {
-      "pd_${local.application_name}_cert" = {
+      "pd_oasys_cert" = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
         domain_name = "oasys.service.justice.gov.uk"
@@ -427,7 +412,7 @@ locals {
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
-          description = "cert for ${local.application_name} ${local.environment} domains"
+          description = "cert for oasys ${local.environment} domains"
         }
       }
     }
@@ -449,8 +434,8 @@ locals {
           https = {
             port                      = 443
             protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["pd_${local.application_name}_cert"]
+            ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+            certificate_names_or_arns = ["pd_oasys_cert"]
             default_action = {
               type = "fixed-response"
               fixed_response = {
@@ -461,14 +446,14 @@ locals {
             }
             # default_action = {
             #   type              = "forward"
-            #   target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+            #   target_group_name = "pd-oasys-web-a-pb-http-8080"
             # }
             rules = {
               pd-web-http-8080 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
+                  target_group_name = "pd-oasys-web-a-pb-http-8080"
                 }]
                 conditions = [
                   {
@@ -486,7 +471,7 @@ locals {
                 priority = 200
                 actions = [{
                   type              = "forward"
-                  target_group_name = "ptc-${local.application_name}-web-a-pb-http-8080"
+                  target_group_name = "ptc-oasys-web-a-pb-http-8080"
                 }]
                 conditions = [
                   {
@@ -504,7 +489,7 @@ locals {
                 priority = 300
                 actions = [{
                   type              = "forward"
-                  target_group_name = "trn-${local.application_name}-web-a-pb-http-8080"
+                  target_group_name = "trn-oasys-web-a-pb-http-8080"
                 }]
                 conditions = [
                   {
@@ -518,27 +503,11 @@ locals {
                   }
                 ]
               }
-              # pd-web-a-http-8080 = {
-              #   priority = 200
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "pd-${local.application_name}-web-a-pb-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "a.oasys.service.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
               # pd-web-b-http-8080 = {
               #   priority = 200
               #   actions = [{
               #     type              = "forward"
-              #     target_group_name = "pd-${local.application_name}-web-b-pb-http-8080"
+              #     target_group_name = "pd-oasys-web-b-pb-http-8080"
               #   }]
               #   conditions = [
               #     {
@@ -569,8 +538,8 @@ locals {
           https = {
             port                      = 443
             protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["pd_${local.application_name}_cert"]
+            ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+            certificate_names_or_arns = ["pd_oasys_cert"]
             # default_action = {
             #   type = "fixed-response"
             #   fixed_response = {
@@ -590,14 +559,14 @@ locals {
             }
             # default_action = {
             #   type              = "forward"
-            #   target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
+            #   target_group_name = "pd-oasys-web-a-pv-http-8080"
             # }
             rules = {
               pd-web-http-8080 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
+                  target_group_name = "pd-oasys-web-a-pv-http-8080"
                 }]
                 conditions = [
                   {
@@ -616,7 +585,7 @@ locals {
                 priority = 200
                 actions = [{
                   type              = "forward"
-                  target_group_name = "ptc-${local.application_name}-web-a-pv-http-8080"
+                  target_group_name = "ptc-oasys-web-a-pv-http-8080"
                 }]
                 conditions = [
                   {
@@ -636,7 +605,7 @@ locals {
                 priority = 300
                 actions = [{
                   type              = "forward"
-                  target_group_name = "trn-${local.application_name}-web-a-pv-http-8080"
+                  target_group_name = "trn-oasys-web-a-pv-http-8080"
                 }]
                 conditions = [
                   {
@@ -652,27 +621,11 @@ locals {
                   }
                 ]
               }
-              # pd-web-a-http-8080 = {
-              #   priority = 200
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "pd-${local.application_name}-web-a-pv-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = [
-              #           "a-int.oasys.service.justice.gov.uk",
-              #         ]
-              #       }
-              #     }
-              #   ]
-              # }
               # pd-web-b-http-8080 = {
               #   priority = 200
               #   actions = [{
               #     type              = "forward"
-              #     target_group_name = "pd-${local.application_name}-web-b-pv-http-8080"
+              #     target_group_name = "pd-oasys-web-b-pv-http-8080"
               #   }]
               #   conditions = [
               #     {
@@ -694,15 +647,15 @@ locals {
       #
       # public
       #
-      (module.environment.domains.public.business_unit_environment) = { # hmpps-production.modernisation-platform.service.justice.gov.uk
+      "hmpps-production.modernisation-platform.service.justice.gov.uk" = {
         records = [
-          { name = "db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.oasys", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.trn.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.ptc.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
-      (module.environment.domains.public.short_name) = { # oasys.service.justice.gov.uk
+      "oasys.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "public" },    # oasys.service.justice.gov.uk
           { name = "www", type = "A", lbs_map_key = "public" }, # www.oasys.service.justice.gov.uk
@@ -759,15 +712,14 @@ locals {
       #
       # internal/private
       #
-      (module.environment.domains.internal.business_unit_environment) = { # hmpps-production.modernisation-platform.internal
-        vpc = {                                                           # this makes it a private hosted zone
+      "hmpps-production.modernisation-platform.internal" = {
+        vpc = {    # this makes it a private hosted zone
           id = module.environment.vpc.id
         }
         records = [
-          # { name = "db.${local.application_name}",     type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # for aws
-          { name = "db.trn.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.ptc.${local.application_name}", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "db.${local.application_name}", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # db.oasys.hmpps-production.modernisation-platform.internal
+          { name = "db.trn.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.ptc.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "db.oasys", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # db.oasys.hmpps-production.modernisation-platform.internal
           { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.internal"] },                         # db.onr.hmpps-production.modernisation-platform.internal
         ]
       }
@@ -793,5 +745,6 @@ locals {
         retention_in_days = 90
       }
     }
+    
   }
 }
