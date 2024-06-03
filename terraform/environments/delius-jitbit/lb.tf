@@ -74,26 +74,6 @@ resource "aws_vpc_security_group_egress_rule" "load_balancer_egress_rule" {
   cidr_ipv4 = each.value
 }
 
-resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule" {
-  for_each          = toset(local.internal_security_group_cidrs)
-  description = "Allow ingress from allow listed CIDRs"
-  security_group_id = aws_security_group.load_balancer_security_group.id
-  from_port         = 443
-  to_port           = 443
-  ip_protocol       = "tcp"
-  cidr_ipv4         = each.value
-}
-
-resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule_ipv6" {
-  for_each          = toset(local.ipv6_cidr_blocks)
-  description = "Allow ingress from allow listed CIDRs"
-  security_group_id = aws_security_group.load_balancer_security_group.id
-  from_port         = 443
-  to_port           = 443
-  ip_protocol       = "tcp"
-  cidr_ipv6         = each.value
-}
-
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.external.id
   port              = 443
