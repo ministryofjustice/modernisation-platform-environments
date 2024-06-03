@@ -7,6 +7,25 @@ locals {
     }
   }
 
+  weblogic_iam_policy_statements = [
+    {
+      effect = "Allow"
+      actions = [
+        "elasticloadbalancing:Describe*",
+      ]
+      resources = ["*"]
+    },
+    {
+      effect = "Allow"
+      actions = [
+        "elasticloadbalancing:SetRulePriorities",
+      ]
+      resources = [
+        "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
+      ]
+    }
+  ]
+
   weblogic_target_group_http_7001 = {
     port                 = 7001
     protocol             = "HTTP"
@@ -143,7 +162,6 @@ locals {
       os-type                = "Linux"
       server-type            = "nomis-web"
       component              = "web"
-
     }
   }
 }

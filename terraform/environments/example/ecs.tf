@@ -2,43 +2,30 @@
 #------------------------Comment out file if not required----------------------------------
 ###########################################################################################
 
-module "ecs-cluster" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.0.3"
 
-  ec2_capacity_instance_type     = local.application_data.accounts[local.environment].container_instance_type
-  ec2_capacity_max_size          = local.application_data.accounts[local.environment].ec2_max_size
-  ec2_capacity_min_size          = local.application_data.accounts[local.environment].ec2_min_size
-  ec2_capacity_security_group_id = aws_security_group.cluster_ec2.id
-  ec2_subnet_ids = [
-    data.aws_subnet.private_subnets_a.id,
-    data.aws_subnet.private_subnets_b.id,
-    data.aws_subnet.private_subnets_c.id
-  ]
-  environment = local.environment
-  name        = local.ecs_application_name
-  namespace   = "platforms"
-  tags        = local.tags
+module "ecs-cluster" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=b00647922a9204a99b023ac884440162e2b51b66" #v4.3.0
+  name   = local.ecs_application_name
+  tags   = local.tags
 }
 
 module "service" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v3.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=b00647922a9204a99b023ac884440162e2b51b66" #v4.3.0
 
-  container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
-  ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
-  name                      = "${local.ecs_application_name}-task_definition_volume"
-  namespace                 = "platforms"
-  vpc_id                    = local.vpc_all
-
-  launch_type  = local.application_data.accounts[local.environment].launch_type
-  network_mode = local.application_data.accounts[local.environment].network_mode
+  container_definitions = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
+  cluster_arn           = module.ecs-cluster.ecs_cluster_arn
+  name                  = "${local.ecs_application_name}-task_definition_volume"
 
   task_cpu    = local.application_data.accounts[local.environment].container_cpu
   task_memory = local.application_data.accounts[local.environment].container_memory
 
+  service_role_arn   = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-service-role"
+  task_role_arn      = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-task-role"
   task_exec_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-task-execution-role"
 
-  environment = local.environment
-  ecs_load_balancers = [
+  health_check_grace_period_seconds = "300"
+
+  service_load_balancers = [
     {
       target_group_arn = aws_lb_target_group.ecs_target_group.arn
       container_name   = local.ecs_application_name
@@ -46,14 +33,17 @@ module "service" {
     }
   ]
 
-  subnet_ids = [
+  subnets = [
     data.aws_subnet.private_subnets_a.id,
     data.aws_subnet.private_subnets_b.id,
     data.aws_subnet.private_subnets_c.id
   ]
 
-  ignore_changes_task_definition = false
-  tags                           = local.tags
+  security_groups = [aws_security_group.cluster_ec2.id]
+
+  ignore_changes = false
+
+  tags = local.tags
 }
 
 locals {
@@ -123,7 +113,7 @@ locals {
 
 # Load balancer build using the module
 module "ecs_lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v4.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=6f59e1ce47df66bc63ee9720b7c58993d1ee64ee" #v4.0.0
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
@@ -143,13 +133,17 @@ module "ecs_lb_access_logs_enabled" {
   idle_timeout               = 60
 }
 
+resource "random_id" "ecs_target_group" {
+  byte_length = 4
+}
+
 //# Create the target group
 resource "aws_lb_target_group" "ecs_target_group" {
-  name                 = "${local.ecs_application_name}-tg-mlb-${local.environment}"
+  name                 = "${local.ecs_application_name}-tg-ecs-${random_id.ecs_target_group.hex}"
   port                 = local.application_data.accounts[local.environment].server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
   stickiness {
@@ -165,6 +159,11 @@ resource "aws_lb_target_group" "ecs_target_group" {
     unhealthy_threshold = "2"
     matcher             = "200-499"
     timeout             = "5"
+  }
+
+  tags = local.tags
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

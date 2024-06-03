@@ -9,6 +9,9 @@
       "lambda_log_retention_in_days": 3,
       "dms_log_retention_in_days": 3,
       "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
       "reporting_hub_spark_driver_mem": "2g",
@@ -83,6 +86,7 @@
       "create_glue_registries": false,
       "setup_s3_buckets": true,
       "create_glue_connections": false,
+      "kinesis_agent_autoscale": false,
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
@@ -91,7 +95,8 @@
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
       "enable_s3_file_transfer_trigger": true,
-      "scheduled_s3_file_transfer_retention_days": 2,
+      "scheduled_s3_file_transfer_retention_period_amount": 2,
+      "scheduled_s3_file_transfer_retention_period_unit": "days",
       "scheduled_s3_file_transfer_schedule": "cron(0 0/3 ? * * *)",
       "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
@@ -176,7 +181,13 @@
           }
         }
       },
-      "setup_cw_insights": true
+      "biprws": {
+        "enable": true,
+        "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
+        "endpoint_type": "domain_name"
+      },
+      "setup_cw_insights": true,
+      "enable_cp_k8s_secrets": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -187,6 +198,9 @@
       "lambda_log_retention_in_days": 3,
       "dms_log_retention_in_days": 3,
       "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
       "reporting_hub_spark_driver_mem": "2g",
@@ -261,6 +275,7 @@
       "create_glue_registries": false,
       "setup_s3_buckets": true,
       "create_glue_connections": false,
+      "kinesis_agent_autoscale": true,      
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
@@ -269,7 +284,8 @@
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
       "enable_s3_file_transfer_trigger": true,
-      "scheduled_s3_file_transfer_retention_days": 2,
+      "scheduled_s3_file_transfer_retention_period_amount": 2,
+      "scheduled_s3_file_transfer_retention_period_unit": "days",
       "scheduled_s3_file_transfer_schedule": "cron(0 0/3 ? * * *)",
       "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
@@ -354,7 +370,13 @@
           }
         }
       },
-      "setup_cw_insights": false
+      "biprws": {
+        "enable": true,
+        "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
+        "endpoint_type": "domain_name"
+      },
+      "setup_cw_insights": false,
+      "enable_cp_k8s_secrets": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -365,6 +387,9 @@
       "lambda_log_retention_in_days": 7,
       "dms_log_retention_in_days": 14,
       "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
       "reporting_hub_spark_driver_mem": "2g",
@@ -439,6 +464,7 @@
       "create_glue_registries": false,
       "setup_s3_buckets": true,
       "create_glue_connections": false,
+      "kinesis_agent_autoscale": true,      
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
@@ -447,7 +473,8 @@
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
       "enable_s3_file_transfer_trigger": true,
-      "scheduled_s3_file_transfer_retention_days": 2,
+      "scheduled_s3_file_transfer_retention_period_amount": 2,
+      "scheduled_s3_file_transfer_retention_period_unit": "days",
       "scheduled_s3_file_transfer_schedule": "cron(0 0/3 ? * * *)",
       "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
@@ -534,7 +561,13 @@
           }
         }
       },
-      "setup_cw_insights": false
+      "biprws": {
+        "enable": true,
+        "endpoint": "https://reporting.preprod.nomis.az.justice.gov.uk",
+        "endpoint_type": "load_balancer"
+      },
+      "setup_cw_insights": false,
+      "enable_cp_k8s_secrets": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -545,6 +578,9 @@
       "lambda_log_retention_in_days": 7,
       "dms_log_retention_in_days": 14,
       "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
       "reporting_hub_spark_driver_mem": "26g",
@@ -619,6 +655,7 @@
       "create_glue_registries": false,
       "setup_s3_buckets": true,
       "create_glue_connections": false,
+      "kinesis_agent_autoscale": true,      
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
@@ -627,7 +664,8 @@
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
       "enable_s3_file_transfer_trigger": true,
-      "scheduled_s3_file_transfer_retention_days": 2,
+      "scheduled_s3_file_transfer_retention_period_amount": 2,
+      "scheduled_s3_file_transfer_retention_period_unit": "days",
       "scheduled_s3_file_transfer_schedule": "cron(0 0/3 ? * * *)",
       "enable_domain_builder_rds": true,
       "enable_domain_builder_agent": true,
@@ -712,7 +750,13 @@
           }
         }
       },
-      "setup_cw_insights": false
+      "biprws": {
+        "enable": false,
+        "endpoint": "placeholder",
+        "endpoint_type": "load_balancer"
+      },
+      "setup_cw_insights": false,
+      "enable_cp_k8s_secrets": false
     }
   }
 }

@@ -29,7 +29,7 @@ locals {
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    # sns_topics = {
+    sns_topics               = {}
     #   pagerduty_integrations = {
     #     onr_pagerduty = "onr_alarms"
     #   }
@@ -72,10 +72,11 @@ locals {
   baseline_security_groups = {
     # instance type security groups
     # loadbalancer              = local.security_groups.loadbalancer
-    web    = local.security_groups.web # apply to onr web servers
-    bods   = local.security_groups.bods
-    boe    = local.security_groups.boe
-    onr_db = local.security_groups.onr_db
+    web                = local.security_groups.web # apply to onr web servers
+    bods               = local.security_groups.bods
+    boe                = local.security_groups.boe
+    onr_db             = local.security_groups.onr_db
+    private-jumpserver = local.security_groups.private_jumpserver
 
     # shared security groups
     oasys_db        = local.security_groups.oasys_db        # apply to bods & boe servers

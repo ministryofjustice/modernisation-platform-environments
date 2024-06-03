@@ -56,7 +56,7 @@ module "oracle_db_primary" {
   subnet_id          = var.account_config.ordered_private_subnet_ids[count.index % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, count.index % 3, "a")}"
 
-  tags = local.tags
+  tags = merge(local.tags, { "Patch Group" = "oracle_db_patchgroup" })
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.db_config.ansible_user_data_config
@@ -104,7 +104,7 @@ module "oracle_db_standby" {
   environment_config = var.environment_config
   subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_primary)) % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_primary)) % 3, "a")}"
-  tags               = local.tags
+  tags               = merge(local.tags, { "Patch Group" = "oracle_db_patchgroup" })
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.db_config.ansible_user_data_config
@@ -118,5 +118,55 @@ module "oracle_db_standby" {
 
   providers = {
     aws.core-vpc = aws.core-vpc
+  }
+}
+
+resource "aws_secretsmanager_secret" "delius_core_application_passwords_secret" {
+  count = local.has_mis_environment ? 1 : 0
+
+  name        = local.application_secret_name
+  description = "Application Users Credentials"
+  kms_key_id  = var.account_config.kms_keys.general_shared
+  tags        = var.tags
+}
+
+data "aws_iam_policy_document" "delius_core_application_passwords_policy_doc" {
+
+  count = local.has_mis_environment ? 1 : 0
+  statement {
+    sid    = "MisAWSAccountToReadTheSecret"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.mis_account_id}:role/instance-role-delius-mis-${var.env_name}-mis-db-1"]
+    }
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn]
+  }
+}
+
+resource "aws_secretsmanager_secret_policy" "delius_core_application_passwords_pol" {
+  count = local.has_mis_environment ? 1 : 0
+
+  secret_arn = aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn
+  policy     = data.aws_iam_policy_document.delius_core_application_passwords_policy_doc[count.index].json
+}
+
+data "aws_iam_policy_document" "db_access_to_secrets_manager" {
+  count = local.has_mis_environment ? 1 : 0
+  statement {
+    sid = "DbAccessToSecretsManager"
+    actions = [
+      "secretsmanager:Describe*",
+      "secretsmanager:Get*",
+      "secretsmanager:ListSecret*",
+      "secretsmanager:Put*",
+      "secretsmanager:RestoreSecret",
+      "secretsmanager:Update*"
+    ]
+    effect = "Allow"
+    resources = [
+      aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn
+    ]
   }
 }

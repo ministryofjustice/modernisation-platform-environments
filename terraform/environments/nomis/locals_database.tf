@@ -1,14 +1,13 @@
-# Use `s3-db-restore-dir` tag to trigger a restore from backup. See
-# https://github.com/ministryofjustice/modernisation-platform-configuration-management/blob/main/ansible/roles/db-restore
-#
-# Use `fixngo-connection-target` tag to monitor connectivity to a target in FixNGo.  See
-# https://github.com/ministryofjustice/modernisation-platform-configuration-management/tree/main/ansible/roles/oracle-db-monitoring
-
 locals {
 
   database_nomis_secretsmanager_secrets = {
     secrets = {
       passwords          = { description = "database passwords" }
+      weblogic-passwords = { description = "passwords available to weblogic servers" }
+    }
+  }
+  database_weblogic_secretsmanager_secrets = {
+    secrets = {
       weblogic-passwords = { description = "passwords available to weblogic servers" }
     }
   }
@@ -121,7 +120,6 @@ locals {
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type                = "r6i.xlarge"
-      disable_api_termination      = true
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
       vpc_security_group_ids       = ["data-db"]

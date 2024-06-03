@@ -1,27 +1,20 @@
 # csr-development environment settings
 locals {
 
-  # cloudwatch monitoring config
-  development_cloudwatch_monitoring_options = {}
-
-  # baseline config
-  development_config = {
-
-    baseline_secretsmanager_secrets = {
-      "/activedirectory/devtest/aws-lambda" = {
-        secrets = {
-          passwords = { description = "active directory lambda service account" }
-        }
-      }
+  baseline_presets_development = {
+    options = {
     }
+  }
 
-    baseline_ec2_autoscaling_groups = {
+  # please keep resources in alphabetical order
+  baseline_development = {
+
+    ec2_autoscaling_groups = {
       dev-base-ol85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_ol_8_5_*"
           availability_zone = null
         })
-        cloudwatch_metric_alarms = {}
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["database"]
         })
@@ -42,7 +35,6 @@ locals {
           server-type = "base-ol-8-5"
         }
       }
-
 
       dev-tst = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -99,9 +91,12 @@ locals {
       }
     }
 
-    baseline_ec2_instances = {
-    }
-    baseline_route53_zones = {
+    secretsmanager_secrets = {
+      "/activedirectory/devtest/aws-lambda" = {
+        secrets = {
+          passwords = { description = "active directory lambda service account" }
+        }
+      }
     }
   }
 }

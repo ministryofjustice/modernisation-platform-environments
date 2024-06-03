@@ -2,9 +2,10 @@ locals {
   production_config = {
     baseline_secretsmanager_secrets = {
       "/ndh/pd" = local.ndh_secretsmanager_secrets
+      "/ndh/dr" = local.ndh_secretsmanager_secrets
     }
     baseline_iam_policies = {
-      Ec2ppPolicy = {
+      Ec2pdPolicy = {
         description = "Permissions required for PD EC2s"
         statements = [
           {
@@ -14,6 +15,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ndh/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/ndh/dr/*",
             ]
           }
         ]
@@ -28,7 +30,7 @@ locals {
       pd-ndh-app-a = merge(local.ndh_app_a, {
         config = merge(local.ndh_app_a.config, {
           instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2ppPolicy",
+            "Ec2pdPolicy",
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
@@ -39,7 +41,7 @@ locals {
       pd-ndh-ems-a = merge(local.ndh_ems_a, {
         config = merge(local.ndh_ems_a.config, {
           instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2ppPolicy",
+            "Ec2pdPolicy",
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
@@ -47,26 +49,28 @@ locals {
           nomis-data-hub-environment = "pd"
         })
       })
-      pd-ndh-app-b = merge(local.ndh_app_a, {
+      dr-ndh-app-b = merge(local.ndh_app_a, {
         config = merge(local.ndh_app_a.config, {
+          availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2ppPolicy",
+            "Ec2pdPolicy",
           ])
         })
         tags = merge(local.ndh_app_a.tags, {
           os-type                    = "Linux"
-          nomis-data-hub-environment = "pd"
+          nomis-data-hub-environment = "dr"
         })
       })
-      pd-ndh-ems-b = merge(local.ndh_ems_a, {
+      dr-ndh-ems-b = merge(local.ndh_ems_a, {
         config = merge(local.ndh_ems_a.config, {
+          availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2ppPolicy",
+            "Ec2pdPolicy",
           ])
         })
         tags = merge(local.ndh_ems_a.tags, {
           os-type                    = "Linux"
-          nomis-data-hub-environment = "pd"
+          nomis-data-hub-environment = "dr"
         })
       })
     }
@@ -81,6 +85,26 @@ locals {
           { name = "pd-ems", type = "A", ttl = 300, records = ["10.40.3.198"] }, #azure
           #{ name = "pd-ems", type = "A", ttl = 300, records = ["10.27.8.131"] }, #aws
         ]
+      }
+    }
+    baseline_ssm_parameters = {
+      "/offloc" = {
+        parameters = {
+          offloc_bucket_name = {
+            description          = "The name of the offloc upload bucket"
+            value_s3_bucket_name = "offloc-upload"
+          }
+        }
+      }
+    }
+
+    baseline_s3_buckets = {
+      offloc-upload = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
   }

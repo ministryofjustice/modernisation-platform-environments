@@ -11,11 +11,12 @@ resource "aws_route53_record" "ebsdb" {
 # EBS Conc
 resource "aws_route53_record" "ebsconc" {
   provider = aws.core-vpc
+  count    = local.application_data.accounts[local.environment].conc_no_instances
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "ccms-ebs-conc-upgrade.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
   ttl      = 300
-  records  = [aws_instance.ec2_oracle_conc.private_ip]
+  records  = [aws_instance.ec2_oracle_conc[count.index].private_ip]
 }
 
 # EBS Apps

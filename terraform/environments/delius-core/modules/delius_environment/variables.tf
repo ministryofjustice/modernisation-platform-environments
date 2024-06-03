@@ -52,6 +52,16 @@ variable "db_config" {
   type = any
 }
 
+variable "dms_config" {
+  type = object({
+    replication_instance_class = string
+    engine_version             = string
+  })
+  default = {
+    replication_instance_class = "dms.t3.micro"
+    engine_version             = "3.5.1"
+  }
+}
 
 variable "tags" {
   type = any
@@ -95,4 +105,10 @@ variable "enable_platform_backups" {
   description = "Enable or disable Mod Platform centralised backups"
   type        = bool
   default     = null
+}
+
+variable "db_suffix" {
+  description = "identifier to append to name e.g. dsd, boe"
+  type        = string
+  default     = "db"
 }

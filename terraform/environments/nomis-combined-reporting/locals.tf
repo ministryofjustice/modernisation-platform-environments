@@ -1,13 +1,19 @@
 locals {
   business_unit = var.networking[0].business-unit
   region        = "eu-west-2"
+  environment_presets = {
+    development   = local.development_baseline_presets_options
+    test          = local.test_baseline_presets_options
+    preproduction = local.preproduction_baseline_presets_options
+    production    = local.production_baseline_presets_options
+  }
   environment_configs = {
     development   = local.development_config
     test          = local.test_config
     preproduction = local.preproduction_config
     production    = local.production_config
   }
-  baseline_preset_options = {
+  baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true
@@ -26,6 +32,7 @@ locals {
     # }
   }
   baseline_acm_certificates       = {}
+  baseline_backup_plans           = {}
   baseline_cloudwatch_log_groups  = {}
   baseline_ec2_autoscaling_groups = {}
   baseline_ec2_instances          = {}
@@ -91,13 +98,15 @@ locals {
   baseline_rds_instances            = {}
   baseline_route53_resolvers        = {}
   baseline_route53_zones            = { "${local.environment}.reporting.nomis.service.justice.gov.uk" = {} }
+  baseline_sns_topics               = {}
   baseline_ssm_parameters           = {}
   baseline_s3_buckets = {
     s3-bucket = {
       iam_policies = module.baseline_presets.s3_iam_policies
     }
   }
-  environment_config = local.environment_configs[local.environment]
+  environment_config                   = local.environment_configs[local.environment]
+  environment_baseline_presets_options = local.environment_presets[local.environment]
 
   baseline_secretsmanager_secrets = {}
 }

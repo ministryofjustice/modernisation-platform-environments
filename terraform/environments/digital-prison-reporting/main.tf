@@ -300,17 +300,18 @@ module "glue_s3_file_transfer_job" {
   )
 
   arguments = {
-    "--extra-jars"                            = local.glue_jobs_latest_jar_location
-    "--extra-files"                           = local.shared_log4j_properties_path
-    "--class"                                 = "uk.gov.justice.digital.job.S3FileTransferJob"
-    "--dpr.aws.region"                        = local.account_region
-    "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
-    "--dpr.file.transfer.source.bucket"       = module.s3_raw_bucket.bucket_id
-    "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
-    "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
-    "--dpr.file.transfer.delete.copied.files" = true,
-    "--dpr.allowed.s3.file.extensions"        = "*",
-    "--dpr.log.level"                         = local.glue_job_common_log_level
+    "--extra-jars"                                = local.glue_jobs_latest_jar_location
+    "--extra-files"                               = local.shared_log4j_properties_path
+    "--class"                                     = "uk.gov.justice.digital.job.S3FileTransferJob"
+    "--dpr.aws.region"                            = local.account_region
+    "--dpr.config.s3.bucket"                      = module.s3_glue_job_bucket.bucket_id,
+    "--dpr.file.transfer.source.bucket"           = module.s3_raw_bucket.bucket_id
+    "--dpr.file.transfer.destination.bucket"      = module.s3_raw_archive_bucket.bucket_id
+    "--dpr.file.transfer.retention.period.amount" = tostring(local.scheduled_s3_file_transfer_retention_period_amount)
+    "--dpr.file.transfer.retention.period.unit"   = tostring(local.scheduled_s3_file_transfer_retention_period_unit)
+    "--dpr.file.transfer.delete.copied.files"     = true,
+    "--dpr.allowed.s3.file.extensions"            = "*",
+    "--dpr.log.level"                             = local.glue_job_common_log_level
   }
 
   depends_on = [
@@ -952,10 +953,12 @@ module "ec2_kinesis_agent" {
   aws_region                  = local.account_region
   ec2_terminate_behavior      = "terminate"
   associate_public_ip_address = false
+  static_private_ip           = "10.26.24.201" # Used for Dev as a Secondary IP
   ebs_optimized               = true
   monitoring                  = true
   ebs_size                    = 20
   ebs_encrypted               = true
+  scale_down                  = local.kinesis_agent_autoscale
   ebs_delete_on_termination   = false
   # s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn # TBC
   region  = local.account_region

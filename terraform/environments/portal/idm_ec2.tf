@@ -283,6 +283,7 @@ resource "aws_instance" "idm_instance_1" {
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.idm_1_userdata)
   user_data_replace_on_change = true
+  key_name                    = aws_key_pair.portal_ssh_ohs.key_name
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
@@ -290,6 +291,18 @@ resource "aws_instance" "idm_instance_1" {
     { "Name" = "${local.application_name} IDM Instance 1" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
+}
+
+#############################################
+# TEMP SSH Key to installing Portal
+#############################################
+resource "aws_vpc_security_group_ingress_rule" "idm_ssh" {
+  security_group_id            = aws_security_group.idm_instance.id
+  description                  = "SSH for Portal Installation"
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
 }
 
 resource "aws_instance" "idm_instance_2" {
@@ -300,7 +313,7 @@ resource "aws_instance" "idm_instance_2" {
   vpc_security_group_ids = [aws_security_group.idm_instance.id]
   monitoring             = true
   subnet_id              = data.aws_subnet.private_subnets_b.id
-  iam_instance_profile   = aws_iam_instance_profile.portal.id # TODO to be updated once merging with OHS work
+  iam_instance_profile   = aws_iam_instance_profile.portal.id
   user_data_base64       = base64encode(local.oam_2_userdata)
 
   tags = merge(

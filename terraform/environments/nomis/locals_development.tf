@@ -1,118 +1,43 @@
-# nomis-development environment settings
 locals {
 
-  # cloudwatch monitoring config
-  development_cloudwatch_monitoring_options = {}
+  lb_maintenance_message_development = {
+    maintenance_title   = "Prison-NOMIS Maintenance Window"
+    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+  }
 
-  # baseline presets config
-  development_baseline_presets_options = {
-    sns_topics = {
-      pagerduty_integrations = {
-        dso_pagerduty               = "nomis_nonprod_alarms"
-        dba_pagerduty               = "hmpps_shef_dba_non_prod"
-        dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+  baseline_presets_development = {
+    options = {
+      sns_topics = {
+        pagerduty_integrations = {
+          dso_pagerduty               = "nomis_nonprod_alarms"
+          dba_pagerduty               = "hmpps_shef_dba_non_prod"
+          dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+        }
       }
     }
   }
 
+  # please keep resources in alphabetical order
+  baseline_development = {
 
-  # baseline config
-  development_config = {
-
-    baseline_s3_buckets = {
-      nomis-audit-archives = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-      }
-      nomis-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-      }
-      syscon-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-      }
-    }
-
-    baseline_acm_certificates = {
+    acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
-        domain_name = module.environment.domains.public.modernisation_platform
+        domain_name = "modernisation-platform.service.justice.gov.uk"
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",
-          "*.${local.environment}.nomis.service.justice.gov.uk",
-          "*.${local.environment}.nomis.az.justice.gov.uk",
+          "*.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk",
+          "*.development.nomis.service.justice.gov.uk",
+          "*.development.nomis.az.justice.gov.uk",
         ]
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
-          description = "wildcard cert for nomis ${local.environment} domains"
+          description = "wildcard cert for nomis development domains"
         }
       }
     }
 
-    baseline_iam_policies = {
-      Ec2DevWeblogicPolicy = {
-        description = "Permissions required for dev Weblogic EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/dev/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/weblogic-*",
-            ]
-          }
-        ]
-      }
-      Ec2Qa11GWeblogicPolicy = {
-        description = "Permissions required for QA11G Weblogic EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/weblogic-*",
-            ]
-          }
-        ]
-      }
-      Ec2Qa11RWeblogicPolicy = {
-        description = "Permissions required for QA11R Weblogic EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11r/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/weblogic-*",
-            ]
-          }
-        ]
-      }
-    }
-
-    baseline_secretsmanager_secrets = {
-      "/oracle/weblogic/dev"   = local.weblogic_secretsmanager_secrets
-      "/oracle/database/dev"   = local.database_nomis_secretsmanager_secrets
-      "/oracle/weblogic/qa11g" = local.weblogic_secretsmanager_secrets
-      "/oracle/database/qa11g" = local.database_nomis_secretsmanager_secrets
-      "/oracle/weblogic/qa11r" = local.weblogic_secretsmanager_secrets
-      "/oracle/database/qa11r" = local.database_nomis_secretsmanager_secrets
-    }
-
-    baseline_ec2_autoscaling_groups = {
-
+    ec2_autoscaling_groups = {
       dev-redhat-rhel79 = {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
@@ -245,12 +170,11 @@ locals {
       dev-nomis-client-a = local.jumpserver_ec2
     }
 
-    baseline_ec2_instances = {
-
+    ec2_instances = {
       dev-nomis-db-1-a = merge(local.database_ec2, {
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2DevWeblogicPolicy",
             "Ec2Qa11GWeblogicPolicy",
@@ -265,6 +189,9 @@ locals {
           data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+        })
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "dev"
           description         = "syscon nomis dev and qa databases"
@@ -276,13 +203,14 @@ locals {
       dev-nomis-web-a = merge(local.weblogic_ec2, {
         cloudwatch_metric_alarms = {}
         config = merge(local.weblogic_ec2.config, {
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2DevWeblogicPolicy",
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
+          disable_api_termination = true
+          instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -305,13 +233,14 @@ locals {
       qa11g-nomis-web-a = merge(local.weblogic_ec2, {
         cloudwatch_metric_alarms = {}
         config = merge(local.weblogic_ec2.config, {
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
+          disable_api_termination = true
+          instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -334,13 +263,14 @@ locals {
       qa11r-nomis-web-a = merge(local.weblogic_ec2, {
         cloudwatch_metric_alarms = {}
         config = merge(local.weblogic_ec2.config, {
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2Qa11RWeblogicPolicy",
           ])
         })
         instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "t2.large"
+          disable_api_termination = true
+          instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -364,7 +294,7 @@ locals {
         cloudwatch_metric_alarms = {}
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_rhel_7_9_2024-03-01T00-00-34.773Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
             "Ec2DevWeblogicPolicy",
             "Ec2Qa11GWeblogicPolicy",
@@ -376,8 +306,9 @@ locals {
           "/dev/sdc" = { label = "app", size = 100, type = "gp3" } # /u02
         }
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          instance_type          = "t3.medium"
-          vpc_security_group_ids = ["private-web"]
+          disable_api_termination = true
+          instance_type           = "t3.medium"
+          vpc_security_group_ids  = ["private-web"]
           tags = {
             backup-plan = "daily-and-weekly"
           }
@@ -399,8 +330,58 @@ locals {
       }
     }
 
-    baseline_lbs = {
-      # AWS doesn't let us call it internal
+    iam_policies = {
+      Ec2DevWeblogicPolicy = {
+        description = "Permissions required for dev Weblogic EC2s"
+        statements = concat(local.weblogic_iam_policy_statements, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/dev/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/weblogic-*",
+            ]
+          }
+        ])
+      }
+      Ec2Qa11GWeblogicPolicy = {
+        description = "Permissions required for QA11G Weblogic EC2s"
+        statements = concat(local.weblogic_iam_policy_statements, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/weblogic-*",
+            ]
+          }
+        ])
+      }
+      Ec2Qa11RWeblogicPolicy = {
+        description = "Permissions required for QA11R Weblogic EC2s"
+        statements = concat(local.weblogic_iam_policy_statements, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11r/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/weblogic-*",
+            ]
+          }
+        ])
+      }
+    }
+
+    lbs = {
       private = {
         internal_lb              = true
         enable_delete_protection = false
@@ -431,6 +412,8 @@ locals {
           http = local.weblogic_lb_listeners.http
 
           https = merge(local.weblogic_lb_listeners.https, {
+            # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
+            # weblogic servers can alter priorities to enable maintenance message
             rules = {
               dev-nomis-web-a-http-7777 = {
                 priority = 100
@@ -477,13 +460,34 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_development)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.development.nomis.service.justice.gov.uk",
+                      "c-dev.development.nomis.service.justice.gov.uk",
+                      "c-qa11g.development.nomis.service.justice.gov.uk",
+                      "c-qa11r.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
       }
     }
 
-    baseline_route53_zones = {
+    route53_zones = {
       "development.hmpps-test.modernisation-platform.service.justice.gov.uk" = {
         records = [
         ]
@@ -500,6 +504,7 @@ locals {
           { name = "qa11r", type = "CNAME", ttl = "300", records = ["dev-nomis-db-1-a.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "private" },
           # dev
           { name = "dev-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "dev-nomis-web-b", type = "A", lbs_map_key = "private" },
@@ -514,6 +519,33 @@ locals {
           { name = "c-qa11r", type = "A", lbs_map_key = "private" },
         ]
       }
+    }
+
+    s3_buckets = {
+      nomis-audit-archives = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+      }
+      nomis-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+      }
+      s3-bucket = {
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+      syscon-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+      }
+    }
+
+    secretsmanager_secrets = {
+      "/oracle/weblogic/dev"   = local.weblogic_secretsmanager_secrets
+      "/oracle/database/dev"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/weblogic/qa11g" = local.weblogic_secretsmanager_secrets
+      "/oracle/database/qa11g" = local.database_nomis_secretsmanager_secrets
+      "/oracle/weblogic/qa11r" = local.weblogic_secretsmanager_secrets
+      "/oracle/database/qa11r" = local.database_nomis_secretsmanager_secrets
     }
   }
 }

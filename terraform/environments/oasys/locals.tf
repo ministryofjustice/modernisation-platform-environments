@@ -65,7 +65,7 @@ locals {
   #  web
   ###
 
-  webserver_a = {
+  webserver = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "oasys_webserver_release_2023-07-02*"
       ssm_parameters_prefix     = "ec2-web/"
@@ -89,6 +89,10 @@ locals {
       maintenance_message = {
         description             = "OASys maintenance message. Use \\n for new lines"
         recovery_window_in_days = 0
+        tags = {
+          instance-access-policy     = "full"
+          instance-management-policy = "full"
+        }
       }
     }
     lb_target_groups = {
@@ -97,12 +101,12 @@ locals {
     }
     tags = {
       component         = "web"
-      description       = "${local.environment} ${local.application_name} web"
+      description       = "${local.environment} oasys web"
       os-type           = "Linux"
       os-major-version  = 7
       os-version        = "RHEL 7.9"
       "Patch Group"     = "RHEL"
-      server-type       = "${local.application_name}-web"
+      server-type       = "oasys-web"
       monitored         = true
       oasys-environment = local.environment
       environment-name  = terraform.workspace
@@ -110,11 +114,7 @@ locals {
       oracle-db-sid = "OASPROD" # for each env using azure DB will need to be OASPROD
     }
   }
-  webserver_b = merge(local.webserver_a, {
-    # config = merge(local.webserver_a.config, {
-    #   availability_zone = "${local.region}b"
-    # })
-  })
+
   target_group_http_8080 = {
     port                 = 8080
     protocol             = "HTTP"
@@ -243,20 +243,20 @@ locals {
     # Example target group setup below
     lb_target_groups = {}
     tags = {
-      backup                                  = "false" # opt out of mod platform default backup plan
-      component                               = "data"
-      oracle-sids                             = "OASPROD BIPINFRA"
-      os-type                                 = "Linux"
-      os-major-version                        = 8
-      os-version                              = "RHEL 8.5"
-      licence-requirements                    = "Oracle Database"
-      "Patch Group"                           = "RHEL"
-      server-type                             = "${local.application_name}-db"
-      description                             = "${local.environment} ${local.application_name} database"
-      monitored                               = true
-      "${local.application_name}-environment" = local.environment
-      environment-name                        = terraform.workspace # used in provisioning script to select group vars
-      OracleDbLTS-ManagedInstance             = true                # oracle license tracking
+      backup                      = "false" # opt out of mod platform default backup plan
+      component                   = "data"
+      oracle-sids                 = "OASPROD BIPINFRA"
+      os-type                     = "Linux"
+      os-major-version            = 8
+      os-version                  = "RHEL 8.5"
+      licence-requirements        = "Oracle Database"
+      "Patch Group"               = "RHEL"
+      server-type                 = "oasys-db"
+      description                 = "${local.environment} oasys database"
+      monitored                   = true
+      oasys-environment           = local.environment
+      environment-name            = terraform.workspace # used in provisioning script to select group vars
+      OracleDbLTS-ManagedInstance = true                # oracle license tracking
     }
   }
   database_b = merge(local.database_a, {
@@ -271,7 +271,9 @@ locals {
 
   database_onr_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
-      ami_name          = "base_rhel_7_9_2024-01-01T00-00-06.493Z"
+      ami_name = "base_rhel_7_9_2024-01-01T00-00-06.493Z"
+      # Uses base ami as Nomis DB ami not available in oasys env. 
+      # Requires ssm_agent_ansible_no_tags set in user_data to execute all ansible amibuild and ec2provision steps
       availability_zone = "${local.region}a"
       instance_profile_policies = flatten([
         module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
@@ -365,20 +367,20 @@ locals {
     # Example target group setup below
     lb_target_groups = {}
     tags = {
-      backup                                  = "false" # opt out of mod platform default backup plan
-      component                               = "data"
-      oracle-sids                             = "OASPROD BIPINFRA"
-      os-type                                 = "Linux"
-      os-major-version                        = 8
-      os-version                              = "RHEL 8.5"
-      licence-requirements                    = "Oracle Database"
-      "Patch Group"                           = "RHEL"
-      server-type                             = "onr-db"
-      description                             = "${local.environment} onr database"
-      monitored                               = true
-      "${local.application_name}-environment" = local.environment
-      environment-name                        = terraform.workspace # used in provisioning script to select group vars
-      OracleDbLTS-ManagedInstance             = true                # oracle license tracking
+      backup                      = "false" # opt out of mod platform default backup plan
+      component                   = "data"
+      oracle-sids                 = "OASPROD BIPINFRA"
+      os-type                     = "Linux"
+      os-major-version            = 8
+      os-version                  = "RHEL 8.5"
+      licence-requirements        = "Oracle Database"
+      "Patch Group"               = "RHEL"
+      server-type                 = "onr-db"
+      description                 = "${local.environment} onr database"
+      monitored                   = true
+      oasys-environment           = local.environment
+      environment-name            = terraform.workspace # used in provisioning script to select group vars
+      OracleDbLTS-ManagedInstance = true                # oracle license tracking
     }
   }
   database_onr_b = merge(local.database_onr_a, {
@@ -422,12 +424,12 @@ locals {
     tags = {
       backup              = "false" # opt out of mod platform default backup plan
       component           = "bip"
-      description         = "${local.environment} ${local.application_name} bip"
+      description         = "${local.environment} oasys bip"
       os-type             = "Linux"
       os-major-version    = 7
       os-version          = "RHEL 7.9"
       "Patch Group"       = "RHEL"
-      server-type         = "${local.application_name}-bip"
+      server-type         = "oasys-bip"
       monitored           = true
       oasys-environment   = local.environment
       environment-name    = terraform.workspace

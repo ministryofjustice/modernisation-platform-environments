@@ -4,7 +4,7 @@
 
 # EC2 Created via module
 module "ec2_test_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v2.4.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=edc55b4005b7039e5b54ad7805e89a473fe3c3dd" #v2.4.1
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -102,12 +102,16 @@ resource "aws_instance" "develop" {
 }
 
 # create single managed policy
+resource "random_id" "ec2_common_policy" {
+  byte_length = 4
+}
+
 resource "aws_iam_policy" "ec2_common_policy" {
-  name        = "ec2-common-policy"
+  name        = "${random_id.ec2_common_policy.dec}-ec2-common-policy"
   path        = "/"
   description = "Common policy for all ec2 instances"
   policy      = data.aws_iam_policy_document.ec2_common_combined.json
-  tags        = { Name = "ec2-common-policy" }
+  tags        = { Name = "${random_id.ec2_common_policy.dec}-ec2-common-policy" }
 }
 
 # combine ec2-common policy documents
@@ -134,6 +138,10 @@ locals {
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ec2_policy" {
+  #checkov:skip=CKV_AWS_107
+  #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356
   statement {
     sid    = "CustomEc2Policy"
     effect = "Allow"
@@ -184,6 +192,7 @@ resource "aws_volume_attachment" "mountvolumetoec2" {
 data "aws_iam_policy_document" "ebs-kms" {
   #checkov:skip=CKV_AWS_111
   #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_356
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]
