@@ -48,11 +48,11 @@ variable "services" {
     "appeals" = {
       name_prefix = "administrativeappeals"
       # module_key  = "appeals"
-      module_key  = "${module.appeals}"
+      module_key  = "module.appeals"
     },
     "ahmlr" = {
       name_prefix = "landregistrationdivision"
-      module_key  = "ahmlr"
+      module_key  = "module.ahmlr"
     }
   }
 }
@@ -68,8 +68,8 @@ resource "aws_route53_record" "external_services" {
   alias {
     # name                   = module.appeals.tribunals_lb.dns_name
     # zone_id                = module.appeals.tribunals_lb.zone_id
-    name                   = module[each.value.module_key].tribunals_lb.dns_name
-    zone_id                = module[each.value.module_key].tribunals_lb.zone_id
+    name                   = each.value.module_key.tribunals_lb.dns_name
+    zone_id                = each.value.module_key.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
