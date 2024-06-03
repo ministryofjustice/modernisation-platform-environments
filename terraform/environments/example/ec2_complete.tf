@@ -55,7 +55,8 @@ locals {
           component   = "ndh"
           environment = "development"
           flexi-startup     = "8am"
-          flexi-shutdown    = "6pm" 
+          flexi-shutdown    = "7pm"
+          instance-scheduling = "skip-scheduling"
         }
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }
@@ -88,8 +89,10 @@ locals {
           os-type     = "Linux"
           component   = "ndh"
           environment = "development"
-          flexi-startup     = "9am"
-          flexi-shutdown    = "7pm" 
+          flexi-startup     = "8am"
+          flexi-shutdown    = "7pm"
+          instance-scheduling = "skip-scheduling"
+
         }
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }
