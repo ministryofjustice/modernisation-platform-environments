@@ -155,8 +155,8 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
 }
 
 
-#checkov:skip=CKV_AWS_272
 resource "aws_lambda_function" "this" {
+  #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
   filename         = var.filename
   function_name    = var.function_name
   role             = var.role_arn
