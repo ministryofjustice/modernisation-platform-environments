@@ -24,7 +24,7 @@ resource "aws_security_group" "rds" {
     for_each = {
       for sg in var.db_ingress_security_groups : sg => sg
     }
-  security_group_id = aws_security_group.db[0].id
+  security_group_id = aws_security_group.rds[0].id
   from_port         = var.rds_port
   to_port           = var.rds_port
   ip_protocol          = "tcp"
@@ -34,7 +34,7 @@ resource "aws_security_group" "rds" {
 
 resource "aws_vpc_security_group_ingress_rule" "rds_from_bastion" {
   count = var.create_rds ? 1 : 0
-  security_group_id = aws_security_group.db[0].id
+  security_group_id = aws_security_group.rds[0].id
   from_port         = var.rds_port
   to_port           = var.rds_port
   ip_protocol          = "tcp"
@@ -44,7 +44,7 @@ resource "aws_vpc_security_group_ingress_rule" "rds_from_bastion" {
 
 resource "aws_vpc_security_group_ingress_rule" "rds_from_service" {
   count = var.create_rds ? 1 : 0
-  security_group_id = aws_security_group.db[0].id
+  security_group_id = aws_security_group.rds[0].id
   from_port         = var.rds_port
   to_port           = var.rds_port
   ip_protocol          = "tcp"
@@ -92,7 +92,7 @@ resource "aws_db_instance" "this" {
   backup_retention_period             = var.rds_backup_retention_period
   iam_database_authentication_enabled = var.rds_iam_database_authentication_enabled
   db_subnet_group_name                = aws_db_subnet_group.this[0].id
-  vpc_security_group_ids              = [aws_security_group.db[0].id]
+  vpc_security_group_ids              = [aws_security_group.rds[0].id]
   multi_az                            = var.rds_multi_az
   monitoring_interval                 = var.rds_monitoring_interval
   monitoring_role_arn                 = var.rds_monitoring_interval != null || var.rds_monitoring_interval != 0 ? aws_iam_role.rds_enhanced_monitoring[0].arn : null
