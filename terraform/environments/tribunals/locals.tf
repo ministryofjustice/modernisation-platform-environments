@@ -1,4 +1,4 @@
-# #### This file can be used to store locals specific to the member account ####
+#### This file can be used to store locals specific to the member account ####
 locals {
   # create name, record,type for monitoring lb aka tribunals_lb
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
