@@ -94,16 +94,6 @@ resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule_ipv6"
   cidr_ipv6         = each.value
 }
 
-resource "aws_vpc_security_group_egress_rule" "load_balancer_egress_rule" {
-  for_each          = toset([data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block])
-  description = "Allow egress to ECS instances"
-  security_group_id = aws_security_group.load_balancer_security_group.id
-  from_port         = local.app_port
-  to_port           = local.app_port
-  ip_protocol          = "tcp"
-  cidr_ipv4 = each.value
-}
-
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.external.id
   port              = 443
