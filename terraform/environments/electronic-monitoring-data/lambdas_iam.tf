@@ -195,6 +195,16 @@ resource "aws_iam_policy" "get_meta_from_s3" {
     policy = data.aws_iam_policy_document.get_meta_from_s3.json
 }
 
+resource "aws_iam_policy" "write_to_ap_s3" {
+    name = "write_to_ap_s3"
+    policy = data.aws_iam_policy_document.write_to_ap_s3.json
+}
+
+resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_write_to_ap_s3" {
+    role = aws_iam_role.send_metadata_to_ap.name
+    policy_arn = aws_iam_policy.write_to_ap_s3.arn
+}
+
 data "aws_iam_policy_document" "get_meta_from_s3" {
     statement {
         effect = "Allow"
