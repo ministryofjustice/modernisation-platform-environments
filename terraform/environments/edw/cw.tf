@@ -112,7 +112,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWEc2MemoryOverThreshold" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = local.application_data.accounts[local.environment].edw_mem_alert_evaluation_periods
   metric_name         = "mem_used_percent"
-  namespace           = local.application_data.accounts[local.environment].edw_metric_supplied_by
+  namespace           = "CustomScript"
   period              = local.application_data.accounts[local.environment].edw_mem_alert_period
   statistic           = "Average"
   threshold           = local.application_data.accounts[local.environment].edw_mem_alert_threshold
@@ -134,7 +134,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWEbsDiskSpaceUsedOverThreshold" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = local.application_data.accounts[local.environment].edw_diskspace_alert_evaluation_periods
   metric_name         = "disk_used_percent"
-  namespace           = local.application_data.accounts[local.environment].edw_metric_supplied_by
+  namespace           = "CustomScript"
   period              = local.application_data.accounts[local.environment].edw_diskspace_alert_period
   statistic           = "Average"
   threshold           = local.application_data.accounts[local.environment].edw_diskspace_alert_threshold
@@ -159,7 +159,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWOradataQueueLengthOverThreshold" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "VolumeQueueLength"
-  namespace           = local.application_data.accounts[local.environment].edw_metric_supplied_by
+  namespace           = "CustomScript"
   period              = 60
   statistic           = "Average"
   threshold           = 3
@@ -176,7 +176,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmOracleAlerts" {
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} OracleAlerts-LogErrors"
   alarm_description   = "Errors Detected in Oracle Alerts Log"
   metric_name         = "${local.application_name}-${local.application_data.accounts[local.environment].edw_log_metrics_oracle_alerts}"
-  namespace           = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+  namespace           = "LogsMetricFilters"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Sum"
   threshold           = local.application_data.accounts[local.environment].edw_logstream_errors_detected_threshold
@@ -195,7 +195,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterOracleAlerts" {
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metrics_oracle_alerts}"
-    namespace = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+    namespace = "LogsMetricFilters"
     value     = "1"
   }
 }
@@ -204,7 +204,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmTBSFreespace" {
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | TBSFreespace-LogErrors"
   alarm_description   = "Errors Detected in Oracle Alerts Log"
   metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metrics_tbs_freespace}"
-  namespace           = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+  namespace           = "LogsMetricFilters"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Sum"
   threshold           = local.application_data.accounts[local.environment].edw_logstream_errors_detected_threshold
@@ -223,7 +223,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterTBSFreespace" {
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metrics_tbs_freespace}"
-    namespace = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+    namespace = "LogsMetricFilters"
     value     = "1"
   }
 }
@@ -232,7 +232,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmPMONstatus" {
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | PMONstatus-LogErrors"
   alarm_description   = "Errors Detected in Oracle Alerts Log"
   metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_pmon_status}"
-  namespace           = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+  namespace           = "LogsMetricFilters"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Sum"
   threshold           = local.application_data.accounts[local.environment].edw_logstream_errors_detected_threshold
@@ -251,7 +251,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterPMONstatus" {
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_pmon_status}"
-    namespace = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+    namespace = "LogsMetricFilters"
     value     = "1"
   }
 }
@@ -260,7 +260,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus" {
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | CDCApplytatus-LogErrors"
   alarm_description   = "Errors Detected in Oracle CDC Log"
   metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status}"
-  namespace           = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+  namespace           = "LogsMetricFilters"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Sum"
   threshold           = local.application_data.accounts[local.environment].edw_logstream_errors_detected_threshold
@@ -279,7 +279,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus" {
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status}"
-    namespace = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+    namespace = "LogsMetricFilters"
     value     = "1"
   }
 }
@@ -288,7 +288,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus2" {
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | CDCSourcestatus-LogErrors"
   alarm_description   = "Errors Detected in Oracle CDC Log"
   metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status2}"
-  namespace           = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+  namespace           = "LogsMetricFilters"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Sum"
   threshold           = local.application_data.accounts[local.environment].edw_logstream_errors_detected_threshold
@@ -307,7 +307,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus2" {
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status2}"
-    namespace = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+    namespace = "LogsMetricFilters"
     value     = "1"
   }
 }
@@ -316,7 +316,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanBackup" {
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | RMan-LogErrors"
   alarm_description   = "Errors Detected in RMan Log"
   metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_name_rman_backup}"
-  namespace           = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+  namespace           = "LogsMetricFilters"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Sum"
   threshold           = local.application_data.accounts[local.environment].edw_logstream_errors_detected_threshold
@@ -335,7 +335,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanBackup" {
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].LogMetricNameRmanBackup}"
-    namespace = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+    namespace = "LogsMetricFilters"
     value     = "1"
   }
 }
@@ -344,7 +344,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanArchBackup" {
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | RManArch-LogErrors"
   alarm_description   = "Errors Detected in RMan Arch Log"
   metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_name_rman_arch_backup}"
-  namespace           = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+  namespace           = "LogsMetricFilters"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Sum"
   threshold           = local.application_data.accounts[local.environment].edw_logstream_errors_detected_threshold
@@ -363,7 +363,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanArchBackup" 
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_name_rman_arch_backup}"
-    namespace = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
+    namespace = "LogsMetricFilters"
     value     = "1"
   }
 }
