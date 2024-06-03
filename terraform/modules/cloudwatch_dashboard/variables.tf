@@ -1,3 +1,9 @@
+variable "accountId" {
+  description = "For monitoring accounts, apply this accountId to all widgets in dashboard"
+  type        = string
+  default     = null
+}
+
 variable "dashboard_name" {
   description = "The name of the dashboard"
   type        = string

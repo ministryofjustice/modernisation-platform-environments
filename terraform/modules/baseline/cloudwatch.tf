@@ -31,9 +31,10 @@ module "cloudwatch_dashboard" {
   source = "../../modules/cloudwatch_dashboard"
 
   dashboard_name = each.key
-  periodOverride = each.value.periodOverride
-  start          = each.value.start
-  widget_groups  = each.value.widget_groups
+  accountId      = lookup(each.value, "account_name", null) == null ? null : var.environment.account_ids[lookup(each.value, "account_name", null)]
+  periodOverride = lookup(each.value, "periodOverride", null)
+  start          = lookup(each.value, "start", null)
+  widget_groups  = lookup(each.value, "widget_groups", [])
 }
 
 resource "aws_cloudwatch_log_group" "this" {
