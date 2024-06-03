@@ -25,6 +25,13 @@ resource "aws_lb" "chaps_lb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.chaps_lb_sc.id]
   subnets            = data.aws_subnets.shared-public.ids
+  idle_timeout       = 60
+
+  access_logs {
+    bucket  = aws_s3_bucket.chaps_lb_logs.id
+    prefix  = "chaps_lb"
+    enabled = true
+  }
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
@@ -36,7 +43,9 @@ resource "aws_lb_target_group" "chaps_target_group" {
   deregistration_delay = 30
 
   stickiness {
-    type = "lb_cookie"
+    type              = "lb_cookie"
+    name              = "chaps_lb_cookie"
+    expiration_period = 86400 
   }
 
   health_check {
@@ -46,6 +55,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
     matcher             = "200-499"
     timeout             = "10"
   }
+
 }
 
 resource "aws_lb_listener" "https_listener" {
@@ -61,4 +71,45 @@ resource "aws_lb_listener" "https_listener" {
     target_group_arn = aws_lb_target_group.chaps_target_group.id
     type             = "forward"
   }
+}
+
+resource "aws_s3_bucket" "chaps_lb_logs" {
+  bucket = "chaps_lb_logs_bucket"
+  acl = "private"
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    id = "log"
+    enabled = true
+
+    transition {
+      days = 30
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 365
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "chaps_lb_logs_bucket_policy" {
+  bucket = aws_s3_bucket.lb.logs.ids
+
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.chaps_lb_logs.arn}/*"
+      },
+    ]
+  })
 }
