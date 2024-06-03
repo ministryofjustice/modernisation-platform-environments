@@ -29,14 +29,18 @@ locals {
       }],
       [
         for j in range(length(var.widget_groups[i].widgets)) : merge(
-          var.accountId == null ? {} : { accountId = var.accountId },
           {
             width  = var.widget_groups[i].width
             height = var.widget_groups[i].height
             x      = j * var.widget_groups[i].width % 24
             y      = (floor(j * var.widget_groups[i].width / 24) * var.widget_groups[i].height) + local.widget_group_y[i] + local.widget_group_header_height[i]
           },
-          var.widget_groups[i].widgets[j]
+          var.widget_groups[i].widgets[j],
+          var.accountId == null ? {} : {
+            properties = merge(var.widget_groups[i].widgets[j].properties, {
+              accountId = var.accountId
+            })
+          }
         ) if var.widget_groups[i].widgets[j] != null
       ]
     ]
