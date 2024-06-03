@@ -96,10 +96,11 @@ $scriptContent = @'
 function GetEnvironmentName {
   $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
   $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
+  return $environmentName
 }
 
 function MonitorAndSyncToS3 {
-  GetEnvironmentName
+  $environmentName = GetEnvironmentName
   "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
   "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
   # Create a FileSystemWatcher object
@@ -127,15 +128,14 @@ function MonitorAndSyncToS3 {
 }
 
 function InitialSyncToS3 {
-  GetEnvironmentName
+  $environmentName = GetEnvironmentName
   "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
   "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
   aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-$environmentName >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
   "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 }
 
-# Call the functions using $environmentName
-GetEnvironmentName
+# Call the functions
 InitialSyncToS3
 MonitorAndSyncToS3
 '@
