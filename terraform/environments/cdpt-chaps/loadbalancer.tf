@@ -82,7 +82,7 @@ resource "aws_s3_bucket" "chaps_lb_logs" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "chaps_lb_logs_lifecycle" {
-  bucket = aws_s3_bucket.chaps_lb_logs.ids
+  bucket = aws_s3_bucket.chaps_lb_logs.id
 
   rule {
     id = "log"
