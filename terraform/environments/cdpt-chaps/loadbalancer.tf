@@ -225,7 +225,7 @@ resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
   depends_on = [aws_acm_certificate_validation.external]
 
-  load_balancer_arn = module.lb_access_logs_enabled.arn
+  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
   port              = 443
   protocol          = "HTTPS"
   certificate_arn   = aws_acm_certificate.external.arn
