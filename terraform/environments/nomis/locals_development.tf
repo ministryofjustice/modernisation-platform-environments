@@ -7,7 +7,7 @@ locals {
 
   baseline_presets_development = {
     options = {
-      enable_hmpps_domain = true # Syscon users are collaborators so need domain creds to access dev-nomis-client EC2
+      enable_hmpps_domain = true # Syscon users are collaborators so need domain creds to access nomis-client EC2s
       sns_topics = {
         pagerduty_integrations = {
           dso_pagerduty               = "nomis_nonprod_alarms"
@@ -169,7 +169,7 @@ locals {
       }
 
       dev-nomis-client-a = local.jumpserver_ec2
-      dev-nomis-client-b = merge(local.jumpserver_ec2, {
+      nomis-client-b = merge(local.jumpserver_ec2, { # 15 char hostname limit as domain joined
         tags = merge(local.jumpserver_ec2.tags, {
           domain-name = "azure.noms.root"
         })
