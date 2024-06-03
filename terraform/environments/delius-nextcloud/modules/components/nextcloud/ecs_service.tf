@@ -95,7 +95,7 @@ module "nextcloud_service" {
   rds_user_secret_variable                  = "MYSQL_USER"
   elasticache_endpoint_environment_variable = "REDIS_HOST"
   elasticache_user_variable                 = "REDIS_USER"
-  elasticache_password_secret_variable      = "REDIS_PASSWORD"
+  elasticache_password_secret_variable      = "REDIS_HOST_PASSWORD"
 
   container_vars_default = {
     MYSQL_DATABASE            = "nextcloud"
