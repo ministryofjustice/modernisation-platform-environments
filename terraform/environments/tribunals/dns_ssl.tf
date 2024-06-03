@@ -1,18 +1,5 @@
 // DEV + PRE-PRODUCTION DNS CONFIGURATION
 
-variable "services" {
-  default = {
-    "appeals" = {
-      name_prefix = "administrativeappeals"
-      module_key  = "appeals"
-    },
-    "ahmlr" = {
-      name_prefix = "landregistrationdivision"
-      module_key  = "ahmlr"
-    }
-  }
-}
-
 // ACM Public Certificate
 resource "aws_acm_certificate" "external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
@@ -56,6 +43,20 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
+variable "services" {
+  default = {
+    "appeals" = {
+      name_prefix = "administrativeappeals"
+      # module_key  = "appeals"
+      module_key  = "${module.appeals}"
+    },
+    "ahmlr" = {
+      name_prefix = "landregistrationdivision"
+      module_key  = "ahmlr"
+    }
+  }
+}
+
 // Create one Route 53 record for each entry in the list of tribunals (assigned in platform_locals.tf)
 resource "aws_route53_record" "external_services" {
   for_each = var.services
@@ -65,8 +66,10 @@ resource "aws_route53_record" "external_services" {
   type    = "A"
 
   alias {
-    name                   = "${module[each.value.module_key].tribunals_lb.dns_name}"
-    zone_id                = "${module[each.value.module_key].tribunals_lb.zone_id}"
+    # name                   = module.appeals.tribunals_lb.dns_name
+    # zone_id                = module.appeals.tribunals_lb.zone_id
+    name                   = module[each.value.module_key].tribunals_lb.dns_name
+    zone_id                = module[each.value.module_key].tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
