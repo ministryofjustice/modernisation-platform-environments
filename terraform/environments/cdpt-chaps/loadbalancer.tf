@@ -75,9 +75,13 @@ resource "aws_lb_listener" "https_listener" {
 resource "aws_s3_bucket" "chaps_lb_logs" {
   bucket = "chaps-lb-logs-bucket"
   acl = "private"
+}
 
-  versioning {
-    enabled = true
+resource "aws_s3_bucket_versioning" "chaps_lb_logs_versioning" {
+  bucket = aws_s3_bucket.chaps_lb_logs.bucket
+
+    versioning_configuration {
+    enabled = "Enabled"
   }
 }
 
