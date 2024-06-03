@@ -93,7 +93,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
 resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
   security_group_id            = aws_security_group.database.id
   description                  = "Allow Lambda SSH access for backup snapshots"
-  referenced_security_group_id = aws_security_group.lambdasg.id
+  referenced_security_group_id = aws_security_group.backup_lambda.id
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22
