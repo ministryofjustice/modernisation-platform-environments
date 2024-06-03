@@ -28,7 +28,7 @@ resource "aws_lb" "chaps_lb" {
   idle_timeout       = 60
 
   access_logs {
-    bucket  = aws_s3_bucket.chaps_lb_logs.id
+    bucket  = aws_s3_bucket.chaps_lb_logs.bucket
     prefix  = "chaps_lb"
     enabled = true
   }
