@@ -136,7 +136,7 @@ resource "aws_iam_policy" "lb_logging_policy" {
 
 resource "aws_iam_role_policy_attachment" "lb_logging_policy_attachment" {
   role       = aws_iam_role.lb_logging_role.name
-  policy_arn = aws_iam_policy.lb_logging_policy.arn
+  policy_arn = aws_iam_policy.elb_logging_policy.arn
 }
  
 resource "aws_s3_bucket_policy" "chaps_lb_logs_bucket_policy" {
