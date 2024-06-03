@@ -65,8 +65,8 @@ resource "aws_route53_record" "external_services" {
   type    = "A"
 
   alias {
-    name                   = module[each.value.module_key].tribunals_lb.dns_name
-    zone_id                = module[each.value.module_key].tribunals_lb.zone_id
+    name                   = "${module[each.value.module_key].tribunals_lb.dns_name}"
+    zone_id                = "${module[each.value.module_key].tribunals_lb.zone_id}"
     evaluate_target_health = true
   }
 }
