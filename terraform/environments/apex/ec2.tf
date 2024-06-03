@@ -8,6 +8,13 @@ sudo systemctl enable amazon-ssm-agent
 echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
 mount -a
 
+sudo su - oracle -c "sqlplus / as sysdba << EOF
+shutdown abort;
+startup;
+exit;
+EOF"
+sudo su - oracle -c "lsnrctl start"
+
 cd /etc
 mkdir cloudwatch_agent
 cd cloudwatch_agent
