@@ -63,11 +63,11 @@ resource "helm_release" "aws_for_fluent_bit" {
 }
 
 resource "helm_release" "amazon_prometheus_proxy" {
-  /* https://artifacthub.io/packages/helm/prometheus-community/prometheus */
+  /* https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack */
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "prometheus"
-  version    = "25.21.0"
+  chart      = "kube-prometheus-stack"
+  version    = "59.1.0"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
