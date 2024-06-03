@@ -56,10 +56,27 @@ variable "services" {
   }
 }
 
+variable "sftp_services" {
+  default = {
+    "appeals" = {
+      name_prefix = "charitytribunal"
+      module_key  = "charity_tribunal_decisions"
+    },
+    "ahmlr" = {
+      name_prefix = "claimsmanagement"
+      module_key  = "claims_management_decisions"
+    }
+  }
+}
+
 locals {
   modules = {
     appeals = module.appeals
     ahmlr = module.ahmlr
+  }
+  sftp_modules = {
+    charity = module.charity_tribunal_decisions
+    claims = module.claims_management_decisions
   }
 }
 
@@ -76,4 +93,15 @@ resource "aws_route53_record" "external_services" {
     zone_id                = local.modules[each.value.module_key].tribunals_lb.zone_id
     evaluate_target_health = true
   }
+}
+
+resource "aws_route53_record" "sftp_external_services" {
+  for_each = var.sftp_services
+  allow_overwrite = true
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "sftp.${each.value.name_prefix}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type            = "CNAME"
+  records         = local.sftp_modules[each.value.module_key].tribunals_lb_ftp[0].dns_name
+  ttl             = 60
 }
