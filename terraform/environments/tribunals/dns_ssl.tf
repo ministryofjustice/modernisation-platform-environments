@@ -58,11 +58,11 @@ variable "services" {
 
 variable "sftp_services" {
   default = {
-    "appeals" = {
+    "charity_tribunal_decisions" = {
       name_prefix = "charitytribunal"
       module_key  = "charity_tribunal_decisions"
     },
-    "ahmlr" = {
+    "claims_management_decisions" = {
       name_prefix = "claimsmanagement"
       module_key  = "claims_management_decisions"
     }
