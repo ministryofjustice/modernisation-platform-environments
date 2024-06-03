@@ -1,3 +1,7 @@
+locals {
+  env_account_id       = local.environment_management.account_ids[terraform.workspace]
+}
+
 resource "aws_sqs_queue" "lambda_dlq" {
   name = "${var.function_name}-dlq"
   kms_master_key_id  = aws_kms_key.lambda_env_key.id
