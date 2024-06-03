@@ -1,20 +1,20 @@
 ---
-name: hmpps-intelligence-management
+name: cica-tariff
 on:
   push:
     branches:
       - main
     paths:
-      - 'terraform/environments/hmpps-intelligence-management/**'
-      - '.github/workflows/hmpps-intelligence-management.yml'
+      - 'terraform/environments/cica-tariff/**'
+      - '.github/workflows/cica-tariff.yml'
 
   pull_request:
     branches:
       - main
     types: [opened, edited, reopened, synchronize]
     paths:
-      - 'terraform/environments/hmpps-intelligence-management/**'
-      - '.github/workflows/hmpps-intelligence-management.yml'
+      - 'terraform/environments/cica-tariff/**'
+      - '.github/workflows/cica-tariff.yml'
 
   workflow_dispatch:
     inputs:

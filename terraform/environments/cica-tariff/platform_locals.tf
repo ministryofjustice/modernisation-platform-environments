@@ -1,6 +1,6 @@
 locals {
 
-  application_name = "hmpps-intelligence-management"
+  application_name = "cica-tariff"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

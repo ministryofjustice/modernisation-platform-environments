@@ -9,6 +9,6 @@ terraform {
     encrypt              = true
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
-    workspace_key_prefix = "environments/members/hmpps-intelligence-management" # This will store the object as environments/members/hmpps-intelligence-management/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/cica-tariff" # This will store the object as environments/members/cica-tariff/${workspace}/terraform.tfstate
   }
 }

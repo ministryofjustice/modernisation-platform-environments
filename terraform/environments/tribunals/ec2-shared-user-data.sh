@@ -9,7 +9,7 @@ $tribunalNames = "appeals","transport","care-standards","cicap","employment-appe
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
-"Starting userdata execution" > $logFile
+"Starting userdata execution" >> $logFile
 
 # Get the volumeid based on its tag
 $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
@@ -92,21 +92,30 @@ if (-not $awsCliInstalled) {
 }
 
 $scriptContent = @'
+
+function GetEnvironmentName {
+  $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
+  $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
+  return $environmentName
+}
+
 function MonitorAndSyncToS3 {
-    "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    # Create a FileSystemWatcher object
-    $watcher = New-Object System.IO.FileSystemWatcher
-    $watcher.Path = "D:\storage\tribunals\"
-    $watcher.IncludeSubdirectories = $true
-    $watcher.EnableRaisingEvents = $true
-    
-    # Define the action to take when a file is created
-    $action = {
-        param($source, $event)
-        $filePath = $event.FullPath
-        $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
-        "A file was created at $filePath. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-        aws s3 cp $filePath "s3://tribunals-ebs-backup/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  $environmentName = GetEnvironmentName
+  "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
+  "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  # Create a FileSystemWatcher object
+  $watcher = New-Object System.IO.FileSystemWatcher
+  $watcher.Path = "D:\storage\tribunals\"
+  $watcher.IncludeSubdirectories = $true
+  $watcher.EnableRaisingEvents = $true
+  
+  # Define the action to take when a file is created
+  $action = {
+      param($source, $event, $environmentName)
+      $filePath = $event.FullPath
+      $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
+      "A file was created at $filePath 's3://tribunals-ebs-backup-$environmentName/$relativePath'. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+      aws s3 cp $filePath "s3://tribunals-ebs-backup-$environmentName/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
     }
 
     # Register the event
@@ -119,12 +128,14 @@ function MonitorAndSyncToS3 {
 }
 
 function InitialSyncToS3 {
-    "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  $environmentName = GetEnvironmentName
+  "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
+  "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-$environmentName >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 }
 
-# Call the function
+# Call the functions
 InitialSyncToS3
 MonitorAndSyncToS3
 '@
