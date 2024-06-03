@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "lambda_invoke_policy" {
 
     resources = [
       "${module.get_metadata_from_rds_lambda.lambda_function_arn}:*",
-      "${aws_lambda_function.create_athena_external_table.arn}:*",
+      "${module.create_athena_external_table.lambda_function_arn}:*",
     ]
   }
   statement {
@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "lambda_invoke_policy" {
 
     resources = [
       module.get_metadata_from_rds_lambda.lambda_function_arn,
-      aws_lambda_function.create_athena_external_table.arn,
+      module.create_athena_external_table.lambda_function_arn,
     ]
   }
 }

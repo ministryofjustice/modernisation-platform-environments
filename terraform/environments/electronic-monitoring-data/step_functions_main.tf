@@ -22,7 +22,7 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
         "States": {
           "CreateAthenaTable": {
             "Type": "Task",
-            "Resource": "${aws_lambda_function.create_athena_external_table.arn}",
+            "Resource": "${module.create_athena_external_table.lambda_function_arn}",
             "ResultPath": "$.result",
             "End": true
           }
