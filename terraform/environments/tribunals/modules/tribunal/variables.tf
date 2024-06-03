@@ -2,10 +2,6 @@ variable "app_name" {
   description = "Name of the application"
 }
 
-variable "module_name" {
-  description = "Name of the module"
-}
-
 variable "app_url" {
 }
 
