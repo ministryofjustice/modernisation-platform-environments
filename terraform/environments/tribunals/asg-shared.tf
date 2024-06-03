@@ -4,9 +4,6 @@ locals {
   instance_profile_name     = join("-", [local.app_name, "ec2-instance-profile"])
   ec2_instance_policy       = join("-", [local.app_name, "ec2-instance-policy"])
   tags_common               = local.tags
-  user_data = templatefile("ec2-shared-user-data.sh", {
-       environmentName = "${local.environment}"
-     })
 }
 
 # Create an IAM policy for the custom permissions required by the EC2 hosting instance
