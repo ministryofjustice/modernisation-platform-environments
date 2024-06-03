@@ -108,7 +108,7 @@ locals {
 
   defaults_bods_ec2 = merge(local.defaults_ec2, {
     config = merge(local.defaults_ec2.config, {
-      ami_name = "hmpps_windows_server_2019_release_*"
+      ami_name = "hmpps_windows_server_2019_release_*" # wildcard to latest. EC2 instance versions ami_name must be fixed
     })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["bods", "oasys_db"]

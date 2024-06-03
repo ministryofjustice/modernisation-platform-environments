@@ -39,6 +39,7 @@ locals {
           availability_zone             = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
+          ami_name = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z" # fixed to a specific version
         })
         instance = merge(local.defaults_bods_ec2.instance, {
           instance_type = "m4.xlarge"
