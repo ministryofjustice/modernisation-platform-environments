@@ -29,6 +29,6 @@ resource "aws_shield_drt_access_role_arn_association" "main" {
 
 resource "aws_wafv2_web_acl_association" "this" {
   for_each     = local.shield_protections
-  resource_arn = each.value["ProtectionArn"]
+  resource_arn = each.value["ResourceArn"]
   web_acl_arn  = data.external.shield_waf.result["arn"]
 }
