@@ -47,7 +47,6 @@ def create_glue_database():
 
 
 def upload_to_s3(local_filepath: str, s3_filepath: str) -> None:
-    s3 = boto3.client("s3")
     bucket_name, key = s3_filepath[5:].split("/", 1)
 
     try:
