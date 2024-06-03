@@ -387,7 +387,7 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
         "title": "EC2 Status Check Failure",
         "annotations": {
           "alarms": [
-            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rStatusCheckFailed.arn}"
+            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWStatusCheckFailed.arn}"
           ]
         },
         "view": "timeSeries",
@@ -409,7 +409,7 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
         "title": "EC2 Status Check Failure- Instance",
         "annotations": {
           "alarms": [
-            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rStatusCheckFailedInstance.arn}"
+            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWStatusCheckFailedInstance.arn}"
           ]
         },
         "view": "timeSeries",
@@ -431,7 +431,7 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
         "title": "EC2 CPU Usage",
         "annotations": {
           "alarms": [
-            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rEc2CpuUtilisationTooHigh.arn}"
+            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWEc2CpuUtilisationTooHigh.arn}"
           ]
         },
         "view": "timeSeries",
@@ -453,7 +453,7 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
         "title": "EC2 Memory Usage",
         "annotations": {
           "alarms": [
-            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rEc2MemoryOverThreshold.arn}"
+            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWEc2MemoryOverThreshold.arn}"
           ]
         },
         "view": "timeSeries",
@@ -475,7 +475,7 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
         "title": "EBS Disk Usage",
         "annotations": {
           "alarms": [
-            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rEbsDiskSpaceUsedOverThreshold.arn}"
+            "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWEbsDiskSpaceUsedOverThreshold.arn}"
           ]
         },
         "view": "timeSeries",
@@ -496,8 +496,8 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
       "properties": {
         "title": "Status Check Failures",
         "alarms": [
-          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rStatusCheckFailed.arn}",
-          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rStatusCheckFailedInstance.arn}"
+          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWStatusCheckFailed.arn}",
+          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWStatusCheckFailedInstance.arn}"
         ]
       }
     },
@@ -510,9 +510,9 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
       "properties": {
         "title": "Resource Consumption",
         "alarms": [
-          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rEc2CpuUtilisationTooHigh.arn}",
-          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rEc2MemoryOverThreshold.arn}",
-          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rEbsDiskSpaceUsedOverThreshold.arn}"
+          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWEc2CpuUtilisationTooHigh.arn}",
+          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWEc2MemoryOverThreshold.arn}",
+          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWEbsDiskSpaceUsedOverThreshold.arn}"
         ]
       }
     },
@@ -525,11 +525,11 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
       "properties": {
         "title": "Oracle Log Errors",
         "alarms": [
-          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rLogStreamErrorsAlarmOracleAlerts.arn}",
+          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWLogStreamErrorsAlarmOracleAlerts.arn}",
           "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWLogStreamErrorsAlarmRmanBackup.arn}",
           "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWLogStreamErrorsAlarmRmanArchBackup.arn}",
-          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rLogStreamErrorsAlarmTBSFreespace.arn}",
-          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.rLogStreamErrorsAlarmPMONstatus.arn}"
+          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWLogStreamErrorsAlarmTBSFreespace.arn}",
+          "arn:aws:cloudwatch:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.EDWLogStreamErrorsAlarmPMONstatus.arn}"
         ]
       }
     }
