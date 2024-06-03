@@ -129,6 +129,15 @@ data "aws_iam_policy_document" "athena_api" {
     ]
   }
 
+  statement {
+    actions = [
+      "kms:GenerateDataKey"
+    ]
+    resources = [
+      "arn:aws:kms:*:771283872747:key/*"
+    ]
+  }
+
 }
 
 # Redshift DataAPI Policy
