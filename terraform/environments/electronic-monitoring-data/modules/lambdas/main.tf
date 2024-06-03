@@ -5,63 +5,93 @@ resource "aws_sqs_queue" "lambda_dlq" {
 
 resource "aws_kms_key" "lambda_env_key" {
   description = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
-  enable_key_rotation     = true
+  enable_key_rotation = true
+
+  policy = <<EOF
+{
+  "Id": "key-default",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Enable IAM User Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${local.env_account_id}:root"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "Enable log service Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "logs.eu-west-2.amazonaws.com"
+      },
+      "Action": [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
 }
 
 resource "aws_iam_policy" "lambda_dlq_policy" {
   name        = "${var.function_name}-dlq-policy"
   description = "Policy for Lambda to use DLQ for ${var.function_name}"
-  policy      = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "sqs:SendMessage",
-          "sqs:GetQueueAttributes",
-          "sqs:GetQueueUrl"
-        ],
-        Resource = aws_sqs_queue.lambda_dlq.arn
-      }
+
+  policy = data.aws_iam_policy_document.lambda_dlq_policy.json
+}
+
+data "aws_iam_policy_document" "lambda_dlq_policy" {
+  statement {
+    actions = [
+      "sqs:SendMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl"
     ]
-  })
+    resources = [aws_sqs_queue.lambda_dlq.arn]
+  }
 }
 
 resource "aws_iam_policy" "lambda_kms_policy" {
   name        = "${var.function_name}-kms-policy"
   description = "Policy for Lambda to use KMS key for ${var.function_name}"
-  policy      = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "kms:Decrypt",
-          "kms:Encrypt",
-          "kms:GenerateDataKey"
-        ],
-        Resource = aws_kms_key.lambda_env_key.arn
-      }
+
+  policy = data.aws_iam_policy_document.lambda_kms_policy.json
+}
+
+data "aws_iam_policy_document" "lambda_kms_policy" {
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
     ]
-  })
+    resources = [aws_kms_key.lambda_env_key.arn]
+  }
 }
 
 resource "aws_iam_policy" "lambda_xray_policy" {
   name        = "${var.function_name}-xray-policy"
   description = "Policy for Lambda to use X-Ray for ${var.function_name}"
-  policy      = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "xray:PutTraceSegments",
-          "xray:PutTelemetryRecords"
-        ],
-        Resource = "*"
-      }
+
+  policy = data.aws_iam_policy_document.lambda_xray_policy.json
+}
+
+data "aws_iam_policy_document" "lambda_xray_policy" {
+  statement {
+    actions = [
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords"
     ]
-  })
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_dlq_policy_attachment" {

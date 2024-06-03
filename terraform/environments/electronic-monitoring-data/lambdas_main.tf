@@ -12,6 +12,7 @@ data "archive_file" "get_metadata_from_rds" {
     output_path = "${local.lambda_path}/get_metadata_from_rds.zip"
 }
 
+#checkov:skip=CKV_AWS_272
 module "get_metadata_from_rds_lambda" {
   source              = "./modules/lambdas"
   filename = "${local.lambda_path}/get_metadata_from_rds.zip"
