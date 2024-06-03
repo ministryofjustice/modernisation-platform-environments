@@ -11,7 +11,8 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.planetfm-test}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-development}:role/LambdaFunctionADObjectCleanUp",
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/LambdaFunctionADObjectCleanUp",
-      "arn:aws:iam::${module.environment.account_ids.core-shared-services-production}:role/ad-fixngo-ec2-nonlive-role"
+      "arn:aws:iam::${module.environment.account_ids.core-shared-services-production}:role/ad-fixngo-ec2-nonlive-role",
+      "arn:aws:iam::${module.environment.account_ids.nomis-development}:role/EC2HmppsDomainSecretsRole",
     ]
     preproduction = []
     production = [
