@@ -101,7 +101,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "chaps_lb_logs_lifecycle" {
     }
 
     noncurrent_version_expiration {
-      days = 90
+      noncurrent_days = 90
     }
   }
 }
