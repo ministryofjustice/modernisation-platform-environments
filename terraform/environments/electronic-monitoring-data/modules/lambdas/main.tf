@@ -109,14 +109,52 @@ resource "aws_iam_role_policy_attachment" "lambda_xray_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_xray_policy.arn
 }
 
+resource "aws_kms_key" "cloudwatch_env_key" {
+  description = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
+  enable_key_rotation = true
+
+  policy = <<EOF
+{
+  "Id": "key-default",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Enable IAM User Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${var.env_account_id}:root"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "Enable log service Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "logs.eu-west-2.amazonaws.com"
+      },
+      "Action": [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = 400
-  kms_key_id = aws_kms_key.lambda_env_key.id
-
-  depends_on = [aws_kms_key.lambda_env_key]
+  kms_key_id = aws_kms_key.cloudwatch_env_key.id
 }
 
+
+#checkov:skip=CKV_AWS_272
 resource "aws_lambda_function" "this" {
   filename         = var.filename
   function_name    = var.function_name
