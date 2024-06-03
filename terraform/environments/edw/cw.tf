@@ -219,7 +219,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmTBSFreespace" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterTBSFreespace" {
   name           = "EDWLogsMetricFilterTBSFreespace"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupTBSFreespace.name
-  pattern = local.application_data.accounts[local.environment].edw_tbs_freespace_logmetric_pattern
+  pattern = "ALERT"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metrics_tbs_freespace}"
@@ -247,7 +247,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmPMONstatus" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterPMONstatus" {
   name           = "EDWLogsMetricFilterPMONstatus"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupPMONstatus.name
-  pattern = local.application_data.accounts[local.environment].edw_pmon_status_logmetroc_pattern
+  pattern = "DOWN"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_pmon_status}"
@@ -331,7 +331,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanBackup" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanBackup" {
   name           = "EDWLogsMetricFilterRmanBackup"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupRman.name
-  pattern = local.application_data.accounts[local.environment].edw_rman_logmetric_pattern
+  pattern = "?ERRORs ?Errors ?errors ?ERROR ?Error ?error"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_name_rman_backup}"
@@ -359,7 +359,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanArchBackup" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanArchBackup" {
   name           = "EDWLogsMetricFilterRmanArchBackup"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupRmanArch.name
-  pattern = local.application_data.accounts[local.environment].edw_rman_arc_logmetric_pattern
+  pattern = "?FAILURE ?Failure ?failure"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_name_rman_arch_backup}"

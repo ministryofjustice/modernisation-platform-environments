@@ -57,11 +57,7 @@
       "edw_dashboard_refresh_period": "60",
       "edw_disk_path": "/oracle/dbf",
       "edw_disk_device": "/dev/xvdf",
-      "edw_disk_fs_type": "ext4",
-      "edw_rman_logmetric_pattern": "?ERRORs ?Errors ?errors ?ERROR ?Error ?error",
-      "edw_rman_arc_logmetric_pattern": "?FAILURE ?Failure ?failure",
-      "edw_tbs_freespace_logmetric_pattern": "ALERT",
-      "edw_pmon_status_logmetroc_pattern": "DOWN"
+      "edw_disk_fs_type": "ext4"
     },
     "test": {
       "example_var": "test-data"
