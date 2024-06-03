@@ -37,6 +37,7 @@ module "get_metadata_from_rds_lambda" {
       DB_NAME = local.db_name
       METADATA_STORE_BUCKET = module.metadata-s3-bucket.bucket.id
     }
+  env_account_id = local.env_account_id
 }
 
 

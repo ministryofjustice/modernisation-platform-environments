@@ -1,8 +1,3 @@
-locals {
-  environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
-  env_account_id       = local.environment_management.account_ids[terraform.workspace]
-}
-
 resource "aws_sqs_queue" "lambda_dlq" {
   name = "${var.function_name}-dlq"
   kms_master_key_id  = aws_kms_key.lambda_env_key.id
@@ -21,7 +16,7 @@ resource "aws_kms_key" "lambda_env_key" {
       "Sid": "Enable IAM User Permissions",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::${local.env_account_id}:root"
+        "AWS": "arn:aws:iam::${var.env_account_id}:root"
       },
       "Action": "kms:*",
       "Resource": "*"

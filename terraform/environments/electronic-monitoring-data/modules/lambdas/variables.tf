@@ -71,3 +71,8 @@ variable "reserved_concurrent_executions" {
   type        = number
   default     = 10
 }
+
+variable "env_account_id" {
+  description = "The account number of the aws account"
+  type        = number
+  }
