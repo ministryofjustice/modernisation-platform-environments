@@ -63,8 +63,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailedInstance" {
     InstanceId = aws_instance.edw_db_instance.id
   }
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailed" {
@@ -82,8 +82,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailed" {
     InstanceId = aws_instance.edw_db_instance.id
   }
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWEc2CpuUtilisationTooHigh" {
@@ -102,8 +102,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWEc2CpuUtilisationTooHigh" {
     InstanceId = aws_instance.edw_db_instance.id
   }
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWEc2MemoryOverThreshold" {
@@ -124,8 +124,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWEc2MemoryOverThreshold" {
     InstanceType = aws_instance.edw_db_instance.instance_type
   }
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWEbsDiskSpaceUsedOverThreshold" {
@@ -149,8 +149,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWEbsDiskSpaceUsedOverThreshold" {
     fstype = local.application_data.accounts[local.environment].edw_disk_fs_type
   }
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWOradataQueueLengthOverThreshold" {
@@ -168,8 +168,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWOradataQueueLengthOverThreshold" {
     VolumeId = aws_ebs_volume.oradataVolume.id
   }
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmOracleAlerts" {
@@ -184,8 +184,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmOracleAlerts" {
   evaluation_periods  = local.application_data.accounts[local.environment].edw_logstream_errors_detected_evaluation_periods
   treat_missing_data  = "notBreaching"
 
-  alarm_actions       = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions          = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions       = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions          = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterOracleAlerts" {
@@ -212,8 +212,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmTBSFreespace" {
   evaluation_periods  = local.application_data.accounts[local.environment].edw_logstream_errors_detected_evaluation_periods
   treat_missing_data  = "notBreaching"
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterTBSFreespace" {
@@ -240,8 +240,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmPMONstatus" {
   evaluation_periods  = local.application_data.accounts[local.environment].edw_logstream_errors_detected_evaluation_periods
   treat_missing_data  = "notBreaching"
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterPMONstatus" {
@@ -259,7 +259,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterPMONstatus" {
 resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus" {
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | CDCApplytatus-LogErrors"
   alarm_description   = "Errors Detected in Oracle CDC Log"
-  metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].local.application_data.accounts[local.environment].edw_log_metric_cdc_status}"
+  metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status}"
   namespace           = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Sum"
@@ -268,8 +268,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus" {
   evaluation_periods  = local.application_data.accounts[local.environment].edw_logstream_errors_detected_evaluation_periods
   treat_missing_data  = "notBreaching"
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus" {
@@ -278,7 +278,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus" {
   pattern =  "[APPLY_NAME, STATUS='DISABLED']"
 
   metric_transformation {
-    name      = "${local.application_name}_${local.application_data.accounts[local.environment].local.application_data.accounts[local.environment].edw_log_metric_cdc_status}"
+    name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status}"
     namespace = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
     value     = "1"
   }
@@ -287,7 +287,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus" {
 resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus2" {
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | CDCSourcestatus-LogErrors"
   alarm_description   = "Errors Detected in Oracle CDC Log"
-  metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].local.application_data.accounts[local.environment].edw_log_metric_cdc_status2}"
+  metric_name         = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status2}"
   namespace           = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Sum"
@@ -296,8 +296,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus2" {
   evaluation_periods  = local.application_data.accounts[local.environment].edw_logstream_errors_detected_evaluation_periods
   treat_missing_data  = "notBreaching"
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus2" {
@@ -306,7 +306,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus2" {
   pattern = "[SOURCE_NAME ,SOURCE_ENABLED='N']"
 
   metric_transformation {
-    name      = "${local.application_name}_${local.application_data.accounts[local.environment].local.application_data.accounts[local.environment].edw_log_metric_cdc_status2}"
+    name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status2}"
     namespace = local.application_data.accounts[local.environment].edw_log_metric_filter_namespace
     value     = "1"
   }
@@ -324,8 +324,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanBackup" {
   evaluation_periods  = local.application_data.accounts[local.environment].edw_logstream_errors_detected_evaluation_periods
   treat_missing_data  = "notBreaching"
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanBackup" {
@@ -352,8 +352,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanArchBackup" {
   evaluation_periods  = local.application_data.accounts[local.environment].edw_logstream_errors_detected_evaluation_periods
   treat_missing_data  = "notBreaching"
 
-  alarm_actions = aws_sns_topic.edw_alerting_topic.arn
-  ok_actions    = aws_sns_topic.edw_alerting_topic.arn
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanArchBackup" {
