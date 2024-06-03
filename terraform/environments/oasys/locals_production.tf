@@ -713,14 +713,14 @@ locals {
       # internal/private
       #
       "hmpps-production.modernisation-platform.internal" = {
-        vpc = {    # this makes it a private hosted zone
+        vpc = { # this makes it a private hosted zone
           id = module.environment.vpc.id
         }
         records = [
           { name = "db.trn.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.oasys", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.internal"] }, # db.oasys.hmpps-production.modernisation-platform.internal
-          { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.internal"] },                         # db.onr.hmpps-production.modernisation-platform.internal
+          { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.internal"] },     # db.onr.hmpps-production.modernisation-platform.internal
         ]
       }
     }
@@ -745,6 +745,6 @@ locals {
         retention_in_days = 90
       }
     }
-    
+
   }
 }

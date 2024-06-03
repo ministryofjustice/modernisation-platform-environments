@@ -1,9 +1,9 @@
 # // Create one Route 53 record for each entry in the list of tribunals (assigned in platform_locals.tf)
 resource "aws_route53_record" "external_appeals" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "administrativeappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "administrativeappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.appeals.tribunals_lb.dns_name
@@ -14,9 +14,9 @@ resource "aws_route53_record" "external_appeals" {
 
 resource "aws_route53_record" "external_ahmlr" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "landregistrationdivision.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "landregistrationdivision.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.ahmlr.tribunals_lb.dns_name
@@ -132,9 +132,9 @@ resource "aws_route53_record" "external_ahmlr" {
 // Records for FTP sites
 resource "aws_route53_record" "external_charity" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "charitytribunal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "charitytribunal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.charity_tribunal_decisions.tribunals_lb.dns_name
@@ -150,15 +150,15 @@ resource "aws_route53_record" "external_charity_sftp" {
   name            = "sftp.charitytribunal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.charity_tribunal_decisions.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.charity_tribunal_decisions.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "external_claims_management" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "claimsmanagement.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "claimsmanagement.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.claims_management_decisions.tribunals_lb.dns_name
@@ -174,15 +174,15 @@ resource "aws_route53_record" "external_claims_management_sftp" {
   name            = "sftp.claimsmanagement.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.claims_management_decisions.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.claims_management_decisions.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "external_consumer_credit_appeals" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "consumercreditappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "consumercreditappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.consumer_credit_appeals.tribunals_lb.dns_name
@@ -198,15 +198,15 @@ resource "aws_route53_record" "external_consumer_credit_appeals_sftp" {
   name            = "sftp.consumercreditappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.consumer_credit_appeals.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.consumer_credit_appeals.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "external_estate_agent_appeals" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "estateagentappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "estateagentappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.estate_agent_appeals.tribunals_lb.dns_name
@@ -222,15 +222,15 @@ resource "aws_route53_record" "external_estate_agent_appeals_sftp" {
   name            = "sftp.estateagentappeals.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.estate_agent_appeals.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.estate_agent_appeals.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "external_primary_health_lists" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "primaryhealthlists.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "primaryhealthlists.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.primary_health_lists.tribunals_lb.dns_name
@@ -246,15 +246,15 @@ resource "aws_route53_record" "external_primary_health_lists_sftp" {
   name            = "sftp.primaryhealthlists.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.primary_health_lists.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.primary_health_lists.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "external_siac" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "siac.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "siac.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.siac.tribunals_lb.dns_name
@@ -270,15 +270,15 @@ resource "aws_route53_record" "external_siac_sftp" {
   name            = "sftp.siac.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.siac.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.siac.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "external_sscs_venue_pages" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "sscsvenues.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "sscsvenues.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.sscs_venue_pages.tribunals_lb.dns_name
@@ -294,15 +294,15 @@ resource "aws_route53_record" "external_sscs_venue_pages_sftp" {
   name            = "sftp.sscsvenues.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.sscs_venue_pages.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.sscs_venue_pages.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "external_tax_chancery_decisions" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "taxchancerydecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "taxchancerydecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.tax_chancery_decisions.tribunals_lb.dns_name
@@ -318,15 +318,15 @@ resource "aws_route53_record" "external_tax_chancery_decisions_sftp" {
   name            = "sftp.taxchancerydecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.tax_chancery_decisions.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.tax_chancery_decisions.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "external_tax_tribunal_decisions" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "taxtribunaldecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "taxtribunaldecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.tax_tribunal_decisions.tribunals_lb.dns_name
@@ -342,15 +342,15 @@ resource "aws_route53_record" "external_tax_tribunal_decisions_sftp" {
   name            = "sftp.taxtribunaldecisions.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.tax_tribunal_decisions.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.tax_tribunal_decisions.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "external_ftp_admin_appeals" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "adminappealsreports.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "adminappealsreports.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = module.ftp-admin-appeals.tribunals_lb.dns_name
@@ -366,14 +366,14 @@ resource "aws_route53_record" "external_admin_appeals_sftp" {
   name            = "sftp.adminappealsreports.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
 
-  records         = [module.ftp-admin-appeals.tribunals_lb_ftp[0].dns_name]
-  ttl             = 60
+  records = [module.ftp-admin-appeals.tribunals_lb_ftp[0].dns_name]
+  ttl     = 60
 }
 
 
 # ACM certificate validation
 resource "aws_acm_certificate_validation" "external" {
-  certificate_arn = aws_acm_certificate.external.arn
+  certificate_arn         = aws_acm_certificate.external.arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 }
 

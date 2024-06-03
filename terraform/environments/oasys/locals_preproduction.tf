@@ -342,7 +342,7 @@ locals {
       #
       # public
       #
-      "hmpps-preproduction.modernisation-platform.service.justice.gov.uk" = { 
+      "hmpps-preproduction.modernisation-platform.service.justice.gov.uk" = {
         records = [
           { name = "db.pp.oasys", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
@@ -352,7 +352,7 @@ locals {
       # internal/private
       #
       "hmpps-preproduction.modernisation-platform.internal" = {
-        vpc = {  # this makes it a private hosted zone
+        vpc = { # this makes it a private hosted zone
           id = module.environment.vpc.id
         }
         records = [

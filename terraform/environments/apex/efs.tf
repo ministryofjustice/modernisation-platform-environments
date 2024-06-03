@@ -1,7 +1,7 @@
 resource "aws_kms_key" "efs" {
   description = "KMS key for encrypting EFS"
   # enable_key_rotation = true
-  tags                = local.tags
+  tags = local.tags
 }
 
 resource "aws_kms_key_policy" "efs" {

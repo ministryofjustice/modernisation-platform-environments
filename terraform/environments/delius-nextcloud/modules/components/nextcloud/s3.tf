@@ -5,7 +5,7 @@ module "s3_bucket_config" {
     aws.bucket-replication = aws
   }
 
-  bucket_prefix     = "${var.env_name}-config"
+  bucket_prefix      = "${var.env_name}-config"
   versioning_enabled = true
   sse_algorithm      = "AES256"
   # Useful guide - https://aws.amazon.com/blogs/storage/how-to-use-aws-datasync-to-migrate-data-between-amazon-s3-buckets/
@@ -18,7 +18,7 @@ module "s3_bucket_config" {
     principals = {
       type = "AWS"
       identifiers = [
-          module.nextcloud_service.task_role_arn,
+        module.nextcloud_service.task_role_arn,
       ]
     }
   }]
@@ -65,9 +65,9 @@ resource "aws_ssm_parameter" "nextcloud_secret" {
   type  = "SecureString"
   value = "replace_me"
   lifecycle {
-    ignore_changes = [ 
+    ignore_changes = [
       value
-     ]
+    ]
   }
 }
 
@@ -81,29 +81,29 @@ resource "aws_s3_object" "config" {
   content = templatefile("${path.module}/templates/nextcloud-conf.json.tftpl",
     {
       nextcloud_passwordsalt = random_password.nextcloud_password_salt.result,
-      nextcloud_secret = data.aws_ssm_parameter.nextcloud_secret.value,
-      nextcloud_id = "nextcloud",
+      nextcloud_secret       = data.aws_ssm_parameter.nextcloud_secret.value,
+      nextcloud_id           = "nextcloud",
       redis = {
         host = module.nextcloud_service.elasticache_endpoint
         port = module.nextcloud_service.elasticache_port
       },
       mail = {
-        server = "replace"
+        server       = "replace"
         from_address = "replace"
-        domain = "replace"
+        domain       = "replace"
       }
       nextcloud_s01ldap_agent_password = "replace"
-      fileshare_user_base = "replace"
-      standard_user_base = "replace"
-      fs_group_prefix = "replace"
-      ldap_host = "ldap.dev.delius-core.hmpps-development.modernisation-platform.internal"
-      pwm_url = "pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
+      fileshare_user_base              = "replace"
+      standard_user_base               = "replace"
+      fs_group_prefix                  = "replace"
+      ldap_host                        = "ldap.dev.delius-core.hmpps-development.modernisation-platform.internal"
+      pwm_url                          = "pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
 
       fileshare_base_groups = "replace"
-      fileshare_user_base = "replace"
-      standard_user_base = "replace"
+      fileshare_user_base   = "replace"
+      standard_user_base    = "replace"
 
-      ldap_user = "cn=admin,ou=Users,dc=moj,dc=com"
+      ldap_user                        = "cn=admin,ou=Users,dc=moj,dc=com"
       nextcloud_s01ldap_agent_password = "replace"
     }
   )

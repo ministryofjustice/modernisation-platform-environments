@@ -1,7 +1,7 @@
 locals {
   default_connection = { "default" = values(var.connection_strings)[0] }
   # Transform connection_strings to the format required by the connector environment properties and add a default
-  connection_strings = merge({ for k, v in var.connection_strings: "${k}_connection_string" => v }, local.default_connection)
+  connection_strings = merge({ for k, v in var.connection_strings : "${k}_connection_string" => v }, local.default_connection)
 }
 
 resource "aws_security_group" "athena_federated_query_lambda_sg" {
@@ -57,8 +57,8 @@ resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
 
   environment {
     variables = merge({
-      spill_bucket            = var.spill_bucket_name
-      spill_prefix            = var.spill_bucket_prefix
+      spill_bucket = var.spill_bucket_name
+      spill_prefix = var.spill_bucket_prefix
     }, local.connection_strings)
   }
 }
