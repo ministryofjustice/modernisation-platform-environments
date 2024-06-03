@@ -19,6 +19,11 @@ output "cloudwatch_dashboard_widgets" {
   value       = local.cloudwatch_dashboard_widgets
 }
 
+output "cloudwatch_dashboard_widget_groups" {
+  description = "Map of common cloudwatch dashboard widget groups"
+  value       = local.cloudwatch_dashboard_widget_groups
+}
+
 output "cloudwatch_dashboards" {
   description = "Map of common cloudwatch dashboards"
   value = {
