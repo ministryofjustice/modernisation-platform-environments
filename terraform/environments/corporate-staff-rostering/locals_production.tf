@@ -318,6 +318,35 @@ locals {
         })
       })
     }
+
+    iam_policies = {
+      Ec2ProdDatabasePolicy = {
+        description = "Permissions required for prod Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
+            ]
+          }
+        ]
+      }
+    }
+
     lbs = {
       r12 = {
         internal_lb              = true
@@ -440,34 +469,6 @@ locals {
             attachments = [
               { ec2_instance_name = "pd-csr-w-1-a" },
               { ec2_instance_name = "pd-csr-w-2-b" },
-            ]
-          }
-        }
-
-        iam_policies = {
-          Ec2ProdDatabasePolicy = {
-            description = "Permissions required for prod Database EC2s"
-            statements = [
-              {
-                effect = "Allow"
-                actions = [
-                  "ssm:GetParameter",
-                ]
-                resources = [
-                  "arn:aws:ssm:*:*:parameter/azure/*",
-                ]
-              },
-              {
-                effect = "Allow"
-                actions = [
-                  "secretsmanager:GetSecretValue",
-                  "secretsmanager:PutSecretValue",
-                ]
-                resources = [
-                  "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
-                  "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
-                ]
-              }
             ]
           }
         }
