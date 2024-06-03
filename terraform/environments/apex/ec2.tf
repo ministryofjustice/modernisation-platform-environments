@@ -20,7 +20,7 @@ EOF
 }
 
 resource "aws_key_pair" "apex" {
-  key_name   = "${local.application_name_short}-ssh-key"
+  key_name   = "${local.application_name}-ssh-key"
   public_key = local.application_data.accounts[local.environment].apex_ec2_key
 }
 
