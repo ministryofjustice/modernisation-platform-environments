@@ -20,6 +20,9 @@ resource "aws_security_group" "database_security_group" {
       Name = "${local.application_name}-database_security_group-security-group"
     }
   )
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_subnet_group" "jitbit" {
