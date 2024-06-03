@@ -57,7 +57,7 @@ resource "aws_security_group" "jitbit_sandbox" {
 
   vpc_id      = data.aws_vpc.shared.id
   name        = format("hmpps-%s-%s-service", "sandbox", local.application_name)
-  description = "Security group for the ${local.application_name} sandbox service"
+  description = "Security group for the ${local.application_name} service"
   tags        = local.tags
 
   lifecycle {
