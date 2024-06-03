@@ -14,6 +14,7 @@ module "appeals" {
   source                            = "./modules/tribunal"
   # The app_name needs to match the folder name in the volume
   app_name                          = "appeals"
+  module_name                       = "appeals"
   app_url                           = "administrativeappeals"
   sql_migration_path                = "../scripts/administrative_appeals"
   app_db_name                       = "ossc"
@@ -50,6 +51,7 @@ module "ahmlr" {
   is_ftp_app                        = false
   source                            = "./modules/tribunal"
   app_name                          = "hmlands"
+  module_name                       = "ahmlr"
   app_url                           = "landregistrationdivision"
   sql_migration_path                = "../scripts/ahmlr"
   app_db_name                       = "hmlands"

@@ -1,5 +1,6 @@
 locals {
   app                    = var.app_name
+  module_name            = var.module_name
   app_url                = var.app_url
   sql_migration_path     = var.sql_migration_path
   app_db_name            = var.app_db_name
@@ -155,4 +156,17 @@ module "ecs_loadbalancer" {
   aws_acm_certificate_external = var.aws_acm_certificate_external
   is_ftp_app                   = var.is_ftp_app
   waf_arn                      = var.waf_arn
+}
+
+resource "aws_route53_record" "external" {
+  provider = aws.core-vpc
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${local.app_url}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = "${module[local.module_name].tribunals_lb.dns_name}"
+    zone_id                = "${module[local.module_name].tribunals_lb.zone_id}"
+    evaluate_target_health = true
+  }
 }
