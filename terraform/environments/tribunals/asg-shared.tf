@@ -4,6 +4,9 @@ locals {
   instance_profile_name     = join("-", [local.app_name, "ec2-instance-profile"])
   ec2_instance_policy       = join("-", [local.app_name, "ec2-instance-policy"])
   tags_common               = local.tags
+  user_data = templatefile("${path.module}/user_data.tpl", {
+       environmentName = "${local.environment}"
+     })
 }
 
 # Create an IAM policy for the custom permissions required by the EC2 hosting instance
@@ -202,14 +205,6 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
     version = "$Latest"
   }
 }
-
-data "template_file" "user_data" {
-  template = "${filebase64("ec2-shared-user-data.sh")}"
-  vars = {
-    environmentName = "${local.environment}"
-  }
-}
-
 
 ###########################################################################
 
