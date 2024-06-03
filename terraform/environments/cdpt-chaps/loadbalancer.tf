@@ -43,9 +43,8 @@ resource "aws_lb_target_group" "chaps_target_group" {
   deregistration_delay = 30
 
   stickiness {
-    type              = "lb_cookie"
-    name              = "chaps_lb_cookie"
-    expiration_period = 86400 
+    type            = "lb_cookie"
+    cookie_duration = 86400
   }
 
   health_check {
@@ -97,7 +96,7 @@ resource "aws_s3_bucket" "chaps_lb_logs" {
 }
 
 resource "aws_s3_bucket_policy" "chaps_lb_logs_bucket_policy" {
-  bucket = aws_s3_bucket.lb.logs.ids
+  bucket = aws_s3_bucket.lb_logs.id
 
   policy = jsonencode({
     Version   = "2012-10-17"
