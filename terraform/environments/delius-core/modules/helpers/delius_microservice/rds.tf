@@ -6,9 +6,9 @@ resource "random_id" "rds_suffix" {
   byte_length = 2
 }
 
-resource "aws_security_group" "db" {
+resource "aws_security_group" "rds" {
   count       = var.create_rds ? 1 : 0
-  name        = "${var.name}-${var.env_name}-database-security-group"
+  name        = "${var.name}-${var.env_name}-rds-security-group"
   description = "controls access to db"
   vpc_id      = var.account_config.shared_vpc_id
 
@@ -20,7 +20,7 @@ resource "aws_security_group" "db" {
   )
 }
 
- resource "aws_vpc_security_group_ingress_rule" "from_custom" {
+ resource "aws_vpc_security_group_ingress_rule" "rds_from_custom" {
     for_each = {
       for sg in var.db_ingress_security_groups : sg => sg
     }
@@ -32,7 +32,7 @@ resource "aws_security_group" "db" {
   description       = "Allow RDS traffic from ${each.value}"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "from_bastion" {
+resource "aws_vpc_security_group_ingress_rule" "rds_from_bastion" {
   count = var.create_rds ? 1 : 0
   security_group_id = aws_security_group.db[0].id
   from_port         = var.rds_port
@@ -42,7 +42,7 @@ resource "aws_vpc_security_group_ingress_rule" "from_bastion" {
   description       = "Allow RDS traffic from service"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "from_service" {
+resource "aws_vpc_security_group_ingress_rule" "rds_from_service" {
   count = var.create_rds ? 1 : 0
   security_group_id = aws_security_group.db[0].id
   from_port         = var.rds_port
