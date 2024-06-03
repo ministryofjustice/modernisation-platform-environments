@@ -79,24 +79,23 @@ resource "aws_s3_bucket" "chaps_lb_logs" {
   versioning {
     enabled = true
   }
+}
 
-  lifecycle_rule {
+resource "aws_s3_bucket_lifecycle_configuration" "chaps_lb_logs_lifecycle" {
+  bucket = aws_s3_bucket.chaps_lb_logs.ids
+
+  rule {
     id = "log"
-    enabled = true
-
-    transition {
-      days = 30
-      storage_class = "GLACIER"
-    }
+    status = "Enabled"
 
     expiration {
-      days = 365
+      days = 90
     }
   }
 }
 
 resource "aws_s3_bucket_policy" "chaps_lb_logs_bucket_policy" {
-  bucket = aws_s3_bucket.lb_logs.id
+  bucket = aws_s3_bucket.chaps_lb_logs.id
 
   policy = jsonencode({
     Version   = "2012-10-17"
