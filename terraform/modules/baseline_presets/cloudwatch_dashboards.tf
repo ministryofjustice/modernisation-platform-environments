@@ -1,3 +1,10 @@
+# Widgets generally correspond to equivalent cloudwatch_metric_alarm
+# SELECT expressions only allow last 3 hours data, so SEARCH is used instead
+# x,y,width,height are not defined here - the cloudwatch_dashboard module populates these
+# AccountIds also not defined here - the cloudwatch_dashboard module can add
+# AccountIds can be defined per widget like this:
+#   SORT(SEARCH('{AWS/EC2,InstanceId} MetricName="CPUUtilization" :aws.AccountId= "272983201692"','Maximum'),MAX,DESC)
+
 locals {
 
   cloudwatch_dashboards_filter = flatten([

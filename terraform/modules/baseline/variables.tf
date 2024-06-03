@@ -87,6 +87,7 @@ variable "cloudwatch_dashboards" {
   # tflint-ignore: terraform_typed_variables
   description = "map of cloudwatch dashboards where key is the dashboard name. Use widget_groups if you want baseline to work out x,y,width,height"
   #type = map(object({
+  #  account_name   = optional(string)        # for monitoring account, limit to given account
   #  periodOverride = optional(string)
   #  start          = optional(string)
   #  widgets        = optional(list(any), []) # use if you want to set x,y,width,height yourself
