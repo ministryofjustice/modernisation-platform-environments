@@ -74,14 +74,18 @@ resource "aws_lb_listener" "https_listener" {
 
 resource "aws_s3_bucket" "chaps_lb_logs" {
   bucket = "chaps-lb-logs-bucket"
-  acl = "private"
+}
+
+resource "aws_s3_bucket_acl" "chaps_lb_logs_acl" {
+  bucket = aws_s3_bucket.chaps_lb_logs.bucket
+  acl    = "private"
 }
 
 resource "aws_s3_bucket_versioning" "chaps_lb_logs_versioning" {
   bucket = aws_s3_bucket.chaps_lb_logs.bucket
 
     versioning_configuration {
-    enabled = "Enabled"
+    status = "Enabled"
   }
 }
 
@@ -93,6 +97,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "chaps_lb_logs_lifecycle" {
     status = "Enabled"
 
     expiration {
+      days = 90
+    }
+
+    noncurrent_version_expiration {
       days = 90
     }
   }
