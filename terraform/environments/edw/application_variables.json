@@ -55,7 +55,7 @@
       "edw_diskspace_alert_period": "60",
       "edw_diskspace_alert_threshold": "90",
       "edw_dashboard_refresh_period": "60",
-      "edw_disk_path": "",
+      "edw_disk_path": "/oracle/dbf",
       "edw_disk_device": "/dev/xvdf",
       "edw_disk_fs_type": "ext4",
       "edw_rman_logmetric_pattern": "?ERRORs ?Errors ?errors ?ERROR ?Error ?error",

@@ -334,7 +334,7 @@ resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanBackup" {
   pattern = local.application_data.accounts[local.environment].edw_rman_logmetric_pattern
 
   metric_transformation {
-    name      = "${local.application_name}_${local.application_data.accounts[local.environment].EDWLogMetricNameRmanBackup}"
+    name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_name_rman_backup}"
     namespace = "LogsMetricFilters"
     value     = "1"
   }
