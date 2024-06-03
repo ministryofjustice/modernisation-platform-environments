@@ -168,25 +168,25 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
 # Write Metadata to AP
 # ------------------------------------------------
 
-resource "aws_iam_role" "write_metadata_to_ap" {
-    name = "write_metadata_to_ap"
+resource "aws_iam_role" "send_metadata_to_ap" {
+    name = "send_metadata_to_ap"
     assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 
 }
 
 resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_lambda_vpc_access_execution" {
-    role = aws_iam_role.write_metadata_to_ap.name
+    role = aws_iam_role.send_metadata_to_ap.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_lambda_sqs_queue_access_execution" {
-    role = aws_iam_role.write_metadata_to_ap.name
+    role = aws_iam_role.send_metadata_to_ap.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
 
 resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_write_meta_to_s3" {
-    role = aws_iam_role.write_metadata_to_ap.name
+    role = aws_iam_role.send_metadata_to_ap.name
     policy_arn = aws_iam_policy.get_meta_from_s3.arn
 }
 
