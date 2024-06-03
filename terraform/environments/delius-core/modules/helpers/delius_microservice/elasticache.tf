@@ -7,7 +7,6 @@ resource "aws_elasticache_subnet_group" "this" {
 
 resource "aws_elasticache_cluster" "this" {
   count = var.create_elasticache ? 1 : 0
-
   cluster_id                 = var.name
   engine                     = var.elasticache_engine
   node_type                  = var.elasticache_node_type
@@ -85,6 +84,16 @@ resource "aws_security_group" "elasticache" {
       Name = "${var.name}-${var.env_name}-database_security_group"
     }
   )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "elasticache_to_ecs_service" {
+  count                        = var.create_elasticache ? 1 : 0
+  security_group_id            = aws_security_group.elasticache[0].id
+  description                  = "elasticache to ecs service"
+  from_port                    = var.elasticache_port
+  to_port                      = var.elasticache_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ecs_service.id
 }
 
 resource "aws_elasticache_parameter_group" "this" {
