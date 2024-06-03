@@ -6,7 +6,7 @@ resource "random_id" "rds_suffix" {
   byte_length = 2
 }
 
-resource "aws_security_group" "rds" {
+resource "aws_security_group" "db" {
   count       = var.create_rds ? 1 : 0
   name        = "${var.name}-${var.env_name}-rds-security-group"
   description = "controls access to db"
