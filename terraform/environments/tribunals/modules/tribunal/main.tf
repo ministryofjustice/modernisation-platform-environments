@@ -158,15 +158,15 @@ module "ecs_loadbalancer" {
   waf_arn                      = var.waf_arn
 }
 
-# resource "aws_route53_record" "external" {
-#   provider = aws.core-vpc
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "${local.app_url}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
+resource "aws_route53_record" "external" {
+  provider = aws.core-vpc
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${local.app_url}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
 
-#   alias {
-#     name                   = "${module[local.module_name].tribunals_lb.dns_name}"
-#     zone_id                = "${module[local.module_name].tribunals_lb.zone_id}"
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = "${module[local.module_name].tribunals_lb.dns_name}"
+    zone_id                = "${module[local.module_name].tribunals_lb.zone_id}"
+    evaluate_target_health = true
+  }
+}
