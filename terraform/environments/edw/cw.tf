@@ -275,7 +275,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus" {
   name           = "EDWLogsMetricFilterCDCstatus"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupCDCstatus.name
-  pattern =  "[APPLY_NAME, STATUS="DISABLED"]"
+  pattern =  "[APPLY_NAME, STATUS=DISABLED]"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status}"
@@ -303,7 +303,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus2" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus2" {
   name           = "EDWLogsMetricFilterCDCstatus2"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupCDCstatus.name
-  pattern = "[SOURCE_NAME ,SOURCE_ENABLED="N"]"
+  pattern = "[SOURCE_NAME ,SOURCE_ENABLED=N]"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status2}"
