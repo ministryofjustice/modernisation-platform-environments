@@ -19,7 +19,10 @@ echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.jso
 EOF
 }
 
-
+resource "aws_key_pair" "apex" {
+  key_name   = "${local.application_name_short}-ssh-key"
+  public_key = local.application_data.accounts[local.environment].apex_ec2_key
+}
 
 
 resource "aws_instance" "apex_db_instance" {
@@ -32,6 +35,7 @@ resource "aws_instance" "apex_db_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
+  key_name                    = aws_key_pair.apex.key_name
   user_data_base64            = base64encode(local.instance-userdata)
   user_data_replace_on_change = true
 
