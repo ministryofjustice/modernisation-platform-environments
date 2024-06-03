@@ -68,12 +68,10 @@ resource "aws_route53_record" "external_services" {
   for_each = var.services
   provider = aws.core-vpc
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${each.value.name_prefix}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
-    # name                   = module.appeals.tribunals_lb.dns_name
-    # zone_id                = module.appeals.tribunals_lb.zone_id
     name                   = local.modules[each.value.module_key].tribunals_lb.dns_name
     zone_id                = local.modules[each.value.module_key].tribunals_lb.zone_id
     evaluate_target_health = true
