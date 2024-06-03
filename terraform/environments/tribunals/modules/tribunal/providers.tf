@@ -1,3 +1,7 @@
+# caller account information to instantiate aws.oidc provider
+data "aws_caller_identity" "original_session" {
+  provider = aws.original-session
+}
 provider "aws" {
   alias  = "core-vpc"
   region = "eu-west-2"
