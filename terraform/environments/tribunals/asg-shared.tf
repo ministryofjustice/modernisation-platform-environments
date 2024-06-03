@@ -4,7 +4,7 @@ locals {
   instance_profile_name     = join("-", [local.app_name, "ec2-instance-profile"])
   ec2_instance_policy       = join("-", [local.app_name, "ec2-instance-policy"])
   tags_common               = local.tags
-  user_data = templatefile("${path.module}/user_data.tpl", {
+  user_data = templatefile("ec2-shared-user-data.sh", {
        environmentName = "${local.environment}"
      })
 }
