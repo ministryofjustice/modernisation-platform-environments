@@ -16,7 +16,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_service_to_db" {
   from_port                    = var.create_rds ? var.rds_port : var.create_elasticache ? var.elasticache_port : null
   to_port                      = var.create_rds ? var.rds_port : var.create_elasticache ? var.elasticache_port : null
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.rds[0].id
+  referenced_security_group_id = aws_security_group.db[0].id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "alb_to_ecs_service" {
