@@ -191,7 +191,7 @@ resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_write_meta_to_s3
 }
 
 resource "aws_iam_policy" "get_meta_from_s3" {
-    name = "write_meta_to_s3"
+    name = "get_meta_from_s3"
     policy = data.aws_iam_policy_document.get_meta_from_s3.json
 }
 
