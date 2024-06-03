@@ -40,7 +40,7 @@ let ec2 = new AWS.EC2({ apiVersion: "2014-10-31" });
 async function getInstances(appname) {
   console.log("Getting all instances tagged with Name:", appname);
   return ec2
-    .describeInstances({ Filters: [{ Name: "tag:Name", Values: [appname] }] })
+    .describeInstances({ Filters: [{ Name: "tag:Name", Values: [appname] }, {Name: "instance-state-name", Values: ["running"]}]})
     .promise();
 }
 
@@ -105,9 +105,9 @@ async function connSSH(action, appname) {
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log("standard output: " + stdout);
+                // console.log("standard output: " + stdout);
                 console.log("standard error: " + stderr);
-                if (code == 0) {
+                if (code == 0 && !stdout.toUpperCase().includes("ERROR")) {
                   resolve();
                 } else {
                   reject();
@@ -137,9 +137,9 @@ async function connSSH(action, appname) {
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log("standard output: " + stdout);
+                // console.log("standard output: " + stdout);
                 console.log("standard error: " + stderr);
-                if (code == 0) {
+                if (code == 0 && !stdout.toUpperCase().includes("ERROR")) {
                   resolve();
                 } else {
                   reject();
