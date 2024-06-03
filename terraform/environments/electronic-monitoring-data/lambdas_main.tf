@@ -116,5 +116,5 @@ resource "aws_lambda_permission" "send_metadata_to_ap" {
   action        = "lambda:InvokeFunction"
   function_name = module.send_metadata_to_ap.lambda_function_arn
   principal     = "s3.amazonaws.com"
-  source_arn    = module.metadata-s3-bucket.bucket.id
+  source_arn    = module.metadata-s3-bucket.bucket.arn
 }
