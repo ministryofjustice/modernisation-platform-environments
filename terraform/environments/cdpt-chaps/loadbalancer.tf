@@ -74,17 +74,13 @@ resource "aws_lb_listener" "https_listener" {
 
 resource "aws_s3_bucket" "chaps_lb_logs" {
   bucket = "chaps-lb-logs-bucket"
-}
-
-resource "aws_s3_bucket_acl" "chaps_lb_logs_acl" {
-  bucket = aws_s3_bucket.chaps_lb_logs.bucket
-  acl    = "private"
+  object_lock_enabled_for_bucket = false
 }
 
 resource "aws_s3_bucket_versioning" "chaps_lb_logs_versioning" {
   bucket = aws_s3_bucket.chaps_lb_logs.bucket
 
-    versioning_configuration {
+  versioning_configuration {
     status = "Enabled"
   }
 }
@@ -117,9 +113,17 @@ resource "aws_s3_bucket_policy" "chaps_lb_logs_bucket_policy" {
         Principal = {
           Service = "logdelivery.elasticloadbalancing.amazonaws.com"
         }
-        Action   = "s3:PutObject"
+        Action   = [
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ]
         Resource = "${aws_s3_bucket.chaps_lb_logs.arn}/*"
-      },
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl" = "bucket-owner-full-control"
+          }
+        }
+      }
     ]
   })
 }
