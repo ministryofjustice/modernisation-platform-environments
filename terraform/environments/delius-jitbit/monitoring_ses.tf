@@ -5,11 +5,11 @@ resource "aws_cloudwatch_metric_alarm" "bounce_rate_over_warning_threshold" {
   metric_name         = "Reputation.BounceRate"
   statistic           = "Average"
   period              = "300"
-  evaluation_periods  = "3"
+  evaluation_periods  = "1"
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
   threshold           = "0.025"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "ignore"
   comparison_operator = "GreaterThanThreshold"
 
   tags = merge(
@@ -27,11 +27,11 @@ resource "aws_cloudwatch_metric_alarm" "bounce_rate_over_critical_threshold" {
   metric_name         = "Reputation.BounceRate"
   statistic           = "Average"
   period              = "300"
-  evaluation_periods  = "3"
+  evaluation_periods  = "1"
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
   threshold           = "0.05"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "ignore"
   comparison_operator = "GreaterThanThreshold"
 
   tags = merge(
