@@ -62,26 +62,26 @@ resource "helm_release" "aws_for_fluent_bit" {
   depends_on = [module.aws_for_fluent_bit_iam_role]
 }
 
-resource "helm_release" "amazon_prometheus_proxy" {
-  /* https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack */
-  name       = "amazon-prometheus-proxy"
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  version    = "59.1.0"
-  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/amazon-prometheus-proxy/values.yml.tftpl",
-      {
-        aws_region       = data.aws_region.current.name
-        eks_role_arn     = module.amazon_prometheus_proxy_iam_role.iam_role_arn
-        amp_workspace_id = aws_prometheus_workspace.main.id
-      }
-    )
-  ]
+# resource "helm_release" "amazon_prometheus_proxy" {
+#   /* https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack */
+#   name       = "amazon-prometheus-proxy"
+#   repository = "https://prometheus-community.github.io/helm-charts"
+#   chart      = "kube-prometheus-stack"
+#   version    = "59.1.0"
+#   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/amazon-prometheus-proxy/values.yml.tftpl",
+#       {
+#         aws_region       = data.aws_region.current.name
+#         eks_role_arn     = module.amazon_prometheus_proxy_iam_role.iam_role_arn
+#         amp_workspace_id = aws_prometheus_workspace.main.id
+#       }
+#     )
+#   ]
 
-  depends_on = [module.amazon_prometheus_proxy_iam_role]
-}
+#   depends_on = [module.amazon_prometheus_proxy_iam_role]
+# }
 
 /* Cluster Autoscaler */
 resource "helm_release" "cluster_autoscaler" {
