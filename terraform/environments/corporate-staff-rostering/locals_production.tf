@@ -1,164 +1,76 @@
-# csr-production environment settings
 locals {
 
-  # cloudwatch monitoring config
-  production_cloudwatch_monitoring_options = {
-    enable_cloudwatch_monitoring_account = true
-    # enable_cloudwatch_dashboard          = true
+  baseline_presets_production = {
+    options = {
+    }
   }
 
-  # baseline config
-  production_config = {
+  # please keep resources in alphabetical order
+  baseline_production = {
 
-    baseline_s3_buckets = {
-      csr-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-    }
-
-    baseline_secretsmanager_secrets = {
-      "/oracle/database/PIWFM" = {
-        secrets = {
-          passwords = { description = "database passwords" }
-        }
-      }
-      "/oracle/database/DIWFM" = {
-        secrets = {
-          passwords = { description = "database passwords" }
-        }
-      }
-    }
-
-
-    baseline_iam_policies = {
-      Ec2ProdDatabasePolicy = {
-        description = "Permissions required for prod Database EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
-            ]
-          }
-        ]
-      }
-    }
-
-    baseline_ec2_instances = {
+    ec2_instances = {
       pd-csr-db-a = merge(local.defaults_database_ec2, {
         config = merge(local.defaults_database_ec2.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.database # inc. ec2_instance_cwagent_collectd_oracle_db_backup alarms
-        instance = merge(local.defaults_database_ec2.instance, {
-          instance_type                = "r6i.xlarge"
-          metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-          disable_api_stop             = false
-          tags = merge(local.defaults_database_ec2.instance.tags, {
-            instance-scheduling = null
-          })
-        })
-
         ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
           "/dev/sdb"  = { label = "app", size = 100 } # /u01
           "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
-
         ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
-          data = {
-            total_size = 1500
-          }
-          flash = {
-            total_size = 500
-          }
+          data  = { total_size = 1500 }
+          flash = { total_size = 500 }
         })
-
-        secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
-
-        tags = {
+        instance = merge(local.defaults_database_ec2.instance, {
+          tags = merge(local.defaults_database_ec2.instance.tags, {
+            instance-scheduling = null # TODO remove this 
+          })
+        })
+        tags = merge(local.defaults_database_ec2.tags, {
+          backup        = "false" # opt out of mod platform default backup plan TODO - apply to all
           pre-migration = "PDCDL00013"
           description   = "PD CSR Oracle primary DB server"
           ami           = "base_ol_8_5"
-          os-type       = "Linux"
-          component     = "data"
-          server-type   = "csr-db"
-          backup        = "false" # opt out of mod platform default backup plan
-        }
+        })
       })
 
       pd-csr-db-b = merge(local.defaults_database_ec2, {
         config = merge(local.defaults_database_ec2.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
-          availability_zone = "${local.region}b"
+          availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
-        cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.backup_database # EXCLUDES ec2_instance_cwagent_collectd_oracle_db_backup alarms (as this is the backup server)
-        instance = merge(local.defaults_database_ec2.instance, {
-          instance_type                = "r6i.xlarge"
-          disable_api_stop             = true
-          metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        })
-
         ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
           "/dev/sdb"  = { label = "app", size = 100 } # /u01
           "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
-
         ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
-          data = {
-            total_size = 1500
-          }
-          flash = {
-            total_size = 500
-          }
+          data  = { total_size = 1500 }
+          flash = { total_size = 500 }
         })
-
-        secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
-
-        tags = {
+        instance = merge(local.defaults_database_ec2.instance, {
+          disable_api_stop = true
+        })
+        tags = merge(local.defaults_database_ec2.tags, {
           pre-migration = "PDCDL00014"
           description   = "PD CSR Oracle secondary DB server"
           ami           = "base_ol_8_5"
-          os-type       = "Linux"
-          component     = "data"
-          server-type   = "csr-db"
           backup        = "false" # opt out of mod platform default backup plan
-        }
+        })
       })
 
       pd-csr-a-7-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-7-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -166,26 +78,20 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
-        tags = {
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
           pre-migration = "PDCAW00007"
           description   = "Application Server Region 1"
-          os-type       = "Windows"
           ami           = "pd-csr-a-7-a"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-a-8-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-8-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -193,26 +99,20 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
-        tags = {
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
           pre-migration = "PDCAW00008"
           description   = "Application Server Region 2"
-          os-type       = "Windows"
           ami           = "pd-csr-a-8-b"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-a-9-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-9-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -220,26 +120,20 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 112 }
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
-        tags = {
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
           pre-migration = "PDCAW00009"
           description   = "Application Server Region 3"
-          os-type       = "Windows"
           ami           = "pd-csr-a-9-a"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-a-10-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-10-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -247,26 +141,20 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
-        tags = {
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
           pre-migration = "PDCAW00010"
           description   = "Application Server Region 4"
-          os-type       = "Windows"
           ami           = "pd-csr-a-10-b"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-a-11-a = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-11-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -274,52 +162,40 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
-        tags = {
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
           pre-migration = "PDCAW00011"
           description   = "Application Server Region 5"
-          os-type       = "Windows"
           ami           = "pd-csr-a-11-a"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-a-12-b = merge(local.defaults_app_ec2, {
         config = merge(local.defaults_app_ec2.config, {
           ami_name          = "pd-csr-a-12-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 128 }
           "/dev/sdc"  = { type = "gp3", size = 112 }
         }
-        tags = {
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
           pre-migration = "PDCAW00012"
           description   = "Application Server Region 6"
-          os-type       = "Windows"
           ami           = "pd-csr-a-12-b"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-w-1-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-1-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -327,26 +203,20 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
-        tags = {
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
           pre-migration = "PDCWW00001"
           description   = "Web Server Region 1 and 2"
-          os-type       = "Windows"
           ami           = "pd-csr-w-1-a"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-w-2-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-2-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -354,26 +224,20 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
-        tags = {
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
           pre-migration = "PDCWW00002"
           description   = "Web Server Region 1 and 2"
-          os-type       = "Windows"
           ami           = "pd-csr-w-2-b"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-w-3-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-3-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -381,26 +245,20 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 112 }
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
-        tags = {
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
           pre-migration = "PDCWW00003"
           description   = "Web Server Region 3 and 4"
-          os-type       = "Windows"
           ami           = "pd-csr-w-3-a"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-w-4-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-4-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -408,26 +266,20 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
-        tags = {
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
           pre-migration = "PDCWW00004"
           description   = "Web Server Region 3 and 4"
-          os-type       = "Windows"
           ami           = "pd-csr-w-4-b"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-w-5-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-5-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -435,26 +287,20 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 112 }
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
-        tags = {
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
           pre-migration = "PDCWW00005"
           description   = "Web Server Region 5 and 6"
-          os-type       = "Windows"
           ami           = "pd-csr-w-5-a"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
 
       pd-csr-w-6-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pd-csr-w-6-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.4xlarge"
+          availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -462,20 +308,17 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
-        tags = {
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.4xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
           pre-migration = "PDCWW00006"
           description   = "Web Server Region 5 and 6"
-          os-type       = "Windows"
           ami           = "pd-csr-w-6-b"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
+        })
       })
     }
-    baseline_lbs = {
+    lbs = {
       r12 = {
         internal_lb              = true
         enable_delete_protection = false
@@ -597,6 +440,34 @@ locals {
             attachments = [
               { ec2_instance_name = "pd-csr-w-1-a" },
               { ec2_instance_name = "pd-csr-w-2-b" },
+            ]
+          }
+        }
+
+        iam_policies = {
+          Ec2ProdDatabasePolicy = {
+            description = "Permissions required for prod Database EC2s"
+            statements = [
+              {
+                effect = "Allow"
+                actions = [
+                  "ssm:GetParameter",
+                ]
+                resources = [
+                  "arn:aws:ssm:*:*:parameter/azure/*",
+                ]
+              },
+              {
+                effect = "Allow"
+                actions = [
+                  "secretsmanager:GetSecretValue",
+                  "secretsmanager:PutSecretValue",
+                ]
+                resources = [
+                  "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
+                  "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
+                ]
+              }
             ]
           }
         }
@@ -1007,7 +878,7 @@ locals {
       }
     }
 
-    baseline_route53_zones = {
+    route53_zones = {
       "csr.service.justice.gov.uk" = {
 
         records = [
@@ -1025,6 +896,29 @@ locals {
           { name = "r5", type = "A", lbs_map_key = "r56" },
           { name = "r6", type = "A", lbs_map_key = "r56" },
         ]
+      }
+    }
+
+    s3_buckets = {
+      csr-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+    }
+
+    secretsmanager_secrets = {
+      "/oracle/database/PIWFM" = {
+        secrets = {
+          passwords = { description = "database passwords" }
+        }
+      }
+      "/oracle/database/DIWFM" = {
+        secrets = {
+          passwords = { description = "database passwords" }
+        }
       }
     }
   }
