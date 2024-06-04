@@ -23,6 +23,7 @@ locals {
 
   shield_protections = {
     for k, v in local.shield_protections_json : k => jsondecode(v)
+    if !(contains(var.excluded_protections, k))
   }
 }
 
@@ -35,3 +36,5 @@ resource "aws_wafv2_web_acl_association" "this" {
   resource_arn = each.value["ResourceArn"]
   web_acl_arn  = data.external.shield_waf.result["arn"]
 }
+
+output "shield_protections"{ value = local.shield_protections}
