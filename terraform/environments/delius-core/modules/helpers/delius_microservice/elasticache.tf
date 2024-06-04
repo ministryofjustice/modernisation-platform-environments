@@ -6,7 +6,7 @@ resource "aws_elasticache_subnet_group" "this" {
 }
 
 resource "aws_elasticache_cluster" "this" {
-  count = var.create_elasticache ? 1 : 0
+  count                      = var.create_elasticache ? 1 : 0
   cluster_id                 = var.name
   engine                     = var.elasticache_engine
   node_type                  = var.elasticache_node_type
@@ -23,11 +23,11 @@ resource "aws_elasticache_cluster" "this" {
 }
 
 module "elasticache_default_user_password" {
-  source = "../secret" 
-  name = "${var.name}-elasticache-password"
-  description = "Elasticache Default User Password"
-  tags = var.tags
-  kms_key_id = var.account_config.kms_keys.general_shared
+  source                   = "../secret"
+  name                     = "${var.name}-elasticache-password"
+  description              = "Elasticache Default User Password"
+  tags                     = var.tags
+  kms_key_id               = var.account_config.kms_keys.general_shared
   generate_random_password = true
 }
 

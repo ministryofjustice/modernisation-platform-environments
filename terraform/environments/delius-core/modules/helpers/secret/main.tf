@@ -11,8 +11,8 @@ resource "aws_secretsmanager_secret_version" "this" {
 }
 
 resource "random_password" "this" {
-  count  = var.generate_random_password ? 1 : 0
-  length = 32
+  count   = var.generate_random_password ? 1 : 0
+  length  = 32
   special = false
 
   keepers = {

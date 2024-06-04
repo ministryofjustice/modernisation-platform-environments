@@ -27,11 +27,11 @@ module "nextcloud_service" {
       ip_protocol                  = "tcp"
       port                         = 2049
       referenced_security_group_id = efs.sg_id
-    }],[
+    }], [
     {
-      ip_protocol                  = "tcp"
-      port                         = 389
-      cidr_ipv4                   = var.account_info.cp_cidr
+      ip_protocol = "tcp"
+      port        = 389
+      cidr_ipv4   = var.account_info.cp_cidr
     }
   ])
 
