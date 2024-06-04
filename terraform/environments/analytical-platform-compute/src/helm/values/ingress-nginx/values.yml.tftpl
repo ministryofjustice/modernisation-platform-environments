@@ -22,6 +22,7 @@ controller:
       external-dns.alpha.kubernetes.io/hostname: ${ingress_hostname}
     externalTrafficPolicy: "Local"
   metrics:
+    enabled: true
     serviceMonitor:
       enabled: true
       namespace: ${service_monitor_namespace}
