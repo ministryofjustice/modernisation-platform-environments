@@ -102,7 +102,11 @@ locals {
         })
       })
 
-      preprod-nomis-client-a = local.jumpserver_ec2
+      preprod-nomis-client-a = merge(local.jumpserver_ec2, {
+        tags = merge(local.jumpserver_ec2.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
     }
 
     ec2_instances = {
