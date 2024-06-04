@@ -13,6 +13,7 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/LambdaFunctionADObjectCleanUp",
       "arn:aws:iam::${module.environment.account_ids.core-shared-services-production}:role/ad-fixngo-ec2-nonlive-role",
       "arn:aws:iam::${module.environment.account_ids.nomis-development}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.nomis-test}:role/EC2HmppsDomainSecretsRole",
     ]
     preproduction = []
     production = [
@@ -25,6 +26,8 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-preproduction}:role/LambdaFunctionADObjectCleanUp",
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-production}:role/LambdaFunctionADObjectCleanUp",
       "arn:aws:iam::${module.environment.account_ids.core-shared-services-production}:role/ad-fixngo-ec2-live-role",
+      "arn:aws:iam::${module.environment.account_ids.nomis-preproduction}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.nomis-production}:role/EC2HmppsDomainSecretsRole",
     ]
   }
 
