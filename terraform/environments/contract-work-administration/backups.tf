@@ -1,16 +1,16 @@
 resource "aws_backup_vault" "cwa" {
-  name = "${local.application_name}-backup-vault"
+  name = "${local.application_name_short}-backup-vault"
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-backup-vault" },
+    { "Name" = "${local.application_name_short}-backup-vault" },
   )
 }
 resource "aws_backup_plan" "cwa" {
 
-  name  = "${local.application_name}-backup-daily-retain-35-days"
+  name  = "${local.application_name_short}-backup-daily-retain-35-days"
 
   rule {
-    rule_name         = "${local.application_name}-backup-daily-retain-35-days"
+    rule_name         = "${local.application_name_short}-backup-daily-retain-35-days"
     target_vault_name = aws_backup_vault.cwa.name
 
     # Backup every day at 12:00am
@@ -36,12 +36,12 @@ resource "aws_backup_plan" "cwa" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-backup-plan" },
+    { "Name" = "${local.application_name_short}-backup-plan" },
   )
 }
 
 resource "aws_backup_selection" "cwa" {
-  name         = "${local.application_name}-backup"
+  name         = "${local.application_name_short}-backup"
   iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/AWSBackup"
   plan_id      = aws_backup_plan.cwa.id
   resources    = ["*"]
