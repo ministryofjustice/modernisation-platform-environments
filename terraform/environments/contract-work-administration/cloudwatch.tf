@@ -12,8 +12,8 @@ resource "aws_cloudwatch_metric_alarm" "efs_data_write" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].efs_data_write_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   treat_missing_data = "ignore"
   tags = merge(
     local.tags,
@@ -37,8 +37,8 @@ resource "aws_cloudwatch_metric_alarm" "efs_data_read" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].efs_data_read_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   treat_missing_data = "ignore"
   tags = merge(
     local.tags,
@@ -62,8 +62,8 @@ resource "aws_cloudwatch_metric_alarm" "database_cpu" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].database_cpu_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   #   treat_missing_data = "ignore"
   tags = merge(
     local.tags,
@@ -87,8 +87,8 @@ resource "aws_cloudwatch_metric_alarm" "elb_target_response_time" {
   period             = 60
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].elb_target_response_time_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   #   treat_missing_data = ""
   tags = merge(
     local.tags,
@@ -112,8 +112,8 @@ resource "aws_cloudwatch_metric_alarm" "elb_request_count" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].elb_request_count_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   #   treat_missing_data = ""
   tags = merge(
     local.tags,
@@ -137,8 +137,8 @@ resource "aws_cloudwatch_metric_alarm" "app1_ec2_status_check" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   #   treat_missing_data = ""
   tags = merge(
     local.tags,
@@ -162,8 +162,8 @@ resource "aws_cloudwatch_metric_alarm" "app2_ec2_status_check" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   #   treat_missing_data = ""
   tags = merge(
     local.tags,
@@ -187,8 +187,8 @@ resource "aws_cloudwatch_metric_alarm" "cm_ec2_status_check" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   #   treat_missing_data = ""
   tags = merge(
     local.tags,
@@ -212,8 +212,8 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_status_check" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   #   treat_missing_data = ""
   tags = merge(
     local.tags,
@@ -237,8 +237,8 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].database_ec2_swap_alarm_threshold
-  #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   #   treat_missing_data = ""
   tags = merge(
     local.tags,
@@ -262,8 +262,8 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
 #   period             = ""
 #   statistic          = ""
 #   threshold          = ""
-# #   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-# #   ok_actions         = [aws_sns_topic.alerting_topic.arn]
+#   alarm_actions      = [aws_sns_topic.cwa.arn]
+#   ok_actions         = [aws_sns_topic.cwa.arn]
 #   treat_missing_data = ""
 #   tags = merge(
 #     local.tags,
