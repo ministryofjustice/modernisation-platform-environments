@@ -46,6 +46,11 @@ resource "aws_efs_file_system" "efs" {
   }
 }
 
+import {
+  to = aws_efs_file_system.efs  # This is the EFS defined in Terraform you are importing onto
+  id = "fs-0ca2e956f29511d3c"   # This is the newly restored EFS ID
+}
+
 resource "aws_security_group" "efs_product" {
   name        = "${local.application_name}-${local.environment}-efs-security-group"
   description = "Apex Product EFS Security Group"
