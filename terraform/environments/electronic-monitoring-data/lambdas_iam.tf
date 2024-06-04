@@ -106,6 +106,13 @@ data "aws_iam_policy_document" "get_s3_output" {
 resource "aws_iam_role" "get_metadata_from_rds" {
     name = "get_metadata_from_rds_lambda"
     assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+    depends_on = [
+        aws_iam_role_policy_attachment.get_metadata_from_rds_lambda_vpc_access_execution,
+        aws_iam_role_policy_attachment.get_metadata_from_rds_lambda_sqs_queue_access_execution,
+        aws_iam_role_policy_attachment.get_metadata_from_rds_get_glue_connections_and_tables,
+        aws_iam_role_policy_attachment.get_metadata_from_rds_get_s3_output,
+        aws_iam_role_policy_attachment.get_metadata_from_rds_write_meta_to_s3
+    ]
 
 }
 
@@ -171,6 +178,12 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
 resource "aws_iam_role" "send_metadata_to_ap" {
     name = "send_metadata_to_ap"
     assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+    depends_on = [ 
+        aws_iam_role_policy_attachment.write_metadata_to_ap_lambda_vpc_access_execution,
+        aws_iam_role_policy_attachment.write_metadata_to_ap_lambda_sqs_queue_access_execution,
+        aws_iam_role_policy_attachment.write_metadata_to_ap_write_meta_to_s3,
+        aws_iam_role_policy_attachment.write_metadata_to_ap_write_to_ap_s3
+     ]
 
 }
 
