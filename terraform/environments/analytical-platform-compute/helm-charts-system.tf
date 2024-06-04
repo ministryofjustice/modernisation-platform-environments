@@ -100,9 +100,10 @@ resource "helm_release" "cluster_autoscaler" {
     templatefile(
       "${path.module}/src/helm/values/cluster-autoscaler/values.yml.tftpl",
       {
-        aws_region   = data.aws_region.current.name
-        cluster_name = module.eks.cluster_name
-        eks_role_arn = module.cluster_autoscaler_iam_role.iam_role_arn
+        aws_region                = data.aws_region.current.name
+        cluster_name              = module.eks.cluster_name
+        eks_role_arn              = module.cluster_autoscaler_iam_role.iam_role_arn
+        service_monitor_namespace = kubernetes_namespace.cluster_autoscaler.metadata[0].name
       }
     )
   ]
