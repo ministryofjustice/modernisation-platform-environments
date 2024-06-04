@@ -5,6 +5,7 @@ resource "aws_backup_vault" "cwa" {
     { "Name" = "${local.application_name_short}-backup-vault" },
   )
 }
+
 resource "aws_backup_plan" "cwa" {
 
   name  = "${local.application_name_short}-backup-daily-retain-35-days"
@@ -52,4 +53,53 @@ resource "aws_backup_selection" "cwa" {
       value = "yes"
     }
   }
+}
+
+################################################
+## Vault policy to allow data migration
+################################################
+
+data "aws_iam_policy_document" "cwa" {
+  statement {
+    sid = "Allow local account basic permissions to the vault"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
+    }
+
+    actions = [
+      "backup:DescribeBackupVault",
+      "backup:PutBackupVaultAccessPolicy",
+      "backup:DeleteBackupVaultAccessPolicy",
+      "backup:GetBackupVaultAccessPolicy",
+      "backup:StartBackupJob",
+      "backup:GetBackupVaultNotifications",
+      "backup:PutBackupVaultNotifications",
+      "backup:StartRestoreJob"
+    ]
+
+    resources = [aws_backup_vault.cwa.arn]
+  }
+  statement {
+    sid = "Allow copying of recovery points from Landing Zone"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::411213865113:root"]
+    }
+
+    actions = [
+      "backup:CopyIntoBackupVault"
+    ]
+
+    resources = [aws_backup_vault.cwa.arn]
+  }
+}
+
+resource "aws_backup_vault_policy" "cwa" {
+  backup_vault_name = aws_backup_vault.cwa.name
+  policy            = data.aws_iam_policy_document.cwa.json
 }
