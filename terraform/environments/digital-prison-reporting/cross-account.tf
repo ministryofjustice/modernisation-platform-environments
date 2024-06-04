@@ -45,7 +45,7 @@ resource "aws_iam_role_policy_attachment" "athena_api" {
 }
 
 # S3 Read Write Policy Attachement
-resource "aws_iam_role_policy_attachment" "athena_api" {
+resource "aws_iam_role_policy_attachment" "s3_read_write" {
   role       = aws_iam_role.redshift_dataapi_cross_role.name
   policy_arn = aws_iam_policy.s3_read_write_policy.arn
 }
