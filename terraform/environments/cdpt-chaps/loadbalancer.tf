@@ -72,98 +72,6 @@
 #   }
 # }
 
-# resource "aws_s3_bucket" "chaps_lb_logs" {
-#   bucket = "chaps-lb-logs-bucket"
-# }
-
-# resource "aws_s3_bucket_versioning" "chaps_lb_logs_versioning" {
-#   bucket = aws_s3_bucket.chaps_lb_logs.bucket
-
-#   versioning_configuration {
-#     status = "Enabled"
-#   }
-# }
-
-# resource "aws_s3_bucket_lifecycle_configuration" "chaps_lb_logs_lifecycle" {
-#   bucket = aws_s3_bucket.chaps_lb_logs.id
-
-#   rule {
-#     id = "log"
-#     status = "Enabled"
-
-#     expiration {
-#       days = 90
-#     }
-
-#     noncurrent_version_expiration {
-#       noncurrent_days = 90
-#     }
-#   }
-# }
-
-# resource "aws_iam_role" "lb_logging_role" {
-#   name = "lb-logging-role"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         Effect    = "Allow",
-#         Principal = {
-#           Service = "elasticloadbalancing.amazonaws.com"
-#         },
-#         Action = "sts:AssumeRole"
-#       }
-#     ]
-#   })
-# }
-
-# resource "aws_iam_policy" "lb_logging_policy" {
-#   name = "lb-logging-policy"
-#   policy = jsonencode({
-#     Version   = "2012-10-17",
-#     Statement = [
-#       {
-#         Effect = "Allow",
-#         Action = [
-#           "s3:PutObject",
-#           "s3:PutObjectAcl"
-#         ],
-#         Resource = "${aws_s3_bucket.chaps_lb_logs.arn}/*"
-#       }
-#     ]
-#   })
-# }
-
-# resource "aws_iam_role_policy_attachment" "lb_logging_policy_attachment" {
-#   role       = aws_iam_role.lb_logging_role.name
-#   policy_arn = aws_iam_policy.lb_logging_policy.arn
-# }
- 
-# resource "aws_s3_bucket_policy" "chaps_lb_logs_bucket_policy" {
-#   bucket = aws_s3_bucket.chaps_lb_logs.id
-
-#   policy = jsonencode({
-#     Version   = "2012-10-17"
-#     Statement = [
-#       {
-#         Effect    = "Allow"
-#         Principal = {
-#           Service = "logdelivery.elasticloadbalancing.amazonaws.com"
-#         }
-#         Action   = [
-#           "s3:PutObject",
-#           "s3:PutObjectAcl"
-#         ],
-#         Resource = "${aws_s3_bucket.chaps_lb_logs.arn}/*"
-#         Condition = {
-#           StringEquals = {
-#             "s3:x-amz-acl" = "bucket-owner-full-control"
-#           }
-#         }
-#       }
-#     ]
-#   })
-# }
 #==========================================================================================
 
 module "lb_access_logs_enabled" {
@@ -189,7 +97,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
+  target_type          = "instance"
   deregistration_delay = 30
 
   stickiness {
@@ -223,13 +131,12 @@ resource "aws_security_group" "chaps_lb_sc" {
 
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
-  depends_on = [aws_acm_certificate_validation.external]
-
+  depends_on        = [aws_acm_certificate_validation.external]
   load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
   port              = 443
   protocol          = "HTTPS"
   certificate_arn   = aws_acm_certificate.external.arn
-
+  
   default_action {
     target_group_arn = aws_lb_target_group.chaps_target_group.id
     type             = "forward"
