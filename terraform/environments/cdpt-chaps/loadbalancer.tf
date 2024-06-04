@@ -98,8 +98,8 @@ resource "random_string" "chaps_target_group_name" {
   special = false
 }
 
-  output "load_balancer_arn" {
-  value = aws_lb.load_balancer.arn
+output "load_balancer_arn" {
+  value = aws_lb.loadbalancer.arn
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
