@@ -11,6 +11,7 @@ on:
   pull_request:
     branches:
       - main
+    types: [opened, edited, reopened, synchronize]
     paths:
       - 'terraform/environments/analytical-platform-compute/**'
       - '.github/workflows/analytical-platform-compute.yml'
