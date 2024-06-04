@@ -67,23 +67,16 @@ resource "aws_security_group" "elasticache" {
   description = "controls access to elasticache"
   vpc_id      = var.account_config.shared_vpc_id
 
-  ingress {
-    protocol    = "tcp"
-    description = "Allow elasticache traffic"
-    from_port   = var.elasticache_port
-    to_port     = var.elasticache_port
-    security_groups = concat(
-      [var.bastion_sg_id],
-      var.db_ingress_security_groups
-    )
-  }
-
   tags = merge(
     var.tags,
     {
       Name = "${var.name}-${var.env_name}-database_security_group"
     }
   )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "elasticache_to_ecs_service" {
