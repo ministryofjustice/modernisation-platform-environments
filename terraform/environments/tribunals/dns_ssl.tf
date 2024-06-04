@@ -53,6 +53,55 @@ variable "services" {
       name_prefix = "landregistrationdivision"
       module_key  = "ahmlr"
     }
+    "care_standards" = {
+      name_prefix = "carestandards"
+      module_key  = "care_standards"
+    },
+    "cicap" = {
+      name_prefix = "cicap"
+      module_key  = "cicap"
+    }
+
+    "charity_tribunal_decisions" = {
+      name_prefix = "charitytribunal"
+      module_key  = "charity_tribunal_decisions"
+    },
+    "claims_management_decisions" = {
+      name_prefix = "claimsmanagement"
+      module_key  = "claims_management_decisions"
+    },
+    "consumer_credit_appeals" = {
+      name_prefix = "consumercreditappeals"
+      module_key  = "consumer_credit_appeals"
+    },
+    "estate_agent_appeals" = {
+      name_prefix = "estateagentappeals"
+      module_key  = "estate_agent_appeals"
+    },
+    "primary_health_lists" = {
+      name_prefix = "primaryhealthlists"
+      module_key  = "primary_health_lists"
+    },
+    "siac" = {
+      name_prefix = "siac"
+      module_key  = "siac"
+    },
+    "sscs_venue_pages" = {
+      name_prefix = "sscsvenues"
+      module_key  = "sscs_venue_pages"
+    },
+    "tax_chancery_decisions" = {
+      name_prefix = "taxchancerydecisions"
+      module_key  = "tax_chancery_decisions"
+    },
+    "tax_tribunal_decisions" = {
+      name_prefix = "taxtribunaldecisions"
+      module_key  = "tax_tribunal_decisions"
+    },
+    "ftp_admin_appeals" = {
+      name_prefix = "adminappealsreports"
+      module_key  = "ftp_admin_appeals"
+    }
   }
 }
 
@@ -65,6 +114,38 @@ variable "sftp_services" {
     "claims_management_decisions" = {
       name_prefix = "claimsmanagement"
       module_key  = "claims_management_decisions"
+    },
+    "consumer_credit_appeals" = {
+      name_prefix = "consumercreditappeals"
+      module_key  = "consumer_credit_appeals"
+    },
+    "estate_agent_appeals" = {
+      name_prefix = "estateagentappeals"
+      module_key  = "estate_agent_appeals"
+    },
+    "primary_health_lists" = {
+      name_prefix = "primaryhealthlists"
+      module_key  = "primary_health_lists"
+    },
+    "siac" = {
+      name_prefix = "siac"
+      module_key  = "siac"
+    },
+    "sscs_venue_pages" = {
+      name_prefix = "sscsvenues"
+      module_key  = "sscs_venue_pages"
+    },
+    "tax_chancery_decisions" = {
+      name_prefix = "taxchancerydecisions"
+      module_key  = "tax_chancery_decisions"
+    },
+    "tax_tribunal_decisions" = {
+      name_prefix = "taxtribunaldecisions"
+      module_key  = "tax_tribunal_decisions"
+    },
+    "ftp_admin_appeals" = {
+      name_prefix = "adminappealsreports"
+      module_key  = "ftp_admin_appeals"
     }
   }
 }
@@ -73,10 +154,30 @@ locals {
   modules = {
     appeals = module.appeals
     ahmlr = module.ahmlr
+    care_standards = module.care_standards
+    cicap = module.cicap
+    charity_tribunal_decisions = module.charity_tribunal_decisions
+    claims_management_decisions = module.claims_management_decisions
+    consumer_credit_appeals = module.consumer_credit_appeals
+    estate_agent_appeals = module.estate_agent_appeals
+    primary_health_lists = module.primary_health_lists
+    siac = module.siac
+    sscs_venue_pages = module.sscs_venue_pages
+    tax_chancery_decisions = module.tax_chancery_decisions
+    tax_tribunal_decisions = module.tax_tribunal_decisions
+    ftp_admin_appeals = module.ftp_admin_appeals
   }
   sftp_modules = {
     charity_tribunal_decisions = module.charity_tribunal_decisions
     claims_management_decisions = module.claims_management_decisions
+    consumer_credit_appeals = module.consumer_credit_appeals
+    estate_agent_appeals = module.estate_agent_appeals
+    primary_health_lists = module.primary_health_lists
+    siac = module.siac
+    sscs_venue_pages = module.sscs_venue_pages
+    tax_chancery_decisions = module.tax_chancery_decisions
+    tax_tribunal_decisions = module.tax_tribunal_decisions
+    ftp_admin_appeals = module.ftp_admin_appeals
   }
 }
 
