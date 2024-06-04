@@ -125,7 +125,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
     ignore_changes = [name]
   }
 
-  tags {
+  tags = {
     Name = "chaps-target-group-${random_string.chaps_target_group_name.result}"
   }
 }
