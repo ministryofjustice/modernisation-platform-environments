@@ -117,7 +117,7 @@ resource "aws_instance" "edw_db_instance" {
   tags = merge(
     local.tags,
     {
-      Name = "${database_ec2_name}"
+      Name = "${local.application_data.accounts[local.environment].database_ec2_name}"
     }
   )
 }
