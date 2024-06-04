@@ -181,7 +181,8 @@ resource "aws_lb_listener_rule" "admin_access" {
 
   condition {
     source_ip {
-      values           = ["194.33.19*", "109.154.193.219/32", "82.1.119.170/32"]
+      values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25"]
+      # values = ["194.33.196.0/25", "194.33.197.0/25"]
     }
   }
 }
@@ -201,14 +202,15 @@ resource "aws_lb_listener_rule" "secure_access" {
 
   condition {
     source_ip {
-      values           = ["194.33.19*", "109.154.193.219/32", "82.1.119.170/32"]
+      values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25"]
+      # values = ["194.33.196.0/25", "194.33.197.0/25"]
     }
   }
 }
 
 resource "aws_lb_listener_rule" "admin_secure_fixed_response" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 3
+  priority     = 5
   action {
     type             = "fixed-response"
     fixed_response {

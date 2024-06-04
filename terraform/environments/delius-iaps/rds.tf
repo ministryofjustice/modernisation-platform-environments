@@ -15,6 +15,7 @@ resource "aws_db_instance" "iaps" {
 
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.oracle-ee-19"
+  ca_cert_identifier          = "rds-ca-rsa4096-g1"
   skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
   allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage

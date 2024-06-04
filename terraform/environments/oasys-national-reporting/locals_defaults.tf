@@ -73,9 +73,10 @@ locals {
       component   = "web"
       server-type = "onr-web"
     }
-    # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
     ebs_volumes = {
-      "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+      "/dev/sda1" = { type = "gp3", size = 32 }  # root volume
+      "/dev/sdb"  = { type = "gp3", size = 128 } # /u01
+      "/dev/sdc"  = { type = "gp3", size = 128 } # /u02
     }
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.web off for now
   })
@@ -107,7 +108,7 @@ locals {
 
   defaults_bods_ec2 = merge(local.defaults_ec2, {
     config = merge(local.defaults_ec2.config, {
-      ami_name = "hmpps_windows_server_2019_release_*"
+      ami_name = "hmpps_windows_server_2019_release_*" # wildcard to latest. EC2 instance versions ami_name must be fixed
     })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["bods", "oasys_db"]

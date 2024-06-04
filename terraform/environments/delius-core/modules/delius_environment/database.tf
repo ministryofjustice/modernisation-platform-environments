@@ -16,7 +16,7 @@ module "oracle_db_shared" {
   platform_vars      = var.platform_vars
   env_name           = var.env_name
   tags               = local.tags
-  public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
+  public_keys        = local.db_public_key_data.keys[var.env_name]
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
@@ -25,7 +25,6 @@ module "oracle_db_shared" {
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
-
 }
 
 module "oracle_db_primary" {
@@ -150,18 +149,6 @@ resource "aws_secretsmanager_secret_policy" "delius_core_application_passwords_p
 
   secret_arn = aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn
   policy     = data.aws_iam_policy_document.delius_core_application_passwords_policy_doc[count.index].json
-}
-
-resource "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
-  count = local.has_mis_environment ? 1 : 0
-
-  secret_id     = aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].id
-  secret_string = "REPLACE"
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
 }
 
 data "aws_iam_policy_document" "db_access_to_secrets_manager" {

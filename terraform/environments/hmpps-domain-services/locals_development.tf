@@ -104,9 +104,10 @@ locals {
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "RHEL8.5 for connection to Azure domain"
-          ami         = "hmpps_rhel_8_5"
+          ami         = "hmpps_domain_services_rhel_8_5"
           os-type     = "Linux"
           component   = "test"
+          server-type = "hmpps-domain-services"
         }
       }
     }

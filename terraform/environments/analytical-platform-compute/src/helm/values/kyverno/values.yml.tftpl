@@ -1,0 +1,19 @@
+---
+admissionController:
+  replicas: 3
+backgroundController:
+  replicas: 2
+cleanupController:
+  replicas: 2
+reportsController:
+  replicas: 2
+
+config:
+  resourceFiltersExcludeNamespaces:
+    - kube-system
+    - amazon-guardduty
+    - aws-observability
+    - cluster-autoscaler
+    - external-dns
+    - cert-manager
+    - ingress-nginx

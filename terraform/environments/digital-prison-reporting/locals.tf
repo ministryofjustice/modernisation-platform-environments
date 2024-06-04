@@ -166,6 +166,7 @@ locals {
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
   s3_read_access_policy  = "${local.project}_s3_read_policy"
+  s3_read_write_policy  = "${local.project}_s3_read_write_policy"
   apigateway_get_policy  = "${local.project}_apigateway_get_policy"
   invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
 
@@ -328,6 +329,16 @@ locals {
     busobj-converter = "placeholder"
     endpoint         = local.application_data.accounts[local.environment].biprws.endpoint
     endpoint_type    = local.application_data.accounts[local.environment].biprws.endpoint_type
+  }
+
+  # cp_k8s_secrets_placeholder
+  enable_cp_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_k8s_secrets
+  cp_k8s_secrets_placeholder = {
+    cloud_platform_k8s_token = "placeholder"
+    cloud_platform_certificate_auth  = "placeholder"
+    cloud_platform_k8s_server = "https://DF366E49809688A3B16EEC29707D8C09.gr7.eu-west-2.eks.amazonaws.com"
+    cloud_platform_k8s_cluster_name = "live.cloud-platform.service.justice.gov.uk"
+    cloud_platform_k8s_cluster_context = "live.cloud-platform.service.justice.gov.uk"
   }
 
   sonatype_secrets_placeholder = {

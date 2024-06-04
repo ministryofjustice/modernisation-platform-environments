@@ -97,7 +97,7 @@ resource "aws_dms_endpoint" "source" {
 # Uncomment modernisation_dms_access for first time creation of the Security Group in AWS DSD Account
 resource "aws_security_group" "modernisation_dms_access" {
    provider    = aws.mojdsd
-   name        = "modernisation_dms_access"
+   name        = "modernisation_dms_access_${local.environment}"
    description = "allow dms access to the database for the modernisation platform"
 
    ingress {

@@ -115,7 +115,8 @@ data "aws_iam_policy_document" "task_exec" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
-      "secretsmanager:GetSecretValue"
+      "secretsmanager:GetSecretValue",
+      "kms:Decrypt",
     ], var.extra_exec_role_allow_statements)
   }
 }

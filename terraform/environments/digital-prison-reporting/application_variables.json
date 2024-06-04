@@ -186,7 +186,8 @@
         "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
         "endpoint_type": "domain_name"
       },
-      "setup_cw_insights": true
+      "setup_cw_insights": true,
+      "enable_cp_k8s_secrets": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -374,7 +375,8 @@
         "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
         "endpoint_type": "domain_name"
       },
-      "setup_cw_insights": false
+      "setup_cw_insights": false,
+      "enable_cp_k8s_secrets": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -564,7 +566,8 @@
         "endpoint": "https://reporting.preprod.nomis.az.justice.gov.uk",
         "endpoint_type": "load_balancer"
       },
-      "setup_cw_insights": false
+      "setup_cw_insights": false,
+      "enable_cp_k8s_secrets": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -752,7 +755,8 @@
         "endpoint": "placeholder",
         "endpoint_type": "load_balancer"
       },
-      "setup_cw_insights": false
+      "setup_cw_insights": false,
+      "enable_cp_k8s_secrets": false
     }
   }
 }

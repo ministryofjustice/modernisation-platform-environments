@@ -66,7 +66,7 @@ variable "backups" {
 variable "bastion_linux" {
   description = "set this if you want a bastion linux created"
   type = object({
-    public_key_data         = map(string)
+    public_key_data         = optional(map(string)) # if this is not set, bastion is not created
     allow_ssh_commands      = optional(bool, true)
     bucket_name             = optional(string, "bastion")
     log_auto_clean          = optional(string, "Enabled")
@@ -76,7 +76,29 @@ variable "bastion_linux" {
     extra_user_data_content = optional(string, "")
     tags                    = optional(map(string), {})
   })
-  default = null
+  default = {
+    public_key_data = null
+  }
+}
+
+# see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html
+# cannot define a type without fully defining the entire cloudwatch dashboard json structure
+variable "cloudwatch_dashboards" {
+  # tflint-ignore: terraform_typed_variables
+  description = "map of cloudwatch dashboards where key is the dashboard name. Use widget_groups if you want baseline to work out x,y,width,height"
+  #type = map(object({
+  #  account_name   = optional(string)        # for monitoring account, limit to given account
+  #  periodOverride = optional(string)
+  #  start          = optional(string)
+  #  widgets        = optional(list(any), []) # use if you want to set x,y,width,height yourself
+  #  widget_groups = optional(list(object({   # automate x,y,width,height values
+  #    header_markdown = optional(string)     # include a header text widget if set
+  #    width           = number               # width of each widget, must be divisor of 24
+  #    height          = number               # height of each widget
+  #    widgets         = list(any)            # no need to set x,y,width,height
+  #  })), [])
+  #}))
+  default = {}
 }
 
 variable "cloudwatch_log_groups" {

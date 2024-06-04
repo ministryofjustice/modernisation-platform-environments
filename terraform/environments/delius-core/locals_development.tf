@@ -11,7 +11,7 @@ locals {
     migration_environment_abbreviated_name = "dmd"
     migration_environment_short_name       = "mis-dev"
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
-    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/dev/ec2-user.pub")
     homepage_path                          = "/"
     has_mis_environment                    = true
   }
@@ -19,7 +19,7 @@ locals {
   ldap_config_dev = {
     name                        = "ldap"
     encrypted                   = true
-    migration_source_account_id = local.application_data.accounts[local.environment].migration_source_account_id
+    migration_source_account_id = "479759138745"
     migration_lambda_role       = "ldap-data-migration-lambda-role"
     efs_throughput_mode         = "bursting"
     efs_provisioned_throughput  = null

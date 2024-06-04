@@ -10,7 +10,7 @@ module "nextcloud_service" {
 
   target_group_protocol_version = "HTTP1"
 
-  container_image = "nextcloud:latest"
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-nextcloud:latest"
   container_port_config = [
     {
       containerPort = "80"
@@ -59,21 +59,25 @@ module "nextcloud_service" {
   alb_listener_rule_paths            = ["/"]
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
   microservice_lb                    = aws_alb.nextcloud
-  name                               = "nextcloud-poc"
+  name                               = "nextcloud"
+
+  extra_task_role_policies = {
+    "S3_BUCKET_CONFIG" = data.aws_iam_policy_document.s3_bucket_config
+  }
 
   create_rds               = true
   rds_engine               = "mariadb"
-  rds_engine_version       = "10.6"
+  rds_engine_version       = "10.5"
   rds_instance_class       = "db.t3.small"
   rds_allocated_storage    = 500
   rds_username             = "misnextcloud"
   rds_port                 = 3306
-  rds_parameter_group_name = "default.mariadb10.6"
+  rds_parameter_group_name = "default.mariadb10.5"
   rds_license_model        = "general-public-license"
-  snapshot_identifier      = "rds-090524-shared-key"
+  snapshot_identifier      = "nextcloud-dev-db-final-532c"
 
-  rds_allow_major_version_upgrade = false
-  rds_apply_immediately           = false
+  rds_allow_major_version_upgrade = true
+  rds_apply_immediately           = true
 
   create_elasticache               = true
   elasticache_engine               = "redis"
@@ -86,16 +90,17 @@ module "nextcloud_service" {
   db_ingress_security_groups = [aws_security_group.cluster.id]
 
   rds_endpoint_environment_variable         = "MYSQL_HOST"
+  rds_password_secret_variable = "MYSQL_PASSWORD"
+  rds_user_secret_variable     = "MYSQL_USER"
   elasticache_endpoint_environment_variable = "REDIS_HOST"
 
   container_vars_default = {
     MYSQL_DATABASE            = "nextcloud"
-    MYSQL_USER                = "dbadmin"
-    MYSQL_PASSWORD            = "password"
     REDIS_PORT                = "6379"
     REDIS_PASSWORD            = "password"
     NEXTCLOUD_ADMIN_USER      = "admin"
     NEXTCLOUD_TRUSTED_DOMAINS = aws_route53_record.nextcloud_external.fqdn
+    S3_BUCKET_CONFIG  = module.s3_bucket_config.bucket.id
   }
   container_vars_env_specific = {}
 
@@ -117,6 +122,8 @@ module "nextcloud_service" {
     aws.core-network-services = aws.core-network-services
   }
 
+  ignore_changes_service_task_definition = false
+
 }
 
 resource "aws_secretsmanager_secret" "nextcloud_admin_password" {
@@ -131,4 +138,15 @@ resource "aws_secretsmanager_secret_version" "nextcloud_admin_password" {
 resource "random_password" "nextcloud_admin_password" {
   length  = 32
   special = true
+}
+
+
+data "aws_iam_policy_document" "s3_bucket_config" {
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject"
+    ]
+    resources = [module.s3_bucket_config.bucket.arn]
+  }
 }

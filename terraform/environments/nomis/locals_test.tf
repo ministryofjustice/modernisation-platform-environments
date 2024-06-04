@@ -1,231 +1,48 @@
-# nomis-test environment settings
 locals {
 
-  # cloudwatch monitoring config
-  test_cloudwatch_monitoring_options = {
-    enable_cloudwatch_cross_account_sharing = true
-    enable_cloudwatch_dashboard             = true
-    monitoring_account_id                   = module.environment.account_ids.hmpps-oem-test
-    source_account_ids                      = [module.environment.account_ids.nomis-test]
-  }
-
-  # baseline presets config
-  test_baseline_presets_options = {
-    enable_observability_platform_monitoring = true
-    sns_topics = {
-      pagerduty_integrations = {
-        dso_pagerduty               = "nomis_nonprod_alarms"
-        dba_pagerduty               = "hmpps_shef_dba_non_prod"
-        dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
-      }
-    }
-  }
-
-  # config for load balancer maintenance rule
-  test_lb_maintenance_message = {
+  lb_maintenance_message_test = {
     maintenance_title   = "Prison-NOMIS Maintenance Window"
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
-  # baseline config
-  test_config = {
-
-    baseline_cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ebs
-
-    baseline_s3_buckets = {
-      nomis-audit-archives = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-
-      nomis-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
-        ]
-      }
-
-      # use this bucket for storing artefacts for use across all accounts
-      ec2-image-builder-nomis = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
+  baseline_presets_test = {
+    options = {
+      enable_observability_platform_monitoring = true
+      sns_topics = {
+        pagerduty_integrations = {
+          dso_pagerduty               = "nomis_nonprod_alarms"
+          dba_pagerduty               = "hmpps_shef_dba_non_prod"
+          dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+        }
       }
     }
+  }
 
-    baseline_acm_certificates = {
+  # please keep resources in alphabetical order
+  baseline_test = {
+
+    acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
-        domain_name = module.environment.domains.public.modernisation_platform
+        domain_name = "modernisation-platform.service.justice.gov.uk"
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",
-          "*.${local.environment}.nomis.service.justice.gov.uk",
-          "*.${local.environment}.nomis.az.justice.gov.uk",
+          "*.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk",
+          "*.test.nomis.service.justice.gov.uk",
+          "*.test.nomis.az.justice.gov.uk",
           "*.hmpp-azdt.justice.gov.uk",
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
-          description = "wildcard cert for nomis ${local.environment} domains"
+          description = "wildcard cert for nomis test domains"
         }
       }
     }
 
-    baseline_iam_policies = {
-      Ec2T1DatabasePolicy = {
-        description = "Permissions required for T1 Database EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
-            ]
-          }
-        ]
-      }
-      Ec2T2DatabasePolicy = {
-        description = "Permissions required for T2 Database EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
-            ]
-          }
-        ]
-      }
-      Ec2T3DatabasePolicy = {
-        description = "Permissions required for T3 Database EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/*",
-            ]
-          }
-        ]
-      }
-      Ec2T1WeblogicPolicy = {
-        description = "Permissions required for T1 Weblogic EC2s"
-        statements = concat(local.weblogic_iam_policy_statements, [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t1/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
-            ]
-          }
-        ])
-      }
-      Ec2T2WeblogicPolicy = {
-        description = "Permissions required for T2 Weblogic EC2s"
-        statements = concat(local.weblogic_iam_policy_statements, [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/weblogic-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-*",
-            ]
-          }
-        ])
-      }
-      Ec2T3WeblogicPolicy = {
-        description = "Permissions required for T3 Weblogic EC2s"
-        statements = concat(local.weblogic_iam_policy_statements, [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t3/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/weblogic-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-*",
-            ]
-          }
-        ])
-      }
-    }
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ebs
 
-    baseline_secretsmanager_secrets = {
-      "/oracle/weblogic/t1"       = local.weblogic_secretsmanager_secrets
-      "/oracle/weblogic/t2"       = local.weblogic_secretsmanager_secrets
-      "/oracle/weblogic/t3"       = local.weblogic_secretsmanager_secrets
-      "/oracle/database/T1CNOM"   = local.database_nomis_secretsmanager_secrets
-      "/oracle/database/T1NDH"    = local.database_secretsmanager_secrets
-      "/oracle/database/T1TRDAT"  = local.database_secretsmanager_secrets
-      "/oracle/database/T1CNMAUD" = local.database_secretsmanager_secrets
-      "/oracle/database/T1MIS"    = local.database_mis_secretsmanager_secrets
-      "/oracle/database/T1ORSYS"  = local.database_secretsmanager_secrets
-      "/oracle/database/T2CNOM"   = local.database_nomis_secretsmanager_secrets
-      "/oracle/database/T2NDH"    = local.database_secretsmanager_secrets
-      "/oracle/database/T2TRDAT"  = local.database_secretsmanager_secrets
-      "/oracle/database/T3CNOM"   = local.database_nomis_secretsmanager_secrets
-    }
-
-    baseline_ec2_autoscaling_groups = {
-
+    ec2_autoscaling_groups = {
       # NOT-ACTIVE (blue deployment)
       t1-nomis-web-a = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
@@ -390,10 +207,14 @@ locals {
         })
       })
 
-      test-nomis-client-a = local.jumpserver_ec2
+      test-nomis-client-a = merge(local.jumpserver_ec2, {
+        tags = merge(local.jumpserver_ec2.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
     }
 
-    baseline_ec2_instances = {
+    ec2_instances = {
       t1-nomis-db-1-a = merge(local.database_ec2, {
         cloudwatch_metric_alarms = merge(
           local.database_ec2_cloudwatch_metric_alarms.standard,
@@ -402,7 +223,7 @@ locals {
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2T1DatabasePolicy",
           ])
@@ -435,7 +256,7 @@ locals {
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2T1DatabasePolicy",
           ])
@@ -464,7 +285,7 @@ locals {
         cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
             "Ec2T1WeblogicPolicy",
           ])
@@ -491,7 +312,7 @@ locals {
         )
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2T2DatabasePolicy",
           ])
@@ -519,7 +340,7 @@ locals {
         cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
         config = merge(local.xtag_ec2.config, {
           ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
             "Ec2T2WeblogicPolicy",
           ])
@@ -545,7 +366,7 @@ locals {
           local.database_ec2_cloudwatch_metric_alarms.db_backup,
         )
         config = merge(local.database_ec2.config, {
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
             "Ec2T3DatabasePolicy",
           ])
@@ -568,12 +389,138 @@ locals {
           instance-scheduling = "skip-scheduling"
         })
       })
-
     }
 
-    baseline_lbs = {
+    iam_policies = {
+      Ec2T1DatabasePolicy = {
+        description = "Permissions required for T1 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T2DatabasePolicy = {
+        description = "Permissions required for T2 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T3DatabasePolicy = {
+        description = "Permissions required for T3 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T1WeblogicPolicy = {
+        description = "Permissions required for T1 Weblogic EC2s"
+        statements = concat(local.weblogic_iam_policy_statements, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
+            ]
+          }
+        ])
+      }
+      Ec2T2WeblogicPolicy = {
+        description = "Permissions required for T2 Weblogic EC2s"
+        statements = concat(local.weblogic_iam_policy_statements, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-*",
+            ]
+          }
+        ])
+      }
+      Ec2T3WeblogicPolicy = {
+        description = "Permissions required for T3 Weblogic EC2s"
+        statements = concat(local.weblogic_iam_policy_statements, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t3/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-*",
+            ]
+          }
+        ])
+      }
+    }
 
-      # AWS doesn't let us call it internal
+    lbs = {
       private = {
         internal_lb              = true
         enable_delete_protection = false
@@ -743,7 +690,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = templatefile("templates/maintenance.html.tftpl", local.test_lb_maintenance_message)
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_test)
                     status_code  = "200"
                   }
                 }]
@@ -764,7 +711,7 @@ locals {
       }
     }
 
-    baseline_route53_zones = {
+    route53_zones = {
       "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
         records = [
         ]
@@ -840,6 +787,50 @@ locals {
           { name = "c-t3", type = "A", lbs_map_key = "private" },
         ]
       }
+    }
+
+    s3_buckets = {
+      nomis-audit-archives = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+
+      nomis-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.DevelopmentReadOnlyAccessBucketPolicy
+        ]
+      }
+
+      # use this bucket for storing artefacts for use across all accounts
+      ec2-image-builder-nomis = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+    }
+
+    secretsmanager_secrets = {
+      "/oracle/weblogic/t1"       = local.weblogic_secretsmanager_secrets
+      "/oracle/weblogic/t2"       = local.weblogic_secretsmanager_secrets
+      "/oracle/weblogic/t3"       = local.weblogic_secretsmanager_secrets
+      "/oracle/database/T1CNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/T1NDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/T1TRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/T1CNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/T1MIS"    = local.database_mis_secretsmanager_secrets
+      "/oracle/database/T1ORSYS"  = local.database_secretsmanager_secrets
+      "/oracle/database/T2CNOM"   = local.database_nomis_secretsmanager_secrets
+      "/oracle/database/T2NDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/T2TRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/T3CNOM"   = local.database_nomis_secretsmanager_secrets
     }
   }
 }

@@ -22,13 +22,3 @@ resource "aws_secretsmanager_secret_policy" "delius_core_dba_passwords" {
   secret_arn = aws_secretsmanager_secret.delius_core_dba_passwords.arn
   policy     = data.aws_iam_policy_document.delius_core_dba_passwords.json
 }
-
-resource "aws_secretsmanager_secret_version" "delius_core_dba_passwords" {
-  secret_id     = aws_secretsmanager_secret.delius_core_dba_passwords.id
-  secret_string = "REPLACE"
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
-}

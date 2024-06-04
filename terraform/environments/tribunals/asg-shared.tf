@@ -178,10 +178,18 @@ resource "aws_launch_template" "tribunals-all-lt" {
     associate_public_ip_address = true
   }
 
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Environment = local.environment
+    }
+  }
+
   user_data = filebase64("ec2-shared-user-data.sh")
+
 }
 
-# Finally, create the Auto scaling group for the launch template
+# # Finally, create the Auto scaling group for the launch template
 resource "aws_autoscaling_group" "tribunals-all-asg" {
   vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
   desired_capacity   = 1
@@ -214,7 +222,7 @@ resource "aws_security_group" "cluster_ec2" {
     protocol    = "-1"
     security_groups = [
       module.appeals.tribunals_lb_sc_id,
-      module.ahmlr.tribunals_lb_sc_id,
+      module.ahmlr.tribunals_lb_sc_id
       # module.care_standards.tribunals_lb_sc_id,
       # module.cicap.tribunals_lb_sc_id,
       # module.employment_appeals.tribunals_lb_sc_id,
@@ -223,16 +231,16 @@ resource "aws_security_group" "cluster_ec2" {
       # module.information_tribunal.tribunals_lb_sc_id,
       # module.lands_tribunal.tribunals_lb_sc_id,
       # module.transport.tribunals_lb_sc_id,
-      module.charity_tribunal_decisions.tribunals_lb_sc_id, module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp,
-      module.claims_management_decisions.tribunals_lb_sc_id, module.claims_management_decisions.tribunals_lb_sc_id_sftp,
-      module.consumer_credit_appeals.tribunals_lb_sc_id, module.consumer_credit_appeals.tribunals_lb_sc_id_sftp,
-      module.estate_agent_appeals.tribunals_lb_sc_id, module.estate_agent_appeals.tribunals_lb_sc_id_sftp,
-      module.primary_health_lists.tribunals_lb_sc_id, module.primary_health_lists.tribunals_lb_sc_id_sftp,
-      module.siac.tribunals_lb_sc_id, module.siac.tribunals_lb_sc_id_sftp,
-      module.sscs_venue_pages.tribunals_lb_sc_id, module.sscs_venue_pages.tribunals_lb_sc_id_sftp,
-      module.tax_chancery_decisions.tribunals_lb_sc_id, module.tax_chancery_decisions.tribunals_lb_sc_id_sftp,
-      module.tax_tribunal_decisions.tribunals_lb_sc_id, module.tax_tribunal_decisions.tribunals_lb_sc_id_sftp,
-      module.ftp-admin-appeals.tribunals_lb_sc_id, module.ftp-admin-appeals.tribunals_lb_sc_id_sftp
+      # module.charity_tribunal_decisions.tribunals_lb_sc_id, module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp,
+      # module.claims_management_decisions.tribunals_lb_sc_id, module.claims_management_decisions.tribunals_lb_sc_id_sftp,
+      # module.consumer_credit_appeals.tribunals_lb_sc_id, module.consumer_credit_appeals.tribunals_lb_sc_id_sftp,
+      # module.estate_agent_appeals.tribunals_lb_sc_id, module.estate_agent_appeals.tribunals_lb_sc_id_sftp,
+      # module.primary_health_lists.tribunals_lb_sc_id, module.primary_health_lists.tribunals_lb_sc_id_sftp,
+      # module.siac.tribunals_lb_sc_id, module.siac.tribunals_lb_sc_id_sftp,
+      # module.sscs_venue_pages.tribunals_lb_sc_id, module.sscs_venue_pages.tribunals_lb_sc_id_sftp,
+      # module.tax_chancery_decisions.tribunals_lb_sc_id, module.tax_chancery_decisions.tribunals_lb_sc_id_sftp,
+      # module.tax_tribunal_decisions.tribunals_lb_sc_id, module.tax_tribunal_decisions.tribunals_lb_sc_id_sftp,
+      # module.ftp-admin-appeals.tribunals_lb_sc_id, module.ftp-admin-appeals.tribunals_lb_sc_id_sftp
     ]
   }
 

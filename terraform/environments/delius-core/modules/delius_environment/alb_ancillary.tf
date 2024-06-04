@@ -18,15 +18,15 @@ resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_https_glob
   cidr_ipv4         = each.key # Global Protect VPN
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_http_global_protect_allowlist" {
-  for_each          = toset(local.all_ingress_ips)
-  security_group_id = aws_security_group.ancillary_alb_security_group.id
-  description       = "Access into alb over http (will redirect)"
-  from_port         = "80"
-  to_port           = "80"
-  ip_protocol       = "tcp"
-  cidr_ipv4         = each.key # Global Protect VPN
-}
+# resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_http_global_protect_allowlist" {
+#   for_each          = toset(local.all_ingress_ips)
+#   security_group_id = aws_security_group.ancillary_alb_security_group.id
+#   description       = "Access into alb over http (will redirect)"
+#   from_port         = "80"
+#   to_port           = "80"
+#   ip_protocol       = "tcp"
+#   cidr_ipv4         = each.key # Global Protect VPN
+# }
 
 resource "aws_vpc_security_group_egress_rule" "ancillary_alb_egress_private" {
   security_group_id = aws_security_group.ancillary_alb_security_group.id
@@ -40,7 +40,7 @@ resource "aws_lb" "delius_core_ancillary" {
   # checkov:skip=CKV_AWS_91
   # checkov:skip=CKV2_AWS_28
 
-  name               = "${var.app_name}-${var.env_name}-ancilliary-alb"
+  name               = "${var.env_name}-ancilliary-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ancillary_alb_security_group.id]
