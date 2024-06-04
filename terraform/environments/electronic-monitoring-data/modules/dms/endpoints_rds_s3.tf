@@ -47,7 +47,7 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   csv_delimiter     = ","
   csv_no_sup_value  = "false"
   csv_null_value    = "null"
-  csv_row_delimiter = "\\n"
+  csv_row_delimiter = "\\r\\n"
   data_format       = "csv"
   data_page_size    = 68000000
   # date_partition_delimiter                    = "UNDERSCORE"
