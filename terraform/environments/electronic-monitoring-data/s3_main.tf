@@ -67,3 +67,16 @@ module "metadata-s3-bucket" {
 
   tags                 = merge(local.tags, {Resource_Type="metadata_store"})
 }
+
+resource "aws_s3_bucket_notification" "send_metadata_to_ap" {
+  bucket = module.metadata-s3-bucket.bucket.id
+
+  lambda_function {
+    id                  = "metadata_bucket_notification"
+    lambda_function_arn = module.send_metadata_to_ap.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".json"
+  }
+
+  depends_on = [aws_lambda_permission.send_metadata_to_ap]
+}
