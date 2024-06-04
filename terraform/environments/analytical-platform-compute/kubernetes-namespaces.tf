@@ -34,6 +34,12 @@ resource "kubernetes_namespace" "ingress_nginx" {
   }
 }
 
+resource "kubernetes_namespace" "kubecost" {
+  metadata {
+    name = "kubecost"
+  }
+}
+
 resource "kubernetes_namespace" "actions_runners" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 

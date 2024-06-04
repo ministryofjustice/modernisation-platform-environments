@@ -204,3 +204,21 @@ resource "helm_release" "ingress_nginx" {
   ]
   depends_on = [helm_release.ingress_nginx_default_certificate]
 }
+
+/* Kubecost */
+# resource "helm_release" "kubecost" {
+#   /* https://gallery.ecr.aws/kubecost/cost-analyzer */
+#   name       = "kubecost"
+#   repository = "oci://public.ecr.aws/kubecost/cost-analyzer"
+#   chart      = "cost-analyzer"
+#   version    = "2.2.5"
+#   namespace  = kubernetes_namespace.kubecost.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/kubecost/values.yml.tftpl",
+#       {
+
+#       }
+#     )
+#   ]
+# }
