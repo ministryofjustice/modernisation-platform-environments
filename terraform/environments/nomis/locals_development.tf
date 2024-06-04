@@ -169,9 +169,9 @@ locals {
       }
 
       dev-nomis-client-a = local.jumpserver_ec2
-      nomis-client-b = merge(local.jumpserver_ec2, { # 15 char hostname limit as domain joined
+      dev-nomis-client-b = merge(local.jumpserver_ec2, {
         tags = merge(local.jumpserver_ec2.tags, {
-          domain-name = "azure.noms.root"
+          # domain-name = "azure.noms.root"
         })
       })
     }
