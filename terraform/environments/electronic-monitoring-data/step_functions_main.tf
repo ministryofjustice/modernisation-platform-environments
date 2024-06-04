@@ -1,4 +1,3 @@
-
 resource "aws_sfn_state_machine" "semantic_athena_layer" {
   name     = "semantic-athena-layer"
   role_arn = aws_iam_role.step_functions_role.arn
@@ -33,4 +32,18 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
   }
 }
 EOF
+
+  tracing_configuration {
+    enabled = true
+  }
+
+  logging_configuration {
+    level = "ALL"
+    include_execution_data = true
+    log_destination        = "${aws_cloudwatch_log_group.semantic_athena_layer.arn}:*"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "semantic_athena_layer" {
+  name = "/aws/step-functions/semantic_athena_layer"
 }
