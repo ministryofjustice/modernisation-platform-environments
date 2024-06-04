@@ -101,7 +101,7 @@ resource "aws_s3_object" "config" {
       fileshare_user_base   = "ou=Users,dc=moj,dc=com"
       standard_user_base    = "ou=Users,dc=moj,dc=com"
 
-      ldap_user = "cn=admin,ou=Users,dc=moj,dc=com"
+      ldap_user = "cn=admin,dc=moj,dc=com"
     }
   )
 }
