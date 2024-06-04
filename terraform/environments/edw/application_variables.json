@@ -57,7 +57,8 @@
       "edw_dashboard_refresh_period": "60",
       "edw_disk_path": "/oracle/dbf",
       "edw_disk_device": "/dev/xvdf",
-      "edw_disk_fs_type": "ext4"
+      "edw_disk_fs_type": "ext4",
+      "database_ec2_name": "edw-db-instance"
     },
     "test": {
       "example_var": "test-data"
