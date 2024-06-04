@@ -92,8 +92,13 @@ module "lb_access_logs_enabled" {
   tags                       = {} 
 }
 
+resource "random_string" "chaps_target_group_name" {
+  length  = 8
+  special = false
+}
+
 resource "aws_lb_target_group" "chaps_target_group" {
-  name                 = "chaps-target-group"
+  name                 = "chaps-target-group-${random_string.chaps_target_group_name.result}"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -113,6 +118,11 @@ resource "aws_lb_target_group" "chaps_target_group" {
     unhealthy_threshold = "2"
     matcher             = "200-499"
     timeout             = "5"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes = ["name"]
   }
 }
 
