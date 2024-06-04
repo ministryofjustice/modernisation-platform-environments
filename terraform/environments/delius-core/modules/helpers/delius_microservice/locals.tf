@@ -51,7 +51,7 @@ locals {
   } : {}
 
   elasticache_endpoint_env_var = var.elasticache_endpoint_environment_variable != "" ? {
-    (var.elasticache_endpoint_environment_variable) = aws_elasticache_cluster.this[0].cluster_address
+    (var.elasticache_endpoint_environment_variable) = aws_elasticache_cluster.this[0].cache_nodes[0].address
   } : {}
 
   elasticache_user_env_var = var.elasticache_user_variable != "" ? {

@@ -97,7 +97,7 @@ module "nextcloud_service" {
 
   container_vars_default = {
     MYSQL_DATABASE            = "nextcloud"
-    REDIS_PORT                = "6379"
+    REDIS_HOST_PORT           = "6379"
     NEXTCLOUD_ADMIN_USER      = "admin"
     NEXTCLOUD_TRUSTED_DOMAINS = aws_route53_record.nextcloud_external.fqdn
     S3_BUCKET_CONFIG          = module.s3_bucket_config.bucket.id
