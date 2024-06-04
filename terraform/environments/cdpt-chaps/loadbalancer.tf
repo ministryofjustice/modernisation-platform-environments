@@ -99,7 +99,7 @@ resource "random_string" "chaps_target_group_name" {
 }
 
 output "load_balancer_arn" {
-  value = aws_lb.loadbalancer.arn
+  value = module.lb_access_logs_enabled.load_balancer.arn
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
@@ -151,7 +151,7 @@ resource "aws_security_group" "chaps_lb_sc" {
 
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
-  depends_on        = [aws_acm_certificate_validation.external]
+  depends_on        = [aws_acm_certificate_validation.external, aws_lb_target_group.chaps_target_group]
   load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
   port              = 443
   protocol          = "HTTPS"
