@@ -40,9 +40,9 @@ resource "aws_lambda_function" "bounce_email_notification" {
 
   environment {
     variables = {
-      RATE_LIMIT = 5
+      RATE_LIMIT     = 5
       DYNAMODB_TABLE = aws_dynamodb_table.bounce_email_notification.name
-      FROM_ADDRESS = "notifications@${aws_sesv2_email_identity.jitbit.email_identity}"
+      FROM_ADDRESS   = "notifications@${aws_sesv2_email_identity.jitbit.email_identity}"
     }
   }
 
@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
     ]
     resources = ["arn:aws:logs:*:*:*"]
   }
-  
+
   statement {
     actions = [
       "dynamodb:PutItem",
@@ -124,18 +124,18 @@ resource "aws_cloudwatch_log_group" "bounce_email_notification" {
 
 
 resource "aws_dynamodb_table" "bounce_email_notification" {
-  name           = "bounce_email_notification"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "email_ticket_id"
+  name         = "bounce_email_notification"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "email_ticket_id"
 
   server_side_encryption {
-    enabled = true
+    enabled     = true
     kms_key_arn = data.aws_kms_key.general_shared.arn
   }
 
   ttl {
     attribute_name = "expireAt"
-    enabled = true
+    enabled        = true
   }
 
   attribute {

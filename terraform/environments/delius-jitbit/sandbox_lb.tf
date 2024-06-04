@@ -1,5 +1,5 @@
 resource "aws_lb_listener_rule" "listener_rule" {
-  count = local.is-development ? 1 : 0
+  count        = local.is-development ? 1 : 0
   listener_arn = aws_lb_listener.listener.arn
   priority     = 10
 
