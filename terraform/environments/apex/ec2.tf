@@ -8,6 +8,13 @@ sudo systemctl enable amazon-ssm-agent
 echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
 mount -a
 
+sudo su - oracle -c "sqlplus / as sysdba << EOF
+shutdown abort;
+startup;
+exit;
+EOF"
+sudo su - oracle -c "lsnrctl start"
+
 cd /etc
 mkdir cloudwatch_agent
 cd cloudwatch_agent
@@ -19,7 +26,10 @@ echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.jso
 EOF
 }
 
-
+resource "aws_key_pair" "apex" {
+  key_name   = "${local.application_name}-ssh-key"
+  public_key = local.application_data.accounts[local.environment].apex_ec2_key
+}
 
 
 resource "aws_instance" "apex_db_instance" {
@@ -32,6 +42,7 @@ resource "aws_instance" "apex_db_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
+  key_name                    = aws_key_pair.apex.key_name
   user_data_base64            = base64encode(local.instance-userdata)
   user_data_replace_on_change = true
 
@@ -93,7 +104,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
 resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
   security_group_id            = aws_security_group.database.id
   description                  = "Allow Lambda SSH access for backup snapshots"
-  referenced_security_group_id = aws_security_group.lambdasg.id
+  referenced_security_group_id = aws_security_group.backup_lambda.id
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22
