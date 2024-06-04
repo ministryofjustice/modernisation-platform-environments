@@ -167,7 +167,11 @@ locals {
         }
       }
 
-      dev-nomis-client-a = local.jumpserver_ec2
+      dev-nomis-client-a = merge(local.jumpserver_ec2, {
+        tags = merge(local.jumpserver_ec2.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
     }
 
     ec2_instances = {
