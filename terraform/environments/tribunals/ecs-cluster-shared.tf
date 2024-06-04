@@ -124,7 +124,7 @@ resource "aws_security_group" "ecs_service" {
       module.appeals.tribunals_lb_sc_id,
       module.ahmlr.tribunals_lb_sc_id,
       module.care_standards.tribunals_lb_sc_id,
-      module.cicap.tribunals_lb_sc_id,
+      # module.cicap.tribunals_lb_sc_id,
       # module.employment_appeals.tribunals_lb_sc_id,
       # module.finance_and_tax.tribunals_lb_sc_id,
       # module.immigration_services.tribunals_lb_sc_id,
