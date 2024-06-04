@@ -19,10 +19,10 @@ def handler(event, context):
     source_bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
     destination_bucket = os.environ.get("REG_BUCKET_NAME")
     # Get object that has been uploaded
-    file_key = event["Records"][0]["s3"]["object"]["key"]
+    file_key = event["Records"][0]["s3"]["object"]["key"].replace("%3D", "=")
     file_parts = file_key.split("/")
-    database_name = file_parts[0]
-    table_name = file_parts[1]
+    database_name = file_parts[0].split("=")[-1]
+    table_name = file_parts[1].split("=")[-1]
     file_name = file_parts[2]
     logger.info(
         f"Copying metadata... Database: {database_name}, Table: {table_name}, File: {file_name}"
