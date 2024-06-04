@@ -48,14 +48,14 @@ locals {
 
       complete-example-1 = { # The first ec2.
         tags = {
-          server-type = "private"
-          description = "ec2-complete-example-1"
-          monitored   = false
-          os-type     = "Linux"
-          component   = "ndh"
-          environment = "development"
-          flexi-startup     = "8am"
-          flexi-shutdown    = "6pm" 
+          server-type    = "private"
+          description    = "ec2-complete-example-1"
+          monitored      = false
+          os-type        = "Linux"
+          component      = "ndh"
+          environment    = "development"
+          flexi-startup  = "8am"
+          flexi-shutdown = "6pm"
         }
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }
@@ -82,14 +82,14 @@ locals {
 
       complete-example-2 = { # The second ec2.
         tags = {
-          server-type = "private"
-          description = "ec2-complete-example-2"
-          monitored   = false
-          os-type     = "Linux"
-          component   = "ndh"
-          environment = "development"
-          flexi-startup     = "9am"
-          flexi-shutdown    = "7pm" 
+          server-type    = "private"
+          description    = "ec2-complete-example-2"
+          monitored      = false
+          os-type        = "Linux"
+          component      = "ndh"
+          environment    = "development"
+          flexi-startup  = "9am"
+          flexi-shutdown = "7pm"
         }
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }

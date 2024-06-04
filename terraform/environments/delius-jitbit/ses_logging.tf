@@ -20,6 +20,7 @@ resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_desti
       "BOUNCE",
       "COMPLAINT",
       "DELIVERY",
+      "DELIVERY_DELAY",
       "REJECT",
       "SEND"
     ]

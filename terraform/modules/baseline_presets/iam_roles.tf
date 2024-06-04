@@ -8,7 +8,7 @@ locals {
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     var.options.enable_observability_platform_monitoring ? ["observability-platform"] : [],
-    try(length(var.options.cloudwatch_metric_oam_links), 0) != 0 ? ["CloudWatchCrossAccountSharingRole"] : [],
+    try(length(var.options.cloudwatch_metric_oam_links), 0) != 0 ? ["CloudWatch-CrossAccountSharingRole"] : [],
   ]))
 
   iam_roles = {
@@ -77,7 +77,7 @@ locals {
       ]
     }
 
-    CloudWatchCrossAccountSharingRole = {
+    CloudWatch-CrossAccountSharingRole = {
       assume_role_policy = [{
         effect  = "Allow"
         actions = ["sts:AssumeRole"]

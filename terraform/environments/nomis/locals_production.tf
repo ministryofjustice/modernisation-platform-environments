@@ -10,10 +10,12 @@ locals {
     options = {
       cloudwatch_dashboard_default_widget_groups = [
         "lb",
-        "ec2_linux_only",
-        "ec2_oracle_db_with_backup",
-        "ec2_service_status_with_connectivity_test",
-        "ec2_textfile_monitoring",
+        "ec2",
+        "ec2_linux",
+        "ec2_autoscaling_group_linux",
+        "ec2_instance_linux",
+        "ec2_instance_oracle_db_with_backup",
+        "ec2_instance_textfile_monitoring_with_connectivity_test",
       ]
       sns_topics = {
         pagerduty_integrations = {
@@ -133,7 +135,11 @@ locals {
         })
       })
 
-      prod-nomis-client-a = local.jumpserver_ec2
+      prod-nomis-client-a = merge(local.jumpserver_ec2, {
+        tags = merge(local.jumpserver_ec2.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
     }
 
     ec2_instances = {
@@ -288,7 +294,7 @@ locals {
           description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
           oracle-sids        = "DRMIS DRCNMAUD"
           misload-dbname     = "DRMIS"
-          connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
+          connectivity-tests = "10.40.0.133:53 10.40.129.79:22"
         })
       })
     }

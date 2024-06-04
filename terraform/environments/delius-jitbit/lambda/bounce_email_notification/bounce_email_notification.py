@@ -4,10 +4,17 @@ import json
 import time
 from datetime import datetime
 from botocore.exceptions import ClientError
+from boto3.dynamodb.conditions import Key, Attr
 
 
 def handler(event, context):
-    todays_date = datetime.now().strftime("%Y-%m-%d")
+    dynamodb = boto3.resource("dynamodb")
+    table = dynamodb.Table(os.environ["DYNAMODB_TABLE"])
+
+    # generate ttl 840 minutes from now (840 minutes is the typical retry period for mail servers)
+    ttl = int(time.time()) + int(os.environ.get("TTL", "840")) * 60
+    # this rate limit is per the ttl delta defined above
+    rate_limit = os.environ["RATE_LIMIT"]
 
     message = event["Records"][0]["Sns"]["Message"]
     message_dict = json.loads(message)
@@ -15,6 +22,8 @@ def handler(event, context):
     mail = message_dict.get("mail")
     common_headers = mail.get("commonHeaders")
     headers = mail.get("headers")
+
+    from_address = os.environ.get("FROM_ADDRESS")
 
     print(headers)
 
@@ -37,6 +46,67 @@ def handler(event, context):
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    try:
+        response = table.update_item(
+          Key={"email_ticket_id": f"{source}|{jitbit_ticket_id}"},
+          UpdateExpression="SET #count = if_not_exists(#count, :initial) + :increment, expiresAt = if_not_exists(expiresAt, :ttl)",
+          ExpressionAttributeNames={"#count": "count"},
+          ExpressionAttributeValues={
+              ":increment": 1,
+              ":initial": 0,
+              ":ttl": ttl,
+              ":current_timestamp": int(time.time()),
+          },
+          ConditionExpression="attribute_not_exists(expiresAt) OR expiresAt > :current_timestamp",
+          ReturnValues="ALL_NEW",
+      )
+    except dynamodb.meta.client.exceptions.ConditionalCheckFailedException:
+        print("DynamoDB conditional check result - record is expired")
+        # if the record is expired then we need to reset the count and the ttl
+        response = table.update_item(
+            Key={"email_ticket_id": f"{source}|{jitbit_ticket_id}"},
+            UpdateExpression="SET #count = :initial, expiresAt = :ttl",
+            ExpressionAttributeNames={"#count": "count"},
+            ExpressionAttributeValues={
+                ":initial": 0,
+                ":ttl": ttl
+            },
+            ReturnValues="ALL_NEW",
+        )
+
+    print(response)
+
+    print(f"Rate limit: {rate_limit}")
+
+    print(f"Rate limit count: {response.get('Attributes').get('count')}")
+
+    rate_limit_warning_message = ""
+    # if the count is not none and greater than the rate limit then exit
+    if response.get("Attributes") is not None and response.get("Attributes").get("count") > int(rate_limit):
+        print(f"Rate limit exceeded for {source} on ticket id {jitbit_ticket_id}")
+        return None
+    # if the count is not none and 1 less than the rate limit
+    elif response.get("Attributes") is not None and int(response.get("Attributes").get("count")) == int(rate_limit) - 1:
+        rate_limit_warning_message = f"""  <p>
+                                    <strong>RATE LIMIT WARNING:</strong>
+                                    <br>
+                                    <p>
+                                        The rate limit of {rate_limit} will be reached for the email address <strong>{source}</strong> and ticket ID <strong>{jitbit_ticket_id}</strong> on the next notification.
+                                        Further notifications will not be sent until the rate limit has been reset.
+                                    </p>
+                                </p>
+                            """
+    elif response.get("Attributes") is not None and int(response.get("Attributes").get("count")) == int(rate_limit):
+        rate_limit_warning_message = f"""  <p>
+                                    <strong>RATE LIMIT WARNING:</strong>
+                                    <br>
+                                    <p>
+                                        The rate limit of {rate_limit} has been reached for the email address <strong>{source}</strong> and ticket ID <strong>{jitbit_ticket_id}</strong>.
+                                        Further notifications will not be sent until the rate limit has been reset.
+                                    </p>
+                                </p>
+                            """
+
     bounced_recipients_message = ""
     for bounced_recipient in bounced_recipients:
         bounced_recipients_message += f"""  <p>
@@ -58,7 +128,7 @@ def handler(event, context):
 
     try:
         email = ses.send_email(
-            FromEmailAddress=source,
+            FromEmailAddress=from_address,
             Destination={"ToAddresses": [reply_to]},
             ReplyToAddresses=[reply_to],
             Content={
@@ -67,6 +137,7 @@ def handler(event, context):
                     "Body": {
                         "Html": {
                             "Data": f"""
+                                    {rate_limit_warning_message}
                                     <table width="100%" style="background-color: rgb(250, 232, 205);">
                                     <tbody>
                                       <tr>

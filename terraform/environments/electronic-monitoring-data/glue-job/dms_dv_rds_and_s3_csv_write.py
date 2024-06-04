@@ -51,7 +51,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "glue_catalog_tbl_name",
                        "rds_sqlserver_dbs",
                        "repartition_factor",
-                       "max_table_size_mb"
+                       "max_table_size_mb",
+                       "trim_rds_df_str_columns"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -191,17 +192,23 @@ def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name):
             .load()
             )
 
-def get_rds_tbl_col_attr_dict(df_col_stats):
+def trim_rds_df_str_columns(in_rds_df: DataFrame) -> DataFrame:
+    return (in_rds_df.select(
+            *[F.trim(F.col(c[0])).alias(c[0]) if c[1] == 'string' else F.col(c[0]) 
+              for c in in_rds_df.dtypes])
+           )
+
+def get_rds_tbl_col_attr_dict(df_col_stats: DataFrame) -> DataFrame:
     key_col = 'column_name'; value_col = 'is_nullable'
     return df_col_stats.select(key_col, value_col).rdd.map(lambda row: (row[key_col], row[value_col])).collectAsMap()
 
-def get_dtype(in_rds_df, in_col_name):
+def get_dtype(in_rds_df: DataFrame, in_col_name):
     return [dtype for name, dtype in in_rds_df.dtypes if name == in_col_name][0]
 
-def get_dtypes_dict(in_rds_df):
+def get_dtypes_dict(in_rds_df: DataFrame):
     return {name:dtype for name, dtype in in_rds_df.dtypes}
 
-def get_nvl_select_list(in_rds_df, in_rds_db_name, in_rds_tbl_name):
+def get_nvl_select_list(in_rds_df: DataFrame, in_rds_db_name, in_rds_tbl_name):
     df_col_attr = get_rds_tbl_col_attributes(in_rds_db_name, in_rds_tbl_name)
     df_col_attr_dict = get_rds_tbl_col_attr_dict(df_col_attr)
     # print(df_col_attr_dict)
@@ -210,7 +217,7 @@ def get_nvl_select_list(in_rds_df, in_rds_db_name, in_rds_tbl_name):
     
     temp_select_list = list()
     for colmn in in_rds_df.columns:
-        if df_col_attr_dict[colmn] == 'YES':
+        if df_col_attr_dict[colmn] == 'YES' and (not df_col_dtype_dict[colmn].startswith("decimal")):
             temp_select_list.append(f"""nvl({colmn}, {NVL_DTYPE_DICT[df_col_dtype_dict[colmn]]}) as {colmn}""")
             # print(f"F.nvl(df_rds.{colmn}, {NVL_DTYPE_DICT[df_col_dtype_dict[colmn]]})")
         else:
@@ -251,13 +258,14 @@ def get_s3_csv_tbl_path(in_database_name, in_table_name):
         return None
 
 
-def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
+def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema) -> DataFrame:
     try:
         return spark.read.csv(in_csv_tbl_s3_folder_path, 
                               header="true", 
                               schema=in_rds_df_schema,
                               enforceSchema=True,
                               nullValue="null",
+                              escape='\"',
                               mode="FAILFAST")
     except Exception as err:
         LOGGER.error(err)
@@ -265,7 +273,7 @@ def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema):
 # ===================================================================================================
 
 
-def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor):
+def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor) -> DataFrame:
 
     default_repartition_factor = input_repartition_factor if total_files <= 1 \
                                     else total_files * input_repartition_factor
@@ -285,7 +293,13 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
     if tbl_csv_s3_path is not None:
 
         df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
-        df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
+
+        if args.get("trim_rds_df_str_columns", "false") == "true":
+            LOGGER.info(f"""Given -> trim_rds_df_str_columns = {args["trim_rds_df_str_columns"]}, {type(args["trim_rds_df_str_columns"])}""")
+            df_rds_temp_t1 = df_rds_temp.transform(trim_rds_df_str_columns)
+            df_rds_temp_t2 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
+        else:
+            df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         LOGGER.info(f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
     
@@ -295,12 +309,12 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
         LOGGER.info(
             f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_csv_temp.rdd.getNumPartitions()}, {total_size} bytes""")
 
-        df_rds_temp_count = df_rds_temp_t1.count()
+        df_rds_temp_count = df_rds_temp_t2.count()
         df_csv_temp_count = df_csv_temp_t1.count()
 
         if df_rds_temp_count == df_csv_temp_count:
 
-            df_subtract_t1 = df_rds_temp_t1.subtract(df_csv_temp_t1)
+            df_subtract_t1 = df_rds_temp_t2.subtract(df_csv_temp_t1)
             df_rds_csv_subtract_row_count = df_subtract_t1.count()
 
             if df_rds_csv_subtract_row_count == 0:
@@ -337,7 +351,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
 
             df_dv_output = df_dv_output.union(df_temp)
         
-        df_rds_temp_t1.unpersist()
+        df_rds_temp_t2.unpersist()
         df_csv_temp_t1.unpersist()
     else:
         df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
@@ -354,7 +368,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
     return df_dv_output
 
 
-def write_parquet_to_s3(df_dv_output, database, table):
+def write_parquet_to_s3(df_dv_output: DataFrame, database, table):
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
 

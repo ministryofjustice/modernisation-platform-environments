@@ -39,6 +39,7 @@ locals {
           availability_zone             = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
+          ami_name = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z" # fixed to a specific version
         })
         instance = merge(local.defaults_bods_ec2.instance, {
           instance_type = "m4.xlarge"
@@ -67,6 +68,21 @@ locals {
           oasys-national-reporting-environment = "t2"
         })
       })
+      # t2-onr-web-1-a = merge(local.defaults_web_ec2, {
+      #   config = merge(local.defaults_web_ec2.config, {
+      #     instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #     availability_zone = "${local.region}a"
+      #   })
+      #   instance = merge(local.defaults_web_ec2.instance, {
+      #     instance_type = "m4.large"
+      #   })
+      #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #   tags = merge(local.defaults_web_ec2.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #   })
+      # })
     }
     baseline_ec2_autoscaling_groups = {
       t2-test-web-asg = merge(local.defaults_web_ec2, {
@@ -79,16 +95,36 @@ locals {
         instance = merge(local.defaults_web_ec2.instance, {
           instance_type = "m4.large"
         })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "onr/dsos-2730/ansible-base"
-          })
-        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = merge(local.defaults_web_ec2.tags, {
+          oasys-national-reporting-environment = "t2"
+        })
+      })
+      # IMPORTANT: this is just for testing at the moment
+      t2-rhel6-web-asg = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+          availability_zone = "${local.region}a"
+          ami_owner         = "374269020027"
+          ami_name          = "base_rhel_6_10_*"
+        })
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m4.large"
+          metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
+        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = merge(local.defaults_web_ec2.tags, {
+          ami                                  = "base_rhel_6_10"
           oasys-national-reporting-environment = "t2"
         })
       })
@@ -104,11 +140,6 @@ locals {
           instance_type = "m4.xlarge"
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        # user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-        #   args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-        #     branch = "onr/DSOS-2682/onr-boe-install"
-        #   })
-        # })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })

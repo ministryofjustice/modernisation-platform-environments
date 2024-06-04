@@ -7,13 +7,6 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
-      cloudwatch_dashboard_default_widget_groups = [
-        "lb",
-        "ec2_linux_only",
-        "ec2_oracle_db_with_backup",
-        "ec2_service_status",
-        "ec2_textfile_monitoring",
-      ]
       sns_topics = {
         pagerduty_integrations = {
           dso_pagerduty               = "nomis_alarms"
@@ -109,7 +102,11 @@ locals {
         })
       })
 
-      preprod-nomis-client-a = local.jumpserver_ec2
+      preprod-nomis-client-a = merge(local.jumpserver_ec2, {
+        tags = merge(local.jumpserver_ec2.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
     }
 
     ec2_instances = {

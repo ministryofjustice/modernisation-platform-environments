@@ -125,18 +125,17 @@ resource "aws_db_instance" "appdb1" {
   storage_encrypted           = true
   apply_immediately           = true
   # snapshot_identifier         = var.rds_snapshot_arn
-  kms_key_id = var.rds_kms_key_arn
+  kms_key_id                  = var.rds_kms_key_arn
   tags = merge(
     var.tags,
     { "Name" = "${var.application_name}-${var.environment}-database" },
-    { instance-scheduling = "skip-scheduling" }
+    { "instance-scheduling" = "skip-scheduling" }
   )
 
   timeouts {
     create = "60m"
     delete = "2h"
   }
-
 }
 
 # enabled_cloudwatch_logs_exports       = ["general", "error", "slowquery"]
