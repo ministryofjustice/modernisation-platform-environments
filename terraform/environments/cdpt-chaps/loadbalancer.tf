@@ -107,9 +107,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
   deregistration_delay = 30
 
   stickiness {
-    cookie_name     = "chaps_lb_app_cookie"
-    type            = "app_cookie"
-    cookie_duration = 86400
+    type            = "lb_cookie"
   } 
 
   health_check {
@@ -149,9 +147,8 @@ resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
   depends_on        = [aws_acm_certificate_validation.external]
   load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
-  port              = 443
-  protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external.arn
+  port              = 80
+  protocol          = "HTTP"
   
   default_action {
     target_group_arn = aws_lb_target_group.chaps_target_group.id
