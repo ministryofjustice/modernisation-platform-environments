@@ -47,7 +47,7 @@ resource "aws_elasticache_user" "app_default" {
 
   authentication_mode {
     type      = "password"
-    passwords = [data.aws_secretsmanager_secret_version.elasticache_default_user_password.secret_string]
+    passwords = [data.aws_secretsmanager_secret_version.elasticache_default_user_password[0].secret_string]
   }
 }
 
