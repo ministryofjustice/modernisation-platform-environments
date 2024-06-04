@@ -166,7 +166,7 @@ resource "aws_lb_listener_rule" "chaps_listener_rule" {
     target_group_arn = aws_lb_target_group.chaps_target_group.id
   }
   condition {
-   path-pattern {
+   path_pattern {
     values = ["/*"]
    }
   }
