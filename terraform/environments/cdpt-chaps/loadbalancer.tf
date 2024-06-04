@@ -118,6 +118,15 @@ resource "aws_lb_target_group" "chaps_target_group" {
     matcher             = "200-499"
     timeout             = "5"
   }
+
+    lifecycle {
+    create_before_destroy = true
+    ignore_changes = [name]
+  }
+
+    tags {
+    Name = "chaps-target-group-${random_string.chaps_target_group_name.result}"
+  }
 }
 
 resource "aws_security_group" "chaps_lb_sc" {
@@ -148,7 +157,7 @@ resource "aws_lb_listener" "https_listener" {
   port              = 443
   protocol          = "HTTPs"
   certificate_arn   = aws_acm_certificate.external.arn
-  
+
   default_action {
     target_group_arn = aws_lb_target_group.chaps_target_group.id
     type             = "forward"
