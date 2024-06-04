@@ -21,3 +21,4 @@ data "http" "prometheus_operator_crds" {
 
   url = each.value
 }
+
