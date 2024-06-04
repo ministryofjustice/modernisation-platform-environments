@@ -90,11 +90,16 @@ module "lb_access_logs_enabled" {
   enable_deletion_protection = false
   idle_timeout               = 60
   tags                       = {} 
+
 }
 
 resource "random_string" "chaps_target_group_name" {
   length  = 8
   special = false
+}
+
+  output "load_balancer_arn" {
+  value = aws_lb.load_balancer.arn
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
