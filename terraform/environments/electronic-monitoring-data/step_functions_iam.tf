@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "step_function_kms_policy" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "step_function_kms_policy2_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "step_function_kms_policy_policy_attachment" {
   role       = aws_iam_role.step_functions_role.name
   policy_arn = aws_iam_policy.step_function_kms_policy.arn
 }
@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "step_function_logs_policy" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "step_function_kms_policy2_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "step_function_log_policy_policy_attachment" {
   role       = aws_iam_role.step_functions_role.name
   policy_arn = aws_iam_policy.step_function_kms_policy.arn
 }
