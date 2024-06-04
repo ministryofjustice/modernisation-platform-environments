@@ -101,9 +101,10 @@ resource "aws_lb_target_group" "chaps_target_group" {
   deregistration_delay = 30
 
   stickiness {
-    type            = "lb_cookie"
+    cookie_name     = "chaps_lb_app_cookie"
+    type            = "app_cookie"
     cookie_duration = 86400
-  }
+  } 
 
   health_check {
     healthy_threshold   = "5"
