@@ -26,6 +26,29 @@ data "aws_iam_policy_document" "lambda_invoke_policy" {
 }
 
 
+resource "aws_iam_policy" "step_function_kms_policy" {
+  name        = "step-function-semantic-athena-layer-kms-policy"
+  description = "Policy for Lambda to use KMS key for semantic-athena-layer step function"
+
+  policy = data.aws_iam_policy_document.step_function_kms_policy.json
+}
+
+data "aws_iam_policy_document" "step_function_kms_policy" {
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [aws_kms_key.semantic_athena_layer_step_functions_log_key.arn]
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_kms_policy_policy_attachment" {
+  role       = aws_iam_role.step_functions_role.name
+  policy_arn = aws_iam_policy.step_function_kms_policy.arn
+}
+
 
 data "aws_iam_policy_document" "xray_policy" {
   statement {
