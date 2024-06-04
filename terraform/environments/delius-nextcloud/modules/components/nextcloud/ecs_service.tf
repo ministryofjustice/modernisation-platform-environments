@@ -22,13 +22,18 @@ module "nextcloud_service" {
   deployment_maximum_percent         = "100"
   deployment_minimum_healthy_percent = "0"
 
-  ecs_service_egress_security_group_ids = [
+  ecs_service_egress_security_group_ids = concat([
     for efs in module.nextcloud_efs : {
       ip_protocol                  = "tcp"
       port                         = 2049
       referenced_security_group_id = efs.sg_id
+    }],[
+    {
+      ip_protocol                  = "tcp"
+      port                         = 389
+      cidr_ipv4                   = var.account_info.cp_cidr
     }
-  ]
+  ])
 
   efs_volumes = [
     for efs in module.nextcloud_efs : {
@@ -107,6 +112,8 @@ module "nextcloud_service" {
   container_vars_env_specific = {}
 
   container_secrets_env_specific = {}
+
+
 
   container_secrets_default = {
     NEXTCLOUD_ADMIN_PASSWORD = aws_secretsmanager_secret.nextcloud_admin_password.arn
