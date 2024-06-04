@@ -28,7 +28,8 @@ def handler(event, context):
         f"Copying metadata... Database: {database_name}, Table: {table_name}, File: {file_name}"
     )
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
-
+    if "_" not in database_name:
+        database_name = f"{database_name}_add_underscore"
     project_name = "electronic-monitoring-metadata"
     destination_key = f"landing/{project_name}/data/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
     logger.info(f"Copying to: {destination_bucket}, {destination_key}")
