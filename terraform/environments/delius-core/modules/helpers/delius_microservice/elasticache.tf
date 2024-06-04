@@ -33,6 +33,7 @@ module "elasticache_default_user_password" {
 }
 
 data "aws_secretsmanager_secret_version" "elasticache_default_user_password" {
+  count = var.create_elasticache ? 1 : 0
   secret_id = module.elasticache_default_user_password[0].secret.id
 }
 
