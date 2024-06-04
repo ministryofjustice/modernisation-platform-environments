@@ -53,6 +53,14 @@ variable "services" {
       name_prefix = "landregistrationdivision"
       module_key  = "ahmlr"
     }
+    "care_standards" = {
+      name_prefix = "carestandards"
+      module_key  = "care_standards"
+    },
+    "cicap" = {
+      name_prefix = "cicap"
+      module_key  = "cicap"
+    }
 
     "charity_tribunal_decisions" = {
       name_prefix = "charitytribunal"
