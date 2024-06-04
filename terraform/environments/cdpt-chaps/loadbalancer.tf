@@ -98,7 +98,7 @@ resource "random_string" "chaps_target_group_name" {
 }
 
 resource "aws_lb_target_group" "chaps_target_group" {
-  name                 = "chaps-target-group-${random_string.chaps_target_group_name.result}"
+  #name                 = "chaps-target-group-${random_string.chaps_target_group_name.result}"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -123,6 +123,10 @@ resource "aws_lb_target_group" "chaps_target_group" {
   lifecycle {
     create_before_destroy = true
     ignore_changes = [name]
+  }
+
+  tags {
+    Name = "chaps-target-group-${random_string.chaps_target_group_name.result}"
   }
 }
 
