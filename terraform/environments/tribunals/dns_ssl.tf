@@ -154,6 +154,8 @@ locals {
   modules = {
     appeals = module.appeals
     ahmlr = module.ahmlr
+    care_standards = module.care_standards
+    cicap = module.cicap
   }
   sftp_modules = {
     charity_tribunal_decisions = module.charity_tribunal_decisions
