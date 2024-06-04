@@ -156,6 +156,16 @@ locals {
     ahmlr = module.ahmlr
     care_standards = module.care_standards
     cicap = module.cicap
+    charity_tribunal_decisions = module.charity_tribunal_decisions
+    claims_management_decisions = module.claims_management_decisions
+    consumer_credit_appeals = module.consumer_credit_appeals
+    estate_agent_appeals = module.estate_agent_appeals
+    primary_health_lists = module.primary_health_lists
+    siac = module.siac
+    sscs_venue_pages = module.sscs_venue_pages
+    tax_chancery_decisions = module.tax_chancery_decisions
+    tax_tribunal_decisions = module.tax_tribunal_decisions
+    ftp_admin_appeals = module.ftp_admin_appeals
   }
   sftp_modules = {
     charity_tribunal_decisions = module.charity_tribunal_decisions
