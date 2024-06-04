@@ -98,10 +98,6 @@ resource "random_string" "chaps_target_group_name" {
   special = false
 }
 
-output "load_balancer_arn" {
-  value = module.lb_access_logs_enabled.load_balancer.arn
-}
-
 resource "aws_lb_target_group" "chaps_target_group" {
   #name                 = "chaps-target-group-${random_string.chaps_target_group_name.result}"
   port                 = 80
@@ -151,7 +147,7 @@ resource "aws_security_group" "chaps_lb_sc" {
 
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
-  depends_on        = [aws_acm_certificate_validation.external, aws_lb_target_group.chaps_target_group]
+  depends_on        = [aws_acm_certificate_validation.external]
   load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
   port              = 443
   protocol          = "HTTPS"
@@ -162,3 +158,16 @@ resource "aws_lb_listener" "https_listener" {
     type             = "forward"
   }
 }
+
+resource "aws_lb_listener_rule" "chaps_listener_rule" {
+   listener_arn = aws_lb_listener.https_listener.arn
+   action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.chaps_target_group.id
+  }
+  condition {
+   field  = "path-pattern"
+   values = ["/*"]
+  }
+}
+
