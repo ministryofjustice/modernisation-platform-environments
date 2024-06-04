@@ -122,7 +122,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes = name
+    ignore_changes = [name]
   }
 }
 
