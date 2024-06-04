@@ -23,6 +23,7 @@ resource "aws_elasticache_cluster" "this" {
 }
 
 module "elasticache_default_user_password" {
+  count = var.create_elasticache ? 1 : 0
   source                   = "../secret"
   name                     = "${var.name}-elasticache-password"
   description              = "Elasticache Default User Password"
@@ -32,7 +33,7 @@ module "elasticache_default_user_password" {
 }
 
 data "aws_secretsmanager_secret_version" "elasticache_default_user_password" {
-  secret_id = module.elasticache_default_user_password.secret.id
+  secret_id = module.elasticache_default_user_password[0].secret.id
 }
 
 resource "aws_elasticache_user" "app_default" {
