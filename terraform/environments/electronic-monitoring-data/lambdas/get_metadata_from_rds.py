@@ -1,5 +1,11 @@
+"""
+connects to rds for a given database and uses mojap metadata to convert
+mojap metadata type and writes out the list of metadata for all tables in the database
+"""
+
 import awswrangler as wr
 from mojap_metadata.converters.sqlalchemy_converter import SQLAlchemyConverter
+from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from sqlalchemy import create_engine
 import os
 import logging
@@ -14,6 +20,8 @@ logger.setLevel(logging.INFO)
 
 SECRET_NAME = os.environ.get("SECRET_NAME")
 DB_NAME = os.environ.get("DB_NAME")
+METADATA_STORE_BUCKET = os.environ.get("METADATA_STORE_BUCKET")
+
 
 db_sem_name = f"{DB_NAME}_semantic_layer"
 
@@ -38,17 +46,48 @@ def create_glue_database():
     wr.catalog.create_database(name=db_sem_name, exist_ok=True)
 
 
+def upload_to_s3(local_filepath: str, s3_filepath: str) -> None:
+    s3 = boto3.client("s3")
+    bucket_name, key = s3_filepath[5:].split("/", 1)
+
+    try:
+        s3.upload_file(local_filepath, bucket_name, key)
+        logger.info(f"Successfully uploaded {local_filepath} to {s3_filepath}")
+    except (NoCredentialsError, PartialCredentialsError) as e:
+        logger.info(f"Error uploading to S3: {e}")
+
+
+def write_meta_to_s3(meta):
+    table_name = meta.name
+    temp_path = "/tmp/temp.json"
+    s3_path = f"s3://{METADATA_STORE_BUCKET}/database={DB_NAME}/table_name={table_name}/metadata.json"
+    meta.to_json(temp_path)
+    upload_to_s3(temp_path, s3_path)
+
+
+def add_db_to_meta(meta):
+    """
+    Database is currently down as dbo -
+    reassign to actual DB Name
+    """
+    meta.database = DB_NAME
+    return meta
+
+
 def handler(event, context):
     conn = get_rds_connection()
     engine = create_engine("mssql+pyodbc://", creator=lambda: conn)
     sqlc = SQLAlchemyConverter(engine)
     metadata_list = sqlc.generate_to_meta_list(schema="dbo")
-    metadata_list = [meta.to_dict() for meta in metadata_list]
+    metadata_list = [add_db_to_meta(meta) for meta in metadata_list]
+    for meta in metadata_list:
+        write_meta_to_s3(meta)
+    dict_metadata_list = [meta.to_dict() for meta in metadata_list]
     create_glue_database()
     result = {
         "status": "success",
         "message": f"Found {len(metadata_list)} tables",
-        "metadata_list": metadata_list,
+        "metadata_list": dict_metadata_list,
     }
     logger.info(result)
     return result
