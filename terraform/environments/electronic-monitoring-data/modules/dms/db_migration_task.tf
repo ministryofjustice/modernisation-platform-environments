@@ -1,6 +1,6 @@
 # Create a new replication task
 resource "aws_dms_replication_task" "dms_db_migration_task" {
-  # cdc_start_time            = "1993-05-21T05:50:00Z"
+
   migration_type            = "full-load"
   replication_instance_arn  = var.dms_replication_instance_arn
   replication_task_id       = "${replace(var.database_name, "_", "-")}-db-migration-task-tf"
@@ -12,7 +12,26 @@ resource "aws_dms_replication_task" "dms_db_migration_task" {
   tags = merge(
     var.local_tags,
     {
-      Resource_Type = "DMS Database Migration Task",
+      Resource_Type = "DMS Database Migration Task without transformations",
+    },
+  )
+}
+
+resource "aws_dms_replication_task" "dms_db_migration_task_v2" {
+  count = fileexists("${path.module}/dms_${var.database_name}_task_transformations.json") ? 1 : 0
+
+  migration_type            = "full-load"
+  replication_instance_arn  = var.dms_replication_instance_arn
+  replication_task_id       = "${replace(var.database_name, "_", "-")}-db-migration-task-v2-tf"
+  replication_task_settings = var.rep_task_settings_filepath
+  source_endpoint_arn       = aws_dms_endpoint.dms_rds_source.endpoint_arn
+  table_mappings            = trimspace(file("${path.module}/dms_${var.database_name}_task_transformations.json"))
+  target_endpoint_arn       = aws_dms_s3_endpoint.dms_s3_parquet_target.endpoint_arn
+
+  tags = merge(
+    var.local_tags,
+    {
+      Resource_Type = "DMS Database Migration Task with transformations",
     },
   )
 }

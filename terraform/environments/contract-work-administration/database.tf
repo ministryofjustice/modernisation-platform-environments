@@ -68,8 +68,7 @@ resource "aws_instance" "database" {
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
-    { "Name" = local.database_ec2_name },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+    { "Name" = local.database_ec2_name }
   )
 }
 
