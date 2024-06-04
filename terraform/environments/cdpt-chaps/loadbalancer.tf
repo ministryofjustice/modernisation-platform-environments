@@ -160,14 +160,15 @@ resource "aws_lb_listener" "https_listener" {
 }
 
 resource "aws_lb_listener_rule" "chaps_listener_rule" {
-   listener_arn = aws_lb_listener.https_listener.arn
+  listener_arn = aws_lb_listener.https_listener.arn
    action {
     type = "forward"
     target_group_arn = aws_lb_target_group.chaps_target_group.id
   }
   condition {
-   field  = "path-pattern"
-   values = ["/*"]
+   path-pattern {
+    values = ["/*"]
+   }
   }
 }
 
