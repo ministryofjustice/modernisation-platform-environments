@@ -370,36 +370,36 @@ locals {
           oracle-db-sid      = "T2OASYS" # for each env using azure DB will need to be OASPROD
         })
       })
-      "t2-oasys-web-b" = merge(local.webserver, {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "oasys_webserver_release_*"
-          ssm_parameters_prefix     = "ec2-web-t2/"
-          iam_resource_names_prefix = "ec2-web-t2"
-          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
-            "Ec2T2WebPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "monitoring-add-inodes"
-          })
-        })
-        autoscaling_schedules = {
-          "scale_up" = {
-            recurrence = "0 5 * * Mon-Fri"
-          }
-          "scale_down" = {
-            desired_capacity = 0
-            recurrence       = "0 19 * * Mon-Fri"
-          }
-        }
-        tags = merge(local.webserver.tags, {
-          description        = "t2 oasys web"
-          oasys-environment  = "t2"
-          oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
-          oracle-db-sid      = "T2OASYS" # for each env using azure DB will need to be OASPROD
-        })
-      })
+      # "t2-oasys-web-b" = merge(local.webserver, {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ami_name                  = "oasys_webserver_release_*"
+      #     ssm_parameters_prefix     = "ec2-web-t2/"
+      #     iam_resource_names_prefix = "ec2-web-t2"
+      #     instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
+      #       "Ec2T2WebPolicy",
+      #     ])
+      #   })
+      #   user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      #     args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+      #       branch = "monitoring-add-inodes"
+      #     })
+      #   })
+      #   autoscaling_schedules = {
+      #     "scale_up" = {
+      #       recurrence = "0 5 * * Mon-Fri"
+      #     }
+      #     "scale_down" = {
+      #       desired_capacity = 0
+      #       recurrence       = "0 19 * * Mon-Fri"
+      #     }
+      #   }
+      #   tags = merge(local.webserver.tags, {
+      #     description        = "t2 oasys web"
+      #     oasys-environment  = "t2"
+      #     oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+      #     oracle-db-sid      = "T2OASYS" # for each env using azure DB will need to be OASPROD
+      #   })
+      # })
 
       ##
       ## T1
