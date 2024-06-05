@@ -2,7 +2,7 @@
 
 ## CrossAccount DataAPI Cross Account Role, 
 # CrossAccount DataAPI Assume Policy
-data "aws_iam_policy_document" "redshift_dataapi_cross_assume" {
+data "aws_iam_policy_document" "dataapi_cross_assume" {
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -34,10 +34,10 @@ data "aws_iam_policy_document" "redshift_dataapi_cross_assume" {
 }
 
 # CrossAccount DataAPI Role
-resource "aws_iam_role" "redshift_dataapi_cross_role" {
+resource "aws_iam_role" "dataapi_cross_role" {
   name                  = "${local.project}-data-api-cross-account-role"
   description           = "Data API Cross Account Role"
-  assume_role_policy    = data.aws_iam_policy_document.redshift_dataapi_cross_assume.json
+  assume_role_policy    = data.aws_iam_policy_document.dataapi_cross_assume.json
   force_detach_policies = true
 
   tags = merge(
@@ -53,24 +53,24 @@ resource "aws_iam_role" "redshift_dataapi_cross_role" {
 
 # CrossAccount DataAPI Role/Policy Attachement
 resource "aws_iam_role_policy_attachment" "redshift_dataapi" {
-  role       = aws_iam_role.redshift_dataapi_cross_role.name
+  role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.redshift_dataapi_cross_policy.arn
 }
 
 # Athena API Role/Policy Attachement
 resource "aws_iam_role_policy_attachment" "athena_api" {
-  role       = aws_iam_role.redshift_dataapi_cross_role.name
+  role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.athena_api_cross_policy.arn
 }
 
 # S3 Read Write Policy Attachement
 resource "aws_iam_role_policy_attachment" "s3_read_write" {
-  role       = aws_iam_role.redshift_dataapi_cross_role.name
+  role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.s3_read_write_policy.arn
 }
 
 # KMS Policy Attachement
 resource "aws_iam_role_policy_attachment" "kms_read_access_policy" {
-  role       = aws_iam_role.redshift_dataapi_cross_role.name
+  role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.kms_read_access_policy.arn
 }
