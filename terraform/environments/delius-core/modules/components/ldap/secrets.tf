@@ -64,7 +64,7 @@ resource "aws_ssm_parameter" "delius_core_ldap_bind_password" {
 
 module "ldap_admin_password" {
   source              = "../../helpers/secret"
-  name                = "ldap-admin-password"
+  name                = "ldap-admin-password-${var.env_name}"
   description         = "LDAP Admin Password"
   tags                = var.tags
   kms_key_id          = var.account_config.kms_keys.general_shared

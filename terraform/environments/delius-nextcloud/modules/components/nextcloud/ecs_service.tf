@@ -51,9 +51,9 @@ module "nextcloud_service" {
       }]
     }
   ]
-  mount_points = [for efs in module.nextcloud_efs : {
-    sourceVolume  = efs.name
-    containerPath = "/var/www/${efs.name}"
+  mount_points = [for k, v in module.nextcloud_efs : {
+    sourceVolume  = v.name
+    containerPath = "/var/www/${k}"
     readOnly      = false
   }]
 
@@ -64,7 +64,7 @@ module "nextcloud_service" {
   alb_listener_rule_paths            = ["/"]
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
   microservice_lb                    = aws_alb.nextcloud
-  name                               = "nextcloud"
+  name                               = "nextcloud-${var.env_name}"
 
 
   container_cpu    = 2048
@@ -97,7 +97,7 @@ module "nextcloud_service" {
   elasticache_parameter_group_name = "default.redis6.x"
   elasticache_subnet_group_name    = "nextcloud-elasticache-subnet-group"
 
-  db_ingress_security_groups = [aws_security_group.cluster.id]
+  db_ingress_security_groups = []
 
   rds_endpoint_environment_variable         = "MYSQL_HOST"
   rds_password_secret_variable              = "MYSQL_PASSWORD"
