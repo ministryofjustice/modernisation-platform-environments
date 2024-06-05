@@ -67,7 +67,7 @@ data "aws_iam_policy_document" "step_function_logs_policy" {
        "logs:PutLogEvents",
        "logs:DescribeLogStreams"
     ]
-    resources = ["${aws_cloudwatch_log_group.semantic_athena_layer.arn}:*"]
+    resources = ["${aws_cloudwatch_log_group.semantic_athena_layer.arn}/*"]
   }
 }
 
