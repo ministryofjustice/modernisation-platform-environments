@@ -53,7 +53,7 @@ module "nextcloud_service" {
   ]
   mount_points = [for efs in module.nextcloud_efs : {
     sourceVolume  = efs.name
-    containerPath = "/var/www/${efs.name}"
+    containerPath = "/var/www/${replace(efs.name, "_", "/")}"
     readOnly      = false
   }]
 
