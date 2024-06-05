@@ -337,7 +337,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
             df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         given_transformed_colmn_list = [e.strip().strip("'") for e in args["transformed_column_list"].split(",")]
-
+        LOGGER.info(f"given_transformed_colmn_list = {given_transformed_colmn_list}, {type(given_transformed_colmn_list)}")
+        
         csv_col_list = get_csv_header_columns_list(tbl_csv_s3_path)
         for transformed_column in given_transformed_colmn_list:
             if not transformed_column in csv_col_list:
