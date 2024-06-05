@@ -33,15 +33,6 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
 }
 EOF
 
-  tracing_configuration {
-    enabled = true
-  }
-
-  logging_configuration {
-    level = "ALL"
-    include_execution_data = true
-    log_destination        = "${aws_cloudwatch_log_group.semantic_athena_layer.arn}:*"
-  }
 }
 
 resource "aws_kms_key" "semantic_athena_layer_step_functions_log_key" {
@@ -86,4 +77,32 @@ resource "aws_cloudwatch_log_group" "semantic_athena_layer" {
   name = "/aws/vendedlogs/states/semantic_athena_layer"
   retention_in_days = 400
   kms_key_id = aws_kms_key.semantic_athena_layer_step_functions_log_key.arn
+}
+
+resource "null_resource" "enable_step_function_logging" {
+      triggers = {
+    state_machine_arn  = aws_sfn_state_machine.semantic_athena_layer.arn
+    logs_params=<<PARAMS
+    {
+        "level":"ALL",
+        "includeExecutionData":true,
+        "destinations":[
+            {
+                "cloudWatchLogsLogGroup":{
+                    "logGroupArn":"${aws_cloudwatch_log_group.semantic_athena_layer.arn}:*"
+                    }
+                }
+            ]
+            }
+    PARAMS
+    }
+  provisioner "local-exec" {
+    command = <<EOT
+set -euo pipefail
+
+aws stepfunctions update-state-machine --state-machine-arn ${self.triggers.state_machine_arn}  --tracing-configuration enabled=true --logging-configuration='${self.triggers.logs_params}'
+
+EOT
+    # interpreter = ["bash"]
+  }
 }
