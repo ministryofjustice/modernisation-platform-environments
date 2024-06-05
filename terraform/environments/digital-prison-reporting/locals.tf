@@ -341,7 +341,7 @@ locals {
     cloud_platform_k8s_cluster_context = "placeholder"
   }
 
-  # Analytics Platform, DBT Secrets
+  # Analytics Platform, DBT Secrets 
   enable_dbt_k8s_secrets = local.application_data.accounts[local.environment].enable_dbt_k8s_secrets
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder"
