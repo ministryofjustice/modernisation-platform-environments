@@ -215,7 +215,7 @@ data "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_secret" {
-  name  = format("/%s-%s/umt_client_secret", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/umt/client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
@@ -229,7 +229,7 @@ resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_sec
 }
 
 resource "aws_ssm_parameter" "delius_core_umt_jwt_secret" {
-  name  = format("/%s-%s/umt_jwt_secret", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/umt/jwt_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
@@ -243,7 +243,7 @@ resource "aws_ssm_parameter" "delius_core_umt_jwt_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_umt_delius_secret" {
-  name  = format("/%s-%s/umt_delius_secret", var.account_info.application_name, var.env_name)
+  name  = format("/%s-%s/umt/delius_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 
