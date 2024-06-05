@@ -64,7 +64,7 @@ module "nextcloud_service" {
   alb_listener_rule_paths            = ["/"]
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
   microservice_lb                    = aws_alb.nextcloud
-  name                               = "nextcloud-${var.env_name}"
+  name                               = "nextcloud"
 
 
   container_cpu    = 2048
