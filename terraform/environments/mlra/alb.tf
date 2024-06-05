@@ -14,15 +14,12 @@ locals {
   }
 
   prod_validation = {
-    "${local.application_data.accounts[local.environment].acm_cert_domain_name}" = {
+    local.application_data.accounts[local.environment].acm_cert_domain_name = {
       account   = "core-network-services"
-      zone_name = "${local.application_data.accounts[local.environment].acm_cert_domain_name}"
+      zone_name = local.application_data.accounts[local.environment].acm_cert_domain_name
     }
   }
-
-
 }
-
 
 
 module "alb" {
