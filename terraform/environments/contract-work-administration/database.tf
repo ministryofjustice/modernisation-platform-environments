@@ -331,7 +331,6 @@ resource "aws_ebs_volume" "oraarch" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-oraarch" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 
@@ -380,7 +379,6 @@ resource "aws_ebs_volume" "oraredo" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-oraredo" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 
@@ -405,7 +403,6 @@ resource "aws_ebs_volume" "share" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-share" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 }
 
