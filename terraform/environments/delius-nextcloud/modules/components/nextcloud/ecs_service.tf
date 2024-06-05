@@ -66,6 +66,10 @@ module "nextcloud_service" {
   microservice_lb                    = aws_alb.nextcloud
   name                               = "nextcloud"
 
+
+  container_cpu = 2048
+  container_memory = 4096
+
   extra_task_role_policies = {
     "S3_BUCKET_CONFIG"   = data.aws_iam_policy_document.s3_bucket_config
     "access_ldap_secret" = data.aws_iam_policy_document.access_ldap_secret
