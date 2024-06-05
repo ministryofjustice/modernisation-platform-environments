@@ -37,19 +37,19 @@ module "umt" {
       cidr_ipv4   = var.account_config.shared_vpc_cidr
     },
     {
-      ip_protocol  = "tcp"
-      port              = 1521
-      cidr_ipv4      = var.environment_config.migration_environment_db_cidr[0]
+      ip_protocol = "tcp"
+      port        = 1521
+      cidr_ipv4   = var.environment_config.migration_environment_db_cidr[0]
     },
-     {
-      ip_protocol  = "tcp"
-      port              = 1521
-      cidr_ipv4      = var.environment_config.migration_environment_db_cidr[1]
+    {
+      ip_protocol = "tcp"
+      port        = 1521
+      cidr_ipv4   = var.environment_config.migration_environment_db_cidr[1]
     },
-     {
-      ip_protocol  = "tcp"
-      port              = 1521
-      cidr_ipv4      = var.environment_config.migration_environment_db_cidr[2]
+    {
+      ip_protocol = "tcp"
+      port        = 1521
+      cidr_ipv4   = var.environment_config.migration_environment_db_cidr[2]
     },
   ]
 
@@ -63,11 +63,9 @@ module "umt" {
   elasticache_node_type            = var.delius_microservice_configs.umt.elasticache_node_type
   elasticache_port                 = 6379
   elasticache_parameter_group_name = var.delius_microservice_configs.umt.elasticache_parameter_group_name
-  elasticache_subnet_group_name    = "nextcloud-elasticache-subnet-group"
   elasticache_apply_immediately    = true
-
   elasticache_parameters = {
-    "notify-keyspace-events" = "eA"
+    "notify-keyspace-events" = "eA" # We need to turn on 'notify-keyspace-events' to support Spring Redis session expiration. See https://github.com/spring-projects/spring-session/issues/124
     "cluster-enabled"        = "yes"
   }
 
@@ -94,7 +92,16 @@ module "umt" {
   enable_platform_backups = var.enable_platform_backups
 }
 
+resource "aws_ssm_parameter" "elasticache_host" {
+  name        = format("/%s-%s/umt/elasticache/host", var.account_info.application_name, var.env_name)
+  description = "UMT ElastiCache Host"
+  type        = "SecureString"
+  value       = module.umt.elasticache_endpoint
+}
 
-#######################
-# User management EIS Params #
-#######################
+resource "aws_ssm_parameter" "elasticache_port" {
+  name        = format("/%s-%s/umt/elasticache/port", var.account_info.application_name, var.env_name)
+  description = "UMT ElastiCache Port"
+  type        = "SecureString"
+  value       = module.umt.elasticache_port
+}

@@ -85,7 +85,6 @@ module "nextcloud_service" {
   elasticache_node_type            = "cache.t3.small"
   elasticache_port                 = 6379
   elasticache_parameter_group_name = "default.redis6.x"
-  elasticache_subnet_group_name    = "nextcloud-elasticache-subnet-group"
 
   db_ingress_security_groups = [aws_security_group.cluster.id]
 
