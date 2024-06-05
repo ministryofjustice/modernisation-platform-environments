@@ -64,7 +64,12 @@ variable "services" {
     "employment_appeals" = {
       name_prefix = "employmentappeals"
       module_key  = "employment_appeals"
-    }
+    },
+
+    "finance_and_tax" = {
+      name_prefix = "financeandtax"
+      module_key  = "finance_and_tax"
+    },
 
     "charity_tribunal_decisions" = {
       name_prefix = "charitytribunal"
@@ -160,6 +165,7 @@ locals {
     ahmlr = module.ahmlr
     care_standards = module.care_standards
     cicap = module.cicap
+    finance_and_tax = module.finance_and_tax
     employment_appeals = module.employment_appeals
     charity_tribunal_decisions = module.charity_tribunal_decisions
     claims_management_decisions = module.claims_management_decisions
