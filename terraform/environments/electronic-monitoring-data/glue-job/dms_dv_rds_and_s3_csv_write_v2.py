@@ -337,7 +337,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
             df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         given_transformed_colmn_list = [e.strip().strip("'") for e in args["transformed_column_list"].split(",")]
-
+        LOGGER.info(f"given_transformed_colmn_list = {given_transformed_colmn_list}, {type(given_transformed_colmn_list)}")
+        
         csv_col_list = get_csv_header_columns_list(tbl_csv_s3_path)
         for transformed_column in given_transformed_colmn_list:
             if not transformed_column in csv_col_list:
@@ -481,8 +482,7 @@ if __name__ == "__main__":
                                              if given_rds_sqlserver_table_str in rds_sqlserver_db_tbl_list else None
 
     if verified_given_rds_sqlserver_table_str is not None:
-        LOGGER.info(
-            f"""Given table being processed: {verified_given_rds_sqlserver_table_str}""")
+        LOGGER.info(f"""Given table being processed: {verified_given_rds_sqlserver_table_str}""")
 
         rds_db_name, rds_tbl_name = verified_given_rds_sqlserver_table_str.split('_dbo_')[0], \
                                     verified_given_rds_sqlserver_table_str.split('_dbo_')[1]
@@ -492,8 +492,11 @@ if __name__ == "__main__":
 
         input_repartition_factor = int(args["repartition_factor"])
 
-        df_dv_output = process_dv_for_table( rds_db_name, rds_tbl_name, total_files, input_repartition_factor)
+        df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor)
 
         write_parquet_to_s3(df_dv_output, rds_db_name, verified_given_rds_sqlserver_table_str)
+    else:
+        LOGGER.warn(f"""Cannot process: given_rds_sqlserver_table_str = {given_rds_sqlserver_table_str}""")
+        LOGGER.warn(f""">> verified_given_rds_sqlserver_table_str = {verified_given_rds_sqlserver_table_str}""")
 
     job.commit()
