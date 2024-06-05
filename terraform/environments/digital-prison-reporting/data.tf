@@ -70,6 +70,10 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration" {
 }
 
 # External cli kubergrunt, used by OIDC
-data "external" "thumb" {
-  program = ["kubergrunt", "eks", "oidc-thumbprint", "--issuer-url", "https://oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287"]
+#data "external" "thumb" {
+#  program = ["kubergrunt", "eks", "oidc-thumbprint", "--issuer-url", "https://oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287"]
+#}
+
+data "tls_certificate" "this" {
+  url = "https://oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287"
 }
