@@ -137,7 +137,8 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "lsast"
           description       = "lsast database for CNOM and MIS"
-          oracle-sids       = ""
+          oracle-sids       = "LSCNOM LSMIS"
+          misload-dbname    = "LSMIS"
         })
       })
 
