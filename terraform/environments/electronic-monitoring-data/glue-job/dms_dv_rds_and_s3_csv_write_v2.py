@@ -341,7 +341,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                 sys.exit(1)
 
         for transformed_column in transformed_columns_original_names:
-            LOGGER.info(f"stripping {args["rds_tbl_col_replace_substring"]} from rds-dataframe-column {transformed_column}")
+            LOGGER.info(f"stripping {args['rds_tbl_col_replace_substring']} from rds-dataframe-column {transformed_column}")
             df_rds_temp_t3 = strip_rds_tbl_col_chars(df_rds_temp_t2, transformed_column, args["rds_tbl_col_replace_substring"])
 
         csv_schema_object = get_csv_schema_object(df_rds_temp, transformed_columns_original_names)
