@@ -1,7 +1,7 @@
 ### Cross Account Role
 
-## Redshift DataAPI Cross Account Role, CP -> MP
-# Redshift DataAPI Assume Policy
+## CrossAccount DataAPI Cross Account Role, 
+# CrossAccount DataAPI Assume Policy
 data "aws_iam_policy_document" "redshift_dataapi_cross_assume" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -10,21 +10,40 @@ data "aws_iam_policy_document" "redshift_dataapi_cross_assume" {
       type        = "AWS"
       identifiers = ["arn:aws:iam::754256621582:root"]
     }
+  }  
 
-  }
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287"]
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-dpr"]
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287:sub"
+    }
+    condition {
+      test     = "StringLike"
+      values   = ["sts.amazonaws.com"]
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287:aud"
+    }
+  }  
 }
 
-# Redshift DataAPI Role
+# CrossAccount DataAPI Role
 resource "aws_iam_role" "redshift_dataapi_cross_role" {
-  name                  = "${local.project}-redshift-data-api-cross-role-${local.env}"
-  description           = "Redshift Data API Cross Account Role, CP to MP"
+  name                  = "${local.project}-data-api-cross-account-role-${local.env}"
+  description           = "Data API Cross Account Role"
   assume_role_policy    = data.aws_iam_policy_document.redshift_dataapi_cross_assume.json
   force_detach_policies = true
 
   tags = merge(
     local.tags,
     {
-      Name              = "${local.project}-redshift-data-api-cross-role-${local.env}"
+      Name              = "${local.project}-data-api-cross-account-role-${local.env}"
       Resource_Type     = "iam"
       Jira              = "DPR2-751"
       Resource_Group    = "Front-End"
@@ -32,7 +51,7 @@ resource "aws_iam_role" "redshift_dataapi_cross_role" {
   )
 }
 
-# Redshift DataAPI Role/Policy Attachement
+# CrossAccount DataAPI Role/Policy Attachement
 resource "aws_iam_role_policy_attachment" "redshift_dataapi" {
   role       = aws_iam_role.redshift_dataapi_cross_role.name
   policy_arn = aws_iam_policy.redshift_dataapi_cross_policy.arn
@@ -48,4 +67,10 @@ resource "aws_iam_role_policy_attachment" "athena_api" {
 resource "aws_iam_role_policy_attachment" "s3_read_write" {
   role       = aws_iam_role.redshift_dataapi_cross_role.name
   policy_arn = aws_iam_policy.s3_read_write_policy.arn
+}
+
+# KMS Policy Attachement
+resource "aws_iam_role_policy_attachment" "kms_read_access_policy" {
+  role       = aws_iam_role.redshift_dataapi_cross_role.name
+  policy_arn = aws_iam_policy.kms_read_access_policy.arn
 }
