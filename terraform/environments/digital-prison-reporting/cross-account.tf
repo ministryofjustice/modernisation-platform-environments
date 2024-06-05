@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "redshift_dataapi_cross_assume" {
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287:sub"
     }
     condition {
-      test     = "StringLike"
+      test     = "StringEquals"
       values   = ["sts.amazonaws.com"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287:aud"
     }
