@@ -1,3 +1,12 @@
+############################################################################
+## This file is used to create a backup vault for migrating EFS data only
+## Resources here can be removed after data migration
+############################################################################
+
+locals {
+  lz_account_id = "411213865113"
+}
+
 resource "aws_backup_vault" "apex" {
   name = "${local.application_name}-backup-vault"
   tags = merge(
@@ -35,7 +44,7 @@ data "aws_iam_policy_document" "apex" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::411213865113:root"]
+      identifiers = ["arn:aws:iam::${local.lz_account_id}:root"]
     }
 
     actions = [

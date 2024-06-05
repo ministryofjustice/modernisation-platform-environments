@@ -29,10 +29,15 @@ resource "aws_kms_alias" "efs" {
   target_key_id = aws_kms_key.efs.key_id
 }
 
-import {
-  to = aws_efs_file_system.apex_efs
-  id = "fs-0ca2e956f29511d3c"
-}
+#########################################
+## Migrating EFS data from Backup
+#########################################
+# import {
+#   to = aws_efs_file_system.apex_efs
+#   id = "fs-0ca2e956f29511d3c"
+# }
+#########################################
+
 resource "aws_efs_file_system" "apex_efs" {
   encrypted        = true
   kms_key_id       = aws_kms_key.efs.arn

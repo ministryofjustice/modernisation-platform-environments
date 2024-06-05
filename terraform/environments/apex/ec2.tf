@@ -60,7 +60,7 @@ resource "aws_instance" "apex_db_instance" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name} Database Server" },
+    { "Name" = local.database_ec2_name },
     { "instance-scheduling" = "skip-scheduling" },
     { "snapshot-with-daily-7-day-retention" = "yes" }
   )
