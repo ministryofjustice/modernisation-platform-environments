@@ -2,7 +2,7 @@ resource "aws_cloudwatch_event_rule" "create_db_snapshots" {
 
   name                = "${local.application_name}-${local.environment}-create-db-snapshots"
   description         = "Daily snapshots of Oracle volumes"
-  schedule_expression = "cron(0 2 ? * MON-SUN *)"
+  schedule_expression = "cron(10 2 ? * MON-FRI *)"
   tags = merge(
     local.tags,
     { Name = "${local.application_name}-${local.environment}-create-db-snapshots" }
