@@ -24,7 +24,7 @@
         "table-name": "Log_LoadErrors"
       },
       "rule-action": "add-column",
-      "expression": "replace(replace($ErrorMessage, char(13), ''), char(10), '')",
+      "expression": "trim(replace(replace($ErrorMessage, char(13), ''), char(10), ''))",
       "value": "ErrorMessage_V2",
       "data-type": {
         "type": "string",
