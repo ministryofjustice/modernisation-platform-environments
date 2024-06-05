@@ -30,6 +30,18 @@ module "umt" {
   health_check_interval             = 30
 
   db_ingress_security_groups = []
+  ecs_service_egress_security_group_ids = [
+    {
+      ip_protocol = "tcp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "tcp"
+      port        = 1521
+      cidr_ipv4   = "0.0.0.0/0"
+    },
+  ]
 
   cluster_security_group_id = aws_security_group.cluster.id
 
