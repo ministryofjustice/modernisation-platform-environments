@@ -317,11 +317,6 @@ variable "elasticache_parameter_group_name" {
   default     = "default.redis5.0"
 }
 
-variable "elasticache_subnet_group_name" {
-  description = "The Elasticache subnet group name"
-  type        = string
-  default     = "default"
-}
 variable "elasticache_num_cache_nodes" {
   description = "The Elasticache number of cache nodes"
   type        = number
