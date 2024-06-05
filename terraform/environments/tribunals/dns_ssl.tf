@@ -57,10 +57,10 @@ variable "services" {
       name_prefix = "carestandards"
       module_key  = "care_standards"
     },
-    # "cicap" = {
-    #   name_prefix = "cicap"
-    #   module_key  = "cicap"
-    # }
+    "cicap" = {
+      name_prefix = "cicap"
+      module_key  = "cicap"
+    }
 
     "charity_tribunal_decisions" = {
       name_prefix = "charitytribunal"
@@ -155,7 +155,7 @@ locals {
     appeals = module.appeals
     ahmlr = module.ahmlr
     care_standards = module.care_standards
-    # cicap = module.cicap
+    cicap = module.cicap
     charity_tribunal_decisions = module.charity_tribunal_decisions
     claims_management_decisions = module.claims_management_decisions
     consumer_credit_appeals = module.consumer_credit_appeals
