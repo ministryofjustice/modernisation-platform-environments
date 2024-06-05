@@ -38,6 +38,8 @@ resource "aws_wafv2_web_acl_association" "this" {
 }
 
 resource "aws_wafv2_web_acl" "main" {
+  #checkov:skip=CKV_AWS_192: Log4J handled by remediation rule
+  #checkov:skip=CKV_AWS_31:  Logging not required at this time
   name  = data.external.shield_waf.result["name"]
   scope = "REGIONAL"
   default_action {
