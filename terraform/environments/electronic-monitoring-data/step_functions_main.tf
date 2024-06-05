@@ -83,7 +83,7 @@ EOF
 }
 
 resource "aws_cloudwatch_log_group" "semantic_athena_layer" {
-  name = "/aws/step-functions/semantic_athena_layer"
+  name = "/aws/vendedlogs/states/semantic_athena_layer"
   retention_in_days = 400
   kms_key_id = aws_kms_key.semantic_athena_layer_step_functions_log_key.arn
 }
