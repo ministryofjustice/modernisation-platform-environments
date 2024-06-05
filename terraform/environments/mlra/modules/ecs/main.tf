@@ -136,7 +136,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   metadata_options {
     http_endpoint               = "enabled"
-    http_tokens                 = "optional"
+    http_tokens                 = "required"
     http_put_response_hop_limit = "2"
   }
 
