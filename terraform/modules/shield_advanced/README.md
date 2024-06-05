@@ -42,6 +42,7 @@ import {
 | Name | Type |
 |------|------|
 | [aws_cloudwatch_metric_alarm.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_shield_application_layer_automatic_response.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/shield_application_layer_automatic_response) | resource |
 | [aws_shield_drt_access_role_arn_association.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/shield_drt_access_role_arn_association) | resource |
 | [aws_sns_topic.module_ddos_alarm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic) | resource |
 | [aws_wafv2_web_acl.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl) | resource |
@@ -59,7 +60,7 @@ import {
 |------|-------------|------|---------|:--------:|
 | <a name="input_application_name"></a> [application\_name](#input\_application\_name) | Name of application being protected. | `string` | n/a | yes |
 | <a name="input_excluded_protections"></a> [excluded\_protections](#input\_excluded\_protections) | A list of strings to not associate with the AWS Shield WAF ACL | `set(string)` | n/a | yes |
-| <a name="input_monitored_resources"></a> [monitored\_resources](#input\_monitored\_resources) | A map of names to ARNs for resources to be included by AWS Shield. | `map(string)` | n/a | yes |
+| <a name="input_resources"></a> [resources](#input\_resources) | Map of resource ARNs and optional automatic response actions | `map(any)` | n/a | yes |
 | <a name="input_waf_acl_rules"></a> [waf\_acl\_rules](#input\_waf\_acl\_rules) | A map of values to be used in a dynamic WAF ACL rule block | `map(any)` | n/a | yes |
 
 ## Outputs

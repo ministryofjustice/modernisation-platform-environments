@@ -8,9 +8,9 @@ variable "excluded_protections" {
   description = "A list of strings to not associate with the AWS Shield WAF ACL"
 }
 
-variable "monitored_resources" {
-  type        = map(string)
-  description = "A map of names to ARNs for resources to be included by AWS Shield."
+variable "resources" {
+  type        = map(any)
+  description = "Map of resource ARNs and optional automatic response actions"
 }
 
 variable "waf_acl_rules" {

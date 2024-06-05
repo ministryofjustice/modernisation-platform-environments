@@ -31,6 +31,12 @@ resource "aws_shield_drt_access_role_arn_association" "main" {
   role_arn = data.aws_iam_role.srt_access.arn
 }
 
+resource "aws_shield_application_layer_automatic_response" "this" {
+  for_each     = { for k, v in var.resources : k => v if lookup(v, "protection", null) != null }
+  resource_arn = each.value["arn"]
+  action       = upper(each.value["action"])
+}
+
 resource "aws_wafv2_web_acl_association" "this" {
   for_each     = local.shield_protections
   resource_arn = each.value["ResourceArn"]
