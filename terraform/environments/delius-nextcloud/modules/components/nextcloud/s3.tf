@@ -5,7 +5,7 @@ module "s3_bucket_config" {
     aws.bucket-replication = aws
   }
 
-  bucket_prefix      = "${var.env_name}-config"
+  bucket_prefix       = "${var.env_name}-config"
   versioning_enabled = true
   sse_algorithm      = "AES256"
   # Useful guide - https://aws.amazon.com/blogs/storage/how-to-use-aws-datasync-to-migrate-data-between-amazon-s3-buckets/
@@ -91,17 +91,19 @@ resource "aws_s3_object" "config" {
         from_address = "replace"
         domain       = "replace"
       }
-      fileshare_user_base = "ou=Users,dc=moj,dc=com"
-      standard_user_base  = "ou=Users,dc=moj,dc=com"
-      fs_group_prefix     = "delius"
-      ldap_host           = "ldap.${var.env_name}.delius-core.hmpps-${var.account_info.mp_environment}.modernisation-platform.internal"
-      pwm_url             = "pwm.${var.env_name}.delius-core.hmpps-${var.account_info.mp_environment}.modernisation-platform.service.justice.gov.uk"
+      nextcloud_s01ldap_agent_password = "replace"
+      fileshare_user_base              = "replace"
+      standard_user_base               = "replace"
+      fs_group_prefix                  = "replace"
+      ldap_host                        = "ldap.dev.delius-core.hmpps-development.modernisation-platform.internal"
+      pwm_url                          = "pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
 
-      fileshare_base_groups = "ou=Groups,dc=moj,dc=com"
-      fileshare_user_base   = "ou=Users,dc=moj,dc=com"
-      standard_user_base    = "ou=Users,dc=moj,dc=com"
+      fileshare_base_groups = "replace"
+      fileshare_user_base   = "replace"
+      standard_user_base    = "replace"
 
-      ldap_user = "cn=admin,dc=moj,dc=com"
+      ldap_user                        = "cn=admin,ou=Users,dc=moj,dc=com"
+      nextcloud_s01ldap_agent_password = "replace"
     }
   )
 }

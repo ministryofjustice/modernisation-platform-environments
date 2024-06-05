@@ -37,7 +37,7 @@ locals {
   internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-    module.ip_addresses.moj_cidrs.trusted_mojo_public, 
+    module.ip_addresses.moj_cidrs.trusted_mojo_public,
     module.ip_addresses.moj_cidr.ark_dc_external_internet,
     module.ip_addresses.moj_cidr.vodafone_dia_networks,
     module.ip_addresses.moj_cidr.palo_alto_primsa_access_corporate,
@@ -55,13 +55,13 @@ locals {
     ]
   ]))
 
-    ipv6_cidr_blocks = [
-      # Route53 Healthcheck Access Cidrs IPv6
-      "2406:da18:7ff:f800::/53",  # ap-southeast-1 Region
-      "2406:da18:fff:f800::/53",  # ap-southeast-1 Region
-      "2a05:d018:fff:f800::/53",  # eu-west-1 Region
-      "2a05:d018:7ff:f800::/53",  # eu-west-1 Region
-      "2600:1f18:7fff:f800::/53", # us-east-1 Region
-      "2600:1f18:3fff:f800::/53", # us-east-1 Region
-    ]
+  ipv6_cidr_blocks = [
+    # Route53 Healthcheck Access Cidrs IPv6
+    "2406:da18:7ff:f800::/53",  # ap-southeast-1 Region
+    "2406:da18:fff:f800::/53",  # ap-southeast-1 Region
+    "2a05:d018:fff:f800::/53",  # eu-west-1 Region
+    "2a05:d018:7ff:f800::/53",  # eu-west-1 Region
+    "2600:1f18:7fff:f800::/53", # us-east-1 Region
+    "2600:1f18:3fff:f800::/53", # us-east-1 Region
+  ]
 }

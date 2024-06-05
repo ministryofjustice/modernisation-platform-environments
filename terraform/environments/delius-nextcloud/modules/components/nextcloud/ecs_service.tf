@@ -100,8 +100,8 @@ module "nextcloud_service" {
   db_ingress_security_groups = [aws_security_group.cluster.id]
 
   rds_endpoint_environment_variable         = "MYSQL_HOST"
-  rds_password_secret_variable              = "MYSQL_PASSWORD"
-  rds_user_secret_variable                  = "MYSQL_USER"
+  rds_password_secret_variable                           = "MYSQL_PASSWORD"
+  rds_user_secret_variable                               = "MYSQL_USER"
   elasticache_endpoint_environment_variable = "REDIS_HOST"
 
   container_vars_default = {
@@ -109,7 +109,7 @@ module "nextcloud_service" {
     REDIS_HOST_PORT           = "6379"
     NEXTCLOUD_ADMIN_USER      = "admin"
     NEXTCLOUD_TRUSTED_DOMAINS = aws_route53_record.nextcloud_external.fqdn
-    S3_BUCKET_CONFIG          = module.s3_bucket_config.bucket.id
+    S3_BUCKET_CONFIG                  = module.s3_bucket_config.bucket.id
     LDAP_PASSWORD_SECRET_ARN  = "arn:aws:secretsmanager:eu-west-2:${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:secret:ldap-admin-password"
   }
 
