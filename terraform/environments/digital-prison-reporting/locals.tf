@@ -336,9 +336,15 @@ locals {
   cp_k8s_secrets_placeholder = {
     cloud_platform_k8s_token = "placeholder"
     cloud_platform_certificate_auth  = "placeholder"
-    cloud_platform_k8s_server = "https://DF366E49809688A3B16EEC29707D8C09.gr7.eu-west-2.eks.amazonaws.com"
-    cloud_platform_k8s_cluster_name = "live.cloud-platform.service.justice.gov.uk"
-    cloud_platform_k8s_cluster_context = "live.cloud-platform.service.justice.gov.uk"
+    cloud_platform_k8s_server = "placeholder"
+    cloud_platform_k8s_cluster_name = "placeholder"
+    cloud_platform_k8s_cluster_context = "placeholder"
+  }
+
+  # Analytics Platform, DBT Secrets
+  enable_dbt_k8s_secrets = local.application_data.accounts[local.environment].enable_dbt_k8s_secrets
+  dbt_k8s_secrets_placeholder = {
+    oidc_cluster_identifier = "placeholder"
   }
 
   sonatype_secrets_placeholder = {

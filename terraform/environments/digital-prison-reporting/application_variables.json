@@ -187,7 +187,8 @@
         "endpoint_type": "domain_name"
       },
       "setup_cw_insights": true,
-      "enable_cp_k8s_secrets": true
+      "enable_cp_k8s_secrets": true,
+      "enable_dbt_k8s_secrets": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -376,7 +377,8 @@
         "endpoint_type": "domain_name"
       },
       "setup_cw_insights": false,
-      "enable_cp_k8s_secrets": false
+      "enable_cp_k8s_secrets": false,
+      "enable_dbt_k8s_secrets": true
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -567,7 +569,8 @@
         "endpoint_type": "load_balancer"
       },
       "setup_cw_insights": false,
-      "enable_cp_k8s_secrets": false
+      "enable_cp_k8s_secrets": false,
+      "enable_dbt_k8s_secrets": true
     },
     "production": {
       "project_short_id": "dpr",
@@ -756,7 +759,8 @@
         "endpoint_type": "load_balancer"
       },
       "setup_cw_insights": false,
-      "enable_cp_k8s_secrets": false
+      "enable_cp_k8s_secrets": false,
+      "enable_dbt_k8s_secrets": true
     }
   }
 }

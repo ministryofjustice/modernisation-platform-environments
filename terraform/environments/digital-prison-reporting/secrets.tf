@@ -211,3 +211,36 @@ resource "aws_secretsmanager_secret" "cp_k8s_secrets" {
     }
   )
 }
+
+## DBT Analytics EKS Cluster Identifier
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "dbt_secrets" {
+  count = local.enable_dbt_k8s_secrets ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.dbt_secrets[0].id
+  secret_string = jsonencode(local.dbt_k8s_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+
+  depends_on = [aws_secretsmanager_secret.dbt_secrets]
+}
+
+resource "aws_secretsmanager_secret" "dbt_secrets" {
+  count = local.enable_dbt_k8s_secrets ? 1 : 0
+
+  name = "external/abalytics_platform/k8s_dbt_auth"
+
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/cloud_platform/k8s_auth"
+      Resource_Type = "Secrets"
+      Source        = "Analytics-Platform"
+      Jira          = "DPR2-751"
+    }
+  )
+}

@@ -69,7 +69,14 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration" {
   secret_id = data.aws_secretsmanager_secret.pagerduty_integration[0].id
 }
 
+# Source Analytics DBT Secrets
+data "aws_secretsmanager_secret" "dbt_secrets" {
+  name = aws_secretsmanager_secret.dbt_secrets.id
+
+  depends_on = [aws_secretsmanager_secret_version.dbt_secrets]
+}
+
 # TLS Certificate for OIDC URL, DBT K8s Platform 
 data "tls_certificate" "dbt_analytics" {
-  url = "https://oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287"
+  url = "https://oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}"
 }
