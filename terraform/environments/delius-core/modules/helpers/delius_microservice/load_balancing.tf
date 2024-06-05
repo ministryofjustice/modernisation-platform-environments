@@ -87,7 +87,7 @@ resource "aws_route53_record" "alb_r53_record" {
 # NLB for service interconnectivity
 
 resource "aws_lb" "delius_microservices" {
-  name                       = "${var.name}-service-nlb"
+  name                       = "${var.name}-${var.env_name}-service-nlb"
   internal                   = true
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.delius_microservices_service_nlb.id]
@@ -97,7 +97,7 @@ resource "aws_lb" "delius_microservices" {
 }
 
 resource "aws_security_group" "delius_microservices_service_nlb" {
-  name        = "${var.name}-service-nlb"
+  name        = "${var.name}-${var.env_name}-service-nlb"
   description = "Security group for delius microservices service load balancer"
   vpc_id      = var.account_info.vpc_id
   tags        = var.tags
@@ -124,7 +124,7 @@ resource "aws_vpc_security_group_egress_rule" "nlb_to_ecs_service" {
 resource "aws_lb_target_group" "service" {
   for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
 
-  name        = "${var.name}-service-at-${each.value}"
+  name        = "${var.name}-${var.env_name}-at-${each.value}"
   target_type = "ip"
   port        = each.value
   protocol    = "TCP"

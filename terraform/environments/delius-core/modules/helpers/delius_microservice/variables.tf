@@ -317,11 +317,6 @@ variable "elasticache_parameter_group_name" {
   default     = "default.redis5.0"
 }
 
-variable "elasticache_subnet_group_name" {
-  description = "The Elasticache subnet group name"
-  type        = string
-  default     = "default"
-}
 variable "elasticache_num_cache_nodes" {
   description = "The Elasticache number of cache nodes"
   type        = number
@@ -338,6 +333,18 @@ variable "elasticache_parameters" {
   description = "A map of elasticache parameter names & values"
   type        = map(string)
   default     = {}
+}
+
+variable "elasticache_password_secret_variable" {
+  description = "Secret variable to store the elasticache secretsmanager arn password"
+  type        = string
+  default     = ""
+}
+
+variable "elasticache_user_variable" {
+  description = "variable to store the elasticache username"
+  type        = string
+  default     = ""
 }
 
 variable "container_vars_default" {

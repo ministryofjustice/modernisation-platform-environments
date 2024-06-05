@@ -45,6 +45,32 @@ locals {
 
     ec2_autoscaling_groups = {
       # ACTIVE (blue deployment)
+      lsast-nomis-web-a = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 0
+        })
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2LsastWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "lsast"
+          oracle-db-hostname-a = "lsnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "lsnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "LSCNOM"
+          deployment           = "blue"
+        })
+      })
+
+      # ACTIVE (blue deployment)
       preprod-nomis-web-a = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 2
@@ -137,7 +163,8 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "lsast"
           description       = "lsast database for CNOM and MIS"
-          oracle-sids       = ""
+          oracle-sids       = "LSCNOM LSMIS"
+          misload-dbname    = "LSMIS"
         })
       })
 
@@ -297,6 +324,23 @@ locals {
             ]
           }
         ]
+      }
+      Ec2LsastWeblogicPolicy = {
+        description = "Permissions required for Preprod Weblogic EC2s"
+        statements = concat(local.weblogic_iam_policy_statements, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/lsast/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/weblogic-*",
+            ]
+          }
+        ])
       }
       Ec2PreprodDatabasePolicy = {
         description = "Permissions required for Preprod Database EC2s"
@@ -501,7 +545,8 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/oracle/database/LSCNOM" = local.database_secretsmanager_secrets
+      "/oracle/weblogic/lsast"  = local.weblogic_secretsmanager_secrets
+      "/oracle/database/LSCNOM" = local.database_nomis_secretsmanager_secrets
       "/oracle/database/LSMIS"  = local.database_mis_secretsmanager_secrets
 
       "/oracle/weblogic/preprod"  = local.weblogic_secretsmanager_secrets

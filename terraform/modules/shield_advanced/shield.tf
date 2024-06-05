@@ -12,7 +12,7 @@ data "external" "shield_protections" {
 data "external" "shield_waf" {
   program = [
     "bash", "-c",
-    "aws wafv2 list-web-acls --scope REGIONAL --output json | jq -c '{arn: .WebACLs[] | select(.Name | contains(\"FMManagedWebACL\")) | .ARN}'"
+    "aws wafv2 list-web-acls --scope REGIONAL --output json | jq -c '{arn: .WebACLs[] | select(.Name | contains(\"FMManagedWebACL\")) | .ARN, name: .WebACLs[] | select(.Name | contains(\"FMManagedWebACL\")) | .Name}'"
   ]
 }
 
@@ -23,6 +23,7 @@ locals {
 
   shield_protections = {
     for k, v in local.shield_protections_json : k => jsondecode(v)
+    if !(contains(var.excluded_protections, k))
   }
 }
 
@@ -34,4 +35,51 @@ resource "aws_wafv2_web_acl_association" "this" {
   for_each     = local.shield_protections
   resource_arn = each.value["ResourceArn"]
   web_acl_arn  = data.external.shield_waf.result["arn"]
+}
+
+resource "aws_wafv2_web_acl" "main" {
+  #checkov:skip=CKV_AWS_192: Log4J handled by remediation rule
+  #checkov:skip=CKV2_AWS_31:  Logging not required at this time
+  name  = data.external.shield_waf.result["name"]
+  scope = "REGIONAL"
+  default_action {
+    allow {}
+  }
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = data.external.shield_waf.result["name"]
+    sampled_requests_enabled   = false
+  }
+  dynamic "rule" {
+    for_each = var.waf_acl_rules
+    content {
+      name     = rule.value["name"]
+      priority = rule.value["priority"]
+      dynamic "action" {
+        for_each = rule.value["action"] == "count" ? [1] : []
+        content {
+          count {}
+        }
+      }
+      dynamic "action" {
+        for_each = rule.value["action"] == "block" ? [1] : []
+        content {
+          block {}
+        }
+      }
+      statement {
+        rate_based_statement {
+          aggregate_key_type    = "IP"
+          evaluation_window_sec = 300
+          limit                 = rule.value["threshold"]
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = rule.value["action"]
+        sampled_requests_enabled   = true
+      }
+    }
+  }
 }

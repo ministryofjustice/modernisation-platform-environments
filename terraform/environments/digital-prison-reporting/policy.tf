@@ -528,3 +528,128 @@ resource "aws_iam_policy" "domain_builder_publish_policy" {
   description = "Additional policy to allow execution of query publish in Athena"
   policy      = data.aws_iam_policy_document.domain_builder_publish.json
 }
+
+## Redshift DataAPI Policy Document
+# Policy Document
+data "aws_iam_policy_document" "redshift_dataapi" {
+  statement {
+    actions = [
+        "redshift-data:ListTables",
+        "redshift-data:DescribeTable",
+        "redshift-data:ListSchemas",
+        "redshift-data:ListDatabases",
+        "redshift-data:ExecuteStatement"
+    ]
+    resources = [
+      "arn:aws:redshift:${local.account_region}:${local.account_id}:cluster:*"
+    ]
+  }
+
+  statement {
+    actions = [
+        "redshift-data:GetStatementResult",
+        "redshift-data:DescribeStatement",
+        "redshift-data:ListStatements"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    actions = [
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:${local.account_region}:${local.account_id}:secret:*"
+    ]
+  }
+
+  statement {
+    actions = [
+        "secretsmanager:ListSecrets"
+    ]
+    resources = [
+      "*"
+    ]
+  }    
+
+}
+
+# Redshift DataAPI Policy
+resource "aws_iam_policy" "redshift_dataapi_cross_policy" {
+  name        = "${local.project}-redshift-data-api-cross-policy"
+  description = "Extra Policy for AWS Redshift"
+  policy      = data.aws_iam_policy_document.redshift_dataapi.json
+}
+
+
+## Athena API Policy Document
+# Policy Document
+data "aws_iam_policy_document" "athena_api" {
+  statement {
+    actions = [
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${local.account_region}:${local.account_id}:*/*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "athena:ListWorkGroups"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+    resources = [
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function"
+    ]
+  }
+
+  statement {
+    actions = [
+      "s3:AbortMultipartUpload",
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:ListMultipartUploadParts",
+      "s3:PutObject"
+    ]
+    resources = [
+      "arn:aws:s3:::dpr-*/*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "kms:GenerateDataKey"
+    ]
+    resources = [
+      "arn:aws:kms:*:771283872747:key/*"
+    ]
+  }
+
+}
+
+# Athena API Policy
+resource "aws_iam_policy" "athena_api_cross_policy" {
+  name        = "${local.project}-athena-api-cross-policy"
+  description = "Extra Policy for AWS Athena"
+  policy      = data.aws_iam_policy_document.athena_api.json
+}

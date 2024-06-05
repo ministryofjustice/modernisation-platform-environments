@@ -81,9 +81,11 @@ locals {
           { name = "preproduction", records = ["ns-1418.awsdns-49.org", "ns-230.awsdns-28.com", "ns-693.awsdns-22.net", "ns-1786.awsdns-31.co.uk"], type = "NS", ttl = "86400" },
           { name = "test", records = ["ns-498.awsdns-62.com", "ns-881.awsdns-46.net", "ns-1294.awsdns-33.org", "ns-1610.awsdns-09.co.uk"], type = "NS", ttl = "86400" },
           { name = "pd-app", type = "A", ttl = 300, records = ["10.40.3.196"] }, #azure
-          #{ name = "pd-app", type = "A", ttl = 300, records = ["10.27.8.186"] }, #aws
+          #{ name = "pd-app", type = "A", ttl = 300, records = ["10.27.8.136"] }, #aws pd
+          #{ name = "pd-app", type = "A", ttl = 300, records = ["10.27.9.33"] }, #aws dr
           { name = "pd-ems", type = "A", ttl = 300, records = ["10.40.3.198"] }, #azure
-          #{ name = "pd-ems", type = "A", ttl = 300, records = ["10.27.8.131"] }, #aws
+          #{ name = "pd-ems", type = "A", ttl = 300, records = ["10.27.8.120"] }, #aws pd
+          #{ name = "pd-ems", type = "A", ttl = 300, records = ["10.27.9.228"] }, #aws dr
         ]
       }
     }
