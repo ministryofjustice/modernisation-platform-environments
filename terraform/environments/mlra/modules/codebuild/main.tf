@@ -51,7 +51,7 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 
 resource "aws_ecr_repository" "local-ecr" {
   name                 = "${var.app_name}-local-ecr"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
