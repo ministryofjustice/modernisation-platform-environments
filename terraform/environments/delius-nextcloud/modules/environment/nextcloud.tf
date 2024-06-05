@@ -4,7 +4,7 @@ module "nextcloud" {
   providers = {
     aws.core-network-services = aws.core-network-services
     aws.core-vpc              = aws.core-vpc
-    aws                    = aws
+    aws                       = aws
   }
 
   env_name      = "dev"
