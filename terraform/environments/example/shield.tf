@@ -9,4 +9,12 @@ module "shield" {
     public_lb      = aws_lb.external.arn,
     certificate_lb = aws_lb.certificate_example_lb.arn
   }
+  waf_acl_rules = {
+    example = {
+      "action" = "count",
+      "name" = "example-count-rule",
+      "priority" = 0,
+      "threshold" = "1000"
+    }
+  }
 }

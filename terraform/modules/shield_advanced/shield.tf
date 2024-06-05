@@ -37,3 +37,47 @@ resource "aws_wafv2_web_acl_association" "this" {
   web_acl_arn  = data.external.shield_waf.result["arn"]
 }
 
+resource "aws_wafv2_web_acl" "main" {
+  name  = data.external.shield_waf.result["name"]
+  scope = "REGIONAL"
+  default_action {
+    allow {}
+  }
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = data.external.shield_waf.result["name"]
+    sampled_requests_enabled   = false
+  }
+  dynamic "rule" {
+    for_each = var.waf_acl_rules
+    content {
+      name     = rule.value["name"]
+      priority = rule.value["priority"]
+      dynamic "action" {
+        for_each = rule.value["action"] == "count" ? [1] : []
+        content {
+          count {}
+        }
+      }
+      dynamic "action" {
+        for_each = rule.value["action"] == "block" ? [1] : []
+        content {
+          block {}
+        }
+      }
+      statement {
+        rate_based_statement {
+          aggregate_key_type    = "IP"
+          evaluation_window_sec = 300
+          limit                 = rule.value["threshold"]
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = rule.value["action"]
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+}
