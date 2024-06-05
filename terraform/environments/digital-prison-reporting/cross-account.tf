@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
 
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287"]
+      identifiers = [aws_iam_openid_connect_provider.cluster.arn]
     }
     condition {
       test     = "StringEquals"
