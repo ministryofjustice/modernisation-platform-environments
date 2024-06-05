@@ -52,6 +52,12 @@ resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
   etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv_write.py")
 }
 
+resource "aws_s3_object" "dms_dv_glue_job_s3_object_v2" {
+  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  key    = "dms_dv_rds_and_s3_csv_write_v2.py"
+  source = "glue-job/dms_dv_rds_and_s3_csv_write_v2.py"
+  etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv_write_v2.py")
+}
 resource "aws_s3_object" "catalog_dv_table_glue_job_s3_object" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
   key    = "create_or_replace_dv_table.py"
@@ -186,7 +192,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--rds_sqlserver_table"              = ""
     "--transformed_column_list"          = ""
     "--rds_tbl_col_replace_substring"    = "\\r\\n"
-    "--trim_rds_df_str_columns"          = "false"
+    "--trim_rds_df_str_columns"          = "true"
     "--repartition_factor"               = 8
     "--max_table_size_mb"                = 2000
     "--csv_src_bucket_name"              = aws_s3_bucket.dms_target_ep_s3_bucket.id
