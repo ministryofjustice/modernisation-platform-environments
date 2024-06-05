@@ -82,7 +82,6 @@ resource "aws_s3_object" "config" {
     {
       nextcloud_passwordsalt = random_password.nextcloud_password_salt.result,
       nextcloud_secret       = data.aws_ssm_parameter.nextcloud_secret.value,
-      nextcloud_id           = "nextcloud",
       redis = {
         host = module.nextcloud_service.elasticache_endpoint
         port = module.nextcloud_service.elasticache_port

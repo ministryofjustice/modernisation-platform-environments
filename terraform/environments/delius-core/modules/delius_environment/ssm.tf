@@ -37,7 +37,6 @@ resource "aws_ssm_parameter" "ldap_admin_password" {
     ]
   }
   tags = local.tags
-
 }
 
 resource "aws_ssm_parameter" "oasys_user" {
