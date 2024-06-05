@@ -170,24 +170,50 @@ module "cert_manager_iam_role" {
   tags = local.tags
 }
 
-module "kubecost_iam_role" {
+module "kubecost_cost_analyzer_amp_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "5.39.1"
 
-  role_name_prefix = "kubecost"
+  role_name_prefix = "kubecost-cost-analyzer-amp"
 
   role_policy_arns = {
-    AmazonManagedPrometheusProxy = module.amazon_prometheus_proxy_iam_policy.arn
-    ManagedPrometheusKMSAccess   = module.managed_prometheus_kms_access_iam_policy.arn
+    AmazonPrometheusQueryAccess       = "arn:aws:iam::aws:policy/AmazonPrometheusQueryAccess"
+    AmazonPrometheusRemoteWriteAccess = "arn:aws:iam::aws:policy/AmazonPrometheusRemoteWriteAccess"
+    ManagedPrometheusKMSAccess        = module.managed_prometheus_kms_access_iam_policy.arn
   }
 
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.kubecost.metadata[0].name}:kubecost"]
+      namespace_service_accounts = ["${kubernetes_namespace.kubecost.metadata[0].name}:kubecost-cost-analyzer-amp"]
+    }
+  }
+
+  tags = local.tags
+}
+
+module "kubecost_prometheus_server_amp_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.39.1"
+
+  role_name_prefix = "kubecost-prometheus-server-amp"
+
+  role_policy_arns = {
+    AmazonPrometheusQueryAccess       = "arn:aws:iam::aws:policy/AmazonPrometheusQueryAccess"
+    AmazonPrometheusRemoteWriteAccess = "arn:aws:iam::aws:policy/AmazonPrometheusRemoteWriteAccess"
+    ManagedPrometheusKMSAccess        = module.managed_prometheus_kms_access_iam_policy.arn
+  }
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["${kubernetes_namespace.kubecost.metadata[0].name}:kubecost-prometheus-server-amp"]
     }
   }
 
