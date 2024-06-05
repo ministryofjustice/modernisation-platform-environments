@@ -89,7 +89,7 @@ module "lb_access_logs_enabled" {
   region                     = "eu-west-2"
   enable_deletion_protection = false
   idle_timeout               = 60
-  tags                       = {} 
+  tags                       = { Name = lb_module } 
 
 }
 
@@ -155,7 +155,7 @@ resource "aws_lb_listener" "https_listener" {
   depends_on        = [aws_acm_certificate_validation.external]
   load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
   port              = 443
-  protocol          = "HTTPs"
+  protocol          = "HTTPS"
   certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
