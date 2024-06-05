@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "redshift_dataapi_cross_assume" {
 
 # CrossAccount DataAPI Role
 resource "aws_iam_role" "redshift_dataapi_cross_role" {
-  name                  = "${local.project}-data-api-cross-account-role-${local.env}"
+  name                  = "${local.project}-data-api-cross-account-role"
   description           = "Data API Cross Account Role"
   assume_role_policy    = data.aws_iam_policy_document.redshift_dataapi_cross_assume.json
   force_detach_policies = true
@@ -43,7 +43,7 @@ resource "aws_iam_role" "redshift_dataapi_cross_role" {
   tags = merge(
     local.tags,
     {
-      Name              = "${local.project}-data-api-cross-account-role-${local.env}"
+      Name              = "${local.project}-data-api-cross-account-role"
       Resource_Type     = "iam"
       Jira              = "DPR2-751"
       Resource_Group    = "Front-End"
