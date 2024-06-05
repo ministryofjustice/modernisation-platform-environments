@@ -1,5 +1,13 @@
-### Cross Account Role
+### Cross Account Resources
 
+## OIDC, OpenID Connect
+resource "aws_iam_openid_connect_provider" "cluster" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.external.thumb.result.thumbprint]
+  url             = "https://oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287"
+}
+
+## Role
 ## CrossAccount DataAPI Cross Account Role, 
 # CrossAccount DataAPI Assume Policy
 data "aws_iam_policy_document" "dataapi_cross_assume" {

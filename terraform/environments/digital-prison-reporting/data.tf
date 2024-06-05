@@ -68,3 +68,8 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration" {
   count     = local.enable_pagerduty_alerts ? 1 : 0
   secret_id = data.aws_secretsmanager_secret.pagerduty_integration[0].id
 }
+
+# External cli kubergrunt, used by OIDC
+data "external" "thumb" {
+  program = ["kubergrunt", "eks", "oidc-thumbprint", "--issuer-url", "https://oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287"]
+}
