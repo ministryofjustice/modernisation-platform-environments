@@ -29,7 +29,11 @@ resource "aws_kms_alias" "efs" {
   target_key_id = aws_kms_key.efs.key_id
 }
 
-resource "aws_efs_file_system" "efs" {
+import {
+  to = aws_efs_file_system.apex_efs
+  id = "fs-0ca2e956f29511d3c"
+}
+resource "aws_efs_file_system" "apex_efs" {
   encrypted        = true
   kms_key_id       = aws_kms_key.efs.arn
   performance_mode = "maxIO"
@@ -44,11 +48,6 @@ resource "aws_efs_file_system" "efs" {
   lifecycle_policy {
     transition_to_ia = "AFTER_90_DAYS"
   }
-}
-
-import {
-  to = aws_efs_file_system.efs  # This is the EFS defined in Terraform you are importing onto
-  id = "fs-0ca2e956f29511d3c"   # This is the newly restored EFS ID
 }
 
 resource "aws_security_group" "efs_product" {
@@ -76,25 +75,25 @@ resource "aws_vpc_security_group_ingress_rule" "efs_product_inbound" {
 }
 
 resource "aws_efs_mount_target" "subnet_a" {
-  file_system_id  = aws_efs_file_system.efs.id
+  file_system_id  = aws_efs_file_system.apex_efs.id
   subnet_id       = data.aws_subnet.data_subnets_a.id
   security_groups = [aws_security_group.efs_product.id]
 }
 
 resource "aws_efs_mount_target" "subnet_b" {
-  file_system_id  = aws_efs_file_system.efs.id
+  file_system_id  = aws_efs_file_system.apex_efs.id
   subnet_id       = data.aws_subnet.data_subnets_b.id
   security_groups = [aws_security_group.efs_product.id]
 }
 
 resource "aws_efs_mount_target" "subnet_c" {
-  file_system_id  = aws_efs_file_system.efs.id
+  file_system_id  = aws_efs_file_system.apex_efs.id
   subnet_id       = data.aws_subnet.data_subnets_c.id
   security_groups = [aws_security_group.efs_product.id]
 }
 
 resource "aws_efs_backup_policy" "efs_backup_policy" {
-  file_system_id = aws_efs_file_system.efs.id
+  file_system_id = aws_efs_file_system.apex_efs.id
 
   backup_policy {
     status = "ENABLED"
