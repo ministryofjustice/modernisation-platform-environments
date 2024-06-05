@@ -73,10 +73,10 @@ variable "services" {
       name_prefix = "immigrationservices"
       module_key  = "immigration_services"
     },
-    # "information_tribunal" = {
-    #   name_prefix = "informationrights"
-    #   module_key  = "information_tribunal"
-    # },
+    "information_tribunal" = {
+      name_prefix = "informationrights"
+      module_key  = "information_tribunal"
+    },
     # "lands_tribunal" = {
     #   name_prefix = "landschamber"
     #   module_key  = "lands_tribunal"
@@ -182,7 +182,7 @@ locals {
     employment_appeals = module.employment_appeals
     finance_and_tax = module.finance_and_tax
     immigration_services = module.immigration_services
-    # information_tribunal = module.information_tribunal
+    information_tribunal = module.information_tribunal
     # lands_tribunal = module.lands_tribunal
     # transport = module.transport
     charity_tribunal_decisions = module.charity_tribunal_decisions
