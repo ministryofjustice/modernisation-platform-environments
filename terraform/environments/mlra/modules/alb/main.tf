@@ -372,6 +372,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 
 resource "aws_cloudfront_distribution" "external" {
   http_version = var.cloudfront_http_version
+  default_root_object = "Empty"
   origin {
     domain_name = aws_lb.loadbalancer.dns_name
     origin_id   = aws_lb.loadbalancer.id
