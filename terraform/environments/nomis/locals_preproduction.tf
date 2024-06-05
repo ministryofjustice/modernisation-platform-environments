@@ -546,7 +546,7 @@ locals {
 
     secretsmanager_secrets = {
       "/oracle/weblogic/lsast"  = local.weblogic_secretsmanager_secrets
-      "/oracle/database/LSCNOM" = local.database_secretsmanager_secrets
+      "/oracle/database/LSCNOM" = local.database_nomis_secretsmanager_secrets
       "/oracle/database/LSMIS"  = local.database_mis_secretsmanager_secrets
 
       "/oracle/weblogic/preprod"  = local.weblogic_secretsmanager_secrets
