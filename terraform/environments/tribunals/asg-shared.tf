@@ -229,7 +229,7 @@ resource "aws_security_group" "cluster_ec2" {
       module.finance_and_tax.tribunals_lb_sc_id,
       module.immigration_services.tribunals_lb_sc_id,
       module.information_tribunal.tribunals_lb_sc_id,
-      # module.lands_tribunal.tribunals_lb_sc_id,
+      module.lands_tribunal.tribunals_lb_sc_id,
       # module.transport.tribunals_lb_sc_id,
       module.charity_tribunal_decisions.tribunals_lb_sc_id, module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp,
       module.claims_management_decisions.tribunals_lb_sc_id, module.claims_management_decisions.tribunals_lb_sc_id_sftp,
