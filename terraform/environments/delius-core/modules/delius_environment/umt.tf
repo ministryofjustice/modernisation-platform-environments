@@ -37,9 +37,19 @@ module "umt" {
       cidr_ipv4   = var.account_config.shared_vpc_cidr
     },
     {
-      ip_protocol = "tcp"
-      port        = 1521
-      cidr_ipv4   = "0.0.0.0/0"
+      ip_protocol  = "tcp"
+      port              = 1521
+      cidr_ipv4      = var.environment_config.migration_environment_db_cidr[0]
+    },
+     {
+      ip_protocol  = "tcp"
+      port              = 1521
+      cidr_ipv4      = var.environment_config.migration_environment_db_cidr[1]
+    },
+     {
+      ip_protocol  = "tcp"
+      port              = 1521
+      cidr_ipv4      = var.environment_config.migration_environment_db_cidr[2]
     },
   ]
 
