@@ -112,7 +112,7 @@ resource "aws_lb_target_group" "chaps_target_group" {
 
   health_check {
     healthy_threshold   = "5"
-    interval            = "120"
+    interval            = "30"
     protocol            = "HTTP"
     unhealthy_threshold = "2"
     matcher             = "200-499"
@@ -173,8 +173,6 @@ resource "aws_security_group" "chaps_target_sc" {
   }
 }
 
-
-
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
   depends_on        = [aws_acm_certificate_validation.external]
@@ -188,17 +186,3 @@ resource "aws_lb_listener" "https_listener" {
     type             = "forward"
   }
 }
-
-# resource "aws_lb_listener_rule" "chaps_listener_rule" {
-#   listener_arn = aws_lb_listener.https_listener.arn
-#    action {
-#     type = "forward"
-#     target_group_arn = aws_lb_target_group.chaps_target_group.id
-#   }
-#   condition {
-#    path_pattern {
-#     values = ["/*"]
-#    }
-#   }
-# }
-
