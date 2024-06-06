@@ -23,7 +23,7 @@ module "get_metadata_from_rds_lambda" {
   layers = [
     "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python311:12",
     aws_lambda_layer_version.mojap_metadata_layer.arn,
-    aws_lambda_layer_version.create_external_athena_tables_layer.arn
+    aws_lambda_layer_version.create_athena_tables_layer.arn
     ]
   source_code_hash = data.archive_file.get_metadata_from_rds.output_base64sha256
   timeout = 900
@@ -46,26 +46,26 @@ module "get_metadata_from_rds_lambda" {
 # ------------------------------------------------------
 
 
-data "archive_file" "create_athena_external_table" {
+data "archive_file" "create_athena_table" {
     type = "zip"
-    source_file = "${local.lambda_path}/create_athena_external_table.py"
-    output_path = "${local.lambda_path}/create_athena_external_table.zip"
+    source_file = "${local.lambda_path}/create_athena_table.py"
+    output_path = "${local.lambda_path}/create_athena_table.zip"
 }
 
-module "create_athena_external_table" {
+module "create_athena_table" {
     source              = "./modules/lambdas"
-    filename = "${local.lambda_path}/create_athena_external_table.zip"
-    function_name = "create_athena_external_table"
-    role_arn = aws_iam_role.create_athena_external_tables_lambda.arn
-    role_name = aws_iam_role.create_athena_external_tables_lambda.name
-    handler = "create_athena_external_table.handler"
+    filename = "${local.lambda_path}/create_athena_table.zip"
+    function_name = "create_athena_table"
+    role_arn = aws_iam_role.create_athena_tables_lambda.arn
+    role_name = aws_iam_role.create_athena_tables_lambda.name
+    handler = "create_athena_table.handler"
     layers = [
       "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:69",
       "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python311:12",
       aws_lambda_layer_version.mojap_metadata_layer.arn,
-      aws_lambda_layer_version.create_external_athena_tables_layer.arn
+      aws_lambda_layer_version.create_athena_tables_layer.arn
       ]
-    source_code_hash = data.archive_file.create_athena_external_table.output_base64sha256
+    source_code_hash = data.archive_file.create_athena_table.output_base64sha256
     timeout = 900
     memory_size = 1024
     runtime = "python3.11"

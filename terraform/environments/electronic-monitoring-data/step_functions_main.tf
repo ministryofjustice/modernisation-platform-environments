@@ -1,5 +1,5 @@
-resource "aws_sfn_state_machine" "semantic_athena_layer" {
-  name     = "semantic-athena-layer"
+resource "aws_sfn_state_machine" "athena_layer" {
+  name     = "athena-layer"
   role_arn = aws_iam_role.step_functions_role.arn
 
   definition = <<EOF
@@ -21,7 +21,7 @@ resource "aws_sfn_state_machine" "semantic_athena_layer" {
         "States": {
           "CreateAthenaTable": {
             "Type": "Task",
-            "Resource": "${module.create_athena_external_table.lambda_function_arn}",
+            "Resource": "${module.create_athena_table.lambda_function_arn}",
             "ResultPath": "$.result",
             "End": true
           }
@@ -35,8 +35,8 @@ EOF
 
 }
 
-resource "aws_kms_key" "semantic_athena_layer_step_functions_log_key" {
-  description = "KMS key for encrypting Step Functions logs for semantic_athena_layer"
+resource "aws_kms_key" "athena_layer_step_functions_log_key" {
+  description = "KMS key for encrypting Step Functions logs for athena_layer"
   enable_key_rotation = true
 
   policy = <<EOF
@@ -73,9 +73,9 @@ resource "aws_kms_key" "semantic_athena_layer_step_functions_log_key" {
 EOF
 }
 
-resource "aws_cloudwatch_log_group" "semantic_athena_layer" {
-  name = "/aws/vendedlogs/states/semantic_athena_layer"
+resource "aws_cloudwatch_log_group" "athena_layer" {
+  name = "/aws/vendedlogs/states/athena_layer"
   retention_in_days = 400
-  kms_key_id = aws_kms_key.semantic_athena_layer_step_functions_log_key.arn
+  kms_key_id = aws_kms_key.athena_layer_step_functions_log_key.arn
 }
 
