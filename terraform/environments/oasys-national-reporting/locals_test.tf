@@ -33,6 +33,20 @@ locals {
       }
     }
 
+    baseline_acm_certificates = {
+      oasys_national_reporting_wildcard_cert = {
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+        ]
+        external_validation_records_created = false
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        tags = {
+          description = "Wildcard certificate for the ${local.environment} environment"
+        }
+      }
+    }
+
     baseline_ec2_instances = {
       t2-onr-bods-1-a = merge(local.defaults_bods_ec2, {
         config = merge(local.defaults_bods_ec2.config, {
@@ -171,6 +185,102 @@ locals {
         })
       })
     }
+
+    # baseline_lbs = {
+    #   private = {
+    #     internal_lb                      = true
+    #     enable_delete_protection         = false
+    #     load_balancer_type               = "application"
+    #     idle_timeout                     = 3600
+    #     security_groups                  = ["lb"]
+    #     subnets                          = module.environment.subnets["private"].ids
+    #     enable_cross_zone_load_balancing = true
+
+    #     instance_target_groups = {
+    #       t2-onr-web-1-a = {
+    #         port     = 7777
+    #         protocol = "HTTP"
+    #         health_check = {
+    #           enabled             = true
+    #           path                = "/"
+    #           healthy_threshold   = 3
+    #           unhealthy_threshold = 5
+    #           timeout             = 5
+    #           interval            = 30
+    #           matcher             = "200-399"
+    #           port                = 7777
+    #         }
+    #         stickiness = {
+    #           enabled = true
+    #           type    = "lb_cookie"
+    #         }
+    #         attachments = [
+    #           { ec2_instance_name = "t2-onr-web-1-a" },
+    #         ]
+    #       }
+    #     }
+    #     listeners = {
+    #       http = {
+    #         port     = 7777
+    #         protocol = "HTTP"
+    #         default_action = {
+    #           type = "fixed-response"
+    #           fixed_response = {
+    #             content_type = "text/plain"
+    #             message_body = "Not implemented"
+    #             status_code  = "501"
+    #           }
+    #         }
+    #         rules = {
+    #           t2-onr-web-1-a = {
+    #             priority = 4000
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "t2-onr-web-1-a"
+    #             }]
+    #             conditions = [{
+    #               host_header = {
+    #                 values = [
+    #                   "t2-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+    #                 ]
+    #               }
+    #             }]
+    #           }
+    #         }
+    #       }
+    #       https = {
+    #         port                      = 443
+    #         protocol                  = "HTTPS"
+    #         ssl_policy                = "ELBSecurityPolicy-2016-08"
+    #         certificate_names_or_arns = ["oasys_national_reporting_wildcard_cert"]
+    #         default_action = {
+    #           type = "fixed-response"
+    #           fixed_response = {
+    #             content_type = "text/plain"
+    #             message_body = "Not implemented"
+    #             status_code  = "501"
+    #           }
+    #         }
+    #         rules = {
+    #           t2-onr-web-1-a = {
+    #             priority = 4580
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "t2-onr-web-1-a"
+    #             }]
+    #             conditions = [{
+    #               host_header = {
+    #                 values = [
+    #                   "t2-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+    #                 ]
+    #               }
+    #             }]
+    #           }
+    #         }
+    #       }
+    #     }
+    #   }
+    # }
     baseline_route53_zones = {
       "test.reporting.oasys.service.justice.gov.uk" = {}
     }
