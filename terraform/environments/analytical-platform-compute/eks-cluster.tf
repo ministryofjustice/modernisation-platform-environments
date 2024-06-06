@@ -98,9 +98,39 @@ module "eks" {
   eks_managed_node_groups = {
     general = {
       min_size       = 1
-      max_size       = 5
+      max_size       = 10
       desired_size   = 3
       instance_types = ["t3.xlarge"]
+    }
+    airflow-high-memory = {
+      min_size       = 0
+      max_size       = 1
+      desired_size   = 0
+      instance_types = ["r6i.8xlarge"]
+      labels = {
+        high-memory = "true"
+      }
+      taints = [
+        {
+          key    = "high-memory"
+          value  = "true"
+          effect = "NO_SCHEDULE"
+        }
+      ]
+      block_device_mappings = {
+        xvdb = {
+          device_name = "/dev/xvdb"
+          ebs = {
+            volume_size           = 200
+            volume_type           = "gp3"
+            iops                  = 3000
+            throughput            = 250
+            encrypted             = true
+            kms_key_id            = module.ebs_kms.key_arn
+            delete_on_termination = true
+          }
+        }
+      }
     }
   }
 
