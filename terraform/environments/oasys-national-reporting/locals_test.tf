@@ -39,7 +39,7 @@ locals {
           availability_zone             = "${local.region}a"
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
-          ami_name = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z" # fixed to a specific version
+          ami_name                      = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z" # fixed to a specific version
         })
         instance = merge(local.defaults_bods_ec2.instance, {
           instance_type = "m4.xlarge"
@@ -79,7 +79,7 @@ locals {
           ami_name          = "base_rhel_6_10_*"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m4.large"
+          instance_type                = "m4.large"
           metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
@@ -120,7 +120,7 @@ locals {
           ami_name          = "base_rhel_6_10_*"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m4.large"
+          instance_type                = "m4.large"
           metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
