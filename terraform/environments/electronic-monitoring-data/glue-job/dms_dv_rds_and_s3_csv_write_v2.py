@@ -366,7 +366,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                                   "'' as json_row",
                                                   f"""'V2: {rds_tbl_name} - Validated.' as validation_msg""",
                                                   f"""'{rds_db_name}' as database_name""",
-                                                  f"""'{rds_tbl_name}_dbo_{rds_tbl_name}' as full_table_name"""
+                                                  f"""'{rds_db_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                                   )
                 LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
