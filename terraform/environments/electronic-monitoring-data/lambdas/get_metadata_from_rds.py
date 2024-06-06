@@ -69,7 +69,7 @@ def add_db_to_meta(meta):
     Database is currently down as dbo -
     reassign to actual DB Name
     """
-    meta.database = DB_NAME
+    meta.database_name = DB_NAME
     return meta
 
 
