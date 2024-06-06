@@ -20,6 +20,10 @@ output "dms_replication_task_arn" {
   value = var.enable_replication_task ? join("", aws_dms_replication_task.dms-replication.*.replication_task_arn) : ""
 }
 
+output "replication_task_id" {
+  value = var.enable_replication_task ? join("", aws_dms_replication_task.dms-replication.*.replication_task_id) : ""
+}
+
 # DMS Endpoint
 output "dms_target_endpoint_arn" {
   value = var.setup_dms_endpoints && var.setup_dms_s3_endpoint ? join("", aws_dms_s3_endpoint.dms-s3-target-endpoint.*.endpoint_arn) : ""
