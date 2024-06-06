@@ -23,6 +23,7 @@ locals {
       description         = "RHEL7.9 NDH App"
       component           = "ndh"
       server-type         = "ndh-app"
+      os-type             = "Linux"
       monitored           = false
       instance-scheduling = "skip-scheduling"
     }
@@ -44,6 +45,7 @@ locals {
       description         = "RHEL7.9 NDH ems"
       component           = "ndh"
       server-type         = "ndh-ems"
+      os-type             = "Linux"
       monitored           = false
       instance-scheduling = "skip-scheduling"
     }
