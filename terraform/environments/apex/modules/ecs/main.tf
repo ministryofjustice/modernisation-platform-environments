@@ -22,7 +22,7 @@ data "aws_subnets" "shared-private" {
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
   name                  = "${var.app_name}-cluster-scaling-group"
-  desired_capacity      = var.ec2_desired_capacity
+  # desired_capacity      = var.ec2_desired_capacity
   max_size              = var.ec2_max_size
   min_size              = var.ec2_min_size
   # protect_from_scale_in = true
