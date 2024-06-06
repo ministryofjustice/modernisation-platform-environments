@@ -29,7 +29,7 @@ locals {
               showUnits = false,
               label     = "%"
             }
-          },
+          }
           annotations = {
             horizontal = [{
               label = "Alarm Threshold"
