@@ -335,7 +335,7 @@ resource "aws_ecs_service" "ecs_service" {
   name            = "${var.app_name}-ecs-service"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = data.aws_ecs_task_definition.task_definition.id
-  desired_count   = var.app_count
+  # desired_count   = var.app_count
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.apex.name
