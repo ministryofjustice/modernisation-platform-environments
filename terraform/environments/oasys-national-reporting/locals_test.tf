@@ -35,9 +35,14 @@ locals {
 
     baseline_acm_certificates = {
       oasys_national_reporting_wildcard_cert = {
-        domain_name = module.environment.domains.public.modernisation_platform
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = "modernisation-platform.service.justice.gov.uk"
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",
+          "*.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+          "test.reporting.oasys.service.justice.gov.uk",
+          "*.test.reporting.oasys.service.justice.gov.uk",
+          # NOTE: there is no azure equivalent for T2
         ]
         external_validation_records_created = false
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
