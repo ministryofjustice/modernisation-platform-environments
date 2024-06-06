@@ -59,9 +59,9 @@ import {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_application_name"></a> [application\_name](#input\_application\_name) | Name of application being protected. | `string` | n/a | yes |
-| <a name="input_excluded_protections"></a> [excluded\_protections](#input\_excluded\_protections) | A list of strings to not associate with the AWS Shield WAF ACL | `set(string)` | n/a | yes |
-| <a name="input_resources"></a> [resources](#input\_resources) | Map of resource ARNs and optional automatic response actions | `map(any)` | n/a | yes |
-| <a name="input_waf_acl_rules"></a> [waf\_acl\_rules](#input\_waf\_acl\_rules) | A map of values to be used in a dynamic WAF ACL rule block | `map(any)` | n/a | yes |
+| <a name="input_excluded_protections"></a> [excluded\_protections](#input\_excluded\_protections) | A list of strings to not associate with the AWS Shield WAF ACL. | `set(string)` | n/a | yes |
+| <a name="input_resources"></a> [resources](#input\_resources) | Map of resource ARNs and optional automatic response actions. | `map(any)` | n/a | yes |
+| <a name="input_waf_acl_rules"></a> [waf\_acl\_rules](#input\_waf\_acl\_rules) | A map of values to be used in a dynamic WAF ACL rule block. | `map(any)` | n/a | yes |
 
 ## Outputs
 
