@@ -85,7 +85,7 @@ resource "null_resource" "enable_step_function_logging" {
     command = <<EOT
 set -euo pipefail
 
-aws stepfunctions update-state-machine --state-machine-arn arn:aws:states:location:acc no:stateMachine:semantic-athena-layer --tracing-configuration enabled=true --logging-configuration='{
+aws stepfunctions update-state-machine --state-machine-arn arn:aws:states:eu-west-2:${local.env_account_id}:stateMachine:semantic-athena-layer --tracing-configuration enabled=true --logging-configuration='{
   "level":"ALL",
   "includeExecutionData":true,
   "destinations":[
