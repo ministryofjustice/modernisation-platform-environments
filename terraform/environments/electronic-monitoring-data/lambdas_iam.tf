@@ -247,3 +247,93 @@ data "aws_iam_policy_document" "write_to_ap_s3" {
     ]
   }
 }
+
+# ------------------------------------------
+# Send table to AP
+# ------------------------------------------
+
+resource "aws_iam_role" "send_table_to_ap" {
+  name                = "send_table_to_ap"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+
+locals {
+  land_bucket = local.is-production ? "mojap-land" : "mojap-land-dev"
+}
+
+data "aws_iam_policy_document" "get_parquet_files" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+    ]
+    resources = [
+      aws_s3_bucket.dms_target_ep_s3_bucket.arn,
+      "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*",
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.land_bucket}"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.land_bucket}/electronic_monitoring/load/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "get_parquet_files" {
+    name = "get_parquet_files"
+    policy = data.aws_iam_policy_document.get_parquet_files.json
+}
+
+resource "aws_iam_role_policy_attachment" "send_table_to_ap_get_parquet_files" {
+    role = aws_iam_role.send_table_to_ap.name
+    policy_arn = aws_iam_policy.get_parquet_files.arn
+}
+
+# ------------------------------------------------
+# Get tables from db
+# ------------------------------------------------
+
+resource "aws_iam_role" "get_tables_from_db" {
+    name                = "get_tables_from_db"
+    assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "get_glue_tables" {
+    statement {
+        effect = "Allow"
+        actions = [
+            "glue:GetTable",
+            "glue:GetTables",
+            "glue:GetDatabase"
+        ]
+        resources = ["*"]
+    }
+}
+
+resource "aws_iam_policy" "get_glue_tables" {
+    name = "get_glue_tables"
+    policy = data.aws_iam_policy_document.get_glue_tables.json
+}
+
+resource "aws_iam_role_policy_attachment" "get_tables_from_db_get_glue_tables" {
+    role = aws_iam_role.get_tables_from_db.name
+    policy_arn = aws_iam_policy.get_glue_tables.arn
+}

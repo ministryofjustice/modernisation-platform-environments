@@ -118,3 +118,72 @@ resource "aws_lambda_permission" "send_metadata_to_ap" {
   principal     = "s3.amazonaws.com"
   source_arn    = module.metadata-s3-bucket.bucket.arn
 }
+
+# ------------------------------------------------------
+# Send table to AP 
+# ------------------------------------------------------
+
+
+data "archive_file" "send_table_to_ap" {
+    type = "zip"
+    source_file = "${local.lambda_path}/send_table_to_ap.py"
+    output_path = "${local.lambda_path}/send_table_to_ap.zip"
+}
+
+module "send_table_to_ap" {
+    source              = "./modules/lambdas"
+    filename = "${local.lambda_path}/send_table_to_ap.zip"
+    function_name = "send_table_to_ap"
+    role_arn = aws_iam_role.send_table_to_ap.arn
+    role_name = aws_iam_role.send_table_to_ap.name
+    handler = "send_table_to_ap.handler"
+    source_code_hash = data.archive_file.send_table_to_ap.output_base64sha256
+    layers = null
+    timeout = 900
+    memory_size = 1024
+    runtime = "python3.11"
+    security_group_ids = [aws_security_group.lambda_db_security_group.id]
+    subnet_ids = data.aws_subnets.shared-public.ids
+    env_account_id = local.env_account_id
+    environment_variables = {
+      REG_BUCKET_NAME = local.register_my_data_bucket
+      
+    }
+}
+
+resource "aws_lambda_permission" "send_metadata_to_ap" {
+  statement_id  = "AllowS3ObjectMetaInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = module.send_metadata_to_ap.lambda_function_arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = module.metadata-s3-bucket.bucket.arn
+}
+
+# ------------------------------------------------------
+# Get Tables from DB
+# ------------------------------------------------------
+
+
+data "archive_file" "get_tables_from_db" {
+    type = "zip"
+    source_file = "${local.lambda_path}/get_tables_from_db.py"
+    output_path = "${local.lambda_path}/get_tables_from_db.zip"
+}
+
+module "get_tables_from_db" {
+    source              = "./modules/lambdas"
+    filename = "${local.lambda_path}/get_tables_from_db.zip"
+    function_name = "get_tables_from_db"
+    role_arn = aws_iam_role.get_tables_from_db.arn
+    role_name = aws_iam_role.get_tables_from_db.name
+    handler = "get_tables_from_db.handler"
+    source_code_hash = data.archive_file.get_tables_from_db.output_base64sha256
+    layers = null
+    timeout = 900
+    memory_size = 1024
+    runtime = "python3.11"
+    security_group_ids = [aws_security_group.lambda_db_security_group.id]
+    subnet_ids = data.aws_subnets.shared-public.ids
+    env_account_id = local.env_account_id
+    environment_variables = null
+}
