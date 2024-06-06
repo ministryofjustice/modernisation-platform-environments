@@ -102,6 +102,10 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
           desired_capacity = 2
           max_size         = 2
+          instance_refresh = {
+            strategy               = "Rolling"
+            min_healthy_percentage = 90
+          }
         })
         # autoscaling_schedules = {
         #   scale_up   = { recurrence = "0 7 * * Mon-Fri" }
@@ -116,7 +120,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "86471c5730194674959e03fff043a6b4d2d1a92f"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {

@@ -229,7 +229,7 @@ variable "ec2_autoscaling_groups" {
       instance_refresh = optional(object({
         strategy               = string
         min_healthy_percentage = number
-        instance_warmup        = number
+        instance_warmup        = optional(number)
       }))
       warm_pool = optional(object({
         pool_state                  = optional(string)
