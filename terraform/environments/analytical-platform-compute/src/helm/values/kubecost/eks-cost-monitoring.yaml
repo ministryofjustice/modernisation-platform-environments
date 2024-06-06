@@ -1,3 +1,6 @@
+---
+# Source: https://raw.githubusercontent.com/kubecost/cost-analyzer-helm-chart/v2.2.5/cost-analyzer/values-eks-cost-monitoring.yaml
+
 global:
   grafana:
     enabled: false
@@ -138,7 +141,7 @@ prometheus:
       scrape_timeout: 60s
       evaluation_interval: 1m
       external_labels:
-        cluster_id: cluster-one # Each cluster should have a unique ID
+        cluster_id: analytical-platform-compute-development # @ministryofjustice/analytical-platform: this needs to be a variable
     persistentVolume:
       size: 32Gi
       enabled: true

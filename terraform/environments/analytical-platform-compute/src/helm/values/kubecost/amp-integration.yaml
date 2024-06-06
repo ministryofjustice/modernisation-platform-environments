@@ -1,0 +1,35 @@
+
+---
+# Source: https://docs.kubecost.com/install-and-configure/advanced-configuration/custom-prom/amp-with-remote-write#helm-values
+
+global:
+  amp:
+    enabled: true
+    prometheusServerEndpoint: http://localhost:8005/workspaces/ws-bfdd5d7a-5571-4686-bfd4-43ab07cf8d54ba
+    remoteWriteService: https://aps-workspaces.eu-west-2.amazonaws.com/workspaces/ws-bfdd5d7a-5571-4686-bfd4-43ab07cf8d54ba/api/v1/remote_write
+    sigv4:
+      region: eu-west-2
+sigV4Proxy:
+  region: eu-west-2
+  host: aps-workspaces.eu-west-2.amazonaws.com
+prometheus:
+  server:
+    global:
+      external_labels:
+        cluster_id: analytical-platform-compute-development
+  serviceAccounts:
+    server:
+      create: true # @ministryofjustice/analytical-platform: this was false
+      name: kubecost-prometheus-server-amp
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::381491960855:role/kubecost-prometheus-server-amp20240605164721364600000002
+kubecostProductConfigs:
+  clusterName: analytical-platform-compute-development
+  projectID: 381491960855
+serviceAccount:
+  create: true # @ministryofjustice/analytical-platform: this was false
+  name: kubecost-cost-analyzer-amp
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::381491960855:role/kubecost-cost-analyzer-amp20240605164721364500000001
+federatedETL:
+  useMultiClusterDB: true
