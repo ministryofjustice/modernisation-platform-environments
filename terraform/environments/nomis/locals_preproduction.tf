@@ -99,9 +99,9 @@ locals {
 
       # NOT-ACTIVE (green deployment)
       preprod-nomis-web-b = merge(local.weblogic_ec2, {
-        # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
-        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 1
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
+          desired_capacity = 2
+          max_size         = 2
         })
         # autoscaling_schedules = {
         #   scale_up   = { recurrence = "0 7 * * Mon-Fri" }
@@ -116,7 +116,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "sar_memory_issue"
+            branch = "main"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
