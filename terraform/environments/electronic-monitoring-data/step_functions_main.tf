@@ -91,7 +91,7 @@ aws stepfunctions update-state-machine --state-machine-arn arn:aws:states:eu-wes
   "destinations":[
     {
       "cloudWatchLogsLogGroup":{
-        "logGroupArn":"arn:aws:logs:location:acc no:log-group:/aws/vendedlogs/states/semantic_athena_layer:*"
+        "logGroupArn":"arn:aws:logs:eu-west-2:${local.env_account_id}:log-group:/aws/vendedlogs/states/semantic_athena_layer:*"
       }
     }
   ]
