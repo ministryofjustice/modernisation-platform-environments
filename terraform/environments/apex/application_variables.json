@@ -27,7 +27,7 @@
       "appscaling_min_capacity": 1,
       "appscaling_max_capacity": 5,
       "ecs_scaling_cpu_threshold": 80,
-      "ecs_scaling_mem_threshold": 27,
+      "ecs_scaling_mem_threshold": 23,
       "region": "eu-west-2",
       "docker_image_tag": "development",
       "app_debug_enabled": "false",
