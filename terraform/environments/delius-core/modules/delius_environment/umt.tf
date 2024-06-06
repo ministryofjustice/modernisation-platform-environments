@@ -105,3 +105,12 @@ resource "aws_ssm_parameter" "elasticache_port" {
   type        = "SecureString"
   value       = module.umt.elasticache_port
 }
+
+resource "aws_vpc_security_group_egress_rule" "alb_to_umt" {
+  security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
+  description                  = "load balancer to umt ecs service"
+  from_port                    = "8080"
+  to_port                      = "8080"
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = module.umt.service_security_group_id
+}
