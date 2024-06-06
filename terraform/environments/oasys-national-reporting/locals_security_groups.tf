@@ -132,7 +132,7 @@ locals {
           security_groups = ["lb"]
         }
         # oracle_weblogic_admin = {
-        #   description     = "7777: Weblogic users"
+        #   description     = "7777: Main Weblogic admin"
         #   from_port       = 7777
         #   to_port         = 7777
         #   protocol        = "TCP"
