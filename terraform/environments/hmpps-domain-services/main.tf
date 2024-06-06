@@ -189,6 +189,12 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "sns_topics", {}),
   )
 
+  ssm_documents = merge(
+    module.baseline_presets.ssm_documents,
+    lookup(local.baseline_all_environments, "ssm_documents", {}),
+    lookup(local.baseline_environment_specific, "ssm_documents", {}),
+  )
+
   ssm_parameters = merge(
     module.baseline_presets.ssm_parameters,
     lookup(local.baseline_all_environments, "ssm_parameters", {}),
