@@ -15,7 +15,7 @@ module "ec2_autoscaling_group" {
 
   for_each = var.ec2_autoscaling_groups
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=7aafc2df99aff8b4750163a4ca5509ac79dd86f3" # DSOS-2838/enable-auto-instance-refresh
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=7174e5845bb089349080fe3fa093d74650a22ca9" # v2.5.5
 
   providers = {
     aws.core-vpc = aws.core-vpc
