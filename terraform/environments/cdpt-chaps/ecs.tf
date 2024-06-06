@@ -246,7 +246,7 @@ resource "aws_security_group" "cluster_ec2" {
     from_port       = 3389
     to_port         = 3389
     protocol        = "tcp"
-    security_groups = [module.bastion_linux.bastion_security_group.id]
+    security_groups = [module.bastion_linux.bastion_security_group]
   }
 
   egress {
