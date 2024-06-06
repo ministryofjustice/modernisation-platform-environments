@@ -24,18 +24,18 @@ locals {
           metrics = [
             [{ "expression" : "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"CPUUtilization\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
           ]
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2.cpu-utilization-high.threshold
+          #    fill  = "above"
+          #  }]
+          #}
           yAxis = {
             left = {
               showUnits = false,
               label     = "%"
             }
-          }
-          annotations = {
-            horizontal = [{
-              label = "Alarm Threshold"
-              value = local.cloudwatch_metric_alarms.ec2.cpu-utilization-high.threshold
-              fill  = "above"
-            }]
           }
         }
       }
