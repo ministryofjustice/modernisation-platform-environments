@@ -166,7 +166,7 @@ resource "aws_lb_listener" "tribunals_lb_health" {
   }
 }
 
-resource "aws_lb_listener_rule" "admin_access" {
+resource "aws_lb_listener_rule" "admin_access_1" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = 1
   action {
@@ -182,14 +182,33 @@ resource "aws_lb_listener_rule" "admin_access" {
   condition {
     source_ip {
       values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25"]
-      # values = ["194.33.196.0/25", "194.33.197.0/25"]
     }
   }
 }
 
-resource "aws_lb_listener_rule" "secure_access" {
+resource "aws_lb_listener_rule" "admin_access_2" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = 2
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tribunals_target_group.arn
+  }
+  condition {
+    path_pattern {
+      values = ["*/Admin*", "*/admin*"]
+    }
+  }
+
+  condition {
+    source_ip {
+      values = ["194.33.196.0/25", "194.33.197.0/25"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "secure_access_1" {
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = 3
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tribunals_target_group.arn
@@ -203,7 +222,26 @@ resource "aws_lb_listener_rule" "secure_access" {
   condition {
     source_ip {
       values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25"]
-      # values = ["194.33.196.0/25", "194.33.197.0/25"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "secure_access_2" {
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = 4
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tribunals_target_group.arn
+  }
+  condition {
+    path_pattern {
+      values = ["*/Secure*", "*/secure*"]
+    }
+  }
+
+  condition {
+    source_ip {
+      values = ["194.33.196.0/25", "194.33.197.0/25"]
     }
   }
 }
