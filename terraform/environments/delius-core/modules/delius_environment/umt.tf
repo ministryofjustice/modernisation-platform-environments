@@ -25,7 +25,7 @@ module "umt" {
   container_memory = var.delius_microservice_configs.umt.container_memory
   container_cpu    = var.delius_microservice_configs.umt.container_cpu
 
-  health_check_path                 = "/umt"
+  health_check_path                 = "/umt/actuator/health"
   health_check_grace_period_seconds = 600
   health_check_interval             = 30
 
