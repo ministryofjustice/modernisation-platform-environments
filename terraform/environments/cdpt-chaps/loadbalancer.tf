@@ -161,7 +161,7 @@ resource "aws_security_group" "chaps_target_sc" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    security_groups = [aws_security_group.chaps_lb_sc.id]
+    security_groups = [module.lb_access_logs_enabled.security_group]
   }
 
   egress {
