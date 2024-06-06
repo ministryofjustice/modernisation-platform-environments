@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "lambda_invoke_policy" {
 
     resources = [
       "${module.get_metadata_from_rds_lambda.lambda_function_arn}:*",
-      "${aws_lambda_function.create_athena_external_table.arn}:*",
+      "${module.create_athena_external_table.lambda_function_arn}:*",
     ]
   }
   statement {
@@ -20,12 +20,67 @@ data "aws_iam_policy_document" "lambda_invoke_policy" {
 
     resources = [
       module.get_metadata_from_rds_lambda.lambda_function_arn,
-      aws_lambda_function.create_athena_external_table.arn,
+      module.create_athena_external_table.lambda_function_arn,
     ]
   }
 }
 
 
+resource "aws_iam_policy" "step_function_kms_policy" {
+  name        = "step-function-semantic-athena-layer-kms-policy"
+  description = "Policy for Lambda to use KMS key for semantic-athena-layer step function"
+
+  policy = data.aws_iam_policy_document.step_function_kms_policy.json
+}
+
+data "aws_iam_policy_document" "step_function_kms_policy" {
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [aws_kms_key.semantic_athena_layer_step_functions_log_key.arn]
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_kms_policy_policy_attachment" {
+  role       = aws_iam_role.step_functions_role.name
+  policy_arn = aws_iam_policy.step_function_kms_policy.arn
+}
+
+
+resource "aws_iam_policy" "step_function_log_policy" {
+  name        = "step-function-semantic-athena-layer-log-policy"
+  description = "Policy for Lambda to put logs for semantic-athena-layer step function"
+
+  policy = data.aws_iam_policy_document.step_function_logs_policy.json
+}
+
+
+data "aws_iam_policy_document" "step_function_logs_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogDelivery",
+      "logs:GetLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:ListLogDeliveries",
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies",
+      "logs:DescribeLogGroups"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_log_policy_policy_attachment" {
+  role       = aws_iam_role.step_functions_role.name
+  policy_arn = aws_iam_policy.step_function_log_policy.arn
+}
 
 data "aws_iam_policy_document" "xray_policy" {
   statement {

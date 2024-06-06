@@ -47,7 +47,6 @@ def create_glue_database():
 
 
 def upload_to_s3(local_filepath: str, s3_filepath: str) -> None:
-    s3 = boto3.client("s3")
     bucket_name, key = s3_filepath[5:].split("/", 1)
 
     try:
@@ -60,8 +59,8 @@ def upload_to_s3(local_filepath: str, s3_filepath: str) -> None:
 def write_meta_to_s3(meta):
     table_name = meta.name
     temp_path = "/tmp/temp.json"
-    s3_path = f"s3://{METADATA_STORE_BUCKET}/database={DB_NAME}/table_name={table_name}/metadata.json"
-    meta.to_json(temp_path)
+    s3_path = f"s3://{METADATA_STORE_BUCKET}/database={DB_NAME}/table_name={table_name}/metadata.yaml"
+    meta.to_yaml(temp_path)
     upload_to_s3(temp_path, s3_path)
 
 
@@ -70,7 +69,7 @@ def add_db_to_meta(meta):
     Database is currently down as dbo -
     reassign to actual DB Name
     """
-    meta.database = DB_NAME
+    meta.database_name = DB_NAME
     return meta
 
 

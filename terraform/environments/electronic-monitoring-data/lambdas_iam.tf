@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
             actions   = [
                 "lambda:InvokeFunction"
             ]
-            resources = [aws_lambda_function.create_athena_external_table.arn]
+            resources = [module.create_athena_external_table.lambda_function_arn]
         }
 
     statement {
@@ -106,7 +106,6 @@ data "aws_iam_policy_document" "get_s3_output" {
 resource "aws_iam_role" "get_metadata_from_rds" {
     name = "get_metadata_from_rds_lambda"
     assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-
 }
 
 resource "aws_iam_role_policy_attachment" "get_metadata_from_rds_lambda_vpc_access_execution" {
@@ -160,4 +159,91 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
             module.metadata-s3-bucket.bucket.arn
         ]
     }
+}
+
+
+
+# ------------------------------------------------
+# Write Metadata to AP
+# ------------------------------------------------
+
+resource "aws_iam_role" "send_metadata_to_ap" {
+    name = "send_metadata_to_ap"
+    assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_lambda_vpc_access_execution" {
+    role = aws_iam_role.send_metadata_to_ap.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_lambda_sqs_queue_access_execution" {
+    role = aws_iam_role.send_metadata_to_ap.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+
+resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_write_meta_to_s3" {
+    role = aws_iam_role.send_metadata_to_ap.name
+    policy_arn = aws_iam_policy.get_meta_from_s3.arn
+}
+
+resource "aws_iam_policy" "get_meta_from_s3" {
+    name = "get_meta_from_s3"
+    policy = data.aws_iam_policy_document.get_meta_from_s3.json
+}
+
+resource "aws_iam_policy" "write_to_ap_s3" {
+    name = "write_to_ap_s3"
+    policy = data.aws_iam_policy_document.write_to_ap_s3.json
+}
+
+resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_write_to_ap_s3" {
+    role = aws_iam_role.send_metadata_to_ap.name
+    policy_arn = aws_iam_policy.write_to_ap_s3.arn
+}
+
+data "aws_iam_policy_document" "get_meta_from_s3" {
+    statement {
+        effect = "Allow"
+        actions = [
+            "s3:ListObjects",
+            "s3:GetObject"
+        ]
+        resources = [
+            "${module.metadata-s3-bucket.bucket.arn}/*"
+        ]
+    }
+    statement {
+        effect = "Allow"
+        actions = [
+            "s3:ListBucket"
+        ]
+        resources = [
+            module.metadata-s3-bucket.bucket.arn
+        ]
+    }
+}
+
+data "aws_iam_policy_document" "write_to_ap_s3" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::moj-reg-${local.register_my_data_bucket_suffix}"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [
+      "arn:aws:s3:::moj-reg-${local.register_my_data_bucket_suffix}/landing/electronic-monitoring-metadata/data/*"
+    ]
+  }
 }
