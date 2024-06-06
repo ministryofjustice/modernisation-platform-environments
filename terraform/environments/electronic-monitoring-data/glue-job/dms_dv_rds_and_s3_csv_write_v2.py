@@ -368,7 +368,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                                   f"""'{rds_db_name}' as database_name""",
                                                   f"""'{rds_tbl_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                                   )
-                LOGGER.info(f"Validated - 1")
+                LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
             else:
                 df_temp = (df_subtract_t1
@@ -382,7 +382,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                              f"""'{rds_db_name}' as database_name""",
                                              f"""'{rds_db_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                              )
-                LOGGER.info(f"Validated - 2")
+                LOGGER.info(f"Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_temp)
 
         else:
@@ -392,7 +392,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                               f"""'{rds_db_name}' as database_name""",
                                               f"""'{rds_db_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                               )
-            LOGGER.info(f"Validated - 3")
+            LOGGER.info(f"Validation Failed - 3")
             df_dv_output = df_dv_output.union(df_temp)
 
         df_rds_temp_t2.unpersist()
@@ -404,7 +404,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                           f"""'{rds_db_name}' as database_name""",
                                           f"""'{rds_db_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                           )
-        LOGGER.info(f"Validated - 4")
+        LOGGER.info(f"Validation not applicable - 4")
         df_dv_output = df_dv_output.union(df_temp)
 
     LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
@@ -412,23 +412,22 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
     return df_dv_output
 
 
-def write_parquet_to_s3(df_dv_output: DataFrame, database, table):
+def write_parquet_to_s3(df_dv_output: DataFrame, database, full_table_name):
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
 
-    LOGGER.info(
-        f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
+    LOGGER.info(f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
 
-    df_dv_output = df_dv_output.orderBy(
-        "database_name", "full_table_name").repartition(1)
+    df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
+    df_dv_output.show(1, truncate=False)
 
     if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
-                               f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={table}'''
+                               f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={full_table_name}'''
                                ):
         LOGGER.info(
-            f"""Purging S3-path: {CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""")
+            f"""Purging S3-path: {CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={full_table_name}""")
 
-        glueContext.purge_s3_path(f"""{CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""",
+        glueContext.purge_s3_path(f"""{CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={full_table_name}""",
                                   options={"retentionPeriod": 0}
                                   )
 
@@ -478,9 +477,7 @@ if __name__ == "__main__":
         total_files, total_size = get_s3_folder_info(CSV_FILE_SRC_S3_BUCKET_NAME,
                                                     f"{rds_db_name}/dbo/{rds_tbl_name}")
 
-        input_repartition_factor = int(args["repartition_factor"])
-
-        df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor)
+        df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, int(args["repartition_factor"]))
 
         write_parquet_to_s3(df_dv_output, rds_db_name, verified_given_rds_sqlserver_table_str)
     else:
