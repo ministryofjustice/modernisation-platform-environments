@@ -79,23 +79,3 @@ resource "aws_cloudwatch_log_group" "semantic_athena_layer" {
   kms_key_id = aws_kms_key.semantic_athena_layer_step_functions_log_key.arn
 }
 
-resource "null_resource" "enable_step_function_logging" {
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command = <<EOT
-set -euo pipefail
-
-aws stepfunctions update-state-machine --state-machine-arn arn:aws:states:eu-west-2:${local.env_account_id}:stateMachine:semantic-athena-layer --tracing-configuration enabled=true --logging-configuration='{
-  "level":"ALL",
-  "includeExecutionData":true,
-  "destinations":[
-    {
-      "cloudWatchLogsLogGroup":{
-        "logGroupArn":"arn:aws:logs:eu-west-2:${local.env_account_id}:log-group:/aws/vendedlogs/states/semantic_athena_layer:*"
-      }
-    }
-  ]
-}'
-EOT
-  }
-}

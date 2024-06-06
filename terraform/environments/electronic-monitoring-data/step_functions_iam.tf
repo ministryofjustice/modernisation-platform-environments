@@ -62,12 +62,18 @@ data "aws_iam_policy_document" "step_function_logs_policy" {
   statement {
     effect = "Allow"
     actions = [
-       "logs:CreateLogGroup",
-       "logs:CreateLogStream",
-       "logs:PutLogEvents",
-       "logs:DescribeLogStreams"
+      "logs:CreateLogDelivery",
+      "logs:GetLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:ListLogDeliveries",
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies",
+      "logs:DescribeLogGroups"
     ]
-    resources = ["${aws_cloudwatch_log_group.semantic_athena_layer.arn}:*"]
+    resources = [
+      "*"
+    ]
   }
 }
 
