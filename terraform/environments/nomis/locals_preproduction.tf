@@ -104,7 +104,7 @@ locals {
           max_size         = 2
           instance_refresh = {
             strategy               = "Rolling"
-            min_healthy_percentage = 90
+            min_healthy_percentage = 50
           }
         })
         # autoscaling_schedules = {
