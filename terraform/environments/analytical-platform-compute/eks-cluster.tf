@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.12.0"
+  version = "20.13.1"
 
   cluster_name    = local.eks_cluster_name
   cluster_version = local.environment_configuration.eks_cluster_version
@@ -115,6 +115,11 @@ module "eks" {
           }
         }
       }
+    }
+    data-engineering-airflow = {
+      principal_arn     = local.environment_configuration.data_engineering_airflow_execution_role_arn
+      username          = "data-engineering-airflow"
+      kubernetes_groups = ["airflow"]
     }
   }
 

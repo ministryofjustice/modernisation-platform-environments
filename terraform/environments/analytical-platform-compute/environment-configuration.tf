@@ -51,6 +51,9 @@ locals {
         vpc_cni                = "v1.18.1-eksbuild.3"
       }
 
+      /* Data Engineering Airflow */
+      data_engineering_airflow_execution_role_arn = "arn:aws:iam::593291632749:role/airflow-dev-execution-role"
+
       /* Observability Platform */
       observability_platform = "development"
 
@@ -89,6 +92,9 @@ locals {
       /* Observability Platform */
       observability_platform = "development"
 
+      /* Data Engineering Airflow */
+      data_engineering_airflow_execution_role_arn = "arn:aws:iam::593291632749:role/airflow-dev-execution-role"
+
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
     }
@@ -120,6 +126,9 @@ locals {
         eks_pod_identity_agent = "v1.2.0-eksbuild.1"
         vpc_cni                = "v1.18.1-eksbuild.3"
       }
+
+      /* Data Engineering Airflow */
+      data_engineering_airflow_execution_role_arn = "arn:aws:iam::593291632749:role/airflow-prod-execution-role"
 
       /* Observability Platform */
       observability_platform = "production"
