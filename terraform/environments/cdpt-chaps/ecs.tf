@@ -238,7 +238,7 @@ resource "aws_security_group" "cluster_ec2" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [module.lb_access_logs_enabled.security_group]
+    security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
   ingress {
@@ -246,7 +246,7 @@ resource "aws_security_group" "cluster_ec2" {
     from_port       = 3389
     to_port         = 3389
     protocol        = "tcp"
-    security_groups = [module.bastion_linux.bastion_security_group]
+    security_groups = [module.bastion_linux.bastion_security_group.id]
   }
 
   egress {
@@ -463,7 +463,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [module.lb_access_logs_enabled.security_group]
+    security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
   egress {
