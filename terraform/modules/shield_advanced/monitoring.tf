@@ -1,6 +1,6 @@
 # DDoS Alarm
 resource "aws_cloudwatch_metric_alarm" "this" {
-  for_each            = var.monitored_resources
+  for_each            = var.resources
   alarm_name          = "DDoSDetected"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -13,7 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.module_ddos_alarm.arn]
   dimensions = {
-    ResourceArn = each.value
+    ResourceArn = each.value["arn"]
   }
 }
 
