@@ -5,6 +5,7 @@ variable "application_name" {
 
 variable "excluded_protections" {
   type        = set(string)
+  default     = []
   description = "A list of strings to not associate with the AWS Shield WAF ACL."
 }
 
