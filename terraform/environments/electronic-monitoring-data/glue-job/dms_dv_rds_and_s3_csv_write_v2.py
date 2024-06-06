@@ -107,25 +107,12 @@ def get_rds_db_jdbc_url(in_rds_db_name=None):
         return f"""jdbc:sqlserver://{RDS_DB_HOST_ENDPOINT}:{RDS_DB_PORT};database={in_rds_db_name}"""
 
 
-def get_rds_database_list(in_rds_databases):
+def get_rds_database_list(in_rds_db_str):
 
-    if in_rds_databases is None:
-        sql_sys_databases_1 = f"""
-        SELECT name FROM sys.databases
-        WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb', 'experimentation', 'rdsadmin')
-        """.strip()
-        sql_sys_databases = sql_sys_databases_1
-    else:
-        if isinstance(in_rds_databases, list):
-            rds_db_str = ', '.join(f"\'{db}\'" for db in in_rds_databases)
-        elif isinstance(in_rds_databases, str):
-            rds_db_str = in_rds_databases
-
-        sql_sys_databases_2 = f"""
-        SELECT name FROM sys.databases
-        WHERE name IN ({rds_db_str})
-        """.strip()
-        sql_sys_databases = sql_sys_databases_2
+    sql_sys_databases = f"""
+    SELECT name FROM sys.databases
+    WHERE name IN ('{in_rds_db_str}')
+    """.strip()
 
     LOGGER.info(f"""Using SQL Statement >>>\n{sql_sys_databases}""")
     df_rds_sys = (spark.read.format("jdbc")
@@ -354,16 +341,17 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                 sys.exit(1)
 
         for transformed_column in transformed_columns_original_names:
+            LOGGER.info(f"stripping {args['rds_tbl_col_replace_substring']} from rds-dataframe-column {transformed_column}")
             df_rds_temp_t3 = strip_rds_tbl_col_chars(df_rds_temp_t2, transformed_column, args["rds_tbl_col_replace_substring"])
 
         csv_schema_object = get_csv_schema_object(df_rds_temp, transformed_columns_original_names)
 
         df_csv_temp = get_s3_csv_dataframe(tbl_csv_s3_path, csv_schema_object).repartition(default_repartition_factor)
 
-        df_csv_temp_t1 = df_csv_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
-
         LOGGER.info(
             f"""S3-CSV-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_csv_temp.rdd.getNumPartitions()}, {total_size} bytes""")
+        
+        df_csv_temp_t1 = df_csv_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         df_rds_temp_count = df_rds_temp_t3.count()
         df_csv_temp_count = df_csv_temp_t1.count()
@@ -380,7 +368,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                                   f"""'{rds_db_name}' as database_name""",
                                                   f"""'{rds_tbl_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                                   )
-
+                LOGGER.info(f"Validated - 1")
                 df_dv_output = df_dv_output.union(df_temp)
             else:
                 df_temp = (df_subtract_t1
@@ -394,7 +382,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                              f"""'{rds_db_name}' as database_name""",
                                              f"""'{rds_db_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                              )
-
+                LOGGER.info(f"Validated - 2")
                 df_dv_output = df_dv_output.union(df_temp)
 
         else:
@@ -404,7 +392,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                               f"""'{rds_db_name}' as database_name""",
                                               f"""'{rds_db_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                               )
-
+            LOGGER.info(f"Validated - 3")
             df_dv_output = df_dv_output.union(df_temp)
 
         df_rds_temp_t2.unpersist()
@@ -416,7 +404,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                           f"""'{rds_db_name}' as database_name""",
                                           f"""'{rds_db_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                           )
-
+        LOGGER.info(f"Validated - 4")
         df_dv_output = df_dv_output.union(df_temp)
 
     LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
