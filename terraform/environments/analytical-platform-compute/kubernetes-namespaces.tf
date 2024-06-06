@@ -40,8 +40,18 @@ resource "kubernetes_namespace" "actions_runners" {
   metadata {
     name = "actions-runners"
     labels = {
-      "pod-security.kubernetes.io/enforce"         = "baseline"
-      "pod-security.kubernetes.io/enforce-version" = "v${local.environment_configuration.eks_cluster_version}"
+      "pod-security.kubernetes.io/enforce"                          = "baseline"
+      "compute.analytical-platform.service.justice.gov.uk/workload" = "actions-runners"
+    }
+  }
+}
+
+resource "kubernetes_namespace" "airflow" {
+  metadata {
+    name = "airflow"
+    labels = {
+      "pod-security.kubernetes.io/enforce"                          = "restricted"
+      "compute.analytical-platform.service.justice.gov.uk/workload" = "airflow"
     }
   }
 }
