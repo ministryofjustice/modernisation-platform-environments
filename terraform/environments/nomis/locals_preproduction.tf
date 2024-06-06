@@ -47,7 +47,7 @@ locals {
       # ACTIVE (blue deployment)
       lsast-nomis-web-a = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
@@ -413,12 +413,29 @@ locals {
 
           https = merge(local.weblogic_lb_listeners.https, {
             alarm_target_group_names = [
+              # "lsast-nomis-web-a-http-7777",
               "preprod-nomis-web-a-http-7777",
               # "preprod-nomis-web-b-http-7777",
             ]
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
             rules = {
+              lsast-nomis-web-a-http-7777 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "lsast-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "lsast-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                      "c-lsast.preproduction.nomis.service.justice.gov.uk",
+                      "c.lsast-nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               preprod-nomis-web-a-http-7777 = {
                 priority = 200
                 actions = [{
@@ -469,7 +486,7 @@ locals {
                       "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
                       "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
                       "c.preproduction.nomis.service.justice.gov.uk",
-                      "c.pp-nomis.az.justice.gov.uk",
+                      "c-lsast.preproduction.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -526,6 +543,7 @@ locals {
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
+          { name = "c-lsast", type = "A", lbs_map_key = "private" },
         ]
       }
     }
