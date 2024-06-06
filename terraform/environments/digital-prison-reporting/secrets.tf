@@ -230,7 +230,7 @@ resource "aws_secretsmanager_secret_version" "dbt_secrets" {
 resource "aws_secretsmanager_secret" "dbt_secrets" {
   count = local.enable_dbt_k8s_secrets ? 1 : 0
 
-  name = "external/abalytics_platform/k8s_dbt_auth"
+  name = "external/analytics_platform/k8s_dbt_auth"
 
   recovery_window_in_days = 0
 
