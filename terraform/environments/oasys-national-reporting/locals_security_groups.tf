@@ -131,14 +131,14 @@ locals {
           cidr_blocks     = local.security_group_cidrs.http7xxx
           security_groups = ["lb"]
         }
-        # oracle_weblogic_admin = {
-        #   description     = "7777: Main Weblogic admin"
-        #   from_port       = 7777
-        #   to_port         = 7777
-        #   protocol        = "TCP"
-        #   cidr_blocks     = local.security_group_cidrs.http7xxx
-        #   security_groups = ["lb"]
-        # }
+        oracle_weblogic_admin = {
+          description     = "7777: Main Weblogic admin"
+          from_port       = 7777
+          to_port         = 7777
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb"]
+        }
         http_web = {
           description     = "8080: Allow HTTP ingress"
           from_port       = 8080
