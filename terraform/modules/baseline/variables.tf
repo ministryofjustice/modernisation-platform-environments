@@ -865,6 +865,15 @@ variable "oam_sinks" {
   default = {}
 }
 
+variable "options" {
+  description = "options to enable standalone resources"
+  type = object({
+    enable_cost_usage_report = optional(bool, false)
+    enable_resource_exporer  = optional(bool, false)
+  })
+  default = {}
+}
+
 variable "route53_resolvers" {
   description = "map of resolver endpoints and associated rules to configure, where map keys are the names of the resources.  The application name is automatically added as a prefix to the resource names"
   type = map(object({
@@ -1163,18 +1172,3 @@ variable "tags" {
   default     = {}
 }
 
-variable "resource_explorer" {
-  description = "Enables AWS Resource Explorer"
-  type        = bool
-  default     = false
-}
-
-variable "cost_usage_report" {
-  description = "Enables AWS Cost Usage Report"
-  type = object({
-    create = bool
-  })
-  default = {
-    create = false
-  }
-}
