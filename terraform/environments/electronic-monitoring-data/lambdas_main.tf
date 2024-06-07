@@ -151,14 +151,6 @@ module "send_table_to_ap" {
     }
 }
 
-resource "aws_lambda_permission" "send_metadata_to_ap" {
-  statement_id  = "AllowS3ObjectMetaInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = module.send_metadata_to_ap.lambda_function_arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.metadata-s3-bucket.bucket.arn
-}
-
 # ------------------------------------------------------
 # Get Tables from DB
 # ------------------------------------------------------
