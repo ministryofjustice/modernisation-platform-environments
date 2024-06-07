@@ -1,6 +1,6 @@
 [
   {
-    "name": "${app_name}",
+    "name": "${app_name}v2",
     "image": "${ecr_url}:${docker_image_tag}",
     "essential": true,
     "cpu": 1024,
