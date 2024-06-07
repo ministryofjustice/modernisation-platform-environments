@@ -366,7 +366,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                                   "'' as json_row",
                                                   f"""'V2: {rds_tbl_name} - Validated.' as validation_msg""",
                                                   f"""'{rds_db_name}' as database_name""",
-                                                  f"""'{rds_tbl_name}_dbo_{rds_tbl_name}' as full_table_name"""
+                                                  f"""'{rds_db_name}_dbo_{rds_tbl_name}' as full_table_name"""
                                                   )
                 LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
@@ -418,8 +418,8 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, full_table_name):
 
     LOGGER.info(f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
 
-    df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
-    df_dv_output.show(1, truncate=False)
+    df_dv_output = df_dv_output.repartition(1)
+    LOGGER.info(df_dv_output.show(1, truncate=False))
 
     if check_s3_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={full_table_name}'''
@@ -433,17 +433,21 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, full_table_name):
 
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
 
-    glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
-                                                 connection_options={
-                                                     'path': f"""{CATALOG_TABLE_S3_FULL_PATH}/""",
-                                                     "partitionKeys": ["database_name", "full_table_name"]
-                                                 },
-                                                 format_options={
-                                                     'useGlueParquetWriter': True,
-                                                     'compression': 'snappy',
-                                                     'blockSize': 13421773,
-                                                     'pageSize': 1048576
-                                                 })
+    try:
+        glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
+                                                    connection_options={
+                                                        'path': f"""{CATALOG_TABLE_S3_FULL_PATH}/""",
+                                                        "partitionKeys": ["database_name", "full_table_name"]
+                                                    },
+                                                    format_options={
+                                                        'useGlueParquetWriter': True,
+                                                        'compression': 'snappy',
+                                                        'blockSize': 13421773,
+                                                        'pageSize': 1048576
+                                                    })
+    except Exception as err:
+        LOGGER.error(err)
+    
     LOGGER.info(
         f"""{rds_db_name}.{rds_tbl_name} validation report written to -> {CATALOG_TABLE_S3_FULL_PATH}/""")
 

@@ -1,42 +1,39 @@
 locals {
 
-  # baseline presets config
-  production_baseline_presets_options = {
-    sns_topics = {
-      pagerduty_integrations = {
-        hmpps_domain_services_pagerduty = "hmpps_domain_services_prod_alarms"
+  baseline_presets_production = {
+    options = {
+      sns_topics = {
+        pagerduty_integrations = {
+          hmpps_domain_services_pagerduty = "hmpps_domain_services_prod_alarms"
+        }
       }
     }
   }
 
-  # baseline config
-  production_config = {
+  # please keep resources in alphabetical order
+  baseline_production = {
 
-    baseline_secretsmanager_secrets = {
-      "/microsoft/AD/azure.hmpp.root" = local.domain_secretsmanager_secrets
-    }
-
-    baseline_acm_certificates = {
+    acm_certificates = {
       remote_desktop_wildcard_and_planetfm_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
-        domain_name = module.environment.domains.public.modernisation_platform
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "modernisation-platform.service.justice.gov.uk"
+        external_validation_records_created = true
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",
+          "*.hmpps-domain-services.hmpps-production.modernisation-platform.service.justice.gov.uk",
           "*.hmpps-domain.service.justice.gov.uk",
           "hmpps-az-gw1.justice.gov.uk",
           "*.hmpps-az-gw1.justice.gov.uk",
           "*.planetfm.service.justice.gov.uk",
         ]
-        external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for hmpps domain load balancer"
         }
       }
     }
 
-    baseline_ec2_instances = {
+    ec2_instances = {
       pd-rdgw-1-a = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
           availability_zone         = "eu-west-2a"
@@ -58,8 +55,8 @@ locals {
       pd-rds-1-a = merge(local.rds_ec2_instance, {
         config = merge(local.rds_ec2_instance.config, {
           availability_zone         = "eu-west-2a"
-          user_data_raw             = base64encode(file("./templates/user-data-domain-join.yaml"))
           instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
+          user_data_raw             = base64encode(file("./templates/user-data-domain-join.yaml"))
         })
         instance = merge(local.rds_ec2_instance.instance, {
           instance_type = "t3.large"
@@ -70,7 +67,7 @@ locals {
       })
     }
 
-    baseline_lbs = {
+    lbs = {
       public = merge(local.rds_lbs.public, {
         instance_target_groups = {
           pd-rdgw-1-http = merge(local.rds_target_groups.http, {
@@ -125,7 +122,7 @@ locals {
       })
     }
 
-    baseline_route53_zones = {
+    route53_zones = {
       "hmpps-domain.service.justice.gov.uk" = {
         records = [
           { name = "development", type = "NS", ttl = "86400", records = ["ns-1447.awsdns-52.org", "ns-1826.awsdns-36.co.uk", "ns-1022.awsdns-63.net", "ns-418.awsdns-52.com", ] },
@@ -139,6 +136,10 @@ locals {
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
       }
+    }
+
+    secretsmanager_secrets = {
+      "/microsoft/AD/azure.hmpp.root" = local.domain_secretsmanager_secrets
     }
   }
 }
