@@ -255,7 +255,16 @@ data "aws_iam_policy_document" "write_to_ap_s3" {
 resource "aws_iam_role" "send_table_to_ap" {
   name                = "send_table_to_ap"
   assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+resource "aws_iam_role_policy_attachment" "send_table_to_ap_lambda_vpc_access_execution" {
+    role = aws_iam_role.send_table_to_ap.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "send_table_to_ap_lambda_sqs_queue_access_execution" {
+    role = aws_iam_role.send_table_to_ap.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
 
@@ -315,6 +324,19 @@ resource "aws_iam_role" "get_tables_from_db" {
     name                = "get_tables_from_db"
     assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
 }
+
+resource "aws_iam_role_policy_attachment" "get_tables_from_db_lambda_vpc_access_execution" {
+    role = aws_iam_role.get_tables_from_db.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "get_tables_from_db_lambda_sqs_queue_access_execution" {
+    role = aws_iam_role.get_tables_from_db.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+
+
 
 data "aws_iam_policy_document" "get_glue_tables" {
     statement {
