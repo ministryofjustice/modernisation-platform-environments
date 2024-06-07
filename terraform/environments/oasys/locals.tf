@@ -52,7 +52,9 @@ locals {
   }
 
   baseline_all_environments = {
-    resource_explorer = true
-    security_groups   = local.security_groups
+    options = {
+      enable_resource_explorer = true
+    }
+    security_groups = local.security_groups
   }
 }

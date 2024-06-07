@@ -869,9 +869,12 @@ variable "options" {
   description = "options to enable standalone resources"
   type = object({
     enable_cost_usage_report = optional(bool, false)
-    enable_resource_exporer  = optional(bool, false)
+    enable_resource_explorer = optional(bool, false)
   })
-  default = {}
+  default = {
+    enable_cost_usage_report = false
+    enable_resource_explorer = false
+  }
 }
 
 variable "route53_resolvers" {

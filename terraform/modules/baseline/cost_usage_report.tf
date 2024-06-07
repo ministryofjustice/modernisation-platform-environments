@@ -1,5 +1,5 @@
 module "cost_usage_report" {
-  count = lookup(var.options, "enable_cost_usage_report", false) ? 1 : 0
+  count = var.options.enable_cost_usage_report == true ? 1 : 0
 
   source = "../../modules/cost_usage_report"
 
