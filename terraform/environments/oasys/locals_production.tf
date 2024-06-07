@@ -594,6 +594,8 @@ locals {
           { name = "trn-int", type = "A", lbs_map_key = "private" },
         ]
         records = [
+          { name = "reporting", type = "NS", ttl = "86400", records = ["ns-1953.awsdns-52.co.uk", "ns-1415.awsdns-48.org", "ns-637.awsdns-15.net", "ns-454.awsdns-56.com"] },
+
           { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db-b", type = "CNAME", ttl = "3600", records = ["pd-oasys-db-b.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
