@@ -28,6 +28,7 @@ module "umt" {
   health_check_path                 = "/umt/actuator/health"
   health_check_grace_period_seconds = 600
   health_check_interval             = 30
+  target_group_protocol_version     = "HTTP1"
 
   db_ingress_security_groups = []
   ecs_service_egress_security_group_ids = [
