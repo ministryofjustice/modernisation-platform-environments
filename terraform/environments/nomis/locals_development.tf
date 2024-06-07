@@ -222,7 +222,7 @@ locals {
         })
         user_data_cloud_init = merge(local.database19c_ec2.user_data_cloud_init, {
           args = merge(local.database19c_ec2.user_data_cloud_init.args, {
-            branch = "nomis/DSOS-2798/oracle19c"
+            branch = "main"
           })
         })
         tags = merge(local.database19c_ec2.tags, {
