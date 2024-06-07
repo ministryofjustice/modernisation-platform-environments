@@ -56,8 +56,8 @@ module "create_athena_table" {
     source              = "./modules/lambdas"
     filename = "${local.lambda_path}/create_athena_table.zip"
     function_name = "create_athena_table"
-    role_arn = aws_iam_role.create_athena_tables_lambda.arn
-    role_name = aws_iam_role.create_athena_tables_lambda.name
+    role_arn = aws_iam_role.create_athena_table_lambda.arn
+    role_name = aws_iam_role.create_athena_table_lambda.name
     handler = "create_athena_table.handler"
     layers = [
       "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:69",
