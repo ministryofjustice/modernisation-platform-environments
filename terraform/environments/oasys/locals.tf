@@ -20,23 +20,23 @@ locals {
 
   baseline_presets_all_environments = {
     options = {
-      # cloudwatch_dashboard_default_widget_groups = [
-      #   "lb",
-      #   "ec2",
-      #   "ec2_linux",
-      #   "ec2_autoscaling_group_linux",
-      #   "ec2_instance_linux",
-      #   "ec2_instance_oracle_db_with_backup",
-      #   "ec2_instance_textfile_monitoring",
-      # ]
-      cloudwatch_log_groups                    = null
-      cloudwatch_metric_alarms_default_actions = ["dso_pagerduty"]
-      # cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
+      cloudwatch_dashboard_default_widget_groups = [
+        "lb",
+        "ec2",
+        "ec2_linux",
+        "ec2_autoscaling_group_linux",
+        "ec2_instance_linux",
+        "ec2_instance_oracle_db_with_backup",
+        "ec2_instance_textfile_monitoring",
+      ]
+      cloudwatch_log_groups                      = null
+      cloudwatch_metric_alarms_default_actions   = ["dso_pagerduty"]
+      cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
       # cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
-      db_backup_s3               = true # adds db backup buckets
-      db_backup_more_permissions = true
-      enable_azure_sas_token     = true
-      # enable_backup_plan_daily_and_weekly = true
+      db_backup_s3                                = true # adds db backup buckets
+      db_backup_more_permissions                  = true
+      enable_azure_sas_token                      = true
+      enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
       enable_image_builder                        = true
       enable_ec2_cloud_watch_agent                = true
