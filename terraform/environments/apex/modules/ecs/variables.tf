@@ -151,3 +151,8 @@ variable "server_port" {
   type        = string
   description = "The port the containers will be listening on"
 }
+
+variable "log_group_kms_key" {
+  type        = string
+  description = "The key ARN for CloudWatch Log Group encryption"
+}
