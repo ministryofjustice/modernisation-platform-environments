@@ -39,7 +39,16 @@ locals {
 
   baseline_presets_options = {
     cloudwatch_log_groups = null
-    # cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
+    cloudwatch_metric_alarms_default_actions     = ["dso_pagerduty"]
+    cloudwatch_dashboard_default_widget_groups = [
+      "lb",
+      "ec2",
+      "ec2_linux",
+      "ec2_autoscaling_group_linux",
+      "ec2_instance_linux",
+      "ec2_instance_oracle_db_with_backup",
+      "ec2_instance_textfile_monitoring",
+    ]
     enable_application_environment_wildcard_cert = false # only use if you'll be attaching hmpps-<enviornment>.modernisation-platform... to load balancers or using for https
     enable_backup_plan_daily_and_weekly          = true
     enable_business_unit_kms_cmks                = true

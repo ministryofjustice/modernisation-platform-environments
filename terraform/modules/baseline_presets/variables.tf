@@ -44,6 +44,8 @@ variable "options" {
 
     sns_topics = optional(object({
       pagerduty_integrations = optional(map(string), {}) # create sns topics where map key is name and value is modernisation platform pagerduty_integration_keys
-    }))
+      }), {
+      pagerduty_integrations = {}
+    })
   })
 }

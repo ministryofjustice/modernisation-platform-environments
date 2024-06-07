@@ -100,8 +100,8 @@ locals {
       # NOT-ACTIVE (green deployment)
       preprod-nomis-web-b = merge(local.weblogic_ec2, {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
-          desired_capacity = 2
-          max_size         = 2
+          desired_capacity = 0
+          max_size         = 0
           instance_refresh = {
             strategy               = "Rolling"
             min_healthy_percentage = 50

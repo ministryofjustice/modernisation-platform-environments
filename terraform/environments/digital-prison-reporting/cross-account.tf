@@ -1,5 +1,13 @@
-### Cross Account Role
+### Cross Account Resources
 
+## OIDC, OpenID Connect
+resource "aws_iam_openid_connect_provider" "cluster" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.dbt_analytics.certificates[0].sha1_fingerprint]
+  url             = "https://oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}"
+}
+
+## Role
 ## CrossAccount DataAPI Cross Account Role, 
 # CrossAccount DataAPI Assume Policy
 data "aws_iam_policy_document" "dataapi_cross_assume" {
@@ -18,17 +26,17 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
 
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287"]
+      identifiers = [aws_iam_openid_connect_provider.cluster.arn]
     }
     condition {
       test     = "StringEquals"
       values   = ["system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-dpr"]
-      variable = "oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287:sub"
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}:sub"
     }
     condition {
       test     = "StringEquals"
       values   = ["sts.amazonaws.com"]
-      variable = "oidc.eks.eu-west-2.amazonaws.com/id/1972AFFBD0701A0D1FD291E34F7D1287:aud"
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}:aud"
     }
   }  
 }
