@@ -1,77 +1,77 @@
 locals {
 
   security_group_cidrs_devtest = {
-    icmp = flatten([
+    icmp = distinct(flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
-    ])
+    ]))
     ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
-    https_internal = flatten([
+    https_internal = distinct(flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
-    ])
-    https_external = flatten([
+    ]))
+    https_external = distinct(flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
       module.ip_addresses.external_cidrs.cloud_platform,
       module.ip_addresses.azure_studio_hosting_public.devtest,
-    ])
-    oracle_db = flatten([
+    ]))
+    oracle_db = distinct(flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
-    ])
-    oracle_oem_agent = flatten([
+    ]))
+    oracle_oem_agent = distinct(flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    http7xxx = flatten([
+    ]))
+    http7xxx = distinct(flatten([
       "10.0.0.0/8",
-    ])
+    ]))
   }
   security_group_cidrs_preprod = {
-    icmp = flatten([
+    icmp = distinct(flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
-    ])
+    ]))
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
-    https_internal = flatten([
+    https_internal = distinct(flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       "10.0.0.0/8",
-    ])
-    https_external = flatten([
+    ]))
+    https_external = distinct(flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
       module.ip_addresses.external_cidrs.cloud_platform,
       module.ip_addresses.azure_studio_hosting_public.prod,
       "10.0.0.0/8"
-    ])
-    oracle_db = flatten([
+    ]))
+    oracle_db = distinct(flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       "10.40.40.0/24", # pp oasys
       "10.40.37.0/24", # pp prison nomis
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
       module.ip_addresses.moj_cidr.aws_data_engineering_stage,
-    ])
-    oracle_oem_agent = flatten([
+    ]))
+    oracle_oem_agent = distinct(flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    http7xxx = flatten([
+    ]))
+    http7xxx = distinct(flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-    ])
+    ]))
   }
   security_group_cidrs_prod = {
-    icmp = flatten([
+    icmp = distinct(flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
-    ])
+    ]))
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
-    https_internal = flatten([
+    https_internal = distinct(flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
-    ])
-    https_external = flatten([
+    ]))
+    https_external = distinct(flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
@@ -90,8 +90,8 @@ locals {
       module.ip_addresses.external_cidrs.dtv,
       module.ip_addresses.external_cidrs.nps_wales,
       module.ip_addresses.external_cidrs.dxw,
-    ])
-    oracle_db = flatten([
+    ]))
+    oracle_db = distinct(flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       "10.40.6.0/24", # prod oasys
@@ -100,15 +100,15 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_studio_hosting_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_data_engineering_prod,
-    ])
-    oracle_oem_agent = flatten([
+    ]))
+    oracle_oem_agent = distinct(flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    http7xxx = flatten([
+    ]))
+    http7xxx = distinct(flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-    ])
+    ]))
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
@@ -254,11 +254,11 @@ locals {
           cidr_blocks = local.security_group_cidrs.icmp
         }
         ssh = {
-          description = "Allow ssh ingress"
-          from_port   = "22"
-          to_port     = "22"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.ssh
+          description     = "Allow ssh ingress"
+          from_port       = "22"
+          to_port         = "22"
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.ssh
           security_groups = []
         }
         http8080 = {
