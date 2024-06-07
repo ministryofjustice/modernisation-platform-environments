@@ -341,9 +341,10 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
         df_rds_temp_t2.unpersist()
         df_prq_temp_t1.unpersist()
     else:
+
         df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                           "'' as json_row",
-                                          f"""'S3-Parquet folder path doesn't exists  --> {tbl_prq_s3_folder_path}' as validation_msg""",
+                                          f"""'{db_dbo_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
                                           f"""'{rds_db_name}' as database_name""",
                                           f"""'{db_dbo_tbl}' as full_table_name"""
                                           )
