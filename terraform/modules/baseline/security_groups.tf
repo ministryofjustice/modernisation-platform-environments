@@ -104,7 +104,7 @@ resource "aws_security_group_rule" "this" {
   from_port                = each.value.from_port
   to_port                  = each.value.to_port
   protocol                 = each.value.protocol
-  cidr_blocks              = each.value.cidr_blocks
+  cidr_blocks              = each.value.cidr_blocks == null ? null : distinct(each.value.cidr_blocks)
   source_security_group_id = each.value.source_security_group_id == null ? null : lookup(local.security_group_ids, each.value.source_security_group_id, each.value.source_security_group_id)
   self                     = each.value.self
   prefix_list_ids          = each.value.prefix_list_ids

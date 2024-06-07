@@ -71,12 +71,12 @@ locals {
 
   baseline_security_groups = {
     # instance type security groups
-    # loadbalancer              = local.security_groups.loadbalancer
-    web                = local.security_groups.web # apply to onr web servers
+    lb                 = local.security_groups.lb
     bods               = local.security_groups.bods
     boe                = local.security_groups.boe
     onr_db             = local.security_groups.onr_db
     private-jumpserver = local.security_groups.private_jumpserver
+    web                = local.security_groups.web # apply to onr web servers
 
     # shared security groups
     oasys_db        = local.security_groups.oasys_db        # apply to bods & boe servers

@@ -87,7 +87,9 @@ output "iam_roles" {
 output "iam_service_linked_roles" {
   description = "Map of common service linked roles to create"
 
-  value = local.iam_service_linked_roles
+  value = var.options.iam_service_linked_roles != null ? {
+    for key, value in local.iam_service_linked_roles : key => value if contains(var.options.iam_service_linked_roles, key)
+  } : local.iam_service_linked_roles
 }
 
 output "iam_policies" {

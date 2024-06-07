@@ -25,7 +25,7 @@ db_path = f"{S3_BUCKET_NAME}/{DB_NAME}/dbo"
 
 def create_glue_table(metadata):
     table_name = metadata.name
-    metadata.file_format = "csv"
+    metadata.file_format = "parquet"
     logger.info(f"Table Name: {table_name}")
     try:
         # Delete table
