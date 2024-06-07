@@ -148,4 +148,67 @@ locals {
       OracleDbLTS-ManagedInstance = true # oracle license tracking
     }
   }
+
+  database19c_ec2 = {
+
+    # cloudwatch_metric_alarms = local.database_ec2_cloudwatch_metric_alarms
+
+    config = merge(module.baseline_presets.ec2_instance.config.db, {
+      ami_name  = "hmpps_ol_8_5_oracledb_19c_release_2024-06-07T07-59-47.056Z"
+      ami_owner = "self"
+    })
+
+    ebs_volumes = {
+      "/dev/sdb" = { label = "app" }   # /u01
+      "/dev/sdc" = { label = "app" }   # /u02
+      "/dev/sde" = { label = "data" }  # DATA01
+      "/dev/sdf" = { label = "data" }  # DATA02
+      "/dev/sdg" = { label = "data" }  # DATA03
+      "/dev/sdh" = { label = "data" }  # DATA04
+      "/dev/sdi" = { label = "data" }  # DATA05
+      "/dev/sdj" = { label = "flash" } # FLASH01
+      "/dev/sdk" = { label = "flash" } # FLASH02
+      "/dev/sds" = { label = "swap" }
+    }
+
+    ebs_volume_config = {
+      data = {
+        iops       = 3000
+        throughput = 125
+      }
+      flash = {
+        iops       = 3000
+        throughput = 125
+      }
+    }
+
+    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      instance_type                = "r6i.xlarge"
+      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+      monitoring                   = true
+      vpc_security_group_ids       = ["data-db"]
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
+    })
+
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+
+    secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
+
+    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ansible
+
+    tags = {
+      ami                         = "hmpps_ol_8_5_oracledb_19c"
+      backup                      = "false" # disable mod platform backup since we use our own policies
+      component                   = "data"
+      instance-access-policy      = "limited"
+      server-type                 = "nomis-db19c"
+      os-type                     = "Linux"
+      os-major-version            = 8
+      os-version                  = "OL 8.5"
+      licence-requirements        = "Oracle Database"
+      OracleDbLTS-ManagedInstance = true # oracle license tracking
+    }
+  }
 }
