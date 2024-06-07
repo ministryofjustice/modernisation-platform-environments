@@ -26,7 +26,7 @@ db_sem_name = f"{DB_NAME}_semantic_layer"
 
 def create_glue_table(metadata):
     table_name = metadata.name
-    metadata.file_format = "csv"
+    metadata.file_format = "parquet"
     logger.info(f"Table Name: {table_name}")
     try:
         # Delete table
