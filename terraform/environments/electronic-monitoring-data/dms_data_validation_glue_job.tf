@@ -96,12 +96,12 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--script_bucket_name"               = "${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}"
     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
-    "--rds_sqlserver_dbs"                = ""
+    "--rds_sqlserver_db"                 = ""
     "--rds_sqlserver_tbls"               = ""
     "--trim_rds_df_str_columns"          = "false"
     "--repartition_factor"               = 8
     "--max_table_size_mb"                = 2000
-    "--csv_src_bucket_name"              = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--parquet_src_bucket_name"          = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"             = "${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}"
     "--glue_catalog_tbl_name"            = "glue_df_output"
