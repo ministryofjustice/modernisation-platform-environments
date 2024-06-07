@@ -238,8 +238,7 @@ resource "aws_security_group" "cluster_ec2" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    cidr_blocks     = ["0.0.0.0/0"]
-    security_groups = [aws_security_group.chaps_lb_sc.id]
+    security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
   ingress {
@@ -256,7 +255,6 @@ resource "aws_security_group" "cluster_ec2" {
     to_port         = 0
     protocol        = "-1"
     cidr_blocks     = ["0.0.0.0/0"]
-    security_groups = []
   }
 
   tags = merge(
@@ -465,7 +463,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.chaps_lb_sc.id]
+    security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
   egress {
