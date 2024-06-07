@@ -20,7 +20,7 @@ locals {
           "*.preproduction.reporting.oasys.service.justice.gov.uk",
           "onr.pp-oasys.az.justice.gov.uk",
         ]
-        external_validation_records_created = false
+        external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "Wildcard certificate for the ${local.environment} environment"
