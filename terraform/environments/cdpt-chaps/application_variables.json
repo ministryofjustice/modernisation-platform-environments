@@ -32,7 +32,7 @@
       "ec2_max_size": 3,
       "ec2_min_size": 2,
       "ami_image_id": "ami-0cf98f96c2bae561e",
-      "instance_type": "t3.large", 
+      "instance_type": "t3.large",  
       "container_port": 80,
       "client_id": "2e2cc8ad-7b64-41b9-93a1-c16b9a00b34f"
     },
