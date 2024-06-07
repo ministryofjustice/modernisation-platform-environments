@@ -1,6 +1,6 @@
 [
   {
-    "name": "${app_name}v2",
+    "name": "${app_name}",
     "image": "${ecr_url}:${docker_image_tag}",
     "essential": true,
     "cpu": 1024,
@@ -9,7 +9,7 @@
         "containerPort": 8080
       }
     ],
-    "memory": 2000,
+    "memory": 2012,
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
