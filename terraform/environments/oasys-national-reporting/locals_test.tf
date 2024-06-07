@@ -40,10 +40,10 @@ locals {
         domain_name = "modernisation-platform.service.justice.gov.uk"
         subject_alternate_names = [
           "*.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
-          "test.reporting.oasys.service.justice.gov.uk",
-          "*.test.reporting.oasys.service.justice.gov.uk",
-          # NOTE: there is no azure equivalent for T2
+          # "test.reporting.oasys.service.justice.gov.uk", FIXME: fails resolution 
+          # "*.test.reporting.oasys.service.justice.gov.uk", FIXME: fails resolution
         ]
+          # NOTE: there is no azure cert equivalent for T2
         external_validation_records_created = false
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
