@@ -12,5 +12,5 @@ def handler(event, context):
     db_name = event.get("db_name")
     response = glue.get_tables(DatabaseName=db_name)
     tables = response['TableList']
-    table_names = [table['Name'] for table in tables]
-    return json.dumps({"db_info":{db_name: table_names}})
+    table_names = [{db_name: table['Name']} for table in tables]
+    return json.dumps({"db_info":table_names})
