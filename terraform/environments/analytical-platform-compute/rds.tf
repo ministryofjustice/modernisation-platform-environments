@@ -15,9 +15,7 @@ module "mlflow_rds" {
 
   ca_cert_identifier = "rds-ca-rsa2048-g1"
 
-  storage_type          = "gp3"
-  iops                  = 3000
-  storage_throughput    = 150
+  storage_type          = "gp2" # Has to be bigger than 400 to use gp3 "You can't specify IOPS or storage throughput for engine postgres and a storage size less than 400."
   allocated_storage     = 64
   max_allocated_storage = 256
 
