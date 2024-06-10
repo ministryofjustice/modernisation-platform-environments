@@ -572,7 +572,7 @@ locals {
           title   = "EC2 Instance filesystems-check-error"
           stat    = "Maximum"
           metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"textfile_monitoring_filesystems_check_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_filesystems_check_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
           ]
           #annotations = {
           #  horizontal = [{
@@ -598,7 +598,7 @@ locals {
           title   = "EC2 Instance filesystems-check-metric-not-updated"
           stat    = "Maximum"
           metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"textfile_monitoring_filesystems_check_seconds\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_filesystems_check_seconds\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
           ]
           #annotations = {
           #  horizontal = [{
