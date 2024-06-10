@@ -35,13 +35,8 @@ EOF
 
 }
 
-<<<<<<< HEAD
 resource "aws_kms_key" "athena_layer_step_functions_log_key" {
   description = "KMS key for encrypting Step Functions logs for athena_layer"
-=======
-resource "aws_kms_key" "semantic_athena_layer_step_functions_log_key" {
-  description         = "KMS key for encrypting Step Functions logs for semantic_athena_layer"
->>>>>>> main
   enable_key_rotation = true
 
   policy = <<EOF
@@ -78,13 +73,11 @@ resource "aws_kms_key" "semantic_athena_layer_step_functions_log_key" {
 EOF
 }
 
-<<<<<<< HEAD
 resource "aws_cloudwatch_log_group" "athena_layer" {
   name = "/aws/vendedlogs/states/athena_layer"
   retention_in_days = 400
   kms_key_id = aws_kms_key.athena_layer_step_functions_log_key.arn
 }
-
 # ------------------------------------------
 # Send Database to AP
 # ------------------------------------------
@@ -168,11 +161,4 @@ resource "aws_cloudwatch_log_group" "send_database_to_ap" {
   name = "/aws/vendedlogs/states/send_database_to_ap"
   retention_in_days = 400
   kms_key_id = aws_kms_key.send_database_to_ap_step_functions_log_key.arn
-=======
-resource "aws_cloudwatch_log_group" "semantic_athena_layer" {
-  name              = "/aws/vendedlogs/states/semantic_athena_layer"
-  retention_in_days = 400
-  kms_key_id        = aws_kms_key.semantic_athena_layer_step_functions_log_key.arn
->>>>>>> main
 }
-
