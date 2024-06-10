@@ -8,6 +8,11 @@ output "target_group_arn" {
   value       = aws_lb_target_group.alb_target_group.arn
 }
 
+output "target_group_arn_suffix" {
+  description = "Output ALB target group ARN Suffix to be picked up by CloudWatch"
+  value       = aws_lb_target_group.alb_target_group.arn_suffix
+}
+
 # output "loab_balancer_listener" {
 #   value = aws_lb_listener.alb_listener
 # }
@@ -27,6 +32,11 @@ output "load_balancer" {
 output "load_balancer_arn" {
   description = "Output ALB DNS name for CloudFront reference"
   value       = aws_lb.loadbalancer.dns_name
+}
+
+output "load_balancer_arn_suffix" {
+  description = "Output ALB ARN Suffix for CloudWatch reference"
+  value       = aws_lb.loadbalancer.arn_suffix
 }
 
 output "load_balancer_id" {
