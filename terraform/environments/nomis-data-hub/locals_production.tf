@@ -1,6 +1,12 @@
 locals {
   baseline_presets_production = {
     options = {
+      cloudwatch_dashboard_default_widget_groups = [
+        "ec2",
+        "ec2_linux",
+        "ec2_instance_linux",
+        "ec2_instance_textfile_monitoring",
+      ]
       sns_topics = {
         pagerduty_integrations = {
           # dso_pagerduty = "nomis_data_hub_prod_alarms"

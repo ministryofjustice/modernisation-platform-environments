@@ -24,9 +24,8 @@ locals {
         "ec2",
         "ec2_linux",
         "ec2_instance_linux",
-        "ec2_instance_textfile_monitoring",
       ]
-      cloudwatch_metric_alarms_default_actions   = ["dso_pagerduty"]
+      # cloudwatch_metric_alarms_default_actions   = ["dso_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
       # cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
       enable_backup_plan_daily_and_weekly = true
