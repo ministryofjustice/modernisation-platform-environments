@@ -4,7 +4,7 @@ locals {
     options = {
       sns_topics = {
         pagerduty_integrations = {
-          dso_pagerduty = "ndh_non_prod"
+          # dso_pagerduty = "nomis_data_hub_nonprod_alarms"
         }
       }
     }
