@@ -20,11 +20,11 @@ resource "aws_db_instance" "database" {
   storage_encrypted         = true
 }
 
-resource "aws_db_instance_role_association" "database" {
-  db_instance_identifier = aws_db_instance.database.identifier
-  feature_name           = "S3_INTEGRATION"
-  role_arn               = aws_iam_role.S3_db_backup_restore_access.arn
-}
+# resource "aws_db_instance_role_association" "database" {
+#   db_instance_identifier = aws_db_instance.database.identifier
+#   feature_name           = "S3_INTEGRATION"
+#   role_arn               = aws_iam_role.S3_db_backup_restore_access.arn
+# }
 
 resource "aws_db_subnet_group" "db" {
   name       = "${local.application_name}-db-subnet-group"
