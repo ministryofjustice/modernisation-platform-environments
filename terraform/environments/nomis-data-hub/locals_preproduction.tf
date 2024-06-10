@@ -2,6 +2,11 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
+      sns_topics = {
+        pagerduty_integrations = {
+          dso_pagerduty = "ndh_prod"
+        }
+      }
     }
   }
 

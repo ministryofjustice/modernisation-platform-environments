@@ -2,6 +2,11 @@ locals {
 
   baseline_presets_test = {
     options = {
+      sns_topics = {
+        pagerduty_integrations = {
+          dso_pagerduty = "ndh_non_prod"
+        }
+      }
     }
   }
 

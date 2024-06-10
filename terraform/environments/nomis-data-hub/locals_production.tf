@@ -1,6 +1,11 @@
 locals {
   baseline_presets_production = {
     options = {
+      sns_topics = {
+        pagerduty_integrations = {
+          dso_pagerduty = "ndh_prod"
+        }
+      }
     }
   }
 
