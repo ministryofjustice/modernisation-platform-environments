@@ -5,7 +5,7 @@ locals {
         "ec2",
         "ec2_linux",
         "ec2_instance_linux",
-        "ec2_instance_textfile_monitoring",
+        "ec2_instance_filesystems",
       ]
       sns_topics = {
         pagerduty_integrations = {
