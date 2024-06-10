@@ -155,10 +155,9 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "oam_sinks", {}),
   )
 
-  resource_explorer = coalesce(
-    lookup(local.baseline_all_environments, "resource_explorer", null),
-    lookup(local.baseline_environment_specific, "resource_explorer", null),
-    false,
+  options = merge(
+    lookup(local.baseline_all_environments, "options", {}),
+    lookup(local.baseline_environment_specific, "options", {}),
   )
 
   route53_resolvers = merge(

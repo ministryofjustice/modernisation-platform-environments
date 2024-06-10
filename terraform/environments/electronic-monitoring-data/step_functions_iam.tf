@@ -103,7 +103,7 @@ data "aws_iam_policy_document" "assume_step_functions" {
   statement {
     effect = "Allow"
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["states.amazonaws.com"]
     }
     actions = ["sts:AssumeRole"]

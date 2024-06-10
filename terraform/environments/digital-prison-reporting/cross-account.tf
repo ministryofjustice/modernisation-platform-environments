@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
       type        = "AWS"
       identifiers = ["arn:aws:iam::754256621582:root"]
     }
-  }  
+  }
 
   statement {
     effect  = "Allow"
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
       values   = ["sts.amazonaws.com"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}:aud"
     }
-  }  
+  }
 }
 
 # CrossAccount DataAPI Role
@@ -51,10 +51,10 @@ resource "aws_iam_role" "dataapi_cross_role" {
   tags = merge(
     local.tags,
     {
-      Name              = "${local.project}-data-api-cross-account-role"
-      Resource_Type     = "iam"
-      Jira              = "DPR2-751"
-      Resource_Group    = "Front-End"
+      Name           = "${local.project}-data-api-cross-account-role"
+      Resource_Type  = "iam"
+      Jira           = "DPR2-751"
+      Resource_Group = "Front-End"
     }
   )
 }

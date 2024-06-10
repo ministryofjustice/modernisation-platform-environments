@@ -89,7 +89,7 @@ module "lb_access_logs_enabled" {
   region                     = "eu-west-2"
   enable_deletion_protection = false
   idle_timeout               = 60
-  tags                       = { Name = "lb_module" } 
+  tags                       = { Name = "lb_module" }
 
 }
 
@@ -107,8 +107,8 @@ resource "aws_lb_target_group" "chaps_target_group" {
   deregistration_delay = 30
 
   stickiness {
-    type            = "lb_cookie"
-  } 
+    type = "lb_cookie"
+  }
 
   health_check {
     healthy_threshold   = "5"
@@ -119,12 +119,12 @@ resource "aws_lb_target_group" "chaps_target_group" {
     timeout             = "5"
   }
 
-    lifecycle {
+  lifecycle {
     create_before_destroy = true
-    ignore_changes = [name]
+    ignore_changes        = [name]
   }
 
-    tags = {
+  tags = {
     Name = "chaps-target-group-${random_string.chaps_target_group_name.result}"
   }
 }
@@ -142,7 +142,7 @@ resource "aws_security_group" "chaps_lb_sc" {
     cidr_blocks = ["188.214.15.75/32", "192.168.5.101/32", "81.134.202.29/32", "79.152.189.104/32", "179.50.12.212/32", "188.172.252.34/32", "194.33.192.0/25", "194.33.193.0/25", "194.33.196.0/25", "194.33.197.0/25", "195.59.75.0/24", "201.33.21.5/32", "213.121.161.112/28", "52.67.148.55/32", "54.94.206.111/32", "178.248.34.42/32", "178.248.34.43/32", "178.248.34.44/32", "178.248.34.45/32", "178.248.34.46/32", "178.248.34.47/32", "89.32.121.144/32", "185.191.249.100/32", "2.138.20.8/32", "18.169.147.172/32", "35.176.93.186/32", "18.130.148.126/32", "35.176.148.126/32", "51.149.250.0/24", "51.149.249.0/29", "194.33.249.0/29", "51.149.249.32/29", "194.33.248.0/29", "20.49.214.199/32", "20.49.214.228/32", "20.26.11.71/32", "20.26.11.108/32", "128.77.75.128/26"]
   }
 
-    egress {
+  egress {
     description = "Open all outbound ports"
     from_port   = 0
     to_port     = 0
@@ -157,10 +157,10 @@ resource "aws_security_group" "chaps_target_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow traffic from load balancer"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    description     = "allow traffic from load balancer"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
     security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 

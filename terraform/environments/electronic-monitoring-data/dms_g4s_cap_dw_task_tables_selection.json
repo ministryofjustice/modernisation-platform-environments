@@ -18,8 +18,8 @@
       "rule-id": "02",
       "rule-name": "02",
       "object-locator": {
-          "schema-name": "dbo",
-          "table-name": "Log_LoadErrors"
+        "schema-name": "dbo",
+        "table-name": "Log_LoadErrors"
       },
       "rule-action": "exclude"
     }

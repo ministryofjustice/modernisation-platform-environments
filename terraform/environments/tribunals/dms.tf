@@ -82,38 +82,38 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
 }
 
 resource "aws_dms_endpoint" "source" {
-  database_name               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dbname"]
-  endpoint_id                 = "tribunals-source"
-  endpoint_type               = "source"
-  engine_name                 = "sqlserver"
-  password                    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
-  port                        = 1433
-  server_name                 = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
-  ssl_mode                    = "none"
+  database_name = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dbname"]
+  endpoint_id   = "tribunals-source"
+  endpoint_type = "source"
+  engine_name   = "sqlserver"
+  password      = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
+  port          = 1433
+  server_name   = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
+  ssl_mode      = "none"
 
   username = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
 }
 
 # Uncomment modernisation_dms_access for first time creation of the Security Group in AWS DSD Account
 resource "aws_security_group" "modernisation_dms_access" {
-   provider    = aws.mojdsd
-   name        = "modernisation_dms_access_${local.environment}"
-   description = "allow dms access to the database for the modernisation platform"
+  provider    = aws.mojdsd
+  name        = "modernisation_dms_access_${local.environment}"
+  description = "allow dms access to the database for the modernisation platform"
 
-   ingress {
-     from_port   = 1433
-     to_port     = 1433
-     protocol    = "tcp"
-     description = "Allow DMS to connect to source database"
-     cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
-   }
+  ingress {
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
+    description = "Allow DMS to connect to source database"
+    cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
+  }
 
-   egress {
-     from_port   = 0
-     to_port     = 0
-     protocol    = "-1"
-     cidr_blocks = ["0.0.0.0/0"]
-   }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 // Uncomment setup_target_rds_security_group for first time setup of DMS
@@ -123,7 +123,7 @@ resource "null_resource" "setup_target_rds_security_group" {
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
-    command = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
+    command     = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
 
     environment = {
       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id

@@ -1,14 +1,17 @@
 locals {
 
-  # cloudwatch monitoring config
-  test_cloudwatch_monitoring_options = {}
+  baseline_presets_test = {
+    options = {}
+  }
 
-  # baseline config
-  test_config = {
+  # please keep resources in alphabetical order
+  baseline_test = {
 
-    baseline_ec2_autoscaling_groups = {}
+    route53_zones = {
+      "test.planetfm.service.justice.gov.uk" = {}
+    }
 
-    baseline_s3_buckets = {
+    s3_buckets = {
       # use this bucket for storing artefacts for use across all accounts
       planetfm-software = {
         custom_kms_key = module.environment.kms_keys["general"].arn
@@ -18,10 +21,6 @@ locals {
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
-    }
-
-    baseline_route53_zones = {
-      "test.planetfm.service.justice.gov.uk" = {}
     }
   }
 }

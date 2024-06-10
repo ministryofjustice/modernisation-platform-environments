@@ -171,7 +171,7 @@ data "aws_iam_policy_document" "combined_policy_documents" {
   source_policy_documents = flatten([
     data.aws_iam_policy_document.db_access_to_secrets_manager.json,
     data.aws_iam_policy_document.allow_access_to_delius_application_passwords.json
-    ])
+  ])
 }
 
 resource "aws_iam_policy" "db_access_to_secrets_manager" {

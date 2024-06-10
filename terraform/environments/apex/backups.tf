@@ -17,7 +17,7 @@ resource "aws_backup_vault" "apex" {
 
 data "aws_iam_policy_document" "apex" {
   statement {
-    sid = "Allow local account basic permissions to the vault"
+    sid    = "Allow local account basic permissions to the vault"
     effect = "Allow"
 
     principals {
@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "apex" {
     resources = [aws_backup_vault.apex.arn]
   }
   statement {
-    sid = "Allow copying of recovery points from Landing Zone"
+    sid    = "Allow copying of recovery points from Landing Zone"
     effect = "Allow"
 
     principals {

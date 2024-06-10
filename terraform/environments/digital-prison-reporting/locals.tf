@@ -166,7 +166,7 @@ locals {
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
   s3_read_access_policy  = "${local.project}_s3_read_policy"
-  s3_read_write_policy  = "${local.project}_s3_read_write_policy"
+  s3_read_write_policy   = "${local.project}_s3_read_write_policy"
   apigateway_get_policy  = "${local.project}_apigateway_get_policy"
   invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
 
@@ -334,10 +334,10 @@ locals {
   # cp_k8s_secrets_placeholder
   enable_cp_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_k8s_secrets
   cp_k8s_secrets_placeholder = {
-    cloud_platform_k8s_token = "placeholder"
-    cloud_platform_certificate_auth  = "placeholder"
-    cloud_platform_k8s_server = "placeholder"
-    cloud_platform_k8s_cluster_name = "placeholder"
+    cloud_platform_k8s_token           = "placeholder"
+    cloud_platform_certificate_auth    = "placeholder"
+    cloud_platform_k8s_server          = "placeholder"
+    cloud_platform_k8s_cluster_name    = "placeholder"
     cloud_platform_k8s_cluster_context = "placeholder"
   }
 

@@ -1,19 +1,19 @@
 locals {
-  app_name                  = "tribunals-shared"
-  instance_role_name        = join("-", [local.app_name, "ec2-instance-role"])
-  instance_profile_name     = join("-", [local.app_name, "ec2-instance-profile"])
-  ec2_instance_policy       = join("-", [local.app_name, "ec2-instance-policy"])
-  tags_common               = local.tags
+  app_name              = "tribunals-shared"
+  instance_role_name    = join("-", [local.app_name, "ec2-instance-role"])
+  instance_profile_name = join("-", [local.app_name, "ec2-instance-profile"])
+  ec2_instance_policy   = join("-", [local.app_name, "ec2-instance-policy"])
+  tags_common           = local.tags
 }
 
 # Create an IAM policy for the custom permissions required by the EC2 hosting instance
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = local.ec2_instance_policy
   tags = merge(
-  local.tags_common,
-  {
-    Name = local.ec2_instance_policy
-  }
+    local.tags_common,
+    {
+      Name = local.ec2_instance_policy
+    }
   )
   policy = <<EOF
 {
@@ -76,10 +76,10 @@ EOF
 resource "aws_iam_role" "ec2_instance_role" {
   name = local.instance_role_name
   tags = merge(
-  local.tags,
-  {
-    Name = local.instance_role_name
-  }
+    local.tags,
+    {
+      Name = local.instance_role_name
+    }
   )
   assume_role_policy = <<EOF
 {
@@ -99,14 +99,14 @@ EOF
 }
 
 resource "aws_iam_role_policy" "ec2_s3_access" {
-  name   = "ec2-s3-access-policy"
-  role   = aws_iam_role.ec2_instance_role.id
+  name = "ec2-s3-access-policy"
+  role = aws_iam_role.ec2_instance_role.id
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "s3:GetObject",
           "s3:PutObject",
           "s3:DeleteObject",
@@ -142,18 +142,18 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = local.instance_profile_name
   role = aws_iam_role.ec2_instance_role.name
   tags = merge(
-  local.tags_common,
-  {
-    Name = local.instance_profile_name
-  }
+    local.tags_common,
+    {
+      Name = local.instance_profile_name
+    }
   )
 }
 
 # Create the Launch Template and assign the instance profile
 resource "aws_launch_template" "tribunals-all-lt" {
-  name_prefix   = "tribunals-all"
-  image_id      = "ami-0b145c21f0f71b68c"
-  instance_type = "m5.4xlarge"
+  name_prefix            = "tribunals-all"
+  image_id               = "ami-0b145c21f0f71b68c"
+  instance_type          = "m5.4xlarge"
   update_default_version = true
 
   iam_instance_profile {
@@ -192,13 +192,13 @@ resource "aws_launch_template" "tribunals-all-lt" {
 # # Finally, create the Auto scaling group for the launch template
 resource "aws_autoscaling_group" "tribunals-all-asg" {
   vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
-  desired_capacity   = 1
-  max_size           = 1
-  min_size           = 1
-  name               = local.app_name
+  desired_capacity    = 1
+  max_size            = 1
+  min_size            = 1
+  name                = local.app_name
 
   launch_template {
-    id      = "${aws_launch_template.tribunals-all-lt.id}"
+    id      = aws_launch_template.tribunals-all-lt.id
     version = "$Latest"
   }
 }
@@ -260,7 +260,7 @@ resource "aws_security_group" "cluster_ec2" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  } 
+  }
 
   tags = merge(
     local.tags_common,

@@ -1,10 +1,10 @@
 resource "aws_sqs_queue" "lambda_dlq" {
-  name = "${var.function_name}-dlq"
-  kms_master_key_id  = aws_kms_key.lambda_env_key.id
+  name              = "${var.function_name}-dlq"
+  kms_master_key_id = aws_kms_key.lambda_env_key.id
 }
 
 resource "aws_kms_key" "lambda_env_key" {
-  description = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
+  description         = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
   enable_key_rotation = true
 
   policy = <<EOF
@@ -113,7 +113,7 @@ resource "aws_iam_role_policy_attachment" "lambda_xray_policy_attachment" {
 resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = 400
-  kms_key_id = aws_kms_key.lambda_env_key.arn
+  kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
 
