@@ -1,3 +1,12 @@
+# Environment module
+
+This module represents a `delius` environment. It contains all resources scoped to an environment - of which there can be many of in an account.
+
+For examples see:
+- `main_development.tf`
+- `main_preproduction.tf` - which demonstrates a 2 env account setup
+
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
