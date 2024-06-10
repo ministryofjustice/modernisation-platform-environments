@@ -152,3 +152,4 @@ resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
     }
   }
 }
+

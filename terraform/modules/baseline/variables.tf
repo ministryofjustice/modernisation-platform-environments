@@ -229,7 +229,7 @@ variable "ec2_autoscaling_groups" {
       instance_refresh = optional(object({
         strategy               = string
         min_healthy_percentage = number
-        instance_warmup        = number
+        instance_warmup        = optional(number)
       }))
       warm_pool = optional(object({
         pool_state                  = optional(string)
@@ -865,6 +865,18 @@ variable "oam_sinks" {
   default = {}
 }
 
+variable "options" {
+  description = "options to enable standalone resources"
+  type = object({
+    enable_cost_usage_report = optional(bool, false)
+    enable_resource_explorer = optional(bool, false)
+  })
+  default = {
+    enable_cost_usage_report = false
+    enable_resource_explorer = false
+  }
+}
+
 variable "route53_resolvers" {
   description = "map of resolver endpoints and associated rules to configure, where map keys are the names of the resources.  The application name is automatically added as a prefix to the resource names"
   type = map(object({
@@ -1163,18 +1175,3 @@ variable "tags" {
   default     = {}
 }
 
-variable "resource_explorer" {
-  description = "Enables AWS Resource Explorer"
-  type        = bool
-  default     = false
-}
-
-variable "cost_usage_report" {
-  description = "Enables AWS Cost Usage Report"
-  type = object({
-    create = bool
-  })
-  default = {
-    create = false
-  }
-}

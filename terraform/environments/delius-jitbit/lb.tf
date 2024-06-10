@@ -31,7 +31,7 @@ resource "aws_security_group" "load_balancer_security_group" {
   name_prefix = "${local.application_name}-loadbalancer-security-group"
   description = "controls access to lb"
   vpc_id      = data.aws_vpc.shared.id
-  
+
   tags = merge(
     local.tags,
     {
@@ -40,13 +40,13 @@ resource "aws_security_group" "load_balancer_security_group" {
   )
 
   lifecycle {
-    create_before_destroy = true 
+    create_before_destroy = true
   }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule" {
   for_each          = toset(local.internal_security_group_cidrs)
-  description = "Allow ingress from allow listed CIDRs"
+  description       = "Allow ingress from allow listed CIDRs"
   security_group_id = aws_security_group.load_balancer_security_group.id
   from_port         = 443
   to_port           = 443
@@ -56,7 +56,7 @@ resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule" {
 
 resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule_ipv6" {
   for_each          = toset(local.ipv6_cidr_blocks)
-  description = "Allow ingress from allow listed CIDRs"
+  description       = "Allow ingress from allow listed CIDRs"
   security_group_id = aws_security_group.load_balancer_security_group.id
   from_port         = 443
   to_port           = 443
@@ -66,12 +66,12 @@ resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule_ipv6"
 
 resource "aws_vpc_security_group_egress_rule" "load_balancer_egress_rule" {
   for_each          = toset([data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block])
-  description = "Allow egress to ECS instances"
+  description       = "Allow egress to ECS instances"
   security_group_id = aws_security_group.load_balancer_security_group.id
   from_port         = local.app_port
   to_port           = local.app_port
-  ip_protocol          = "tcp"
-  cidr_ipv4 = each.value
+  ip_protocol       = "tcp"
+  cidr_ipv4         = each.value
 }
 
 resource "aws_lb_listener" "listener" {

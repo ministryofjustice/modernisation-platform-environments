@@ -18,3 +18,7 @@ rbac:
     name: cluster-autoscaler
     annotations:
       eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+serviceMonitor:
+  enabled: true
+  namespace: ${service_monitor_namespace}

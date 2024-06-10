@@ -48,6 +48,8 @@ resource "aws_db_instance" "jitbit" {
   identifier     = "${local.application_name}-${local.environment}-database"
   username       = local.application_data.accounts[local.environment].db_user
 
+  apply_immediately = true
+
   manage_master_user_password = true
 
   snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)

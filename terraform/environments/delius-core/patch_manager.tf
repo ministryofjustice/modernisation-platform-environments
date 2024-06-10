@@ -3,8 +3,8 @@ module "ssm-auto-patching" {
   providers = {
     aws.bucket-replication = aws
   }
-  account_number             = local.environment_management.account_ids[terraform.workspace]
-  application_name           = local.application_name
+  account_number   = local.environment_management.account_ids[terraform.workspace]
+  application_name = local.application_name
   tags = merge(
     local.tags,
     {
