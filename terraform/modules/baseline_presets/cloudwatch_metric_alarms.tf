@@ -288,11 +288,11 @@ locals {
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "textfile_monitoring_filesystems_check_value"
+        metric_name         = "collectd_textfile_monitoring_filesystems_check_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if any metric collected via /opt/textfile_monitoring is in error, e.g. nomis batch or misload. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327"
+        alarm_description   = "Triggers if any metric collected via /opt/textfile_monitoring/filesystems_check is in error, See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4939874968"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
       filesystems-check-metric-not-updated = {
@@ -300,12 +300,12 @@ locals {
         evaluation_periods  = "1"
         datapoints_to_alarm = "1"
         namespace           = "CWAgent"
-        metric_name         = "textfile_monitoring_filesystems_check_seconds"
+        metric_name         = "collectd_textfile_monitoring_filesystems_check_seconds"
         period              = "300"
         statistic           = "Maximum"
-        threshold           = "129600"
+        threshold           = "3600"
         treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if any metric in /opt/textfile_monitoring hasn't been updated for over 36 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186"
+        alarm_description   = "Triggers if any metric in /opt/textfile_monitoring/filesystems_check hasn't been updated for over 1 hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4939842649"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
