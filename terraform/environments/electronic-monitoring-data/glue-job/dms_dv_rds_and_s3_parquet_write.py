@@ -328,7 +328,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                              f"""'{rds_db_name}' as database_name""",
                                              f"""'{db_dbo_tbl}' as full_table_name"""
                                              )
-                LOGGER.info(f"Validation Failed - 2")
+                LOGGER.warn(f"Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_temp)
 
         else:
@@ -338,7 +338,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                               f"""'{rds_db_name}' as database_name""",
                                               f"""'{db_dbo_tbl}' as full_table_name"""
                                               )
-            LOGGER.info(f"Validation Failed - 3")
+            LOGGER.warn(f"Validation Failed - 3")
             df_dv_output = df_dv_output.union(df_temp)
 
         df_rds_temp_t2.unpersist()
@@ -351,7 +351,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                           f"""'{rds_db_name}' as database_name""",
                                           f"""'{db_dbo_tbl}' as full_table_name"""
                                           )
-        LOGGER.info(f"Validation not applicable - 4")
+        LOGGER.warn(f"Validation not applicable - 4")
         df_dv_output = df_dv_output.union(df_temp)
 
     LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
