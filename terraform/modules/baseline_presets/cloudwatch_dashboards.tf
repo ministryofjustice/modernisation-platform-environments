@@ -562,6 +562,60 @@ locals {
         }
       }
     }
+    ec2_instance_cwagent_collectd_filesystems_check = {
+      filesystems-check-error = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 Instance filesystems-check-error"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"textfile_monitoring_filesystems_check_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+          ]
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = 1
+          #    fill  = "above"
+          #  }]
+          #}
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "exitcode"
+            }
+          }
+        }
+      }
+      filesystems-check-metric-not-updated = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Instance filesystems-check-metric-not-updated"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"textfile_monitoring_filesystems_check_seconds\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+          ]
+          #annotations = {
+          #  horizontal = [{
+          #    label = "Alarm Threshold"
+          #    value = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated.threshold
+          #    fill  = "above"
+          #  }]
+          #}
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "seconds"
+            }
+          }
+        }
+      }
+    }
 
     lb = {
       load-balancer-requests = {
@@ -900,6 +954,15 @@ locals {
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run,
       ]
     }
+    ec2_instance_filesystems = {
+      width  = 8
+      height = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_filesystems_check.filesystems-check-error,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_filesystems_check.filesystems-check-metric-not-updated,
+      ]
+    }
+
     lb = {
       header_markdown = "## Application ELB"
       width           = 8

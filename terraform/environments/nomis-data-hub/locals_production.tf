@@ -5,11 +5,11 @@ locals {
         "ec2",
         "ec2_linux",
         "ec2_instance_linux",
-        "ec2_instance_textfile_monitoring",
+        "ec2_instance_filesystems",
       ]
       sns_topics = {
         pagerduty_integrations = {
-          # dso_pagerduty = "nomis_data_hub_prod_alarms"
+          dso_pagerduty = "nomis_data_hub_prod_alarms"
         }
       }
     }
@@ -22,7 +22,7 @@ locals {
       dr-ndh-app-b = merge(local.ndh_app_a, {
         cloudwatch_metric_alarms = merge(
           local.ndh_app_a.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_filesystems_check
         )
         config = merge(local.ndh_app_a.config, {
           availability_zone = "eu-west-2b"
@@ -50,7 +50,7 @@ locals {
       pd-ndh-app-a = merge(local.ndh_app_a, {
         cloudwatch_metric_alarms = merge(
           local.ndh_app_a.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_filesystems_check
         )
         config = merge(local.ndh_app_a.config, {
           availability_zone = "eu-west-2a"
