@@ -14,7 +14,8 @@ AP_DESTINATION_BUCKET = os.environ.get("AP_DESTINATION_BUCKET")
 # lambda function to copy file from 1 s3 to another s3
 def handler(event, context):
     # Specify source bucket
-    database_name, table_name = event.items()[0]
+    for key, value in event.items():
+        database_name, table_name = key, value
     logger.info(f"Copying table {table_name} from database {database_name}")
     source_key = f"{database_name}/{table_name}/"
     destination_key = f"electronic_monitoring/load/{database_name}/{table_name}/"

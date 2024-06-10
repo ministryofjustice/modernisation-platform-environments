@@ -167,6 +167,10 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
 # Write Metadata to AP
 # ------------------------------------------------
 
+locals {
+    metadata_ap_bucket = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
+}
+
 resource "aws_iam_role" "send_metadata_to_ap" {
     name = "send_metadata_to_ap"
     assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
@@ -233,7 +237,7 @@ data "aws_iam_policy_document" "write_to_ap_s3" {
       "s3:ListBucket"
     ]
     resources = [
-      "arn:aws:s3:::moj-reg-${local.register_my_data_bucket_suffix}"
+      "arn:aws:s3:::${local.metadata_ap_bucket}"
     ]
   }
   statement {
@@ -243,7 +247,7 @@ data "aws_iam_policy_document" "write_to_ap_s3" {
       "s3:PutObjectAcl"
     ]
     resources = [
-      "arn:aws:s3:::moj-reg-${local.register_my_data_bucket_suffix}/landing/electronic-monitoring-metadata/data/*"
+      "arn:aws:s3:::${local.metadata_ap_bucket}/electronic_monitoring/data/*"
     ]
   }
 }

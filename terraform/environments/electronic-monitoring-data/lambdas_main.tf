@@ -106,7 +106,7 @@ module "send_metadata_to_ap" {
     subnet_ids = data.aws_subnets.shared-public.ids
     env_account_id = local.env_account_id
     environment_variables = {
-      REG_BUCKET_NAME = local.register_my_data_bucket
+      METADATA_BUCKET_NAME = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
       
     }
 }
@@ -146,8 +146,8 @@ module "send_table_to_ap" {
     subnet_ids = data.aws_subnets.shared-public.ids
     env_account_id = local.env_account_id
     environment_variables = {
-      REG_BUCKET_NAME = local.register_my_data_bucket
-      
+      PARQUET_BUCKET_NAME = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+      AP_DESTINATION_BUCKET = local.land_bucket
     }
 }
 

@@ -102,7 +102,7 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
       "ItemsPath": "$.db_info",
       "MaxConcurrency": 4,
       "Iterator": {
-        "StartAt": "CreateAthenaTable",
+        "StartAt": "SendTableToAp",
         "States": {
           "CreateAthenaTable": {
             "Type": "Task",
