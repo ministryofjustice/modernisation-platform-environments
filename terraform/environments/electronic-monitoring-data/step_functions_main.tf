@@ -103,7 +103,7 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
       "Iterator": {
         "StartAt": "SendTableToAp",
         "States": {
-          "CreateAthenaTable": {
+          "SendTableToAp": {
             "Type": "Task",
             "Resource": "${module.send_table_to_ap.lambda_function_arn}",
             "ResultPath": "$.result",
