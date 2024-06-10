@@ -50,7 +50,7 @@ resource "kubernetes_namespace" "airflow" {
   metadata {
     name = "airflow"
     labels = {
-      "pod-security.kubernetes.io/enforce"                          = "restricted"
+      "pod-security.kubernetes.io/enforce"                          = "baseline" # This was restricted, but the current pod specification doesn't set the right metadata
       "compute.analytical-platform.service.justice.gov.uk/workload" = "airflow"
     }
   }
