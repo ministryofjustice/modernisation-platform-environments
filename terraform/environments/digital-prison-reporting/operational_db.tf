@@ -1,7 +1,6 @@
 module "operational_db_server" {
   source = "./modules/compute_node"
 
-  count                       = 1
   enable_compute_node         = true
   scale_down                  = false
   name                        = "${local.project}-operational-db-server-${local.env}"
