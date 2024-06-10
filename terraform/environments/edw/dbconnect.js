@@ -1,10 +1,10 @@
-/////////////////////////////////////////////////////////////////////
 // CWA automated backup script
 // - Makes call to lambda which connects to EC2 instance and put
 //   DB in backup mode
 // - Call Oracle SQL scripts as Oracle user
 //
-//   version: 1.0 (for migration to MP)
+//   version: 0.1
+//   auth: phil h
 /////////////////////////////////////////////////////////////////////
 
 const SSH = require("simple-ssh");
@@ -14,7 +14,7 @@ const AWS = require("aws-sdk");
 const ssm = new AWS.SSM({ apiVersion: "2014-11-06" });
 
 // Environment variables
-const pem = "EC2_SSH_KEY";
+const pem = "MGMT_EC2_KEY_DEFAULT";
 const username = "ec2-user";
 
 //Set date format
@@ -105,13 +105,8 @@ async function connSSH(action, appname) {
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log("standard output: " + stdout);
-                console.log("standard error: " + stderr);
-                if (code == 0) {
-                  resolve();
-                } else {
-                  reject();
-                }
+                console.log(stdout);
+                console.log(stderr);
               },
             }
           )
@@ -137,13 +132,8 @@ async function connSSH(action, appname) {
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log("standard output: " + stdout);
-                console.log("standard error: " + stderr);
-                if (code == 0) {
-                  resolve();
-                } else {
-                  reject();
-                }
+                console.log(stdout);
+                console.log(stderr);
               },
             }
           )
@@ -152,10 +142,20 @@ async function connSSH(action, appname) {
     });
     try {
       await prom;
-      ssh.end();
+
+      const response = {
+        statusCode: 200,
+      };
+
       console.log(`[+] Completed DB alter state: ${action} ==>> ` + address);
+      console.log("[+] Returned response: " + response);
+
+      ssh.end();
+
+      return response;
     } catch (e) {
-      throw new Error("SSH Exec did not run successfully on the database. " + e);
+      console.log(e);
+      context.fail();
     }
   }
 }
@@ -167,6 +167,7 @@ exports.handler = async (event, context) => {
 
     context.done();
   } catch (error) {
-    throw new Error(error);
+    console.error(error);
+    context.fail();
   }
 };
