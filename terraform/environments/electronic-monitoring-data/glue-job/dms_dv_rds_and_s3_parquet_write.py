@@ -275,6 +275,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
 
     tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
 
+    additional_message = ''
+
     if tbl_prq_s3_folder_path is not None:
 
         df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
@@ -283,6 +285,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
             LOGGER.info(
                 f"""Given -> trim_rds_df_str_columns = {args["trim_rds_df_str_columns"]}, {type(args["trim_rds_df_str_columns"])}""")
             df_rds_temp_t1 = df_rds_temp.transform(trim_rds_df_str_columns)
+            additional_message = " - [After trimming RDS-DB-string column(s) spaces]"
             df_rds_temp_t2 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
         else:
             df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
@@ -307,11 +310,11 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
             if df_rds_prq_subtract_row_count == 0:
                 df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                   "'' as json_row",
-                                                  f"""'{rds_tbl_name} - Validated.' as validation_msg""",
+                                                  f"""'{rds_tbl_name} - Validated.{additional_message}' as validation_msg""",
                                                   f"""'{rds_db_name}' as database_name""",
                                                   f"""'{db_dbo_tbl}' as full_table_name"""
                                                   )
-
+                LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
             else:
                 df_temp = (df_rds_prq_subtract_t1
@@ -325,7 +328,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                              f"""'{rds_db_name}' as database_name""",
                                              f"""'{db_dbo_tbl}' as full_table_name"""
                                              )
-
+                LOGGER.warn(f"Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_temp)
 
         else:
@@ -335,7 +338,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                               f"""'{rds_db_name}' as database_name""",
                                               f"""'{db_dbo_tbl}' as full_table_name"""
                                               )
-
+            LOGGER.warn(f"Validation Failed - 3")
             df_dv_output = df_dv_output.union(df_temp)
 
         df_rds_temp_t2.unpersist()
@@ -348,7 +351,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                           f"""'{rds_db_name}' as database_name""",
                                           f"""'{db_dbo_tbl}' as full_table_name"""
                                           )
-
+        LOGGER.warn(f"Validation not applicable - 4")
         df_dv_output = df_dv_output.union(df_temp)
 
     LOGGER.info(f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed.""")
@@ -359,9 +362,6 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
 def write_parquet_to_s3(df_dv_output: DataFrame, database, table):
     df_dv_output = df_dv_output.dropDuplicates()
     df_dv_output = df_dv_output.where("run_datetime is not null")
-
-    LOGGER.info(
-        f"""Dataframe-'df_dv_output' partitions before repartition: {df_dv_output.rdd.getNumPartitions()}""")
 
     df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
 
