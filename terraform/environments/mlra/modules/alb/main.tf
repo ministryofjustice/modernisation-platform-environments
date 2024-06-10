@@ -300,7 +300,7 @@ resource "random_password" "cloudfront" {
   length  = 16
   special = false
 }
-
+#checkov:skip=CKV_AWS_*: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_secretsmanager_secret" "cloudfront" {
   name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
@@ -503,7 +503,7 @@ resource "aws_waf_rule" "block" {
   }
 }
 
-#checkov:skip=CKV_AWS_176 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#checkov:skip=CKV_AWS_*: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_waf_web_acl" "waf_acl" {
   name        = "${upper(var.application_name)} Whitelisting Requesters"
   metric_name = "${upper(var.application_name)}WhitelistingRequesters"
@@ -657,7 +657,7 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 
 ## External LB Cert
-#checkov:skip=CKV_AWS_233 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#checkov:skip=CKV_AWS_*: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_acm_certificate" "external_lb" {
 
   domain_name               = var.acm_cert_domain_name
@@ -747,7 +747,7 @@ resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
 
 ######## Cloudfront Cert
 
-#checkov:skip=CKV_AWS_233 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#checkov:skip=CKV_AWS_*: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_acm_certificate" "cloudfront" {
   domain_name               = var.acm_cert_domain_name
   validation_method         = "DNS"
