@@ -43,6 +43,7 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
             sid       = "SecretsManagerDbCredentialsAccess"
             effect    = "Allow"
             actions   = ["secretsmanager:GetSecretValue"]
+            resources = [aws_secretsmanager_secret_version.db_glue_connection.arn]
         }
     statement {
             sid       = "TriggerLambda"
