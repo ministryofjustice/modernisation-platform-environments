@@ -3,7 +3,11 @@
 #############################################
 
 #tfsec:ignore:all TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV_AWS_*: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#checkov:skip=CKV_AWS_144: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#checkov:skip=CKV_AWS_18: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#checkov:skip=CKV_AWS_62: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#checkov:skip=CKV_AWS_145: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#checkov:skip=CKV2_AWS_6: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "selenium_report" {
   bucket = "laa-${var.app_name}-deployment-pipeline-pipelinereportbucket"
   tags = merge(
@@ -15,6 +19,7 @@ resource "aws_s3_bucket" "selenium_report" {
 }
 
 #tfsec:ignore:avd-aws-0132 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#checkov:skip=CKV_AWS_67: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_server_side_encryption_configuration" "report_sse" {
   bucket = aws_s3_bucket.selenium_report.id
   rule {
