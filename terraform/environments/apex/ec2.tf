@@ -93,12 +93,12 @@ resource "aws_vpc_security_group_ingress_rule" "db_ecs" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
-  security_group_id            = aws_security_group.database.id
-  description                  = "Allow MP VPC (OAS) to access database instance"
-  cidr_ipv4                    = data.aws_vpc.shared.cidr_block
-  from_port                    = 1521
-  ip_protocol                  = "tcp"
-  to_port                      = 1521
+  security_group_id = aws_security_group.database.id
+  description       = "Allow MP VPC (OAS) to access database instance"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
@@ -111,18 +111,18 @@ resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
-  security_group_id            = aws_security_group.database.id
-  description                  = "Database listener port access to Workspaces"
-  cidr_ipv4 = local.application_data.accounts[local.environment].workspace_cidr
-  from_port                    = 1521
-  ip_protocol                  = "tcp"
-  to_port                      = 1521
+  security_group_id = aws_security_group.database.id
+  description       = "Database listener port access to Workspaces"
+  cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
 }
 
 resource "aws_vpc_security_group_egress_rule" "db_outbound" {
   security_group_id = aws_security_group.database.id
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
 }
 
 

@@ -1,10 +1,10 @@
 locals {
   lower_env_cloudfront_url = "${local.application_name}.${data.aws_route53_zone.external.name}"
   # TODO: The production CloudFront FQDN is to be determined
-  prod_fqdn = data.aws_route53_zone.production_network_services.name
+  prod_fqdn        = data.aws_route53_zone.production_network_services.name
   cloudfront_alias = local.environment == "production" ? local.prod_fqdn : local.lower_env_cloudfront_url
-  
-  custom_header            = "X-Custom-Header-LAA-${upper(local.application_name)}"
+
+  custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
 
   cloudfront_default_cache_behavior = {
     smooth_streaming                           = false
@@ -123,7 +123,7 @@ resource "aws_s3_bucket" "cloudfront" {
 resource "aws_s3_bucket_ownership_controls" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
   rule {
-    object_ownership = local.environment == "production" ? "ObjectWriter": "BucketOwnerPreferred"
+    object_ownership = local.environment == "production" ? "ObjectWriter" : "BucketOwnerPreferred"
   }
 }
 
@@ -154,7 +154,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "cloudfront" {
-  count = local.environment == "production" ? 1 : 0
+  count  = local.environment == "production" ? 1 : 0
   bucket = aws_s3_bucket.cloudfront.id
 
   rule {
@@ -166,7 +166,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudfront" {
 
     noncurrent_version_expiration {
       newer_noncurrent_versions = 1
-      noncurrent_days = 90
+      noncurrent_days           = 90
     }
 
     status = "Enabled"

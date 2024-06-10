@@ -42,6 +42,6 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_fri" {
 }
 
 resource "aws_cloudwatch_event_target" "deletesnapshotFunctioncheck_mon_fri" {
-  rule  = aws_cloudwatch_event_rule.deletesnapshotFunction_mon_fri.name
-  arn   = aws_lambda_function.delete_db_snapshots.arn
+  rule = aws_cloudwatch_event_rule.deletesnapshotFunction_mon_fri.name
+  arn  = aws_lambda_function.delete_db_snapshots.arn
 }

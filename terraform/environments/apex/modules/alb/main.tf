@@ -3,10 +3,10 @@ locals {
 
   loadbalancer_ingress_rules = {
     "lb_ingress" = {
-      description = "Loadbalancer ingress rule from CloudFront"
-      from_port   = var.security_group_ingress_from_port
-      to_port     = var.security_group_ingress_to_port
-      protocol    = var.security_group_ingress_protocol
+      description     = "Loadbalancer ingress rule from CloudFront"
+      from_port       = var.security_group_ingress_from_port
+      to_port         = var.security_group_ingress_to_port
+      protocol        = var.security_group_ingress_protocol
       prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
     }
   }

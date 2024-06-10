@@ -11,26 +11,26 @@ resource "aws_dms_endpoint" "target" {
 }
 
 resource "aws_dms_endpoint" "source" {
-  database_name               = var.source_database_name
-  endpoint_id                 = var.source_endpoint_id
-  endpoint_type               = "source"
-  engine_name                 = "sqlserver"
-  password                    = var.source_password
-  port                        = 1433
-  server_name                 = var.source_server_name
-  ssl_mode                    = "none"
+  database_name = var.source_database_name
+  endpoint_id   = var.source_endpoint_id
+  endpoint_type = "source"
+  engine_name   = "sqlserver"
+  password      = var.source_password
+  port          = 1433
+  server_name   = var.source_server_name
+  ssl_mode      = "none"
 
   username = var.source_username
 }
 
 resource "aws_dms_replication_task" "migration-task" {
-  migration_type            = "full-load"
-  replication_instance_arn  = var.replication_instance_arn
-  replication_task_id       = var.replication_task_id
-  source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
-  target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
+  migration_type           = "full-load"
+  replication_instance_arn = var.replication_instance_arn
+  replication_task_id      = var.replication_task_id
+  source_endpoint_arn      = aws_dms_endpoint.source.endpoint_arn
+  target_endpoint_arn      = aws_dms_endpoint.target.endpoint_arn
   start_replication_task   = false
- 
+
   replication_task_settings = jsonencode({
     TargetMetadata = {
       FullLobMode  = true,
@@ -52,7 +52,7 @@ resource "aws_dms_replication_task" "migration-task" {
     }
   })
 
-   table_mappings = jsonencode({
+  table_mappings = jsonencode({
     rules = [
       {
         "rule-type" = "selection"
@@ -66,5 +66,5 @@ resource "aws_dms_replication_task" "migration-task" {
       }
     ]
   })
- 
+
 }

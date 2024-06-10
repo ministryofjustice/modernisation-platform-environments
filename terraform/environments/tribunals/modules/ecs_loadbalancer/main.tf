@@ -250,7 +250,7 @@ resource "aws_lb_listener_rule" "admin_secure_fixed_response" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = 5
   action {
-    type             = "fixed-response"
+    type = "fixed-response"
     fixed_response {
       content_type = "text/html"
       message_body = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"

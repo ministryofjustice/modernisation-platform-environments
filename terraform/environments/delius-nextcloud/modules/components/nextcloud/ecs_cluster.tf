@@ -6,8 +6,8 @@ module "ecs" {
 }
 
 resource "aws_security_group" "cluster" {
-  name = "ecs-cluster-nextcloud-${var.env_name}"
-  vpc_id      = var.account_info.vpc_id
+  name   = "ecs-cluster-nextcloud-${var.env_name}"
+  vpc_id = var.account_info.vpc_id
   lifecycle {
     create_before_destroy = true
   }
