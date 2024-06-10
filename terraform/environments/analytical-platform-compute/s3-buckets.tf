@@ -17,4 +17,6 @@ module "mlflow_bucket" {
       }
     }
   }
+
+  tags = local.tags
 }
