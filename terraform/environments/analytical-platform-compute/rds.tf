@@ -15,6 +15,9 @@ module "mlflow_rds" {
 
   ca_cert_identifier = "rds-ca-rsa2048-g1"
 
+  storage_type          = "gp3"
+  iops                  = 3000
+  storage_throughput    = 150
   allocated_storage     = 64
   max_allocated_storage = 256
 
