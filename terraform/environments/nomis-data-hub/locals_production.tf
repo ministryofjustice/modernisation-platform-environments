@@ -9,7 +9,7 @@ locals {
       ]
       sns_topics = {
         pagerduty_integrations = {
-          # dso_pagerduty = "nomis_data_hub_prod_alarms"
+          dso_pagerduty = "nomis_data_hub_prod_alarms"
         }
       }
     }
