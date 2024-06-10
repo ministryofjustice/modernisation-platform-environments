@@ -39,6 +39,7 @@ jobs:
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
           tfsec_trivy: trivy
+          trivy_version: v0.52.0
 
   terraform-static-analysis-full-scan:
     permissions:
@@ -68,6 +69,7 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
+          trivy_version: v0.52.0
 
   terraform-static-analysis-scheduled-scan:
     name: Terraform Static Analysis - scheduled scan of all directories
@@ -91,6 +93,7 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
+          trivy_version: v0.52.0
       - name: Slack failure notification
         uses: slackapi/slack-github-action@70cd7be8e40a46e8b0eced40b0de447bdb42f68e # v1.26.0
         with:
