@@ -54,6 +54,7 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 # ECR Resources
 ######################################################
 
+#checkov:skip=CKV_AWS_136 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_ecr_repository" "local-ecr" {
   name                 = "${var.app_name}-local-ecr"
   image_tag_mutability = "IMMUTABLE"
@@ -199,7 +200,7 @@ resource "aws_codebuild_project" "app-build" {
 }
 
 
-
+#checkov:skip=CKV_AWS_314 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_codebuild_project" "selenium" {
   name          = "${var.app_name}-selenium-test"
   description   = "Project to test the Java application ${var.app_name}"
