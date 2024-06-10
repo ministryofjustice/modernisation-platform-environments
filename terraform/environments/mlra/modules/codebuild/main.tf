@@ -2,6 +2,10 @@
 # S3 Bucket for storing Selenium reports and other outputs
 #############################################
 
+#tfsec:ignore:avd-aws-0086 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#tfsec:ignore:avd-aws-0087 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#tfsec:ignore:avd-aws-0091 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#tfsec:ignore:avd-aws-0093 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "selenium_report" {
   bucket = "laa-${var.app_name}-deployment-pipeline-pipelinereportbucket"
   tags = merge(
@@ -12,6 +16,7 @@ resource "aws_s3_bucket" "selenium_report" {
   )
 }
 
+#tfsec:ignore:avd-aws-0132 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_server_side_encryption_configuration" "report_sse" {
   bucket = aws_s3_bucket.selenium_report.id
   rule {

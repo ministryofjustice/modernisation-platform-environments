@@ -105,6 +105,7 @@ resource "aws_security_group" "cluster_ec2" {
       from_port       = lookup(egress.value, "from_port", null)
       to_port         = lookup(egress.value, "to_port", null)
       protocol        = lookup(egress.value, "protocol", null)
+      #tfsec:ignore:avd-aws-0104 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
       cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
       security_groups = lookup(egress.value, "security_groups", null)
     }
