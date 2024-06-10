@@ -57,7 +57,7 @@ locals {
         instance-scheduling = "skip-scheduling"
       }
     })
-    # user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ansible
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
   }
 
   defaults_web_ec2 = merge(local.defaults_ec2, {
