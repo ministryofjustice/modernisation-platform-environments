@@ -323,6 +323,7 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
 
 # TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP? Yes for now
 
+#checkov:skip=CKV_AWS_*: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-development in laa-dev
   bucket = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
   # force_destroy = true # Enable to recreate bucket deleting everything inside

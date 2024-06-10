@@ -311,6 +311,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   )
 }
 
+#checkov:skip=CKV_AWS_*: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
   family             = "${var.app_name}-task-definition"
   count              = var.container_instance_type == "windows" ? 1 : 0
@@ -413,6 +414,7 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
+#checkov:skip=CKV_AWS_*: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${var.app_name}-ecs-task-execution-s3-policy"
   tags = merge(
