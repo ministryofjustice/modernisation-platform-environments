@@ -91,7 +91,7 @@ resource "aws_iam_policy" "s3_read_write_policy" {
         "Resource" : [
           "arn:aws:s3:::${local.project}-*"
         ]
-      },      
+      },
       {
         "Effect" : "Allow",
         "Action" : [
@@ -534,11 +534,11 @@ resource "aws_iam_policy" "domain_builder_publish_policy" {
 data "aws_iam_policy_document" "redshift_dataapi" {
   statement {
     actions = [
-        "redshift-data:ListTables",
-        "redshift-data:DescribeTable",
-        "redshift-data:ListSchemas",
-        "redshift-data:ListDatabases",
-        "redshift-data:ExecuteStatement"
+      "redshift-data:ListTables",
+      "redshift-data:DescribeTable",
+      "redshift-data:ListSchemas",
+      "redshift-data:ListDatabases",
+      "redshift-data:ExecuteStatement"
     ]
     resources = [
       "arn:aws:redshift:${local.account_region}:${local.account_id}:cluster:*"
@@ -547,9 +547,9 @@ data "aws_iam_policy_document" "redshift_dataapi" {
 
   statement {
     actions = [
-        "redshift-data:GetStatementResult",
-        "redshift-data:DescribeStatement",
-        "redshift-data:ListStatements"
+      "redshift-data:GetStatementResult",
+      "redshift-data:DescribeStatement",
+      "redshift-data:ListStatements"
     ]
     resources = [
       "*"
@@ -558,10 +558,10 @@ data "aws_iam_policy_document" "redshift_dataapi" {
 
   statement {
     actions = [
-        "secretsmanager:GetResourcePolicy",
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:DescribeSecret",
-        "secretsmanager:ListSecretVersionIds"
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds"
     ]
     resources = [
       "arn:aws:secretsmanager:${local.account_region}:${local.account_id}:secret:*"
@@ -570,12 +570,12 @@ data "aws_iam_policy_document" "redshift_dataapi" {
 
   statement {
     actions = [
-        "secretsmanager:ListSecrets"
+      "secretsmanager:ListSecrets"
     ]
     resources = [
       "*"
     ]
-  }    
+  }
 
 }
 
