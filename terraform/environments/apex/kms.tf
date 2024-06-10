@@ -3,6 +3,13 @@
 ######################################
 resource "aws_kms_key" "cloudwatch_logs_key" {
   description             = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  enable_key_rotation = true
+  tags                = local.tags
+}
+
+resource "aws_kms_alias" "cloudwatch_logs_key" {
+  name          = "alias/${local.application_name}-cloudwatch-logs-kms"
+  target_key_id = aws_kms_key.cloudwatch_logs_key.key_id
 }
 
 resource "aws_kms_key_policy" "cloudwatch_logs_policy" {
