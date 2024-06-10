@@ -330,7 +330,7 @@ module "lands_tribunal" {
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "JudgmentFiles"
+  documents_location           = "judgmentfiles"
   waf_arn                      = local.waf_arn
 }
 
