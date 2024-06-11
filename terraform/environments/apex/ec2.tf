@@ -265,7 +265,7 @@ resource "aws_cloudwatch_log_group" "database" {
 
 resource "aws_cloudwatch_log_metric_filter" "database" {
   name           = "${upper(local.application_name)}-LogMetricOracleAlerts"
-  pattern        = "ORA-"
+  pattern        = "\"ORA-\""
   log_group_name = aws_cloudwatch_log_group.database.name
 
   metric_transformation {
