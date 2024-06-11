@@ -1,0 +1,19 @@
+{{ if .Values.serviceMonitor.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "mlflow.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mlflow.labels" . | nindent 4 }}
+spec:
+  jobLabel: {{ template "mlflow.fullname" . }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ template "mlflow.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  endpoints:
+    - targetPort: {{ .Values.service.port }}
+      interval: {{ .Values.serviceMonitor.interval }}
+      path: {{ .Values.serviceMonitor.path }}
+{{- end -}}

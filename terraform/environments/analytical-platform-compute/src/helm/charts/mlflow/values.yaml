@@ -1,0 +1,72 @@
+---
+affinity: {}
+
+fullnameOverride: ""
+
+image:
+  repository: ghcr.io/ministryofjustice/analytical-platform-mlflow
+  pullPolicy: IfNotPresent
+  tag: 2.13.2-rc0
+
+imagePullSecrets: []
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+
+mlflow:
+  environment: []
+
+nameOverride: ""
+
+nodeSelector: {}
+
+podAnnotations: {}
+
+podLabels: {}
+
+podSecurityContext: {}
+
+replicaCount: 1
+
+securityContext: {}
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+
+resources: {}
+
+service:
+  type: ClusterIP
+  port: 5000
+
+serviceAccount:
+  create: true
+  automount: true
+  name: ""
+  annotations: {}
+
+serviceMonitor:
+  enabled: false
+  interval: 15s
+  path: /metrics
+
+tolerations: []
+
+volumes: []
+
+volumeMounts: []

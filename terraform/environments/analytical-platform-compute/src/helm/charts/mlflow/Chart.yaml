@@ -1,0 +1,7 @@
+---
+apiVersion: v2
+name: mlflow
+description: MLflow on Kubernetes
+type: application
+version: 0.0.1
+appVersion: "v2.13.2"

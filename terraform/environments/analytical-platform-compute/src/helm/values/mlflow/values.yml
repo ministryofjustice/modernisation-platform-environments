@@ -1,0 +1,67 @@
+---
+# this needs converting to a tftpl eventually
+
+ingress:
+  enabled: true
+  className: "default"
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: mlflow.compute.development.analytical-platform.service.justice.gov.uk
+  hosts:
+    - host: mlflow.compute.development.analytical-platform.service.justice.gov.uk
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: mlflow
+              port:
+                number: 5000
+  tls:
+    - hosts:
+      - mlflow.compute.development.analytical-platform.service.justice.gov.uk
+
+mlflow:
+  environment:
+    - name: "MLFLOW_AUTH_ADMIN_PASSWORD"
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-admin
+          key:  password
+    - name: "MLFLOW_AUTH_DATABASE_URI"
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-auth-rds
+          key:  postgres_connection_string
+    - name: "MLFLOW_SERVER_BACKEND_STORE_URI"
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-rds
+          key:  postgres_connection_string
+    - name: "MLFLOW_SERVER_DEFAULT_ARTIFACT_ROOT"
+      value: "s3://mojap-compute-development-mlflow/tracking"
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::381491960855:role/mlflow20240610161705974000000002
+
+serviceMonitor:
+  enabled: true
+
+resources:
+  limits:
+    cpu: 1
+    memory: 1Gi
+  requests:
+    cpu: 0.1
+    memory: 128Mi
