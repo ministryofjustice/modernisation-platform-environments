@@ -409,12 +409,12 @@ if __name__ == "__main__":
 
             total_files, total_size = get_s3_folder_info(PRQ_FILES_SRC_S3_BUCKET_NAME, f"{rds_db_name}/dbo/{rds_tbl_name}")
 
-            dv_ctlg_tbl_partition_path = f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}'''
+            dv_ctlg_tbl_partition_path = f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}/'''
             if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, dv_ctlg_tbl_partition_path):
                 LOGGER.info(
                     f"""Already exists, 
                     Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
-                continue
+                continue 
 
             elif total_size/1024/1024 > int(args["max_table_size_mb"]):
                 LOGGER.info(
