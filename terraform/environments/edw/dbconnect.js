@@ -1,10 +1,13 @@
-// CWA automated backup script
+/////////////////////////////////////////////////////////////////////
+// APEX automated backup script
 // - Makes call to lambda which connects to EC2 instance and put
 //   DB in backup mode
 // - Call Oracle SQL scripts as Oracle user
 //
-//   version: 0.1
-//   auth: phil h
+//   version: 1.1 (for migration to MP)
+//   - Added error catching for failed SSH
+//   - Added error catching for stdout for SSH exec
+//   - Filter for running EC2 instances only to connect to
 /////////////////////////////////////////////////////////////////////
 
 const SSH = require("simple-ssh");
@@ -14,7 +17,7 @@ const AWS = require("aws-sdk");
 const ssm = new AWS.SSM({ apiVersion: "2014-11-06" });
 
 // Environment variables
-const pem = "MGMT_EC2_KEY_DEFAULT";
+const pem = "EC2_SSH_KEY";
 const username = "ec2-user";
 
 //Set date format
@@ -35,12 +38,12 @@ today = dd + "-" + mm + "-" + yyyy;
 //EC2 object
 let ec2 = new AWS.EC2({ apiVersion: "2014-10-31" });
 
-//Get private IP address for EC2 instances tagged with Name:{ appname }
+// Get private IP address for EC2 instances tagged with Name:{ appname } that are running
 // May return more than 1 instance if there are multiple instances with the same name
 async function getInstances(appname) {
   console.log("Getting all instances tagged with Name:", appname);
   return ec2
-    .describeInstances({ Filters: [{ Name: "tag:Name", Values: [appname] }] })
+    .describeInstances({ Filters: [{ Name: "tag:Name", Values: [appname] }, {Name: "instance-state-name", Values: ["running"]}]})
     .promise();
 }
 
@@ -105,13 +108,26 @@ async function connSSH(action, appname) {
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log(stdout);
-                console.log(stderr);
+                // console.log("standard output: " + stdout);
+                console.log("standard error: " + stderr);
+                if (code == 0 && !stdout.toUpperCase().includes("ERROR")) {
+                  resolve();
+                } else {
+                  reject();
+                }
               },
             }
           )
-          .start();
+          .start(
+            {
+              fail: function (err) {
+                console.error("SSH failed: " + err);
+                reject();
+              }
+            }
+          );
       } else if (action == "end"){
+        console.log("[+] Trying connecting to EC2 ==>> " + address);
         console.log(`[+] Running "end backup commands" as Oracle`);
 
         ssh
@@ -132,30 +148,32 @@ async function connSSH(action, appname) {
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log(stdout);
-                console.log(stderr);
+                // console.log("standard output: " + stdout);
+                console.log("standard error: " + stderr);
+                if (code == 0 && !stdout.toUpperCase().includes("ERROR")) {
+                  resolve();
+                } else {
+                  reject();
+                }
               },
             }
           )
-          .start();
+          .start(
+            {
+              fail: function (err) {
+                console.error("SSH failed: " + err);
+                reject();
+              }
+            }
+          );
       }
     });
     try {
       await prom;
-
-      const response = {
-        statusCode: 200,
-      };
-
-      console.log(`[+] Completed DB alter state: ${action} ==>> ` + address);
-      console.log("[+] Returned response: " + response);
-
       ssh.end();
-
-      return response;
+      console.log(`[+] Completed DB alter state: ${action} ==>> ` + address);
     } catch (e) {
-      console.log(e);
-      context.fail();
+      throw new Error(`SSH Exec did not run successfully on the instance ${address}: ` + e );
     }
   }
 }
@@ -167,7 +185,6 @@ exports.handler = async (event, context) => {
 
     context.done();
   } catch (error) {
-    console.error(error);
-    context.fail();
+    throw new Error(error);
   }
 };
