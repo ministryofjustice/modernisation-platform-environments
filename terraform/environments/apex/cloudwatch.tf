@@ -12,8 +12,8 @@ resource "aws_cloudwatch_metric_alarm" "database_status" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].database_status_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "breaching"
   tags = merge(
     local.tags,
@@ -37,8 +37,8 @@ resource "aws_cloudwatch_metric_alarm" "database_cpu" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].database_cpu_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "breaching"
   tags = merge(
     local.tags,
@@ -59,8 +59,8 @@ resource "aws_cloudwatch_metric_alarm" "database_oracle_alerts" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].database_oracle_alerts_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
@@ -81,8 +81,8 @@ resource "aws_cloudwatch_metric_alarm" "database_pmon_status" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].database_pmon_status_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
@@ -106,8 +106,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].ecs_cpu_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "breaching"
   tags = merge(
     local.tags,
@@ -131,8 +131,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].ecs_memory_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "breaching"
   tags = merge(
     local.tags,
@@ -156,8 +156,8 @@ resource "aws_cloudwatch_metric_alarm" "asg_cpu" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].asg_cpu_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "breaching"
   tags = merge(
     local.tags,
@@ -181,8 +181,8 @@ resource "aws_cloudwatch_metric_alarm" "asg_status" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].asg_status_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "breaching"
   tags = merge(
     local.tags,
@@ -206,8 +206,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_time" {
   period             = "60"
   extended_statistic = "p99"
   threshold          = local.application_data.accounts[local.environment].alb_response_time_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
@@ -231,8 +231,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_time_max" {
   period             = "60"
   statistic          = "Maximum"
   threshold          = local.application_data.accounts[local.environment].alb_response_time_max_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
@@ -257,8 +257,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
   period             = "60"
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].alb_unhealthy_hosts_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
@@ -282,8 +282,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_rejected_connections" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].alb_rejected_connections_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
@@ -308,8 +308,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_target_5xx" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].alb_target_5xx_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
@@ -333,8 +333,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_elb_5xx" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].alb_elb_5xx_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
@@ -358,8 +358,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_target_4xx" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].alb_target_4xx_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
@@ -383,8 +383,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_elb_4xx" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].alb_elb_4xx_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.apex.arn]
-#   ok_actions         = [aws_sns_topic.apex.arn]
+  alarm_actions      = [aws_sns_topic.apex.arn]
+  ok_actions         = [aws_sns_topic.apex.arn]
   treat_missing_data = "notBreaching"
   tags = merge(
     local.tags,
