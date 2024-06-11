@@ -19,7 +19,7 @@ locals {
       }
     }
     baseline_ec2_autoscaling_groups = {
-      test-ncr-client-a = merge(local.jumpserver_ec2, {
+      dev-ncr-client-a = merge(local.jumpserver_ec2, {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
