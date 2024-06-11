@@ -75,7 +75,7 @@ resource "aws_cloudwatch_metric_alarm" "database_pmon_status" {
   alarm_name          = "${local.application_name}-${local.environment}-oracle-alerts-pmon-status"
   alarm_description   = "Database Down indicator found in the pmon logs"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "60"
+  evaluation_periods = "1"
   metric_name        = aws_cloudwatch_log_metric_filter.pmon_status.name
   namespace          = aws_cloudwatch_log_metric_filter.pmon_status.metric_transformation[0].namespace
   period             = "60"
