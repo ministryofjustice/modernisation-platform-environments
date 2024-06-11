@@ -120,7 +120,7 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 
 # Terraform module which creates S3 Bucket resources for Load Balancer Access Logs on AWS.
-
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 module "s3-bucket" {
   #checkov:skip=CKV_TF_1:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   count  = var.existing_bucket_name == "" ? 1 : 0
