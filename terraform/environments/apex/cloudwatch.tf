@@ -394,6 +394,29 @@ resource "aws_cloudwatch_metric_alarm" "alb_elb_4xx" {
   )
 }
 
+################################
+### CloudWatch Dashboard
+################################
+
+data "template_file" "dashboard" {
+  template = file("${path.module}/dashboard.tpl")
+
+  vars = {
+    aws_region                  = "eu-west-2"
+    alb_elb_5xx_alarm           = aws_cloudwatch_metric_alarm.alb_elb_5xx.arn
+    alb_elb_4xx_alarm           = aws_cloudwatch_metric_alarm.alb_elb_4xx.arn
+    alb_response_time_alarm     = aws_cloudwatch_metric_alarm.alb_response_time.arn
+    ecs_cpu_alarm               = aws_cloudwatch_metric_alarm.ecs_cpu.arn
+    ecs_memory_alarm            = aws_cloudwatch_metric_alarm.ecs_memory.arn
+
+  }
+}
+
+resource "aws_cloudwatch_dashboard" "dashboard" {
+  dashboard_name = "${upper(local.application_name)}-Monitoring-Dashboard"
+  dashboard_body = data.template_file.dashboard.rendered
+}
+
 
 
 
