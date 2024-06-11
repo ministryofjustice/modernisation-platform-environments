@@ -27,15 +27,18 @@ variable "pTargetGroupName" {
 
 }
 variable "appnameenv" {
+  type    = string
   default = ""
-
 }
-variable "sns_topic_name" {
-  default = ""
 
+variable "sns_topic_name" {
+  type    = string
+  default = ""
 }
 
 variable "pagerduty_integration_key" {
+  type    = string
+  default = ""
 }
 
 variable "pECSCPUAlarmThreshold" {
