@@ -17,7 +17,6 @@ resource "aws_db_instance" "database" {
   db_subnet_group_name      = aws_db_subnet_group.db.id
   final_snapshot_identifier = "final-snapshot-${formatdate("YYYYMMDDhhmmss", timestamp())}"
   publicly_accessible       = false
-  storage_encrypted         = true
 }
 
 resource "aws_db_subnet_group" "db" {
