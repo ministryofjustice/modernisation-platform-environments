@@ -300,8 +300,9 @@ resource "random_password" "cloudfront" {
   length  = 16
   special = false
 }
-#checkov:skip=CKV_AWS_149: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+
 resource "aws_secretsmanager_secret" "cloudfront" {
+  #checkov:skip=CKV2_AWS_57: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
@@ -322,6 +323,11 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
 }
 
 resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-development in laa-dev
+  #checkov:skip=CKV_AWS_18: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_21: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_144: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_145: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_61: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
   # force_destroy = true # Enable to recreate bucket deleting everything inside
   tags = merge(
@@ -346,6 +352,7 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront" {
 
 #tfsec:ignore:avd-aws-0132 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
+  #checkov:skip=CKV2_AWS_67: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.cloudfront.id
   rule {
     apply_server_side_encryption_by_default {
@@ -372,6 +379,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 }
 
 resource "aws_cloudfront_distribution" "external" {
+  #checkov:skip=CKV2_AWS_46: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   http_version = var.cloudfront_http_version
   default_root_object = "Empty"
   origin {

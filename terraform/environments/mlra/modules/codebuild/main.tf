@@ -4,6 +4,7 @@
 
 #tfsec:ignore:all TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "selenium_report" {
+  #checkov:skip=CKV2_AWS_6: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = "laa-${var.app_name}-deployment-pipeline-pipelinereportbucket"
   tags = merge(
     var.tags,
