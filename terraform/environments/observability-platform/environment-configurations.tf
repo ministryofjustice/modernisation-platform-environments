@@ -95,6 +95,7 @@ locals {
         },
         "modernisation-platform" = {
           identity_centre_team = "modernisation-platform"
+          slack_channels       = ["mod-plat-observ-test"]
           aws_accounts = {
             "core-network-services-production" = {
               cloudwatch_enabled              = true
