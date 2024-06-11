@@ -53,7 +53,7 @@ resource "aws_cloudwatch_metric_alarm" "database_oracle_alerts" {
   alarm_name          = "${local.application_name}-${local.environment}-oracle-alerts-log-errors"
   alarm_description   = "Errors Detected in Oracle Alerts Log."
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "60"
+  evaluation_periods = "1"
   metric_name        = aws_cloudwatch_log_metric_filter.database.name
   namespace          = aws_cloudwatch_log_metric_filter.database.metric_transformation[0].namespace
   period             = "60"
