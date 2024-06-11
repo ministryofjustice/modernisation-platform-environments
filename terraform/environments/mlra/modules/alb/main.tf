@@ -328,6 +328,7 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
   #checkov:skip=CKV_AWS_144: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_145: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV2_AWS_61: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_62: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
   # force_destroy = true # Enable to recreate bucket deleting everything inside
   tags = merge(

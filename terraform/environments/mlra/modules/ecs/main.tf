@@ -419,6 +419,7 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" {
   #checkov:skip=CKV_AWS_288: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_355: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_289: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_290: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name = "${var.app_name}-ecs-task-execution-s3-policy"
   tags = merge(
     var.tags_common,
