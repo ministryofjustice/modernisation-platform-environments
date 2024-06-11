@@ -25,3 +25,15 @@ resource "kubernetes_secret" "mlflow_rds" {
     postgres_connection_string = "postgresql://${module.mlflow_rds.db_instance_username}:${random_password.mlflow_rds.result}@${module.mlflow_rds.db_instance_address}:${module.mlflow_rds.db_instance_port}/mlflow"
   }
 }
+
+resource "kubernetes_secret" "mlflow_admin" {
+  metadata {
+    name      = "mlflow-admin"
+    namespace = kubernetes_namespace.mlflow.metadata[0].name
+  }
+
+  type = "Opaque"
+  data = {
+    password = random_password.mlflow_admin.result
+  }
+}
