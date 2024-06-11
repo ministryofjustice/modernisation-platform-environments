@@ -189,6 +189,22 @@ module "ebs_kms" {
   tags = local.tags
 }
 
+module "mlflow_auth_rds_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.0.0"
+
+  aliases               = ["rds/mlflow-auth"]
+  description           = "MLflow Auth RDS KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+}
+
 module "mlflow_rds_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
