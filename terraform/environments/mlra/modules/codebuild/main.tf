@@ -5,6 +5,7 @@
 #tfsec:ignore:AVD-AWS-0091 tfsec:ignore:AVD-AWS-0086 tfsec:ignore:AVD-AWS-0087 tfsec:ignore:AVD-AWS-0093:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "selenium_report" {
   #checkov:skip=CKV2_AWS_6:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_18:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV2_AWS_62:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_144:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_145:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
@@ -141,6 +142,9 @@ resource "aws_iam_role_policy" "codebuild_s3" {
 
 
 resource "aws_codebuild_project" "app-build" {
+  #checkov:skip=CKV_AWS_18:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_314:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_316:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name          = "${var.app_name}-app-build"
   description   = "Project to build the ${var.app_name} java application and xray docker images"
   build_timeout = 20

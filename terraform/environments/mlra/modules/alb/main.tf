@@ -382,7 +382,9 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 }
 
 resource "aws_cloudfront_distribution" "external" {
+  #checkov:skip=CKV2_AWS_32:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV2_AWS_46:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_47:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_310:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   http_version = var.cloudfront_http_version
   default_root_object = "Empty"
