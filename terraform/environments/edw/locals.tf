@@ -1,6 +1,8 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
 
+  database_ec2_name = "${local.application_name} Database Server"
+
   #Lambda files
   dbsnapshot_source_file     = "dbsnapshot.js"
   deletesnapshot_source_file = "deletesnapshots.py"

@@ -3,8 +3,7 @@
 // - Calls dbconnect lambda to put DB in backup mode
 // - Triggers volume snapshots for all volumes connected to instance
 //
-//   version: 0.1
-//   auth: phil h
+//   version: 1.0 (for migration to MP)
 /////////////////////////////////////////////////////////////////////
 
 const AWS = require("aws-sdk");
@@ -24,36 +23,40 @@ let lambda = new AWS.Lambda({ apiVersion: "2015-03-31" });
 let ec2 = new AWS.EC2({ apiVersion: "2014-10-31" });
 
 async function invokeLambdaStart(appname) {
-  try {
+  // try {
     console.log("[+] Putting DB into backup mode");
 
     const lambdaInvokeStart = await lambda
       .invoke({
         FunctionName: "connectDBFunction",
-        InvocationType: "RequestResponse",
+        InvocationType: "RequestResponse", // This means invoking the function synchronously. Note that if Lambda was able to run the function, the status code is 200, even if the function returned an error.
         Payload: JSON.stringify({ action: "begin", appname: appname }),
       })
       .promise();
-
+    
     //Check lambda returns success
-    if (lambdaInvokeStart["StatusCode"] == "200");
+    if (lambdaInvokeStart["FunctionError"] == null)
     {
       // Run the volume snapshots
       console.log("[+] Creating volume snapshot");
       await handleSnapshot(appname);
+    } else {
+      console.log("Return output: ", lambdaInvokeStart);
+      throw new Error("The connectDBFunction (begin) Lambda function has an error. Please see that function's logs for more information.");
     }
-  } catch (e) {
-    console.log("[-] " + e);
-  }
+
+  // } catch (e) {
+  //   throw new Error("[-] " + e);
+  // }
 }
 
 async function invokeLambdaStop(appname) {
-  try {
+  // try {
     console.log("[+] Putting DB into normal operations mode");
 
-    setTimeout(() => {
-      console.log("[+] Waiting for DB.....");
-    }, 7000);
+    // setTimeout(() => {
+    //   console.log("[+] Waiting for DB.....");
+    // }, 7000);
 
     const lambdaInvokeStop = await lambda
       .invoke({
@@ -64,14 +67,19 @@ async function invokeLambdaStop(appname) {
       .promise();
 
     //Check lambda returns success
-    if (lambdaInvokeStop["StatusCode"] == "200");
+    if (lambdaInvokeStop["FunctionError"] == null)
     {
       // Run the volume snapshots
       console.log("[+] Datatbase is back in normal operations mode");
+    } else {
+      console.log("Return output: ", lambdaInvokeStop);
+      throw new Error("The connectDBFunction (end) Lambda function has an error. Please see that function's logs for more information.");
     }
-  } catch (e) {
-    console.log("[-] " + e);
-  }
+
+  // } catch (e) {
+  //   console.log("[-] " + e);
+  //   throw new Error("The connectDBFunction Lambda (end) function has an error. Please see that function's logs for more information.");
+  // }
 }
 
 async function invokeLambdaFinal(appname) {
@@ -82,6 +90,7 @@ async function invokeLambdaFinal(appname) {
     await handleSnapshot2(appname);
   } catch (e) {
     console.log("[-]" + e);
+    throw new Error("There is an error taking final shapshots.");
   }
 }
 
@@ -285,19 +294,22 @@ exports.handler = async (event, context) => {
     await invokeLambdaStart(appname);
   }
   catch (error) {
-    console.error(error);
+    throw new Error(error);
   }
   try{
     console.log("Taking DB out of Hotbackup mode");
     await invokeLambdaStop(appname);
   } catch (error) {
-    console.error(error);
+    throw new Error(error);
   }
-  try{
-    console.log("Operating outside of Hotbackup mode");
-    await invokeLambdaFinal(appname);
-    console.log("Snapshots Complete");
-  } catch (error) {
-    console.error(error);
-  }
+  //////////////////////////////////
+  // Unsure why this part is required to take a second set of oraarch and oraredo snapshots, thus disabling it for now
+  //////////////////////////////////
+  // try{
+  //   console.log("Operating outside of Hotbackup mode");
+  //   await invokeLambdaFinal(appname);
+  //   console.log("Snapshots Complete");
+  // } catch (error) {
+  //   throw new Error(error);
+  // }
 };
