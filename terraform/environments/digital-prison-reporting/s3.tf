@@ -59,7 +59,7 @@ module "s3_domain_preview_bucket" {
 }
 
 # S3 Structured Historical, DPR2-717
-module "s3_transfer_artifacts_bucket" {
+module "s3_structured_historical_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
   name                      = "${local.project}-structured-historical-${local.environment}"
