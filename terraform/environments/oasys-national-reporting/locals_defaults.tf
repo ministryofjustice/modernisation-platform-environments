@@ -78,6 +78,8 @@ locals {
       "/dev/sdb"  = { type = "gp3", size = 128 } # /u01
       "/dev/sdc"  = { type = "gp3", size = 128 } # /u02
     }
+    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.web off for now
   })
 
@@ -91,6 +93,7 @@ locals {
       metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
     })
     # cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.boe off for now
+    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
     tags = {
       ami         = "base_rhel_6_10"
       os-type     = "Linux"
@@ -108,7 +111,9 @@ locals {
 
   defaults_bods_ec2 = merge(local.defaults_ec2, {
     config = merge(local.defaults_ec2.config, {
-      ami_name = "hmpps_windows_server_2019_release_*" # wildcard to latest. EC2 instance versions ami_name must be fixed
+      ami_name                      = "hmpps_windows_server_2019_release_*" # wildcard to latest. EC2 instance versions ami_name must be fixed
+      ebs_volumes_copy_all_from_ami = false
+      user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
     })
     instance = merge(local.defaults_ec2.instance, {
       vpc_security_group_ids = ["bods", "oasys_db"]
