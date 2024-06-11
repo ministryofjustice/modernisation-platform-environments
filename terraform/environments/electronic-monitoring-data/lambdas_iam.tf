@@ -246,7 +246,7 @@ data "aws_iam_policy_document" "write_to_ap_s3" {
       "s3:PutObjectAcl"
     ]
     resources = [
-      "arn:aws:s3:::${local.metadata_ap_bucket}/electronic_monitoring/data/*"
+      "arn:aws:s3:::${local.metadata_ap_bucket}/electronic_monitoring/*"
     ]
   }
 }
