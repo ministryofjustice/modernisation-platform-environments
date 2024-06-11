@@ -324,6 +324,7 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
   secret_id = data.aws_secretsmanager_secret.cloudfront.arn
 }
 
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-development in laa-dev
   #checkov:skip=CKV_AWS_18:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_21:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
@@ -345,6 +346,7 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
   }
 }
 
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_ownership_controls" "cloudfront" {
   #checkov:skip=CKV2_AWS_65:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.cloudfront.id
@@ -368,6 +370,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
   }
 }
 
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_public_access_block" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
 

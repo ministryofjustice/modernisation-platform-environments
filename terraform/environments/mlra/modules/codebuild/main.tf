@@ -2,7 +2,7 @@
 # S3 Bucket for storing Selenium reports and other outputs
 #############################################
 
-#tfsec:ignore:AVD-AWS-0091 tfsec:ignore:AVD-AWS-0086 tfsec:ignore:AVD-AWS-0087 tfsec:ignore:AVD-AWS-0093:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#tfsec:ignore:AVD-AWS-0091 tfsec:ignore:AVD-AWS-0086 tfsec:ignore:AVD-AWS-0087 tfsec:ignore:AVD-AWS-0093 tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "selenium_report" {
   #checkov:skip=CKV2_AWS_6:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_18:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
@@ -29,7 +29,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "report_sse" {
   }
 }
 
-
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_lifecycle_configuration" "report_lifecycle" {
   #checkov:skip=CKV_AWS_300:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.selenium_report.id
@@ -47,6 +47,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "report_lifecycle" {
   }
 }
 
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_versioning" "report_versioning" {
   bucket = aws_s3_bucket.selenium_report.id
   versioning_configuration {
