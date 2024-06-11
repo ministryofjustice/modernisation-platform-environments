@@ -386,6 +386,7 @@ EOF
 }
 
 # SNS topic for monitoring to send alarms to
+#tfsec:ignore:AVD-AWS-0095:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_sns_topic" "mlra_alerting_topic" {
   #checkov:skip=CKV_AWS_26:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name = var.sns_topic_name
