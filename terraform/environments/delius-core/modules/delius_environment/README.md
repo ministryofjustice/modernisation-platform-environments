@@ -6,6 +6,42 @@ For examples see:
 - `main_development.tf`
 - `main_preproduction.tf` - which demonstrates a 2 env account setup
 
+## Pre-Requisites
+
+In order for a new environment block to be created and successfully deployed, the equivalent `locals_<env-name>.tf` needs to be created.
+
+This file contains a number of maps which are called `<component>_config_<env_name>` and get passed into the environment block as `<component>_config`. For example: 
+
+```
+  ldap_config_dev = {
+    name                        = "ldap"
+    encrypted                   = true
+    migration_source_account_id = "479759138745"
+    migration_lambda_role       = "ldap-data-migration-lambda-role"
+    efs_throughput_mode         = "bursting"
+    efs_provisioned_throughput  = null
+    efs_backup_schedule         = "cron(0 19 * * ? *)",
+    efs_backup_retention_period = "30"
+    port                        = 389
+  }
+```
+
+is passed into the dev module call with:
+```
+  ldap_config = local.ldap_config_dev
+```
+
+The following providers block correctly passes the platform provided aws providers to the module.
+```
+  providers = {
+    aws                       = aws
+    aws.bucket-replication    = aws
+    aws.core-vpc              = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
+  }
+```
+
+The TF Docs below provides reference to all inputs.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
