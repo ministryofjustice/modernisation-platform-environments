@@ -1,7 +1,12 @@
 locals {
 
-  # baseline config
-  production_config = {
+  baseline_presets_production = {
+    options = {
+    }
+  }
+
+  # please keep resources in alphabetical order
+  baseline_production = {
 
     # Instance Type Defaults for production
     # instance_type_defaults = {
@@ -9,26 +14,25 @@ locals {
     #   boe = "m4.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
     #   bods = "r4.2xlarge" # 8 vCPUs, 61GB RAM x 2 instance, NOT CONFIRMED as pre-prod usage may not warrant this high spec
     # }
-    baseline_acm_certificates = {
+
+    acm_certificates = {
       oasys_national_reporting_wildcard_cert = {
-        # domain_name limited to 64 chars so use modernisation platform domain for this
-        # and put the wildcard in the san
-        domain_name = "modernisation-platform.service.justice.gov.uk"
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "modernisation-platform.service.justice.gov.uk"
+        external_validation_records_created = true
         subject_alternate_names = [
           "*.oasys-national-reporting.hmpps-production.modernisation-platform.service.justice.gov.uk",
           "reporting.oasys.service.justice.gov.uk",
           "*.reporting.oasys.service.justice.gov.uk",
           "onr.oasys.az.justice.gov.uk",
         ]
-        external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "Wildcard certificate for the ${local.environment} environment"
         }
       }
     }
 
-    baseline_route53_zones = {
+    route53_zones = {
       "reporting.oasys.service.justice.gov.uk" = {
         ns_records = [
           # use this if NS records can be pulled from terrafrom, otherwise use records variable

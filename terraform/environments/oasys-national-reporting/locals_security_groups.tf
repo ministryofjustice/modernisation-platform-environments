@@ -326,7 +326,7 @@ locals {
         }
       }
     }
-    private_jumpserver = {
+    private-jumpserver = {
       description = "Security group for jumpservers"
       ingress = {
         all-from-self = {
