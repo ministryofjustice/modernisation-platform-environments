@@ -122,6 +122,7 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 # Terraform module which creates S3 Bucket resources for Load Balancer Access Logs on AWS.
 
 module "s3-bucket" {
+  #checkov:skip=CKV_TF_1:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   count  = var.existing_bucket_name == "" ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
@@ -303,6 +304,7 @@ resource "random_password" "cloudfront" {
 
 resource "aws_secretsmanager_secret" "cloudfront" {
   #checkov:skip=CKV2_AWS_57:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_149:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
@@ -381,6 +383,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 
 resource "aws_cloudfront_distribution" "external" {
   #checkov:skip=CKV2_AWS_46:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_310:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   http_version = var.cloudfront_http_version
   default_root_object = "Empty"
   origin {

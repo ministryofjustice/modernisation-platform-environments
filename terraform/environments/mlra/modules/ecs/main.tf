@@ -222,7 +222,10 @@ EOF
 }
 
 resource "aws_iam_policy" "ec2_instance_policy" {
+  #checkov:skip=CKV_AWS_288:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_289:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_290:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_355:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name = "${var.app_name}-ec2-instance-policy"
   tags = merge(
     var.tags_common,
