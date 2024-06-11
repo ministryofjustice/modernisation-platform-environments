@@ -321,13 +321,6 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
   secret_id = data.aws_secretsmanager_secret.cloudfront.arn
 }
 
-# TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP? Yes for now
-
-#checkov:skip=CKV_AWS_18: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV_AWS_21: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV_AWS_145: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV2_AWS_61: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV2_AWS_62: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-development in laa-dev
   bucket = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
   # force_destroy = true # Enable to recreate bucket deleting everything inside
@@ -343,8 +336,8 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
   }
 }
 
-#checkov:skip=CKV2_AWS_65: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_ownership_controls" "cloudfront" {
+  #checkov:skip=CKV2_AWS_65: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.cloudfront.id
   rule {
     object_ownership = "BucketOwnerPreferred"
@@ -509,7 +502,8 @@ resource "aws_waf_rule" "block" {
   }
 }
 
-resource "aws_waf_web_acl" "waf_acl" { #checkov:skip=CKV_AWS_176: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+resource "aws_waf_web_acl" "waf_acl" {
+  #checkov:skip=CKV_AWS_176: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name        = "${upper(var.application_name)} Whitelisting Requesters"
   metric_name = "${upper(var.application_name)}WhitelistingRequesters"
   default_action {
@@ -544,10 +538,9 @@ resource "null_resource" "always_run" {
 
 
 resource "aws_lb_listener" "alb_listener" {
-
+  #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   load_balancer_arn = aws_lb.loadbalancer.arn
   port              = var.listener_port
-  #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
   ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
   certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
@@ -662,8 +655,8 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 
 ## External LB Cert
-resource "aws_acm_certificate" "external_lb" { #checkov:skip=CKV_AWS_233: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-
+resource "aws_acm_certificate" "external_lb" {
+  #checkov:skip=CKV_AWS_233: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   domain_name               = var.acm_cert_domain_name
   validation_method         = "DNS"
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
@@ -751,8 +744,8 @@ resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
 
 ######## Cloudfront Cert
 
-#checkov:skip=CKV_AWS_233: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_acm_certificate" "cloudfront" {
+  #checkov:skip=CKV_AWS_233: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   domain_name               = var.acm_cert_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1

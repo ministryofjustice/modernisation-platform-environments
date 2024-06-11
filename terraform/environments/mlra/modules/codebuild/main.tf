@@ -3,11 +3,6 @@
 #############################################
 
 #tfsec:ignore:all TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV_AWS_144: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV_AWS_18: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV_AWS_62: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV_AWS_145: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV2_AWS_6: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "selenium_report" {
   bucket = "laa-${var.app_name}-deployment-pipeline-pipelinereportbucket"
   tags = merge(
@@ -19,8 +14,8 @@ resource "aws_s3_bucket" "selenium_report" {
 }
 
 #tfsec:ignore:avd-aws-0132 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-#checkov:skip=CKV_AWS_67: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_server_side_encryption_configuration" "report_sse" {
+  #checkov:skip=CKV_AWS_67: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.selenium_report.id
   rule {
     apply_server_side_encryption_by_default {
@@ -29,8 +24,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "report_sse" {
   }
 }
 
-#checkov:skip=CKV_AWS_300: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+
 resource "aws_s3_bucket_lifecycle_configuration" "report_lifecycle" {
+  #checkov:skip=CKV_AWS_300: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.selenium_report.id
 
   rule {
@@ -58,8 +54,8 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 # ECR Resources
 ######################################################
 
-#checkov:skip=CKV_AWS_136: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_ecr_repository" "local-ecr" {
+  #checkov:skip=CKV_AWS_136: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name                 = "${var.app_name}-local-ecr"
   image_tag_mutability = "IMMUTABLE"
 
@@ -204,9 +200,8 @@ resource "aws_codebuild_project" "app-build" {
 }
 
 
-
-#checkov:skip=CKV_AWS_314: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_codebuild_project" "selenium" {
+  #checkov:skip=CKV_AWS_314: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name          = "${var.app_name}-selenium-test"
   description   = "Project to test the Java application ${var.app_name}"
   build_timeout = 20
