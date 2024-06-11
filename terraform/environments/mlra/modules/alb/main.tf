@@ -286,7 +286,7 @@ resource "aws_security_group" "lb" {
       from_port       = lookup(egress.value, "from_port", null)
       to_port         = lookup(egress.value, "to_port", null)
       protocol        = lookup(egress.value, "protocol", null)
-      #tfsec:ignore:avd-aws-0104 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+      #tfsec:ignore:AVD-AWS-0104:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
       cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
       security_groups = lookup(egress.value, "security_groups", null)
     }
@@ -302,7 +302,7 @@ resource "random_password" "cloudfront" {
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  #checkov:skip=CKV2_AWS_57: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_57:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
@@ -323,12 +323,12 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
 }
 
 resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-development in laa-dev
-  #checkov:skip=CKV_AWS_18: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  #checkov:skip=CKV_AWS_21: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  #checkov:skip=CKV_AWS_144: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  #checkov:skip=CKV_AWS_145: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  #checkov:skip=CKV2_AWS_61: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  #checkov:skip=CKV2_AWS_62: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_18:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_21:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_144:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_145:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_61:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_62:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
   # force_destroy = true # Enable to recreate bucket deleting everything inside
   tags = merge(
@@ -344,16 +344,16 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
 }
 
 resource "aws_s3_bucket_ownership_controls" "cloudfront" {
-  #checkov:skip=CKV2_AWS_65: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_65:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.cloudfront.id
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
-#tfsec:ignore:avd-aws-0132 TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
-  #checkov:skip=CKV2_AWS_67: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_67:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.cloudfront.id
   rule {
     apply_server_side_encryption_by_default {
@@ -380,7 +380,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 }
 
 resource "aws_cloudfront_distribution" "external" {
-  #checkov:skip=CKV2_AWS_46: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_46:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   http_version = var.cloudfront_http_version
   default_root_object = "Empty"
   origin {
@@ -512,7 +512,7 @@ resource "aws_waf_rule" "block" {
 }
 
 resource "aws_waf_web_acl" "waf_acl" {
-  #checkov:skip=CKV_AWS_176: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_176:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name        = "${upper(var.application_name)} Whitelisting Requesters"
   metric_name = "${upper(var.application_name)}WhitelistingRequesters"
   default_action {
@@ -665,7 +665,7 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 ## External LB Cert
 resource "aws_acm_certificate" "external_lb" {
-  #checkov:skip=CKV_AWS_233: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_233:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   domain_name               = var.acm_cert_domain_name
   validation_method         = "DNS"
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
@@ -754,7 +754,7 @@ resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
 ######## Cloudfront Cert
 
 resource "aws_acm_certificate" "cloudfront" {
-  #checkov:skip=CKV_AWS_233: TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_233:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   domain_name               = var.acm_cert_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1
