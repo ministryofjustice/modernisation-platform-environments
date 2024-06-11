@@ -252,15 +252,53 @@ resource "aws_route53_record" "apex-db" {
 }
 
 resource "aws_cloudwatch_log_group" "database" {
-  name              = "${upper(local.application_name)}-EC2-database"
+  name              = "${upper(local.application_name)}-EC2-database-alert"
   retention_in_days = 0
   # kms_key_id = aws_kms_key.cloudwatch_logs_key.arn # Not encrypted in LZ
   tags = merge(
     local.tags,
     {
-      Name = "${upper(local.application_name)}-EC2-database"
+      Name = "${upper(local.application_name)}-EC2-database-alert"
     }
   )
+}
+
+resource "aws_cloudwatch_log_metric_filter" "database" {
+  name           = "${upper(local.application_name)}-LogMetricOracleAlerts"
+  pattern        = "\"ORA-\""
+  log_group_name = aws_cloudwatch_log_group.database.name
+
+  metric_transformation {
+    name      = "${upper(local.application_name)}-LogMetricOracleAlerts"
+    namespace = "LogsMetricFilters"
+    value     = "1"
+    default_value = 0
+  }
+}
+
+resource "aws_cloudwatch_log_group" "pmon_status" {
+  name              = "${upper(local.application_name)}-EC2-database-pmon-status"
+  retention_in_days = 0
+  # kms_key_id = aws_kms_key.cloudwatch_logs_key.arn # Not encrypted in LZ
+  tags = merge(
+    local.tags,
+    {
+      Name = "${upper(local.application_name)}-EC2-database-pmon-status"
+    }
+  )
+}
+
+resource "aws_cloudwatch_log_metric_filter" "pmon_status" {
+  name           = "${upper(local.application_name)}-LogMetricPMONStatus"
+  pattern        = "DOWN"
+  log_group_name = aws_cloudwatch_log_group.pmon_status.name
+
+  metric_transformation {
+    name      = "${upper(local.application_name)}-LogMetricPMONStatus"
+    namespace = "LogsMetricFilters"
+    value     = "1"
+    default_value = 0
+  }
 }
 
 
