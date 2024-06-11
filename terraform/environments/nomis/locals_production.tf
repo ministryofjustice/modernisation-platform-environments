@@ -110,6 +110,11 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
           desired_capacity = 8
           max_size         = 8
+
+          instance_refresh = {
+            strategy               = "Rolling"
+            min_healthy_percentage = 80
+          }
         })
         cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
         config = merge(local.weblogic_ec2.config, {
@@ -123,7 +128,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
@@ -135,7 +140,11 @@ locals {
         })
       })
 
-      prod-nomis-client-a = local.jumpserver_ec2
+      prod-nomis-client-a = merge(local.jumpserver_ec2, {
+        tags = merge(local.jumpserver_ec2.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
     }
 
     ec2_instances = {

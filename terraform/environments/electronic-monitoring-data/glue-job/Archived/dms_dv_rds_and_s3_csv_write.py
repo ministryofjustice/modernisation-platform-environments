@@ -257,14 +257,13 @@ def get_s3_csv_tbl_path(in_database_name, in_table_name):
     else:
         return None
 
-
+                            #   nullValue="null",
 def get_s3_csv_dataframe(in_csv_tbl_s3_folder_path, in_rds_df_schema) -> DataFrame:
     try:
         return spark.read.csv(in_csv_tbl_s3_folder_path, 
                               header="true", 
                               schema=in_rds_df_schema,
                               enforceSchema=True,
-                              nullValue="null",
                               escape='\"',
                               mode="FAILFAST")
     except Exception as err:

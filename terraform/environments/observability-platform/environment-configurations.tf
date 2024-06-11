@@ -92,6 +92,18 @@ locals {
               xray_enabled                    = true
             }
           }
+        },
+        "modernisation-platform" = {
+          identity_centre_team = "modernisation-platform"
+          slack_channels       = ["mod-plat-observ-test"]
+          aws_accounts = {
+            "core-network-services-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+            }
+          }
         }
       }
       grafana_api_key_rotator_version = "1.0.5"

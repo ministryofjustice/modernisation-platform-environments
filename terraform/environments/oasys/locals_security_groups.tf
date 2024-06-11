@@ -118,7 +118,7 @@ locals {
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
-  baseline_security_groups = {
+  security_groups = {
     private = {
       description = "Security group for private subnet"
       ingress = {
@@ -218,10 +218,10 @@ locals {
           from_port   = 0
           to_port     = 8080
           protocol    = "tcp"
-          cidr_blocks = distinct(flatten([
+          cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
             local.security_group_cidrs.https_external,
-          ]))
+          ])
           security_groups = ["private_lb", "public_lb"]
         }
       }
@@ -254,11 +254,11 @@ locals {
           cidr_blocks = local.security_group_cidrs.icmp
         }
         ssh = {
-          description = "Allow ssh ingress"
-          from_port   = "22"
-          to_port     = "22"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.ssh
+          description     = "Allow ssh ingress"
+          from_port       = "22"
+          to_port         = "22"
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.ssh
           security_groups = []
         }
         http8080 = {

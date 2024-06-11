@@ -7,15 +7,15 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   ]
 
   volume {
-    name = var.task_definition_volume
+    name      = var.task_definition_volume
     host_path = "D:/storage/tribunals/${var.app_name}"
   }
 
   container_definitions = var.container_definition
 
   runtime_platform {
-     operating_system_family = "WINDOWS_SERVER_2019_CORE"
-  #   cpu_architecture        = "X86_64"
+    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    #   cpu_architecture        = "X86_64"
   }
 
   tags = merge(
@@ -127,7 +127,7 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
 
 resource "aws_ecs_service" "ecs_service" {
   count           = var.is_ftp_app ? 0 : 1
-  name            = "${var.app_name}"
+  name            = var.app_name
   cluster         = var.cluster_id
   task_definition = aws_ecs_task_definition.ecs_task_definition.id
   desired_count   = var.app_count
@@ -161,7 +161,7 @@ resource "aws_ecs_service" "ecs_service" {
 // SFTP service
 resource "aws_ecs_service" "ecs_service_sftp" {
   count           = var.is_ftp_app ? 1 : 0
-  name            = "${var.app_name}"
+  name            = var.app_name
   cluster         = var.cluster_id
   task_definition = aws_ecs_task_definition.ecs_task_definition.id
   desired_count   = var.app_count

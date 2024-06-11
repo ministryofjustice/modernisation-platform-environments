@@ -18,6 +18,13 @@ locals {
         iam_policies   = module.baseline_presets.s3_iam_policies
       }
     }
+    baseline_ec2_autoscaling_groups = {
+      dev-ncr-client-a = merge(local.jumpserver_ec2, {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+      })
+    }
     baseline_route53_zones = {
       "development.reporting.nomis.service.justice.gov.uk" = {
       }

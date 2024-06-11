@@ -3,16 +3,16 @@
 # ------------------------------------------------------------------------
 
 module "metadata-s3-bucket" {
-    source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f109c88"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f109c88"
 
-  bucket_prefix                            = "metadata-store-"
-  versioning_enabled                       = true
+  bucket_prefix      = "metadata-store-"
+  versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
 
   # Refer to the below section "Replication" before enabling replication
-  replication_enabled                      = false
+  replication_enabled = false
   # Below two variables and providers configuration are only relevant if 'replication_enabled' is set to true
   # replication_region                       = "eu-west-2"
   # replication_role_arn                     = module.s3-bucket.role.arn
@@ -65,5 +65,18 @@ module "metadata-s3-bucket" {
     }
   ]
 
-  tags                 = merge(local.tags, {Resource_Type="metadata_store"})
+  tags = merge(local.tags, { Resource_Type = "metadata_store" })
+}
+
+resource "aws_s3_bucket_notification" "send_metadata_to_ap" {
+  bucket = module.metadata-s3-bucket.bucket.id
+
+  lambda_function {
+    id                  = "metadata_bucket_notification"
+    lambda_function_arn = module.send_metadata_to_ap.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".yaml"
+  }
+
+  depends_on = [aws_lambda_permission.send_metadata_to_ap]
 }

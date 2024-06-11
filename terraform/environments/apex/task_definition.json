@@ -9,13 +9,13 @@
         "containerPort": 8080
       }
     ],
-    "memory": 2000,
+    "memory": ${memory_allocation},
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
         "awslogs-region": "${region}",
         "awslogs-stream-prefix": "${app_name}-app",
-        "awslogs-group": "${app_name}-ecs-log-group"
+        "awslogs-group": "${app_name}-ecs-container-logs"
       }
     },
     "environment": [

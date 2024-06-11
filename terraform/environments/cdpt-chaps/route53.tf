@@ -52,8 +52,8 @@ resource "aws_route53_record" "external" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.chaps_lb.dns_name
-    zone_id                = aws_lb.chaps_lb.zone_id
+    name                   = module.lb_access_logs_enabled.load_balancer.dns_name
+    zone_id                = module.lb_access_logs_enabled.load_balancer.zone_id
     evaluate_target_health = true
   }
 }
@@ -105,8 +105,8 @@ resource "aws_route53_record" "external_prod" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.chaps_lb.dns_name
-    zone_id                = aws_lb.chaps_lb.zone_id
+    name                   = module.lb_access_logs_enabled.load_balancer.dns_name
+    zone_id                = module.lb_access_logs_enabled.load_balancer.zone_id
     evaluate_target_health = true
   }
 }

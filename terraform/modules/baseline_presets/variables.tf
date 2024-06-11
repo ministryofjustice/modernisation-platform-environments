@@ -16,7 +16,7 @@ variable "options" {
     backup_plan_daily_delete_after               = optional(number, 7)             # override retention for daily + weekly backup plan
     backup_plan_weekly_delete_after              = optional(number, 28)            # override retention for daily + weekly backup plan
     cloudwatch_dashboard_default_widget_groups   = optional(list(string))          # create Cloudwatch-Default dashboard; list of map keys to filter local.cloudwatch_dashboard_widget_groups
-    cloudwatch_log_groups                        = optional(list(string))          # create cloudwatch log groups; list of map keys to filter local.cloudwatch_log_groups
+    cloudwatch_log_groups                        = optional(list(string))          # create cloudwatch log groups; list of map keys to filter local.cloudwatch_log_groups; default is to create all
     cloudwatch_metric_alarms_default_actions     = optional(list(string))          # default alarm_action to apply to cloudwatch metrics returned by this module
     cloudwatch_metric_oam_links_ssm_parameters   = optional(list(string))          # list of account names to send cloudwatch metrics to, creates placeholder SSM param for each
     cloudwatch_metric_oam_links                  = optional(list(string))          # list of account names to send cloudwatch metrics to, creates oam link for each
@@ -40,10 +40,13 @@ variable "options" {
     route53_resolver_rules                       = optional(map(list(string)), {}) # create route53 resolver rules; list of map keys to filter local.route53_resolver_rules_all
     iam_policies_filter                          = optional(list(string), [])      # any policies to add from local.iam_policies which haven't been added automatically by the enable options
     iam_policies_ec2_default                     = optional(list(string), [])      # any policies to add to the default EC2 policy which haven't been added automatically the above enable_ec2 options
+    iam_service_linked_roles                     = optional(list(string))          # create iam service linked roles; list of map keys to filter local.iam_service_linked_roles; default is to create all
     s3_iam_policies                              = optional(list(string))          # create default iam policies for bucket access, list of map keys to filter local.s3_iam_policies
 
     sns_topics = optional(object({
       pagerduty_integrations = optional(map(string), {}) # create sns topics where map key is name and value is modernisation platform pagerduty_integration_keys
-    }))
+      }), {
+      pagerduty_integrations = {}
+    })
   })
 }

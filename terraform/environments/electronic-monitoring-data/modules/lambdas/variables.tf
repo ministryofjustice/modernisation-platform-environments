@@ -26,6 +26,7 @@ variable "handler" {
 variable "layers" {
   description = "List of Lambda Layer Version ARNs to attach to your Lambda Function."
   type        = list(string)
+  nullable    = true
 }
 
 variable "source_code_hash" {
@@ -75,4 +76,4 @@ variable "reserved_concurrent_executions" {
 variable "env_account_id" {
   description = "The account number of the aws account"
   type        = number
-  }
+}

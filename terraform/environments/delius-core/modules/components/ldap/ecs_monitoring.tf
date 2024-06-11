@@ -4,7 +4,7 @@ locals {
 }
 # Alarm for high CPU usage
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
-  alarm_name          = "ldap-${var.env_name}-ecs-memory-threshold"
+  alarm_name          = "ldap-${var.env_name}-ecs-cpu-threshold"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"

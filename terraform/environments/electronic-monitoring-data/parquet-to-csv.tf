@@ -91,9 +91,8 @@ resource "aws_iam_role" "parquet-to-csv" {
   }
 }
 
-resource "aws_iam_policy_attachment" "glue_log_attachment" {
-  name       = "glue-log-attachment"
-  roles      = [aws_iam_role.parquet-to-csv.name]
+resource "aws_iam_role_policy_attachment" "glue_log_attachment" {
+  role       = aws_iam_role.parquet-to-csv.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 
 }

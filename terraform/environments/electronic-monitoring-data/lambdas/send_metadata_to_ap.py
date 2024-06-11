@@ -1,39 +1,43 @@
-import json
+"""
+takes the json mojap metadatas of each table and moves them to the AP
+"""
+
 import boto3
-import datetime
-from logging import getLogger
 import os
+import logging
+import datetime
+import json
 
-logger = getLogger(__name__)
+s3 = boto3.client("s3")
 
-s3_client = boto3.client("s3")
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
-# lambda function to copy file from 1 s3 to another s3
 def handler(event, context):
     # Specify source bucket
     source_bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
-    destination_bucket = os.environ.get("REG_BUCKET_NAME")
+    destination_bucket = os.environ.get("METADATA_BUCKET_NAME")
     # Get object that has been uploaded
-    file_key = event["Records"][0]["s3"]["object"]["key"]
+    file_key = event["Records"][0]["s3"]["object"]["key"].replace("%3D", "=")
     file_parts = file_key.split("/")
-    database_name = file_parts[0]
-    table_name = file_parts[2]
-    file_name = file_parts[3]
+    database_name = file_parts[0].split("=")[-1]
+    table_name = file_parts[1].split("=")[-1]
+    file_name = file_parts[2]
     logger.info(
-        f"Copying data... Database: {database_name}, Table: {table_name}, File: {file_name}"
+        f"Copying metadata... Database: {database_name}, Table: {table_name}, File: {file_name}"
     )
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
-
-    project_name = "electronic-monitoring-service"
-    destination_key = f"landing/{project_name}/data/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
+    if "_" not in database_name:
+        database_name = f"{database_name}_add_underscore"
+    destination_key = f"electronic-monitoring/metadata/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
     logger.info(f"Copying to: {destination_bucket}, {destination_key}")
     # Specify from where file needs to be copied
     copy_object = {"Bucket": source_bucket_name, "Key": file_key}
 
     try:
         # Put the object into the destination bucket
-        response = s3_client.copy_object(
+        response = s3.copy_object(
             Bucket=destination_bucket,
             Key=destination_key,
             CopySource=copy_object,
@@ -53,4 +57,7 @@ def handler(event, context):
         logger.error(msg)
         raise Exception(msg)
 
-    return {"statusCode": 200, "body": json.dumps("File has been Successfully Copied")}
+    return {
+        "statusCode": 200,
+        "body": json.dumps("File has been Successfully Copied"),
+    }

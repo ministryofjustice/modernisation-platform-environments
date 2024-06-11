@@ -19,7 +19,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_sun" {
 resource "aws_cloudwatch_event_target" "snapshotDBFunctioncheck_mon_sun" {
   rule  = aws_cloudwatch_event_rule.snapshotDBFunctionmon_sun.name
   arn   = aws_lambda_function.create_db_snapshots.arn
-  input = jsonencode({ "appname" : "apex Database Server" })
+  input = jsonencode({ "appname" : "${local.database_ec2_name}" })
 }
 
 resource "aws_cloudwatch_event_rule" "deletesnapshotFunction_mon_fri" {
@@ -42,7 +42,6 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_mon_fri" {
 }
 
 resource "aws_cloudwatch_event_target" "deletesnapshotFunctioncheck_mon_fri" {
-  rule  = aws_cloudwatch_event_rule.deletesnapshotFunction_mon_fri.name
-  arn   = aws_lambda_function.delete_db_snapshots.arn
-  # input = jsonencode({ "appname" : "apex Database Server" })
+  rule = aws_cloudwatch_event_rule.deletesnapshotFunction_mon_fri.name
+  arn  = aws_lambda_function.delete_db_snapshots.arn
 }

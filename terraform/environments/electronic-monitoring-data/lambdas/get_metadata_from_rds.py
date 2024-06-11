@@ -19,35 +19,33 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 SECRET_NAME = os.environ.get("SECRET_NAME")
-DB_NAME = os.environ.get("DB_NAME")
 METADATA_STORE_BUCKET = os.environ.get("METADATA_STORE_BUCKET")
 
 
-db_sem_name = f"{DB_NAME}_semantic_layer"
 
 
-def get_rds_connection():
+
+def get_rds_connection(db_name):
     con_sqlserver = wr.sqlserver.connect(
-        secret_id=SECRET_NAME, odbc_driver_version=17, dbname=DB_NAME
+        secret_id=SECRET_NAME, odbc_driver_version=17, dbname=db_name
     )
     logger.info("Successfully connected to RDS database")
     return con_sqlserver
 
 
-def create_glue_database():
+def create_glue_database(db_name):
     # Try to delete the database
     try:
         # Delete database
-        wr.catalog.delete_database(name=db_sem_name)
-        logger.info(f"Delete database {db_sem_name}")
+        wr.catalog.delete_database(name=db_name)
+        logger.info(f"Delete database {db_name}")
     # Handle case where database doesn't exist
     except s3.exceptions.from_code("EntityNotFoundException"):
-        logger.info(f"Database '{db_sem_name}' does not exist")
-    wr.catalog.create_database(name=db_sem_name, exist_ok=True)
+        logger.info(f"Database '{db_name}' does not exist")
+    wr.catalog.create_database(name=db_name, exist_ok=True)
 
 
 def upload_to_s3(local_filepath: str, s3_filepath: str) -> None:
-    s3 = boto3.client("s3")
     bucket_name, key = s3_filepath[5:].split("/", 1)
 
     try:
@@ -58,32 +56,34 @@ def upload_to_s3(local_filepath: str, s3_filepath: str) -> None:
 
 
 def write_meta_to_s3(meta):
+    db_name = meta.database_name
     table_name = meta.name
     temp_path = "/tmp/temp.json"
-    s3_path = f"s3://{METADATA_STORE_BUCKET}/database={DB_NAME}/table_name={table_name}/metadata.json"
-    meta.to_json(temp_path)
+    s3_path = f"s3://{METADATA_STORE_BUCKET}/database={db_name}/table_name={table_name}/metadata.yaml"
+    meta.to_yaml(temp_path)
     upload_to_s3(temp_path, s3_path)
 
 
-def add_db_to_meta(meta):
+def add_db_to_meta(meta, db_name):
     """
     Database is currently down as dbo -
     reassign to actual DB Name
     """
-    meta.database = DB_NAME
+    meta.database_name = db_name
     return meta
 
 
 def handler(event, context):
-    conn = get_rds_connection()
+    db_name = event.get("db_name")
+    conn = get_rds_connection(db_name)
     engine = create_engine("mssql+pyodbc://", creator=lambda: conn)
     sqlc = SQLAlchemyConverter(engine)
     metadata_list = sqlc.generate_to_meta_list(schema="dbo")
-    metadata_list = [add_db_to_meta(meta) for meta in metadata_list]
+    metadata_list = [add_db_to_meta(meta, db_name) for meta in metadata_list]
     for meta in metadata_list:
         write_meta_to_s3(meta)
     dict_metadata_list = [meta.to_dict() for meta in metadata_list]
-    create_glue_database()
+    create_glue_database(db_name)
     result = {
         "status": "success",
         "message": f"Found {len(metadata_list)} tables",

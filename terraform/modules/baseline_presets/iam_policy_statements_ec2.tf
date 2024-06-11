@@ -109,6 +109,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging", # required for aws cp if restoring grom Glacier
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -140,6 +141,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
         ]
         resources = [
@@ -161,6 +163,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -184,6 +187,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -224,7 +228,8 @@ locals {
           "secretsmanager:GetSecretValue",
         ]
         resources = [
-          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.delius}:secret:*delius-dba*",
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.delius}:secret:*db-dba-*",
+          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.delius_mis}:secret:*db-dba-*",
         ]
       }
     ]
@@ -274,8 +279,9 @@ locals {
         sid    = "OracleLicenseTracking"
         effect = "Allow"
         actions = [
-          "s3:PutObject",
           "s3:GetObject",
+          "s3:GetObjectTagging",
+          "s3:PutObject",
           "s3:PutObjectAcl",
           "s3:ListBucket",
           "s3:DeleteObject"
@@ -340,6 +346,7 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectTagging",
           "s3:ListBucket",
         ]
         resources = flatten([

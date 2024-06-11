@@ -147,12 +147,12 @@ resource "aws_iam_role_policy" "em_ap_transfer_lambda" {
 
 data "archive_file" "em_ap_transfer_lambda" {
   type        = "zip"
-  source_file = "lambdas/em_ap_transfer_lambda.py"
-  output_path = "lambdas/em_ap_transfer_lambda.zip"
+  source_file = "lambdas/send_table_to_ap.py"
+  output_path = "lambdas/send_table_to_ap.zip"
 }
 
 resource "aws_lambda_function" "em_ap_transfer_lambda" {
-  filename      = "lambdas/em_ap_transfer_lambda.zip"
+  filename      = "lambdas/send_table_to_ap.zip"
   function_name = "em-ap-transfer-lambda"
   role          = aws_iam_role.em_ap_transfer_lambda.arn
   handler       = "em_ap_transfer_lambda.handler"
