@@ -4,7 +4,7 @@
 * @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-compute @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-ingestion @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
-/terraform/environments/apex @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
+/terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-chaps @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
