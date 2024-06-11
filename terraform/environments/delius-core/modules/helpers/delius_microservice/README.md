@@ -1,3 +1,11 @@
+# Microservices module
+
+This is a 'batteries-included' terraform module that creates an ECS Service (plus the associated resources such as target groups, ALB associations, dns etc). 
+
+Optionally, resources such as RDS and elasticache can be deployed.
+
+In addition, this module deploys the baseline monitoring stack for all components and hooks alarms up to pagerduty.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
