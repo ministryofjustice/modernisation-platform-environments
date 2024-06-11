@@ -48,7 +48,7 @@
       "app_count": 2,
       "ec2_desired_capacity": 2,
       "ec2_max_size": 3,
-      "ec2_min_size": 1,
+      "ec2_min_size": 2,
       "ami_image_id": "ami-0cf98f96c2bae561e",
       "instance_type": "t3.large",
       "container_port": 80,
