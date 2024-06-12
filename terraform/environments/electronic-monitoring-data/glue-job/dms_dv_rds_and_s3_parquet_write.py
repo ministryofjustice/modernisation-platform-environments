@@ -456,7 +456,8 @@ if __name__ == "__main__":
 
         LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
 
-        given_rds_sqlserver_tbls_list = [e.strip().strip("'") for e in given_rds_sqlserver_tbls_str.split(",")]
+        given_rds_sqlserver_tbls_list = [f"{rds_sqlserver_db_str}_{given_rds_sqlserver_db_schema}_{tbl}".strip().strip("'") 
+                                         for tbl in given_rds_sqlserver_tbls_str.split(",")]
 
         LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
