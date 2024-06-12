@@ -1,6 +1,6 @@
 locals {
   s3_origin_id = "portalerrorpagebucketorigin"
-
+  cloudfront_url = "mp-portal.${data.aws_route53_zone.external.name}"
   cloudfront_domain_types = { for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
@@ -329,7 +329,7 @@ resource "aws_acm_certificate" "cloudfront" {
   domain_name               = local.application_data.accounts[local.environment].mp_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1
-  subject_alternative_names = local.environment == "production" ? null : [aws_route53_record.cloudfront-non-prod.name]
+  subject_alternative_names = local.environment == "production" ? null : [local.cloudfront_url]
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
