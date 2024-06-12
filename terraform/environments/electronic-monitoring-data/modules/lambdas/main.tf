@@ -1,5 +1,5 @@
 locals {
-  use_vpc_config = length(var.security_group_ids) > 0 && length(var.subnet_ids) > 0
+  use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null || length(var.security_group_ids) == 0 || length(var.subnet_ids) == 0)
 }
 
 resource "aws_sqs_queue" "lambda_dlq" {
