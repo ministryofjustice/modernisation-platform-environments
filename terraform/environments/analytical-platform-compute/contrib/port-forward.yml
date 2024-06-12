@@ -6,19 +6,19 @@ metadata:
   annotations:
     # I'm not fixing these, this whole pod is a modification of https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-external-access.html
     # with securityContext added
-    checkov.io/skip1: CKV_K8S_43=This isn't a debugging tool
-    checkov.io/skip2: CKV_K8S_10=This isn't a debugging tool
-    checkov.io/skip3: CKV_K8S_14=This isn't a debugging tool
-    checkov.io/skip4: CKV_K8S_12=This isn't a debugging tool
-    checkov.io/skip5: CKV_K8S_8=This isn't a debugging tool
-    checkov.io/skip6: CKV_K8S_13=This isn't a debugging tool
-    checkov.io/skip7: CKV_K8S_40=This isn't a debugging tool
-    checkov.io/skip8: CKV_K8S_22=This isn't a debugging tool
-    checkov.io/skip9: CKV_K8S_35=This isn't a debugging tool
-    checkov.io/skip10: CKV_K8S_38=This isn't a debugging tool
-    checkov.io/skip11: CKV_K8S_11=This isn't a debugging tool
-    checkov.io/skip12: CKV_K8S_9=This isn't a debugging tool
-    checkov.io/skip13: CKV2_K8S_6=This isn't a debugging tool
+    checkov.io/skip1: CKV_K8S_43=This is a debugging tool
+    checkov.io/skip2: CKV_K8S_10=This is a debugging tool
+    checkov.io/skip3: CKV_K8S_14=This is a debugging tool
+    checkov.io/skip4: CKV_K8S_12=This is a debugging tool
+    checkov.io/skip5: CKV_K8S_8=This is a debugging tool
+    checkov.io/skip6: CKV_K8S_13=This is a debugging tool
+    checkov.io/skip7: CKV_K8S_40=This is a debugging tool
+    checkov.io/skip8: CKV_K8S_22=This is a debugging tool
+    checkov.io/skip9: CKV_K8S_35=This is a debugging tool
+    checkov.io/skip10: CKV_K8S_38=This is a debugging tool
+    checkov.io/skip11: CKV_K8S_11=This is a debugging tool
+    checkov.io/skip12: CKV_K8S_9=This is a debugging tool
+    checkov.io/skip13: CKV2_K8S_6=This is a debugging tool
 spec:
   containers:
   - name: port-forward-pod
