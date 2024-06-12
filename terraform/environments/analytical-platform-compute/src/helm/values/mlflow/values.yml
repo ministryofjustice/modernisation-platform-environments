@@ -5,9 +5,9 @@ ingress:
   enabled: true
   className: "default"
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: mlflow.compute.development.analytical-platform.service.justice.gov.uk
+    external-dns.alpha.kubernetes.io/hostname: ${mlflow_hostname}
   hosts:
-    - host: mlflow.compute.development.analytical-platform.service.justice.gov.uk
+    - host: ${mlflow_hostname}
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -18,7 +18,7 @@ ingress:
                 number: 5000
   tls:
     - hosts:
-      - mlflow.compute.development.analytical-platform.service.justice.gov.uk
+      - ${mlflow_hostname}
 
 mlflow:
   environment:
@@ -38,7 +38,7 @@ mlflow:
           name: mlflow-rds
           key:  postgres_connection_string
     - name: "MLFLOW_SERVER_DEFAULT_ARTIFACT_ROOT"
-      value: "s3://mojap-compute-development-mlflow/tracking"
+      value: "s3://${s3_bucket_name}/tracking"
 
 securityContext:
   allowPrivilegeEscalation: false
@@ -53,7 +53,7 @@ securityContext:
 
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::381491960855:role/mlflow20240610161705974000000002
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
 
 serviceMonitor:
   enabled: true
