@@ -92,7 +92,6 @@ locals {
           flexi-startup     = "8am"
           flexi-shutdown    = "7pm"
           instance-scheduling = "skip-scheduling"
-
         }
         ebs_volumes = {
           "/dev/sdf" = { size = 20, type = "gp3" }

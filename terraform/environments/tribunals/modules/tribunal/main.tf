@@ -17,7 +17,7 @@ locals {
     cluster_name = "${local.app}_app_cluster"
   }))
   app_container_definition = templatefile("container_definition.json", {
-    app_name = "${local.app}"
+    app_name                   = "${local.app}"
     awslogs-group              = "${local.app}-ecs-log-group"
     supportEmail               = "${var.application_data.support_email}"
     supportTeam                = "${var.application_data.support_team}"
@@ -79,7 +79,7 @@ resource "null_resource" "app_setup_db" {
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
-    command = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
+    command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
 
     environment = {
       DB_URL        = local.app_rds_url

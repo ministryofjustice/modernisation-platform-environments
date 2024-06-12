@@ -9,6 +9,16 @@ resource "aws_security_group" "ecs_service" {
   }
 }
 
+resource "aws_vpc_security_group_egress_rule" "ecs_serice_to_elasticache" {
+  count                        = var.create_elasticache ? 1 : 0
+  security_group_id            = aws_security_group.ecs_service.id
+  description                  = "weblogic service to elasticache"
+  from_port                    = var.create_elasticache ? var.elasticache_port : null
+  to_port                      = var.create_elasticache ? var.elasticache_port : null
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.elasticache[0].id
+}
+
 resource "aws_vpc_security_group_egress_rule" "ecs_service_to_db" {
   count                        = var.create_rds ? 1 : 0
   security_group_id            = aws_security_group.ecs_service.id

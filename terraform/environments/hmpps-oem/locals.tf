@@ -46,6 +46,45 @@ locals {
   }
 
   baseline_all_environments = {
+    cloudwatch_dashboards = {
+      "hmpps-oem-${local.environment}" = {
+        account_name   = "hmpps-oem-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
+        ]
+      }
+      "nomis-${local.environment}" = {
+        account_name   = "nomis-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_autoscaling_group_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
+        ]
+      }
+      "corporate-staff-rostering-${local.environment}" = {
+        account_name   = "corporate-staff-rostering-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
+        ]
+      }
+    }
     iam_policies = {
       Ec2OracleEnterpriseManagerPolicy = {
         description = "Permissions required for Oracle Enterprise Manager"

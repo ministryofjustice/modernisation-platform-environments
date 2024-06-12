@@ -167,7 +167,11 @@ locals {
         }
       }
 
-      dev-nomis-client-a = local.jumpserver_ec2
+      dev-nomis-client-a = merge(local.jumpserver_ec2, {
+        tags = merge(local.jumpserver_ec2.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
     }
 
     ec2_instances = {
@@ -175,10 +179,8 @@ locals {
         config = merge(local.database_ec2.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
           availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-            "Ec2DevWeblogicPolicy",
-            "Ec2Qa11GWeblogicPolicy",
-            "Ec2Qa11RWeblogicPolicy",
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2DevDatabasePolicy",
           ])
         })
         ebs_volumes = merge(local.database_ec2.ebs_volumes, {
@@ -195,6 +197,37 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment   = "dev"
           description         = "syscon nomis dev and qa databases"
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = ""
+        })
+      })
+
+      dev-nomis-db19c-1-a = merge(local.database19c_ec2, {
+        config = merge(local.database19c_ec2.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.database19c_ec2.config.instance_profile_policies, [
+            "Ec2DevDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database19c_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database19c_ec2.ebs_volume_config, {
+          data  = { total_size = 500 }
+          flash = { total_size = 50 }
+        })
+        instance = merge(local.database19c_ec2.instance, {
+          # disable_api_termination = true
+        })
+        user_data_cloud_init = merge(local.database19c_ec2.user_data_cloud_init, {
+          args = merge(local.database19c_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.database19c_ec2.tags, {
+          nomis-environment   = "dev"
+          description         = "syscon nomis dev and qa Oracle 19c databases"
           instance-scheduling = "skip-scheduling"
           oracle-sids         = ""
         })
@@ -331,6 +364,23 @@ locals {
     }
 
     iam_policies = {
+      Ec2DevDatabasePolicy = {
+        description = "Permissions required for Dev Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/*",
+            ]
+          }
+        ]
+      }
       Ec2DevWeblogicPolicy = {
         description = "Permissions required for dev Weblogic EC2s"
         statements = concat(local.weblogic_iam_policy_statements, [

@@ -1,21 +1,17 @@
-# nomis-test environment settings
 locals {
 
-  # cloudwatch monitoring config
-  test_cloudwatch_monitoring_options = {}
+  baseline_presets_test = {
+    options = {
+    }
+  }
 
-  # baseline config
-  test_config = {
-
-    baseline_ec2_instances = {}
-
-    baseline_ec2_autoscaling_groups = {}
-
-    baseline_route53_zones = {
+  # please keep resources in alphabetical order
+  baseline_test = {
+    route53_zones = {
       "test.csr.service.justice.gov.uk" = {}
     }
 
-    baseline_s3_buckets = {
+    s3_buckets = {
       # use this bucket for storing artefacts for use across all accounts
       csr-software = {
         custom_kms_key = module.environment.kms_keys["general"].arn
@@ -25,7 +21,6 @@ locals {
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
-
 
       csr-db-backup-bucket = {
         custom_kms_key = module.environment.kms_keys["general"].arn

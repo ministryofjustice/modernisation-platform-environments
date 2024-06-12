@@ -115,7 +115,7 @@ resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
 
-    ingress {
+  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -123,14 +123,14 @@ resource "aws_security_group" "ecs_service" {
     security_groups = [
       module.appeals.tribunals_lb_sc_id,
       module.ahmlr.tribunals_lb_sc_id,
-      # module.care_standards.tribunals_lb_sc_id,
-      # module.cicap.tribunals_lb_sc_id,
-      # module.employment_appeals.tribunals_lb_sc_id,
-      # module.finance_and_tax.tribunals_lb_sc_id,
-      # module.immigration_services.tribunals_lb_sc_id,
-      # module.information_tribunal.tribunals_lb_sc_id,
-      # module.lands_tribunal.tribunals_lb_sc_id,
-      # module.transport.tribunals_lb_sc_id,
+      module.care_standards.tribunals_lb_sc_id,
+      module.cicap.tribunals_lb_sc_id,
+      module.employment_appeals.tribunals_lb_sc_id,
+      module.finance_and_tax.tribunals_lb_sc_id,
+      module.immigration_services.tribunals_lb_sc_id,
+      module.information_tribunal.tribunals_lb_sc_id,
+      module.lands_tribunal.tribunals_lb_sc_id,
+      module.transport.tribunals_lb_sc_id,
       module.charity_tribunal_decisions.tribunals_lb_sc_id,
       module.claims_management_decisions.tribunals_lb_sc_id,
       module.consumer_credit_appeals.tribunals_lb_sc_id,
@@ -141,7 +141,7 @@ resource "aws_security_group" "ecs_service" {
       module.sscs_venue_pages.tribunals_lb_sc_id,
       module.tax_chancery_decisions.tribunals_lb_sc_id,
       module.tax_tribunal_decisions.tribunals_lb_sc_id,
-      module.ftp-admin-appeals.tribunals_lb_sc_id
+      module.ftp_admin_appeals.tribunals_lb_sc_id
     ]
   }
 
@@ -163,7 +163,16 @@ resource "aws_security_group" "ecs_service_sftp" {
     protocol    = "tcp"
     description = "Allow traffic on port 22 from network load balancer"
     security_groups = [
-      module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp, module.claims_management_decisions.tribunals_lb_sc_id_sftp
+      module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp,
+      module.claims_management_decisions.tribunals_lb_sc_id_sftp,
+      module.consumer_credit_appeals.tribunals_lb_sc_id_sftp,
+      module.estate_agent_appeals.tribunals_lb_sc_id_sftp,
+      module.primary_health_lists.tribunals_lb_sc_id_sftp,
+      module.siac.tribunals_lb_sc_id_sftp,
+      module.sscs_venue_pages.tribunals_lb_sc_id_sftp,
+      module.tax_chancery_decisions.tribunals_lb_sc_id_sftp,
+      module.tax_tribunal_decisions.tribunals_lb_sc_id_sftp,
+      module.ftp_admin_appeals.tribunals_lb_sc_id_sftp
     ]
   }
 
@@ -173,7 +182,16 @@ resource "aws_security_group" "ecs_service_sftp" {
     protocol    = "tcp"
     description = "Allow traffic on port 10022 from sftp network load balancers"
     security_groups = [
-      module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp, module.claims_management_decisions.tribunals_lb_sc_id_sftp
+      module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp,
+      module.claims_management_decisions.tribunals_lb_sc_id_sftp,
+      module.consumer_credit_appeals.tribunals_lb_sc_id_sftp,
+      module.estate_agent_appeals.tribunals_lb_sc_id_sftp,
+      module.primary_health_lists.tribunals_lb_sc_id_sftp,
+      module.siac.tribunals_lb_sc_id_sftp,
+      module.sscs_venue_pages.tribunals_lb_sc_id_sftp,
+      module.tax_chancery_decisions.tribunals_lb_sc_id_sftp,
+      module.tax_tribunal_decisions.tribunals_lb_sc_id_sftp,
+      module.ftp_admin_appeals.tribunals_lb_sc_id_sftp
     ]
   }
 

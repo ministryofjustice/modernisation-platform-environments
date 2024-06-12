@@ -63,11 +63,12 @@ resource "helm_release" "aws_for_fluent_bit" {
 }
 
 resource "helm_release" "amazon_prometheus_proxy" {
-  /* https://artifacthub.io/packages/helm/prometheus-community/prometheus */
+  /* https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack */
+  /* If you are upgrading this chart, check whether the CRD version needs updating */
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "prometheus"
-  version    = "25.21.0"
+  chart      = "kube-prometheus-stack"
+  version    = "59.1.0"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -80,7 +81,10 @@ resource "helm_release" "amazon_prometheus_proxy" {
     )
   ]
 
-  depends_on = [module.amazon_prometheus_proxy_iam_role]
+  depends_on = [
+    kubernetes_manifest.prometheus_operator_crds,
+    module.amazon_prometheus_proxy_iam_role
+  ]
 }
 
 /* Cluster Autoscaler */
@@ -96,9 +100,10 @@ resource "helm_release" "cluster_autoscaler" {
     templatefile(
       "${path.module}/src/helm/values/cluster-autoscaler/values.yml.tftpl",
       {
-        aws_region   = data.aws_region.current.name
-        cluster_name = module.eks.cluster_name
-        eks_role_arn = module.cluster_autoscaler_iam_role.iam_role_arn
+        aws_region                = data.aws_region.current.name
+        cluster_name              = module.eks.cluster_name
+        eks_role_arn              = module.cluster_autoscaler_iam_role.iam_role_arn
+        service_monitor_namespace = kubernetes_namespace.cluster_autoscaler.metadata[0].name
       }
     )
   ]
@@ -191,8 +196,9 @@ resource "helm_release" "ingress_nginx" {
     templatefile(
       "${path.module}/src/helm/values/ingress-nginx/values.yml.tftpl",
       {
-        default_ssl_certificate = "${kubernetes_namespace.ingress_nginx.metadata[0].name}/default-certificate"
-        ingress_hostname        = "ingress.${local.environment_configuration.route53_zone}"
+        default_ssl_certificate   = "${kubernetes_namespace.ingress_nginx.metadata[0].name}/default-certificate"
+        ingress_hostname          = "ingress.${local.environment_configuration.route53_zone}"
+        service_monitor_namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
       }
     )
   ]

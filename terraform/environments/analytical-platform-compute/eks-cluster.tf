@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.12.0"
+  version = "20.13.1"
 
   cluster_name    = local.eks_cluster_name
   cluster_version = local.environment_configuration.eks_cluster_version
@@ -98,9 +98,39 @@ module "eks" {
   eks_managed_node_groups = {
     general = {
       min_size       = 1
-      max_size       = 5
+      max_size       = 10
       desired_size   = 3
       instance_types = ["t3.xlarge"]
+    }
+    airflow-high-memory = {
+      min_size       = 0
+      max_size       = 1
+      desired_size   = 0
+      instance_types = ["r6i.8xlarge"]
+      labels = {
+        high-memory = "true"
+      }
+      taints = [
+        {
+          key    = "high-memory"
+          value  = "true"
+          effect = "NO_SCHEDULE"
+        }
+      ]
+      block_device_mappings = {
+        xvdb = {
+          device_name = "/dev/xvdb"
+          ebs = {
+            volume_size           = 200
+            volume_type           = "gp3"
+            iops                  = 3000
+            throughput            = 250
+            encrypted             = true
+            kms_key_id            = module.ebs_kms.key_arn
+            delete_on_termination = true
+          }
+        }
+      }
     }
   }
 
@@ -115,6 +145,11 @@ module "eks" {
           }
         }
       }
+    }
+    data-engineering-airflow = {
+      principal_arn     = local.environment_configuration.data_engineering_airflow_execution_role_arn
+      username          = "data-engineering-airflow"
+      kubernetes_groups = ["airflow"]
     }
   }
 

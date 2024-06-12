@@ -19,6 +19,11 @@ output "cloudwatch_dashboard_widgets" {
   value       = local.cloudwatch_dashboard_widgets
 }
 
+output "cloudwatch_dashboard_widget_groups" {
+  description = "Map of common cloudwatch dashboard widget groups"
+  value       = local.cloudwatch_dashboard_widget_groups
+}
+
 output "cloudwatch_dashboards" {
   description = "Map of common cloudwatch dashboards"
   value = {
@@ -82,7 +87,9 @@ output "iam_roles" {
 output "iam_service_linked_roles" {
   description = "Map of common service linked roles to create"
 
-  value = local.iam_service_linked_roles
+  value = var.options.iam_service_linked_roles != null ? {
+    for key, value in local.iam_service_linked_roles : key => value if contains(var.options.iam_service_linked_roles, key)
+  } : local.iam_service_linked_roles
 }
 
 output "iam_policies" {

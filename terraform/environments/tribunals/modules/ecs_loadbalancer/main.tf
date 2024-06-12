@@ -166,7 +166,7 @@ resource "aws_lb_listener" "tribunals_lb_health" {
   }
 }
 
-resource "aws_lb_listener_rule" "admin_access" {
+resource "aws_lb_listener_rule" "admin_access_1" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = 1
   action {
@@ -181,14 +181,34 @@ resource "aws_lb_listener_rule" "admin_access" {
 
   condition {
     source_ip {
-      values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25", "194.33.196.0/25", "194.33.197.0/25"]
+      values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25"]
     }
   }
 }
 
-resource "aws_lb_listener_rule" "secure_access" {
+resource "aws_lb_listener_rule" "admin_access_2" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = 2
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tribunals_target_group.arn
+  }
+  condition {
+    path_pattern {
+      values = ["*/Admin*", "*/admin*"]
+    }
+  }
+
+  condition {
+    source_ip {
+      values = ["194.33.196.0/25", "194.33.197.0/25"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "secure_access_1" {
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = 3
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tribunals_target_group.arn
@@ -201,16 +221,36 @@ resource "aws_lb_listener_rule" "secure_access" {
 
   condition {
     source_ip {
-      values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25", "194.33.196.0/25", "194.33.197.0/25"]
+      values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "secure_access_2" {
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = 4
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tribunals_target_group.arn
+  }
+  condition {
+    path_pattern {
+      values = ["*/Secure*", "*/secure*"]
+    }
+  }
+
+  condition {
+    source_ip {
+      values = ["194.33.196.0/25", "194.33.197.0/25"]
     }
   }
 }
 
 resource "aws_lb_listener_rule" "admin_secure_fixed_response" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 3
+  priority     = 5
   action {
-    type             = "fixed-response"
+    type = "fixed-response"
     fixed_response {
       content_type = "text/html"
       message_body = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"

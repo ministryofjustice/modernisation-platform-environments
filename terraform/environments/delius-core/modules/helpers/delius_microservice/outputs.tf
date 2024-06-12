@@ -15,7 +15,7 @@ output "task_role_arn" {
 }
 
 output "elasticache_endpoint" {
-  value = var.create_elasticache ? aws_elasticache_cluster.this[0].cache_nodes[0].address : null  
+  value = var.create_elasticache ? aws_elasticache_cluster.this[0].cache_nodes[0].address : null
 }
 
 output "elasticache_port" {

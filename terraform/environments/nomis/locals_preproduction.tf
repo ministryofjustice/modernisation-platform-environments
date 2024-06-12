@@ -45,6 +45,32 @@ locals {
 
     ec2_autoscaling_groups = {
       # ACTIVE (blue deployment)
+      lsast-nomis-web-a = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 1
+        })
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2LsastWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "lsast"
+          oracle-db-hostname-a = "lsnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "lsnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "LSCNOM"
+          deployment           = "blue"
+        })
+      })
+
+      # ACTIVE (blue deployment)
       preprod-nomis-web-a = merge(local.weblogic_ec2, {
         autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
           desired_capacity = 2
@@ -73,9 +99,13 @@ locals {
 
       # NOT-ACTIVE (green deployment)
       preprod-nomis-web-b = merge(local.weblogic_ec2, {
-        # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
-        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
           desired_capacity = 0
+          max_size         = 0
+          instance_refresh = {
+            strategy               = "Rolling"
+            min_healthy_percentage = 50
+          }
         })
         # autoscaling_schedules = {
         #   scale_up   = { recurrence = "0 7 * * Mon-Fri" }
@@ -90,7 +120,7 @@ locals {
         })
         user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
           args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "86471c5730194674959e03fff043a6b4d2d1a92f"
           })
         })
         tags = merge(local.weblogic_ec2.tags, {
@@ -102,7 +132,11 @@ locals {
         })
       })
 
-      preprod-nomis-client-a = local.jumpserver_ec2
+      preprod-nomis-client-a = merge(local.jumpserver_ec2, {
+        tags = merge(local.jumpserver_ec2.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
     }
 
     ec2_instances = {
@@ -133,7 +167,8 @@ locals {
         tags = merge(local.database_ec2.tags, {
           nomis-environment = "lsast"
           description       = "lsast database for CNOM and MIS"
-          oracle-sids       = ""
+          oracle-sids       = "LSCNOM LSMIS"
+          misload-dbname    = "LSMIS"
         })
       })
 
@@ -294,6 +329,23 @@ locals {
           }
         ]
       }
+      Ec2LsastWeblogicPolicy = {
+        description = "Permissions required for Preprod Weblogic EC2s"
+        statements = concat(local.weblogic_iam_policy_statements, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/lsast/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/weblogic-*",
+            ]
+          }
+        ])
+      }
       Ec2PreprodDatabasePolicy = {
         description = "Permissions required for Preprod Database EC2s"
         statements = [
@@ -365,12 +417,29 @@ locals {
 
           https = merge(local.weblogic_lb_listeners.https, {
             alarm_target_group_names = [
+              # "lsast-nomis-web-a-http-7777",
               "preprod-nomis-web-a-http-7777",
               # "preprod-nomis-web-b-http-7777",
             ]
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
             rules = {
+              lsast-nomis-web-a-http-7777 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "lsast-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "lsast-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                      "c-lsast.preproduction.nomis.service.justice.gov.uk",
+                      "c.lsast-nomis.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               preprod-nomis-web-a-http-7777 = {
                 priority = 200
                 actions = [{
@@ -421,7 +490,7 @@ locals {
                       "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
                       "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
                       "c.preproduction.nomis.service.justice.gov.uk",
-                      "c.pp-nomis.az.justice.gov.uk",
+                      "c-lsast.preproduction.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -478,6 +547,7 @@ locals {
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
+          { name = "c-lsast", type = "A", lbs_map_key = "private" },
         ]
       }
     }
@@ -497,7 +567,8 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/oracle/database/LSCNOM" = local.database_secretsmanager_secrets
+      "/oracle/weblogic/lsast"  = local.weblogic_secretsmanager_secrets
+      "/oracle/database/LSCNOM" = local.database_nomis_secretsmanager_secrets
       "/oracle/database/LSMIS"  = local.database_mis_secretsmanager_secrets
 
       "/oracle/weblogic/preprod"  = local.weblogic_secretsmanager_secrets
