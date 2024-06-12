@@ -547,6 +547,31 @@ module "glue_registry_avro" {
   )
 }
 
+# Allows Glue jobs to be configured to access resources in the VPC
+resource "aws_glue_connection" "glue_vpc_access_connection" {
+  name            = "${local.project}-glue-vpc-connection-${local.env}"
+  connection_type = "NETWORK"
+
+  physical_connection_requirements {
+    availability_zone      = "${local.account_region}a"
+    security_group_id_list = [aws_security_group.glue_vpc_access_connection_sg.id]
+    subnet_id              = data.aws_subnet.private_subnets_a.id
+  }
+}
+
+resource aws_security_group "glue_vpc_access_connection_sg" {
+  name        = "glue_vpc_access_connection_sg"
+  description = "Security group to allow glue access to resources in the VPC"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    cidr_blocks = [data.aws_vpc.dpr.cidr_block]
+  }
+}
+
 ###################################################
 # Glue Tables, Reusable Module: /modules/glue_table
 ###################################################

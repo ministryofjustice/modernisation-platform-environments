@@ -336,6 +336,12 @@ variable "env" {
   description = "Env Type"
 }
 
+variable "connections" {
+  type        = list(string)
+  description = "A list of Glue connections used by this job"
+  default     = []
+}
+
 variable "script_version" {}
 variable "jar_version" {}
 
