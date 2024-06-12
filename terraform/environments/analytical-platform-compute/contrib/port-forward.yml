@@ -43,6 +43,7 @@ spec:
       capabilities:
         drop: ["ALL"]
   securityContext:
+    readOnlyRootFilesystem: true
     runAsNonRoot: true
     seccompProfile:
       type: RuntimeDefault
