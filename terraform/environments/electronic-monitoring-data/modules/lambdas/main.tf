@@ -1,3 +1,7 @@
+locals {
+  use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null)
+}
+
 resource "aws_sqs_queue" "lambda_dlq" {
   name              = "${var.function_name}-dlq"
   kms_master_key_id = aws_kms_key.lambda_env_key.id
@@ -129,10 +133,14 @@ resource "aws_lambda_function" "this" {
   memory_size      = var.memory_size
   runtime          = var.runtime
 
-  vpc_config {
-    security_group_ids = var.security_group_ids
-    subnet_ids         = var.subnet_ids
+  dynamic "vpc_config" {
+    for_each = local.use_vpc_config ? [1] : []
+    content {
+      security_group_ids = var.security_group_ids
+      subnet_ids         = var.subnet_ids
+    }
   }
+
 
   environment {
     variables = var.environment_variables
