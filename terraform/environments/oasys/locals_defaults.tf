@@ -10,6 +10,20 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
+      {
+        low-inodes = {
+          comparison_operator = "GreaterThanOrEqualToThreshold"
+          evaluation_periods  = "15"
+          datapoints_to_alarm = "15"
+          metric_name         = "collectd_inode_used_percent_value"
+          namespace           = "CWAgent"
+          period              = "60"
+          statistic           = "Maximum"
+          threshold           = "85"
+          alarm_description   = "Triggers if free inodes falls below the threshold for an hour"
+          alarm_actions       = ["dso_pagerduty"]
+        }
+      }
     )
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "oasys_webserver_release_2023-07-02*"
@@ -82,6 +96,20 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
+      {
+        low-inodes = {
+          comparison_operator = "GreaterThanOrEqualToThreshold"
+          evaluation_periods  = "15"
+          datapoints_to_alarm = "15"
+          metric_name         = "collectd_inode_used_percent_value"
+          namespace           = "CWAgent"
+          period              = "60"
+          statistic           = "Maximum"
+          threshold           = "85"
+          alarm_description   = "Triggers if free inodes falls below the threshold for an hour"
+          alarm_actions       = ["dso_pagerduty"]
+        }
+      },
       local.environment == "production" ? {} : {
         cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2["cpu-utilization-high"], {
           evaluation_periods  = "480"
@@ -162,6 +190,20 @@ locals {
           alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on an oasys-db instance"
           alarm_actions       = ["dso_pagerduty"]
         }
+      },
+      {
+        low-inodes = {
+          comparison_operator = "GreaterThanOrEqualToThreshold"
+          evaluation_periods  = "15"
+          datapoints_to_alarm = "15"
+          metric_name         = "collectd_inode_used_percent_value"
+          namespace           = "CWAgent"
+          period              = "60"
+          statistic           = "Maximum"
+          threshold           = "85"
+          alarm_description   = "Triggers if free inodes falls below the threshold for an hour"
+          alarm_actions       = ["dso_pagerduty"]
+        }
       }
     )
     config = merge(module.baseline_presets.ec2_instance.config.db, {
@@ -213,6 +255,20 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
+      {
+        low-inodes = {
+          comparison_operator = "GreaterThanOrEqualToThreshold"
+          evaluation_periods  = "15"
+          datapoints_to_alarm = "15"
+          metric_name         = "collectd_inode_used_percent_value"
+          namespace           = "CWAgent"
+          period              = "60"
+          statistic           = "Maximum"
+          threshold           = "85"
+          alarm_description   = "Triggers if free inodes falls below the threshold for an hour"
+          alarm_actions       = ["dso_pagerduty"]
+        }
+      }
     )
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "oasys_bip_release_2023-12-02*"

@@ -3,7 +3,8 @@ variable "database_list" {
   type = list(string)
   # cap_dw
   default = [
-    "g4s_cap_dw"
+    "g4s_cap_dw",
+    "g4s_emsys_mvp"
   ]
 }
 

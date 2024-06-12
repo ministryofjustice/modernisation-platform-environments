@@ -103,7 +103,7 @@ module "send_metadata_to_ap" {
     timeout = 900
     memory_size = 1024
     runtime = "python3.11"
-    security_group_ids = [aws_security_group.lambda_db_security_group.id]
+    security_group_ids = null
     subnet_ids = data.aws_subnets.shared-public.ids
     env_account_id = local.env_account_id
     environment_variables = {
@@ -142,8 +142,8 @@ module "send_table_to_ap" {
     timeout = 900
     memory_size = 1024
     runtime = "python3.11"
-    security_group_ids = [aws_security_group.lambda_db_security_group.id]
-    subnet_ids = data.aws_subnets.shared-public.ids
+    security_group_ids = null
+    subnet_ids = null
     env_account_id = local.env_account_id
     environment_variables = {
       PARQUET_BUCKET_NAME = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
