@@ -6,15 +6,15 @@ parameters:
     type: String
     description: Which branch of modernisation-platform-configuration-management to use
     default: main
-  ansible_args:
+  ansibleArgs:
     type: String
     description: Any additional parameters to pass to ansible
     default: site.yml --tags ec2patch
-  powershell_script:
+  powershellScript:
     type: String
     description: Powershell script to invoke from config management repo powershell/Scripts directory
     default: Invoke-UserDataScript.ps1
-  powershell_script_args:
+  powershellScriptArgs:
     type: String
     description: 'Any additional parameters to pass to powershell in hashtable format, e.g. @{"DomainNameFQDN" = "azure.noms.root"}'
     default: '@{}'
@@ -31,12 +31,12 @@ mainSteps:
           run_ansible() {
             tmpdir=/root/.ec2-configuration-management
             branch="{{ branch }}"
-            ansible_args="{{ ansible_args }}"
+            ansibleArgs="{{ ansibleArgs }}"
             sudo /bin/rm -rf $tmpdir 2>/dev/null || true
             sudo mkdir $tmpdir 2>/dev/null || true
             sudo curl "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$branch/ansible/roles/ansible-script/files/ansible.sh" -o $tmpdir/ansible.sh
             sudo chmod +x $tmpdir/ansible.sh
-            sudo ansible_dir=$tmpdir branch=$branch $tmpdir/ansible.sh $ansible_args
+            sudo ansible_dir=$tmpdir branch=$branch $tmpdir/ansible.sh $ansibleArgs
           }
           run_ansible | logger -s -p local3.info -t ec2-configuration-management-ansible 2>&1
   - name: WindowsPowershellConfigurationManagement
@@ -53,8 +53,8 @@ mainSteps:
           Write-Output "Downloading and running Run-GitScript.ps1"
           Set-Location -Path ([System.IO.Path]::GetTempPath())
           $GitBranch = "{{ branch }}"
-          $Script = "{{ powershell_script }}"
-          $ScriptArgs = {{ powershell_script_args }}
+          $Script = "{{ powershellScript }}"
+          $ScriptArgs = {{ powershellScriptArgs }}
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
           Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
           . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch -ScriptArgs $ScriptArgs
