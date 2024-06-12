@@ -17,6 +17,7 @@ locals {
   ssm_documents_filter = flatten([
     var.options.enable_hmpps_domain ? ["ec2-ad-join-windows"] : [],
     var.options.enable_hmpps_domain ? ["ec2-ad-leave-windows"] : [],
+    var.options.enable_ec2_self_provision ? ["ec2-configuration-management.yaml"] : [],
   ])
 
   ssm_documents = {
