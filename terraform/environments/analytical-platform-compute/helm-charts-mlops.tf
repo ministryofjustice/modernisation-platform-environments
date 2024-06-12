@@ -4,7 +4,7 @@ resource "helm_release" "mlflow" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.13.2-rc1"
   chart      = "mlflow"
-  namespace  = kubernetes_namespace.mlflow[0].metadata[0].name
+  namespace  = kubernetes_namespace.mlflow.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/mlflow/values.yml.tftpl",
