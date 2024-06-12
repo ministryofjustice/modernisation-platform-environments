@@ -113,9 +113,10 @@ resource "aws_security_group_rule" "allow_glue_security_group_access_to_operatio
   count = (local.environment == "development" ? 1 : 0)
 
   type              = "ingress"
+  security_group_id = module.operational_db_server[0].security_group_id
   description       = "Allow glue security group to communicate with operational data store"
   from_port         = 0
   to_port           = 65535
   protocol          = "tcp"
-  security_group_id = module.operational_db_server[0].security_group_id
+  source_security_group_id = aws_security_group.glue_vpc_access_connection_sg[0].id
 }
