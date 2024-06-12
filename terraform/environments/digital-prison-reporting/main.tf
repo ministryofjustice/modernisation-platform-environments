@@ -553,7 +553,7 @@ resource "aws_glue_connection" "glue_vpc_access_connection" {
   connection_type = "NETWORK"
 
   physical_connection_requirements {
-    availability_zone      = "${local.account_region}a"
+    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
     security_group_id_list = [aws_security_group.glue_vpc_access_connection_sg.id]
     subnet_id              = data.aws_subnet.private_subnets_a.id
   }
@@ -564,11 +564,20 @@ resource aws_security_group "glue_vpc_access_connection_sg" {
   description = "Security group to allow glue access to resources in the VPC"
   vpc_id      = data.aws_vpc.shared.id
 
+  # The security group must open all ingress and egress ports.
+  # To limit traffic, the source security group in the rule is restricted to the same security group with self = true.
   ingress {
-    from_port = 5432
-    to_port   = 5432
+    from_port = 0
+    to_port   = 65535
     protocol  = "tcp"
-    cidr_blocks = [data.aws_vpc.dpr.cidr_block]
+    self      = true
+  }
+
+  egress {
+    from_port = 0
+    to_port   = 65535
+    protocol  = "tcp"
+    self      = true
   }
 }
 
