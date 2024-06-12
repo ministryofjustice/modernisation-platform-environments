@@ -675,7 +675,6 @@ resource "aws_acm_certificate" "external_lb" {
   validation_method         = "DNS"
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
   tags                      = var.tags
-  create_before_destroy     = true
   lifecycle {
     prevent_destroy = false
   }
@@ -765,7 +764,6 @@ resource "aws_acm_certificate" "cloudfront" {
   provider                  = aws.us-east-1
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
   tags                      = var.tags
-  create_before_destroy     = true
   lifecycle {
     prevent_destroy = false
   }
