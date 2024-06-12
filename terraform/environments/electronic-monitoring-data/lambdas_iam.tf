@@ -393,7 +393,7 @@ data "aws_iam_policy_document" "list_target_s3_bucket" {
 
 resource "aws_iam_policy" "list_target_s3_bucket" {
   name = "list_target_s3_bucket"
-  policy = data.aws_iam_policy_document.list_target_s3_bucket
+  policy = data.aws_iam_policy_document.list_target_s3_bucket.json
 }
 resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_list_target_s3_bucket" {
     role = aws_iam_role.get_file_keys_for_table.name
