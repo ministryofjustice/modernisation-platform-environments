@@ -1,4 +1,3 @@
-# tflint-ignore-file: terraform_required_version, terraform_required_providers TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 locals {
 
   loadbalancer_ingress_rules = {
@@ -296,6 +295,7 @@ resource "aws_security_group" "lb" {
 
 ## Cloudfront
 resource "random_password" "cloudfront" {
+  # tflint-ignore: terraform_required_version, terraform_required_providers
   length  = 16
   special = false
 }
@@ -548,6 +548,7 @@ resource "aws_waf_web_acl" "waf_acl" {
 # TODO This resource is required because otherwise Error: failed to read schema for module.alb.null_resource.always_run in registry.terraform.io/hashicorp/null: failed to instantiate provider
 # When the whole stack is recreated this can be removed
 resource "null_resource" "always_run" {
+  # tflint-ignore: terraform_required_version, terraform_required_providers
 }
 
 

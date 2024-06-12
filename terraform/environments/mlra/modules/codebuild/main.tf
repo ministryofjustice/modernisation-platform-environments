@@ -1,4 +1,3 @@
-# tflint-ignore-file: terraform_required_version, terraform_required_providers TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 #############################################
 # S3 Bucket for storing Selenium reports and other outputs
 #############################################
@@ -211,6 +210,7 @@ resource "aws_codebuild_project" "app-build" {
 
 
 resource "aws_codebuild_project" "selenium" {
+  # tflint-ignore: terraform_required_version, terraform_required_providers
   #checkov:skip=CKV_AWS_314:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name          = "${var.app_name}-selenium-test"
   description   = "Project to test the Java application ${var.app_name}"

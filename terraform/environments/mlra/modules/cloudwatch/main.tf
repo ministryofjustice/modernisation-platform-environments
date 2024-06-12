@@ -1,4 +1,4 @@
-# tflint-ignore-file: terraform_required_version, terraform_required_providers TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+# tflint-ignore-file: terraform_required_version, terraform_required_providers
 resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
   alarm_name         = "${var.appnameenv}-ECS-CPU-high-threshold-alarm"
   alarm_description  = "If the CPU exceeds the predefined threshold, this alarm will trigger. \n Please investigate."
