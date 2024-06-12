@@ -245,7 +245,7 @@ def check_s3_folder_path_if_exists(in_bucket_name, in_folder_path):
 
 
 def get_s3_table_folder_path(in_database_name, in_table_name):
-    dir_path_str = f"{in_database_name}/{args["rds_sqlserver_db_schema"]}/{in_table_name}"
+    dir_path_str = f"{in_database_name}/{args['rds_sqlserver_db_schema']}/{in_table_name}"
     tbl_full_dir_path_str = f"s3://{PRQ_FILES_SRC_S3_BUCKET_NAME}/{dir_path_str}/"
     if check_s3_folder_path_if_exists(PRQ_FILES_SRC_S3_BUCKET_NAME, dir_path_str):
         return tbl_full_dir_path_str
@@ -278,6 +278,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
     tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
 
     additional_message = ''
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
 
     if tbl_prq_s3_folder_path is not None:
 
@@ -293,13 +294,13 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
             df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         LOGGER.info(
-            f"""RDS-Read-dataframe['{rds_db_name}.{args["rds_sqlserver_db_schema"]}.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
+            f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
 
         df_prq_temp = get_s3_parquet_df(tbl_prq_s3_folder_path, df_rds_temp.schema).repartition(default_repartition_factor)
         df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         LOGGER.info(
-            f"""S3-Parquet-Read-dataframe['{rds_db_name}/{args["rds_sqlserver_db_schema"]}/{rds_tbl_name}'] partitions --> {df_prq_temp.rdd.getNumPartitions()}, {total_size} bytes""")
+            f"""S3-Parquet-Read-dataframe['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] partitions --> {df_prq_temp.rdd.getNumPartitions()}, {total_size} bytes""")
 
         df_rds_temp_count = df_rds_temp_t2.count()
         df_prq_temp_count = df_prq_temp_t1.count()
