@@ -1,4 +1,4 @@
-# tflint-ignore-file: terraform_required_version, terraform_required_providers
+# tflint-ignore-file: terraform_required_version, terraform_required_providers TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 locals {
 
   loadbalancer_ingress_rules = {
