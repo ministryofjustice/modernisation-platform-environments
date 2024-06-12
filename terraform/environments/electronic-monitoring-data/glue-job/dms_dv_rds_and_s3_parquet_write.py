@@ -128,12 +128,15 @@ def check_if_rds_db_exists(in_rds_db_str):
 
 
 def get_rds_tables_dataframe(in_rds_db_name):
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
     sql_information_schema = f"""
     SELECT table_catalog, table_schema, table_name
       FROM information_schema.tables
      WHERE table_type = 'BASE TABLE'
-       AND  = '{args["rds_sqlserver_db_schema"]}'
+       AND  = '{given_rds_sqlserver_db_schema}'
     """.strip()
+
+    LOGGER.info(f"using the SQL Statement:\n{sql_information_schema}")
 
     return (spark.read.format("jdbc")
             .option("url", get_rds_db_jdbc_url(in_rds_db_name))
@@ -170,10 +173,12 @@ def get_rds_dataframe(in_rds_db_name, in_table_name):
 
 
 def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name):
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
     sql_statement = f"""
     SELECT column_name, data_type, is_nullable 
     FROM information_schema.columns
-    WHERE table_name='{in_tbl_name}'
+    WHERE table_schema = '{given_rds_sqlserver_db_schema}'
+      AND table_name='{in_tbl_name}'
     """.strip()
     # ORDER BY ordinal_position
 
