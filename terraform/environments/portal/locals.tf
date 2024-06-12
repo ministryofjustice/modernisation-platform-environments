@@ -15,7 +15,7 @@ locals {
   ebs_conditional = ["testing", "preproduction", "production"]
 
   external_lb_validation_records = {
-    for dvo in aws_acm_certificate.legalservices_cert.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.alb.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
