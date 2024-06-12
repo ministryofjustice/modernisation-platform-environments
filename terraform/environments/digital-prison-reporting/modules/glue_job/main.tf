@@ -101,8 +101,8 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "s3:*"
     ]
     resources = [
-      "arn:aws:s3:::${var.project_id}-*/*",
-      "arn:aws:s3:::${var.project_id}-*"
+      "arn:aws:s3:::*/*",
+      "arn:aws:s3:::*"
     ]
   }
   # https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging-enable.html#monitor-continuous-logging-encrypt-log-data
