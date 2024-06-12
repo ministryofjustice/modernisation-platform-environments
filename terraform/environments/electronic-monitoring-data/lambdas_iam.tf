@@ -386,7 +386,7 @@ resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_lambda_sqs_qu
 data "aws_iam_policy_document" "list_target_s3_bucket" {
   statement {
     effect = "Allow"
-    actions = "s3:ListBucket"
+    actions = ["s3:ListBucket"]
     resources = [aws_s3_bucket.dms_target_ep_s3_bucket.arn]
   }
 }
