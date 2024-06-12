@@ -133,7 +133,7 @@ def get_rds_tables_dataframe(in_rds_db_name):
     SELECT table_catalog, table_schema, table_name
       FROM information_schema.tables
      WHERE table_type = 'BASE TABLE'
-       AND  = '{given_rds_sqlserver_db_schema}'
+       AND table_schema = '{given_rds_sqlserver_db_schema}'
     """.strip()
 
     LOGGER.info(f"using the SQL Statement:\n{sql_information_schema}")
@@ -178,7 +178,7 @@ def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name):
     SELECT column_name, data_type, is_nullable 
     FROM information_schema.columns
     WHERE table_schema = '{given_rds_sqlserver_db_schema}'
-      AND table_name='{in_tbl_name}'
+      AND table_name = '{in_tbl_name}'
     """.strip()
     # ORDER BY ordinal_position
 
