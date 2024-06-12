@@ -59,6 +59,10 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
 resource "aws_cloudwatch_log_group" "application_logs" {
   name = "cdpt-ifs-std-logs"
   retention_in_days = 1
+
+  lifecycle {
+    ignore_changes = [name]
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
