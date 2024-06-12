@@ -212,6 +212,9 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
+
+      test-nomis-client-b = merge(local.jumpserver_ec2, {
+      })
     }
 
     ec2_instances = {
