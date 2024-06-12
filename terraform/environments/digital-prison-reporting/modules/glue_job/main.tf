@@ -85,6 +85,19 @@ EOF
 data "aws_iam_policy_document" "extra-policy-document" {
   statement {
     actions = [
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:CreateNetworkInterface",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    actions = [
       "s3:*"
     ]
     resources = [

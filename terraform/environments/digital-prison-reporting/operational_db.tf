@@ -58,3 +58,61 @@ module "operational_db_server" {
     }
   )
 }
+
+# Allows Glue jobs to be configured to access resources in the VPC
+resource "aws_glue_connection" "glue_vpc_access_connection" {
+  name            = "${local.project}-glue-vpc-connection-${local.env}"
+  connection_type = "NETWORK"
+
+  physical_connection_requirements {
+    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    security_group_id_list = [aws_security_group.glue_vpc_access_connection_sg.id]
+    subnet_id              = data.aws_subnet.private_subnets_a.id
+  }
+}
+
+resource aws_security_group "glue_vpc_access_connection_sg" {
+  name        = "glue_vpc_access_connection_sg"
+  description = "Security group to allow glue access to resources in the VPC"
+  vpc_id      = data.aws_vpc.shared.id
+
+  # The security group must open all ingress and egress ports.
+  # To limit traffic, the source security group in the rule is restricted to the same security group with self = true.
+  ingress {
+    from_port = 0
+    to_port   = 65535
+    protocol  = "tcp"
+    self      = true
+  }
+
+  egress {
+    from_port = 0
+    to_port   = 65535
+    protocol  = "tcp"
+    self      = true
+  }
+
+  egress {
+    from_port = 0
+    to_port   = 65535
+    protocol  = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+
+  egress {
+    from_port = 0
+    to_port   = 65535
+    protocol  = "tcp"
+    security_groups = [module.operational_db_server.security_group_id]
+  }
+}
+
+resource "aws_security_group_rule" "allow_glue_security_group_access_to_operational_db" {
+
+  type              = "ingress"
+  description       = "Allow glue security group to communicate with operational data store"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  security_group_id = module.operational_db_server.security_group_id
+}
