@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: port-forward-pod
+  namespace: mlflow
+spec:
+  containers:
+  - name: port-forward-pod
+    image: docker.io/ministryofjustice/port-forward
+    ports:
+    - containerPort: 5432
+    env:
+    - name: REMOTE_HOST
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-auth-rds
+          key: address
+    - name: LOCAL_PORT
+      value: "5432"
+    - name: REMOTE_PORT
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-auth-rds
+          key: port
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
