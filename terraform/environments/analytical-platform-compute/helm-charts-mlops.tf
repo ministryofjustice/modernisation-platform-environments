@@ -1,25 +1,25 @@
-# resource "helm_release" "mlflow" {
-#   /* https://github.com/ministryofjustice/analytical-platform-mlflow */
-#   name       = "mlflow"
-#   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-#   version    = "2.13.2-rc1"
-#   chart      = "mlflow"
-#   namespace  = kubernetes_namespace.mlflow.metadata[0].name
-#   values = [
-#     templatefile(
-#       "./src/helm/values/mlflow/values.yml.tftpl",
-#       {
-#         mlflow_hostname = "mlflow.${local.environment_configuration.route53_zone}"
-#         eks_role_arn    = module.mlflow_iam_role.iam_role_arn
-#         s3_bucket_name  = module.mlflow_bucket.s3_bucket_id
-#       }
-#     )
-#   ]
-#   depends_on = [
-#     module.mlflow_iam_role,
-#     module.mlflow_bucket,
-#     kubernetes_secret.mlflow_admin,
-#     kubernetes_secret.mlflow_auth_rds,
-#     kubernetes_secret.mlflow_rds
-#   ]
-# }
+resource "helm_release" "mlflow" {
+  /* https://github.com/ministryofjustice/analytical-platform-mlflow */
+  name       = "mlflow"
+  repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
+  version    = "2.13.2-rc1"
+  chart      = "mlflow"
+  namespace  = kubernetes_namespace.mlflow.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/mlflow/values.yml.tftpl",
+      {
+        mlflow_hostname = "mlflow.${local.environment_configuration.route53_zone}"
+        eks_role_arn    = module.mlflow_iam_role.iam_role_arn
+        s3_bucket_name  = module.mlflow_bucket.s3_bucket_id
+      }
+    )
+  ]
+  depends_on = [
+    module.mlflow_iam_role,
+    module.mlflow_bucket,
+    kubernetes_secret.mlflow_admin,
+    kubernetes_secret.mlflow_auth_rds,
+    kubernetes_secret.mlflow_rds
+  ]
+}
