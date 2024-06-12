@@ -1,0 +1,18 @@
+{
+    "rules": [
+      {
+        "rule-type": "selection",
+        "rule-id": "01",
+        "rule-name": "all",
+        "object-locator": {
+          "schema-name": "dbo",
+          "table-name": "%"
+        },
+        "rule-action": "include",
+        "filters": [],
+        "parallel-load": null,
+        "isAutoSegmentationChecked": false
+      }
+    ]
+  }
+  
