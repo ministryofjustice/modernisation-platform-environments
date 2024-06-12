@@ -1,5 +1,4 @@
-# tflint-ignore-file: terraform_required_version, terraform_required_providers
-resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
+resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" { # tflint-ignore: terraform_required_version, terraform_required_providers
   alarm_name         = "${var.appnameenv}-ECS-CPU-high-threshold-alarm"
   alarm_description  = "If the CPU exceeds the predefined threshold, this alarm will trigger. \n Please investigate."
   namespace          = "AWS/ECS"

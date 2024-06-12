@@ -3,7 +3,7 @@
 #############################################
 
 #tfsec:ignore:AVD-AWS-0091 tfsec:ignore:AVD-AWS-0086 tfsec:ignore:AVD-AWS-0087 tfsec:ignore:AVD-AWS-0093 tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-resource "aws_s3_bucket" "selenium_report" {
+resource "aws_s3_bucket" "selenium_report" { # tflint-ignore: terraform_required_version, terraform_required_providers
   #checkov:skip=CKV2_AWS_6:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_18:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV2_AWS_62:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
@@ -124,7 +124,7 @@ resource "aws_iam_role" "codebuild_s3" {
   )
 }
 
-data "template_file" "codebuild_policy" {
+data "template_file" "codebuild_policy" { # tflint-ignore: terraform_required_version, terraform_required_providers
   template = file("${path.module}/codebuild_iam_policy.json.tpl")
 
   vars = {
@@ -209,8 +209,7 @@ resource "aws_codebuild_project" "app-build" {
 }
 
 
-resource "aws_codebuild_project" "selenium" {
-  # tflint-ignore: terraform_required_version, terraform_required_providers
+resource "aws_codebuild_project" "selenium" { # tflint-ignore: terraform_required_version, terraform_required_providers
   #checkov:skip=CKV_AWS_314:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name          = "${var.app_name}-selenium-test"
   description   = "Project to test the Java application ${var.app_name}"

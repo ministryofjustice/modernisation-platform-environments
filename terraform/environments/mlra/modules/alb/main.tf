@@ -294,8 +294,7 @@ resource "aws_security_group" "lb" {
 }
 
 ## Cloudfront
-resource "random_password" "cloudfront" {
-  # tflint-ignore: terraform_required_version, terraform_required_providers
+resource "random_password" "cloudfront" { # tflint-ignore: terraform_required_version, terraform_required_providers
   length  = 16
   special = false
 }
@@ -547,8 +546,7 @@ resource "aws_waf_web_acl" "waf_acl" {
 
 # TODO This resource is required because otherwise Error: failed to read schema for module.alb.null_resource.always_run in registry.terraform.io/hashicorp/null: failed to instantiate provider
 # When the whole stack is recreated this can be removed
-resource "null_resource" "always_run" {
-  # tflint-ignore: terraform_required_version, terraform_required_providers
+resource "null_resource" "always_run" { # tflint-ignore: terraform_required_version, terraform_required_providers
 }
 
 
