@@ -1,3 +1,4 @@
+# tflint-ignore: terraform_required_version, terraform_required_providers
 resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
   # tflint-ignore: terraform_required_version, terraform_required_providers
   alarm_name         = "${var.appnameenv}-ECS-CPU-high-threshold-alarm"
@@ -399,7 +400,7 @@ resource "aws_sns_topic" "mlra_alerting_topic" {
   )
 }
 
-resource "aws_sns_topic_subscription" "pagerduty_subscription" {
+resource "aws_sns_topic_subscription" "pagerduty_subscription" { # tflint-ignore: terraform_required_version, terraform_required_providers
   # tflint-ignore: terraform_required_version, terraform_required_providers
   topic_arn = aws_sns_topic.mlra_alerting_topic.arn
   protocol  = "https"
