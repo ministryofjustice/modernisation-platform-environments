@@ -3,7 +3,8 @@
 #############################################
 
 #tfsec:ignore:AVD-AWS-0091 tfsec:ignore:AVD-AWS-0086 tfsec:ignore:AVD-AWS-0087 tfsec:ignore:AVD-AWS-0093 tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-resource "aws_s3_bucket" "selenium_report" { # tflint-ignore: terraform_required_version, terraform_required_providers
+resource "aws_s3_bucket" "selenium_report" {
+  # tflint-ignore: terraform_required_version, terraform_required_providers
   #checkov:skip=CKV2_AWS_6:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_18:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV2_AWS_62:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
