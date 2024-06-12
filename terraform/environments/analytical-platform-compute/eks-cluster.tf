@@ -151,6 +151,12 @@ module "eks" {
       username          = "data-engineering-airflow"
       kubernetes_groups = ["airflow"]
     }
+    github-actions-mojas-airflow = {
+      # principal_arn doesn't use the module output because they reference each other
+      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-mojas-airflow"
+      username          = "github-actions-mojas-airflow"
+      kubernetes_groups = ["airflow-serviceaccount-management"]
+    }
   }
 
   tags = local.tags

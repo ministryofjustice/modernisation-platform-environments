@@ -32,3 +32,20 @@ resource "kubernetes_role" "airflow_execution" {
     ]
   }
 }
+
+resource "kubernetes_role" "airflow_serviceaccount_management" {
+  metadata {
+    name      = "airflow-serviceaccount-management"
+    namespace = kubernetes_namespace.airflow.metadata[0].name
+  }
+  rule {
+    api_groups = [""]
+    resources  = ["serviceaccounts"]
+    verbs = [
+      "create",
+      "delete",
+      "get",
+      "update"
+    ]
+  }
+}
