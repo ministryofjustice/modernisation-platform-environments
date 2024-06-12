@@ -230,7 +230,8 @@ jobs:
               core.notice('Pull request approved by a member of @ministryofjustice/modernisation-platform');
             } 
             else {
-              core.setFailed('Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance');
+              core.setFailed('Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance'
+              # NEW code here);
 
               await github.rest.pulls.createReview({
                 owner: context.repo.owner,
@@ -238,6 +239,7 @@ jobs:
                 pull_number: context.payload.pull_request.number,
                 event: 'REQUEST_CHANGES',
                 body: 'Terraform plan evaluation detected changes to resources that require approval from @ministryofjustice/modernsation-platform - please contact #ask-modernisation-platform for assistance'
+                # NEW code here
               });
             }
 
@@ -256,6 +258,7 @@ jobs:
               repo: repo,
               issue_number: context.payload.pull_request.number,
               body: `@${context.actor} Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance`
+              # NEW code here
             });
 
   apply:
