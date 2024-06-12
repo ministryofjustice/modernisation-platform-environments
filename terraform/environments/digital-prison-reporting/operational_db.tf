@@ -8,7 +8,7 @@ module "operational_db_server" {
   name                        = "${local.project}-operational-db-server-${local.env}"
   description                 = "Operational DB Instance"
   vpc                         = data.aws_vpc.shared.id
-  cidr                        = [data.aws_vpc.shared.cidr_block]
+  cidr = [data.aws_vpc.shared.cidr_block]
   subnet_ids                  = data.aws_subnet.private_subnets_a.id
   ec2_instance_type           = "t3.large"
   ami_image_id                = local.image_id
@@ -46,7 +46,7 @@ module "operational_db_server" {
 
   env_vars = {
     POSTGRES_P = "postgres" # WEAK - this is just used for dev environment only spike
-    ENV        = local.env
+    ENV = local.env
   }
 
   tags = merge(
@@ -61,19 +61,19 @@ module "operational_db_server" {
 
 # Allows Glue jobs to be configured to access resources in the VPC
 resource "aws_glue_connection" "glue_vpc_access_connection" {
-  count = (local.environment == "development" ? 1 : 0)
+  count           = (local.environment == "development" ? 1 : 0)
   name            = "${local.project}-glue-vpc-connection-${local.env}"
   connection_type = "NETWORK"
 
   physical_connection_requirements {
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone = data.aws_subnet.private_subnets_a.availability_zone
     security_group_id_list = [aws_security_group.glue_vpc_access_connection_sg[0].id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
+    subnet_id         = data.aws_subnet.private_subnets_a.id
   }
 }
 
 resource aws_security_group "glue_vpc_access_connection_sg" {
-  count = (local.environment == "development" ? 1 : 0)
+  count       = (local.environment == "development" ? 1 : 0)
   name        = "glue_vpc_access_connection_sg"
   description = "Security group to allow glue access to resources in the VPC"
   vpc_id      = data.aws_vpc.shared.id
@@ -112,11 +112,11 @@ resource aws_security_group "glue_vpc_access_connection_sg" {
 resource "aws_security_group_rule" "allow_glue_security_group_access_to_operational_db" {
   count = (local.environment == "development" ? 1 : 0)
 
-  type              = "ingress"
-  security_group_id = module.operational_db_server[0].security_group_id
-  description       = "Allow glue security group to communicate with operational data store"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "tcp"
+  type                     = "ingress"
+  security_group_id        = module.operational_db_server[0].security_group_id
+  description              = "Allow glue security group to communicate with operational data store"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
   source_security_group_id = aws_security_group.glue_vpc_access_connection_sg[0].id
 }
