@@ -85,12 +85,15 @@ EOF
 data "aws_iam_policy_document" "extra-policy-document" {
   statement {
     actions = [
+      "ec2:DescribeVpcEndpoints",
+      "ec2:DescribeRouteTables",
       "ec2:DescribeNetworkInterfaces",
       "ec2:CreateNetworkInterface",
       "ec2:DeleteNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
       "ec2:DescribeSecurityGroups",
       "ec2:DescribeSubnets",
-      "ec2:DescribeVpcs"
+      "ec2:DescribeVpcAttribute"
     ]
     resources = [
       "*"
@@ -98,11 +101,20 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
+      "s3:GetObject"
+    ]
+    resources = [
+      "arn:aws:s3:::${var.project_id}-*/*",
+      "arn:aws:s3:::${var.project_id}-*"
+    ]
+  }
+  statement {
+    actions = [
       "s3:*"
     ]
     resources = [
-      "arn:aws:s3:::*/*",
-      "arn:aws:s3:::*"
+      "arn:aws:s3:::aws-glue-*",
+      "arn:aws:s3:::crawler-public*"
     ]
   }
   # https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging-enable.html#monitor-continuous-logging-encrypt-log-data
