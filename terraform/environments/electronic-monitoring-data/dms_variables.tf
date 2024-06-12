@@ -11,7 +11,7 @@ variable "database_list" {
 variable "dms_replication_instance_class" {
   description = "Name of the replication instance class to be used"
   type        = string
-  default     = "dms.c5.2xlarge"
+  default     = "dms.c6i.16xlarge"
 }
 
 variable "dms_engine_version" {

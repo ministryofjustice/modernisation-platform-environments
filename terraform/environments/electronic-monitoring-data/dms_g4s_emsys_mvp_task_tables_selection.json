@@ -6,7 +6,7 @@
         "rule-name": "all",
         "object-locator": {
           "schema-name": "dbo",
-          "table-name": "%"
+          "table-name": "GPSPosition"
         },
         "rule-action": "include",
         "filters": [],
