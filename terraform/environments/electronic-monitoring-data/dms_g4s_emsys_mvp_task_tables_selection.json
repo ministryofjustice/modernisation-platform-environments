@@ -5,7 +5,7 @@
         "rule-id": "01",
         "rule-name": "all",
         "object-locator": {
-          "schema-name": "dbo",
+          "schema-name": "%",
           "table-name": "%"
         },
         "rule-action": "include",
