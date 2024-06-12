@@ -8,6 +8,8 @@ resource "kubernetes_secret" "mlflow_auth_rds" {
   data = {
     username                   = module.mlflow_auth_rds.db_instance_username
     password                   = random_password.mlflow_auth_rds.result
+    address                    = module.mlflow_auth_rds.db_instance_address
+    port                       = module.mlflow_auth_rds.db_instance_port
     postgres_connection_string = "postgresql://${module.mlflow_auth_rds.db_instance_username}:${random_password.mlflow_auth_rds.result}@${module.mlflow_auth_rds.db_instance_address}:${module.mlflow_auth_rds.db_instance_port}/mlflowauth"
   }
 }
@@ -22,6 +24,8 @@ resource "kubernetes_secret" "mlflow_rds" {
   data = {
     username                   = module.mlflow_rds.db_instance_username
     password                   = random_password.mlflow_rds.result
+    address                    = module.mlflow_rds.db_instance_address
+    port                       = module.mlflow_rds.db_instance_port
     postgres_connection_string = "postgresql://${module.mlflow_rds.db_instance_username}:${random_password.mlflow_rds.result}@${module.mlflow_rds.db_instance_address}:${module.mlflow_rds.db_instance_port}/mlflow"
   }
 }
