@@ -284,11 +284,11 @@ resource "aws_security_group" "edw_db_security_group" {
 
 ###### DB DNS #######
 
-# resource "aws_route53_record" "edw_internal_dns_record" {
-#   provider = aws.core-vpc
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "${local.application_name}.${data.aws_route53_zone.external.name}"
-#   type    = "A"
-#   ttl     = 900
-#   records = [aws_instance.edw_db_instance.private_ip]
-# }
+resource "aws_route53_record" "edw_internal_dns_record" {
+  provider = aws.core-vpc
+  zone_id = data.aws_route53_zone.inner.zone_id
+  name    = "${local.application_name}.${data.aws_route53_zone.inner.name}"
+  type    = "A"
+  ttl     = 900
+  records = [aws_instance.edw_db_instance.private_ip]
+}
