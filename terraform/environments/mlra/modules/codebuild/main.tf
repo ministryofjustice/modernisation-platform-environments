@@ -62,6 +62,7 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 # ECR Resources
 ######################################################
 
+#tfsec:ignore:AVD-AWS-0030:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_ecr_repository" "local-ecr" {
   #checkov:skip=CKV_AWS_51:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_136:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
