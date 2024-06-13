@@ -11,6 +11,7 @@ on:
   pull_request:
     branches:
       - main
+    types: [opened, edited, reopened, synchronize]
     paths:
       - 'terraform/environments/mlra/**'
       - '.github/workflows/mlra.yml'
@@ -63,4 +64,4 @@ jobs:
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
-      
+
