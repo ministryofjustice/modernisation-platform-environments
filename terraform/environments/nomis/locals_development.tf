@@ -190,7 +190,7 @@ locals {
         })
         tags = {
           description = "For testing nomis weblogic 19c image"
-          ami         = "base_ol_8_5"
+          # ami       = "base_ol_8_5" # commented out to ensure harden role does not re-run
           os-type     = "Linux"
           component   = "web"
           server-type = "nomis-web19c"
