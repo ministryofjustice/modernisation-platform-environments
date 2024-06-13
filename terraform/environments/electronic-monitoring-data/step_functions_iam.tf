@@ -9,6 +9,7 @@ data "aws_iam_policy_document" "lambda_invoke_policy" {
     resources = [
       "${module.get_metadata_from_rds_lambda.lambda_function_arn}:*",
       "${module.create_athena_table.lambda_function_arn}:*",
+      "${module.get_file_keys_for_table.lambda_function_arn}:*",
     ]
   }
   statement {
@@ -21,6 +22,7 @@ data "aws_iam_policy_document" "lambda_invoke_policy" {
     resources = [
       module.get_metadata_from_rds_lambda.lambda_function_arn,
       module.create_athena_table.lambda_function_arn,
+      module.get_file_keys_for_table.lambda_function_arn,
     ]
   }
 }
