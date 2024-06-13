@@ -82,6 +82,9 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   alarm_actions = [
     for item in each.value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
   ]
+  ok_actions = [
+    for item in each.value.ok_actions : try(aws_sns_topic.this[item].arn, item)
+  ]
 
   alarm_description   = each.value.alarm_description
   datapoints_to_alarm = each.value.datapoints_to_alarm
