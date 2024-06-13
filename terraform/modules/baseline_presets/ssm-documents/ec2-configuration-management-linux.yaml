@@ -27,7 +27,7 @@ mainSteps:
             ansibleArgs="{{ ansibleArgs }}"
             sudo /bin/rm -rf $tmpdir 2>/dev/null || true
             sudo mkdir $tmpdir 2>/dev/null || true
-            sudo curl "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$branch/ansible/roles/ansible-script/files/ansible.sh" -o $tmpdir/ansible.sh
+            sudo curl -sS "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$branch/ansible/roles/ansible-script/files/ansible.sh" -o $tmpdir/ansible.sh
             sudo chmod +x $tmpdir/ansible.sh
             sudo ansible_dir=$tmpdir branch=$branch $tmpdir/ansible.sh $ansibleArgs
           }
