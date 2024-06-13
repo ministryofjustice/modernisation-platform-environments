@@ -1,36 +1,21 @@
 locals {
 
-  # baseline presets config
-  production_baseline_presets_options = {
-    sns_topics = {
-      pagerduty_integrations = {
-        dso_pagerduty               = "nomis_alarms"
-        dba_pagerduty               = "hmpps_shef_dba_low_priority"
-        dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
+  baseline_presets_production = {
+    options = {
+      sns_topics = {
+        pagerduty_integrations = {
+          dso_pagerduty               = "nomis_alarms"
+          dba_pagerduty               = "hmpps_shef_dba_low_priority"
+          dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
+        }
       }
     }
   }
 
-  production_config = {
+  # please keep resources in alphabetical order
+  baseline_production = {
 
-    baseline_s3_buckets = {
-      ncr-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-    }
-
-    baseline_secretsmanager_secrets = {
-      "/oracle/database/PDBIPSYS" = local.database_secretsmanager_secrets
-      "/oracle/database/PDBIPAUD" = local.database_secretsmanager_secrets
-      "/oracle/database/PDBISYS"  = local.database_secretsmanager_secrets
-      "/oracle/database/PDBIAUD"  = local.database_secretsmanager_secrets
-    }
-
-    baseline_iam_policies = {
+    iam_policies = {
       Ec2PDDatabasePolicy = {
         description = "Permissions required for PROD Database EC2s"
         statements = [
@@ -58,7 +43,7 @@ locals {
       }
     }
 
-    baseline_ec2_instances = {
+    ec2_instances = {
       pd-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
           local.database_cloudwatch_metric_alarms.standard,
@@ -71,47 +56,6 @@ locals {
             "Ec2PDDatabasePolicy",
           ])
         })
-        ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            size  = 100
-            label = "app"
-            type  = "gp3"
-          }
-          "/dev/sdc" = { # /u02
-            size  = 500
-            label = "app"
-            type  = "gp3"
-          }
-          "/dev/sde" = { # DATA01
-            label = "data"
-            size  = 500
-            type  = "gp3"
-          }
-          "/dev/sdj" = { # FLASH01
-            label = "flash"
-            type  = "gp3"
-            size  = 200
-          }
-          "/dev/sds" = {
-            label = "swap"
-            type  = "gp3"
-            size  = 4
-          }
-        }
-        ebs_volume_config = {
-          data = {
-            iops       = 3000 # min 3000
-            type       = "gp3"
-            throughput = 125
-            total_size = 500
-          }
-          flash = {
-            iops       = 3000 # min 3000
-            type       = "gp3"
-            throughput = 125
-            total_size = 200
-          }
-        }
         tags = merge(local.database_ec2_default.tags, {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
@@ -119,6 +63,7 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
+
       pd-ncr-db-1-b = merge(local.database_ec2_default, {
         # TODO: comment in when commissioned
         # cloudwatch_metric_alarms = merge(
@@ -131,47 +76,6 @@ locals {
             "Ec2PDDatabasePolicy",
           ])
         })
-        ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            size  = 100
-            label = "app"
-            type  = "gp3"
-          }
-          "/dev/sdc" = { # /u02
-            size  = 500
-            label = "app"
-            type  = "gp3"
-          }
-          "/dev/sde" = { # DATA01
-            label = "data"
-            size  = 500
-            type  = "gp3"
-          }
-          "/dev/sdj" = { # FLASH01
-            label = "flash"
-            type  = "gp3"
-            size  = 200
-          }
-          "/dev/sds" = {
-            label = "swap"
-            type  = "gp3"
-            size  = 4
-          }
-        }
-        ebs_volume_config = {
-          data = {
-            iops       = 3000 # min 3000
-            type       = "gp3"
-            throughput = 125
-            total_size = 500
-          }
-          flash = {
-            iops       = 3000 # min 3000
-            type       = "gp3"
-            throughput = 125
-            total_size = 200
-          }
-        }
         tags = merge(local.database_ec2_default.tags, {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
@@ -181,7 +85,7 @@ locals {
       })
     }
 
-    baseline_route53_zones = {
+    route53_zones = {
       "reporting.nomis.service.justice.gov.uk" = {
         ns_records = [
           # use this if NS records can be pulled from terrafrom, otherwise use records variable
@@ -196,10 +100,26 @@ locals {
           { name = "db-b", type = "CNAME", ttl = "300", records = ["pd-ncr-db-1-b.nomis-combined-reporting.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
+
       "production.reporting.nomis.service.justice.gov.uk" = {
       }
-
     }
 
+    s3_buckets = {
+      ncr-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+    }
+
+    secretsmanager_secrets = {
+      "/oracle/database/PDBIPSYS" = local.database_secretsmanager_secrets
+      "/oracle/database/PDBIPAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/PDBISYS"  = local.database_secretsmanager_secrets
+      "/oracle/database/PDBIAUD"  = local.database_secretsmanager_secrets
+    }
   }
 }
