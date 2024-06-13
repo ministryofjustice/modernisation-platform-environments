@@ -20,6 +20,7 @@ mainSteps:
     inputs:
       runCommand:
         - |
+          set -eo pipefail
           run_ansible() {
             tmpdir=/root/.ec2-configuration-management
             branch="{{ branch }}"
@@ -30,4 +31,6 @@ mainSteps:
             sudo chmod +x $tmpdir/ansible.sh
             sudo ansible_dir=$tmpdir branch=$branch $tmpdir/ansible.sh $ansibleArgs
           }
-          run_ansible | logger -s -p local3.info -t ec2-configuration-management-ansible 2>&1
+          echo "Running ansible: check /var/log/messages on server or cloudwatch for logs"
+          run_ansible | logger -p local3.info -t ec2-configuration-management-ansible
+          echo "Great success: ansible completed without error"
