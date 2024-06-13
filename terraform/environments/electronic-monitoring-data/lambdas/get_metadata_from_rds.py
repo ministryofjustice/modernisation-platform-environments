@@ -68,6 +68,11 @@ def add_db_to_meta(meta, db_name):
     """
     meta.database_name = db_name
     return meta
+    
+def remove_comments_from_meta(meta):
+    for col in meta['columns']:
+        col["description"] = ""
+    return meta
 
 
 def handler(event, context):
@@ -80,6 +85,7 @@ def handler(event, context):
     for meta in metadata_list:
         write_meta_to_s3(meta)
     dict_metadata_list = [meta.to_dict() for meta in metadata_list]
+    dict_metadata_list = [remove_comments_from_meta(meta) for meta in dict_metadata_list]
     create_glue_database(db_name)
     result = {
         "status": "success",
