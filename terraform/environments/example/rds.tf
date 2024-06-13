@@ -43,7 +43,8 @@ resource "aws_db_instance" "example-rds" {
   performance_insights_kms_key_id     = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
   enabled_cloudwatch_logs_exports     = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-example", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-example", local.application_name, local.environment)) },
+    { instance-scheduling = "skip-scheduling" } # This is now managed by the flexible shutdown & startup workflow.
   )
 }
 

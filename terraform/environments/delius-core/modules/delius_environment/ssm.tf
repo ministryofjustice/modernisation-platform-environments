@@ -37,7 +37,6 @@ resource "aws_ssm_parameter" "ldap_admin_password" {
     ]
   }
   tags = local.tags
-
 }
 
 resource "aws_ssm_parameter" "oasys_user" {
@@ -217,6 +216,34 @@ data "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
 
 resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_secret" {
   name  = format("/%s-%s/umt_client_secret", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+
+  tags = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_umt_jwt_secret" {
+  name  = format("/%s-%s/umt_jwt_secret", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+
+  tags = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_umt_delius_secret" {
+  name  = format("/%s-%s/umt_delius_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
 

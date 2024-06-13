@@ -110,7 +110,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v4.0.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v4.1.0"
 
   providers = {
     aws.bucket-replication = aws
@@ -175,6 +175,9 @@ module "lb_listener" {
     for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
       alarm_actions = [
         for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+      ok_actions = [
+        for item in value.ok_actions : try(aws_sns_topic.this[item].arn, item)
       ]
     })
   }

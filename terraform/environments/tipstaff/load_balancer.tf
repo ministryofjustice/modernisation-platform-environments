@@ -56,6 +56,28 @@ resource "aws_security_group" "tipstaff_lb_sc" {
     ]
   }
 
+  // Replacement DOM1 allow list from Jaz Chan 11/6/24
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    cidr_blocks = [
+      "20.26.11.71/32",
+      "20.26.11.108/32",
+      "20.49.214.199/32",
+      "20.49.214.228/32",
+      "51.149.249.0/29",
+      "51.149.249.32/29",
+      "51.149.250.0/24",
+      "128.77.75.64/26",
+      "194.33.200.0/21",
+      "194.33.216.0/23",
+      "194.33.218.0/24",
+      "194.33.248.0/29",
+      "194.33.249.0/29"
+    ]
+  }
+
   // Allow all IP addresses provided by the users
   ingress {
     from_port = 443
@@ -277,7 +299,7 @@ resource "aws_lb_listener" "tipstaff_lb" {
   load_balancer_arn = aws_lb.tipstaff_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     type             = "forward"

@@ -2,7 +2,7 @@
 
 # For macie code
 data "aws_s3_bucket" "bucket1" {
-  bucket = "bastion-example-example-development-jxaebg"
+  bucket = module.bastion_linux.bastion_s3_bucket.bucket.id
 }
 
 data "aws_s3_bucket" "bucket2" {
@@ -10,5 +10,5 @@ data "aws_s3_bucket" "bucket2" {
 }
 
 data "aws_s3_bucket" "bucket3" {
-  bucket = "s3-bucket-example20240430100555519600000006"
+  bucket = module.s3-bucket.bucket.id
 }

@@ -25,7 +25,7 @@ locals {
     } } : {},
 
     # If db_backup_s3 enabled, create db_backups in all environments.
-    # Dev and Test can both access each other: Preprod can access prod but not vice-versa
+    # Dev and Test can both access each other: Preprod can access prod but not vice-versa
     var.options.db_backup_s3 && var.environment.environment == "production" && !var.options.db_backup_more_permissions ? { "prod-${var.environment.application_name}-db-backup-bucket-" = {
       bucket_policy_v2 = [
         local.s3_bucket_policies.PreprodReadOnlyAccessBucketPolicy,

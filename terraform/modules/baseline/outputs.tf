@@ -23,6 +23,11 @@ output "bastion_linux" {
   value       = length(module.bastion_linux) == 1 ? module.bastion_linux[0] : null
 }
 
+output "cloudwatch_dashboards" {
+  description = "map of cloudwatch_dashboard modules corresponding to var.cloudwatch_dashboards"
+  value       = module.cloudwatch_dashboard
+}
+
 output "cloudwatch_log_groups" {
   description = "map of aws_cloudwatch_log_group resources"
   value       = aws_cloudwatch_log_group.this
@@ -82,6 +87,16 @@ output "lbs" {
       }
     })
   }
+}
+
+output "oam_links" {
+  description = "map of aws_oam_link resources corresponding to var.oam_links"
+  value       = aws_oam_link.this
+}
+
+output "oam_sinks" {
+  description = "map of aws_oam_sink resources corresponding to var.oam_sinks"
+  value       = aws_oam_sink.this
 }
 
 output "route53_resolvers_security_group" {

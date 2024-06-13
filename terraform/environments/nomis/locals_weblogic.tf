@@ -6,6 +6,7 @@ locals {
       rms       = { description = "combined reporting secrets" }
     }
   }
+
   weblogic_iam_policy_statements = [
     {
       effect = "Allow"
@@ -161,7 +162,6 @@ locals {
       os-type                = "Linux"
       server-type            = "nomis-web"
       component              = "web"
-
     }
   }
 }

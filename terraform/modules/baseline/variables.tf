@@ -17,6 +17,7 @@ variable "acm_certificates" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -66,7 +67,7 @@ variable "backups" {
 variable "bastion_linux" {
   description = "set this if you want a bastion linux created"
   type = object({
-    public_key_data         = map(string)
+    public_key_data         = optional(map(string)) # if this is not set, bastion is not created
     allow_ssh_commands      = optional(bool, true)
     bucket_name             = optional(string, "bastion")
     log_auto_clean          = optional(string, "Enabled")
@@ -76,7 +77,29 @@ variable "bastion_linux" {
     extra_user_data_content = optional(string, "")
     tags                    = optional(map(string), {})
   })
-  default = null
+  default = {
+    public_key_data = null
+  }
+}
+
+# see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html
+# cannot define a type without fully defining the entire cloudwatch dashboard json structure
+variable "cloudwatch_dashboards" {
+  # tflint-ignore: terraform_typed_variables
+  description = "map of cloudwatch dashboards where key is the dashboard name. Use widget_groups if you want baseline to work out x,y,width,height"
+  #type = map(object({
+  #  account_name   = optional(string)        # for monitoring account, limit to given account
+  #  periodOverride = optional(string)
+  #  start          = optional(string)
+  #  widgets        = optional(list(any), []) # use if you want to set x,y,width,height yourself
+  #  widget_groups = optional(list(object({   # automate x,y,width,height values
+  #    header_markdown = optional(string)     # include a header text widget if set
+  #    width           = number               # width of each widget, must be divisor of 24
+  #    height          = number               # height of each widget
+  #    widgets         = list(any)            # no need to set x,y,width,height
+  #  })), [])
+  #}))
+  default = {}
 }
 
 variable "cloudwatch_log_groups" {
@@ -118,6 +141,7 @@ variable "cloudwatch_metric_alarms" {
     statistic           = string
     threshold           = number
     alarm_actions       = optional(list(string), [])
+    ok_actions          = optional(list(string), [])
     actions_enabled     = optional(bool, false)
     alarm_description   = optional(string)
     datapoints_to_alarm = optional(number)
@@ -207,7 +231,7 @@ variable "ec2_autoscaling_groups" {
       instance_refresh = optional(object({
         strategy               = string
         min_healthy_percentage = number
-        instance_warmup        = number
+        instance_warmup        = optional(number)
       }))
       warm_pool = optional(object({
         pool_state                  = optional(string)
@@ -275,6 +299,7 @@ variable "ec2_autoscaling_groups" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -381,6 +406,7 @@ variable "ec2_instances" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -801,6 +827,7 @@ variable "lbs" {
         statistic           = string
         threshold           = number
         alarm_actions       = optional(list(string), [])
+        ok_actions          = optional(list(string), [])
         actions_enabled     = optional(bool, false)
         alarm_description   = optional(string)
         datapoints_to_alarm = optional(number)
@@ -822,6 +849,37 @@ variable "kms_grants" {
     operations        = list(string)
   }))
   default = {}
+}
+
+variable "oam_links" {
+  description = "map of aws_oam_link resources to create where the map key is the label_template and tag.Name"
+  type = map(object({
+    label_template                     = string
+    resource_types                     = list(string) # e.g. ["AWS::CloudWatch::Metric"]
+    sink_identifier_ssm_parameter_name = string
+  }))
+  default = {}
+}
+
+variable "oam_sinks" {
+  description = "map of aws_oam_sink and ows_oam_sink_policy resources to create where the map key is the sink name"
+  type = map(object({
+    resource_types       = list(string) # e.g. ["AWS::CloudWatch::Metric"]
+    source_account_names = list(string)
+  }))
+  default = {}
+}
+
+variable "options" {
+  description = "options to enable standalone resources"
+  type = object({
+    enable_cost_usage_report = optional(bool, false)
+    enable_resource_explorer = optional(bool, false)
+  })
+  default = {
+    enable_cost_usage_report = false
+    enable_resource_explorer = false
+  }
 }
 
 variable "route53_resolvers" {
@@ -1122,18 +1180,3 @@ variable "tags" {
   default     = {}
 }
 
-variable "resource_explorer" {
-  description = "Enables AWS Resource Explorer"
-  type        = bool
-  default     = false
-}
-
-variable "cost_usage_report" {
-  description = "Enables AWS Cost Usage Report"
-  type = object({
-    create = bool
-  })
-  default = {
-    create = false
-  }
-}

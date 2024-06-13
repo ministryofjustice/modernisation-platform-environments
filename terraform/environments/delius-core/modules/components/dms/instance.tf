@@ -25,4 +25,7 @@ resource "aws_dms_replication_subnet_group" "this" {
   replication_subnet_group_description = "subnet for dms replication"
   replication_subnet_group_id          = "${var.env_name}-dms-subnet-group"
   subnet_ids                           = var.account_config.ordered_private_subnet_ids
+  lifecycle {
+    create_before_destroy = true
+  }
 }

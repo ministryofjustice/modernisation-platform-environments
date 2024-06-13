@@ -26,6 +26,7 @@ data "aws_kms_alias" "sns" {
 }
 
 module "pagerduty_core_alerts" {
+  #checkov:skip=CKV_TF_1:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   depends_on = [
     aws_sns_topic.mlra_ddos_alarm
   ]

@@ -146,6 +146,7 @@ variable "cloudwatch_metric_alarms" {
     statistic           = string
     threshold           = number
     alarm_actions       = list(string)
+    ok_actions          = optional(list(string))
     actions_enabled     = optional(bool, false)
     alarm_description   = optional(string)
     datapoints_to_alarm = optional(number)

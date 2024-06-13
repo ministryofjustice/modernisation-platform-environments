@@ -72,7 +72,7 @@ resource "aws_instance" "concurrent_manager" {
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = local.cm_ec2_name },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "no" } : { "snapshot-with-daily-35-day-retention" = "yes" }
   )
 }
 

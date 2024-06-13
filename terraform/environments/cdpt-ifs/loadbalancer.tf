@@ -21,10 +21,11 @@ resource "aws_security_group" "ifs_lb_sc" {
 }
 
 resource "aws_lb" "ifs_lb" {
-  name               = "ifs-load-balancer"
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.ifs_lb_sc.id]
-  subnets            = data.aws_subnets.shared-public.ids
+  name                       = "ifs-load-balancer"
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.ifs_lb_sc.id]
+  subnets                    = data.aws_subnets.shared-public.ids
+  drop_invalid_header_fields = false
 }
 
 resource "aws_lb_target_group" "ifs_target_group" {

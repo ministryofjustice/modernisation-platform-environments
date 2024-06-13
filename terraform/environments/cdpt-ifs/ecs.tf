@@ -26,8 +26,13 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
                 "ecr:BatchGetImage",
+                "logs:CreateLogGroup",
                 "logs:CreateLogStream",
+                "logs:GetLogEvents",
                 "logs:PutLogEvents",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:PutRetentionPolicy",
                 "s3:ListBucket",
                 "s3:*Object*",
                 "kms:Decrypt",
@@ -318,7 +323,6 @@ resource "aws_security_group" "cluster_ec2" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    cidr_blocks     = ["0.0.0.0/0"]
     security_groups = [aws_security_group.ifs_lb_sc.id]
   }
 
@@ -331,12 +335,11 @@ resource "aws_security_group" "cluster_ec2" {
   }
 
   egress {
-    description     = "Cluster EC2 loadbalancer egress rule"
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-    security_groups = []
+    description = "Cluster EC2 loadbalancer egress rule"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = merge(

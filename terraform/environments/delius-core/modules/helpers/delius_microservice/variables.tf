@@ -51,7 +51,13 @@ variable "rds_endpoint_environment_variable" {
 }
 
 variable "rds_password_secret_variable" {
-  description = "Secret variable to store the rds secretsmanager arn"
+  description = "Secret variable to store the rds secretsmanager arn password"
+  type        = string
+  default     = ""
+}
+
+variable "rds_user_secret_variable" {
+  description = "Secret variable to store the rds secretsmanager arn username"
   type        = string
   default     = ""
 }
@@ -311,11 +317,6 @@ variable "elasticache_parameter_group_name" {
   default     = "default.redis5.0"
 }
 
-variable "elasticache_subnet_group_name" {
-  description = "The Elasticache subnet group name"
-  type        = string
-  default     = "default"
-}
 variable "elasticache_num_cache_nodes" {
   description = "The Elasticache number of cache nodes"
   type        = number
@@ -332,6 +333,18 @@ variable "elasticache_parameters" {
   description = "A map of elasticache parameter names & values"
   type        = map(string)
   default     = {}
+}
+
+variable "elasticache_password_secret_variable" {
+  description = "Secret variable to store the elasticache secretsmanager arn password"
+  type        = string
+  default     = ""
+}
+
+variable "elasticache_user_variable" {
+  description = "variable to store the elasticache username"
+  type        = string
+  default     = ""
 }
 
 variable "container_vars_default" {
@@ -519,4 +532,10 @@ variable "sns_topic_arn" {
 variable "frontend_lb_arn_suffix" {
   description = "Used by alarms"
   type        = string
+}
+
+variable "extra_task_role_policies" {
+  description = "A map of data \"aws_iam_policy_document\" objects, keyed by name, to attach to the task role"
+  type        = map(any)
+  default     = {}
 }

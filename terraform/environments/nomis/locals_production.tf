@@ -1,73 +1,310 @@
 # nomis-production environment settings
 locals {
 
-  # cloudwatch monitoring config
-  production_cloudwatch_monitoring_options = {}
-
-  # baseline presets config
-  production_baseline_presets_options = {
-    sns_topics = {
-      pagerduty_integrations = {
-        dso_pagerduty               = "nomis_alarms"
-        dba_pagerduty               = "hmpps_shef_dba_low_priority"
-        dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
-      }
-    }
-    route53_resolver_rules = {
-      outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
-    }
-  }
-
-  # config for load balancer maintenance rule
-  production_lb_maintenance_message = {
+  lb_maintenance_message_production = {
     maintenance_title   = "Prison-NOMIS Maintenance Window"
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
-  # baseline config
-  production_config = {
-
-    baseline_s3_buckets = {
-      nomis-audit-archives = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-        lifecycle_rule = [
-          module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
-        ]
+  baseline_presets_production = {
+    options = {
+      cloudwatch_dashboard_default_widget_groups = [
+        "lb",
+        "ec2",
+        "ec2_linux",
+        "ec2_autoscaling_group_linux",
+        "ec2_instance_linux",
+        "ec2_instance_oracle_db_with_backup",
+        "ec2_instance_textfile_monitoring_with_connectivity_test",
+      ]
+      sns_topics = {
+        pagerduty_integrations = {
+          dso_pagerduty               = "nomis_alarms"
+          dba_pagerduty               = "hmpps_shef_dba_low_priority"
+          dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
+        }
       }
-      nomis-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
+      route53_resolver_rules = {
+        outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
     }
+  }
 
-    baseline_acm_certificates = {
+  # please keep resources in alphabetical order
+  baseline_production = {
+
+    acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
-        domain_name = module.environment.domains.public.modernisation_platform
+        domain_name = "modernisation-platform.service.justice.gov.uk"
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",
-          "*.${local.environment}.nomis.service.justice.gov.uk",
-          "*.${local.environment}.nomis.az.justice.gov.uk",
+          "*.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk",
+          "*.production.nomis.service.justice.gov.uk",
+          "*.production.nomis.az.justice.gov.uk",
           "*.nomis.service.justice.gov.uk",
           "*.nomis.az.justice.gov.uk",
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
-          description = "wildcard cert for nomis ${local.environment} domains"
+          description = "wildcard cert for nomis production domains"
         }
       }
     }
 
-    baseline_iam_policies = {
+    cloudwatch_log_groups = {
+      session-manager-logs = {
+        retention_in_days = 400
+      }
+      cwagent-var-log-messages = {
+        retention_in_days = 90
+      }
+      cwagent-var-log-secure = {
+        retention_in_days = 400
+      }
+      cwagent-windows-system = {
+        retention_in_days = 90
+      }
+      cwagent-nomis-autologoff = {
+        retention_in_days = 400
+      }
+      cwagent-weblogic-logs = {
+        retention_in_days = 90
+      }
+    }
+
+    ec2_autoscaling_groups = {
+      # NOT-ACTIVE (blue deployment)
+      prod-nomis-web-a = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 0
+        })
+        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2ProdWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "r4.2xlarge"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "prod"
+          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PCNOM"
+          deployment           = "blue"
+        })
+      })
+
+      # ACTIVE (green deployment)
+      prod-nomis-web-b = merge(local.weblogic_ec2, {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
+          desired_capacity = 8
+          max_size         = 8
+
+          instance_refresh = {
+            strategy               = "Rolling"
+            min_healthy_percentage = 80
+          }
+        })
+        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
+        config = merge(local.weblogic_ec2.config, {
+          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
+            "Ec2ProdWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.weblogic_ec2.instance, {
+          instance_type = "r4.2xlarge"
+        })
+        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
+          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
+            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
+          })
+        })
+        tags = merge(local.weblogic_ec2.tags, {
+          nomis-environment    = "prod"
+          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PCNOM"
+          deployment           = "green"
+        })
+      })
+
+      prod-nomis-client-a = merge(local.jumpserver_ec2, {
+        tags = merge(local.jumpserver_ec2.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
+    }
+
+    ec2_instances = {
+      prod-nomis-xtag-a = merge(local.xtag_ec2, {
+        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
+        config = merge(local.xtag_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
+            "Ec2ProdWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
+          args = merge(local.xtag_ec2.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.xtag_ec2.tags, {
+          nomis-environment    = "prod"
+          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PCNOM"
+          ndh-ems-hostname     = "pd-ems.ndh.nomis.service.justice.gov.uk"
+        })
+      })
+
+      prod-nomis-db-1-a = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
+          local.database_ec2_cloudwatch_metric_alarms.nomis_batch,
+        )
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }  # /u01
+          "/dev/sdc" = { label = "app", size = 1000 } # /u02
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 4000, iops = 12000, throughput = 750 }
+          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "prod"
+          description       = "Production databases for CNOM and NDH"
+          oracle-sids       = "PDCNOM PDNDH PDTRDAT"
+        })
+      })
+
+      prod-nomis-db-1-b = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+        )
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 4000, iops = 12000, throughput = 750 }
+          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "prod"
+          description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
+          oracle-sids       = "DRCNOM DRNDH DRTRDAT"
+        })
+      })
+
+      prod-nomis-db-2-a = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.db_backup,
+          local.database_ec2_cloudwatch_metric_alarms.misload,
+        )
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }  # /u01
+          "/dev/sdc" = { label = "app", size = 1000 } # /u02
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 6000, iops = 12000, throughput = 750 }
+          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment = "prod"
+          description       = "Production databases for AUDIT/MIS"
+          oracle-sids       = "PDCNMAUD PDMIS"
+          misload-dbname    = "PDMIS"
+        })
+      })
+
+      prod-nomis-db-2-b = merge(local.database_ec2, {
+        cloudwatch_metric_alarms = merge(
+          local.database_ec2_cloudwatch_metric_alarms.standard,
+          local.database_ec2_cloudwatch_metric_alarms.db_connected,
+          local.database_ec2_cloudwatch_metric_alarms.connectivity_test,
+        )
+        config = merge(local.database_ec2.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
+            "Ec2ProdDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
+          data  = { total_size = 6000, iops = 12000, throughput = 750 }
+          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+        })
+        instance = merge(local.database_ec2.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.4xlarge"
+        })
+        tags = merge(local.database_ec2.tags, {
+          nomis-environment  = "prod"
+          description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+          oracle-sids        = "DRMIS DRCNMAUD"
+          misload-dbname     = "DRMIS"
+          connectivity-tests = "10.40.0.133:53 10.40.129.79:22"
+        })
+      })
+    }
+
+    iam_policies = {
       Ec2ProdDatabasePolicy = {
         description = "Permissions required for prod Database EC2s"
         statements = [
@@ -116,316 +353,7 @@ locals {
       }
     }
 
-    baseline_secretsmanager_secrets = {
-      "/oracle/weblogic/prod"  = local.weblogic_secretsmanager_secrets
-      "/oracle/database/PCNOM" = local.database_weblogic_secretsmanager_secrets # weblogic oracle-db-name set to PCNOM
-      # PROD ACTIVE
-      "/oracle/database/PDCNOM"   = local.database_secretsmanager_secrets
-      "/oracle/database/PDNDH"    = local.database_secretsmanager_secrets
-      "/oracle/database/PDTRDAT"  = local.database_secretsmanager_secrets
-      "/oracle/database/PDCNMAUD" = local.database_secretsmanager_secrets
-      "/oracle/database/PDMIS"    = local.database_mis_secretsmanager_secrets
-      # PROD STANDBY
-      "/oracle/database/DRCNOM"   = local.database_secretsmanager_secrets
-      "/oracle/database/DRNDH"    = local.database_secretsmanager_secrets
-      "/oracle/database/DRTRDAT"  = local.database_secretsmanager_secrets
-      "/oracle/database/DRCNMAUD" = local.database_secretsmanager_secrets
-      "/oracle/database/DRMIS"    = local.database_mis_secretsmanager_secrets
-    }
-
-    baseline_cloudwatch_log_groups = {
-      session-manager-logs = {
-        retention_in_days = 400
-      }
-      cwagent-var-log-messages = {
-        retention_in_days = 90
-      }
-      cwagent-var-log-secure = {
-        retention_in_days = 400
-      }
-      cwagent-windows-system = {
-        retention_in_days = 90
-      }
-      cwagent-nomis-autologoff = {
-        retention_in_days = 400
-      }
-      cwagent-weblogic-logs = {
-        retention_in_days = 90
-      }
-    }
-
-    baseline_ec2_autoscaling_groups = {
-      # NOT-ACTIVE (blue deployment)
-      prod-nomis-web-a = merge(local.weblogic_ec2, {
-        autoscaling_group = merge(local.weblogic_ec2.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 0
-        })
-        # cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
-        config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-            "Ec2ProdWeblogicPolicy",
-          ])
-        })
-        instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "r4.2xlarge"
-        })
-        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
-          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.weblogic_ec2.tags, {
-          nomis-environment    = "prod"
-          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
-          oracle-db-name       = "PCNOM"
-          deployment           = "blue"
-        })
-      })
-
-      # ACTIVE (green deployment)
-      prod-nomis-web-b = merge(local.weblogic_ec2, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
-          desired_capacity = 8
-          max_size         = 8
-        })
-        cloudwatch_metric_alarms = local.weblogic_cloudwatch_metric_alarms
-        config = merge(local.weblogic_ec2.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
-          instance_profile_policies = concat(local.weblogic_ec2.config.instance_profile_policies, [
-            "Ec2ProdWeblogicPolicy",
-          ])
-        })
-        instance = merge(local.weblogic_ec2.instance, {
-          instance_type = "r4.2xlarge"
-        })
-        user_data_cloud_init = merge(local.weblogic_ec2.user_data_cloud_init, {
-          args = merge(local.weblogic_ec2.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.weblogic_ec2.tags, {
-          nomis-environment    = "prod"
-          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
-          oracle-db-name       = "PCNOM"
-          deployment           = "green"
-        })
-      })
-
-      prod-nomis-client-a = local.jumpserver_ec2
-    }
-
-    baseline_ec2_instances = {
-      prod-nomis-xtag-a = merge(local.xtag_ec2, {
-        cloudwatch_metric_alarms = local.xtag_cloudwatch_metric_alarms
-        config = merge(local.xtag_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.xtag_ec2.config.instance_profile_policies, [
-            "Ec2ProdWeblogicPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.xtag_ec2.user_data_cloud_init, {
-          args = merge(local.xtag_ec2.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.xtag_ec2.tags, {
-          nomis-environment    = "prod"
-          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
-          oracle-db-name       = "PCNOM"
-          ndh-ems-hostname     = "pd-ems.ndh.nomis.service.justice.gov.uk"
-        })
-      })
-
-      prod-nomis-db-1-a = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms.standard,
-          local.database_ec2_cloudwatch_metric_alarms.db_connected,
-          local.database_ec2_cloudwatch_metric_alarms.db_backup,
-          local.database_ec2_cloudwatch_metric_alarms.nomis_batch,
-        )
-        config = merge(local.database_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }  # /u01
-          "/dev/sdc" = { label = "app", size = 1000 } # /u02
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
-        })
-        instance = merge(local.database_ec2.instance, {
-          disable_api_termination = true
-          instance_type           = "r6i.4xlarge"
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment = "prod"
-          description       = "Production databases for CNOM and NDH"
-          oracle-sids       = "PDCNOM PDNDH PDTRDAT"
-        })
-      })
-      prod-nomis-db-1-b = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms.standard,
-          local.database_ec2_cloudwatch_metric_alarms.db_connected,
-        )
-        config = merge(local.database_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "${local.region}b"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 500 }
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
-        })
-        instance = merge(local.database_ec2.instance, {
-          disable_api_termination = true
-          instance_type           = "r6i.4xlarge"
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment = "prod"
-          description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
-          oracle-sids       = "DRCNOM DRNDH DRTRDAT"
-        })
-      })
-
-      prod-nomis-db-2 = merge(local.database_ec2, {
-        config = merge(local.database_ec2.config, {
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 3000, iops = 9000 }
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
-        })
-        instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.2xlarge"
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment  = "prod"
-          description        = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
-          oracle-sids        = ""
-          connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
-        })
-      })
-
-      prod-nomis-db-2-a = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms.standard,
-          local.database_ec2_cloudwatch_metric_alarms.db_connected,
-          local.database_ec2_cloudwatch_metric_alarms.db_backup,
-          local.database_ec2_cloudwatch_metric_alarms.misload,
-        )
-        config = merge(local.database_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }  # /u01
-          "/dev/sdc" = { label = "app", size = 1000 } # /u02
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 6000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
-        })
-        instance = merge(local.database_ec2.instance, {
-          disable_api_termination = true
-          instance_type           = "r6i.4xlarge"
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment = "prod"
-          description       = "Production databases for AUDIT/MIS"
-          oracle-sids       = "PDCNMAUD PDMIS"
-          misload-dbname    = "PDMIS"
-        })
-      })
-
-      prod-nomis-db-2-b = merge(local.database_ec2, {
-        cloudwatch_metric_alarms = merge(
-          local.database_ec2_cloudwatch_metric_alarms.standard,
-          local.database_ec2_cloudwatch_metric_alarms.db_connected,
-          local.database_ec2_cloudwatch_metric_alarms.connectivity_test,
-        )
-        config = merge(local.database_ec2.config, {
-          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "${local.region}b"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 500 }
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 6000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
-        })
-        instance = merge(local.database_ec2.instance, {
-          disable_api_termination = true
-          instance_type           = "r6i.4xlarge"
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment  = "prod"
-          description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          oracle-sids        = "DRMIS DRCNMAUD"
-          misload-dbname     = "DRMIS"
-          connectivity-tests = "10.40.0.136:4903 10.40.129.79:22"
-        })
-      })
-
-      prod-nomis-db-3 = merge(local.database_ec2, {
-        config = merge(local.database_ec2.config, {
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.database_ec2.config.instance_profile_policies, [
-            "Ec2ProdDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.database_ec2.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 1000 }
-        })
-        ebs_volume_config = merge(local.database_ec2.ebs_volume_config, {
-          data  = { total_size = 3000, iops = 3750, throughput = 750 }
-          flash = { total_size = 500 }
-        })
-        instance = merge(local.database_ec2.instance, {
-          instance_type = "r6i.4xlarge"
-        })
-        tags = merge(local.database_ec2.tags, {
-          nomis-environment = "prod"
-          description       = "Production NOMIS HA database to replace Azure PDPDL00062"
-          oracle-sids       = ""
-        })
-      })
-    }
-
-    baseline_lbs = {
+    lbs = {
       private = {
         internal_lb              = true
         enable_delete_protection = false
@@ -485,7 +413,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = templatefile("templates/maintenance.html.tftpl", local.production_lb_maintenance_message)
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
                     status_code  = "200"
                   }
                 }]
@@ -507,7 +435,7 @@ locals {
       }
     }
 
-    baseline_route53_zones = {
+    route53_zones = {
 
       "hmpps-production.modernisation-platform.internal" = {
       }
@@ -567,6 +495,43 @@ locals {
           { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
+    }
+
+    s3_buckets = {
+      nomis-audit-archives = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+        lifecycle_rule = [
+          module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
+        ]
+      }
+      nomis-db-backup-bucket = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+    }
+
+    secretsmanager_secrets = {
+      "/oracle/weblogic/prod"  = local.weblogic_secretsmanager_secrets
+      "/oracle/database/PCNOM" = local.database_weblogic_secretsmanager_secrets # weblogic oracle-db-name set to PCNOM
+      # PROD ACTIVE
+      "/oracle/database/PDCNOM"   = local.database_secretsmanager_secrets
+      "/oracle/database/PDNDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/PDTRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/PDCNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/PDMIS"    = local.database_mis_secretsmanager_secrets
+      # PROD STANDBY
+      "/oracle/database/DRCNOM"   = local.database_secretsmanager_secrets
+      "/oracle/database/DRNDH"    = local.database_secretsmanager_secrets
+      "/oracle/database/DRTRDAT"  = local.database_secretsmanager_secrets
+      "/oracle/database/DRCNMAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/DRMIS"    = local.database_mis_secretsmanager_secrets
     }
   }
 }

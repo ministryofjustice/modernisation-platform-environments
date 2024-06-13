@@ -2,27 +2,36 @@ data "local_file" "userdata" {
   filename = "userdata.sh"
 }
 
+resource "aws_network_interface" "oas_eni" {
+  subnet_id       = data.aws_subnet.private_subnets_a.id
+  private_ips     = ["10.26.56.108"]
+  security_groups = [aws_security_group.ec2.id]
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name} ENI" }
+  )
+}
+
 resource "aws_instance" "oas_app_instance" {
-  ami                         = local.application_data.accounts[local.environment].ec2amiid
-  associate_public_ip_address = false
-  availability_zone           = "eu-west-2a"
-  ebs_optimized               = true
-  instance_type               = local.application_data.accounts[local.environment].ec2instancetype
-  vpc_security_group_ids      = [aws_security_group.ec2.id]
-  monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  ami = local.application_data.accounts[local.environment].ec2amiid
+  # associate_public_ip_address = false
+  availability_zone = "eu-west-2a"
+  ebs_optimized     = true
+  instance_type     = local.application_data.accounts[local.environment].ec2instancetype
+  # vpc_security_group_ids      = [aws_security_group.ec2.id]
+  monitoring = true
+  # subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   user_data_replace_on_change = true
   user_data                   = base64encode(data.local_file.userdata.content)
-  # user_data                   = base64encode(templatefile("./userdata.sh", {
-  #   hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
-  #   ec2_image_id = "${local.application_data.accounts[local.environment].ec2amiid}"
-  #   ec2_instance_type = "${local.application_data.accounts[local.environment].ec2instancetype}"
-  #   application_name = "${local.application_name}"
-  # }))
-  # user_data = base64encode(templatefile("./userdata.sh", {
-  #   hostname = "oas.laa-development.modernisation-platform.service.justice.gov.uk"
-  # }))
+
+
+
+  network_interface {
+    network_interface_id = aws_network_interface.oas_eni.id
+    device_index         = 0
+  }
 
   root_block_device {
     delete_on_termination = false

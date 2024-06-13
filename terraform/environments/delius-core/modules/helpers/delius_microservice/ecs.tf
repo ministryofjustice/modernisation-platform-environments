@@ -23,10 +23,11 @@ module "container_definition" {
 }
 
 module "ecs_policies" {
-  source       = "../ecs_policies"
-  env_name     = var.env_name
-  service_name = var.name
-  tags         = var.tags
+  source                   = "../ecs_policies"
+  env_name                 = var.env_name
+  service_name             = var.name
+  tags                     = var.tags
+  extra_task_role_policies = var.extra_task_role_policies
 }
 
 module "ecs_service" {
