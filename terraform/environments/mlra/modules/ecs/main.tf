@@ -138,7 +138,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   metadata_options {
     http_endpoint               = "enabled"
-    http_tokens                 = "required"
+    http_tokens                 = "optional"
     http_put_response_hop_limit = "2"
   }
 
@@ -533,7 +533,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_ssm_access" {
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
   name              = "${var.app_name}-ecs-log-group"
-  retention_in_days = 365
+  retention_in_days = 30
   tags = merge(
     var.tags_common,
     {
