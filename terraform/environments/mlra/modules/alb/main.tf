@@ -381,6 +381,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   }
 }
 
+#tfsec:ignore:AVD-AWS-0013:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_cloudfront_distribution" "external" {
   #checkov:skip=CKV2_AWS_32:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV2_AWS_46:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
