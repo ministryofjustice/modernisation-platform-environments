@@ -14,7 +14,7 @@ resource "aws_cloudwatch_event_rule" "certificate-approaching-expiration-uat" {
 
 resource "aws_cloudwatch_event_target" "certificate-approaching-expiration-target-uat" {
   count     = local.is-preproduction == true ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.certificate-approaching-expiration[0].name
-  target_id = "ec2_cloudwatch_alarms"
-  arn       = aws_sns_topic.ec2_cloudwatch_alarms.[0].arn
+  rule      = aws_cloudwatch_event_rule.certificate-approaching-expiration-uat[0].name
+  target_id = "ppud-uat-cw-alerts"
+  arn       = aws_sns_topic.ppud-uat-cw-alerts.[0].arn
 }
