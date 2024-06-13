@@ -22,9 +22,6 @@ SECRET_NAME = os.environ.get("SECRET_NAME")
 METADATA_STORE_BUCKET = os.environ.get("METADATA_STORE_BUCKET")
 
 
-
-
-
 def get_rds_connection(db_name):
     con_sqlserver = wr.sqlserver.connect(
         secret_id=SECRET_NAME, odbc_driver_version=17, dbname=db_name

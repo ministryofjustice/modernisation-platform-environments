@@ -33,7 +33,6 @@ module "get_metadata_from_rds_lambda" {
   subnet_ids         = data.aws_subnets.shared-public.ids
   environment_variables = {
     SECRET_NAME           = aws_secretsmanager_secret.db_glue_connection.name
-    DB_NAME               = local.db_name
     METADATA_STORE_BUCKET = module.metadata-s3-bucket.bucket.id
   }
   env_account_id = local.env_account_id
@@ -74,7 +73,6 @@ module "create_athena_table" {
     subnet_ids = data.aws_subnets.shared-public.ids
     env_account_id = local.env_account_id
     environment_variables = {
-      DB_NAME = local.db_name
       S3_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
     }
 }

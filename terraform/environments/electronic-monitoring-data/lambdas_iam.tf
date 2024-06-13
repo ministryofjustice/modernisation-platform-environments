@@ -68,9 +68,9 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
     ]
     resources = [
       "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/${local.db_name}",
-      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/${local.db_name}/*",
-      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:userDefinedFunction/${local.db_name}/*"
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*"
 
     ]
   }
