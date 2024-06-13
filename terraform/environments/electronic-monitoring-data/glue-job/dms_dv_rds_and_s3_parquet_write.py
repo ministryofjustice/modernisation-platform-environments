@@ -51,6 +51,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
                        "rds_sqlserver_db",
+                       "rds_sqlserver_db_schema",
                        "repartition_factor",
                        "max_table_size_mb",
                        "trim_rds_df_str_columns"
@@ -127,11 +128,15 @@ def check_if_rds_db_exists(in_rds_db_str):
 
 
 def get_rds_tables_dataframe(in_rds_db_name):
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
     sql_information_schema = f"""
     SELECT table_catalog, table_schema, table_name
       FROM information_schema.tables
      WHERE table_type = 'BASE TABLE'
+       AND table_schema = '{given_rds_sqlserver_db_schema}'
     """.strip()
+
+    LOGGER.info(f"using the SQL Statement:\n{sql_information_schema}")
 
     return (spark.read.format("jdbc")
             .option("url", get_rds_db_jdbc_url(in_rds_db_name))
@@ -168,10 +173,12 @@ def get_rds_dataframe(in_rds_db_name, in_table_name):
 
 
 def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name):
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
     sql_statement = f"""
     SELECT column_name, data_type, is_nullable 
     FROM information_schema.columns
-    WHERE table_name='{in_tbl_name}'
+    WHERE table_schema = '{given_rds_sqlserver_db_schema}'
+      AND table_name = '{in_tbl_name}'
     """.strip()
     # ORDER BY ordinal_position
 
@@ -243,7 +250,7 @@ def check_s3_folder_path_if_exists(in_bucket_name, in_folder_path):
 
 
 def get_s3_table_folder_path(in_database_name, in_table_name):
-    dir_path_str = f"{in_database_name}/dbo/{in_table_name}"
+    dir_path_str = f"{in_database_name}/{args['rds_sqlserver_db_schema']}/{in_table_name}"
     tbl_full_dir_path_str = f"s3://{PRQ_FILES_SRC_S3_BUCKET_NAME}/{dir_path_str}/"
     if check_s3_folder_path_if_exists(PRQ_FILES_SRC_S3_BUCKET_NAME, dir_path_str):
         return tbl_full_dir_path_str
@@ -276,6 +283,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
     tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
 
     additional_message = ''
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
 
     if tbl_prq_s3_folder_path is not None:
 
@@ -291,13 +299,13 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
             df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         LOGGER.info(
-            f"""RDS-Read-dataframe['{rds_db_name}.dbo.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
+            f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
 
         df_prq_temp = get_s3_parquet_df(tbl_prq_s3_folder_path, df_rds_temp.schema).repartition(default_repartition_factor)
         df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
 
         LOGGER.info(
-            f"""S3-Parquet-Read-dataframe['{rds_db_name}/dbo/{rds_tbl_name}'] partitions --> {df_prq_temp.rdd.getNumPartitions()}, {total_size} bytes""")
+            f"""S3-Parquet-Read-dataframe['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] partitions --> {df_prq_temp.rdd.getNumPartitions()}, {total_size} bytes""")
 
         df_rds_temp_count = df_rds_temp_t2.count()
         df_prq_temp_count = df_prq_temp_t1.count()
@@ -312,7 +320,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                                   "'' as json_row",
                                                   f"""'{rds_tbl_name} - Validated.{additional_message}' as validation_msg""",
                                                   f"""'{rds_db_name}' as database_name""",
-                                                  f"""'{db_dbo_tbl}' as full_table_name"""
+                                                  f"""'{db_sch_tbl}' as full_table_name"""
                                                   )
                 LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
@@ -326,7 +334,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                              "json_row",
                                              f""" "'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_prq_subtract_row_count} row-count !" as validation_msg""",
                                              f"""'{rds_db_name}' as database_name""",
-                                             f"""'{db_dbo_tbl}' as full_table_name"""
+                                             f"""'{db_sch_tbl}' as full_table_name"""
                                              )
                 LOGGER.warn(f"Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_temp)
@@ -336,7 +344,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
                                               "'' as json_row",
                                               f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_prq_temp_count} MISMATCHED !' as validation_msg""",
                                               f"""'{rds_db_name}' as database_name""",
-                                              f"""'{db_dbo_tbl}' as full_table_name"""
+                                              f"""'{db_sch_tbl}' as full_table_name"""
                                               )
             LOGGER.warn(f"Validation Failed - 3")
             df_dv_output = df_dv_output.union(df_temp)
@@ -347,9 +355,9 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartiti
 
         df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                           "'' as json_row",
-                                          f"""'{db_dbo_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
+                                          f"""'{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
                                           f"""'{rds_db_name}' as database_name""",
-                                          f"""'{db_dbo_tbl}' as full_table_name"""
+                                          f"""'{db_sch_tbl}' as full_table_name"""
                                           )
         LOGGER.warn(f"Validation not applicable - 4")
         df_dv_output = df_dv_output.union(df_temp)
@@ -398,56 +406,71 @@ if __name__ == "__main__":
     LOGGER.info(f"""Given database(s): {args.get("rds_sqlserver_db", None)}""")
     rds_sqlserver_db_str = check_if_rds_db_exists(args.get("rds_sqlserver_db", None))
     LOGGER.info(f"""Using database(s): {rds_sqlserver_db_str}""")
+    
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
+    LOGGER.info(f"""Given rds_sqlserver_db_schema = {given_rds_sqlserver_db_schema}""")
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_str)
 
     if args.get("rds_sqlserver_tbls", None) is None:
         LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
 
-        for db_dbo_tbl in rds_sqlserver_db_tbl_list:
-            rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
+        for db_sch_tbl in rds_sqlserver_db_tbl_list:
+            rds_db_name, rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[0], \
+                                        db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[1]
 
-            total_files, total_size = get_s3_folder_info(PRQ_FILES_SRC_S3_BUCKET_NAME, f"{rds_db_name}/dbo/{rds_tbl_name}")
+            total_files, total_size = get_s3_folder_info(PRQ_FILES_SRC_S3_BUCKET_NAME, 
+                                                         f"{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}")
 
-            dv_ctlg_tbl_partition_path = f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}/'''
-            if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, dv_ctlg_tbl_partition_path):
+            dv_ctlg_tbl_partition_path = f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_sch_tbl}/'''
+            if not rds_sqlserver_db_tbl_list:
+                LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
+                sys.exit(1)
+
+            elif check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, dv_ctlg_tbl_partition_path):
                 LOGGER.info(
                     f"""Already exists, 
-                    Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
+                    Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_sch_tbl}""")
                 continue
 
             elif total_size/1024/1024 > int(args["max_table_size_mb"]):
                 LOGGER.info(
                     f"""Size greaterthan {args["max_table_size_mb"]}MB ({total_size} bytes), 
-                    Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_dbo_tbl}""")
+                    Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_sch_tbl}""")
                 continue
 
             input_repartition_factor = int(args["repartition_factor"])
 
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor)
 
-            write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
+            write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
 
     else:
-        LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
+        if not rds_sqlserver_db_tbl_list:
+                LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
+                sys.exit(1)
+        else:
+            LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
 
         given_rds_sqlserver_tbls_str = args["rds_sqlserver_tbls"]
 
         LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
 
-        given_rds_sqlserver_tbls_list = [e.strip().strip("'") for e in given_rds_sqlserver_tbls_str.split(",")]
+        given_rds_sqlserver_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}"""
+                                         for tbl in given_rds_sqlserver_tbls_str.split(",")]
 
         LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
-        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list
-                                              if tbl in rds_sqlserver_db_tbl_list]
+        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list if tbl in rds_sqlserver_db_tbl_list]
 
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
 
-        for db_dbo_tbl in filtered_rds_sqlserver_db_tbl_list:
-            rds_db_name, rds_tbl_name = db_dbo_tbl.split('_dbo_')[0], db_dbo_tbl.split('_dbo_')[1]
+        for db_sch_tbl in filtered_rds_sqlserver_db_tbl_list:
+            rds_db_name, rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[0], \
+                                        db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[1]
 
-            total_files, total_size = get_s3_folder_info(PRQ_FILES_SRC_S3_BUCKET_NAME, f"{rds_db_name}/dbo/{rds_tbl_name}")
+            total_files, total_size = get_s3_folder_info(PRQ_FILES_SRC_S3_BUCKET_NAME, 
+                                                         f"{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}")
 
             if total_size/1024/1024 > int(args["max_table_size_mb"]):
                 LOGGER.warn(f""">> Size greaterthan {args["max_table_size_mb"]}MB ({total_size} bytes) <<""")
@@ -456,6 +479,6 @@ if __name__ == "__main__":
 
             df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, input_repartition_factor)
 
-            write_parquet_to_s3(df_dv_output, rds_db_name, db_dbo_tbl)
+            write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
 
     job.commit()
