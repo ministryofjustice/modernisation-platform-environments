@@ -163,6 +163,58 @@ locals {
       }
     }
 
+    web = {
+      config = {
+        ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+        availability_zone         = "eu-west-2a"
+        iam_resource_names_prefix = "ec2-weblogic"
+        instance_profile_policies = [
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
+        ]
+        secretsmanager_secrets_prefix = "ec2/" # TODO can be removed with line below
+        ssm_parameters_prefix         = "ec2/"
+        subnet_name                   = "private"
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "t2.xlarge"
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "optional"
+        monitoring                   = false
+        vpc_security_group_ids       = ["private-web"]
+      }
+      route53_records = {
+        create_internal_record = true
+        create_external_record = true
+      }
+      user_data_cloud_init = {
+        args = {
+          lifecycle_hook_name  = "ready-hook"
+          branch               = "main"
+          ansible_repo         = "modernisation-platform-configuration-management"
+          ansible_repo_basedir = "ansible"
+          ansible_args         = "--tags ec2provision"
+        }
+        scripts = [
+          "install-ssm-agent.sh.tftpl",
+          "ansible-ec2provision.sh.tftpl",
+          "post-ec2provision.sh.tftpl"
+        ]
+      }
+      tags = {
+        ami                    = "nomis_rhel_6_10_weblogic_appserver_10_3"
+        backup                 = "false" # disable mod platform backup since everything is in code
+        component              = "web"
+        description            = "nomis weblogic appserver 10.3"
+        instance-access-policy = "limited"
+        os-type                = "Linux"
+        server-type            = "nomis-web"
+      }
+    }
+
     xtag = {
       config = {
         ami_name                  = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"

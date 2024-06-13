@@ -319,10 +319,70 @@ locals {
           component   = "test"
         }
       }
-
     }
 
     ec2_instances = {
+      dev-nomis-build-a = {
+        config = {
+          ami_name                  = "base_rhel_7_9_2024-03-01T00-00-34.773Z"
+          availability_zone         = "eu-west-2a"
+          iam_resource_names_prefix = "ec2-instance"
+          instance_profile_policies = [
+            # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+            "EC2Default",
+            "EC2S3BucketWriteAndDeleteAccessPolicy",
+            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+            "Ec2DevWeblogicPolicy",
+            "Ec2Qa11GWeblogicPolicy",
+            "Ec2Qa11RWeblogicPolicy",
+          ]
+          subnet_name                   = "private"
+          ssm_parameters_prefix         = "ec2/"
+          secretsmanager_secrets_prefix = "ec2/"
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { label = "app", size = 100, type = "gp3" } # /u01
+          "/dev/sdc" = { label = "app", size = 100, type = "gp3" } # /u02
+        }
+        instance = {
+          disable_api_termination      = true
+          instance_type                = "t3.medium"
+          key_name                     = "ec2-user"
+          metadata_options_http_tokens = "required"
+          monitoring                   = false
+          vpc_security_group_ids       = ["private-web"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+        user_data_cloud_init = {
+          args = {
+            lifecycle_hook_name  = "ready-hook"
+            branch               = "main"
+            ansible_repo         = "modernisation-platform-configuration-management"
+            ansible_repo_basedir = "ansible"
+            ansible_args         = "--tags ec2provision"
+          }
+          scripts = [
+            "install-ssm-agent.sh.tftpl",
+            "ansible-ec2provision.sh.tftpl",
+            "post-ec2provision.sh.tftpl"
+          ]
+        }
+        tags = {
+          description         = "Syscon build and release server"
+          ami                 = "base_rhel_7_9"
+          instance-scheduling = "skip-scheduling"
+          os-type             = "Linux"
+          component           = "build"
+          server-type         = "nomis-build"
+        }
+      }
+
       dev-nomis-db-1-a = merge(local.ec2_instances.db, {
         config = merge(local.ec2_instances.db.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -381,28 +441,26 @@ locals {
         })
       })
 
-      dev-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_autoscaling_groups.web.config, {
+      dev-nomis-web-a = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
             "Ec2DevWeblogicPolicy",
           ])
         })
-        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
           instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
         })
-        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.ec2_instances.web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web.user_data_cloud_init.args, {
             branch = "main"
           })
         })
-        tags = merge(local.ec2_autoscaling_groups.web.tags, {
+        tags = merge(local.ec2_instances.web.tags, {
           instance-scheduling  = "skip-scheduling"
           nomis-environment    = "dev"
           oracle-db-hostname-a = "dev-nomis-db-1-a"
@@ -411,28 +469,26 @@ locals {
         })
       })
 
-      qa11g-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_autoscaling_groups.web.config, {
+      qa11g-nomis-web-a = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
           ])
         })
-        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
           instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
         })
-        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.ec2_instances.web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web.user_data_cloud_init.args, {
             branch = "main"
           })
         })
-        tags = merge(local.ec2_autoscaling_groups.web.tags, {
+        tags = merge(local.ec2_instances.web.tags, {
           instance-scheduling  = "skip-scheduling"
           nomis-environment    = "qa11g"
           oracle-db-hostname-a = "dev-nomis-db-1-a"
@@ -441,28 +497,26 @@ locals {
         })
       })
 
-      qa11r-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_autoscaling_groups.web.config, {
+      qa11r-nomis-web-a = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
             "Ec2Qa11RWeblogicPolicy",
           ])
         })
-        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
           instance_type           = "t2.large"
           tags = {
             backup-plan = "daily-and-weekly"
           }
         })
-        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.ec2_instances.web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web.user_data_cloud_init.args, {
             branch = "main"
           })
         })
-        tags = merge(local.ec2_autoscaling_groups.web.tags, {
+        tags = merge(local.ec2_instances.web.tags, {
           instance-scheduling  = "skip-scheduling"
           nomis-environment    = "qa11r"
           oracle-db-hostname-a = "dev-nomis-db-1-a"
@@ -471,44 +525,6 @@ locals {
         })
       })
 
-      dev-nomis-build-a = {
-        cloudwatch_metric_alarms = {}
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name          = "base_rhel_7_9_2024-03-01T00-00-34.773Z"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
-            "Ec2DevWeblogicPolicy",
-            "Ec2Qa11GWeblogicPolicy",
-            "Ec2Qa11RWeblogicPolicy",
-          ])
-        })
-        ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100, type = "gp3" } # /u01
-          "/dev/sdc" = { label = "app", size = 100, type = "gp3" } # /u02
-        }
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          disable_api_termination = true
-          instance_type           = "t3.medium"
-          vpc_security_group_ids  = ["private-web"]
-          tags = {
-            backup-plan = "daily-and-weekly"
-          }
-        })
-        route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "main"
-          })
-        })
-        tags = {
-          description         = "Syscon build and release server"
-          ami                 = "base_rhel_7_9"
-          instance-scheduling = "skip-scheduling"
-          os-type             = "Linux"
-          component           = "build"
-          server-type         = "nomis-build"
-        }
-      }
     }
 
     iam_policies = {
