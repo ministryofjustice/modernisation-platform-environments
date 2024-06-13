@@ -135,12 +135,6 @@ locals {
           instance_type = "m4.xlarge"
         })
       })
-
-      test-onr-client-a = merge(local.jumpserver_ec2, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
-        })
-      })
     }
 
     ec2_instances = {
@@ -195,6 +189,7 @@ locals {
           oasys-national-reporting-environment = "t2"
         })
       })
+      t2-onr-client-a = local.jumpserver_ec2
     }
 
     iam_policies = {

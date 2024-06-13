@@ -97,6 +97,7 @@ resource "aws_glue_job" "dms_dv_glue_job" {
     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
     "--rds_sqlserver_db"                 = ""
+    "--rds_sqlserver_db_schema"          = ""
     "--rds_sqlserver_tbls"               = ""
     "--trim_rds_df_str_columns"          = "false"
     "--repartition_factor"               = 8
