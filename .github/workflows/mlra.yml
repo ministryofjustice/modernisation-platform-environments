@@ -11,7 +11,6 @@ on:
   pull_request:
     branches:
       - main
-    types: [opened, edited, reopened, synchronize]
     paths:
       - 'terraform/environments/mlra/**'
       - '.github/workflows/mlra.yml'
@@ -19,13 +18,13 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'Set either [deploy|destroy-dev].'
+        description: 'Set either [deploy|destroy].'
         default: 'deploy'
         required: true
         type: string
         options:
           - deploy
-          - destroy-dev
+          - destroy
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -54,7 +53,7 @@ jobs:
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
 
   destroy-development:
-    if: inputs.action == 'destroy-dev'
+    if: inputs.action == 'destroy'
     uses: ./.github/workflows/reusable_terraform_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
@@ -64,4 +63,3 @@ jobs:
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
-
