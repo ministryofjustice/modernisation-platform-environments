@@ -18,13 +18,13 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'Set either [deploy|destroy].'
-        default: 'deploy-dev'
+        description: 'Set either [deploy|destroy-dev].'
+        default: 'deploy'
         required: true
         type: string
         options:
           - deploy
-          - destroy
+          - destroy-dev
 
 permissions:
   id-token: write  # This is required for requesting the JWT
