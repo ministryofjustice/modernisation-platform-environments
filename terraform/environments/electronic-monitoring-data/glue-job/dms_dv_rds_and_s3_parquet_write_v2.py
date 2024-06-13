@@ -479,11 +479,12 @@ if __name__ == "__main__":
     # -------------------------------------------------------
     if args.get("select_rds_db_tbls", None) is None:
 
-        exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}"""
-                                         for tbl in args['exclude_rds_db_tbls'].split(",")]
+        exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}""" 
+                                    for tbl in args['exclude_rds_db_tbls'].split(",")]
         LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
 
-        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in rds_sqlserver_db_tbl_list if tbl not in exclude_rds_db_tbls_list]
+        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in rds_sqlserver_db_tbl_list 
+                                              if tbl not in exclude_rds_db_tbls_list]
 
         if not filtered_rds_sqlserver_db_tbl_list:
             LOGGER.error(f"""filtered_rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
@@ -541,7 +542,8 @@ if __name__ == "__main__":
 
         LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
-        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list if tbl in rds_sqlserver_db_tbl_list]
+        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list 
+                                              if tbl in rds_sqlserver_db_tbl_list]
 
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
 
