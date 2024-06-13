@@ -125,6 +125,7 @@ resource "aws_security_group" "cluster_ec2" {
 
 #tfsec:ignore:AVD-AWS-0130:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_launch_template" "ec2-launch-template" {
+  #checkov:skip=CKV_AWS_79:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_341:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name_prefix            = "${var.app_name}-ec2-launch-template"
   image_id               = var.ami_image_id
@@ -533,6 +534,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_ssm_access" {
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
+  #checkov:skip=CKV_AWS_338:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name              = "${var.app_name}-ecs-log-group"
   retention_in_days = 30
   tags = merge(

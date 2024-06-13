@@ -63,7 +63,9 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 ######################################################
 
 resource "aws_ecr_repository" "local-ecr" {
+  #checkov:skip=CKV_AWS_51:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_136:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_163:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name                 = "${var.app_name}-local-ecr"
   image_tag_mutability = "MUTABLE"
 
