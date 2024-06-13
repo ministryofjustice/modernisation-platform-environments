@@ -19,7 +19,7 @@ on:
     inputs:
       action:
         description: 'Set either [deploy|destroy].'
-        default: 'deploy'
+        default: 'deploy-dev'
         required: true
         type: string
         options:
@@ -53,7 +53,7 @@ jobs:
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
 
   destroy-development:
-    if: inputs.action == 'destroy'
+    if: inputs.action == 'destroy-dev'
     uses: ./.github/workflows/reusable_terraform_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
