@@ -24,8 +24,8 @@
         "table-name": "D_Comments"
       },
       "rule-action": "add-column",
-      "expression": "trim(replace($comments, char(141), ''))",
-      "value": "comments",
+      "expression": "trim(replace($Comments, char(141), ''))",
+      "value": "Comments_V2",
       "data-type": {
         "type": "string",
         "length": 4200
@@ -39,11 +39,26 @@
       "object-locator": {
         "schema-name": "dbo",
         "table-name": "D_Comments",
-        "column-name": "comments"
+        "column-name": "Comments"
       },
       "parallel-load": null,
       "rule-action": "remove-column",
       "value": null,
+      "old-value": null
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "013",
+      "rule-name": "rename_column_013",
+      "rule-target": "column",
+      "object-locator": {
+          "schema-name": "dbo",
+          "table-name": "D_Comments",
+          "column-name": "Comments_V2"
+      },
+      "parallel-load": null,
+      "rule-action": "rename",
+      "value": "Comments",
       "old-value": null
     }
   ]
