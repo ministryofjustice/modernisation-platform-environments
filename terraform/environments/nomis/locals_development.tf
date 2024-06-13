@@ -167,6 +167,36 @@ locals {
         }
       }
 
+      dev-nomis-web19c-a = {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_warm_pool, {
+          desired_capacity = 1
+          max_size         = 1
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "base_ol_8_5*"
+          availability_zone = null
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { label = "app", type = "gp3", size = 100 }
+        }
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "main"
+          })
+        })
+        tags = {
+          description = "For testing nomis weblogic 19c image"
+          # ami       = "base_ol_8_5" # commented out to ensure harden role does not re-run
+          os-type     = "Linux"
+          component   = "web"
+          server-type = "nomis-web19c"
+        }
+      }
+
       dev-nomis-client-a = merge(local.jumpserver_ec2, {
         tags = merge(local.jumpserver_ec2.tags, {
           domain-name = "azure.noms.root"
