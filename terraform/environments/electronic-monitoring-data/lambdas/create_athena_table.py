@@ -17,28 +17,27 @@ lambda_client = boto3.client("lambda")
 
 logger = Logger()
 
-DB_NAME = os.environ.get("DB_NAME")
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
 
-db_path = f"{S3_BUCKET_NAME}/{DB_NAME}/dbo"
-
-
 def create_glue_table(metadata):
+    db_name = metadata.database_name
+    schema_name = metadata.database
+    db_path = f"{S3_BUCKET_NAME}/{db_name}/{schema_name}"
     table_name = metadata.name
     metadata.file_format = "parquet"
     logger.info(f"Table Name: {table_name}")
     try:
         # Delete table
-        wr.catalog.delete_table_if_exists(database=DB_NAME, table=table_name)
-        logger.info(f"Delete table {table_name} in database {DB_NAME}")
+        wr.catalog.delete_table_if_exists(database=db_name, table=table_name)
+        logger.info(f"Delete table {table_name} in database {db_name}")
     except s3.exceptions.from_code("EntityNotFoundException"):
-        logger.info(f"Database '{DB_NAME}' table '{table_name}' does not exist")
+        logger.info(f"Database '{db_name}' table '{table_name}' does not exist")
     options = GlueConverterOptions()
     options.csv.skip_header = True
     gc = GlueConverter(options)
     boto_dict = gc.generate_from_meta(
         metadata,
-        database_name=DB_NAME,
+        database_name=db_name,
         table_location=f"s3://{db_path}/{table_name}",
     )
     glue_client.create_table(**boto_dict)
