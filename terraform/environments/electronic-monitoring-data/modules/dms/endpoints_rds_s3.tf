@@ -194,7 +194,7 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_source" {
   tags = merge(
     var.local_tags,
     {
-      Resource_Type = "DMS Target Endpoint - S3-Parquet",
+      Resource_Type = "DMS Source Endpoint - S3-Parquet",
     },
   )
 
