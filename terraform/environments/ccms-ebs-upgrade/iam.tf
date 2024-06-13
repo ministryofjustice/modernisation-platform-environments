@@ -260,6 +260,7 @@ resource "aws_iam_policy" "ec2_operations_policy" {
           "Action" : [
             "ec2:Describe*",
             "ec2:CreateSnapshot",
+            "ec2:CreateSnapshots",
             "ec2:DeleteSnapshot",
             "ec2:CreateTags",
             "ec2:DeleteTags"
