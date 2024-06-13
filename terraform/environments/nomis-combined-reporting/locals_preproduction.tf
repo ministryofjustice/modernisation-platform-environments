@@ -173,6 +173,7 @@ locals {
       pp-ncr-cms-a = merge(local.bip_ec2_default, {
         #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
@@ -192,6 +193,7 @@ locals {
       pp-ncr-cms-b = merge(local.bip_ec2_default, {
         #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
           availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
@@ -211,6 +213,7 @@ locals {
       pp-ncr-processing-1-a = merge(local.bip_ec2_default, {
         # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
@@ -230,6 +233,7 @@ locals {
       pp-ncr-web-admin-a = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
@@ -247,6 +251,7 @@ locals {
       pp-ncr-web-1-a = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
           availability_zone = "${local.region}a"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
@@ -264,6 +269,7 @@ locals {
       pp-ncr-web-2-b = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
           availability_zone = "${local.region}b"
           instance_profile_policies = concat(local.web_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
@@ -281,6 +287,7 @@ locals {
       pp-ncr-etl-a = merge(local.etl_ec2_default, {
         # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.etl_ec2_default.config, {
+          ami_name = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
           instance_profile_policies = concat(local.etl_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
