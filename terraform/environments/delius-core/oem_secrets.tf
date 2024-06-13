@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "OracleEnterpriseManagementSecretsPolicyDocument"
 }
 
 resource "aws_iam_policy" "OracleEnterpriseManagementSecretsPolicy" {
-  name   = "OracleEnterpriseManagementSecretsPolicy"
+  name   = "OracleEnterpriseManagementSecretsPolicy-${var.env_name}"
   policy = data.aws_iam_policy_document.OracleEnterpriseManagementSecretsPolicyDocument.json
 }
 
@@ -25,7 +25,7 @@ resource "aws_iam_role_policy_attachment" "OracleEnterpriseManagementSecretsPoli
 
 # new IAM role OEM setup to allow ec2s to access secrets manager and kms keys
 resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
-  name = "EC2OracleEnterpriseManagementSecretsRole"
+  name = "EC2OracleEnterpriseManagementSecretsRole-${var.env_name}"
 
   assume_role_policy = <<EOF
 {
