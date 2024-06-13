@@ -1113,7 +1113,13 @@ locals {
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.network_lb.unhealthy-network-load-balancer-host,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-unhealthy-host-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-active-flow-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-new-flow-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-peak-packets-per-second,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-bytes,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-packets,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-target-tls-negotiation-error-count,
         null,
         null,
       ]
