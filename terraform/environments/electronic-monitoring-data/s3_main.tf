@@ -87,7 +87,7 @@ resource "aws_s3_bucket_notification" "send_metadata_to_ap" {
 module "athena-s3-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=cadab51"
 
-  bucket_name        = join("-", ["aws-athena-query-results", local.env_account_id, local.region])
+  bucket_name        = join("-", ["aws-athena-query-results", local.env_account_id, "eu-west-2"])
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
