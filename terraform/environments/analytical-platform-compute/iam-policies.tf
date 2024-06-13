@@ -120,3 +120,24 @@ module "mlflow_iam_policy" {
 
   policy = data.aws_iam_policy_document.mlflow.json
 }
+
+data "aws_iam_policy_document" "gha_mojas_airflow" {
+  statement {
+    sid       = "EKSAccess"
+    effect    = "Allow"
+    actions   = ["eks:DescribeCluster"]
+    resources = [module.eks.cluster_arn]
+  }
+}
+
+module "gha_mojas_airflow_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.39.1"
+
+  name_prefix = "github-actions-mojas-airflow"
+
+  policy = data.aws_iam_policy_document.gha_mojas_airflow.json
+}
