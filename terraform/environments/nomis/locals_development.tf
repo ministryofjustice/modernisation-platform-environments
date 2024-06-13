@@ -178,7 +178,7 @@ locals {
           availability_zone = null
         })
         ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdb" = { label = "app", type = "gp3", size = 100 }
         }
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
