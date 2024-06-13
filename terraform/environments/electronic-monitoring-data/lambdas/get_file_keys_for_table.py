@@ -1,9 +1,10 @@
 import json
 import boto3
-from logging import getLogger
+import logging
 import os
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 s3_client = boto3.client("s3")
 
@@ -74,11 +75,11 @@ def handler(event, context):
         database_name, table_name = key, value
     logger.info(f"Copying table {table_name} from database {database_name}")
     source_key = f"{database_name}/{table_name}"
-    destination_key = f"electronic_monitoring/load/{database_name}/{table_name}/"
     logger.info(
         f"""Getting file keys: {source_key} from bucket: {PARQUET_BUCKET_NAME}"""
     )
 
     file_paths = get_filepaths_from_s3_folder(f"s3://{PARQUET_BUCKET_NAME}/{source_key}/")
+    logger.info(f"Found {len(file_paths)} file paths")
 
     return [{source_key: file_path} for file_path in file_paths]
