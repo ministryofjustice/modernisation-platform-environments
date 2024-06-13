@@ -19,9 +19,8 @@ logger = Logger()
 
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
 
-def create_glue_table(metadata):
+def create_glue_table(metadata, schema_name):
     db_name = metadata.database_name
-    schema_name = metadata.database
     db_path = f"{S3_BUCKET_NAME}/{db_name}/{schema_name}"
     table_name = metadata.name
     metadata.file_format = "parquet"
@@ -46,8 +45,9 @@ def create_glue_table(metadata):
 
 @logger.inject_lambda_context
 def handler(event: dict, context: LambdaContext) -> str:
+    schema_name = event["database"]
     meta = Metadata.from_dict(event)
-    boto_dict = create_glue_table(meta)
+    boto_dict = create_glue_table(meta, schema_name)
     table_name = boto_dict["TableInput"]["Name"]
     result = {
         "status": "success",
