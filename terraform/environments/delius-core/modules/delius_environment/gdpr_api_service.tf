@@ -86,7 +86,7 @@ module "gdpr_api_service" {
 #######################
 
 resource "aws_ssm_parameter" "gpdr_api_snapshot_identifier" {
-  name  = "/gdpr-api/snapshot_id"
+  name  = "/${var.env_name}/gdpr-api/snapshot_id"
   type  = "String"
   value = "DEFAULT"
   lifecycle {
