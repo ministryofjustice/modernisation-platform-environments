@@ -1,10 +1,12 @@
 import json
 import boto3
 import datetime
-from logging import getLogger
+import logging
 import os
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 s3_client = boto3.client("s3")
 
@@ -21,10 +23,9 @@ def handler(event, context):
     # Specify source bucket
     for key, value in event.items():
         database_table_name, source_s3_key = key, value
-    database_name, table_name = database_table_name.split("/")
-    logger.info(f"Copying table {table_name} from database {database_name}")
     bucket, source_key = s3_path_to_bucket_key(source_s3_key)
-    file_name = source_key.split("/")[-1]
+    database_name, schema_name, table_name, file_name = source_key.split("/")
+    logger.info(f"Copying table {table_name} from database {database_name}")
     destination_key = f"electronic_monitoring/load/{database_name}/{table_name}/{file_name}"
     logger.info(
         f"""Copying file: {source_key} from bucket: {bucket}
@@ -55,4 +56,4 @@ def handler(event, context):
         logger.error(msg)
         raise Exception(msg)
 
-    return {"statusCode": 200, "body": json.dumps("File has been Successfully Copied to the AP")}
+    return {"statusCode": 200, "body": json.dumps(f"{copy_object} has been Successfully Copied to the AP")}

@@ -1,5 +1,6 @@
 import json
 import boto3
+import re
 import logging
 import os
 
@@ -68,18 +69,23 @@ def get_filepaths_from_s3_folder(
 
     return paths
 
-# lambda function to copy file from 1 s3 to another s3
+# Lambda function to copy file from one S3 bucket to another
 def handler(event, context):
     # Specify source bucket
     for key, value in event.items():
         database_name, table_name = key, value
     logger.info(f"Copying table {table_name} from database {database_name}")
-    source_key = f"{database_name}/{table_name}"
-    logger.info(
-        f"""Getting file keys: {source_key} from bucket: {PARQUET_BUCKET_NAME}"""
-    )
 
-    file_paths = get_filepaths_from_s3_folder(f"s3://{PARQUET_BUCKET_NAME}/{source_key}/")
-    logger.info(f"Found {len(file_paths)} file paths")
+    source_key = f"{database_name}/*/{table_name}"
+    destination_key = f"electronic_monitoring/load/{database_name}/{table_name}/"
+    logger.info(f"Getting file keys: {source_key} from bucket: {PARQUET_BUCKET_NAME}")
 
-    return [{source_key: file_path} for file_path in file_paths]
+    # List objects in the source folder and filter using regex pattern
+    file_paths = get_filepaths_from_s3_folder(f"s3://{PARQUET_BUCKET_NAME}/{database_name}/")
+    pattern = re.compile(rf'{database_name}/.*?/{table_name}', re.IGNORECASE)
+    filtered_paths = [path for path in file_paths if pattern.search(path)]
+
+    logger.info(f"Number of files: {len(filtered_paths)}")
+
+    # Return list of file paths that match the pattern
+    return [{source_key: file_path} for file_path in filtered_paths]
