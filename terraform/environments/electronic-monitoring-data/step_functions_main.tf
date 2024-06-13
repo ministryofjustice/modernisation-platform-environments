@@ -101,17 +101,34 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
       "ItemsPath": "$.db_info",
       "MaxConcurrency": 4,
       "Iterator": {
-        "StartAt": "SendTableToAp",
+        "StartAt": "GetTableFileNames",
         "States": {
-          "SendTableToAp": {
+          "GetTableFileNames": {
             "Type": "Task",
-            "Resource": "${module.send_table_to_ap.lambda_function_arn}",
+            "Resource": "${module.get_file_keys_for_table.lambda_function_arn}",
             "ResultPath": "$.result",
+            "Next": "LoopThroughFileKeys"
+          },
+          "LoopThroughFileKeys": {
+          "Type": "Map",
+          "ItemsPath": "$.result",
+          "MaxConcurrency": 4,
+          "Iterator": {
+            "StartAt": "SendTableToAp",
+            "States": {
+              "SendTableToAp": {
+                "Type": "Task",
+                "Resource": "${module.send_table_to_ap.lambda_function_arn}",
+                "ResultPath": "$.final_result",
+                "End": true
+                }
+              }
+            },
             "End": true
           }
         }
       },
-      "End": true
+    "End": true
     }
   }
 }

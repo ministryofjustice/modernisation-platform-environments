@@ -362,3 +362,40 @@ resource "aws_iam_role_policy_attachment" "get_tables_from_db_get_glue_tables" {
     role = aws_iam_role.get_tables_from_db.name
     policy_arn = aws_iam_policy.get_glue_tables.arn
 }
+
+
+# ------------------------------------------
+# get_file_keys_for_table
+# ------------------------------------------
+
+resource "aws_iam_role" "get_file_keys_for_table" {
+  name = "get_file_keys_for_table"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_lambda_vpc_access_execution" {
+    role = aws_iam_role.get_file_keys_for_table.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_lambda_sqs_queue_access_execution" {
+    role = aws_iam_role.get_file_keys_for_table.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+data "aws_iam_policy_document" "list_target_s3_bucket" {
+  statement {
+    effect = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.dms_target_ep_s3_bucket.arn]
+  }
+}
+
+resource "aws_iam_policy" "list_target_s3_bucket" {
+  name = "list_target_s3_bucket"
+  policy = data.aws_iam_policy_document.list_target_s3_bucket.json
+}
+resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_list_target_s3_bucket" {
+    role = aws_iam_role.get_file_keys_for_table.name
+    policy_arn = aws_iam_policy.list_target_s3_bucket.arn
+}
