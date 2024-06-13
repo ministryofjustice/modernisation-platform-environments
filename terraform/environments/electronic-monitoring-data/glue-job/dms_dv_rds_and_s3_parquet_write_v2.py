@@ -58,7 +58,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        ]
 
 OPTIONAL_INPUTS = [
-    "rds_sqlserver_tbls",
+    "select_rds_db_tbls",
+    "exclude_rds_db_tbls",
     "transformed_column_list_1",
     "rds_tbl_col_replace_char_1"
 ]
@@ -473,12 +474,24 @@ if __name__ == "__main__":
     LOGGER.info(f"""Given rds_sqlserver_db_schema = {given_rds_sqlserver_db_schema}""")
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_str)
+    LOGGER.info(f"""Total List of tables available in {rds_sqlserver_db_str}.{given_rds_sqlserver_db_schema}\n{rds_sqlserver_db_tbl_list}""")
 
     # -------------------------------------------------------
-    if args.get("rds_sqlserver_tbls", None) is None:
-        LOGGER.info(f"""List of tables to be processed: {rds_sqlserver_db_tbl_list}""")
+    if args.get("select_rds_db_tbls", None) is None:
 
-        for db_sch_tbl in rds_sqlserver_db_tbl_list:
+        exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}"""
+                                         for tbl in args['exclude_rds_db_tbls'].split(",")]
+        LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
+
+        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in rds_sqlserver_db_tbl_list if tbl not in exclude_rds_db_tbls_list]
+
+        if not filtered_rds_sqlserver_db_tbl_list:
+            LOGGER.error(f"""filtered_rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
+            sys.exit(1)
+        else:
+            LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
+
+        for db_sch_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[0], \
                                         db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[1]
 
@@ -490,11 +503,8 @@ if __name__ == "__main__":
                 {GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_sch_tbl}/'''.strip()
             
             # -------------------------------------------------------
-            if not rds_sqlserver_db_tbl_list:
-                LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
-                sys.exit(1)
 
-            elif check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, dv_ctlg_tbl_partition_path):
+            if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, dv_ctlg_tbl_partition_path):
                 LOGGER.info(
                     f"""Already exists, 
                     Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_sch_tbl}""")
@@ -522,7 +532,7 @@ if __name__ == "__main__":
             LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
         # -------------------------------------------------------
 
-        given_rds_sqlserver_tbls_str = args["rds_sqlserver_tbls"]
+        given_rds_sqlserver_tbls_str = args["select_rds_db_tbls"]
 
         LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
 
