@@ -147,7 +147,5 @@ module "athena-s3-bucket" {
     }
   ]
 
-  version_enabled = true
-
   tags = local.tags
 }
