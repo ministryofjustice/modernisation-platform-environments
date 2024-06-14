@@ -17,6 +17,7 @@ variable "options" {
     backup_plan_weekly_delete_after              = optional(number, 28)            # override retention for daily + weekly backup plan
     cloudwatch_dashboard_default_widget_groups   = optional(list(string))          # create Cloudwatch-Default dashboard; list of map keys to filter local.cloudwatch_dashboard_widget_groups
     cloudwatch_log_groups                        = optional(list(string))          # create cloudwatch log groups; list of map keys to filter local.cloudwatch_log_groups; default is to create all
+    cloudwatch_log_groups_retention_in_days      = optional(number, 30)            # number of days to retain cloudwatch log groups
     cloudwatch_metric_alarms_default_actions     = optional(list(string))          # default alarm_action to apply to cloudwatch metrics returned by this module
     cloudwatch_metric_oam_links_ssm_parameters   = optional(list(string))          # list of account names to send cloudwatch metrics to, creates placeholder SSM param for each
     cloudwatch_metric_oam_links                  = optional(list(string))          # list of account names to send cloudwatch metrics to, creates oam link for each
