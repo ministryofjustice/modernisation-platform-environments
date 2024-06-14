@@ -92,7 +92,7 @@ resource "aws_iam_user_policy" "nextcloud_ses_smtp_user" {
           "ses:SendEmail",
           "ses:SendRawEmail"
         ]
-        Resource = "${aws_sesv2_email_identity.nextcloud.arn}"
+        Resource = aws_sesv2_email_identity.nextcloud.arn
       }
     ]
   })
