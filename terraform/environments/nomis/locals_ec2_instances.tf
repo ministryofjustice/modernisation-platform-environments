@@ -7,14 +7,12 @@ locals {
         ami_name                  = "base_rhel_7_9_2024-03-01T00-00-34.773Z"
         iam_resource_names_prefix = "ec2-instance"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
-        subnet_name                   = "private"
-        ssm_parameters_prefix         = "ec2/"
-        secretsmanager_secrets_prefix = "ec2/"
+        subnet_name = "private"
       }
       ebs_volumes = {
         "/dev/sdb" = { label = "app", size = 100, type = "gp3" } # /u01
@@ -25,7 +23,6 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = false
         vpc_security_group_ids       = ["private-web"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -47,11 +44,11 @@ locals {
         ]
       }
       tags = {
-        ami                 = "base_rhel_7_9"
-        instance-scheduling = "skip-scheduling"
-        os-type             = "Linux"
-        component           = "build"
-        server-type         = "nomis-build"
+        ami         = "base_rhel_7_9"
+        backup      = "false"
+        component   = "build"
+        os-type     = "Linux"
+        server-type = "nomis-build"
       }
     }
 
@@ -61,13 +58,12 @@ locals {
         ami_owner                 = "self"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
         secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/"
         subnet_name                   = "data"
       }
       ebs_volumes = {
@@ -126,7 +122,6 @@ locals {
         os-major-version            = 7
         os-type                     = "Linux"
         os-version                  = "RHEL 7.9"
-        "Patch Group"               = "RHEL"
         server-type                 = "nomis-db"
       }
     }
@@ -137,13 +132,12 @@ locals {
         ami_owner                 = "self"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
         secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/"
         subnet_name                   = "data"
       }
       ebs_volumes = {
@@ -211,21 +205,18 @@ locals {
         ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
         iam_resource_names_prefix = "ec2-weblogic"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO can be removed with line below
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       instance = {
         disable_api_termination      = false
         instance_type                = "t2.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional"
-        monitoring                   = false
         vpc_security_group_ids       = ["private-web"]
       }
       route53_records = {
@@ -259,20 +250,17 @@ locals {
         ami_name                  = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
         iam_resource_names_prefix = "ec2-instance"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       instance = {
         disable_api_termination = false
         instance_type           = "t2.large"
         key_name                = "ec2-user"
-        monitoring              = false
         vpc_security_group_ids  = ["private-web"]
       }
       user_data_cloud_init = {
@@ -288,6 +276,7 @@ locals {
       }
       tags = {
         ami                    = "nomis_rhel_7_9_weblogic_xtag_10_3"
+        backup                 = "false" # disable mod platform backup since everything is in code
         description            = "nomis XTAG weblogic component"
         instance-access-policy = "limited"
         os-type                = "Linux"

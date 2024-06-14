@@ -33,12 +33,10 @@ locals {
       cloudwatch_metric_alarms_default_actions    = ["dso_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters  = ["hmpps-oem-${local.environment}"]
       cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
-      enable_azure_sas_token                      = true
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
       enable_image_builder                        = true
       enable_ec2_cloud_watch_agent                = true
-      enable_ec2_reduced_ssm_policy               = true
       enable_ec2_self_provision                   = true
       enable_ec2_oracle_enterprise_managed_server = true
       enable_ec2_user_keypair                     = true
@@ -53,15 +51,6 @@ locals {
   }
 
   baseline_all_environments = {
-    cloudwatch_log_groups = {
-      cwagent-nomis-autologoff = {
-        retention_in_days = 90
-      }
-      cwagent-weblogic-logs = {
-        retention_in_days = 30
-      }
-    }
-
     s3_buckets = {
       s3-bucket = {
         iam_policies = module.baseline_presets.s3_iam_policies
