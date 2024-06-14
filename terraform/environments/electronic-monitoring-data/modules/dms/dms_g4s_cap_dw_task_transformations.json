@@ -16,7 +16,7 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "011",
+      "rule-id": "11",
       "rule-name": "add_column_011",
       "rule-target": "column",
       "object-locator": {
@@ -24,8 +24,8 @@
         "table-name": "D_Comments"
       },
       "rule-action": "add-column",
-      "expression": "trim(replace($comments, char(141), ''))",
-      "value": "comments",
+      "expression": "trim(replace($Comments, char(141), ''))",
+      "value": "Comments_V2",
       "data-type": {
         "type": "string",
         "length": 4200
@@ -33,13 +33,13 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "012",
+      "rule-id": "12",
       "rule-name": "remove_column_012",
       "rule-target": "column",
       "object-locator": {
         "schema-name": "dbo",
         "table-name": "D_Comments",
-        "column-name": "comments"
+        "column-name": "Comments"
       },
       "parallel-load": null,
       "rule-action": "remove-column",
