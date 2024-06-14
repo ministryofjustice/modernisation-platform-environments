@@ -339,7 +339,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
             df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
         # -------------------------------------------------------
 
-        prq_df_created_msg = f"""S3-Parquet-Read-dataframe['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] partitions --> {df_prq_temp.rdd.getNumPartitions()}, {total_size_mb}MB"""
+        prq_df_created_msg_1 = f"""S3-Parquet-Read-dataframe['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] -- {total_size_mb}MB"""
 
         # -------------------------------------------------------
         if args.get("transformed_column_list_1", None) is not None:
@@ -348,7 +348,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
 
             altered_schema_object = get_altered_df_schema_object(df_rds_temp, given_transformed_colmn_list_1)
             df_prq_temp = get_s3_parquet_df(tbl_prq_s3_folder_path, altered_schema_object).repartition(default_repartition_factor)
-            LOGGER.info(prq_df_created_msg)
+            prq_df_created_msg_2 = f"""\n >> parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
+            LOGGER.info(f"""{prq_df_created_msg_1}{prq_df_created_msg_2}""")
 
             LOGGER.info(f"stripping {args['rds_tbl_col_replace_char_1']} from rds-dataframe-column(s)\n {given_transformed_colmn_list_1}")
             df_rds_temp_t3 = (strip_rds_tbl_col_chars(df_rds_temp_t2, given_transformed_colmn_list_1, args['rds_tbl_col_replace_char_1'])
@@ -357,7 +358,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
             additional_message = f" - [After stripping '{args['rds_tbl_col_replace_char_1']}' from RDS-DB-tranformed column(s)]"
         else:
             df_prq_temp = get_s3_parquet_df(tbl_prq_s3_folder_path, df_rds_temp.schema).repartition(default_repartition_factor)
-            LOGGER.info(prq_df_created_msg)
+            prq_df_created_msg_2 = f"""\n >> parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
+            LOGGER.info(f"""{prq_df_created_msg_1}{prq_df_created_msg_2}""")
             
             df_rds_temp_t3 = df_rds_temp_t2.cache()
         # -------------------------------------------------------
