@@ -323,44 +323,14 @@ resource "aws_iam_role_policy_attachment" "send_table_to_ap_get_parquet_files" {
 # Get tables from db
 # ------------------------------------------------
 
-resource "aws_iam_role" "get_tables_from_db" {
-    name                = "get_tables_from_db"
+resource "aws_iam_role" "query_output_to_list" {
+    name                = "query_output_to_list"
     assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-resource "aws_iam_role_policy_attachment" "get_tables_from_db_lambda_vpc_access_execution" {
-    role = aws_iam_role.get_tables_from_db.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "get_tables_from_db_lambda_sqs_queue_access_execution" {
-    role = aws_iam_role.get_tables_from_db.name
+resource "aws_iam_role_policy_attachment" "query_output_to_list_lambda_sqs_queue_access_execution" {
+    role = aws_iam_role.query_output_to_list.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
-
-
-
-data "aws_iam_policy_document" "get_glue_tables" {
-    statement {
-        effect = "Allow"
-        actions = [
-            "glue:GetTable",
-            "glue:GetTables",
-            "glue:GetDatabase"
-        ]
-        resources = ["*"]
-    }
-}
-
-resource "aws_iam_policy" "get_glue_tables" {
-    name = "get_glue_tables"
-    policy = data.aws_iam_policy_document.get_glue_tables.json
-}
-
-resource "aws_iam_role_policy_attachment" "get_tables_from_db_get_glue_tables" {
-    role = aws_iam_role.get_tables_from_db.name
-    policy_arn = aws_iam_policy.get_glue_tables.arn
 }
 
 
