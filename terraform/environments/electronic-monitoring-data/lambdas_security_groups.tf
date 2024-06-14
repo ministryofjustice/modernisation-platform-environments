@@ -34,7 +34,7 @@ resource "aws_vpc_security_group_ingress_rule" "lambda_to_rds_sg_rule" {
 resource "aws_security_group" "lambda_sg_send_table_to_ap" {
   name_prefix = "lambda_sg"
   description = "Security Group for send table to ap Lambda"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.shared.id
 
   egress {
     from_port        = 0
