@@ -16,7 +16,7 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "011",
+      "rule-id": "11",
       "rule-name": "add_column_011",
       "rule-target": "column",
       "object-locator": {
@@ -33,7 +33,7 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "012",
+      "rule-id": "12",
       "rule-name": "remove_column_012",
       "rule-target": "column",
       "object-locator": {
@@ -44,21 +44,6 @@
       "parallel-load": null,
       "rule-action": "remove-column",
       "value": null,
-      "old-value": null
-    },
-    {
-      "rule-type": "transformation",
-      "rule-id": "013",
-      "rule-name": "rename_column_013",
-      "rule-target": "column",
-      "object-locator": {
-          "schema-name": "dbo",
-          "table-name": "D_Comments",
-          "column-name": "Comments_V2"
-      },
-      "parallel-load": null,
-      "rule-action": "rename",
-      "value": "Comments",
       "old-value": null
     }
   ]
