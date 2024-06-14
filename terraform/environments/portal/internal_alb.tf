@@ -2,7 +2,7 @@ locals {
   internal_lb_idle_timeout = 180
   internal_lb_http_port    = 80
   internal_lb_https_port   = 443
-  internal_lb_http_hosts   = [aws_route53_record.oim_internal.name, aws_route53_record.oam_internal.name, aws_route53_record.idm_console.name]
+  internal_lb_http_hosts   = [aws_route53_record.oim_internal.name, aws_route53_record.oam_internal.name, aws_route53_record.idm_console.name, aws_route53_record.ohs_internal.name]
 }
 
 ####################################
@@ -84,7 +84,7 @@ resource "aws_lb_listener_rule" "host_based_internal" {
 
   condition {
     host_header {
-      values = local.internal_lb_http_hosts
+      values = local.internal_lb_http_hosts  # These are the URLs that accessed the LAA-Porta-AppOhsIn CLB in Landing Zone via Port 80, but we have merged this CLB with the Internal ALB instead, so this additional rule is required
     }
   }
 
