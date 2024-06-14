@@ -7,7 +7,7 @@ locals {
         ami_name                  = "base_rhel_7_9_2024-03-01T00-00-34.773Z"
         iam_resource_names_prefix = "ec2-instance"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -58,7 +58,7 @@ locals {
         ami_owner                 = "self"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
@@ -132,7 +132,7 @@ locals {
         ami_owner                 = "self"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
@@ -205,7 +205,7 @@ locals {
         ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
         iam_resource_names_prefix = "ec2-weblogic"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
@@ -250,7 +250,7 @@ locals {
         ami_name                  = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
         iam_resource_names_prefix = "ec2-instance"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
