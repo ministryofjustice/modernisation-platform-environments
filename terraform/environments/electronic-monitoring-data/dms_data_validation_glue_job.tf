@@ -146,7 +146,8 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
     "--rds_sqlserver_db"                 = ""
     "--rds_sqlserver_db_schema"          = ""
-    "--rds_sqlserver_tbls"               = ""
+    "--exclude_rds_db_tbls"              = ""
+    "--select_rds_db_tbls"               = ""
     "--trim_rds_df_str_columns"          = "false"
     "--repartition_factor"               = 8
     "--max_table_size_mb"                = 2000
