@@ -12,6 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.module_ddos_alarm.arn]
+  ok_actions          = [aws_sns_topic.module_ddos_alarm.arn]
   dimensions = {
     ResourceArn = each.value["arn"]
   }
