@@ -7,15 +7,16 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
+      cloudwatch_log_groups_retention_in_days = 90
+      route53_resolver_rules = {
+        outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
+      }
       sns_topics = {
         pagerduty_integrations = {
           dso_pagerduty               = "nomis_alarms"
           dba_pagerduty               = "hmpps_shef_dba_low_priority"
           dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
         }
-      }
-      route53_resolver_rules = {
-        outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
     }
   }
