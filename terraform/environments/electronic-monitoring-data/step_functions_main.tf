@@ -95,11 +95,11 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
       "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
       "Parameters": {
         "QueryString.$": "States.Format('SELECT full_table_name FROM \"dms_data_validation\".\"glue_df_output\" WHERE validation_msg like \"%Validated%\" and database_name = \"{}\"', $.db_name)",
-        "WorkGroup": "primary",
+        "WorkGroup": "primary"
+        },
       "ResultPath": "$.queryResult",
       "Next": "GetQueryResults"
       },
-      "Next": "GetQueryResults"
     },
     "GetQueryResults": {
       "Type": "Task",
