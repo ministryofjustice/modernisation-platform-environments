@@ -221,7 +221,7 @@ data "archive_file" "update_log_table" {
     output_path = "${local.lambda_path}/update_log_table.zip"
 }
 
-module "query_output_to_list" {
+module "update_log_table" {
     source              = "./modules/lambdas"
     filename = "${local.lambda_path}/update_log_table.zip"
     function_name = "update_log_table"
