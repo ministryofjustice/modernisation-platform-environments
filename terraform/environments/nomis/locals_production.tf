@@ -394,7 +394,7 @@ locals {
 
     route53_zones = {
 
-      nomis.service.justice.gov.uk = {
+      "nomis.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "c", type = "A", lbs_map_key = "private" },
         ]
@@ -411,9 +411,9 @@ locals {
         ]
       }
 
-      production.nomis.az.justice.gov.uk = {} # remove from cert before deleting
+      "production.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
 
-      production.nomis.service.justice.gov.uk = {
+      "production.nomis.service.justice.gov.uk" = {
         records = [
           { name = "pnomis", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "pnomis-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },

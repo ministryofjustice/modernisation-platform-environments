@@ -447,8 +447,8 @@ locals {
     }
 
     route53_zones = {
-      development.nomis.az.justice.gov.uk = {} # remove from cert before deleting
-      development.nomis.service.justice.gov.uk = {
+      "development.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
+      "development.nomis.service.justice.gov.uk" = {
         records = [
           # SYSCON
           { name = "dev", type = "CNAME", ttl = "300", records = ["dev-nomis-db-1-a.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk"] },
