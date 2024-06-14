@@ -36,225 +36,73 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      dev-base-ol85 = {
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 1
-          force_delete        = true
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        autoscaling_schedules = {
-          "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
-          "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
-        }
-        config = {
-          ami_name                  = "base_ol_8_5*"
-          iam_resource_names_prefix = "ec2-instance"
-          instance_profile_policies = [
-            # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
-          ]
-          secretsmanager_secrets_prefix = "ec2/"
-          ssm_parameters_prefix         = "ec2/"
-          subnet_name                   = "private"
-        }
-        instance = {
-          disable_api_termination      = false
-          instance_type                = "t3.medium"
-          key_name                     = "ec2-user"
-          vpc_security_group_ids       = ["private-web"]
-          metadata_options_http_tokens = "required"
-          monitoring                   = false
-        }
-        user_data_cloud_init = {
-          args = {
-            lifecycle_hook_name  = "ready-hook"
-            branch               = "main"
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-          scripts = [
-            "install-ssm-agent.sh.tftpl",
-            "ansible-ec2provision.sh.tftpl",
-            "post-ec2provision.sh.tftpl"
-          ]
-        }
-        tags = {
-          description = "For testing our base OL 8.5 base image"
+      dev-base-ol85 = merge(local.ec2_autoscaling_groups.base, {
+        config = merge(local.ec2_autoscaling_groups.base.config, {
+          ami_name = "base_ol_8_5*"
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.base.tags, {
           ami         = "base_ol_8_5"
-          os-type     = "Linux"
-          component   = "test"
+          description = "For testing our base OL 8.5 base image"
           server-type = "base-ol85"
-        }
-      }
+        })
+      })
 
-      dev-base-rhel610 = {
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 1
-          force_delete        = true
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        autoscaling_schedules = {
-          "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
-          "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
-        }
-        config = {
-          ami_name                  = "base_rhel_6_10*"
-          iam_resource_names_prefix = "ec2-instance"
-          instance_profile_policies = [
-            # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
-          ]
-          secretsmanager_secrets_prefix = "ec2/"
-          ssm_parameters_prefix         = "ec2/"
-          subnet_name                   = "private"
-        }
-        instance = {
-          disable_api_termination      = false
+      dev-base-rhel610 = merge(local.ec2_autoscaling_groups.base, {
+        config = merge(local.ec2_autoscaling_groups.base.config, {
+          ami_name = "base_rhel_6_10*"
+        })
+        instance = merge(local.ec2_autoscaling_groups.base.instance, {
           instance_type                = "t2.medium"
-          key_name                     = "ec2-user"
-          vpc_security_group_ids       = ["private-web"]
           metadata_options_http_tokens = "optional"
-          monitoring                   = false
-        }
-        user_data_cloud_init = {
-          args = {
-            lifecycle_hook_name  = "ready-hook"
-            branch               = "main"
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-          scripts = [
-            "install-ssm-agent.sh.tftpl",
-            "ansible-ec2provision.sh.tftpl",
-            "post-ec2provision.sh.tftpl"
-          ]
-        }
-        tags = {
-          description = "For testing our base RHEL6.10 base image"
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.base.tags, {
           ami         = "base_rhel_6_10"
-          os-type     = "Linux"
-          component   = "test"
+          description = "For testing our base RHEL6.10 base image"
           server-type = "base-rhel610"
-        }
-      }
+        })
+      })
 
-      dev-base-rhel79 = {
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 1
-          force_delete        = true
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        autoscaling_schedules = {
-          "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
-          "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
-        }
-        config = {
-          ami_name                  = "base_rhel_7_9_*"
-          iam_resource_names_prefix = "ec2-instance"
-          instance_profile_policies = [
-            # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
-          ]
-          secretsmanager_secrets_prefix = "ec2/"
-          ssm_parameters_prefix         = "ec2/"
-          subnet_name                   = "private"
-        }
-        instance = {
-          disable_api_termination      = false
-          instance_type                = "t3.medium"
-          key_name                     = "ec2-user"
-          vpc_security_group_ids       = ["private-web"]
-          metadata_options_http_tokens = "required"
-          monitoring                   = false
-        }
-        user_data_cloud_init = {
-          args = {
-            lifecycle_hook_name  = "ready-hook"
-            branch               = "main"
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-          scripts = [
-            "install-ssm-agent.sh.tftpl",
-            "ansible-ec2provision.sh.tftpl",
-            "post-ec2provision.sh.tftpl"
-          ]
-        }
-        tags = {
-          description = "For testing our base RHEL7.9 base image"
+      dev-base-rhel79 = merge(local.ec2_autoscaling_groups.base, {
+        config = merge(local.ec2_autoscaling_groups.base.config, {
+          ami_name = "base_rhel_7_9_*"
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.base.tags, {
           ami         = "base_rhel_7_9"
-          os-type     = "Linux"
-          component   = "test"
+          description = "For testing our base RHEL7.9 base image"
           server-type = "base-rhel79"
-        }
-      }
+        })
+      })
 
-      dev-base-rhel85 = {
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 1
-          force_delete        = true
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        autoscaling_schedules = {
-          "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
-          "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
-        }
-        config = {
-          ami_name                  = "base_rhel_8_5_*"
-          iam_resource_names_prefix = "ec2-instance"
-          instance_profile_policies = [
-            # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
-          ]
-          secretsmanager_secrets_prefix = "ec2/"
-          ssm_parameters_prefix         = "ec2/"
-          subnet_name                   = "private"
-        }
-        instance = {
-          disable_api_termination      = false
-          instance_type                = "t3.medium"
-          key_name                     = "ec2-user"
-          vpc_security_group_ids       = ["private-web"]
-          metadata_options_http_tokens = "required"
-          monitoring                   = false
-        }
-        user_data_cloud_init = {
-          args = {
-            lifecycle_hook_name  = "ready-hook"
-            branch               = "main"
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-          scripts = [
-            "install-ssm-agent.sh.tftpl",
-            "ansible-ec2provision.sh.tftpl",
-            "post-ec2provision.sh.tftpl"
-          ]
-        }
-        tags = {
-          description = "For testing our base RHEL8.5 base image"
+      dev-base-rhel85 = merge(local.ec2_autoscaling_groups.base, {
+        config = merge(local.ec2_autoscaling_groups.base.config, {
+          ami_name = "base_rhel_8_5_*"
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.base.tags, {
           ami         = "base_rhel_8_5"
-          os-type     = "Linux"
-          component   = "test"
+          description = "For testing our base RHEL8.5 base image"
           server-type = "base-rhel85"
-        }
-      }
+        })
+      })
 
       dev-nomis-client-a = merge(local.ec2_autoscaling_groups.client, {
         tags = merge(local.ec2_autoscaling_groups.client.tags, {
@@ -265,123 +113,42 @@ locals {
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
       })
 
-      dev-redhat-rhel79 = {
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 1
-          force_delete        = true
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        autoscaling_schedules = {
-          "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
-          "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
-        }
-        config = {
-          ami_name                  = "hmpps_windows_server_2022_release_2024-*"
-          ami_name                  = "RHEL-7.9_HVM-*"
-          ami_owner                 = "309956199498"
-          iam_resource_names_prefix = "ec2-instance"
-          instance_profile_policies = [
-            # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
-          ]
-          secretsmanager_secrets_prefix = "ec2/"
-          ssm_parameters_prefix         = "ec2/"
-          subnet_name                   = "private"
-        }
-        instance = {
-          disable_api_termination      = false
-          instance_type                = "t3.medium"
-          key_name                     = "ec2-user"
-          vpc_security_group_ids       = ["private-web"]
-          metadata_options_http_tokens = "required"
-          monitoring                   = false
-        }
-        user_data_cloud_init = {
-          args = {
-            lifecycle_hook_name  = "ready-hook"
-            branch               = "main"
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-          scripts = [
-            "install-ssm-agent.sh.tftpl",
-            "ansible-ec2provision.sh.tftpl",
-            "post-ec2provision.sh.tftpl"
-          ]
-        }
-        tags = {
+      dev-redhat-rhel79 = merge(local.ec2_autoscaling_groups.base, {
+        config = merge(local.ec2_autoscaling_groups.base.config, {
+          ami_name  = "hmpps_windows_server_2022_release_2024-*"
+          ami_name  = "RHEL-7.9_HVM-*"
+          ami_owner = "309956199498"
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.base.tags, {
           description = "For testing official RedHat RHEL7.9 image"
-          os-type     = "Linux"
-          component   = "test"
-        }
-      }
+        })
+      })
     }
 
     ec2_instances = {
-      dev-nomis-build-a = {
-        config = {
-          ami_name                  = "base_rhel_7_9_2024-03-01T00-00-34.773Z"
-          availability_zone         = "eu-west-2a"
-          iam_resource_names_prefix = "ec2-instance"
-          instance_profile_policies = [
-            # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+      dev-nomis-build-a = merge(local.ec2_instances.build, {
+        config = merge(local.ec2_instances.build.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.build.config.instance_profile_policies, [
             "Ec2DevWeblogicPolicy",
             "Ec2Qa11GWeblogicPolicy",
             "Ec2Qa11RWeblogicPolicy",
-          ]
-          subnet_name                   = "private"
-          ssm_parameters_prefix         = "ec2/"
-          secretsmanager_secrets_prefix = "ec2/"
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100, type = "gp3" } # /u01
-          "/dev/sdc" = { label = "app", size = 100, type = "gp3" } # /u02
-        }
-        instance = {
-          disable_api_termination      = true
-          instance_type                = "t3.medium"
-          key_name                     = "ec2-user"
-          metadata_options_http_tokens = "required"
-          monitoring                   = false
-          vpc_security_group_ids       = ["private-web"]
-          tags = {
-            backup-plan = "daily-and-weekly"
-          }
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-        user_data_cloud_init = {
-          args = {
-            lifecycle_hook_name  = "ready-hook"
-            branch               = "main"
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-          scripts = [
-            "install-ssm-agent.sh.tftpl",
-            "ansible-ec2provision.sh.tftpl",
-            "post-ec2provision.sh.tftpl"
-          ]
-        }
-        tags = {
-          description         = "Syscon build and release server"
-          ami                 = "base_rhel_7_9"
-          instance-scheduling = "skip-scheduling"
-          os-type             = "Linux"
-          component           = "build"
-          server-type         = "nomis-build"
-        }
-      }
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.build.user_data_cloud_init, {
+          args = merge(local.ec2_instances.build.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.build.tags, {
+          description = "Syscon build and release server"
+        })
+      })
 
       dev-nomis-db-1-a = merge(local.ec2_instances.db, {
         config = merge(local.ec2_instances.db.config, {

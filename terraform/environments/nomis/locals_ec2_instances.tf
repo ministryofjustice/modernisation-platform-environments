@@ -2,6 +2,59 @@ locals {
 
   ec2_instances = {
 
+    build = {
+      config = {
+        ami_name                  = "base_rhel_7_9_2024-03-01T00-00-34.773Z"
+        iam_resource_names_prefix = "ec2-instance"
+        instance_profile_policies = [
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name                   = "private"
+        ssm_parameters_prefix         = "ec2/"
+        secretsmanager_secrets_prefix = "ec2/"
+      }
+      ebs_volumes = {
+        "/dev/sdb" = { label = "app", size = 100, type = "gp3" } # /u01
+        "/dev/sdc" = { label = "app", size = 100, type = "gp3" } # /u02
+      }
+      instance = {
+        disable_api_termination      = true
+        instance_type                = "t3.medium"
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "required"
+        monitoring                   = false
+        vpc_security_group_ids       = ["private-web"]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
+      }
+      route53_records = {
+        create_internal_record = true
+        create_external_record = true
+      }
+      user_data_cloud_init = {
+        args = {
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
+        }
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+        ]
+      }
+      tags = {
+        ami                 = "base_rhel_7_9"
+        instance-scheduling = "skip-scheduling"
+        os-type             = "Linux"
+        component           = "build"
+        server-type         = "nomis-build"
+      }
+    }
+
     db = {
       config = {
         ami_name                  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"

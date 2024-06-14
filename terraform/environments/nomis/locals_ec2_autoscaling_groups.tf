@@ -1,6 +1,54 @@
 locals {
 
   ec2_autoscaling_groups = {
+    base = {
+      autoscaling_group = {
+        desired_capacity    = 0
+        max_size            = 1
+        force_delete        = true
+        vpc_zone_identifier = module.environment.subnets["private"].ids
+      }
+      autoscaling_schedules = {
+        "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
+        "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
+      }
+      config = {
+        iam_resource_names_prefix = "ec2-instance"
+        instance_profile_policies = [
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
+        ]
+        secretsmanager_secrets_prefix = "ec2/"
+        ssm_parameters_prefix         = "ec2/"
+        subnet_name                   = "private"
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "t3.medium"
+        key_name                     = "ec2-user"
+        vpc_security_group_ids       = ["private-web"]
+        metadata_options_http_tokens = "required"
+        monitoring                   = false
+      }
+      user_data_cloud_init = {
+        args = {
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
+        }
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+        ]
+      }
+      tags = {
+        os-type   = "Linux"
+        component = "test"
+      }
+    }
+
     client = {
       autoscaling_group = {
         desired_capacity    = 1

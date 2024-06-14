@@ -524,7 +524,7 @@ locals {
       private = merge(local.lbs.private, {
 
         listeners = merge(local.lbs.private.listeners, {
-          # TODO REMOVE - this is unused
+          # TODO REMOVE - this is unused
           http7777 = {
             port     = 7777
             protocol = "HTTP"
