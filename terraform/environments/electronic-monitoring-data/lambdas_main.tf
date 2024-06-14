@@ -174,7 +174,7 @@ module "send_table_to_ap" {
     memory_size = 1024
     runtime = "python3.11"
     security_group_ids = [aws_security_group.lambda_sg_send_table_to_ap.id]
-    subnet_ids = data.aws_subnets.private_subnets.ids
+    subnet_ids = data.aws_subnets.shared-private.ids
     env_account_id = local.env_account_id
     environment_variables = {
       AP_DESTINATION_BUCKET = local.land_bucket
