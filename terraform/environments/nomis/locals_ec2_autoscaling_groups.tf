@@ -20,9 +20,7 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       instance = {
         disable_api_termination      = false
@@ -30,7 +28,6 @@ locals {
         key_name                     = "ec2-user"
         vpc_security_group_ids       = ["private-web"]
         metadata_options_http_tokens = "required"
-        monitoring                   = false
       }
       user_data_cloud_init = {
         args = {
@@ -44,8 +41,9 @@ locals {
         ]
       }
       tags = {
-        os-type   = "Linux"
+        backup    = "false"
         component = "test"
+        os-type   = "Linux"
       }
     }
 
@@ -74,9 +72,7 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
+        subnet_name = "private"
         user_data_raw = base64encode(templatefile(
           "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
             branch = "main"
@@ -90,17 +86,16 @@ locals {
         disable_api_termination      = false
         instance_type                = "t3.large"
         key_name                     = "ec2-user"
-        vpc_security_group_ids       = ["private-jumpserver"]
         metadata_options_http_tokens = "required"
-        monitoring                   = false
+        vpc_security_group_ids       = ["private-jumpserver"]
       }
       tags = {
+        backup                 = "false"
+        component              = "test"
         description            = "Windows Server 2022 client testing for NOMIS"
         instance-access-policy = "full"
         os-type                = "Windows"
-        component              = "test"
         server-type            = "NomisClient"
-        backup                 = "false" # no need to back this up as they are destroyed each night
       }
     }
 
@@ -164,9 +159,7 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       ebs_volumes = {
         "/dev/sdb" = { label = "app", type = "gp3", size = 100 }
@@ -177,7 +170,6 @@ locals {
         key_name                     = "ec2-user"
         vpc_security_group_ids       = ["private-web"]
         metadata_options_http_tokens = "required"
-        monitoring                   = false
       }
       user_data_cloud_init = {
         args = {
@@ -191,10 +183,11 @@ locals {
         ]
       }
       tags = {
-        description = "For testing nomis weblogic 19c image"
         # ami       = "base_ol_8_5" # commented out to ensure harden role does not re-run
-        os-type     = "Linux"
+        backup      = "false"
         component   = "web"
+        description = "For testing nomis weblogic 19c image"
+        os-type     = "Linux"
         server-type = "nomis-web19c"
       }
     }

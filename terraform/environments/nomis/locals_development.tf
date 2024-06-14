@@ -112,22 +112,6 @@ locals {
 
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
       })
-
-      dev-redhat-rhel79 = merge(local.ec2_autoscaling_groups.base, {
-        config = merge(local.ec2_autoscaling_groups.base.config, {
-          ami_name  = "hmpps_windows_server_2022_release_2024-*"
-          ami_name  = "RHEL-7.9_HVM-*"
-          ami_owner = "309956199498"
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.base.tags, {
-          description = "For testing official RedHat RHEL7.9 image"
-        })
-      })
     }
 
     ec2_instances = {
@@ -146,7 +130,8 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.build.tags, {
-          description = "Syscon build and release server"
+          description         = "Syscon build and release server"
+          instance-scheduling = "skip-scheduling"
         })
       })
 
@@ -170,9 +155,9 @@ locals {
           disable_api_termination = true
         })
         tags = merge(local.ec2_instances.db.tags, {
-          nomis-environment   = "dev"
           description         = "syscon nomis dev and qa databases"
           instance-scheduling = "skip-scheduling"
+          nomis-environment   = "dev"
           oracle-sids         = ""
         })
       })
@@ -201,9 +186,9 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.db19c.tags, {
-          nomis-environment   = "dev"
           description         = "syscon nomis dev and qa Oracle 19c databases"
           instance-scheduling = "skip-scheduling"
+          nomis-environment   = "dev"
           oracle-sids         = ""
         })
       })
@@ -462,15 +447,8 @@ locals {
     }
 
     route53_zones = {
-      "development.hmpps-test.modernisation-platform.service.justice.gov.uk" = {
-        records = [
-        ]
-      }
-      "development.nomis.az.justice.gov.uk" = {
-        lb_alias_records = [
-        ]
-      }
-      "development.nomis.service.justice.gov.uk" = {
+      development.nomis.az.justice.gov.uk = {} # remove from cert before deleting
+      development.nomis.service.justice.gov.uk = {
         records = [
           # SYSCON
           { name = "dev", type = "CNAME", ttl = "300", records = ["dev-nomis-db-1-a.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk"] },

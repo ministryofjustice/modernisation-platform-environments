@@ -23,17 +23,15 @@ locals {
 
     acm_certificates = {
       nomis_wildcard_cert = {
-        # domain_name limited to 64 chars so use modernisation platform domain for this
-        # and put the wildcard in the san
-        domain_name = "modernisation-platform.service.justice.gov.uk"
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "modernisation-platform.service.justice.gov.uk"
+        external_validation_records_created = true
         subject_alternate_names = [
           "*.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk",
           "*.test.nomis.service.justice.gov.uk",
           "*.test.nomis.az.justice.gov.uk",
           "*.hmpp-azdt.justice.gov.uk",
         ]
-        external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for nomis test domains"
         }
@@ -67,7 +65,6 @@ locals {
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
-          deployment           = "blue"
         })
       })
 
@@ -95,7 +92,6 @@ locals {
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
-          deployment           = "green"
         })
       })
 
@@ -123,7 +119,6 @@ locals {
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T2CNOM"
-          deployment           = "blue"
         })
       })
 
@@ -151,7 +146,6 @@ locals {
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T2CNOM"
-          deployment           = "green"
         })
       })
 
@@ -177,7 +171,6 @@ locals {
           oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T3CNOM"
-          deployment           = "blue"
         })
       })
 
@@ -203,7 +196,6 @@ locals {
           oracle-db-hostname-a = "t3nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t3nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T3CNOM"
-          deployment           = "green"
         })
       })
 
@@ -240,10 +232,10 @@ locals {
           disable_api_termination = true
         })
         tags = merge(local.ec2_instances.db.tags, {
-          nomis-environment   = "t1"
           description         = "T1 NOMIS database"
-          oracle-sids         = "T1CNOM T1NDH T1TRDAT T1ORSYS"
           instance-scheduling = "skip-scheduling"
+          nomis-environment   = "t1"
+          oracle-sids         = "T1CNOM T1NDH T1TRDAT T1ORSYS"
         })
       })
 
@@ -273,11 +265,11 @@ locals {
           disable_api_termination = true
         })
         tags = merge(local.ec2_instances.db.tags, {
-          nomis-environment   = "t1"
           description         = "T1 NOMIS Audit and MIS database"
-          oracle-sids         = "T1MIS T1CNMAUD"
           instance-scheduling = "skip-scheduling"
           misload-dbname      = "T1MIS"
+          nomis-environment   = "t1"
+          oracle-sids         = "T1MIS T1CNMAUD"
         })
       })
 
@@ -296,11 +288,11 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.xtag.tags, {
+          ndh-ems-hostname     = "t1-ems.test.ndh.nomis.service.justice.gov.uk"
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
-          ndh-ems-hostname     = "t1-ems.test.ndh.nomis.service.justice.gov.uk"
         })
       })
 
@@ -329,10 +321,10 @@ locals {
           disable_api_termination = true
         })
         tags = merge(local.ec2_instances.db.tags, {
-          nomis-environment   = "t2"
           description         = "T2 NOMIS database"
-          oracle-sids         = "T2CNOM T2NDH T2TRDAT"
           instance-scheduling = "skip-scheduling"
+          nomis-environment   = "t2"
+          oracle-sids         = "T2CNOM T2NDH T2TRDAT"
         })
       })
 
@@ -351,11 +343,11 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.xtag.tags, {
+          ndh-ems-hostname     = "t2-ems.test.ndh.nomis.service.justice.gov.uk"
           nomis-environment    = "t2"
           oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T2CNOM"
-          ndh-ems-hostname     = "t2-ems.test.ndh.nomis.service.justice.gov.uk"
         })
       })
 
@@ -383,10 +375,10 @@ locals {
           disable_api_termination = true
         })
         tags = merge(local.ec2_instances.db.tags, {
-          nomis-environment   = "t3"
           description         = "T3 NOMIS database to replace Azure T3PDL0070"
-          oracle-sids         = "T3CNOM"
           instance-scheduling = "skip-scheduling"
+          nomis-environment   = "t3"
+          oracle-sids         = "T3CNOM"
         })
       })
     }
@@ -398,20 +390,10 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
             ]
           }
@@ -423,20 +405,10 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
             ]
           }
@@ -448,20 +420,10 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/*",
             ]
           }
@@ -478,7 +440,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t1/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/weblogic-*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/weblogic-*",
             ]
           }
@@ -495,7 +456,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/weblogic-*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/weblogic-*",
             ]
           }
@@ -512,7 +472,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/t3/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T3/weblogic-*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T3*/weblogic-*",
             ]
           }
@@ -524,60 +483,6 @@ locals {
       private = merge(local.lbs.private, {
 
         listeners = merge(local.lbs.private.listeners, {
-          # TODO REMOVE - this is unused
-          http7777 = {
-            port     = 7777
-            protocol = "HTTP"
-
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-
-            rules = {
-              # T1 users in Azure accessed server directly on http 7777
-              # so support this in Mod Platform as well to minimise
-              # disruption.  This isn't needed for other environments.
-              t1-nomis-web-a = {
-                priority = 300
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t1-nomis-web-a-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
-                      "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              t1-nomis-web-b = {
-                priority = 400
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t1-nomis-web-b-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
-                      "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
-                      "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          }
-
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["nomis_wildcard_cert"]
 
@@ -602,7 +507,6 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
                     ]
                   }
@@ -617,9 +521,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
                       "c-t1.test.nomis.service.justice.gov.uk",
                       "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
@@ -635,7 +537,6 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t2-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t2-nomis-web-a.test.nomis.service.justice.gov.uk",
                     ]
                   }
@@ -650,9 +551,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t2-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t2-nomis-web-b.test.nomis.service.justice.gov.uk",
-                      "c-t2.test.nomis.az.justice.gov.uk",
                       "c-t2.test.nomis.service.justice.gov.uk",
                       "t2-cn.hmpp-azdt.justice.gov.uk",
                     ]
@@ -668,7 +567,6 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t3-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t3-nomis-web-a.test.nomis.service.justice.gov.uk",
                     ]
                   }
@@ -683,9 +581,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t3-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t3-nomis-web-b.test.nomis.service.justice.gov.uk",
-                      "c-t3.test.nomis.az.justice.gov.uk",
                       "c-t3.test.nomis.service.justice.gov.uk",
                       "t3-cn.hmpp-azdt.justice.gov.uk",
                     ]
@@ -720,29 +616,10 @@ locals {
     }
 
     route53_zones = {
-      "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
+      test.nomis.az.justice.gov.uk = {} # remove from cert before deleting
+      test.nomis.service.justice.gov.uk = {
         records = [
-        ]
-      }
-      "test.nomis.az.justice.gov.uk" = {
-        lb_alias_records = [
           # T1
-          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
-          { name = "t1-nomis-web-b", type = "A", lbs_map_key = "private" },
-          { name = "c-t1", type = "A", lbs_map_key = "private" },
-          # T2
-          { name = "t2-nomis-web-a", type = "A", lbs_map_key = "private" },
-          { name = "t2-nomis-web-b", type = "A", lbs_map_key = "private" },
-          { name = "c-t2", type = "A", lbs_map_key = "private" },
-          # T3
-          { name = "t3-nomis-web-a", type = "A", lbs_map_key = "private" },
-          { name = "t3-nomis-web-b", type = "A", lbs_map_key = "private" },
-          { name = "c-t3", type = "A", lbs_map_key = "private" },
-        ]
-      }
-      "test.nomis.service.justice.gov.uk" = {
-        records = [
-          # T1 [1-a: T1CNOM, T1NDH, T1TRDAT, T1ORSYS] [2-a: T1MIS, T1CNMAUD]
           { name = "t1nomis", type = "CNAME", ttl = "300", records = ["t1nomis-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1nomis-a", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1nomis-b", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
@@ -761,7 +638,7 @@ locals {
           { name = "t1mis", type = "CNAME", ttl = "300", records = ["t1mis-a.test.nomis.service.justice.gov.uk"] },
           { name = "t1mis-a", type = "CNAME", ttl = "300", records = ["t1-nomis-db-2-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1mis-b", type = "CNAME", ttl = "300", records = ["t1-nomis-db-2-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # T2 [1-a: T2CNOM, T2NDH, T2TRDAT]
+          # T2
           { name = "t2nomis", type = "CNAME", ttl = "300", records = ["t2nomis-a.test.nomis.service.justice.gov.uk"] },
           { name = "t2nomis-a", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2nomis-b", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
@@ -774,7 +651,7 @@ locals {
           { name = "t2trdat", type = "CNAME", ttl = "300", records = ["t2trdat-a.test.nomis.service.justice.gov.uk"] },
           { name = "t2trdat-a", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t2trdat-b", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-a.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # T3: [1-b: T3CNOM]
+          # T3
           { name = "t3nomis", type = "CNAME", ttl = "300", records = ["t3nomis-b.test.nomis.service.justice.gov.uk"] },
           { name = "t3nomis-a", type = "CNAME", ttl = "300", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t3nomis-b", type = "CNAME", ttl = "300", records = ["t3-nomis-db-1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
