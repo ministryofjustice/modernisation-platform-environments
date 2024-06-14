@@ -128,7 +128,7 @@ module "athena-s3-bucket" {
       ]
 
       expiration = {
-        days = 14
+        days = 31
       }
 
       noncurrent_version_transition = [
@@ -142,7 +142,7 @@ module "athena-s3-bucket" {
       ]
 
       noncurrent_version_expiration = {
-        days = 14
+        days = 31
       }
     }
   ]
