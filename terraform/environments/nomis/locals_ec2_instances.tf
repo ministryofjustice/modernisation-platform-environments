@@ -6,7 +6,6 @@ locals {
       config = {
         ami_name                  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner                 = "self"
-        availability_zone         = "eu-west-2a"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
@@ -38,8 +37,7 @@ locals {
         disable_api_termination      = false
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
-        metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        monitoring                   = true
+        metadata_options_http_tokens = "optional"
         vpc_security_group_ids       = ["data-db"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -57,15 +55,12 @@ locals {
       }
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
         }
-        scripts = [
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh"
         ]
       }
       tags = {
@@ -87,7 +82,6 @@ locals {
       config = {
         ami_name                  = "hmpps_ol_8_5_oracledb_19c_release_2024-06-07T07-59-47.056Z"
         ami_owner                 = "self"
-        availability_zone         = "eu-west-2a"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
@@ -119,8 +113,7 @@ locals {
         disable_api_termination      = false
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
-        metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        monitoring                   = true
+        metadata_options_http_tokens = "optional"
         vpc_security_group_ids       = ["data-db"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -138,15 +131,12 @@ locals {
       }
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
         }
-        scripts = [
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh"
         ]
       }
       tags = {
@@ -166,7 +156,6 @@ locals {
     web = {
       config = {
         ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
-        availability_zone         = "eu-west-2a"
         iam_resource_names_prefix = "ec2-weblogic"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
@@ -192,16 +181,13 @@ locals {
       }
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
         }
-        scripts = [
-          "install-ssm-agent.sh.tftpl",
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       tags = {
@@ -218,7 +204,6 @@ locals {
     xtag = {
       config = {
         ami_name                  = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
-        availability_zone         = "eu-west-2a"
         iam_resource_names_prefix = "ec2-instance"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
@@ -231,25 +216,21 @@ locals {
         subnet_name                   = "private"
       }
       instance = {
-        disable_api_termination      = false
-        instance_type                = "t2.large"
-        key_name                     = "ec2-user"
-        metadata_options_http_tokens = "required"
-        monitoring                   = false
-        vpc_security_group_ids       = ["private-web"]
+        disable_api_termination = false
+        instance_type           = "t2.large"
+        key_name                = "ec2-user"
+        monitoring              = false
+        vpc_security_group_ids  = ["private-web"]
       }
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
         }
-        scripts = [
-          "install-ssm-agent.sh.tftpl",
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       tags = {

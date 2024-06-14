@@ -29,7 +29,11 @@ locals {
         secretsmanager_secrets_prefix = "ec2/"
         ssm_parameters_prefix         = "ec2/"
         subnet_name                   = "private"
-        user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
@@ -59,28 +63,8 @@ locals {
         force_delete        = true
         vpc_zone_identifier = module.environment.subnets["private"].ids
       }
-      config = {
-        ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
-        availability_zone         = null # use all AZs since latency not an issue
-        iam_resource_names_prefix = "ec2-weblogic"
-        instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-          "EC2Default",
-          "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
-        ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO can be removed with line below
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
-      }
-      instance = {
-        disable_api_termination      = false
-        instance_type                = "t2.xlarge"
-        key_name                     = "ec2-user"
-        metadata_options_http_tokens = "optional"
-        monitoring                   = false
-        vpc_security_group_ids       = ["private-web"]
-      }
+      config   = local.ec2_instances.web.config
+      instance = local.ec2_instances.web.instance
       lb_target_groups = {
         http-7777 = {
           deregistration_delay = 30
@@ -104,29 +88,8 @@ locals {
           }
         }
       }
-      user_data_cloud_init = {
-        args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
-        }
-        scripts = [
-          "install-ssm-agent.sh.tftpl",
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
-        ]
-      }
-      tags = {
-        ami                    = "nomis_rhel_6_10_weblogic_appserver_10_3"
-        backup                 = "false" # disable mod platform backup since everything is in code
-        component              = "web"
-        description            = "nomis weblogic appserver 10.3"
-        instance-access-policy = "limited"
-        os-type                = "Linux"
-        server-type            = "nomis-web"
-      }
+      user_data_cloud_init = local.ec2_instances.web.user_data_cloud_init
+      tags                 = local.ec2_instances.web.tags
     }
 
     web19c = {
@@ -170,16 +133,13 @@ locals {
       }
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
         }
-        scripts = [
-          "install-ssm-agent.sh.tftpl",
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       tags = {
