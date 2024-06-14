@@ -50,5 +50,5 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
 
   vpc_endpoint_type = "Gateway"
 
-  route_table_ids = data.aws_subnets.private_subnets.ids
+  route_table_ids = data.aws_subnets.shared-private.ids
 }
