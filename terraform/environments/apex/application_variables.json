@@ -26,7 +26,7 @@
       "app_count": 1,
       "appscaling_min_capacity": 1,
       "appscaling_max_capacity": 5,
-      "ecs_scaling_cpu_threshold": 50,
+      "ecs_scaling_cpu_threshold": 0.3,
       "ecs_scaling_mem_threshold": 80,
       "container_memory_allocation": 3000,
       "region": "eu-west-2",
