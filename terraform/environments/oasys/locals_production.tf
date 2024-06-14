@@ -671,4 +671,5 @@ locals {
       "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
     }
   }
+  
 }
