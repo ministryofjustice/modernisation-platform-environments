@@ -369,3 +369,42 @@ resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_list_target_s
     role = aws_iam_role.get_file_keys_for_table.name
     policy_arn = aws_iam_policy.list_target_s3_bucket.arn
 }
+
+# ------------------------------------------
+# update_log_table
+# ------------------------------------------
+
+resource "aws_iam_role" "update_log_table" {
+  name = "update_log_table"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "update_log_table_lambda_sqs_queue_access_execution" {
+    role = aws_iam_role.update_log_table.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+data "aws_iam_policy_document" "get_log_s3_files" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:GetBucketLocation"
+      ]
+    resources = [
+      aws_s3_bucket.dms_target_ep_s3_bucket.arn,
+      "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*"
+      ]
+  }
+}
+
+resource "aws_iam_policy" "get_log_s3_files" {
+  name = "get_log_s3_files"
+  policy = data.aws_iam_policy_document.get_log_s3_files.json
+}
+resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
+    role = aws_iam_role.update_log_table.name
+    policy_arn = aws_iam_policy.get_log_s3_files.arn
+}
