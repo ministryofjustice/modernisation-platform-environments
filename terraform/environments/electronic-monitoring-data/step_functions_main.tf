@@ -88,29 +88,31 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
 
   definition = <<EOF
 {
-  "StartAt": "GetMetadataList",
+  "StartAt": "GetValidatedTableList",
   "States": {
-      "Get Validated Table List": {
+      "GetValidatedTableList": {
       "Type": "Task",
       "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
       "Parameters": {
         "QueryString.$": "States.Format('SELECT full_table_name FROM \"dms_data_validation\".\"glue_df_output\" WHERE validation_msg like \"%Validated%\" and database_name = \"{}\"', $.db_name)",
         "WorkGroup": "primary",
-        "ResultConfiguration": {
-          "OutputLocation": "s3://${module.athena-query-bucket}/validation_tables/"
-        }
+      "ResultPath": "$.queryResult",
+      "Next": "GetQueryResults"
       },
-      "Next": "Get results of the query"
+      "Next": "GetQueryResults"
     },
-    "GetMetadataList": {
+    "GetQueryResults": {
       "Type": "Task",
-      "Resource": "${module.get_tables_from_db.lambda_function_arn}",
-      "ResultPath": "$.db_info",
-      "Next": "LoopThroughMetadataList"
+      "Resource": "arn:aws:states:::athena:getQueryResults",
+      "Parameters": {
+        "QueryExecutionId.$": "$.queryResult.QueryExecutionId"
+      },
+      "ResultPath": "$.queryOutput",
+      "Next": "LoopThroughTables"
     },
-    "LoopThroughMetadataList": {
+    "LoopThroughTables": {
       "Type": "Map",
-      "ItemsPath": "$.db_info",
+      "ItemsPath": "$.queryOutput.ResultSet.Rows",
       "MaxConcurrency": 4,
       "Iterator": {
         "StartAt": "GetTableFileNames",

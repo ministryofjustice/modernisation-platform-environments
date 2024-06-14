@@ -153,33 +153,13 @@ data "aws_iam_policy_document" "send_database_to_ap_athena_queries" {
     effect = "Allow"
 
     actions = [
-    "athena:getQueryResults",
-    "athena:startQueryExecution",
-    "athena:stopQueryExecution",
-    "athena:getQueryExecution",
-    "athena:getDataCatalog"
+      "athena:startQueryExecution",
+      "athena:getQueryExecution",
+      "athena:getQueryResults"
     ]
 
     resources = [
-      "arn:aws:athena:eu-west-2:${local.env_account_id}:workgroup/primaryworkgroup",
-      "arn:aws:athena:eu-west-2:${local.env_account_id}:datacatalog/*"
-    ]
-  }
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:ListBucketMultipartUploads",
-      "s3:ListMultipartUploadParts",
-      "s3:AbortMultipartUpload",
-      "s3:PutObject"
-    ]
-
-    resources = [
-      module.athena_query_s3
+      "*"
     ]
   }
 }
