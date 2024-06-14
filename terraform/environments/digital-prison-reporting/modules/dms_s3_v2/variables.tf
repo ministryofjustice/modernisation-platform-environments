@@ -1,16 +1,19 @@
 
 variable "account_region" {
   description = "Current AWS Region."
+  type        = string
   default     = "eu-west-2"
 }
 
 variable "account_id" {
   description = "AWS Account ID."
+  type        = string
   default     = ""
 }
 
 variable "name" {
   description = "DMS Replication name."
+  type        = string
   default     = ""
 }
 
@@ -58,14 +61,17 @@ variable "vpc" {
 }
 
 variable "availability_zone" {
+  type    = string
   default = null
 }
 
 variable "create" {
+  type    = bool
   default = true
 }
 
 variable "create_iam_roles" {
+  type    = bool
   default = true
 }
 
@@ -79,11 +85,13 @@ variable "iam_role_permissions_boundary" {
 
 variable "stack_name" {
   description = "The name of our application"
+  type        = string
   default     = "dblink"
 }
 
 variable "owner" {
   description = "A group email address to be used in tags"
+  type        = string
   default     = "autobots@ga.gov.au"
 }
 
@@ -93,6 +101,7 @@ variable "owner" {
 
 variable "identifier" {
   default     = "rds"
+  type        = string
   description = "Name of the database in the RDS"
 }
 
@@ -102,21 +111,25 @@ variable "identifier" {
 
 variable "replication_instance_maintenance_window" {
   description = "Maintenance window for the replication instance"
+  type        = string
   default     = "sun:10:30-sun:14:30"
 }
 
 variable "replication_instance_storage" {
   description = "Size of the replication instance in GB"
+  type        = string
   default     = "10"
 }
 
 variable "replication_instance_version" {
   description = "Engine version of the replication instance"
+  type        = string
   default     = "3.4.6"
 }
 
 variable "replication_instance_class" {
   description = "Instance class of replication instance"
+  type        = string
   default     = "dms.t2.micro"
 }
 
@@ -138,6 +151,7 @@ variable "dms_log_retention_in_days" {
 
 variable "database_subnet_cidr" {
   default     = ["10.26.25.208/28", "10.26.25.224/28", "10.26.25.240/28"]
+  type        = list(string)
   description = "List of subnets to be used for databases"
 }
 
@@ -234,6 +248,7 @@ variable "extra_attributes" {
 
 variable "source_db_name" {
   description = "Name of the Source database"
+  type        = string
   default     = "oracle"
 }
 
@@ -256,6 +271,7 @@ variable "short_name" {
 variable "source_address" {
   default     = ""
   description = "Default Source Address"
+  type        = string
 }
 
 variable "bucket_name" {
@@ -266,26 +282,31 @@ variable "bucket_name" {
 
 variable "source_db_port" {
   description = "The port the Application Server will access the database on"
+  type        = number
   default     = null
 }
 
 variable "source_engine" {
   default     = "oracle-se2"
+  type        = string
   description = "Engine type, example values mysql, postgres"
 }
 
 variable "source_engine_name" {
   default     = ""
+  type        = string
   description = "Engine name for DMS"
 }
 
 
 variable "source_app_password" {
   description = "Password for the endpoint to access the source database"
+  type        = string
   default     = ""
 }
 
 variable "source_app_username" {
   description = "Username for the endpoint to access the source database"
+  type        = string
   default     = ""
 }
