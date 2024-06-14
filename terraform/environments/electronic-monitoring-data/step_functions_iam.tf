@@ -162,6 +162,34 @@ data "aws_iam_policy_document" "send_database_to_ap_athena_queries" {
       "*"
     ]
   }
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      "arn:aws:s3:::em-athena-result-output",
+      "arn:aws:s3:::em-athena-result-output/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:GetPartition",
+      "glue:GetTables"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
