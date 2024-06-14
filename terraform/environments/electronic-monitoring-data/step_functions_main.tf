@@ -110,11 +110,17 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
             "QueryExecutionId.$": "$.queryResult.QueryExecution.QueryExecutionId"
           },
           "ResultPath": "$.queryOutput",
+          "Next": "QueryOutputToList"
+        },
+        "QueryOutputToList": {
+          "Type": "Task",
+          "Resource": "${module.query_output_to_list.lambda_function_arn}",
+          "ResultPath": "$.queryOutputList",
           "Next": "LoopThroughTables"
         },
         "LoopThroughTables": {
           "Type": "Map",
-          "ItemsPath": "$.queryOutput.ResultSet.Rows",
+          "ItemsPath": "$.queryOutputList",
           "MaxConcurrency": 4,
           "Iterator": {
             "StartAt": "GetTableFileNames",
