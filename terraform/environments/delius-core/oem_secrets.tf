@@ -15,7 +15,6 @@ data "aws_iam_policy_document" "OracleEnterpriseManagementSecretsPolicyDocument"
 variable "env_name" {
   description = "Environment name short ie dev"
   type        = string
-  default = null
 }
 resource "aws_iam_policy" "OracleEnterpriseManagementSecretsPolicy" {
   name   = "OracleEnterpriseManagementSecretsPolicy"
