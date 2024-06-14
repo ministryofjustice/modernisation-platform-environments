@@ -531,6 +531,7 @@ resource "aws_ecs_capacity_provider" "apex" {
       # minimum_scaling_step_size = 1
       status          = "ENABLED"
       target_capacity = var.ecs_target_capacity
+      instance_warmup_period = var.ec2_instance_warmup_period
     }
     managed_draining = "ENABLED"
   }
