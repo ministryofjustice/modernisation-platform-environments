@@ -148,6 +148,42 @@ resource "aws_iam_role" "send_database_to_ap" {
   assume_role_policy = data.aws_iam_policy_document.assume_step_functions.json
 }
 
+data "aws_iam_policy_document" "send_database_to_ap_athena_queries" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+    "athena:getQueryResults",
+    "athena:startQueryExecution",
+    "athena:stopQueryExecution",
+    "athena:getQueryExecution",
+    "athena:getDataCatalog"
+    ]
+
+    resources = [
+      "arn:aws:athena:eu-west-2:${local.env_account_id}:workgroup/primaryworkgroup",
+      "arn:aws:athena:eu-west-2:${local.env_account_id}:datacatalog/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload",
+      "s3:PutObject"
+    ]
+
+    resources = [
+      module.athena_query_s3
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
   statement {
     effect = "Allow"
@@ -175,6 +211,16 @@ data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
   }
 }
 
+resource "aws_iam_policy" "send_database_to_ap_athena_queries" {
+  name        = "send_database_to_ap_athena_queries"
+  description = "Policy to allow start and get specific Athena queries"
+  policy      = data.aws_iam_policy_document.send_database_to_ap_athena_queries.json
+}
+
+resource "aws_iam_role_policy_attachment" "send_database_to_ap_athena_queries_attach_send_database_to_ap" {
+  role       = aws_iam_role.send_database_to_ap.name
+  policy_arn = aws_iam_policy.send_database_to_ap_athena_queries.arn
+}
 
 resource "aws_iam_policy" "send_tables_to_ap_lambda_invoke_policy" {
   name        = "send_tables_to_ap_lambda_invoke_policy"

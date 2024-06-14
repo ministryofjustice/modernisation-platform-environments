@@ -90,6 +90,18 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
 {
   "StartAt": "GetMetadataList",
   "States": {
+      "Get Validated Table List": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
+      "Parameters": {
+        "QueryString.$": "States.Format('SELECT full_table_name FROM \"dms_data_validation\".\"glue_df_output\" WHERE validation_msg like \"%Validated%\" and database_name = \"{}\"', $.db_name)",
+        "WorkGroup": "primary",
+        "ResultConfiguration": {
+          "OutputLocation": "s3://${module.athena-query-bucket}/validation_tables/"
+        }
+      },
+      "Next": "Get results of the query"
+    },
     "GetMetadataList": {
       "Type": "Task",
       "Resource": "${module.get_tables_from_db.lambda_function_arn}",
