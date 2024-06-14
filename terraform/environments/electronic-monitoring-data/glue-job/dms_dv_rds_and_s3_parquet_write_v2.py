@@ -339,7 +339,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
             df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
         # -------------------------------------------------------
 
-        prq_df_created_msg_1 = f"""S3-Parquet-Read-dataframe['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] -- {total_size_mb}MB"""
+        prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] -- {total_size_mb}MB"""
 
         # -------------------------------------------------------
         if args.get("transformed_column_list_1", None) is not None:
