@@ -1,5 +1,5 @@
 locals {
-    pagerduty_integration_key_name = local.environment == "production" ? "laa_cwa_prod_alarms" : "laa_cwa_nonprod_alarms"
+  pagerduty_integration_key_name = local.environment == "production" ? "laa_cwa_prod_alarms" : "laa_cwa_nonprod_alarms"
 }
 
 # SNS topic for monitoring to send alarms to

@@ -202,7 +202,7 @@ data "aws_iam_policy_document" "generic" {
     actions = [
       "ec2:Describe*",
       "ec2:Get*",
-      "ec2:List*",  
+      "ec2:List*",
       "ec2:AssignPrivateIpAddresses",
     ]
     resources = [

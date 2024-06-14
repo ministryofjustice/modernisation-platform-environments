@@ -7,7 +7,7 @@ resource "aws_backup_vault" "cwa" {
 }
 resource "aws_backup_plan" "cwa" {
 
-  name  = "${local.application_name_short}-backup-daily-retain-35-days"
+  name = "${local.application_name_short}-backup-daily-retain-35-days"
 
   rule {
     rule_name         = "${local.application_name_short}-backup-daily-retain-35-days"

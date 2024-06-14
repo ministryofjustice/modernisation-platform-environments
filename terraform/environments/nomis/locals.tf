@@ -28,6 +28,7 @@ locals {
         "ec2_instance_linux",
         "ec2_instance_oracle_db_with_backup",
         "ec2_instance_textfile_monitoring",
+        "ec2_windows",
       ]
       cloudwatch_metric_alarms_default_actions    = ["dso_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters  = ["hmpps-oem-${local.environment}"]
@@ -52,10 +53,14 @@ locals {
   }
 
   baseline_all_environments = {
-    cloudwatch_log_groups = merge(
-      local.weblogic_cloudwatch_log_groups,
-      local.database_cloudwatch_log_groups,
-    )
+    cloudwatch_log_groups = {
+      cwagent-nomis-autologoff = {
+        retention_in_days = 90
+      }
+      cwagent-weblogic-logs = {
+        retention_in_days = 30
+      }
+    }
 
     s3_buckets = {
       s3-bucket = {
@@ -63,11 +68,6 @@ locals {
       }
     }
 
-    security_groups = {
-      private-lb         = local.security_groups.private_lb
-      private-web        = local.security_groups.private_web
-      private-jumpserver = local.security_groups.private_jumpserver
-      data-db            = local.security_groups.data_db
-    }
+    security_groups = local.security_groups
   }
 }

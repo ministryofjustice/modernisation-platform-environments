@@ -48,7 +48,7 @@ locals {
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
-  baseline_security_groups = {
+  security_groups = {
     lb = {
       description = "Security group for public subnet"
       ingress = {
@@ -143,10 +143,10 @@ locals {
       description = "Security group for bip"
       ingress = {
         all-from-web = {
-          description = "Allow all ingress from web"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
+          description     = "Allow all ingress from web"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
           security_groups = ["web"]
         }
         all-within-subnet = {
@@ -297,6 +297,28 @@ locals {
           to_port     = "3872"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.oracle_oem_agent
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+    private-jumpserver = {
+      description = "Security group for jumpservers"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
         }
       }
       egress = {

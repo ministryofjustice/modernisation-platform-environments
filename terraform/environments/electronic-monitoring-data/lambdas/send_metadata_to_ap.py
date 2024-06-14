@@ -17,7 +17,7 @@ logger.setLevel(logging.INFO)
 def handler(event, context):
     # Specify source bucket
     source_bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
-    destination_bucket = os.environ.get("REG_BUCKET_NAME")
+    destination_bucket = os.environ.get("METADATA_BUCKET_NAME")
     # Get object that has been uploaded
     file_key = event["Records"][0]["s3"]["object"]["key"].replace("%3D", "=")
     file_parts = file_key.split("/")
@@ -30,8 +30,7 @@ def handler(event, context):
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
     if "_" not in database_name:
         database_name = f"{database_name}_add_underscore"
-    project_name = "electronic-monitoring-metadata"
-    destination_key = f"landing/{project_name}/data/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
+    destination_key = f"electronic_monitoring/metadata/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
     logger.info(f"Copying to: {destination_bucket}, {destination_key}")
     # Specify from where file needs to be copied
     copy_object = {"Bucket": source_bucket_name, "Key": file_key}

@@ -25,9 +25,10 @@ module "umt" {
   container_memory = var.delius_microservice_configs.umt.container_memory
   container_cpu    = var.delius_microservice_configs.umt.container_cpu
 
-  health_check_path                 = "/umt"
+  health_check_path                 = "/umt/actuator/health"
   health_check_grace_period_seconds = 600
   health_check_interval             = 30
+  target_group_protocol_version     = "HTTP1"
 
   db_ingress_security_groups = []
   ecs_service_egress_security_group_ids = [
@@ -104,4 +105,13 @@ resource "aws_ssm_parameter" "elasticache_port" {
   description = "UMT ElastiCache Port"
   type        = "SecureString"
   value       = module.umt.elasticache_port
+}
+
+resource "aws_vpc_security_group_egress_rule" "alb_to_umt" {
+  security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
+  description                  = "load balancer to umt ecs service"
+  from_port                    = "8080"
+  to_port                      = "8080"
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = module.umt.service_security_group_id
 }

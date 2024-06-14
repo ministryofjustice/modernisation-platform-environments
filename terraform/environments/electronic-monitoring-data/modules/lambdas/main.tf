@@ -1,10 +1,14 @@
+locals {
+  use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null)
+}
+
 resource "aws_sqs_queue" "lambda_dlq" {
-  name = "${var.function_name}-dlq"
-  kms_master_key_id  = aws_kms_key.lambda_env_key.id
+  name              = "${var.function_name}-dlq"
+  kms_master_key_id = aws_kms_key.lambda_env_key.id
 }
 
 resource "aws_kms_key" "lambda_env_key" {
-  description = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
+  description         = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
   enable_key_rotation = true
 
   policy = <<EOF
@@ -113,7 +117,7 @@ resource "aws_iam_role_policy_attachment" "lambda_xray_policy_attachment" {
 resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = 400
-  kms_key_id = aws_kms_key.lambda_env_key.arn
+  kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
 
@@ -129,10 +133,14 @@ resource "aws_lambda_function" "this" {
   memory_size      = var.memory_size
   runtime          = var.runtime
 
-  vpc_config {
-    security_group_ids = var.security_group_ids
-    subnet_ids         = var.subnet_ids
+  dynamic "vpc_config" {
+    for_each = local.use_vpc_config ? [1] : []
+    content {
+      security_group_ids = var.security_group_ids
+      subnet_ids         = var.subnet_ids
+    }
   }
+
 
   environment {
     variables = var.environment_variables

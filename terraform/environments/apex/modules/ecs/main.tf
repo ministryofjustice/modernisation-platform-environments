@@ -452,22 +452,35 @@ resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
   policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
 }
 
-# Set up CloudWatch group and log stream and retain logs for 30 days
+# Set up CloudWatch group and log stream and retain logs for 3 months
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
-  name              = "${var.app_name}-ecs-log-group"
-  retention_in_days = 30
+  name              = "${var.app_name}-ecs-container-logs"
+  retention_in_days = 90
+  kms_key_id = var.log_group_kms_key
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-log-group"
+      Name = "${var.app_name}-ecs-container-logs"
     }
   )
 }
 
-resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
-  name           = "${var.app_name}-log-stream"
-  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+# resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
+#   name           = "${var.app_name}-log-stream"
+#   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+# }
+
+resource "aws_cloudwatch_log_group" "ec2" {
+  name              = "${var.app_name}-ecs-ec2-logs"
+  retention_in_days = 90
+  kms_key_id = var.log_group_kms_key
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-ec2-logs"
+    }
+  )
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
@@ -528,3 +541,4 @@ resource "aws_ecs_cluster_capacity_providers" "apex" {
 
   capacity_providers = [aws_ecs_capacity_provider.apex.name]
 }
+

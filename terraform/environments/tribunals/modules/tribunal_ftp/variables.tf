@@ -48,7 +48,7 @@ variable "aws_acm_certificate_external" {
 variable "vpc_shared_id" {
 }
 
-variable "documents_location"{
+variable "documents_location" {
 }
 
 variable "application_data" {

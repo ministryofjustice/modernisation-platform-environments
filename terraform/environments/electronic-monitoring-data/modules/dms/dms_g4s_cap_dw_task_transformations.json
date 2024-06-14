@@ -6,7 +6,7 @@
       "rule-name": "select-table",
       "object-locator": {
         "schema-name": "dbo",
-        "table-name": "Log_LoadErrors"
+        "table-name": "D_Comments"
       },
       "rule-action": "include",
       "load-order": "1",
@@ -16,30 +16,30 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "011",
+      "rule-id": "11",
       "rule-name": "add_column_011",
       "rule-target": "column",
       "object-locator": {
         "schema-name": "dbo",
-        "table-name": "Log_LoadErrors"
+        "table-name": "D_Comments"
       },
       "rule-action": "add-column",
-      "expression": "trim(replace(replace($ErrorMessage, char(13), ''), char(10), ''))",
-      "value": "ErrorMessage_V2",
+      "expression": "trim(replace($Comments, char(141), ''))",
+      "value": "Comments_V2",
       "data-type": {
         "type": "string",
-        "length": 700
+        "length": 4200
       }
     },
     {
       "rule-type": "transformation",
-      "rule-id": "012",
+      "rule-id": "12",
       "rule-name": "remove_column_012",
       "rule-target": "column",
       "object-locator": {
         "schema-name": "dbo",
-        "table-name": "Log_LoadErrors",
-        "column-name": "ErrorMessage"
+        "table-name": "D_Comments",
+        "column-name": "Comments"
       },
       "parallel-load": null,
       "rule-action": "remove-column",

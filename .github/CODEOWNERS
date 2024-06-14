@@ -4,7 +4,7 @@
 * @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-compute @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-ingestion @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
-/terraform/environments/apex @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
+/terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-chaps @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
@@ -30,6 +30,7 @@
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/eric @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
+/terraform/environments/genesys-call-centre-data @ministryofjustice/ @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-domain-services @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-oem @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-infra-azure-ad-sso @ministryofjustice/laa-ccms-webops @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
@@ -55,7 +56,6 @@
 /terraform/environments/pra-register @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dashboard-access @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
 /terraform/environments/sprinkler @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
-/terraform/environments/tariff @ministryofjustice/cica @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/tribunals @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform

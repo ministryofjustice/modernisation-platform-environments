@@ -1,7 +1,7 @@
 locals {
   create_db_snapshots_script_prefix = "dbsnapshot"
   delete_db_snapshots_script_prefix = "deletesnapshots"
-  db_connect_script_prefix = "dbconnect"
+  db_connect_script_prefix          = "dbconnect"
 }
 
 resource "aws_ssm_parameter" "ssh_key" {
@@ -48,8 +48,8 @@ resource "aws_iam_role" "backup_lambda" {
 }
 
 resource "aws_iam_policy" "backup_lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name   = "${local.application_name}-${local.environment}-backup-lambda-policy"
-  tags   = merge(
+  name = "${local.application_name}-${local.environment}-backup-lambda-policy"
+  tags = merge(
     local.tags,
     { Name = "${local.application_name}-${local.environment}-backup-lambda-policy" }
   )
@@ -100,7 +100,7 @@ resource "aws_iam_role_policy_attachment" "backup_lambda" {
 
 resource "aws_s3_bucket" "backup_lambda" {
   bucket = "${local.application_name}-${local.environment}-backup-lambda"
-  tags   = merge(
+  tags = merge(
     local.tags,
     { Name = "${local.application_name}-${local.environment}-backup-lambda" }
   )
@@ -110,7 +110,7 @@ resource "aws_s3_object" "provision_files" {
   bucket       = aws_s3_bucket.backup_lambda.id
   for_each     = fileset("./zipfiles/", "**")
   key          = each.value
-  source       = "./zipfiles/${each.value}" 
+  source       = "./zipfiles/${each.value}"
   content_type = "application/zip"
   source_hash  = filemd5("./zipfiles/${each.value}")
 }
@@ -201,15 +201,15 @@ resource "aws_security_group" "backup_lambda" {
 }
 
 resource "aws_lambda_layer_version" "backup_lambda" {
-  layer_name   = "SSHNodeJSLayer"
-  description  = "A layer to add ssh libs to lambda"
-  license_info = "Apache-2.0"
-  s3_bucket    = aws_s3_bucket.backup_lambda.id
-  s3_key       = "nodejs.zip"
+  layer_name       = "SSHNodeJSLayer"
+  description      = "A layer to add ssh libs to lambda"
+  license_info     = "Apache-2.0"
+  s3_bucket        = aws_s3_bucket.backup_lambda.id
+  s3_key           = "nodejs.zip"
   source_code_hash = filebase64sha256("zipfiles/nodejs.zip")
 
   compatible_runtimes = ["nodejs18.x"]
-  depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
+  depends_on          = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 }
 
 resource "aws_lambda_function" "create_db_snapshots" {
