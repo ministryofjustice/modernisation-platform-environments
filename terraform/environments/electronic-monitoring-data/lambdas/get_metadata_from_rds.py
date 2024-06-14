@@ -22,9 +22,6 @@ SECRET_NAME = os.environ.get("SECRET_NAME")
 METADATA_STORE_BUCKET = os.environ.get("METADATA_STORE_BUCKET")
 
 
-
-
-
 def get_rds_connection(db_name):
     con_sqlserver = wr.sqlserver.connect(
         secret_id=SECRET_NAME, odbc_driver_version=17, dbname=db_name
@@ -71,6 +68,11 @@ def add_db_to_meta(meta, db_name):
     """
     meta.database_name = db_name
     return meta
+    
+def remove_comments_from_meta(meta):
+    for col in meta['columns']:
+        col["description"] = ""
+    return meta
 
 
 def handler(event, context):
@@ -83,6 +85,7 @@ def handler(event, context):
     for meta in metadata_list:
         write_meta_to_s3(meta)
     dict_metadata_list = [meta.to_dict() for meta in metadata_list]
+    dict_metadata_list = [remove_comments_from_meta(meta) for meta in dict_metadata_list]
     create_glue_database(db_name)
     result = {
         "status": "success",

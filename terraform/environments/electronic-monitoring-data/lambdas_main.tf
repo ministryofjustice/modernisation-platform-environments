@@ -33,7 +33,6 @@ module "get_metadata_from_rds_lambda" {
   subnet_ids         = data.aws_subnets.shared-public.ids
   environment_variables = {
     SECRET_NAME           = aws_secretsmanager_secret.db_glue_connection.name
-    DB_NAME               = local.db_name
     METADATA_STORE_BUCKET = module.metadata-s3-bucket.bucket.id
   }
   env_account_id = local.env_account_id
@@ -74,7 +73,6 @@ module "create_athena_table" {
     subnet_ids = data.aws_subnets.shared-public.ids
     env_account_id = local.env_account_id
     environment_variables = {
-      DB_NAME = local.db_name
       S3_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
     }
 }
@@ -120,6 +118,39 @@ resource "aws_lambda_permission" "send_metadata_to_ap" {
 }
 
 # ------------------------------------------------------
+# get file keys for table
+# ------------------------------------------------------
+
+
+data "archive_file" "get_file_keys_for_table" {
+    type = "zip"
+    source_file = "${local.lambda_path}/get_file_keys_for_table.py"
+    output_path = "${local.lambda_path}/get_file_keys_for_table.zip"
+}
+
+module "get_file_keys_for_table" {
+    source              = "./modules/lambdas"
+    filename = "${local.lambda_path}/get_file_keys_for_table.zip"
+    function_name = "get_file_keys_for_table"
+    role_arn = aws_iam_role.get_file_keys_for_table.arn
+    role_name = aws_iam_role.get_file_keys_for_table.name
+    handler = "get_file_keys_for_table.handler"
+    source_code_hash = data.archive_file.send_table_to_ap.output_base64sha256
+    layers = null
+    timeout = 900
+    memory_size = 1024
+    runtime = "python3.11"
+    security_group_ids = [aws_security_group.lambda_db_security_group.id]
+    subnet_ids = data.aws_subnets.shared-public.ids
+    env_account_id = local.env_account_id
+    environment_variables = {
+      PARQUET_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    }
+}
+
+
+
+# ------------------------------------------------------
 # Send table to AP 
 # ------------------------------------------------------
 
@@ -146,7 +177,6 @@ module "send_table_to_ap" {
     subnet_ids = null
     env_account_id = local.env_account_id
     environment_variables = {
-      PARQUET_BUCKET_NAME = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
       AP_DESTINATION_BUCKET = local.land_bucket
     }
 }
