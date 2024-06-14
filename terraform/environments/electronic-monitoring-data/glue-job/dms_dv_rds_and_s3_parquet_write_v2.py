@@ -383,7 +383,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                                   f"""'{rds_tbl_name} - Validated.{additional_message}' as validation_msg""",
                                                   f"""'{rds_db_name}' as database_name""",
                                                   f"""'{db_sch_tbl}' as full_table_name""",
-                                                  """'False' as table_in_ap""",
+                                                  """'False' as table_in_ap"""
                                                   )
                 LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
@@ -399,7 +399,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                              validation_msg,
                                              f"""'{rds_db_name}' as database_name""",
                                              f"""'{db_sch_tbl}' as full_table_name""",
-                                             """'False' as table_in_ap""",
+                                             """'False' as table_in_ap"""
                                              )
                 LOGGER.warn(f"Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_temp)
@@ -411,7 +411,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                               "'' as json_row",
                                               validation_msg,
                                               f"""'{rds_db_name}' as database_name""",
-                                              f"""'{db_sch_tbl}' as full_table_name"""
+                                              f"""'{db_sch_tbl}' as full_table_name""",
+                                              """'False' as table_in_ap"""
                                               )
             LOGGER.warn(f"Validation Failed - 3")
             df_dv_output = df_dv_output.union(df_temp)
@@ -426,7 +427,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                           "'' as json_row",
                                           f"""'{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
                                           f"""'{rds_db_name}' as database_name""",
-                                          f"""'{db_sch_tbl}' as full_table_name"""
+                                          f"""'{db_sch_tbl}' as full_table_name""",
+                                          """'False' as table_in_ap"""
                                           )
         LOGGER.warn(f"Validation not applicable - 4")
         df_dv_output = df_dv_output.union(df_temp)
