@@ -416,6 +416,7 @@ resource "aws_ebs_volume" "db_home" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
+  snapshot_id       = length(local.application_data.accounts[local.environment].home_snapshot_id) > 0 ? local.application_data.accounts[local.environment].home_snapshot_id : null
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_home
   type              = "io2"
   iops              = 3000
@@ -438,7 +439,6 @@ resource "aws_ebs_volume" "db_temp" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  snapshot_id       = length(local.application_data.accounts[local.environment].home_snapshot_id) > 0 ? local.application_data.accounts[local.environment].home_snapshot_id : null
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_temp
   type              = "io2"
   iops              = 3000
