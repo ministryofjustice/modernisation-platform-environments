@@ -9,7 +9,7 @@
         "containerPort": 8080
       }
     ],
-    "memory": 2012,
+    "memory": 3000,
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
