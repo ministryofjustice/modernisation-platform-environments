@@ -68,6 +68,7 @@ resource "aws_sesv2_configuration_set" "nexctloud_ses_configuration_set" {
 #####################
 
 resource "aws_iam_user" "nextcloud_ses_smtp_user" {
+  #checkov:skip=CKV_AWS_273:Nextcloud requires an SMTP user to send emails
   name = "${var.env_name}-${var.account_info.application_name}-smtp-user"
 
   tags = var.tags
@@ -81,6 +82,7 @@ resource "aws_iam_user_policy" "nextcloud_ses_smtp_user" {
   name = "${var.env_name}-${var.account_info.application_name}-smtp-user-policy"
   user = aws_iam_user.nextcloud_ses_smtp_user.name
 
+  #checkov:skip=CKV_AWS_290:No restrictions can be set in the policy
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -90,15 +92,16 @@ resource "aws_iam_user_policy" "nextcloud_ses_smtp_user" {
           "ses:SendEmail",
           "ses:SendRawEmail"
         ]
-        Resource = "*"
+        Resource = aws_sesv2_email_identity.nextcloud.arn
       }
     ]
   })
 }
 
 resource "aws_ssm_parameter" "nextcloud_ses_smtp_user" {
-  name = "/${var.env_name}/${var.account_info.application_name}/ses_smtp"
-  type = "SecureString"
+  name   = "/${var.env_name}/${var.account_info.application_name}/ses_smtp"
+  type   = "SecureString"
+  key_id = var.account_config.kms_keys.general_shared
   value = jsonencode({
     user              = aws_iam_user.nextcloud_ses_smtp_user.name
     key               = aws_iam_access_key.nextcloud_ses_smtp_user.id
