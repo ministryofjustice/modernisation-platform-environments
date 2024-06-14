@@ -19,16 +19,24 @@ locals {
     var.options.enable_hmpps_domain ? ["ec2-ad-leave-windows"] : [],
     var.options.enable_ec2_self_provision ? ["ec2-configuration-management-windows"] : [],
     var.options.enable_ec2_self_provision ? ["ec2-configuration-management-linux"] : [],
+    var.options.enable_ec2_session_manager_cloudwatch_logs ? ["SSM-SessionManagerRunShell"] : [],
   ])
 
-  ssm_documents = {
-    for item in fileset("${path.module}/ssm-documents", "*.yaml") :
-    trimsuffix(item, ".yaml") => {
-      document_type   = "Command"
-      document_format = "YAML"
-      content         = file("${path.module}/ssm-documents/${item}")
-    }
-  }
+  ssm_documents_list = flatten([
+    for document_type in ["Command", "Session"] : [
+      for document_format in ["yaml", "json"] : [
+        for item in fileset("${path.module}/ssm-documents/${document_type}", "*.${document_format}") : {
+          key = trimsuffix(item, ".${document_format}")
+          value = {
+            document_type   = document_type
+            document_format = upper(document_format)
+            content         = file("${path.module}/ssm-documents/${document_type}/${item}")
+          }
+        }
+      ]
+    ]
+  ])
+  ssm_documents = { for item in local.ssm_documents_list : item.key => item.value }
 
   ssm_parameters_filter = flatten([
     length(local.account_names_for_account_ids_ssm_parameter) != 0 ? ["account"] : [],

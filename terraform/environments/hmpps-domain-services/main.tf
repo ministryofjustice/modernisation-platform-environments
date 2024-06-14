@@ -155,6 +155,11 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "oam_sinks", {}),
   )
 
+  options = merge(
+    lookup(local.baseline_all_environments, "options", {}),
+    lookup(local.baseline_environment_specific, "options", {}),
+  )
+
   route53_resolvers = merge(
     module.baseline_presets.route53_resolvers,
     lookup(local.baseline_all_environments, "route53_resolvers", {}),
