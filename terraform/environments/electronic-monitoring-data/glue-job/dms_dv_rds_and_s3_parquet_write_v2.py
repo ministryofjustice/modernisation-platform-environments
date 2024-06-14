@@ -231,9 +231,11 @@ def get_nvl_select_list(in_rds_df: DataFrame, in_rds_db_name, in_rds_tbl_name):
 
     temp_select_list = list()
     for colmn in in_rds_df.columns:
-        if df_col_attr_dict[colmn] == 'YES' and (not df_col_dtype_dict[colmn].startswith("decimal")):
-            temp_select_list.append(
-                f"""nvl({colmn}, {NVL_DTYPE_DICT[df_col_dtype_dict[colmn]]}) as {colmn}""")
+        if df_col_attr_dict[colmn] == 'YES' and \
+           (not df_col_dtype_dict[colmn].startswith("decimal")) and \
+           (not df_col_dtype_dict[colmn].startswith("binary")):
+            
+            temp_select_list.append(f"""nvl({colmn}, {NVL_DTYPE_DICT[df_col_dtype_dict[colmn]]}) as {colmn}""")
         else:
             temp_select_list.append(colmn)
     return temp_select_list
