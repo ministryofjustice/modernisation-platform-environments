@@ -1,42 +1,4 @@
 #------------------------------------------------------------------------------
-# Session Manager Logging and Settings
-#------------------------------------------------------------------------------
-
-resource "aws_ssm_document" "session_manager_settings" {
-  #checkov:skip=CKV_AWS_112: "Ensure Session Manager data is encrypted in transit"
-  #checkov:skip=CKV_AWS_113: "Ensure Session Manager logs are enabled and encrypted"
-  # Review in DSOS-2229
-  name            = "SSM-SessionManagerRunShell"
-  document_type   = "Session"
-  document_format = "JSON"
-
-  content = jsonencode(
-    {
-      schemaVersion = "1.0"
-      description   = "Document to hold regional settings for Session Manager"
-      sessionType   = "Standard_Stream",
-      inputs = {
-        cloudWatchLogGroupName      = "session-manager-logs"
-        cloudWatchEncryptionEnabled = false
-        cloudWatchStreamingEnabled  = true
-        s3BucketName                = ""
-        s3KeyPrefix                 = ""
-        s3EncryptionEnabled         = false
-        idleSessionTimeout          = "20"
-        kmsKeyId                    = "" # aws_kms_key.session_manager.arn
-        runAsEnabled                = false
-        runAsDefaultUser            = ""
-        shellProfile = {
-          windows = ""
-          linux   = ""
-        }
-      }
-    }
-  )
-}
-
-
-#------------------------------------------------------------------------------
 # SSM Agent - update Systems Manager Agent
 #------------------------------------------------------------------------------
 
