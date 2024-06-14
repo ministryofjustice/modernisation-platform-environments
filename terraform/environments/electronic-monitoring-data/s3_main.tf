@@ -119,7 +119,7 @@ module "athena-s3-bucket" {
 
       transition = [
         {
-          days          = 14
+          days          = 30
           storage_class = "STANDARD_IA"
           }, {
           days          = 365
@@ -133,7 +133,7 @@ module "athena-s3-bucket" {
 
       noncurrent_version_transition = [
         {
-          days          = 14
+          days          = 30
           storage_class = "STANDARD_IA"
           }, {
           days          = 365
