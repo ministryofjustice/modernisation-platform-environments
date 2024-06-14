@@ -185,7 +185,7 @@ data "aws_iam_policy_document" "send_database_to_ap_athena_queries" {
     actions = [
       "glue:GetDatabase",
       "glue:GetTable",
-      "glue:GetPartition",
+      "glue:GetPartitions",
       "glue:GetTables"
     ]
 
