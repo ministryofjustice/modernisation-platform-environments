@@ -29,7 +29,7 @@
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80,
       "ec2_instance_warmup_period": 300,
-      "container_memory_allocation": 2024,
+      "container_memory_allocation": 1000,
       "region": "eu-west-2",
       "docker_image_tag": "development",
       "app_debug_enabled": "false",
