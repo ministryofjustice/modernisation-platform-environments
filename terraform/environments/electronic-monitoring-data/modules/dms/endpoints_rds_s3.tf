@@ -45,7 +45,7 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   # cdc_path                                    = "cdc/path"
   # compression_type                            = "NONE"
   # csv_delimiter     = ","
-  # csv_no_sup_value  = "false"
+  csv_no_sup_value  = "false"
   # csv_null_value    = "null"
   # csv_row_delimiter = "\\n"
   data_format    = "parquet"
@@ -63,7 +63,7 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   # glue_catalog_generation                     = true
   # ignore_header_rows                          = 1
   # include_op_for_full_load                    = true
-  # max_file_size = 64000
+  max_file_size = 64000
   parquet_timestamp_in_millisecond = true
   parquet_version                  = "parquet-2-0"
   # preserve_transactions                       = false
