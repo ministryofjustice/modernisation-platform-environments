@@ -5,9 +5,9 @@ PATH=$PATH:/usr/local/bin
 
 main() {
   # call lifecycle script if one has been configured by ansible
-  if [[ -x /usr/local/bin/autoscaling-lifecycle-${lifecycle_hook_name}.sh ]]; then
-    echo "# running: /usr/local/bin/autoscaling-lifecycle-${lifecycle_hook_name}.sh"
-    /usr/local/bin/autoscaling-lifecycle-${lifecycle_hook_name}.sh
+  if [[ -x /usr/local/bin/autoscaling-lifecycle-ready-hook.sh ]]; then
+    echo "# running: /usr/local/bin/autoscaling-lifecycle-ready-hook.sh"
+    /usr/local/bin/autoscaling-lifecycle-ready-hook.sh
   else
     # otherwise, check if part of lifecycle.
     token=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -17,7 +17,7 @@ main() {
       instance_id=$(curl -sS -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-id)
       region=$(curl -sS -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/placement/region)
       name=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=Name" --output=text | cut -f5)
-      aws autoscaling complete-lifecycle-action --lifecycle-action-result "ABANDON" --instance-id "$instance_id" --lifecycle-hook-name "$name-${lifecycle_hook_name}" --auto-scaling-group-name "$name" --region "$region" || true
+      aws autoscaling complete-lifecycle-action --lifecycle-action-result "ABANDON" --instance-id "$instance_id" --lifecycle-hook-name "$name-ready-hook" --auto-scaling-group-name "$name" --region "$region" || true
     fi
   fi
 }
