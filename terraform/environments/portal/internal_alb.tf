@@ -2,7 +2,7 @@ locals {
   internal_lb_idle_timeout = 180
   internal_lb_http_port    = 80
   internal_lb_https_port   = 443
-  internal_lb_http_hosts   = ["portal-oim-internal.aws.dev.legalservices.gov.uk", "portal-oam-internal.aws.dev.legalservices.gov.uk", "portal-idm-console.aws.dev.legalservices.gov.uk"]
+  internal_lb_http_hosts   = [aws_route53_record.oim_internal.name, aws_route53_record.oam_internal.name, aws_route53_record.idm_console.name]
 }
 
 ####################################

@@ -56,11 +56,6 @@ resource "aws_acm_certificate_validation" "load_balancer" {
   validation_record_fqdns = [local.lbs_domain_name_main[0], local.lbs_domain_name_sub[0]]
 }
 
-
-
-
-
-
 ######################################################
 ## Old cert validation code in case still required
 ######################################################
