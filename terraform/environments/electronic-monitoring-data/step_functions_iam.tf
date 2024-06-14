@@ -168,12 +168,15 @@ data "aws_iam_policy_document" "send_database_to_ap_athena_queries" {
     actions = [
       "s3:PutObject",
       "s3:GetObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
     ]
 
     resources = [
       "arn:aws:s3:::em-athena-result-output",
-      "arn:aws:s3:::em-athena-result-output/*"
+      "arn:aws:s3:::em-athena-result-output/*",
+      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.id}/*",
+      aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     ]
   }
   statement {
