@@ -1,7 +1,7 @@
 locals {
   default_arguments = {
     "--job-language"                     = var.job_language
-    "--job-bookmark-option"              = "${lookup(var.bookmark_options, var.bookmark)}"
+    "--job-bookmark-option"              = var.bookmark_options[var.bookmark]
     "--TempDir"                          = var.temp_dir
     "--checkpoint.location"              = var.checkpoint_dir
     "--spark-event-logs-path"            = var.spark_event_logs
@@ -115,6 +115,15 @@ data "aws_iam_policy_document" "extra-policy-document" {
     ]
     resources = [
       "*"
+    ]
+  }
+  statement {
+    actions = [
+      "dms:DescribeReplicationTasks",
+      "dms:StopReplicationTask"
+    ]
+    resources = [
+      "arn:aws:dms:${var.region}:${var.account}:*:*"
     ]
   }
   statement {

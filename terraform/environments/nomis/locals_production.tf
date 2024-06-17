@@ -18,15 +18,16 @@ locals {
         "ec2_instance_textfile_monitoring_with_connectivity_test",
         "ec2_windows",
       ]
+      cloudwatch_log_groups_retention_in_days = 90
+      route53_resolver_rules = {
+        outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
+      }
       sns_topics = {
         pagerduty_integrations = {
           dso_pagerduty               = "nomis_alarms"
           dba_pagerduty               = "hmpps_shef_dba_low_priority"
           dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
         }
-      }
-      route53_resolver_rules = {
-        outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
     }
   }
@@ -36,9 +37,9 @@ locals {
 
     acm_certificates = {
       nomis_wildcard_cert = {
-        # domain_name limited to 64 chars so use modernisation platform domain for this
-        # and put the wildcard in the san
-        domain_name = "modernisation-platform.service.justice.gov.uk"
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "modernisation-platform.service.justice.gov.uk"
+        external_validation_records_created = true
         subject_alternate_names = [
           "*.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk",
           "*.production.nomis.service.justice.gov.uk",
@@ -46,32 +47,9 @@ locals {
           "*.nomis.service.justice.gov.uk",
           "*.nomis.az.justice.gov.uk",
         ]
-        external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         tags = {
           description = "wildcard cert for nomis production domains"
         }
-      }
-    }
-
-    cloudwatch_log_groups = {
-      session-manager-logs = {
-        retention_in_days = 400
-      }
-      cwagent-var-log-messages = {
-        retention_in_days = 90
-      }
-      cwagent-var-log-secure = {
-        retention_in_days = 400
-      }
-      cwagent-windows-system = {
-        retention_in_days = 90
-      }
-      cwagent-nomis-autologoff = {
-        retention_in_days = 400
-      }
-      cwagent-weblogic-logs = {
-        retention_in_days = 90
       }
     }
 
@@ -102,7 +80,6 @@ locals {
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
-          deployment           = "blue"
         })
       })
 
@@ -112,10 +89,10 @@ locals {
           desired_capacity = 8
           max_size         = 8
 
-          instance_refresh = {
-            strategy               = "Rolling"
-            min_healthy_percentage = 80
-          }
+          # instance_refresh = {
+          #   strategy               = "Rolling"
+          #   min_healthy_percentage = 80
+          # }
         })
         cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -129,6 +106,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
+            # Comment in instance refresh above if changing branch + want automated instance refresh
             branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
           })
         })
@@ -137,7 +115,6 @@ locals {
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
-          deployment           = "green"
         })
       })
 
@@ -164,11 +141,11 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.xtag.tags, {
+          ndh-ems-hostname     = "pd-ems.ndh.nomis.service.justice.gov.uk"
           nomis-environment    = "prod"
           oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
           oracle-db-name       = "PCNOM"
-          ndh-ems-hostname     = "pd-ems.ndh.nomis.service.justice.gov.uk"
         })
       })
 
@@ -199,8 +176,8 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          nomis-environment = "prod"
           description       = "Production databases for CNOM and NDH"
+          nomis-environment = "prod"
           oracle-sids       = "PDCNOM PDNDH PDTRDAT"
         })
       })
@@ -230,8 +207,8 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          nomis-environment = "prod"
           description       = "Disaster-Recovery/High-Availability production databases for CNOM and NDH"
+          nomis-environment = "prod"
           oracle-sids       = "DRCNOM DRNDH DRTRDAT"
         })
       })
@@ -263,10 +240,10 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          nomis-environment = "prod"
           description       = "Production databases for AUDIT/MIS"
-          oracle-sids       = "PDCNMAUD PDMIS"
           misload-dbname    = "PDMIS"
+          nomis-environment = "prod"
+          oracle-sids       = "PDCNMAUD PDMIS"
         })
       })
 
@@ -296,11 +273,11 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          nomis-environment  = "prod"
-          description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          oracle-sids        = "DRMIS DRCNMAUD"
-          misload-dbname     = "DRMIS"
           connectivity-tests = "10.40.0.133:53 10.40.129.79:22"
+          description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+          misload-dbname     = "DRMIS"
+          nomis-environment  = "prod"
+          oracle-sids        = "DRMIS DRCNMAUD"
         })
       })
     }
@@ -312,22 +289,11 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*DR/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/DR*/*",
             ]
           }
@@ -345,9 +311,7 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/prod/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/weblogic-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/weblogic-*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/DR*/weblogic-*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*DR/weblogic-*",
             ]
           }
         ])
@@ -378,7 +342,6 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
                       "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
                     ]
                   }
@@ -393,9 +356,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
                       "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
-                      "c.production.nomis.az.justice.gov.uk",
                       "c.nomis.service.justice.gov.uk",
                       "c.nomis.az.justice.gov.uk",
                     ]
@@ -433,11 +394,7 @@ locals {
 
     route53_zones = {
 
-      "hmpps-production.modernisation-platform.internal" = {
-      }
       "nomis.service.justice.gov.uk" = {
-        # NOTE this top level zone is currently hosted in Azure but
-        # will be moved here at some point
         lb_alias_records = [
           { name = "c", type = "A", lbs_map_key = "private" },
         ]
@@ -453,13 +410,9 @@ locals {
           { name = "ndh", type = "NS", ttl = "86400", records = ["ns-1106.awsdns-10.org", "ns-1904.awsdns-46.co.uk", "ns-44.awsdns-05.com", "ns-799.awsdns-35.net"] },
         ]
       }
-      "production.nomis.az.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
-          { name = "prod-nomis-web-b", type = "A", lbs_map_key = "private" },
-          { name = "c", type = "A", lbs_map_key = "private" },
-        ]
-      }
+
+      "production.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
+
       "production.nomis.service.justice.gov.uk" = {
         records = [
           { name = "pnomis", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },

@@ -10,8 +10,19 @@ module "replay_pipeline" {
   definition = jsonencode(
     {
       "Comment" : "Replay Pipeline Step Function",
-      "StartAt" : "Stop Glue Streaming Job",
+      "StartAt" : "Stop DMS Replication Task",
       "States" : {
+        "Stop DMS Replication Task" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.stop_dms_task_job,
+            "Arguments" : {
+              "--dpr.dms.replication.task.id" : var.replication_task_id
+            }
+          },
+          "Next" : "Stop Glue Streaming Job"
+        },
         "Stop Glue Streaming Job" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
@@ -111,6 +122,15 @@ module "replay_pipeline" {
               "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
               "--dpr.config.key" : var.domain
             }
+          },
+          "Next" : "Resume DMS Replication Task"
+        },
+        "Resume DMS Replication Task" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
+          "Parameters" : {
+            "ReplicationTaskArn" : var.dms_replication_task_arn,
+            "StartReplicationTaskType" : "resume-processing"
           },
           "Next" : "Start Glue Streaming Job"
         },
