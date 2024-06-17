@@ -217,7 +217,7 @@ resource "helm_release" "external_secrets" {
     templatefile(
       "${path.module}/src/helm/external-secrets/values.yml.tftpl",
       {
-        eks_role_arn = module.external_secrets_role.iam_role_arn
+        eks_role_arn = module.external_secrets_iam_role.iam_role_arn
       }
     )
   ]
