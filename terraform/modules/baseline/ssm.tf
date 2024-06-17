@@ -67,8 +67,8 @@ resource "aws_ssm_association" "this" {
   dynamic "output_location" {
     for_each = each.value.output_location != null ? [each.value.output_location] : []
     content {
-      s3_bucket_name = try(module.s3_bucket[output_location.s3_bucket_name].bucket.bucket, output_location.s3_bucket_name)
-      s3_key_prefix  = output_location.s3_key_prefix
+      s3_bucket_name = try(module.s3_bucket[output_location.value.s3_bucket_name].bucket.bucket, output_location.value.s3_bucket_name)
+      s3_key_prefix  = output_location.value.s3_key_prefix
       s3_region      = var.environment.region
     }
   }

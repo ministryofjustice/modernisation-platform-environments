@@ -2,7 +2,7 @@ locals {
 
   ssm_schedule_expressions = {
     development = {
-      update-ssm-agent-patchgroup1 = "cron(40 13 ? * MON *)"
+      update-ssm-agent-patchgroup1 = "cron(00 14 ? * MON *)"
       update-ssm-agent-patchgroup2 = "cron(30 7 ? * WED *)"
     }
     test = {
@@ -42,6 +42,7 @@ locals {
     AWS-UpdateSSMAgent-patchgroup1 = {
       apply_only_at_cron_interval = true
       name                        = "AWS-UpdateSSMAgent"
+      output_location             = { s3_bucket_name = "s3-bucket", s3_key_prefix = "update-ssm-agent" }
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-ssm-agent-patchgroup1
       targets = [{
         key    = "tag:update-ssm-agent"
