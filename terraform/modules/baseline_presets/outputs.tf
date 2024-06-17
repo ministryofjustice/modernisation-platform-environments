@@ -172,6 +172,13 @@ output "secretsmanager_secrets" {
   }
 }
 
+output "ssm_associations" {
+  description = "Map of common ssm associations to create"
+  value = {
+    for key, value in local.ssm_associations : key => value if contains(local.ssm_associations_filter, key)
+  }
+}
+
 output "ssm_documents" {
   description = "Map of common ssm documents to create"
   value = {

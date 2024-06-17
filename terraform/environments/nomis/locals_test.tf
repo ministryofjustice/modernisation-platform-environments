@@ -379,6 +379,7 @@ locals {
           instance-scheduling = "skip-scheduling"
           nomis-environment   = "t3"
           oracle-sids         = "T3CNOM"
+          update-ssm-agent    = "patchgroup2"
         })
       })
     }

@@ -179,6 +179,7 @@ locals {
           description       = "Production databases for CNOM and NDH"
           nomis-environment = "prod"
           oracle-sids       = "PDCNOM PDNDH PDTRDAT"
+          update-ssm-agent  = "patchgroup2"
         })
       })
 
@@ -244,6 +245,7 @@ locals {
           misload-dbname    = "PDMIS"
           nomis-environment = "prod"
           oracle-sids       = "PDCNMAUD PDMIS"
+          update-ssm-agent  = "patchgroup2"
         })
       })
 
