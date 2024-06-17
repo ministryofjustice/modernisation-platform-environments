@@ -1,8 +1,12 @@
 SET IDENTITY_INSERT g4s_cap_dw.dbo.D_Comments_V2 ON
 ;
 
+truncate table [g4s_cap_dw].[dbo].[D_Comments_V2];
+
 INSERT INTO g4s_cap_dw.dbo.D_Comments_V2 (CommentSID, VisitID, ActivityID, Comments, CommentType)
- SELECT CommentSID, VisitID, ActivityID, trim(replace(Comments, char(141), '')) AS Comments, CommentType
+ SELECT CommentSID, VisitID, ActivityID, 
+        trim(replace(replace(Comments, char(141), ''), char(129), '')) AS Comments, 
+        CommentType
   FROM g4s_cap_dw.dbo.D_Comments
 ;
 
