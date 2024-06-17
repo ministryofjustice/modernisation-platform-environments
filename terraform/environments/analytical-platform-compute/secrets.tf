@@ -20,8 +20,3 @@ module "actions_runners_create_a_derived_table_secret" {
     }
   )
 }
-
-moved {
-  from = module.actions_runners_create_a_derived_table
-  to   = module.actions_runners_create_a_derived_table_secret
-}
