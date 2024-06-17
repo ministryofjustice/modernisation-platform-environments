@@ -1122,6 +1122,37 @@ variable "sns_topics" {
   default = {}
 }
 
+variable "ssm_associations" {
+  description = "A map of ssm associations to create where map key is the association name"
+  type = map(object({
+    apply_only_at_cron_interval = optional(bool)
+    name                        = string
+    max_concurrency             = optional(number)
+    max_errors                  = optional(number)
+    schedule_expression         = optional(string)
+    output_location = optional(object({
+      s3_bucket_name = string # or s3_buckets map key
+      s3_key_prefix  = optional(string)
+    }))
+    targets = optional(list(object({
+      key    = string       # 'tag:my_tag_name' or 'InstanceIds'
+      values = list(string) # [my_tag_value] or [ec2_instance map key]
+    })), [])
+  }))
+  default = {}
+}
+
+variable "ssm_documents" {
+  description = "A map of ssm documents to create where map key is the document name"
+  type = map(object({
+    content         = string
+    document_format = optional(string)
+    document_type   = string
+    tags            = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "ssm_parameters" {
   # Example usage:
   # my_ec2_params = {
@@ -1163,20 +1194,8 @@ variable "ssm_parameters" {
   default = {}
 }
 
-variable "ssm_documents" {
-  description = "A map of ssm documents to create where map key is the document name"
-  type = map(object({
-    content         = string
-    document_format = optional(string)
-    document_type   = string
-    tags            = optional(map(string), {})
-  }))
-  default = {}
-}
-
 variable "tags" {
   description = "Any additional tags to apply to all resources, in addition to those provided by environment module"
   type        = map(string)
   default     = {}
 }
-
