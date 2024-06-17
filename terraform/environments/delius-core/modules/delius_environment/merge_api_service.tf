@@ -20,12 +20,13 @@ module "merge_api_service" {
   microservice_lb                    = aws_lb.delius_core_frontend
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
-  alb_listener_rule_paths = ["/merge/api", "/merge/api/*"]
-  platform_vars           = var.platform_vars
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-api-ecr-repo:${var.delius_microservice_configs.merge_api.image_tag}"
-  account_config          = var.account_config
-  health_check_path       = "/merge/api/actuator/health"
-  account_info            = var.account_info
+  alb_listener_rule_paths       = ["/merge/api", "/merge/api/*"]
+  platform_vars                 = var.platform_vars
+  container_image               = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-api:${var.delius_microservice_configs.merge_api.image_tag}"
+  account_config                = var.account_config
+  health_check_path             = "/merge/api/actuator/health"
+  target_group_protocol_version = "HTTP1"
+  account_info                  = var.account_info
 
   create_rds                  = var.delius_microservice_configs.merge_api.create_rds
   rds_engine                  = var.delius_microservice_configs.merge_api.rds_engine
@@ -78,4 +79,13 @@ module "merge_api_service" {
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_frontend.arn_suffix
   enable_platform_backups = var.enable_platform_backups
+}
+
+resource "aws_vpc_security_group_egress_rule" "alb_to_merge_api" {
+  security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
+  description                  = "load balancer to merge api ecs service"
+  from_port                    = "8080"
+  to_port                      = "8080"
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = module.merge_api_service.service_security_group_id
 }
