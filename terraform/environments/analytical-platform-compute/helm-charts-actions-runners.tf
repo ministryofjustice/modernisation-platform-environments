@@ -45,7 +45,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr" {
         github_organisation  = "moj-analytical-services"
         github_repository    = "create-a-derived-table"
         github_token         = data.aws_secretsmanager_secret_version.actions_runners_create_a_derived_table[0].secret_string
-        github_runner_labels = "analytical-platform,digital-prison-reporting"
+        github_runner_labels = "digital-prison-reporting"
         eks_role_arn         = "arn:aws:iam::972272129531:role/dpr-data-api-cross-account-role"
       }
     )
