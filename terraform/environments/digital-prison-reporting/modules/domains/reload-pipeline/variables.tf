@@ -59,11 +59,11 @@ variable "glue_s3_data_deletion_job" {
 }
 
 variable "dms_replication_task_arn" {
-  type        = string
+  type = string
 }
 
 variable "replication_task_id" {
-  type        = string
+  type = string
 }
 
 variable "pipeline_notification_lambda_function" {

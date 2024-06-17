@@ -17,11 +17,11 @@ variable "pipeline_additional_policies" {
 }
 
 variable "dms_replication_task_arn" {
-  type        = string
+  type = string
 }
 
 variable "replication_task_id" {
-  type        = string
+  type = string
 }
 
 variable "glue_stop_glue_instance_job" {
