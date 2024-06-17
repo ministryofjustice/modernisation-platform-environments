@@ -434,11 +434,11 @@ if __name__ == "__main__":
                 LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
                 sys.exit(1)
 
-            elif check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, dv_ctlg_tbl_partition_path):
-                LOGGER.info(
-                    f"""Already exists, 
-                    Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_sch_tbl}""")
-                continue
+            # elif check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, dv_ctlg_tbl_partition_path):
+            #     LOGGER.info(
+            #         f"""Already exists, 
+            #         Skipping --> {CATALOG_TABLE_S3_FULL_PATH}/database_name={rds_db_name}/full_table_name={db_sch_tbl}""")
+            #     continue
 
             elif total_size/1024/1024 > int(args["max_table_size_mb"]):
                 LOGGER.info(
