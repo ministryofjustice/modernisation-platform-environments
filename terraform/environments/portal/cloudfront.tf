@@ -1,5 +1,5 @@
 locals {
-  s3_origin_id = "portalerrorpagebucketorigin"
+  s3_origin_id   = "portalerrorpagebucketorigin"
   cloudfront_url = local.environment == "production" ? "tbd.service.justice.gov.uk" : "mp-${local.application_name}.${data.aws_route53_zone.external.name}"
   cloudfront_domain_types = { for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name

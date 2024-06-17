@@ -84,7 +84,7 @@ resource "aws_lb_listener_rule" "host_based_internal" {
 
   condition {
     host_header {
-      values = local.internal_lb_http_hosts  # These are the URLs that accessed the LAA-Porta-AppOhsIn CLB in Landing Zone via Port 80, but we have merged this CLB with the Internal ALB instead, so this additional rule is required
+      values = local.internal_lb_http_hosts # These are the URLs that accessed the LAA-Porta-AppOhsIn CLB in Landing Zone via Port 80, but we have merged this CLB with the Internal ALB instead, so this additional rule is required
     }
   }
 

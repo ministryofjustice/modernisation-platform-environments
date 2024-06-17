@@ -2,7 +2,7 @@
 # KMS keys for CloudWatch Log Groups
 ######################################
 resource "aws_kms_key" "cloudwatch_logs_key" {
-  description             = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  description         = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
   enable_key_rotation = true
   tags                = local.tags
 }
@@ -29,18 +29,18 @@ resource "aws_kms_key_policy" "cloudwatch_logs_policy" {
       },
       {
         Action = [
-            "kms:Encrypt*",
-            "kms:Decrypt*",
-            "kms:ReEncrypt*",
-            "kms:GenerateDataKey*",
-            "kms:Describe*"            
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
         ]
         Effect = "Allow"
         Principal = {
-            Service = "logs.eu-west-2.amazonaws.com"
+          Service = "logs.eu-west-2.amazonaws.com"
         }
         Resource = "*"
-        Sid = "Enable log service Permissions"
+        Sid      = "Enable log service Permissions"
       }
     ]
     Version = "2012-10-17"
