@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------
 
 module "metadata-s3-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f109c88"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=cadab51"
 
   bucket_prefix      = "metadata-store-"
   versioning_enabled = true
