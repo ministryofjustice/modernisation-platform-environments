@@ -28,6 +28,12 @@ variable "glue_stop_glue_instance_job" {
   default     = ""
 }
 
+variable "stop_dms_task_job" {
+  description = "Name of job to stop a running DMS task"
+  type        = string
+  default     = ""
+}
+
 variable "glue_s3_file_transfer_job" {
   description = "Name of s3 file transfer job"
   type        = string
@@ -52,7 +58,13 @@ variable "glue_s3_data_deletion_job" {
   default     = ""
 }
 
-variable "dms_replication_task_arn" {}
+variable "dms_replication_task_arn" {
+  type = string
+}
+
+variable "replication_task_id" {
+  type = string
+}
 
 variable "pipeline_notification_lambda_function" {
   description = "Pipeline Notification Lambda Name"

@@ -5,12 +5,12 @@ set -eo pipefail
 run_ansible() {
   export PATH=/usr/local/bin:$PATH
 
-  echo "ansible_repo:         ${ansible_repo}"
-  echo "ansible_repo_basedir: ${ansible_repo_basedir}"
+  echo "ansible_repo:         modernisation-platform-configuration-management"
+  echo "ansible_repo_basedir: ansible"
   echo "ansible_args:         ${ansible_args}"
   echo "branch:               ${branch}"
 
-  if [[ -z ${ansible_repo} ]]; then
+  if [[ -z modernisation-platform-configuration-management ]]; then
     echo "ansible_repo not defined, not installing any ansible" >&2
     exit 0
   fi
@@ -38,10 +38,10 @@ run_ansible() {
 
   # clone ansible roles and playbook
   ansible_dir=$(mktemp -d)
-  echo "# Cloning ${ansible_repo} into $ansible_dir using branch=${branch}"
+  echo "# Cloning modernisation-platform-configuration-management into $ansible_dir using branch=${branch}"
   cd $ansible_dir
-  git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
-  cd $ansible_dir/${ansible_repo}
+  git clone "https://github.com/ministryofjustice/modernisation-platform-configuration-management.git"
+  cd $ansible_dir/modernisation-platform-configuration-management
   git checkout "${branch}"
   cd $ansible_dir
 
@@ -56,9 +56,9 @@ run_ansible() {
       ansible_group_vars="$ansible_group_vars --extra-vars ec2_name=$${tag[4]}"
     elif [[ "$${tag[1]}" == "application" ]]; then
       application="$${tag[4]}"
-    elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
+    elif [[ -e $ansible_dir/modernisation-platform-configuration-management/ansible/group_vars/$group.yml ]]; then
       ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
-    elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
+    elif [[ -e $ansible_dir/modernisation-platform-configuration-management/ansible/group_vars/$group/ansible.yml ]]; then
       ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
     else
       echo "Could not find group_vars $group yml"
@@ -81,9 +81,9 @@ run_ansible() {
       for ((i=0; i<$${#tags[@]}; i++)); do
         tag=($${tags[i]})
         group=$(echo "$${tag[1]}_$${tag[4]}_$${application_environment}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
-        if [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
+        if [[ -e $ansible_dir/modernisation-platform-configuration-management/ansible/group_vars/$group.yml ]]; then
           ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
-        elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
+        elif [[ -e $ansible_dir/modernisation-platform-configuration-management/ansible/group_vars/$group/ansible.yml ]]; then
           ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
         fi
       done
@@ -119,7 +119,7 @@ run_ansible() {
 
   # install requirements in virtual env
   echo "# Installing ansible requirements"
-  cd $ansible_dir/${ansible_repo}/${ansible_repo_basedir}
+  cd $ansible_dir/modernisation-platform-configuration-management/ansible
   $python -m pip install -r requirements.txt
   ansible-galaxy role install -r $requirements_yml
   ansible-galaxy collection install -r $requirements_yml
@@ -136,7 +136,7 @@ run_ansible() {
   echo "# Cleanup"
   deactivate
   rm -rf $ansible_dir/python-venv
-  rm -rf $ansible_dir/${ansible_repo}
+  rm -rf $ansible_dir/modernisation-platform-configuration-management
   rmdir $ansible_dir
 }
 

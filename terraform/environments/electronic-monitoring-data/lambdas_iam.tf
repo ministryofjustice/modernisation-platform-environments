@@ -3,23 +3,23 @@
 # --------------------------------------------------------------------------------
 
 resource "aws_iam_role" "create_athena_table_lambda" {
-    name = "create_athena_table_lambda"
-    assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+  name               = "create_athena_table_lambda"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_vpc_access_execution" {
-    role = aws_iam_role.create_athena_table_lambda.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+  role       = aws_iam_role.create_athena_table_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_sqs_queue_access_execution" {
-    role = aws_iam_role.create_athena_table_lambda.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+  role       = aws_iam_role.create_athena_table_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "get_glue_connections_and_tables" {
-    role = aws_iam_role.create_athena_table_lambda.name
-    policy_arn = aws_iam_policy.get_glue_connections_and_tables.arn
+  role       = aws_iam_role.create_athena_table_lambda.name
+  policy_arn = aws_iam_policy.get_glue_connections_and_tables.arn
 }
 
 resource "aws_iam_policy" "get_glue_connections_and_tables" {
@@ -28,8 +28,8 @@ resource "aws_iam_policy" "get_glue_connections_and_tables" {
 }
 
 resource "aws_iam_role_policy_attachment" "get_s3_output" {
-    role = aws_iam_role.create_athena_table_lambda.name
-    policy_arn = aws_iam_policy.get_s3_output.arn
+  role       = aws_iam_role.create_athena_table_lambda.name
+  policy_arn = aws_iam_policy.get_s3_output.arn
 }
 
 resource "aws_iam_policy" "get_s3_output" {
@@ -39,24 +39,24 @@ resource "aws_iam_policy" "get_s3_output" {
 
 
 data "aws_iam_policy_document" "get_glue_connections_and_tables" {
-    statement {
-            sid       = "SecretsManagerDbCredentialsAccess"
-            effect    = "Allow"
-            actions   = ["secretsmanager:GetSecretValue"]
-            resources = [aws_secretsmanager_secret_version.db_glue_connection.arn]
-        }
-    statement {
-            sid       = "TriggerLambda"
-            effect    = "Allow"
-            actions   = [
-                "lambda:InvokeFunction"
-            ]
-            resources = [module.create_athena_table.lambda_function_arn]
-        }
   statement {
-    sid       = "GetGlueTables"
+    sid       = "SecretsManagerDbCredentialsAccess"
     effect    = "Allow"
-    actions   = [
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret_version.db_glue_connection.arn]
+  }
+  statement {
+    sid    = "TriggerLambda"
+    effect = "Allow"
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+    resources = [module.create_athena_table.lambda_function_arn]
+  }
+  statement {
+    sid    = "GetGlueTables"
+    effect = "Allow"
+    actions = [
       "glue:GetTables",
       "glue:GetTable",
       "glue:GetDatabase",
@@ -68,9 +68,9 @@ data "aws_iam_policy_document" "get_glue_connections_and_tables" {
     ]
     resources = [
       "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/${local.db_name}",
-      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/${local.db_name}/*",
-      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:userDefinedFunction/${local.db_name}/*"
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*"
 
     ]
   }
@@ -167,7 +167,7 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
 # ------------------------------------------------
 
 locals {
-    metadata_ap_bucket = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
+  metadata_ap_bucket = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
 }
 
 resource "aws_iam_role" "send_metadata_to_ap" {
@@ -256,18 +256,18 @@ data "aws_iam_policy_document" "write_to_ap_s3" {
 # ------------------------------------------
 
 resource "aws_iam_role" "send_table_to_ap" {
-  name                = "send_table_to_ap"
-  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  name               = "send_table_to_ap"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "send_table_to_ap_lambda_vpc_access_execution" {
-    role = aws_iam_role.send_table_to_ap.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+  role       = aws_iam_role.send_table_to_ap.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "send_table_to_ap_lambda_sqs_queue_access_execution" {
-    role = aws_iam_role.send_table_to_ap.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+  role       = aws_iam_role.send_table_to_ap.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
 
@@ -310,13 +310,13 @@ data "aws_iam_policy_document" "get_parquet_files" {
 }
 
 resource "aws_iam_policy" "get_parquet_files" {
-    name = "get_parquet_files"
-    policy = data.aws_iam_policy_document.get_parquet_files.json
+  name   = "get_parquet_files"
+  policy = data.aws_iam_policy_document.get_parquet_files.json
 }
 
 resource "aws_iam_role_policy_attachment" "send_table_to_ap_get_parquet_files" {
-    role = aws_iam_role.send_table_to_ap.name
-    policy_arn = aws_iam_policy.get_parquet_files.arn
+  role       = aws_iam_role.send_table_to_ap.name
+  policy_arn = aws_iam_policy.get_parquet_files.arn
 }
 
 # ------------------------------------------------
@@ -324,41 +324,78 @@ resource "aws_iam_role_policy_attachment" "send_table_to_ap_get_parquet_files" {
 # ------------------------------------------------
 
 resource "aws_iam_role" "get_tables_from_db" {
-    name                = "get_tables_from_db"
-    assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  name               = "get_tables_from_db"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "get_tables_from_db_lambda_vpc_access_execution" {
-    role = aws_iam_role.get_tables_from_db.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+  role       = aws_iam_role.get_tables_from_db.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "get_tables_from_db_lambda_sqs_queue_access_execution" {
-    role = aws_iam_role.get_tables_from_db.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+  role       = aws_iam_role.get_tables_from_db.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
 
 
 
 data "aws_iam_policy_document" "get_glue_tables" {
-    statement {
-        effect = "Allow"
-        actions = [
-            "glue:GetTable",
-            "glue:GetTables",
-            "glue:GetDatabase"
-        ]
-        resources = ["*"]
-    }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetDatabase"
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_policy" "get_glue_tables" {
-    name = "get_glue_tables"
-    policy = data.aws_iam_policy_document.get_glue_tables.json
+  name   = "get_glue_tables"
+  policy = data.aws_iam_policy_document.get_glue_tables.json
 }
 
 resource "aws_iam_role_policy_attachment" "get_tables_from_db_get_glue_tables" {
-    role = aws_iam_role.get_tables_from_db.name
-    policy_arn = aws_iam_policy.get_glue_tables.arn
+  role       = aws_iam_role.get_tables_from_db.name
+  policy_arn = aws_iam_policy.get_glue_tables.arn
+}
+
+
+# ------------------------------------------
+# get_file_keys_for_table
+# ------------------------------------------
+
+resource "aws_iam_role" "get_file_keys_for_table" {
+  name               = "get_file_keys_for_table"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_lambda_vpc_access_execution" {
+  role       = aws_iam_role.get_file_keys_for_table.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.get_file_keys_for_table.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+data "aws_iam_policy_document" "list_target_s3_bucket" {
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.dms_target_ep_s3_bucket.arn]
+  }
+}
+
+resource "aws_iam_policy" "list_target_s3_bucket" {
+  name   = "list_target_s3_bucket"
+  policy = data.aws_iam_policy_document.list_target_s3_bucket.json
+}
+resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_list_target_s3_bucket" {
+  role       = aws_iam_role.get_file_keys_for_table.name
+  policy_arn = aws_iam_policy.list_target_s3_bucket.arn
 }

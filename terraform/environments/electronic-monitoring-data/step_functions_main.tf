@@ -36,7 +36,7 @@ EOF
 }
 
 resource "aws_kms_key" "athena_layer_step_functions_log_key" {
-  description = "KMS key for encrypting Step Functions logs for athena_layer"
+  description         = "KMS key for encrypting Step Functions logs for athena_layer"
   enable_key_rotation = true
 
   policy = <<EOF
@@ -74,9 +74,9 @@ EOF
 }
 
 resource "aws_cloudwatch_log_group" "athena_layer" {
-  name = "/aws/vendedlogs/states/athena_layer"
+  name              = "/aws/vendedlogs/states/athena_layer"
   retention_in_days = 400
-  kms_key_id = aws_kms_key.athena_layer_step_functions_log_key.arn
+  kms_key_id        = aws_kms_key.athena_layer_step_functions_log_key.arn
 }
 # ------------------------------------------
 # Send Database to AP
@@ -101,17 +101,34 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
       "ItemsPath": "$.db_info",
       "MaxConcurrency": 4,
       "Iterator": {
-        "StartAt": "SendTableToAp",
+        "StartAt": "GetTableFileNames",
         "States": {
-          "SendTableToAp": {
+          "GetTableFileNames": {
             "Type": "Task",
-            "Resource": "${module.send_table_to_ap.lambda_function_arn}",
+            "Resource": "${module.get_file_keys_for_table.lambda_function_arn}",
             "ResultPath": "$.result",
+            "Next": "LoopThroughFileKeys"
+          },
+          "LoopThroughFileKeys": {
+          "Type": "Map",
+          "ItemsPath": "$.result",
+          "MaxConcurrency": 4,
+          "Iterator": {
+            "StartAt": "SendTableToAp",
+            "States": {
+              "SendTableToAp": {
+                "Type": "Task",
+                "Resource": "${module.send_table_to_ap.lambda_function_arn}",
+                "ResultPath": "$.final_result",
+                "End": true
+                }
+              }
+            },
             "End": true
           }
         }
       },
-      "End": true
+    "End": true
     }
   }
 }
@@ -120,7 +137,7 @@ EOF
 }
 
 resource "aws_kms_key" "send_database_to_ap_step_functions_log_key" {
-  description = "KMS key for encrypting Step Functions logs for send_database_to_ap"
+  description         = "KMS key for encrypting Step Functions logs for send_database_to_ap"
   enable_key_rotation = true
 
   policy = <<EOF
@@ -158,7 +175,7 @@ EOF
 }
 
 resource "aws_cloudwatch_log_group" "send_database_to_ap" {
-  name = "/aws/vendedlogs/states/send_database_to_ap"
+  name              = "/aws/vendedlogs/states/send_database_to_ap"
   retention_in_days = 400
-  kms_key_id = aws_kms_key.send_database_to_ap_step_functions_log_key.arn
+  kms_key_id        = aws_kms_key.send_database_to_ap_step_functions_log_key.arn
 }

@@ -17,6 +17,7 @@ variable "acm_certificates" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -140,6 +141,7 @@ variable "cloudwatch_metric_alarms" {
     statistic           = string
     threshold           = number
     alarm_actions       = optional(list(string), [])
+    ok_actions          = optional(list(string), [])
     actions_enabled     = optional(bool, false)
     alarm_description   = optional(string)
     datapoints_to_alarm = optional(number)
@@ -297,6 +299,7 @@ variable "ec2_autoscaling_groups" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -403,6 +406,7 @@ variable "ec2_instances" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -823,6 +827,7 @@ variable "lbs" {
         statistic           = string
         threshold           = number
         alarm_actions       = optional(list(string), [])
+        ok_actions          = optional(list(string), [])
         actions_enabled     = optional(bool, false)
         alarm_description   = optional(string)
         datapoints_to_alarm = optional(number)
