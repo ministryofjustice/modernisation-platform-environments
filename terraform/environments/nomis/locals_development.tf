@@ -132,6 +132,7 @@ locals {
         tags = merge(local.ec2_instances.build.tags, {
           description         = "Syscon build and release server"
           instance-scheduling = "skip-scheduling"
+          update-ssm-agent    = "patchgroup2"
         })
       })
 
@@ -159,6 +160,7 @@ locals {
           instance-scheduling = "skip-scheduling"
           nomis-environment   = "dev"
           oracle-sids         = ""
+          update-ssm-agent    = "patchgroup2"
         })
       })
 
