@@ -423,7 +423,7 @@ resource "aws_ebs_volume" "db_home" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "db-home")) },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "home")) },
     { device-name = "/dev/sdr" }
   )
 }
@@ -445,7 +445,7 @@ resource "aws_ebs_volume" "db_temp" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "db-temp")) },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "temp")) },
     { device-name = "/dev/sds" }
   )
 }
