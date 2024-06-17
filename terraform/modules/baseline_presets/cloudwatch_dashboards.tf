@@ -840,8 +840,8 @@ locals {
 
       #UnHealthyHostCount
       load-balancer-unhealthy-host-count = {
-        height: 6
-        width: 24,
+        height : 6
+        width : 24,
         type = "metric"
         properties = {
           view    = "singleValue"

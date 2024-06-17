@@ -1,6 +1,6 @@
 # Microservices module
 
-This is a 'batteries-included' terraform module that creates an ECS Service (plus the associated resources such as target groups, ALB associations, dns etc). 
+This is a 'batteries-included' terraform module that creates an ECS Service (plus the associated resources such as target groups, ALB associations, dns etc).
 
 Optionally, resources such as RDS and elasticache can be deployed.
 
@@ -26,9 +26,9 @@ In addition, this module deploys the baseline monitoring stack for all component
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_container_definition"></a> [container\_definition](#module\_container\_definition) | git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container | v4.3.0 |
+| <a name="module_container_definition"></a> [container\_definition](#module\_container\_definition) | git::<https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container> | v4.3.0 |
 | <a name="module_ecs_policies"></a> [ecs\_policies](#module\_ecs\_policies) | ../ecs_policies | n/a |
-| <a name="module_ecs_service"></a> [ecs\_service](#module\_ecs\_service) | git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service | v4.3.0 |
+| <a name="module_ecs_service"></a> [ecs\_service](#module\_ecs\_service) | git::<https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service> | v4.3.0 |
 
 ## Resources
 

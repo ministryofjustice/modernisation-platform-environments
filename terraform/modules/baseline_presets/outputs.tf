@@ -34,9 +34,9 @@ output "cloudwatch_dashboards" {
 output "cloudwatch_log_groups" {
   description = "Map of log groups"
 
-  value = var.options.cloudwatch_log_groups != null ? {
-    for key, value in local.cloudwatch_log_groups : key => value if contains(var.options.cloudwatch_log_groups, key)
-  } : local.cloudwatch_log_groups
+  value = {
+    for key, value in local.cloudwatch_log_groups : key => value if contains(local.cloudwatch_log_groups_filter, key)
+  }
 }
 
 output "cloudwatch_metric_alarms" {

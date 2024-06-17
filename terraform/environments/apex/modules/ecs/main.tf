@@ -457,7 +457,7 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
   name              = "${var.app_name}-ecs-container-logs"
   retention_in_days = 90
-  kms_key_id = var.log_group_kms_key
+  kms_key_id        = var.log_group_kms_key
   tags = merge(
     var.tags_common,
     {
@@ -474,7 +474,7 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
 resource "aws_cloudwatch_log_group" "ec2" {
   name              = "${var.app_name}-ecs-ec2-logs"
   retention_in_days = 90
-  kms_key_id = var.log_group_kms_key
+  kms_key_id        = var.log_group_kms_key
   tags = merge(
     var.tags_common,
     {
