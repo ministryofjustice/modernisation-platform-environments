@@ -20,7 +20,6 @@ resource "kubernetes_role" "airflow_execution" {
       "pods/portforward",
       "secrets",
       "services",
-      "serviceaccounts",
     ]
     verbs = [
       "create",
