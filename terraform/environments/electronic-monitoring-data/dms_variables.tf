@@ -2,10 +2,10 @@
 variable "database_list" {
   type = list(string)
   # cap_dw
-  default = [
+  default = local.is-production? [
     "g4s_cap_dw",
     "g4s_emsys_mvp"
-  ]
+  ] : ["test"]
 }
 
 variable "dms_replication_instance_class" {
