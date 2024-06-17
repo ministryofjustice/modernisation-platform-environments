@@ -1,7 +1,7 @@
 locals {
 
   iam_policy_statements_ec2 = {
-    web = [
+    web = [ # allow maintenance mode script to adjust priorities
       {
         effect = "Allow"
         actions = [

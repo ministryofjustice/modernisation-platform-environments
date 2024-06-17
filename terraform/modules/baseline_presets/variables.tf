@@ -16,7 +16,7 @@ variable "options" {
     backup_plan_daily_delete_after               = optional(number, 7)             # override retention for daily + weekly backup plan
     backup_plan_weekly_delete_after              = optional(number, 28)            # override retention for daily + weekly backup plan
     cloudwatch_dashboard_default_widget_groups   = optional(list(string))          # create Cloudwatch-Default dashboard; list of map keys to filter local.cloudwatch_dashboard_widget_groups
-    cloudwatch_log_groups                        = optional(list(string))          # create cloudwatch log groups; list of map keys to filter local.cloudwatch_log_groups; default is to create all
+    cloudwatch_log_groups_retention_in_days      = optional(number, 30)            # number of days to retain cloudwatch log groups
     cloudwatch_metric_alarms_default_actions     = optional(list(string))          # default alarm_action to apply to cloudwatch metrics returned by this module
     cloudwatch_metric_oam_links_ssm_parameters   = optional(list(string))          # list of account names to send cloudwatch metrics to, creates placeholder SSM param for each
     cloudwatch_metric_oam_links                  = optional(list(string))          # list of account names to send cloudwatch metrics to, creates oam link for each
@@ -32,6 +32,7 @@ variable "options" {
     enable_ec2_self_provision                    = optional(bool, false)           # create EC2 policy for ansible provisioning
     enable_ec2_reduced_ssm_policy                = optional(bool, false)           # create standard AWS SSM policy minus ssm:GetParameter
     enable_ec2_oracle_enterprise_managed_server  = optional(bool, false)           # create role for accessing secrets in hmpps-oem accounts
+    enable_ec2_session_manager_cloudwatch_logs   = optional(bool, false)           # create SSM doc and log group for session manager logs
     enable_ec2_user_keypair                      = optional(bool, false)           # create secret and key-pair for ec2-user
     enable_shared_s3                             = optional(bool, false)           # create devtest and preprodprod S3 bucket
     enable_observability_platform_monitoring     = optional(bool, false)           # create role for observability platform monitroing

@@ -282,10 +282,10 @@ resource "aws_security_group" "lb" {
   dynamic "egress" {
     for_each = local.loadbalancer_egress_rules
     content {
-      description     = lookup(egress.value, "description", null)
-      from_port       = lookup(egress.value, "from_port", null)
-      to_port         = lookup(egress.value, "to_port", null)
-      protocol        = lookup(egress.value, "protocol", null)
+      description = lookup(egress.value, "description", null)
+      from_port   = lookup(egress.value, "from_port", null)
+      to_port     = lookup(egress.value, "to_port", null)
+      protocol    = lookup(egress.value, "protocol", null)
       #tfsec:ignore:AVD-AWS-0104:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
       cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
       security_groups = lookup(egress.value, "security_groups", null)
@@ -387,7 +387,7 @@ resource "aws_cloudfront_distribution" "external" {
   #checkov:skip=CKV2_AWS_46:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV2_AWS_47:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_310:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  http_version = var.cloudfront_http_version
+  http_version        = var.cloudfront_http_version
   default_root_object = "Empty"
   origin {
     domain_name = aws_lb.loadbalancer.dns_name
@@ -556,9 +556,9 @@ resource "aws_lb_listener" "alb_listener" {
   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   load_balancer_arn = aws_lb.loadbalancer.arn
   port              = var.listener_port
-  protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
-  ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
-  certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
+  protocol          = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
+  ssl_policy        = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
+  certificate_arn   = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
   default_action {
     type = "fixed-response"

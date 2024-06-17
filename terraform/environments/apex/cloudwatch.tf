@@ -53,15 +53,15 @@ resource "aws_cloudwatch_metric_alarm" "database_oracle_alerts" {
   alarm_name          = "${local.application_name}-${local.environment}-oracle-alerts-log-errors"
   alarm_description   = "Errors Detected in Oracle Alerts Log."
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "1"
-  metric_name        = aws_cloudwatch_log_metric_filter.database.name
-  namespace          = aws_cloudwatch_log_metric_filter.database.metric_transformation[0].namespace
-  period             = "60"
-  statistic          = "Sum"
-  threshold          = local.application_data.accounts[local.environment].database_oracle_alerts_alarm_threshold
-  alarm_actions      = [aws_sns_topic.apex.arn]
-  ok_actions         = [aws_sns_topic.apex.arn]
-  treat_missing_data = "notBreaching"
+  evaluation_periods  = "1"
+  metric_name         = aws_cloudwatch_log_metric_filter.database.name
+  namespace           = aws_cloudwatch_log_metric_filter.database.metric_transformation[0].namespace
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = local.application_data.accounts[local.environment].database_oracle_alerts_alarm_threshold
+  alarm_actions       = [aws_sns_topic.apex.arn]
+  ok_actions          = [aws_sns_topic.apex.arn]
+  treat_missing_data  = "notBreaching"
   tags = merge(
     local.tags,
     {
@@ -75,15 +75,15 @@ resource "aws_cloudwatch_metric_alarm" "database_pmon_status" {
   alarm_name          = "${local.application_name}-${local.environment}-oracle-alerts-pmon-status"
   alarm_description   = "Database Down indicator found in the pmon logs"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "1"
-  metric_name        = aws_cloudwatch_log_metric_filter.pmon_status.name
-  namespace          = aws_cloudwatch_log_metric_filter.pmon_status.metric_transformation[0].namespace
-  period             = "60"
-  statistic          = "Sum"
-  threshold          = local.application_data.accounts[local.environment].database_pmon_status_alarm_threshold
-  alarm_actions      = [aws_sns_topic.apex.arn]
-  ok_actions         = [aws_sns_topic.apex.arn]
-  treat_missing_data = "notBreaching"
+  evaluation_periods  = "1"
+  metric_name         = aws_cloudwatch_log_metric_filter.pmon_status.name
+  namespace           = aws_cloudwatch_log_metric_filter.pmon_status.metric_transformation[0].namespace
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = local.application_data.accounts[local.environment].database_pmon_status_alarm_threshold
+  alarm_actions       = [aws_sns_topic.apex.arn]
+  ok_actions          = [aws_sns_topic.apex.arn]
+  treat_missing_data  = "notBreaching"
   tags = merge(
     local.tags,
     {
@@ -249,7 +249,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
   comparison_operator = "GreaterThanThreshold"
   dimensions = {
     LoadBalancer = module.alb.load_balancer_arn_suffix
-    TargetGroup = module.alb.target_group_arn_suffix
+    TargetGroup  = module.alb.target_group_arn_suffix
   }
   evaluation_periods = "5"
   metric_name        = "UnHealthyHostCount"
@@ -301,16 +301,16 @@ resource "aws_cloudwatch_metric_alarm" "alb_target_5xx" {
   dimensions = {
     LoadBalancer = module.alb.load_balancer_arn_suffix
   }
-  evaluation_periods = "5"
+  evaluation_periods  = "5"
   datapoints_to_alarm = "2"
-  metric_name        = "HTTPCode_Target_5XX_Count"
-  namespace          = "AWS/ApplicationELB"
-  period             = "60"
-  statistic          = "Sum"
-  threshold          = local.application_data.accounts[local.environment].alb_target_5xx_alarm_threshold
-  alarm_actions      = [aws_sns_topic.apex.arn]
-  ok_actions         = [aws_sns_topic.apex.arn]
-  treat_missing_data = "notBreaching"
+  metric_name         = "HTTPCode_Target_5XX_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = local.application_data.accounts[local.environment].alb_target_5xx_alarm_threshold
+  alarm_actions       = [aws_sns_topic.apex.arn]
+  ok_actions          = [aws_sns_topic.apex.arn]
+  treat_missing_data  = "notBreaching"
   tags = merge(
     local.tags,
     {
@@ -402,12 +402,12 @@ data "template_file" "dashboard" {
   template = file("${path.module}/dashboard.tpl")
 
   vars = {
-    aws_region                  = "eu-west-2"
-    alb_elb_5xx_alarm           = aws_cloudwatch_metric_alarm.alb_elb_5xx.arn
-    alb_elb_4xx_alarm           = aws_cloudwatch_metric_alarm.alb_elb_4xx.arn
-    alb_response_time_alarm     = aws_cloudwatch_metric_alarm.alb_response_time.arn
-    ecs_cpu_alarm               = aws_cloudwatch_metric_alarm.ecs_cpu.arn
-    ecs_memory_alarm            = aws_cloudwatch_metric_alarm.ecs_memory.arn
+    aws_region              = "eu-west-2"
+    alb_elb_5xx_alarm       = aws_cloudwatch_metric_alarm.alb_elb_5xx.arn
+    alb_elb_4xx_alarm       = aws_cloudwatch_metric_alarm.alb_elb_4xx.arn
+    alb_response_time_alarm = aws_cloudwatch_metric_alarm.alb_response_time.arn
+    ecs_cpu_alarm           = aws_cloudwatch_metric_alarm.ecs_cpu.arn
+    ecs_memory_alarm        = aws_cloudwatch_metric_alarm.ecs_memory.arn
 
   }
 }
