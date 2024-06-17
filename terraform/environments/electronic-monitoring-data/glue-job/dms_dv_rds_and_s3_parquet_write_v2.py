@@ -96,7 +96,7 @@ CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATA
 
 NVL_DTYPE_DICT = {'string': "''", 'int': 0, 'double': 0, 'float': 0, 'smallint': 0, 'bigint':0,
                   'boolean': False,
-                  'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')"}
+                  'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')", 'date': "to_date('1900-01-01', 'yyyy-MM-dd')"}
 
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
