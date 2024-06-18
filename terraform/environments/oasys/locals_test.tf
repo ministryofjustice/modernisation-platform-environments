@@ -203,7 +203,7 @@ locals {
     ec2_instances = {
       audit_vault_image_creator = merge(local.audit_vault_image_creator, {
         ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 300}
+          "/dev/sda1" = { type = "gp3", size = 300 }
         }
       })
 
