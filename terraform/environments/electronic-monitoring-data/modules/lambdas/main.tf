@@ -133,6 +133,8 @@ resource "aws_lambda_function" "this" {
   memory_size      = var.memory_size
   runtime          = var.runtime
 
+  tags             = var.tags ? local.tags : null
+
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []
     content {
@@ -140,7 +142,6 @@ resource "aws_lambda_function" "this" {
       subnet_ids         = var.subnet_ids
     }
   }
-
 
   environment {
     variables = var.environment_variables
