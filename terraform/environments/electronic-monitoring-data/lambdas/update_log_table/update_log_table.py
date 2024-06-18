@@ -77,7 +77,7 @@ def handler(event, context):
     log_table = pd.read_parquet(s3_path)
     log_table["table_to_ap"] = "True"
     try:
-        log_table.to_parquet(f"{s3_path}/{file_names[0]}")
+        log_table.to_parquet(f"{s3_path}{file_names[0]}")
     except Exception as e:
         msg = f"An error has occured: {e}"
         logger.error(msg)

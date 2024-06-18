@@ -391,7 +391,8 @@ data "aws_iam_policy_document" "get_log_s3_files" {
       "s3:ListBucket",
       "s3:GetObject",
       "s3:PutObject",
-      "s3:GetBucketLocation"
+      "s3:GetBucketLocation",
+      "s3:DeleteObject"
       ]
     resources = [
       aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
