@@ -245,8 +245,8 @@ resource "aws_lambda_permission" "s3_allow_summarise_zip_lambda" {
 
 data "archive_file" "output_file_structure_as_json_from_zip" {
   type        = "zip"
-  source_file = "lambdas/output_file_structure_as_json_from_zip.py"
-  output_path = "lambdas/output_file_structure_as_json_from_zip.zip"
+  source_file = "${local.lambda_path}/output_file_structure_as_json_from_zip.py"
+  output_path = "${local.lambda_path}/output_file_structure_as_json_from_zip.zip"
 }
 
 resource "aws_lambda_function" "output_file_structure_as_json_from_zip" {
