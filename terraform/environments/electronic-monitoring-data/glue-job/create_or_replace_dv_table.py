@@ -75,7 +75,7 @@ if __name__ == "__main__":
     `run_datetime` timestamp,
     `json_row` string, 
     `validation_msg` string,
-    `table_in_ap` string)
+    `table_to_ap` string)
     PARTITIONED BY ( 
         `database_name` string,
         `full_table_name` string)
