@@ -4,21 +4,21 @@ locals {
     development = {
       update-ssm-agent-patchgroup1                = "cron(30 7 ? * MON *)"
       update-ssm-agent-patchgroup2                = "cron(30 7 ? * WED *)"
-      update-configuration-management-daily       = "cron(00 8 ? * MON-FRI *)"
+      update-configuration-management-daily       = "cron(00 8 ? * * *)"
       update-configuration-management-patchgroup1 = "cron(00 8 ? * MON *)"
       update-configuration-management-patchgroup2 = "cron(00 8 ? * WED *)"
     }
     test = {
       update-ssm-agent-patchgroup1                = "cron(30 7 ? * MON *)"
       update-ssm-agent-patchgroup2                = "cron(30 7 ? * WED *)"
-      update-configuration-management-daily       = "cron(00 8 ? * MON-FRI *)"
+      update-configuration-management-daily       = "cron(00 8 ? * * *)"
       update-configuration-management-patchgroup1 = "cron(00 8 ? * MON *)"
       update-configuration-management-patchgroup2 = "cron(00 8 ? * WED *)"
     }
     preproduction = {
       update-ssm-agent-patchgroup1                = "cron(00 12 ? * TUE *)"
       update-ssm-agent-patchgroup2                = "cron(00 12 ? * WED *)"
-      update-configuration-management-daily       = "cron(30 12 ? * MON-FRI *)"
+      update-configuration-management-daily       = "cron(30 12 ? * * *)"
       update-configuration-management-patchgroup1 = "cron(30 12 ? * TUE *)"
       update-configuration-management-patchgroup2 = "cron(30 12 ? * WED *)"
     }
