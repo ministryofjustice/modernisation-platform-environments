@@ -238,3 +238,59 @@ resource "aws_lambda_permission" "s3_allow_summarise_zip_lambda" {
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.data_store.arn
 }
+
+#-----------------------------------------------------------------------------------
+# S3 lambda function to perform zip file structure extraction into json for Athena
+#-----------------------------------------------------------------------------------
+
+data "archive_file" "output_file_structure_as_json_from_zip" {
+  type        = "zip"
+  source_file = "lambdas/output_file_structure_as_json_from_zip.py"
+  output_path = "lambdas/output_file_structure_as_json_from_zip.zip"
+}
+
+resource "aws_lambda_function" "output_file_structure_as_json_from_zip" {
+  filename         = "lambdas/output_file_structure_as_json_from_zip.zip"
+  function_name    = "output-file-structure-as-json-from-zip"
+  role             = aws_iam_role.output_file_structure_as_json_from_zip.arn
+  handler          = "output_file_structure_as_json_from_zip.handler"
+  runtime          = "python3.12"
+  timeout          = 900
+  memory_size      = 1024
+  layers           = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
+  source_code_hash = data.archive_file.output_file_structure_as_json_from_zip.output_base64sha256
+  tags             = local.tags
+}
+
+resource "aws_iam_role" "output_file_structure_as_json_from_zip" {
+  name                = "output-file-structure-as-json-from-zip-iam-role"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+data "aws_iam_policy_document" "output_file_structure_as_json_from_zip" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = ["${aws_s3_bucket.data_store.arn}/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "output_file_structure_as_json_from_zip" {
+  name   = "output-file-structure-as-json-from-zip-iam-policy"
+  role   = aws_iam_role.output_file_structure_as_json_from_zip.id
+  policy = data.aws_iam_policy_document.output_file_structure_as_json_from_zip.json
+}
+
+resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zip" {
+  statement_id  = "AllowOutputFileStructureAsJsonFromZipExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.output_file_structure_as_json_from_zip.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.data_store.arn
+}
