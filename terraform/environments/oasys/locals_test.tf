@@ -202,9 +202,10 @@ locals {
 
     ec2_instances = {
       audit_vault_image_creator = merge(local.audit_vault_image_creator, {
-        ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 300}
-        }
+        # ebs_volumes = {
+        #   "/dev/sda1"
+        #   "/dev/sdb" = { label = "app", size = 300}
+        # }
       })
 
       t1-oasys-bip-a = merge(local.bip_a, {
