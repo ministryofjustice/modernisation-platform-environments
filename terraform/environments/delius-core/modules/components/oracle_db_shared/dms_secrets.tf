@@ -1,7 +1,7 @@
 # Database Read Access
 resource "aws_secretsmanager_secret" "dms_audit_endpoint_source" {
   name        = local.dms_audit_endpoint_source_secret_name
-  description = "Database Endpoint for Reading Audited Interaction Replication Data"
+  description = "DMS Database Endpoint for Reading Audited Interaction Replication Data"
   kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
 }
@@ -28,7 +28,7 @@ resource "aws_secretsmanager_secret_policy" "dms_audit_endpoint_source" {
 # ASM Read Access
 resource "aws_secretsmanager_secret" "dms_asm_endpoint_source" {
   name        = local.dms_asm_endpoint_source_secret_name
-  description = "ASM Endpoint"
+  description = "DMS ASM Endpoint"
   kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
 }
@@ -55,7 +55,7 @@ resource "aws_secretsmanager_secret_policy" "dms_asm_endpoint_source" {
 # Database Write Access
 resource "aws_secretsmanager_secret" "dms_audit_endpoint_target" {
   name        = local.dms_audit_endpoint_source_secret_name
-  description = "Database Endpoint for Writing Audited Interaction Replication Data"
+  description = "DMS Database Endpoint for Writing Audited Interaction Replication Data"
   kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
 }
