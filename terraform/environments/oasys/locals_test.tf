@@ -198,15 +198,15 @@ locals {
           oracle-db-sid      = "T2OASYS" # for each env using azure DB will need to be OASPROD
         })
       })
+    }
 
+    ec2_instances = {
       audit_vault_image_creator = merge(local.audit_vault_image_creator, {
         ebs_volumes = {
           "/dev/sdb" = { label = "app", size = 300}
         }
       })
-    }
 
-    ec2_instances = {
       t1-oasys-bip-a = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
           instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
