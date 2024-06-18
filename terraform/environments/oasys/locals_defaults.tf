@@ -315,6 +315,7 @@ locals {
   ###
 
   audit_vault_image_creator = {
+    autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                      = "hmpps_windows_server_2022_release_2024-*"
       availability_zone             = null
