@@ -91,13 +91,14 @@ locals {
         vpc_security_group_ids       = ["private-jumpserver"]
       }
       tags = {
-        backup                 = "false"
-        component              = "test"
-        description            = "Windows Server 2022 client testing for NOMIS"
-        instance-access-policy = "full"
-        os-type                = "Windows"
-        server-type            = "NomisClient"
-        update-ssm-agent       = "patchgroup1"
+        backup                          = "false"
+        component                       = "test"
+        description                     = "Windows Server 2022 client testing for NOMIS"
+        instance-access-policy          = "full"
+        os-type                         = "Windows"
+        server-type                     = "NomisClient"
+        update-ssm-agent                = "patchgroup1"
+        update-configuration-management = "patchgroup1"
       }
     }
 

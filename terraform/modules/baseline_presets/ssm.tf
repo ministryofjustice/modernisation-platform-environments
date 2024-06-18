@@ -2,20 +2,32 @@ locals {
 
   ssm_schedule_expressions = {
     development = {
-      update-ssm-agent-patchgroup1 = "cron(30 7 ? * MON *)"
-      update-ssm-agent-patchgroup2 = "cron(30 7 ? * WED *)"
+      update-ssm-agent-patchgroup1                = "cron(30 7 ? * MON *)"
+      update-ssm-agent-patchgroup2                = "cron(30 7 ? * WED *)"
+      update-configuration-management-daily       = "cron(00 8 ? * * *)"
+      update-configuration-management-patchgroup1 = "cron(00 8 ? * MON *)"
+      update-configuration-management-patchgroup2 = "cron(00 8 ? * WED *)"
     }
     test = {
-      update-ssm-agent-patchgroup1 = "cron(30 7 ? * MON *)"
-      update-ssm-agent-patchgroup2 = "cron(30 7 ? * WED *)"
+      update-ssm-agent-patchgroup1                = "cron(30 7 ? * MON *)"
+      update-ssm-agent-patchgroup2                = "cron(30 7 ? * WED *)"
+      update-configuration-management-daily       = "cron(00 8 ? * * *)"
+      update-configuration-management-patchgroup1 = "cron(00 8 ? * MON *)"
+      update-configuration-management-patchgroup2 = "cron(00 8 ? * WED *)"
     }
     preproduction = {
-      update-ssm-agent-patchgroup1 = "cron(00 12 ? * TUE *)"
-      update-ssm-agent-patchgroup2 = "cron(00 12 ? * WED *)"
+      update-ssm-agent-patchgroup1                = "cron(00 12 ? * TUE *)"
+      update-ssm-agent-patchgroup2                = "cron(00 12 ? * WED *)"
+      update-configuration-management-daily       = "cron(30 12 ? * * *)"
+      update-configuration-management-patchgroup1 = "cron(30 12 ? * TUE *)"
+      update-configuration-management-patchgroup2 = "cron(30 12 ? * WED *)"
     }
     production = {
-      update-ssm-agent-patchgroup1 = "cron(00 12 ? * WED *)"
-      update-ssm-agent-patchgroup2 = "cron(00 12 ? * THU *)"
+      update-ssm-agent-patchgroup1                = "cron(00 18 ? * WED *)"
+      update-ssm-agent-patchgroup2                = "cron(00 18 ? * THU *)"
+      update-configuration-management-daily       = "cron(30 18 ? * * *)"
+      update-configuration-management-patchgroup1 = "cron(30 18 ? * WED *)"
+      update-configuration-management-patchgroup2 = "cron(30 18 ? * THU *)"
     }
   }
 
@@ -36,6 +48,12 @@ locals {
   ssm_associations_filter = flatten([
     var.options.enable_ec2_ssm_agent_update ? ["AWS-UpdateSSMAgent-patchgroup1"] : [],
     var.options.enable_ec2_ssm_agent_update ? ["AWS-UpdateSSMAgent-patchgroup2"] : [],
+    var.options.enable_ec2_self_provision ? ["ec2-configuration-management-windows-daily"] : [],
+    var.options.enable_ec2_self_provision ? ["ec2-configuration-management-windows-patchgroup1"] : [],
+    var.options.enable_ec2_self_provision ? ["ec2-configuration-management-windows-patchgroup2"] : [],
+    var.options.enable_ec2_self_provision ? ["ec2-configuration-management-linux-daily"] : [],
+    var.options.enable_ec2_self_provision ? ["ec2-configuration-management-linux-patchgroup1"] : [],
+    var.options.enable_ec2_self_provision ? ["ec2-configuration-management-linux-patchgroup2"] : [],
   ])
 
   ssm_associations = {
@@ -54,6 +72,60 @@ locals {
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-ssm-agent-patchgroup2
       targets = [{
         key    = "tag:update-ssm-agent"
+        values = ["patchgroup2"]
+      }]
+    }
+    ec2-configuration-management-windows-daily = {
+      apply_only_at_cron_interval = true
+      name                        = "ec2-configuration-management-windows"
+      schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-daily
+      targets = [{
+        key    = "tag:update-configuration-management"
+        values = ["daily"]
+      }]
+    }
+    ec2-configuration-management-windows-patchgroup1 = {
+      apply_only_at_cron_interval = true
+      name                        = "ec2-configuration-management-windows"
+      schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-patchgroup1
+      targets = [{
+        key    = "tag:update-configuration-management"
+        values = ["patchgroup1"]
+      }]
+    }
+    ec2-configuration-management-windows-patchgroup2 = {
+      apply_only_at_cron_interval = true
+      name                        = "ec2-configuration-management-windows"
+      schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-patchgroup2
+      targets = [{
+        key    = "tag:update-configuration-management"
+        values = ["patchgroup2"]
+      }]
+    }
+    ec2-configuration-management-linux-daily = {
+      apply_only_at_cron_interval = true
+      name                        = "ec2-configuration-management-linux"
+      schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-daily
+      targets = [{
+        key    = "tag:update-configuration-management"
+        values = ["daily"]
+      }]
+    }
+    ec2-configuration-management-linux-patchgroup1 = {
+      apply_only_at_cron_interval = true
+      name                        = "ec2-configuration-management-linux"
+      schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-patchgroup1
+      targets = [{
+        key    = "tag:update-configuration-management"
+        values = ["patchgroup1"]
+      }]
+    }
+    ec2-configuration-management-linux-patchgroup2 = {
+      apply_only_at_cron_interval = true
+      name                        = "ec2-configuration-management-linux"
+      schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-patchgroup2
+      targets = [{
+        key    = "tag:update-configuration-management"
         values = ["patchgroup2"]
       }]
     }
