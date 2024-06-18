@@ -74,7 +74,8 @@ if __name__ == "__main__":
     CREATE EXTERNAL TABLE IF NOT EXISTS `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
     `run_datetime` timestamp,
     `json_row` string, 
-    `validation_msg` string)
+    `validation_msg` string,
+    `table_in_ap` boolean)
     PARTITIONED BY ( 
         `database_name` string,
         `full_table_name` string)
