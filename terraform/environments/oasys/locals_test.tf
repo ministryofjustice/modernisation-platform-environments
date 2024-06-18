@@ -198,6 +198,8 @@ locals {
           oracle-db-sid      = "T2OASYS" # for each env using azure DB will need to be OASPROD
         })
       })
+
+      audit_vault_image_creator = local.audit_vault_image_creator
     }
 
     ec2_instances = {

@@ -310,4 +310,34 @@ locals {
     })
   })
 
+  ###
+  #  windows
+  ###
+
+  audit_vault_image_creator = {
+    config = merge(module.baseline_presets.ec2_instance.config.default, {
+      ami_name                      = "hmpps_windows_server_2022_release_2024-*"
+      availability_zone             = null
+      ebs_volumes_copy_all_from_ami = false
+      instance_profile_policies = flatten([
+        module.baseline_presets.ec2_instance.config.default.instance_profile_policies,
+      ])
+    })
+    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      instance_type = "r6i.4xlarge"
+    })
+    user_data_cloud_init   = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
+    tags = {
+      backup                      = "false" # opt out of mod platform default backup plan
+      component                   = "test"
+      description                 = "${local.environment} audit vault image creator"
+      environment-name            = terraform.workspace # used in provisioning script to select group vars
+      monitored                   = false
+      os-type                     = "Windows"
+      os-version                  = "Windows server 2022"
+      server-type                 = "audit-vault-image-creator"
+    }
+  }
+
 }
+
