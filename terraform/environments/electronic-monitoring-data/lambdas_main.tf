@@ -228,8 +228,6 @@ locals {
 resource "aws_lambda_function" "update_log_table" {
     function_name = "update_log_table"
     role = aws_iam_role.update_log_table.arn
-    handler = "update_log_table.handler"
-    timeout = 900
     memory_size = 1024
     package_type  = "Image"
     image_uri = "${module.ecr_lambda_repo.repository_url}:${local.env_name}"
