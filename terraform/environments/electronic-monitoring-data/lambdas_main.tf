@@ -233,6 +233,7 @@ resource "aws_lambda_function" "update_log_table" {
     memory_size = 1024
     package_type  = "Image"
     image_uri = "${module.ecr_lambda_repo.repository_url}:${local.env_name}"
+    architectures = ["arm64"]
     environment {
       variables = {
       S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
