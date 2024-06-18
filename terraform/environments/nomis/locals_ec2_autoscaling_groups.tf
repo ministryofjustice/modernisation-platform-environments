@@ -41,9 +41,10 @@ locals {
         ]
       }
       tags = {
-        backup    = "false"
-        component = "test"
-        os-type   = "Linux"
+        backup           = "false"
+        component        = "test"
+        os-type          = "Linux"
+        update-ssm-agent = "patchgroup1"
       }
     }
 
@@ -96,6 +97,7 @@ locals {
         instance-access-policy = "full"
         os-type                = "Windows"
         server-type            = "NomisClient"
+        update-ssm-agent       = "patchgroup1"
       }
     }
 
@@ -184,11 +186,12 @@ locals {
       }
       tags = {
         # ami       = "base_ol_8_5" # commented out to ensure harden role does not re-run
-        backup      = "false"
-        component   = "web"
-        description = "For testing nomis weblogic 19c image"
-        os-type     = "Linux"
-        server-type = "nomis-web19c"
+        backup           = "false"
+        component        = "web"
+        description      = "For testing nomis weblogic 19c image"
+        os-type          = "Linux"
+        server-type      = "nomis-web19c"
+        update-ssm-agent = "patchgroup1"
       }
     }
   }

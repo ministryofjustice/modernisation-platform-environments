@@ -200,6 +200,7 @@ locals {
           instance-scheduling = "skip-scheduling"
           nomis-environment   = "preprod"
           oracle-sids         = "PPCNOM PPNDH PPTRDAT"
+          update-ssm-agent    = "patchgroup2"
         })
       })
 
@@ -265,6 +266,7 @@ locals {
           misload-dbname      = "PPMIS"
           nomis-environment   = "preprod"
           oracle-sids         = "PPMIS PPCNMAUD"
+          update-ssm-agent    = "patchgroup2"
         })
       })
 

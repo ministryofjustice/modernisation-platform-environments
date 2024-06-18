@@ -39,6 +39,7 @@ locals {
       enable_ec2_oracle_enterprise_managed_server = true
       enable_ec2_self_provision                   = true
       enable_ec2_session_manager_cloudwatch_logs  = true
+      enable_ec2_ssm_agent_update                 = true
       enable_ec2_user_keypair                     = true
       enable_image_builder                        = true
       enable_hmpps_domain                         = true # Syscon users are collaborators so need domain creds to access nomis-client EC2s

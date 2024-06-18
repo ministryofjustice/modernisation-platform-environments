@@ -46,6 +46,7 @@ resource "aws_lb_target_group" "ifs_target_group" {
     unhealthy_threshold = "5"
     matcher             = "200-499"
     timeout             = "10"
+    path                = "/health"
   }
 }
 

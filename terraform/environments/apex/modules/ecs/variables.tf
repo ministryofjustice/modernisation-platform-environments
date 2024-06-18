@@ -142,6 +142,11 @@ variable "ecs_target_capacity" {
   description = "The target value for the CloudWatch metric used in the Amazon ECS-managed target tracking scaling policy. For example, a value of 100 will result in the Amazon EC2 instances in your Auto Scaling group being completely utilized."
 }
 
+variable "ec2_instance_warmup_period" {
+  type        = string
+  description = "Period of time, in seconds, after a newly launched Amazon EC2 instance can contribute to CloudWatch metrics for Auto Scaling group for the Capacity Provider."
+}
+
 variable "lb_tg_arn" {
   type        = string
   description = "Load balancer target group ARN used by ECS service"
