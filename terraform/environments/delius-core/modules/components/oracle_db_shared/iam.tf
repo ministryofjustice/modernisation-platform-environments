@@ -311,7 +311,7 @@ resource "aws_iam_role" "DMSSecretsManagerAccessRole" {
     {
       "Effect": "Allow",
       "Principal": {
-         "Service": ["dms.eu-west-2.com"]
+         "Service": ["dms.eu-west-2.amazonaws.com"]
       },
       "Action": "sts:AssumeRole"
     }
