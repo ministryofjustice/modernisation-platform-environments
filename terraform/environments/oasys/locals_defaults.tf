@@ -318,8 +318,8 @@ locals {
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group.default
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                      = "hmpps_windows_server_2022_release_2024-*"
-      availability_zone             = null
-      ebs_volumes_copy_all_from_ami = false
+      availability_zone             = "eu-west-2b"
+      ebs_volumes_copy_all_from_ami = true
       instance_profile_policies = flatten([
         module.baseline_presets.ec2_instance.config.default.instance_profile_policies,
       ])
