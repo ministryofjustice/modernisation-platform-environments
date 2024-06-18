@@ -1,6 +1,9 @@
 locals {
-  lambda_path = "lambdas"
-  db_name     = local.is-production ? "g4s_cap_dw" : "test"
+  lambda_path           = "lambdas"
+  db_name               = local.is-production ? "g4s_cap_dw" : "test"
+  env_name              = local.is-production? "prod": "dev"
+  
+  output_fs_json_lambda = "output_file_structure_as_json_from_zip"
 }
 # ------------------------------------------------------
 # Get Metadata from RDS Function
@@ -216,17 +219,23 @@ module "get_tables_from_db" {
 
 data "archive_file" "output_file_structure_as_json_from_zip" {
   type        = "zip"
-  source_file = "${local.lambda_path}/output_file_structure_as_json_from_zip.py"
-  output_path = "${local.lambda_path}/output_file_structure_as_json_from_zip.zip"
+  source_file = "${local.lambda_path}/${locals.output_fs_json_lambda}.py"
+  output_path = "${local.lambda_path}/${locals.output_fs_json_lambda}.zip"
+}
+
+resource "aws_s3_bucket" "data_store" {
+  bucket_prefix = "em-data-store-"
+
+  tags = local.tags
 }
 
 module "output_file_structure_as_json_from_zip" {
   source                = "./modules/lambdas"
-  filename              = "${local.lambda_path}/output_file_structure_as_json_from_zip.zip"
-  function_name         = "output-file-structure-as-json-from-zip"
-  role_arn              = aws_iam_role.output_file_structure_as_json_from_zip.arn
-  role_name             = aws_iam_role.output_file_structure_as_json_from_zip.name
-  handler               = "output_file_structure_as_json_from_zip.handler"
+  filename              = "${local.lambda_path}/${local.output_fs_json_lambda}.zip"
+  function_name         = "${local.output_fs_json_lambda}"
+  role_arn              = aws_iam_role.output_fs_json_lambda_s3_iam_role.arn
+  role_name             = aws_iam_role.output_fs_json_lambda_s3_iam_role.name
+  handler               = "${local.output_fs_json_lambda}.handler"
   source_code_hash      = data.archive_file.output_file_structure_as_json_from_zip.output_base64sha256
   layers                = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
   timeout               = 900
@@ -237,4 +246,49 @@ module "output_file_structure_as_json_from_zip" {
   env_account_id        = local.env_account_id
   environment_variables = null
   tags                  = local.tags
+}
+
+resource "aws_iam_role" "output_fs_json_lambda_s3_iam_role" {
+  name                = "output_fs_json_lambda_s3_iam_role"
+  assume_role_policy  = data.aws_iam_policy_document.output_fs_json_lambda_s3_iam_policy_document.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+data "aws_iam_policy_document" "output_fs_json_lambda_s3_iam_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = ["${aws_s3_bucket.data_store.arn}/*"]
+  }
+}
+
+resource "aws_iam_policy" "output_fs_json_lambda_s3_iam_policy" {
+  name        = "output-fs-json-lambda-s3-policy"
+  description = "Policy for output_fs_json_lambda_s3 Lambda to interact with appropriate S3 buckets"
+
+  policy = data.aws_iam_policy_document.output_fs_json_lambda_s3_iam_policy_document.json
+}
+
+resource "aws_iam_role_policy" "output_fs_json_lambda_s3_policy" {
+  name   = "output_fs_json_lambda_s3_policy"
+  role   = aws_iam_role.output_fs_json_lambda_s3_iam_role.id
+  policy = data.aws_iam_policy_document.output_fs_json_lambda_s3_iam_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attachment" {
+  role       = var.role_name
+  policy_arn = aws_iam_policy.output_fs_json_lambda_s3_iam_policy.arn
+}
+
+resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zip" {
+  statement_id  = "AllowOutputFileStructureAsJsonFromZipExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.output_file_structure_as_json_from_zip.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.data_store.arn
 }
