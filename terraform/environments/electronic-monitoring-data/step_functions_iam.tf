@@ -206,7 +206,8 @@ data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
     resources = [
       "${module.send_table_to_ap.lambda_function_arn}:*",
       "${module.get_file_keys_for_table.lambda_function_arn}:*",
-      "${module.query_output_to_list.lambda_function_arn}:*"
+      "${module.query_output_to_list.lambda_function_arn}:*",
+      "${module.update_log_table.lambda_function_arn}:*"
     ]
   }
   statement {
@@ -219,7 +220,8 @@ data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
     resources = [
       module.send_table_to_ap.lambda_function_arn,
       module.get_file_keys_for_table.lambda_function_arn,
-      module.query_output_to_list.lambda_function_arn
+      module.query_output_to_list.lambda_function_arn,
+      module.update_log_table.lambda_function_arn
     ]
   }
 }
