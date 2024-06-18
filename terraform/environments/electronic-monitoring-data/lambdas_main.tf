@@ -215,31 +215,28 @@ module "query_output_to_list" {
 # ------------------------------------------------------
 
 
-data "archive_file" "update_log_table" {
-    type = "zip"
-    source_file = "${local.lambda_path}/update_log_table.py"
-    output_path = "${local.lambda_path}/update_log_table.zip"
+# data "archive_file" "update_log_table" {
+#     type = "zip"
+#     source_file = "${local.lambda_path}/update_log_table.py"
+#     output_path = "${local.lambda_path}/update_log_table.zip"
+# }
+
+locals {
+  env_name = local.is-production? "prod": "dev"
 }
 
-module "update_log_table" {
-    source              = "./modules/lambdas"
-    filename = "${local.lambda_path}/update_log_table.zip"
+resource "aws_lambda_function" "update_log_table" {
     function_name = "update_log_table"
-    role_arn = aws_iam_role.update_log_table.arn
-    role_name = aws_iam_role.update_log_table.name
+    role = aws_iam_role.update_log_table.arn
     handler = "update_log_table.handler"
-    source_code_hash = data.archive_file.update_log_table.output_base64sha256
-    layers = [      
-      aws_lambda_layer_version.pandas_layer.arn
-      ]
     timeout = 900
     memory_size = 1024
-    runtime = "python3.11"
-    security_group_ids = null
-    subnet_ids = null
-    env_account_id = local.env_account_id
-    environment_variables = {
+    package_type  = "Image"
+    image_uri = "${module.ecr_lambda_repo.repository_url}:${local.env_name}"
+    environment {
+      variables = {
       S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+      }
     }
 }
 

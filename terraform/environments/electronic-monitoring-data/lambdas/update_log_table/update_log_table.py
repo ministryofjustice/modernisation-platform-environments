@@ -4,7 +4,7 @@ import os
 
 logger = logging.getLogger(__name__)
 
-logger.setLogger(logging.INFO)
+logger.setLevel(logging.INFO)
 
 S3_LOG_BUCKET = os.environ.get("S3_LOG_BUCKET")
 

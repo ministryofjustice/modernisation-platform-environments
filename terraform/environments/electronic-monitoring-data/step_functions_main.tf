@@ -146,7 +146,7 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
                     },
                   "UpdateLogTable": {
                     "Type": "Task",
-                    "Resource": "${module.update_log_table.lambda_function_arn}",
+                    "Resource": "${aws_lambda_function.update_log_table.arn}",
                     "ResultPath": "$.final_result",
                     "End": true
                   }
