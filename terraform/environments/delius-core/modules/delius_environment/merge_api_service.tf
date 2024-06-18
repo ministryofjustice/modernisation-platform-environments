@@ -85,7 +85,7 @@ module "merge_api_service" {
 #######################
 
 resource "aws_ssm_parameter" "merge_api_snapshot_identifier" {
-  name  = "/${var.env_name}/merge-api/snapshot_id"
+  name  = "/delius-core-${var.env_name}/merge-api/snapshot_id"
   type  = "String"
   value = "DEFAULT"
   lifecycle {
