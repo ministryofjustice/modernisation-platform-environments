@@ -209,3 +209,32 @@ module "get_tables_from_db" {
   env_account_id        = local.env_account_id
   environment_variables = null
 }
+
+#-----------------------------------------------------------------------------------
+# S3 lambda function to perform zip file structure extraction into json for Athena
+#-----------------------------------------------------------------------------------
+
+data "archive_file" "output_file_structure_as_json_from_zip" {
+  type        = "zip"
+  source_file = "${local.lambda_path}/output_file_structure_as_json_from_zip.py"
+  output_path = "${local.lambda_path}/output_file_structure_as_json_from_zip.zip"
+}
+
+module "output_file_structure_as_json_from_zip" {
+  source                = "./modules/lambdas"
+  filename              = "${local.lambda_path}/output_file_structure_as_json_from_zip.zip"
+  function_name         = "output-file-structure-as-json-from-zip"
+  role_arn              = aws_iam_role.output_file_structure_as_json_from_zip.arn
+  role_name             = aws_iam_role.output_file_structure_as_json_from_zip.name
+  handler               = "output_file_structure_as_json_from_zip.handler"
+  source_code_hash      = data.archive_file.output_file_structure_as_json_from_zip.output_base64sha256
+  layers                = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
+  timeout               = 900
+  memory_size           = 1024
+  runtime               = "python3.12"
+  security_group_ids    = [aws_security_group.lambda_db_security_group.id]
+  subnet_ids            = data.aws_subnets.shared-public.ids
+  env_account_id        = local.env_account_id
+  environment_variables = null
+  tags                  = local.tags
+}
