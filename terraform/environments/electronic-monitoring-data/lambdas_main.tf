@@ -239,7 +239,6 @@ module "output_file_structure_as_json_from_zip" {
   subnet_ids            = data.aws_subnets.shared-public.ids
   env_account_id        = local.env_account_id
   environment_variables = null
-  tags                  = local.tags
 }
 
 resource "aws_iam_role" "output_fs_json_lambda_s3_iam_role" {
