@@ -219,8 +219,8 @@ module "get_tables_from_db" {
 
 data "archive_file" "output_file_structure_as_json_from_zip" {
   type        = "zip"
-  source_file = "${local.lambda_path}/${locals.output_fs_json_lambda}.py"
-  output_path = "${local.lambda_path}/${locals.output_fs_json_lambda}.zip"
+  source_file = "${local.lambda_path}/${local.output_fs_json_lambda}.py"
+  output_path = "${local.lambda_path}/${local.output_fs_json_lambda}.zip"
 }
 
 module "output_file_structure_as_json_from_zip" {
@@ -263,7 +263,6 @@ data "aws_iam_policy_document" "output_fs_json_lambda_s3_iam_policy_document" {
 resource "aws_iam_policy" "output_fs_json_lambda_s3_iam_policy" {
   name        = "output-fs-json-lambda-s3-policy"
   description = "Policy for output_fs_json_lambda_s3 Lambda to interact with appropriate S3 buckets"
-
   policy = data.aws_iam_policy_document.output_fs_json_lambda_s3_iam_policy_document.json
 }
 
@@ -274,7 +273,7 @@ resource "aws_iam_role_policy" "output_fs_json_lambda_s3_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attachment" {
-  role       = var.role_name
+  role       = aws_iam_role.output_fs_json_lambda_s3_iam_role.name
   policy_arn = aws_iam_policy.output_fs_json_lambda_s3_iam_policy.arn
 }
 
