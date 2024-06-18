@@ -204,3 +204,30 @@ resource "helm_release" "ingress_nginx" {
   ]
   depends_on = [helm_release.ingress_nginx_default_certificate]
 }
+
+/* External Secrets */
+resource "helm_release" "external_secrets" {
+  /* https://artifacthub.io/packages/helm/external-secrets-operator/external-secrets */
+  name       = "external-secrets"
+  repository = "https://charts.external-secrets.io"
+  chart      = "external-secrets"
+  version    = "0.9.19"
+  namespace  = kubernetes_namespace.external_secrets.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/external-secrets/values.yml.tftpl",
+      {
+        eks_role_arn = module.external_secrets_iam_role.iam_role_arn
+      }
+    )
+  ]
+  depends_on = [module.external_secrets_iam_role]
+}
+
+resource "helm_release" "external_secrets_cluster_secret_store" {
+  name      = "external-secrets-cluster-secret-store"
+  chart     = "./src/helm/charts/external-secrets-cluster-secret-store"
+  namespace = kubernetes_namespace.external_secrets.metadata[0].name
+
+  depends_on = [helm_release.external_secrets]
+}
