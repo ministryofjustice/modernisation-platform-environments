@@ -223,3 +223,11 @@ resource "helm_release" "external_secrets" {
   ]
   depends_on = [module.external_secrets_iam_role]
 }
+
+resource "helm_release" "external_secrets_cluster_secret_store" {
+  name      = "external-secrets-cluster-secret-store"
+  chart     = "./src/helm/charts/external-secrets-cluster-secret-store"
+  namespace = kubernetes_namespace.external_secrets.metadata[0].name
+
+  depends_on = [helm_release.external_secrets]
+}
