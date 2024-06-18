@@ -223,12 +223,6 @@ data "archive_file" "output_file_structure_as_json_from_zip" {
   output_path = "${local.lambda_path}/${locals.output_fs_json_lambda}.zip"
 }
 
-resource "aws_s3_bucket" "data_store" {
-  bucket_prefix = "em-data-store-"
-
-  tags = local.tags
-}
-
 module "output_file_structure_as_json_from_zip" {
   source                = "./modules/lambdas"
   filename              = "${local.lambda_path}/${local.output_fs_json_lambda}.zip"
