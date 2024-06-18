@@ -1,5 +1,6 @@
 locals {
   lambda_path = "lambdas"
+  env_name = local.is-production? "prod": "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
 }
 # ------------------------------------------------------
@@ -214,16 +215,6 @@ module "query_output_to_list" {
 # Update log table
 # ------------------------------------------------------
 
-
-# data "archive_file" "update_log_table" {
-#     type = "zip"
-#     source_file = "${local.lambda_path}/update_log_table.py"
-#     output_path = "${local.lambda_path}/update_log_table.zip"
-# }
-
-locals {
-  env_name = local.is-production? "prod": "dev"
-}
 
 resource "aws_lambda_function" "update_log_table" {
     function_name = "update_log_table"
