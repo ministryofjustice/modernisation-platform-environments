@@ -394,8 +394,8 @@ data "aws_iam_policy_document" "get_log_s3_files" {
       "s3:GetBucketLocation"
       ]
     resources = [
-      aws_s3_bucket.dms_target_ep_s3_bucket.arn,
-      "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*"
+      aws_s3_bucket.dms_dv_parquet_s3_bucket,
+      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*"
       ]
   }
 }

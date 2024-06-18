@@ -229,6 +229,7 @@ resource "aws_lambda_function" "update_log_table" {
     function_name = "update_log_table"
     role = aws_iam_role.update_log_table.arn
     memory_size = 1024
+    timeout = 900
     package_type  = "Image"
     image_uri = "${module.ecr_lambda_repo.repository_url}:${local.env_name}"
     architectures = ["arm64"]
