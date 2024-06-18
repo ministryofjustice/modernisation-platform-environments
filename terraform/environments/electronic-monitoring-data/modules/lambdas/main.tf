@@ -132,7 +132,6 @@ resource "aws_lambda_function" "this" {
   timeout          = var.timeout
   memory_size      = var.memory_size
   runtime          = var.runtime
-
   tags             = var.tags ? local.tags : null
 
   dynamic "vpc_config" {
