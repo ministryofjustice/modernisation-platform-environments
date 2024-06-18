@@ -312,7 +312,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     cast(null as string) as validation_msg,
     cast(null as string) as database_name,
     cast(null as string) as full_table_name,
-    cast(null as string) as table_in_ap
+    cast(null as string) as table_to_ap
     """.strip()
 
     df_dv_output = spark.sql(sql_select_str).repartition(input_repartition_factor)
