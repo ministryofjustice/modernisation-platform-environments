@@ -34,14 +34,14 @@ locals {
         access_points = {
           root = {
             posix_user = {
-              gid = 10003 # binstall
-              uid = 10003 # bobj
+              gid = 1201 # binstall
+              uid = 1201 # bobj
             }
             root_directory = {
               path = "/"
               creation_info = {
-                owner_gid   = 10003 # binstall
-                owner_uid   = 10003 # bobj
+                owner_gid   = 1201 # binstall
+                owner_uid   = 1201 # bobj
                 permissions = "0777"
               }
             }
