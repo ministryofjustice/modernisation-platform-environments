@@ -199,7 +199,11 @@ locals {
         })
       })
 
-      audit_vault_image_creator = local.audit_vault_image_creator
+      audit_vault_image_creator = merge(local.audit_vault_image_creator, {
+        ebs_volumes = {
+          "/dev/sdb" = { label = "app", size = 300}
+        }
+      })
     }
 
     ec2_instances = {
