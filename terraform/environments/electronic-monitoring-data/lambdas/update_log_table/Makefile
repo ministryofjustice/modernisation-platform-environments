@@ -1,5 +1,5 @@
 APP_NAME = update_log_table
-APP_VERSION = 0.0.1
+APP_VERSION = dev
 
 AWS_ECR_ACCOUNT_ID := $(shell terraform -chdir=../../ output -raw account_id)
 
@@ -27,4 +27,4 @@ docker/run:
 	docker run -p 9000:8080 $(AWS_ECR_ACCOUNT_ID).dkr.ecr.$(AWS_ECR_REGION).amazonaws.com/$(AWS_ECR_REPO):$(TAG)
 
 docker/test:
-	curl -XPOST 'http://localhost:9000/2015-03-31/functions/function/invocations' -d '{}'
+	curl -XPOST 'http://localhost:9000/2015-03-31/functions/function/invocations' -d '{"input": {"test/*/Financials": "s3://dms-rds-to-parquet-20240606142913727200000001/test/dbo/Financials/LOAD00000001.parquet","db_info": ["test","dbo","Financials"]},"inputDetails": {"truncated": false},"resource": "arn:aws:lambda:eu-west-2:800964199911:function:update_log_table"}'
