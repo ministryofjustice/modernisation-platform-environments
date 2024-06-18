@@ -230,7 +230,7 @@ module "update_log_table" {
     handler = "update_log_table.handler"
     source_code_hash = data.archive_file.update_log_table.output_base64sha256
     layers = [      
-      aws_lambda_layer_version.mojap_metadata_layer.arn
+      aws_lambda_layer_version.pandas_layer.arn
       ]
     timeout = 900
     memory_size = 1024

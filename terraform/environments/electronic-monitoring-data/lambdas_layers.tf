@@ -49,3 +49,26 @@ resource "aws_lambda_layer_version" "mojap_metadata_layer" {
   compatible_runtimes = ["python3.11"]
   source_code_hash    = filesha1(local.mojap_metadata.layer_zip_path)
 }
+
+# --------------------------------------------------------------------------------------------------
+# mojap_metadata layer
+# --------------------------------------------------------------------------------------------------
+locals {
+  pandas_core = {
+    layer_zip_name    = "pandas-layer.zip"
+    layer_name        = "pandas"
+  }
+
+  pandas = {
+    layer_zip_name    = local.pandas_core.layer_zip_name
+    layer_name        = local.pandas_core.layer_name
+    layer_zip_path    = "${local.layer_path}/${local.pandas_core.layer_zip_name}"
+  }
+}
+
+resource "aws_lambda_layer_version" "pandas_layer" {
+  filename            = local.pandas.layer_zip_path
+  layer_name          = local.pandas.layer_name
+  compatible_runtimes = ["python3.11"]
+  source_code_hash    = filesha1(local.pandas.layer_zip_path)
+}
