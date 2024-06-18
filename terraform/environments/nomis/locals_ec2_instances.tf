@@ -44,11 +44,12 @@ locals {
         ]
       }
       tags = {
-        ami         = "base_rhel_7_9"
-        backup      = "false"
-        component   = "build"
-        os-type     = "Linux"
-        server-type = "nomis-build"
+        ami              = "base_rhel_7_9"
+        backup           = "false"
+        component        = "build"
+        os-type          = "Linux"
+        server-type      = "nomis-build"
+        update-ssm-agent = "patchgroup1"
       }
     }
 
@@ -123,6 +124,7 @@ locals {
         os-type                     = "Linux"
         os-version                  = "RHEL 7.9"
         server-type                 = "nomis-db"
+        update-ssm-agent            = "patchgroup1"
       }
     }
 
@@ -197,6 +199,7 @@ locals {
         os-type                     = "Linux"
         os-version                  = "OL 8.5"
         server-type                 = "nomis-db19c"
+        update-ssm-agent            = "patchgroup1"
       }
     }
 
@@ -242,6 +245,7 @@ locals {
         instance-access-policy = "limited"
         os-type                = "Linux"
         server-type            = "nomis-web"
+        #update-ssm-agent      = "patchgroup1" # not supported on RHEL6, don't include
       }
     }
 
@@ -281,6 +285,7 @@ locals {
         instance-access-policy = "limited"
         os-type                = "Linux"
         server-type            = "nomis-xtag"
+        update-ssm-agent       = "patchgroup1"
       }
     }
   }
