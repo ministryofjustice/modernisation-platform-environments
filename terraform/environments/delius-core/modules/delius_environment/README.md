@@ -10,7 +10,7 @@ For examples see:
 
 In order for a new environment block to be created and successfully deployed, the equivalent `locals_<env-name>.tf` needs to be created.
 
-This file contains a number of maps which are called `<component>_config_<env_name>` and get passed into the environment block as `<component>_config`. For example: 
+This file contains a number of maps which are called `<component>_config_<env_name>` and get passed into the environment block as `<component>_config`. For example:
 
 ```
   ldap_config_dev = {

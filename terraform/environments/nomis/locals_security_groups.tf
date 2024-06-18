@@ -66,7 +66,7 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
-    private_lb = {
+    private-lb = {
       description = "Security group for internal load balancer"
       ingress = {
         all-from-self = {
@@ -128,7 +128,7 @@ locals {
         }
       }
     }
-    private_web = {
+    private-web = {
       description = "Security group for web servers"
       ingress = {
         all-from-self = {
@@ -186,7 +186,7 @@ locals {
         }
       }
     }
-    private_jumpserver = {
+    private-jumpserver = {
       description = "Security group for jumpservers"
       ingress = {
         all-from-self = {
@@ -209,7 +209,7 @@ locals {
       }
     }
 
-    data_db = {
+    data-db = {
       description = "Security group for databases"
       ingress = {
         all-from-self = {

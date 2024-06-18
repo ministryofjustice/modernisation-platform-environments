@@ -269,9 +269,9 @@ resource "aws_cloudwatch_log_metric_filter" "database" {
   log_group_name = aws_cloudwatch_log_group.database.name
 
   metric_transformation {
-    name      = "${upper(local.application_name)}-LogMetricOracleAlerts"
-    namespace = "LogsMetricFilters"
-    value     = "1"
+    name          = "${upper(local.application_name)}-LogMetricOracleAlerts"
+    namespace     = "LogsMetricFilters"
+    value         = "1"
     default_value = 0
   }
 }
@@ -294,9 +294,9 @@ resource "aws_cloudwatch_log_metric_filter" "pmon_status" {
   log_group_name = aws_cloudwatch_log_group.pmon_status.name
 
   metric_transformation {
-    name      = "${upper(local.application_name)}-LogMetricPMONStatus"
-    namespace = "LogsMetricFilters"
-    value     = "1"
+    name          = "${upper(local.application_name)}-LogMetricPMONStatus"
+    namespace     = "LogsMetricFilters"
+    value         = "1"
     default_value = 0
   }
 }

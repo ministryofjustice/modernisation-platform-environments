@@ -36,7 +36,7 @@ resource "aws_sfn_state_machine" "athena_layer" {
 }
 
 resource "aws_kms_key" "athena_layer_step_functions_log_key" {
-  description = "KMS key for encrypting Step Functions logs for athena_layer"
+  description         = "KMS key for encrypting Step Functions logs for athena_layer"
   enable_key_rotation = true
 
   policy = jsonencode(
@@ -74,9 +74,9 @@ resource "aws_kms_key" "athena_layer_step_functions_log_key" {
 }
 
 resource "aws_cloudwatch_log_group" "athena_layer" {
-  name = "/aws/vendedlogs/states/athena_layer"
+  name              = "/aws/vendedlogs/states/athena_layer"
   retention_in_days = 400
-  kms_key_id = aws_kms_key.athena_layer_step_functions_log_key.arn
+  kms_key_id        = aws_kms_key.athena_layer_step_functions_log_key.arn
 }
 # ------------------------------------------
 # Send Database to AP
@@ -176,7 +176,7 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
 }
 
 resource "aws_kms_key" "send_database_to_ap_step_functions_log_key" {
-  description = "KMS key for encrypting Step Functions logs for send_database_to_ap"
+  description         = "KMS key for encrypting Step Functions logs for send_database_to_ap"
   enable_key_rotation = true
 
   policy = jsonencode(
@@ -214,7 +214,7 @@ resource "aws_kms_key" "send_database_to_ap_step_functions_log_key" {
 }
 
 resource "aws_cloudwatch_log_group" "send_database_to_ap" {
-  name = "/aws/vendedlogs/states/send_database_to_ap"
+  name              = "/aws/vendedlogs/states/send_database_to_ap"
   retention_in_days = 400
-  kms_key_id = aws_kms_key.send_database_to_ap_step_functions_log_key.arn
+  kms_key_id        = aws_kms_key.send_database_to_ap_step_functions_log_key.arn
 }

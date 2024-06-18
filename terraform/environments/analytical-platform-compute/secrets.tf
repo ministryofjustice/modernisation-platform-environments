@@ -21,7 +21,19 @@ module "actions_runners_create_a_derived_table_secret" {
   )
 }
 
-moved {
-  from = module.actions_runners_create_a_derived_table
-  to   = module.actions_runners_create_a_derived_table_secret
+module "ui_sentry_dsn_secret" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.1.2"
+
+  name        = "ui/sentry-dsn"
+  description = "Sentry DSN for Analytical Platform UI"
+  kms_key_id  = module.common_secrets_manager_kms.key_arn
+
+  secret_string         = "CHANGEME"
+  ignore_secret_changes = true
+
+  tags = local.tags
 }

@@ -64,7 +64,7 @@ module "s3_structured_historical_bucket" {
   create_s3                 = local.setup_buckets
   name                      = "${local.project}-structured-historical-${local.environment}"
   custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false 
+  create_notification_queue = false
   enable_lifecycle          = true
   cloudtrail_access_policy  = true
 

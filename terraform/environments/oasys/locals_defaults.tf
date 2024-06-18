@@ -173,24 +173,10 @@ locals {
 
   database_onr_a = {
     cloudwatch_metric_alarms = merge(
-      module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
-      {
-        cpu-utilization-high = {
-          comparison_operator = "GreaterThanOrEqualToThreshold"
-          evaluation_periods  = "120"
-          datapoints_to_alarm = "120"
-          metric_name         = "CPUUtilization"
-          namespace           = "AWS/EC2"
-          period              = "60"
-          statistic           = "Maximum"
-          threshold           = "95"
-          alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 2 hours on an oasys-db instance"
-          alarm_actions       = ["dso_pagerduty"]
-        }
-      },
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
       {
         low-inodes = {
           comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -204,7 +190,25 @@ locals {
           alarm_description   = "Triggers if free inodes falls below the threshold for an hour"
           alarm_actions       = ["dso_pagerduty"]
         }
-      }
+      },
+      local.environment == "production" ? {} : {
+        cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2["cpu-utilization-high"], {
+          evaluation_periods  = "480"
+          datapoints_to_alarm = "480"
+          threshold           = "95"
+          alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 8 hours to allow for DB refreshes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326064583"
+        })
+        cpu-iowait-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux["cpu-iowait-high"], {
+          evaluation_periods  = "480"
+          datapoints_to_alarm = "480"
+          threshold           = "40"
+          alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 8 hours allowing for DB refreshes.  See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
+        })
+      },
+      # DBAs have slack integration via OEM for this so don't include pagerduty integration
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
+      # db_backup
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,
     )
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name = "base_rhel_7_9_2024-01-01T00-00-06.493Z"
