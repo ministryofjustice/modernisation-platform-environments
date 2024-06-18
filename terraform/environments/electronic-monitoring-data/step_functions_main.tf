@@ -94,7 +94,7 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
           "Type": "Task",
           "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
           "Parameters": {
-            "QueryString.$": "States.Format('SELECT database_name, split(validation_msg, \\' - \\', 2)[1] as table_name FROM \"dms_data_validation\".\"glue_df_output\" WHERE validation_msg like \\'%Validated%\\' and database_name = \\'{}\\' and table_to_ap = \\'false\\'', $.db_name)",
+            "QueryString.$": "States.Format('SELECT database_name, split(validation_msg, \\' - \\', 2)[1] as table_name FROM \"dms_data_validation\".\"glue_df_output\" WHERE validation_msg like \\'%Validated%\\' and database_name = \\'{}\\' and table_in_ap = \\'False\\'', $.db_name)",
             "WorkGroup": "primary",
             "ResultConfiguration": {
                 "OutputLocation": "s3://em-athena-result-output/random-location/"
@@ -156,9 +156,21 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
               }
             }
           },
-        "End": true
+        "Next": "FixLogTable"
+        },
+        "FixLogTable": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
+            "Parameters": {
+              "QueryString": "MSCK REPAIR TABLE dms_data_validation.glue_df_output",
+              "WorkGroup": "primary",
+              "ResultConfiguration": {
+                  "OutputLocation": "s3://em-athena-result-output/random-location/"
+                }
+              },
+            "End": true
         }
-    }
+      }
     }
   )
 }
