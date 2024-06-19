@@ -30,9 +30,10 @@ module "merge_ui_service" {
 
   alb_listener_rule_paths = ["/merge/ui", "/merge/ui/*"]
   platform_vars           = var.platform_vars
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-ui-ecr-repo:${var.delius_microservice_configs.merge_ui.image_tag}"
+  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-merge-ui:${var.delius_microservice_configs.merge_ui.image_tag}"
   account_config          = var.account_config
   health_check_path       = "/merge/ui/"
+  target_group_protocol_version = "HTTP1"
   account_info            = var.account_info
 
   ignore_changes_service_task_definition = true
@@ -46,4 +47,13 @@ module "merge_ui_service" {
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_frontend.arn_suffix
   enable_platform_backups = var.enable_platform_backups
+}
+
+resource "aws_vpc_security_group_egress_rule" "alb_to_merge_ui" {
+  security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
+  description                  = "load balancer to merge ui ecs service"
+  from_port                    = "80"
+  to_port                      = "80"
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = module.merge_ui_service.service_security_group_id
 }
