@@ -1,5 +1,5 @@
 APP_NAME = update_log_table
-APP_VERSION = := $(shell terraform -chdir=../../ output -raw account_suffix)
+APP_VERSION := $(shell terraform -chdir=../../ output -raw account_suffix)
 
 .PHONY: print-account-suffix
 print-account-suffix:
@@ -19,7 +19,7 @@ TAG = $(APP_VERSION)
 
 .PHONY: docker/build docker/push docker/run docker/test
 
-docker/build:
+docker/build :
 	docker build -t $(APP_NAME):$(APP_VERSION) .
 
 docker/push: docker/build
