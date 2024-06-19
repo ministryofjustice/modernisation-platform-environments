@@ -16,7 +16,7 @@ locals {
   baseline_development = {
 
     ec2_autoscaling_groups = {
-      dev-ncr-client-a = merge(local.jumpserver_ec2, {
+      dev-ncr-client-a = merge(local.jumpserver_ec2_default, {
         autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default_with_warm_pool
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
