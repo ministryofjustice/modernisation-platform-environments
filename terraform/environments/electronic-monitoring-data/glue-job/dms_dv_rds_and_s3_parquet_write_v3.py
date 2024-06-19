@@ -363,8 +363,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         prq_df_created_msg_2 = f""" >> parquet_read_df_partitions = {df_prq.rdd.getNumPartitions()}"""
         LOGGER.info(f"""{prq_df_created_msg_1}\n{prq_df_created_msg_2}""")
 
-        df_rds_count = df_rds.count
-        df_prq_count = df_prq.count
+        df_rds_count = df_rds.count()
+        df_prq_count = df_prq.count()
         # -------------------------------------------------------
         if not (df_rds_count == df_prq_count):
             validation_msg = f"""'{rds_tbl_name} - Table row-count {df_rds_count}:{df_prq_count} MISMATCHED !' as validation_msg"""
@@ -376,7 +376,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                                  """'False' as table_in_ap"""
                                                  )
             LOGGER.warn(f"Validation Failed - 3")
-
+            LOGGER.warn(f"df_rds_count={df_rds_count} ; df_prq_count={df_prq_count}")
             LOGGER.info(final_validation_msg)
             return df_dv_output
         # -------------------------------------------------------
@@ -396,8 +396,9 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
                                     for column in args.get('rds_df_trim_str_col_list', '').split(",")]
         
-        trim_col_msg = f"""Given -> trim_rds_df_str_columns = {args["trim_rds_df_str_columns"]}, 
-                        {type(args["trim_rds_df_str_columns"])}""".strip()
+        if rds_df_trim_str_col_list:
+            LOGGER.warn(f"""rds_df_trim_str_col_list = {rds_df_trim_str_col_list}""")
+            additional_validation_msg =f"""{rds_df_trim_str_col_list} - extra spaces trimmed."""
         
         validated_colmn_msg_list = list()
 
@@ -417,12 +418,11 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             df_rds_temp = df_rds.select(*temp_select_list)
 
             # -------------------------------------------------------
-            
+            rds_column_trimmed = 0
             if rds_column in rds_df_trim_str_col_list:
-                LOGGER.info(trim_col_msg)
-                    
+                rds_column_trimmed = 1
                 df_rds_temp_t1 = df_rds_temp.transform(trim_rds_df_str_columns)
-                additional_validation_msg = "-[After trimming string-column spaces]"
+                
                 df_rds_temp_t2 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
             else:
                 df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
@@ -439,7 +439,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             # -------------------------------------------------------
             if df_rds_prq_subtract_row_count == 0:
-                validated_colmn_msg_list.append(f"""'{rds_column}'{additional_validation_msg}""")
+                validated_colmn_msg = f"""'{rds_column}'-spaces trimmed""" if rds_column_trimmed == 1 else rds_column
+                validated_colmn_msg_list.append(validated_colmn_msg)
 
             else:
                 df_temp = (df_rds_prq_subtract_transform
@@ -461,28 +462,29 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             df_rds_prq_subtract_transform.unpersist(True)
 
-            if validated_colmn_msg_list:
-                total_non_primary_key_columns = len(df_rds_temp.columns) - len(rds_db_tbl_primary_key_list)
-                if total_non_primary_key_columns == len(validated_colmn_msg_list):
-                    df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                                  "'' as json_row",
-                                                  f"""'{rds_tbl_name} - Validated.{additional_validation_msg}' as validation_msg""",
-                                                  f"""'{rds_db_name}' as database_name""",
-                                                  f"""'{db_sch_tbl}' as full_table_name""",
-                                                  """'False' as table_to_ap"""
-                                                  )
-                    LOGGER.info(f"Validation Successful - 1")
-                    df_dv_output = df_dv_output.union(df_temp)
-                else:
-                    df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                                  "'' as json_row",
-                                                  f"""{',chr(10)'.join(e for e in validated_colmn_msg_list)} - Validated""",
-                                                  f"""'{rds_db_name}' as database_name""",
-                                                  f"""'{db_sch_tbl}' as full_table_name""",
-                                                  """'False' as table_in_ap"""
-                                                  )
-                    LOGGER.info(f"Not all table columns validated - 1b")
-                    df_dv_output = df_dv_output.union(df_temp)
+        # -------------------------------------------------------
+        if validated_colmn_msg_list:
+            total_non_primary_key_columns = len(df_rds_temp.columns) - len(rds_db_tbl_primary_key_list)
+            if total_non_primary_key_columns == len(validated_colmn_msg_list):
+                df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
+                                                "'' as json_row",
+                                                f"""'{rds_tbl_name} - Validated.\n{additional_validation_msg}' as validation_msg""",
+                                                f"""'{rds_db_name}' as database_name""",
+                                                f"""'{db_sch_tbl}' as full_table_name""",
+                                                """'False' as table_to_ap"""
+                                                )
+                LOGGER.info(f"Validation Successful - 1")
+                df_dv_output = df_dv_output.union(df_temp)
+            else:
+                df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
+                                                "'' as json_row",
+                                                f"""{' ; '.join(e for e in validated_colmn_msg_list)} - Validated""",
+                                                f"""'{rds_db_name}' as database_name""",
+                                                f"""'{db_sch_tbl}' as full_table_name""",
+                                                """'False' as table_in_ap"""
+                                                )
+                LOGGER.info(f"Not all table columns validated - 1b")
+                df_dv_output = df_dv_output.union(df_temp)
 
     else:
 
@@ -505,7 +507,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 def write_parquet_to_s3(df_dv_output: DataFrame, database, db_sch_tbl_name):
 
     df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
-
+    LOGGER.info(f"""database={database} ; db_sch_tbl_name={db_sch_tbl_name}""")
     if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                       f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={db_sch_tbl_name}'''
                                       ):
@@ -578,6 +580,6 @@ if __name__ == "__main__":
                                         total_size_mb, 
                                         input_repartition_factor)
 
-    write_parquet_to_s3(df_dv_output, rds_sqlserver_db_str, f"'{db_sch_tbl}'")
+    write_parquet_to_s3(df_dv_output, rds_sqlserver_db_str, db_sch_tbl)
 
     job.commit()
