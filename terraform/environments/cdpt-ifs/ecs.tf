@@ -89,7 +89,7 @@ resource "aws_ecs_task_definition" "ifs_task_definition" {
   task_role_arn            = aws_iam_role.app_task.arn
   container_definitions = jsonencode([
     {
-      name      = "${local.application_name}ifs-container"
+      name      = "${local.application_name}-container"
       image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].environment_name}"
       cpu       = 2048
       memory    = 2048
@@ -231,22 +231,39 @@ resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
 
-  policy = <<-EOF
+  policy = <<EOF
   {
     "Version": "2012-10-17",
     "Statement": [
       {
-           "Action": [
-              "ecr:*",
-              "logs:CreateLogGroup",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "logs:DescribeLogStreams",
-              "secretsmanager:GetSecretValue"
-           ],
-           "Resource": "*",
-           "Effect": "Allow"
-      }
+        "Effect": "Allow"
+        "Action": [
+          "ecr:*",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
+          "secretsmanager:GetSecretValue"
+        ],
+        "Resource": "*",
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ecs:RunTask",
+          "ecs:StopTask",
+          "ecs:UpdateContainerInstancesState",
+          "ecs:RegisterContainerInstance",
+          "ecs:DeregisterContainerInstance",
+          "ecs:DiscoverPollEndpoint",
+          "ecs:Submit*",
+          "ecs:Poll",
+          "ecs:StartTelemetrySession",
+          "ecs:ListTasks",
+          "ecs:DescribeTasks"
+        ],
+        "Resource": "*" 
+      }  
     ]
   }
   EOF
@@ -374,7 +391,7 @@ resource "aws_ecs_service" "ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ifs_target_group.arn
-    container_name   = "${local.application_name}ifs-container"
+    container_name   = "${local.application_name}-container"
     container_port   = local.application_data.accounts[local.environment].container_port
   }
 
