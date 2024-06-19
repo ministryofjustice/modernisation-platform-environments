@@ -1,5 +1,9 @@
 APP_NAME = update_log_table
-APP_VERSION = dev
+APP_VERSION = := $(shell terraform -chdir=../../ output -raw account_suffix)
+
+.PHONY: print-account-suffix
+print-account-suffix:
+	@echo APP_VERSION=$(APP_VERSION)
 
 AWS_ECR_ACCOUNT_ID := $(shell terraform -chdir=../../ output -raw account_id)
 
