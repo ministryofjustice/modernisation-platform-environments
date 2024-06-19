@@ -266,19 +266,19 @@ locals {
         })
       })
 
-      pp-ncr-client-a = merge(local.client_ec2_default, {
+      pp-ncr-client-a = merge(local.jumpserver_ec2_default, {
         # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
-        config = merge(local.client_ec2_default.config, {
+        config = merge(local.jumpserver_ec2_default.config, {
           ami_name = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
-          instance_profile_policies = concat(local.client_ec2_default.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.jumpserver_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
         })
-        instance = merge(local.client_ec2_default.instance, {
+        instance = merge(local.jumpserver_ec2_default.instance, {
           instance_type = "t3.large",
         })
-        tags = merge(local.etl_ec2_default.tags, {
-          description                          = "PreProd SAP BI Platform Client Tools installation and configurations"
+        tags = merge(local.jumpserver_ec2_default.tags, {
+          description                          = "PreProd Jumpserver and Client Tools"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
         })

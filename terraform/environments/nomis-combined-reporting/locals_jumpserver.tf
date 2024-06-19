@@ -1,7 +1,5 @@
 locals {
   jumpserver_ec2 = {
-    autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default_with_warm_pool
-    autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     # ami has unwanted ephemeral device, don't copy all the ebs_volumes
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                      = "hmpps_windows_server_2019_release_2024-*"
