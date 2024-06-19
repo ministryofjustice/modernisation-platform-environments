@@ -53,6 +53,29 @@ resource "aws_secretsmanager_secret_version" "dps" {
   }
 }
 
+# Operational DataStore Secrets for use in DataHub
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret" "operational_datastore" {
+  name = "external/operational_data_store"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/operational_data_store"
+      Resource_Type = "Secrets"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "operational_datastore" {
+  secret_id     = aws_secretsmanager_secret.operational_datastore.id
+  secret_string = jsonencode(local.operational_datastore_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
 # Redshift Access Secrets
 resource "aws_secretsmanager_secret" "redshift" {
   name = "dpr-redshift-sqlworkbench-${local.env}"
