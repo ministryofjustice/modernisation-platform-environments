@@ -280,7 +280,7 @@ resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attac
 resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zip" {
   statement_id  = "AllowOutputFileStructureAsJsonFromZipExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
-  function_name = module.output_file_structure_as_json_from_zip.function_arn
+  function_name = module.output_file_structure_as_json_from_zip.lambda_function_arn
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.data_store.arn
 }
