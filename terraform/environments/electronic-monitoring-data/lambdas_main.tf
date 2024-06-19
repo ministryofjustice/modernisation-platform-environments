@@ -2,6 +2,8 @@ locals {
   lambda_path = "lambdas"
   env_name = local.is-production? "prod": "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
+  
+  output_fs_json_lambda = "output_file_structure_as_json_from_zip"
 }
 
 # ------------------------------------------------------
