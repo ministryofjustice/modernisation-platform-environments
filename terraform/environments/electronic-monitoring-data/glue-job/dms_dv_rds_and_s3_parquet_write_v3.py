@@ -292,7 +292,7 @@ def get_s3_table_folder_path(in_database_name, in_table_name):
     if check_s3_folder_path_if_exists(PRQ_FILES_SRC_S3_BUCKET_NAME, dir_path_str):
         return tbl_full_dir_path_str
     else:
-        LOGGER.error(f"{tbl_full_dir_path_str} -- Table-Folder-S3-Path Not Found !")
+        LOGGER.error(f"{tbl_full_dir_path_str} -- Parquet-Source-S3-Folder-Path Not Found !")
         sys.exit(1)
 
 
@@ -349,6 +349,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
     given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
 
     tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
+    LOGGER.info(f"""tbl_prq_s3_folder_path = {tbl_prq_s3_folder_path}""")
     # -------------------------------------------------------
     if tbl_prq_s3_folder_path is not None:
 
@@ -367,7 +368,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         # -------------------------------------------------------
         if not (df_rds_count == df_prq_count):
             validation_msg = f"""'{rds_tbl_name} - Table row-count {df_rds_count}:{df_prq_count} MISMATCHED !' as validation_msg"""
-            df_dv_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
+            df_dv_output = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                  "'' as json_row",
                                                  validation_msg,
                                                  f"""'{rds_db_name}' as database_name""",
@@ -375,7 +376,6 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                                  """'False' as table_in_ap"""
                                                  )
             LOGGER.warn(f"Validation Failed - 3")
-            df_dv_output = df_dv_output.union(df_dv_temp)
 
             LOGGER.info(final_validation_msg)
             return df_dv_output
