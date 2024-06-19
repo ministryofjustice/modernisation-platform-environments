@@ -467,7 +467,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                 else:
                     df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                   "'' as json_row",
-                                                  f"""{',\n'.join(e for e in validated_colmn_msg_list)} - Validated""",
+                                                  f"""{',\\n'.join(e for e in validated_colmn_msg_list)} - Validated""",
                                                   f"""'{rds_db_name}' as database_name""",
                                                   f"""'{db_sch_tbl}' as full_table_name""",
                                                   """'False' as table_in_ap"""
