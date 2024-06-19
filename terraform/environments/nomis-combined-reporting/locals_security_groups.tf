@@ -176,6 +176,7 @@ locals {
           to_port         = 6400
           protocol        = "tcp"
           security_groups = ["web"]
+          cidr_blocks     = ["10.0.0.0/8"]
         }
         sia = {
           description     = "Allow http6410 to http6415 ingress"
