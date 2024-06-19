@@ -270,7 +270,7 @@ locals {
         # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.jumpserver_ec2_default.config, {
           ami_name = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
-          availability_zone             = "eu-west-1"
+          availability_zone             = "eu-west-2a"
           instance_profile_policies = concat(local.jumpserver_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
