@@ -1,5 +1,5 @@
 locals {
-  jumpserver_ec2 = {
+  jumpserver_ec2_default = {
     # ami has unwanted ephemeral device, don't copy all the ebs_volumes
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                      = "hmpps_windows_server_2019_release_2024-*"
