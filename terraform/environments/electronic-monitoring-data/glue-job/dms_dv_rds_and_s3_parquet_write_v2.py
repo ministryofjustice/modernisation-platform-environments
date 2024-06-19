@@ -488,9 +488,14 @@ if __name__ == "__main__":
     # -------------------------------------------------------
     if args.get("select_rds_db_tbls", None) is None:
 
-        exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}""" 
-                                    for tbl in args['exclude_rds_db_tbls'].split(",")]
-        LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
+        if args.get("exclude_rds_db_tbls", None) is not None:
+
+            exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}""" 
+                                        for tbl in args['exclude_rds_db_tbls'].split(",")]
+            LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
+
+        else:
+            exclude_rds_db_tbls_list = []
 
         filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in rds_sqlserver_db_tbl_list 
                                               if tbl not in exclude_rds_db_tbls_list]
