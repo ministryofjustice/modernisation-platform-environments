@@ -74,7 +74,7 @@ def get_filepaths_from_s3_folder(
 
 def handler(event, context):
     database_name, schema_name, table_name = event.get("db_info")
-    s3_path = f"s3://{S3_LOG_BUCKET}/{DATBASE_NAME}/{TABLE_NAME}/database_name={database_name}/full_table_name={database_name}_{schema_name}_{table_name}"
+    s3_path = f"s3://{S3_LOG_BUCKET}/{DATABASE_NAME}/{TABLE_NAME}/database_name={database_name}/full_table_name={database_name}_{schema_name}_{table_name}"
     file_names = [file.split("/")[-1] for file in get_filepaths_from_s3_folder(s3_path)]
     log_table = pd.read_parquet(s3_path)
     log_table["table_to_ap"] = "True"
