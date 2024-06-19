@@ -292,8 +292,8 @@ def get_s3_table_folder_path(in_database_name, in_table_name):
     if check_s3_folder_path_if_exists(PRQ_FILES_SRC_S3_BUCKET_NAME, dir_path_str):
         return tbl_full_dir_path_str
     else:
-        LOGGER.info(f"{tbl_full_dir_path_str} -- Table-Folder-S3-Path Not Found !")
-        return None
+        LOGGER.error(f"{tbl_full_dir_path_str} -- Table-Folder-S3-Path Not Found !")
+        sys.exit(1)
 
 
 def get_s3_parquet_df_v1(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
@@ -326,8 +326,9 @@ def get_altered_df_schema_object(in_df_rds: DataFrame, in_transformed_column_lis
 # ===================================================================================================
 
 
-def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, input_repartition_factor) -> DataFrame:
-
+def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, input_repartition_factor) -> DataFrame:
+    
+    rds_tbl_name = db_sch_tbl.split(f"_{args['rds_sqlserver_db_schema']}_")[1]
     default_repartition_factor = input_repartition_factor if total_files <= 1 \
         else total_files * input_repartition_factor
 
@@ -356,7 +357,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
         rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds.rdd.getNumPartitions()}"""
         LOGGER.info(f"""{rds_df_created_msg_1}\n{rds_df_created_msg_2}""")
         
-        df_prq = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema).repartition(default_repartition_factor)
+        df_prq = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds.schema).repartition(default_repartition_factor)
         prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] - {total_size_mb}MB"""
         prq_df_created_msg_2 = f""" >> parquet_read_df_partitions = {df_prq.rdd.getNumPartitions()}"""
         LOGGER.info(f"""{prq_df_created_msg_1}\n{prq_df_created_msg_2}""")
@@ -400,11 +401,19 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
         
         validated_colmn_msg_list = list()
 
-        for rds_column in df_rds_temp.columns:
+        for_loop_count = 0
+        for rds_column in df_rds.columns:
+            for_loop_count += 1
             if rds_column in rds_db_tbl_primary_key_list:
                 continue
 
-            temp_select_list = rds_db_tbl_primary_key_list.append(rds_column)
+            temp_select_list = list()
+            temp_select_list = temp_select_list+rds_db_tbl_primary_key_list
+            temp_select_list.append(rds_column)
+            
+            LOGGER.info(f"""{for_loop_count}-Processing - {rds_tbl_name}.{rds_column}.""")
+            LOGGER.info(f"""Using 'select' column list: {temp_select_list}""")
+
             df_rds_temp = df_rds.select(*temp_select_list)
 
             # -------------------------------------------------------
@@ -467,7 +476,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                 else:
                     df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                                   "'' as json_row",
-                                                  f"""{',\\n'.join(e for e in validated_colmn_msg_list)} - Validated""",
+                                                  f"""{',chr(10)'.join(e for e in validated_colmn_msg_list)} - Validated""",
                                                   f"""'{rds_db_name}' as database_name""",
                                                   f"""'{db_sch_tbl}' as full_table_name""",
                                                   """'False' as table_in_ap"""
@@ -542,11 +551,12 @@ if __name__ == "__main__":
         sys.exit(1)
 
     given_rds_sqlserver_table = args["rds_sqlserver_db_table"]
+    db_sch_tbl = f"""{rds_sqlserver_db_str}_{given_rds_sqlserver_db_schema}_{given_rds_sqlserver_table}"""
     if not rds_sqlserver_db_tbl_list:
         LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty! Exiting ...""")
         sys.exit(1)
-    elif given_rds_sqlserver_table not in rds_sqlserver_db_tbl_list:
-        LOGGER.error(f"""'{given_rds_sqlserver_table}' - is not an existing table! Exiting ...""")
+    elif db_sch_tbl not in rds_sqlserver_db_tbl_list:
+        LOGGER.error(f"""'{db_sch_tbl}' - is not an existing table! Exiting ...""")
         sys.exit(1)
     # -------------------------------------------------------
 
@@ -557,19 +567,17 @@ if __name__ == "__main__":
     total_size_mb = total_size/1024/1024
 
     # -------------------------------------------------------
-    if total_size_mb > int(args["max_table_size_mb"]):
-        LOGGER.warn(f""">> Size greaterthan {args["max_table_size_mb"]}MB ({total_size_mb}MB) <<""")
+    LOGGER.warn(f""">> '{db_sch_tbl}' Size: {total_size_mb} MB <<""")
     # -------------------------------------------------------
 
     input_repartition_factor = int(args["repartition_factor"])
 
     df_dv_output = process_dv_for_table(rds_sqlserver_db_str, 
-                                        given_rds_sqlserver_table, 
+                                        db_sch_tbl, 
                                         total_files, 
                                         total_size_mb, 
                                         input_repartition_factor)
 
-    db_sch_tbl = f"""'{rds_sqlserver_db_str}_{given_rds_sqlserver_db_schema}_{given_rds_sqlserver_table}'"""
-    write_parquet_to_s3(df_dv_output, rds_sqlserver_db_str, db_sch_tbl)
+    write_parquet_to_s3(df_dv_output, rds_sqlserver_db_str, f"'{db_sch_tbl}'")
 
     job.commit()
