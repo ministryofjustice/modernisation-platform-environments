@@ -322,6 +322,20 @@ locals {
       ebs_volumes_copy_all_from_ami = false
       instance_profile_policies = flatten([
         module.baseline_presets.ec2_instance.config.default.instance_profile_policies,
+        {
+          effect = "Allow"
+          actions = [
+            "s3:GetObject",
+            "s3:GetObjectTagging",
+            "s3:ListBucket",
+            "s3:PutObject",
+            "s3:PutObjectAcl",
+          ]
+          resources = [
+            "arn:aws:s3:::s3-bucket*/*",
+            "arn:aws:s3:::s3-bucket*"
+          ]
+        }
       ])
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
