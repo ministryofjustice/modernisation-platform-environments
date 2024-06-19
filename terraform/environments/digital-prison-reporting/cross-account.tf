@@ -82,3 +82,10 @@ resource "aws_iam_role_policy_attachment" "kms_read_access_policy" {
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.kms_read_access_policy.arn
 }
+
+# Glue Catalog Readonly Attachement
+resource "aws_iam_role_policy_attachment" "glue_catalog_readonly" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.glue_catalog_readonly.arn
+}
+

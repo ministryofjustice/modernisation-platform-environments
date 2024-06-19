@@ -56,4 +56,4 @@ def handler(event, context):
         logger.error(msg)
         raise Exception(msg)
 
-    return {"statusCode": 200, "body": json.dumps(f"{copy_object} has been Successfully Copied to the AP")}
+    return (database_name, schema_name, table_name)

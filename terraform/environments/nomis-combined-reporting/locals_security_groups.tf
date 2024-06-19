@@ -170,47 +170,13 @@ locals {
           protocol        = "tcp"
           security_groups = ["web"]
         }
-        cms = {
-          description     = "Allow http6400 ingress"
+        cms-ingress = {
+          description     = "Allow http6400-http6500 ingress"
           from_port       = 6400
-          to_port         = 6400
+          to_port         = 6500
           protocol        = "tcp"
           security_groups = ["web"]
-        }
-        sia = {
-          description     = "Allow http6410 to http6415 ingress"
-          from_port       = 6410
-          to_port         = 6415
-          protocol        = "tcp"
-          security_groups = ["web"]
-        }
-        adaptive-processing = {
-          description     = "Allow adaptive processing ingress"
-          from_port       = 6430
-          to_port         = 6441
-          protocol        = "tcp"
-          security_groups = ["web"]
-        }
-        web-application-container = {
-          description     = "Allow web application container ingress"
-          from_port       = 6450
-          to_port         = 6450
-          protocol        = "tcp"
-          security_groups = ["web"]
-        }
-        web-processing = {
-          description     = "Allow web processing ingress"
-          from_port       = 6460
-          to_port         = 6470
-          protocol        = "tcp"
-          security_groups = ["web"]
-        }
-        wacs = {
-          description     = "Allow http6455 ingress"
-          from_port       = 6455
-          to_port         = 6455
-          protocol        = "tcp"
-          security_groups = ["web"]
+          cidr_blocks     = ["10.0.0.0/8"] # added for testing, remove later
         }
       }
       egress = {

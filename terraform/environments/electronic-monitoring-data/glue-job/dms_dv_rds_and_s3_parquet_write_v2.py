@@ -96,7 +96,7 @@ CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATA
 
 NVL_DTYPE_DICT = {'string': "''", 'int': 0, 'double': 0, 'float': 0, 'smallint': 0, 'bigint':0,
                   'boolean': False,
-                  'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')"}
+                  'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')", 'date': "to_date('1900-01-01', 'yyyy-MM-dd')"}
 
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
@@ -311,7 +311,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     cast(null as string) as json_row,
     cast(null as string) as validation_msg,
     cast(null as string) as database_name,
-    cast(null as string) as full_table_name
+    cast(null as string) as full_table_name,
+    cast(null as string) as table_to_ap
     """.strip()
 
     df_dv_output = spark.sql(sql_select_str).repartition(input_repartition_factor)
@@ -381,7 +382,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                                   "'' as json_row",
                                                   f"""'{rds_tbl_name} - Validated.{additional_message}' as validation_msg""",
                                                   f"""'{rds_db_name}' as database_name""",
-                                                  f"""'{db_sch_tbl}' as full_table_name"""
+                                                  f"""'{db_sch_tbl}' as full_table_name""",
+                                                  """'False' as table_to_ap"""
                                                   )
                 LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
@@ -396,7 +398,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                              "json_row",
                                              validation_msg,
                                              f"""'{rds_db_name}' as database_name""",
-                                             f"""'{db_sch_tbl}' as full_table_name"""
+                                             f"""'{db_sch_tbl}' as full_table_name""",
+                                             """'False' as table_to_ap"""
                                              )
                 LOGGER.warn(f"Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_temp)
@@ -408,7 +411,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                               "'' as json_row",
                                               validation_msg,
                                               f"""'{rds_db_name}' as database_name""",
-                                              f"""'{db_sch_tbl}' as full_table_name"""
+                                              f"""'{db_sch_tbl}' as full_table_name""",
+                                              """'False' as table_to_ap"""
                                               )
             LOGGER.warn(f"Validation Failed - 3")
             df_dv_output = df_dv_output.union(df_temp)
@@ -423,7 +427,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                           "'' as json_row",
                                           f"""'{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
                                           f"""'{rds_db_name}' as database_name""",
-                                          f"""'{db_sch_tbl}' as full_table_name"""
+                                          f"""'{db_sch_tbl}' as full_table_name""",
+                                          """'False' as table_to_ap"""
                                           )
         LOGGER.warn(f"Validation not applicable - 4")
         df_dv_output = df_dv_output.union(df_temp)
@@ -482,19 +487,24 @@ if __name__ == "__main__":
 
     # -------------------------------------------------------
     if args.get("select_rds_db_tbls", None) is None:
-
-        exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}""" 
-                                    for tbl in args['exclude_rds_db_tbls'].split(",")]
-        LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
-
-        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in rds_sqlserver_db_tbl_list 
+ 
+        if args.get("exclude_rds_db_tbls", None) is None:
+            exclude_rds_db_tbls_list = list()
+        else:
+            exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}"""
+                                        for tbl in args['exclude_rds_db_tbls'].split(",")]
+            LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
+        filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in rds_sqlserver_db_tbl_list
                                               if tbl not in exclude_rds_db_tbls_list]
-
+ 
         if not filtered_rds_sqlserver_db_tbl_list:
-            LOGGER.error(f"""filtered_rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
+            LOGGER.error(
+                f"""filtered_rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
             sys.exit(1)
         else:
-            LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
+            LOGGER.info(
+                f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
+ 
 
         for db_sch_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[0], \

@@ -1,13 +1,3 @@
-# This variable needs to be supplied with the list of database names to be migrated
-variable "database_list" {
-  type = list(string)
-  # cap_dw
-  default = [
-    "g4s_cap_dw",
-    "g4s_emsys_mvp"
-  ]
-}
-
 variable "dms_replication_instance_class" {
   description = "Name of the replication instance class to be used"
   type        = string

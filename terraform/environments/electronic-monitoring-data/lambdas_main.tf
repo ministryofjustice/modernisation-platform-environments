@@ -1,5 +1,6 @@
 locals {
   lambda_path = "lambdas"
+  env_name = local.is-production? "prod": "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
 }
 # ------------------------------------------------------
@@ -186,26 +187,49 @@ module "send_table_to_ap" {
 # ------------------------------------------------------
 
 
-data "archive_file" "get_tables_from_db" {
-  type        = "zip"
-  source_file = "${local.lambda_path}/get_tables_from_db.py"
-  output_path = "${local.lambda_path}/get_tables_from_db.zip"
+data "archive_file" "query_output_to_list" {
+    type = "zip"
+    source_file = "${local.lambda_path}/query_output_to_list.py"
+    output_path = "${local.lambda_path}/query_output_to_list.zip"
 }
 
-module "get_tables_from_db" {
-  source                = "./modules/lambdas"
-  filename              = "${local.lambda_path}/get_tables_from_db.zip"
-  function_name         = "get_tables_from_db"
-  role_arn              = aws_iam_role.get_tables_from_db.arn
-  role_name             = aws_iam_role.get_tables_from_db.name
-  handler               = "get_tables_from_db.handler"
-  source_code_hash      = data.archive_file.get_tables_from_db.output_base64sha256
-  layers                = null
-  timeout               = 900
-  memory_size           = 1024
-  runtime               = "python3.11"
-  security_group_ids    = [aws_security_group.lambda_db_security_group.id]
-  subnet_ids            = data.aws_subnets.shared-public.ids
-  env_account_id        = local.env_account_id
-  environment_variables = null
+module "query_output_to_list" {
+    source              = "./modules/lambdas"
+    filename = "${local.lambda_path}/query_output_to_list.zip"
+    function_name = "query_output_to_list"
+    role_arn = aws_iam_role.query_output_to_list.arn
+    role_name = aws_iam_role.query_output_to_list.name
+    handler = "query_output_to_list.handler"
+    source_code_hash = data.archive_file.query_output_to_list.output_base64sha256
+    layers = null
+    timeout = 900
+    memory_size = 1024
+    runtime = "python3.11"
+    security_group_ids = null
+    subnet_ids = null
+    env_account_id = local.env_account_id
+    environment_variables = null
 }
+
+# ------------------------------------------------------
+# Update log table
+# ------------------------------------------------------
+
+
+resource "aws_lambda_function" "update_log_table" {
+    function_name = "update_log_table"
+    role = aws_iam_role.update_log_table.arn
+    memory_size = 1024
+    timeout = 900
+    package_type  = "Image"
+    image_uri = "${module.ecr_lambda_repo.repository_url}:${local.env_name}"
+    architectures = ["arm64"]
+    environment {
+      variables = {
+      S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+      DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+      TABLE_NAME = "glue_df_output"
+      }
+    }
+}
+
