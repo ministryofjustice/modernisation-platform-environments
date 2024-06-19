@@ -374,7 +374,7 @@ resource "aws_ecs_service" "ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ifs_target_group.arn
-    container_name   = "${local.application_name}-container"
+    container_name   = "${local.application_name}ifs-container"
     container_port   = local.application_data.accounts[local.environment].container_port
   }
 
