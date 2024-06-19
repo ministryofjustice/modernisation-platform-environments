@@ -231,12 +231,12 @@ resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
 
-  policy = <<-EOF
+  policy = <<EOF
   {
     "Version": "2012-10-17",
     "Statement": [
       {
-        "Effect": "Allow"
+        "Effect": "Allow",
         "Action": [
           "ecr:*",
           "logs:CreateLogGroup",
