@@ -145,8 +145,7 @@ resource "aws_iam_policy" "glue_user_restricted_notebook_service_role_iam_policy
             ],
             "Resource": [
                 "arn:aws:iam::*:role/service-role/AwsGlueSessionServiceRoleUserRestrictedForNotebook*",
-                "arn:aws:iam::976799291502:role/${aws_iam_role.glue_notebook_iam_role.name}",
-                "arn:aws:iam::800964199911:role/${aws_iam_role.glue_notebook_iam_role.name}"
+                "arn:aws:iam::${local.env_account_id}:role/${aws_iam_role.glue_notebook_iam_role.name}"
             ],
             "Condition": {
                 "StringLike": {
