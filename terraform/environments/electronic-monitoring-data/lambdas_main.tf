@@ -264,7 +264,7 @@ module "output_file_structure_as_json_from_zip" {
   environment_variables = null
 }
 
-data "aws_iam_policy_document" "output_fs_json_lambda_s3_iam_policy_document" {
+data "aws_iam_policy_document" "output_fs_json_lambda_s3_policy_document" {
   statement {
     sid    = "S3Permissions"
     effect = "Allow"
@@ -277,20 +277,21 @@ data "aws_iam_policy_document" "output_fs_json_lambda_s3_iam_policy_document" {
   }
 }
 
-resource "aws_iam_role" "output_fs_json_lambda_s3_iam_role" {
-  name                = "output_fs_json_lambda_s3_iam_role"
-  assume_role_policy  = data.aws_iam_policy_document.output_fs_json_lambda_s3_iam_policy_document.json
+resource "aws_iam_policy" "output_fs_json_lambda_s3_policy" {
+  name                = "output-fs-json-lambda-s3-policy"
+  description         = "Policy for Lambda to use S3 for ${local.output_fs_json_lambda}"
+  policy              = data.aws_iam_policy_document.output_fs_json_lambda_s3_policy_document.json
 }
 
 resource "aws_iam_role_policy" "output_fs_json_lambda_s3_policy" {
   name   = "output_fs_json_lambda_s3_policy"
   role   = aws_iam_role.output_fs_json_lambda_s3_iam_role.id
-  policy = data.aws_iam_policy_document.output_fs_json_lambda_s3_iam_policy_document.json
+  policy = data.aws_iam_policy_document.output_fs_json_lambda_s3_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attachment" {
   role       = aws_iam_role.output_fs_json_lambda_s3_iam_role.name
-  policy_arn = aws_iam_role_policy.output_fs_json_lambda_s3_policy.arn
+  policy_arn = aws_iam_policy.output_fs_json_lambda_s3_policy.arn
 }
 
 resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zip" {
