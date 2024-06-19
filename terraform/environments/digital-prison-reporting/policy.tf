@@ -653,3 +653,24 @@ resource "aws_iam_policy" "athena_api_cross_policy" {
   description = "Extra Policy for AWS Athena"
   policy      = data.aws_iam_policy_document.athena_api.json
 }
+
+## Glue Catalog ReadOnly
+# Policy Document
+data "aws_iam_policy_document" "glue_catalog_readonly" {
+  statement {
+    actions = [
+      "glue:Get*",
+      "glue:List*"
+    ]
+    resources = [
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
+    ]
+  }
+}
+
+# Athena API Policy
+resource "aws_iam_policy" "glue_catalog_readonly" {
+  name        = "${local.project}-glue-catalog-readonly"
+  description = "Glue Catalog Readonly Policy"
+  policy      = data.aws_iam_policy_document.glue_catalog_readonly.json
+}
