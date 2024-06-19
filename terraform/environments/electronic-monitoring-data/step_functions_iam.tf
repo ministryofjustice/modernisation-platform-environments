@@ -148,6 +148,53 @@ resource "aws_iam_role" "send_database_to_ap" {
   assume_role_policy = data.aws_iam_policy_document.assume_step_functions.json
 }
 
+data "aws_iam_policy_document" "send_database_to_ap_athena_queries" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "athena:startQueryExecution",
+      "athena:getQueryExecution",
+      "athena:getQueryResults"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+
+    resources = [
+      "arn:aws:s3:::em-athena-result-output",
+      "arn:aws:s3:::em-athena-result-output/*",
+      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
+      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn
+    ]
+  }
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:GetPartitions",
+      "glue:GetTables"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
   statement {
     effect = "Allow"
@@ -158,7 +205,9 @@ data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
 
     resources = [
       "${module.send_table_to_ap.lambda_function_arn}:*",
-      "${module.get_tables_from_db.lambda_function_arn}:*",
+      "${module.get_file_keys_for_table.lambda_function_arn}:*",
+      "${module.query_output_to_list.lambda_function_arn}:*",
+      "${aws_lambda_function.update_log_table.arn}:*"
     ]
   }
   statement {
@@ -170,11 +219,23 @@ data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
 
     resources = [
       module.send_table_to_ap.lambda_function_arn,
-      module.get_tables_from_db.lambda_function_arn,
+      module.get_file_keys_for_table.lambda_function_arn,
+      module.query_output_to_list.lambda_function_arn,
+      aws_lambda_function.update_log_table.arn
     ]
   }
 }
 
+resource "aws_iam_policy" "send_database_to_ap_athena_queries" {
+  name        = "send_database_to_ap_athena_queries"
+  description = "Policy to allow start and get specific Athena queries"
+  policy      = data.aws_iam_policy_document.send_database_to_ap_athena_queries.json
+}
+
+resource "aws_iam_role_policy_attachment" "send_database_to_ap_athena_queries_attach_send_database_to_ap" {
+  role       = aws_iam_role.send_database_to_ap.name
+  policy_arn = aws_iam_policy.send_database_to_ap_athena_queries.arn
+}
 
 resource "aws_iam_policy" "send_tables_to_ap_lambda_invoke_policy" {
   name        = "send_tables_to_ap_lambda_invoke_policy"
