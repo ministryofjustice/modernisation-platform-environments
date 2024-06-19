@@ -245,7 +245,7 @@ resource "aws_iam_role_policy" "app_execution" {
           "logs:DescribeLogStreams",
           "secretsmanager:GetSecretValue"
         ],
-        "Resource": "*",
+        "Resource": "*"
       },
       {
         "Effect": "Allow",
