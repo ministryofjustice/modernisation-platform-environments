@@ -89,7 +89,7 @@ resource "aws_ecs_task_definition" "ifs_task_definition" {
   task_role_arn            = aws_iam_role.app_task.arn
   container_definitions = jsonencode([
     {
-      name      = "${local.application_name}-container"
+      name      = "${local.application_name}ifs-container"
       image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].environment_name}"
       cpu       = 2048
       memory    = 2048
