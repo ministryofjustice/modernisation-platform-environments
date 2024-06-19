@@ -227,6 +227,8 @@ resource "aws_lambda_function" "update_log_table" {
     environment {
       variables = {
       S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+      DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+      TABLE_NAME = "glue_df_output"
       }
     }
 }
