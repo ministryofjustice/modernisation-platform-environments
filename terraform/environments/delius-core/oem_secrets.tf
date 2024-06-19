@@ -16,6 +16,7 @@ variable "env_name" {
   description = "Environment name short ie dev"
   type        = string
 }
+
 resource "aws_iam_policy" "OracleEnterpriseManagementSecretsPolicy" {
   name   = "OracleEnterpriseManagementSecretsPolicy"
   policy = data.aws_iam_policy_document.OracleEnterpriseManagementSecretsPolicyDocument.json
