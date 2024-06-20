@@ -177,7 +177,9 @@ locals {
           ]
         }]
       }]
-
+      policy_attachments = [
+        "vmimportPolicy",
+      ]
     }
   }
 

@@ -198,5 +198,50 @@ locals {
       description = "AmazonSSMManagedInstanceCore minus GetParameters"
       statements  = local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced
     }
+
+    vmimportPolicy = {
+      description = "vm import permissions"
+      statements = [
+        {
+          effect = "Allow"
+          actions = [
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:ListBucket",
+              "s3:PutObject",
+              "s3:GetBucketAcl"
+          ],
+          resources = [
+              "arn:aws:s3:::*",
+              "arn:aws:s3:::*/*",
+              "arn:aws:s3:::*/*/*"
+          ]
+        },
+        {
+          effect = "Allow"
+          actions = [
+              "ec2:ModifySnapshotAttribute",
+              "ec2:CopySnapshot",
+              "ec2:RegisterImage",
+              "ec2:Describe*"
+          ],
+          resources = [ "*" ]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "kms:CreateGrant",
+            "kms:Decrypt",
+            "kms:DescribeKey",
+            "kms:Encrypt",
+            "kms:GenerateDataKey*",
+            "kms:ReEncrypt*"
+          ],
+          resources = [ "*" ]
+        }
+      ]
+    }
+    
+
   }
 }
