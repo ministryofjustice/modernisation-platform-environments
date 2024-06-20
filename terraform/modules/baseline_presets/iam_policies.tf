@@ -12,6 +12,7 @@ locals {
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
+    var.options.enable_vmimport ? ["vmimportPolicy"] : [],
     var.options.iam_policies_filter,
     "EC2Default",
     "EC2Db",
@@ -242,6 +243,5 @@ locals {
       ]
     }
     
-
   }
 }
