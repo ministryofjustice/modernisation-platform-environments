@@ -250,8 +250,8 @@ module "output_file_structure_as_json_from_zip" {
   source                = "./modules/lambdas"
   filename              = "${local.lambda_path}/${local.output_fs_json_lambda}.zip"
   function_name         = "${local.output_fs_json_lambda}"
-  role_arn              = aws_iam_role.output_fs_json_lambda_s3_iam_role.arn
-  role_name             = aws_iam_role.output_fs_json_lambda_s3_iam_role.name
+  role_arn              = aws_iam_role.output_fs_json_lambda.arn
+  role_name             = aws_iam_role.output_fs_json_lambda.name
   handler               = "${local.output_fs_json_lambda}.handler"
   source_code_hash      = data.archive_file.output_file_structure_as_json_from_zip.output_base64sha256
   layers                = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
@@ -262,42 +262,4 @@ module "output_file_structure_as_json_from_zip" {
   subnet_ids            = data.aws_subnets.shared-public.ids
   env_account_id        = local.env_account_id
   environment_variables = null
-}
-
-data "aws_iam_policy_document" "output_fs_json_lambda_s3_policy_document" {
-  statement {
-    sid    = "S3Permissions"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket"
-    ]
-    resources = ["${aws_s3_bucket.data_store.arn}/*"]
-  }
-}
-
-resource "aws_iam_policy" "output_fs_json_lambda_s3_policy" {
-  name                = "output-fs-json-lambda-s3-policy"
-  description         = "Policy for Lambda to use S3 for ${local.output_fs_json_lambda}"
-  policy              = data.aws_iam_policy_document.output_fs_json_lambda_s3_policy_document.json
-}
-
-resource "aws_iam_role_policy" "output_fs_json_lambda_s3_policy" {
-  name   = "output_fs_json_lambda_s3_policy"
-  role   = aws_iam_role.output_fs_json_lambda_s3_iam_role.id
-  policy = data.aws_iam_policy_document.output_fs_json_lambda_s3_policy_document.json
-}
-
-resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attachment" {
-  role       = module.output_file_structure_as_json_from_zip.lambda_function_name
-  policy_arn = aws_iam_policy.output_fs_json_lambda_s3_policy.arn
-}
-
-resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zip" {
-  statement_id  = "AllowOutputFileStructureAsJsonFromZipExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = module.output_file_structure_as_json_from_zip.lambda_function_arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.data_store.arn
 }
