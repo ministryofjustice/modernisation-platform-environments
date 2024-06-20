@@ -138,6 +138,8 @@ resource "aws_iam_policy" "ec2_access_for_ansible" {
 #  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 #}
 
+# Policy document for both Oracle database DBA and application secrets
+
 data "aws_iam_policy_document" "db_access_to_secrets_manager" {
   statement {
     sid = "DbAccessToSecretsManager"
@@ -151,39 +153,18 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
     ]
     effect = "Allow"
     resources = [
-      aws_secretsmanager_secret.delius_core_dba_passwords.arn
+      aws_secretsmanager_secret.delius_core_dba_passwords.arn,
+      aws_secretsmanager_secret.delius_core_application_passwords.arn,
     ]
   }
 }
 
-data "aws_iam_policy_document" "allow_access_to_delius_application_passwords" {
-  statement {
-    sid     = "DbAccessToDeliusSecretsManager"
-    actions = ["secretsmanager:GetSecretValue"]
-    effect  = "Allow"
-    resources = [
-      "arn:aws:secretsmanager:*:${local.delius_account_id}:secret:delius-core-${var.env_name}-oracle-db-application-passwords*"
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "combined_policy_documents" {
-  source_policy_documents = flatten([
-    data.aws_iam_policy_document.db_access_to_secrets_manager.json,
-    data.aws_iam_policy_document.allow_access_to_delius_application_passwords.json
-  ])
-}
+# Policy to allow access to both Oracle database DBA and application secrets
 
 resource "aws_iam_policy" "db_access_to_secrets_manager" {
   name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-secrets-manager-access"
-  policy = data.aws_iam_policy_document.combined_policy_documents.json
+  policy = data.aws_iam_policy_document.db_access_to_secrets_manager.json
 }
-
-
-#resource "aws_iam_role_policy_attachment" "db_access_to_secrets_manager" {
-#  role       = aws_iam_role.db_ec2_instance_iam_role.name
-#  policy_arn = aws_iam_policy.db_access_to_secrets_manager.arn
-#}
 
 
 data "aws_iam_policy_document" "instance_ssm" {
