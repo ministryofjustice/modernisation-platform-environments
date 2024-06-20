@@ -175,7 +175,7 @@ locals {
           from_port       = 6400
           to_port         = 6500
           protocol        = "tcp"
-          security_groups = ["web"]
+          security_groups = ["web", "private-jumpserver"]
           cidr_blocks     = ["10.0.0.0/8"] # added for testing, remove later
         }
       }

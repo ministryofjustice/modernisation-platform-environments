@@ -67,6 +67,8 @@ module "oracle_db_primary" {
 
   instance_profile_policies = local.instance_policies
 
+  sns_topic_arn = aws_sns_topic.delius_core_alarms.arn
+
   providers = {
     aws.core-vpc = aws.core-vpc
   }
@@ -114,6 +116,8 @@ module "oracle_db_standby" {
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
   instance_profile_policies = local.instance_policies
+
+  sns_topic_arn = aws_sns_topic.delius_core_alarms.arn
 
   providers = {
     aws.core-vpc = aws.core-vpc
