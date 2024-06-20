@@ -86,7 +86,7 @@ locals {
       # ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
-          desired_capacity = 8
+          desired_capacity = 6
           max_size         = 8
 
           # instance_refresh = {
