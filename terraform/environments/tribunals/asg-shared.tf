@@ -86,7 +86,11 @@ resource "aws_iam_role" "ec2_instance_role" {
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Action": "sts:AssumeRole",
+            Action = [
+              "sts:AssumeRole",
+              "ec2:DescribeImages",
+              "ec2:RunInstances"
+            ],
             "Principal": {
                "Service": "ec2.amazonaws.com"
             },
