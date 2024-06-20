@@ -54,6 +54,9 @@ locals {
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::593291632749:role/airflow-dev-execution-role"
 
+      /* MLFlow */
+      mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-development"
+
       /* Observability Platform */
       observability_platform = "development"
 
@@ -95,6 +98,9 @@ locals {
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::593291632749:role/airflow-dev-execution-role"
 
+      /* MLFlow */
+      mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-test"
+
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
     }
@@ -129,6 +135,9 @@ locals {
 
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::593291632749:role/airflow-prod-execution-role"
+
+      /* MLFlow */
+      mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"
 
       /* Observability Platform */
       observability_platform = "production"
