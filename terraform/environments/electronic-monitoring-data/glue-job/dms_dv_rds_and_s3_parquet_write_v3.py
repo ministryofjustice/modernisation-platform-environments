@@ -327,10 +327,11 @@ def get_altered_df_schema_object(in_df_rds: DataFrame, in_transformed_column_lis
 
 
 def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, input_repartition_factor) -> DataFrame:
-    
-    rds_tbl_name = db_sch_tbl.split(f"_{args['rds_sqlserver_db_schema']}_")[1]
-    default_repartition_factor = input_repartition_factor if total_files <= 1 \
-        else total_files * input_repartition_factor
+    given_rds_sqlserver_db_schema = {args['rds_sqlserver_db_schema']}
+    rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[1]
+
+    default_repartition_factor = input_repartition_factor \
+                                    if total_files <= 1 else total_files * input_repartition_factor
 
     df_dv_output_schema = T.StructType(
         [T.StructField("run_datetime", T.TimestampType(), True),
@@ -342,9 +343,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
     additional_validation_msg = ''
     
-    final_validation_msg = f"""{rds_db_name}.{rds_tbl_name} -- Validation Completed."""
-
-    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
+    final_validation_msg = f"""{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name} -- Validation Completed."""
 
     tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
     LOGGER.info(f"""tbl_prq_s3_folder_path = {tbl_prq_s3_folder_path}""")
@@ -453,7 +452,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                 df_temp = df_temp.selectExpr(
                                     "current_timestamp as run_datetime",
                                     "json_row",
-                                    f"""'{subtract_validation_msg} - Dataframe-Subtract Non-Zero Row Count!' as validation_msg""",
+                                    f""""{subtract_validation_msg} - Dataframe-Subtract Non-Zero Row Count!" as validation_msg""",
                                     f"""'{rds_db_name}' as database_name""",
                                     f"""'{db_sch_tbl}' as full_table_name""",
                                     """'False' as table_in_ap"""
@@ -467,8 +466,13 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         # -------------------------------------------------------
 
         if validated_colmn_msg_list:
+            LOGGER.info(f"""validated_colmn_msg_list = {validated_colmn_msg_list}""")
+
             df_temp = get_pyspark_empty_df(df_dv_output_schema)
+
             total_non_primary_key_columns = len(df_rds_temp.columns) - len(rds_db_tbl_primary_key_list)
+            # -------------------------------------------------------
+
             if total_non_primary_key_columns == len(validated_colmn_msg_list):
                 df_temp = df_temp.selectExpr(
                                     "current_timestamp as run_datetime", 
@@ -478,8 +482,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                     f"""'{db_sch_tbl}' as full_table_name""",
                                     """'False' as table_to_ap"""
                             )
+                LOGGER.warn(f"""{df_temp.show(truncate=False)}""")
                 LOGGER.info(f"Validation Successful - 1")
-                df_dv_output = df_dv_output.union(df_temp)
             else:
                 # depupe list --> list(dict.fromkeys(validated_colmn_msg_list)))
                 df_temp = df_temp.selectExpr(
@@ -490,9 +494,12 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                     f"""'{db_sch_tbl}' as full_table_name""",
                                     """'False' as table_in_ap"""
                             )
+                LOGGER.warn(f"""{df_temp.show(truncate=False)}""")
                 LOGGER.warn(f"Not all table columns validated - 1b")
-                df_dv_output = df_dv_output.union(df_temp)
             # -------------------------------------------------------
+
+            df_dv_output = df_dv_output.union(df_temp)
+        # -------------------------------------------------------
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
         df_dv_output = df_dv_output.selectExpr(
