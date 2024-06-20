@@ -356,6 +356,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         rds_df_created_msg_1 = f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}']"""
         rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds.rdd.getNumPartitions()}"""
         LOGGER.info(f"""{rds_df_created_msg_1}\n{rds_df_created_msg_2}""")
+        df_rds_columns_list = df_rds.columns
         
         df_prq = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds.schema).repartition(default_repartition_factor)
         prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}']"""
@@ -407,7 +408,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         validated_colmn_msg_list = list()
 
         for_loop_count = 0
-        for rds_column in df_rds.columns:
+        for rds_column in df_rds_columns_list:
             for_loop_count += 1
             if rds_column in rds_db_tbl_primary_key_list:
                 continue
@@ -469,7 +470,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         if validated_colmn_msg_list:
             #LOGGER.info(f"""validated_colmn_msg_list = {validated_colmn_msg_list}""")
 
-            total_non_primary_key_columns = len(df_rds_temp.columns) - len(rds_db_tbl_primary_key_list)
+            total_non_primary_key_columns = len(df_rds_columns_list) - len(rds_db_tbl_primary_key_list)
             # -------------------------------------------------------
 
             if total_non_primary_key_columns == len(validated_colmn_msg_list):
