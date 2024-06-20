@@ -49,3 +49,9 @@ data "aws_iam_policy_document" "delius_core_application_passwords" {
     resources = [aws_secretsmanager_secret.delius_core_application_passwords.arn]
   }
 }
+
+resource "aws_secretsmanager_secret_policy" "delius_core_application_passwords" {
+  count = local.has_mis_environment && var.account_info.application_name == "delius-core" ? 1 : 0
+  secret_arn = aws_secretsmanager_secret.delius_core_application_passwords.arn
+  policy     = data.aws_iam_policy_document.delius_core_application_passwords[count.index].json
+}
