@@ -658,12 +658,50 @@ resource "aws_iam_policy" "athena_api_cross_policy" {
 # Policy Document
 data "aws_iam_policy_document" "glue_catalog_readonly" {
   statement {
+    effect = "Allow"
     actions = [
       "glue:Get*",
-      "glue:List*"
+      "glue:List*",
+      "glue:DeleteTable",
+      "glue:DeleteSchema",
+      "glue:DeletePartition",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:UpdateSchema",
+      "glue:UpdatePartition",
+      "glue:UpdateDatabase",
+      "glue:CreateTable",
+      "glue:CreateSchema",
+      "glue:CreatePartition",
+      "glue:CreatePartitionIndex",
+      "glue:BatchCreatePartition",
+      "glue:CreateDatabase"
     ]
     resources = [
-      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:schema/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/*/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/*"
+    ]
+  }
+  statement {
+    effect = "Deny"
+    actions = [
+      "glue:DeleteDatabase",
+      "glue:UpdateDatabase",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:UpdateTable"
+    ]
+    resources = [
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw_archive",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/raw_archive/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/curated",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/curated/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/raw/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/structured",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/structured/*"              
     ]
   }
 }
