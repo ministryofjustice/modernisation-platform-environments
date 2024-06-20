@@ -3,17 +3,26 @@ import json
 import datetime
 import gzip
 import base64
-from io import BytesIO
+import io
 from logging import getLogger
 from aws_lambda_powertools.utilities.streaming.transformations import ZipTransform
 from aws_lambda_powertools.utilities.streaming.s3_object import S3Object
 
 # def gzip_b64encode(data):
-#     compressed = BytesIO()
+#     compressed = io.BytesIO()
 #     with gzip.GzipFile(fileobj=compressed, mode='w') as f:
 #         json_response = json.dumps(data)
 #         f.write(json_response.encode('utf-8'))
 #     return base64.b64encode(compressed.getvalue()).decode('ascii')
+
+def upload_json_gz(s3client, bucket, key, obj, default=None, encoding='utf-8'):
+    ''' upload python dict into s3 bucket with gzip archive '''
+    inmem = io.BytesIO()
+    with gzip.GzipFile(fileobj=inmem, mode='wb') as fh:
+        with io.TextIOWrapper(fh, encoding=encoding) as wrapper:
+            wrapper.write(json.dumps(obj, ensure_ascii=False, default=default))
+    inmem.seek(0)
+    s3client.put_object(Bucket=bucket, Body=inmem, Key=key)
 
 logger = getLogger(__name__)
 
@@ -86,12 +95,12 @@ def handler(event, context):
     #Compressed json for comparison
 
     logger.info(f"\n\nPerforming JSON compression")
-    
-    s3_object = S3Object(bucket=bucket, key=compressed_object_key)
 
-    s3_client.put_object(
-        Bucket=bucket, Key=compressed_object_key, Body=gzip.compress(json_str)
-    )
+    upload_json_gz(s3_client, bucket, compressed_object_key, json_structure)
+
+    #s3_client.put_object(
+    #    Bucket=bucket, Key=compressed_object_key, Body=gzip.compress(json_str)
+    #)
 
     logger.info(f"Compressed JSON saved to {compressed_object_key}")
 
