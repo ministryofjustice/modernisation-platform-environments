@@ -21,45 +21,15 @@ data "http" "ansible_standbydb2_groupvars_file" {
   url = format("https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/main/ansible/group_vars/environment_name_%s_%s_delius_standbydb2.yml",replace(terraform.workspace,"-","_"),var.env_name)
 }
 
-data "external" "ansible_all_vars" {
-  program = ["bash","${path.module}/get_dms_replication_config.sh"]
-  query = {
-    file_content = data.http.ansible_all_groupvars_file.response_body
-  }
-}
-
-data "external" "ansible_primarydb_vars" {
-  program = ["bash","${path.module}/get_dms_replication_config.sh"]
-  query = {
-    file_content = data.http.ansible_primarydb_groupvars_file.response_body
-  }
-}
-
-data "external" "ansible_standbydb1_vars" {
-  program = ["bash","${path.module}/get_dms_replication_config.sh"]
-  query = {
-    file_content = data.http.ansible_standbydb1_groupvars_file.response_body
-  }
-}
-
-data "external" "ansible_standbydb2_vars" {
-  program = ["bash","${path.module}/get_dms_replication_config.sh"]
-  query = {
-    file_content = data.http.ansible_standbydb2_groupvars_file.response_body
-  }
-}
-
-
 locals {
-  audited_interaction_repository = lookup(data.external.ansible_all_vars.result,"audited_interaction_repository","none") 
-  primarydb_database_name = lookup(data.external.ansible_primarydb_vars.result,"database_name")
-  standbydb1_database_name = lookup(data.external.ansible_standbydb1_vars.result,"database_name","none")
-  standbydb1_active_data_guard = lookup(data.external.ansible_standbydb1_vars.result,"active_data_guard","none")
-  standbydb2_database_name = lookup(data.external.ansible_standbydb2_vars.result,"database_name","none")
-  standbydb2_active_data_guard = lookup(data.external.ansible_standbydb2_vars.result,"active_data_guard","none")
+  audited_interaction_repository = try("${yamldecode(data.http.ansible_all_groupvars_file.response_body)["audited_interaction_repository"]}","none")
+  primarydb_database_name = "${yamldecode(data.http.ansible_primarydb_groupvars_file.response_body)["database_primary_sid"]}"
+  standbydb1_database_name = try("${yamldecode(data.http.ansible_standbydb1_groupvars_file.response_body)["database_standby_sid"]}","none")
+  standbydb1_active_data_guard = try("${yamldecode(data.http.ansible_standbydb1_groupvars_file.response_body)["active_data_guard"]}","none")
+  standbydb2_database_name = try("${yamldecode(data.http.ansible_standbydb2_groupvars_file.response_body)["database_standby_sid"]}","none")
+  standbydb2_active_data_guard = try("${yamldecode(data.http.ansible_standbydb2_groupvars_file.response_body)["active_data_guard"]}","none")
   read_target = local.standbydb2_active_data_guard == "true" ? "standbydb2" : (local.standbydb1_active_data_guard == "true" ? "standbydb1" : "primarydb")
 }
-
 
 # resource "aws_dms_endpoint" "source_endpoint" {
 #    database_name                   = local.standbydb2_database_name

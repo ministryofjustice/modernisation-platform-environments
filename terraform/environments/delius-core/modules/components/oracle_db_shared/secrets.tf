@@ -49,3 +49,7 @@ data "aws_iam_policy_document" "delius_core_application_passwords" {
     resources = [aws_secretsmanager_secret.delius_core_application_passwords.arn]
   }
 }
+
+resource "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
+    secret_id = aws_secretsmanager_secret.delius_core_application_passwords.id
+ }

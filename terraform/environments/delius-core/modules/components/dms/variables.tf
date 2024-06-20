@@ -46,7 +46,7 @@ variable "db_suffix" {
   default     = "db"
 }
 
-variable "delius_core_application_passwords_secret_arn" {
+variable "delius_core_application_passwords_arn" {
   type = any
 }
 

@@ -6,8 +6,8 @@ module "dms" {
   env_name                    = var.env_name
   platform_vars               = var.platform_vars
 
-  delius_core_application_passwords_secret_arn = aws_secretsmanager_secret.delius_core_application_passwords_secret.arn
-  oracle_db_server_names                       = local.oracle_db_server_names
+  delius_core_application_passwords_arn = module.oracle_db_shared.delius_core_application_passwords_arn
+  oracle_db_server_names                = local.oracle_db_server_names
 
   dms_config = lookup(local.dms_config, terraform.workspace, {
     replication_instance_class = "dms.t3.small"

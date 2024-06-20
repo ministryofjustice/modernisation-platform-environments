@@ -24,19 +24,19 @@ resource "aws_secretsmanager_secret_policy" "dms_audit_endpoint_source" {
   policy     = data.aws_iam_policy_document.dms_audit_endpoint_source.json
 }
 
-data "aws_secretsmanager_secret" "delius_core_application_passwords_secret" {
-  arn = var.delius_core_application_passwords_secret_arn
+data "aws_secretsmanager_secret" "delius_core_application_passwords" {
+  arn = var.delius_core_application_passwords_arn
 }
 
-data "aws_secretsmanager_secret_version" "delius_core_application_passwords_secret" {
-  secret_id = data.aws_secretsmanager_secret.delius_core_application_passwords_secret.id
+data "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
+  secret_id = data.aws_secretsmanager_secret.delius_core_application_passwords.id
 }
 
 resource "aws_secretsmanager_secret_version" "dms_audit_endpoint_source" {
   secret_id = aws_secretsmanager_secret.dms_audit_endpoint_source.id
   secret_string = jsonencode({
     username = "delius_audit_dms_pool"
-    password = jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords_secret.secret_string)["delius_audit_dms_pool"]
+    password = jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"]
     port = "1521"
     host = var.oracle_db_server_names[local.read_target]
   })
