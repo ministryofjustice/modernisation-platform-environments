@@ -334,8 +334,9 @@ data "aws_iam_policy_document" "DMSSecretsManagerAccessRolePolicyDocument" {
     ]
     resources = [
       "arn:aws:secretsmanager:*:*:secret:dms_audit_endpoint_source-*",
-      "arn:aws:secretsmanager:*:*:secret:dms_asm_endpoint_source-*",
-      "arn:aws:secretsmanager:*:*:secret:dms_audit_endpoint_target-*"
+      "arn:aws:secretsmanager:*:*:secret:dms_audit_endpoint_target-*",
+      "arn:aws:secretsmanager:*:${local.delius_account_id}:secret:delius-core-${var.env_name}-oracle-db-application-passwords*"
+
     ]
   }
 }

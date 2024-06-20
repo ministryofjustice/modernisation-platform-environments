@@ -39,3 +39,47 @@ variable "dms_config" {
     engine_version             = string
   })
 }
+
+variable "db_suffix" {
+  description = "identifier to append to name e.g. dsd, boe"
+  type        = string
+  default     = "db"
+}
+
+variable "environment_config" {
+  type = any
+}
+
+variable "app_name" {
+  type = string
+}
+
+variable "platform_vars" {
+  type = object({
+    environment_management = any
+  })
+}
+
+variable "bastion_config" {
+  type = any
+}
+
+variable "delius_microservice_configs" {
+  type = any
+}
+
+variable "db_config" {
+  type = any
+}
+
+variable "delius_core_application_passwords_secret_arn" {
+  type = any
+}
+
+variable "oracle_db_server_names" {
+  type = object({
+    primarydb  = string
+    standbydb1 = string
+    standbydb2 = string
+  })
+}

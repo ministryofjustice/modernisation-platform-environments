@@ -121,8 +121,6 @@ module "oracle_db_standby" {
 }
 
 resource "aws_secretsmanager_secret" "delius_core_application_passwords_secret" {
-  count = local.has_mis_environment ? 1 : 0
-
   name        = local.application_secret_name
   description = "Application Users Credentials"
   kms_key_id  = var.account_config.kms_keys.general_shared
@@ -140,15 +138,15 @@ data "aws_iam_policy_document" "delius_core_application_passwords_policy_doc" {
       identifiers = ["arn:aws:iam::${local.mis_account_id}:role/instance-role-delius-mis-${var.env_name}-mis-db-1"]
     }
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = [aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn]
+    resources = [aws_secretsmanager_secret.delius_core_application_passwords_secret.arn]
   }
 }
 
 resource "aws_secretsmanager_secret_policy" "delius_core_application_passwords_pol" {
   count = local.has_mis_environment ? 1 : 0
 
-  secret_arn = aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn
-  policy     = data.aws_iam_policy_document.delius_core_application_passwords_policy_doc[count.index].json
+  secret_arn = aws_secretsmanager_secret.delius_core_application_passwords_secret.arn
+  policy     = data.aws_iam_policy_document.delius_core_application_passwords_policy_doc[0].json
 }
 
 data "aws_iam_policy_document" "db_access_to_secrets_manager" {
@@ -165,7 +163,11 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
     ]
     effect = "Allow"
     resources = [
-      aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn
+      aws_secretsmanager_secret.delius_core_application_passwords_secret.arn
     ]
   }
+}
+
+resource "aws_secretsmanager_secret_version" "delius_core_application_passwords_secret" {
+   secret_id = aws_secretsmanager_secret.delius_core_application_passwords_secret.id
 }
