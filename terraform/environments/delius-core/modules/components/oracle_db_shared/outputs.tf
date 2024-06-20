@@ -25,3 +25,7 @@ output "instance_policies" {
     "instance_ssm"                        = aws_iam_policy.instance_ssm
   }
 }
+
+output "delius_core_application_passwords_arn" {
+   value = aws_secretsmanager_secret.delius_core_application_passwords.arn
+}
