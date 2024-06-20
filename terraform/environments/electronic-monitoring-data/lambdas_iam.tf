@@ -417,6 +417,7 @@ resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
 resource "aws_iam_role" "output_fs_json_lambda" {
   name = "output_fs_json_lambda"
   assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
 
 data "aws_iam_policy_document" "output_fs_json_lambda_s3_policy_document" {
