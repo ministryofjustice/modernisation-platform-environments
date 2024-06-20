@@ -349,6 +349,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
     tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
     LOGGER.info(f"""tbl_prq_s3_folder_path = {tbl_prq_s3_folder_path}""")
     # -------------------------------------------------------
+
     if tbl_prq_s3_folder_path is not None:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
 
@@ -358,23 +359,26 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         LOGGER.info(f"""{rds_df_created_msg_1}\n{rds_df_created_msg_2}""")
         
         df_prq = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds.schema).repartition(default_repartition_factor)
-        prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] - {total_size_mb}MB"""
-        prq_df_created_msg_2 = f""" >> parquet_read_df_partitions = {df_prq.rdd.getNumPartitions()}"""
+        prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}']"""
+        prq_df_created_msg_2 = f""" >> {total_size_mb}MB ; parquet_read_df_partitions = {df_prq.rdd.getNumPartitions()}"""
         LOGGER.info(f"""{prq_df_created_msg_1}\n{prq_df_created_msg_2}""")
 
         df_rds_count = df_rds.count()
         df_prq_count = df_prq.count()
         # -------------------------------------------------------
+
         if not (df_rds_count == df_prq_count):
-            validation_msg = f"""'{rds_tbl_name} - Table row-count {df_rds_count}:{df_prq_count} MISMATCHED !' as validation_msg"""
-            LOGGER.warn(f"df_rds_row_count={df_rds_count} ; df_prq_row_count={df_prq_count} ; MISMATCHED Row Count!")
-            df_dv_output = df_dv_output.selectExpr("current_timestamp as run_datetime", 
-                                                   "'' as json_row",
-                                                   validation_msg,
-                                                   f"""'{rds_db_name}' as database_name""",
-                                                   f"""'{db_sch_tbl}' as full_table_name""",
-                                                   """'False' as table_in_ap"""
-                                                  )
+            mismatch_validation_msg_1 = "MISMATCHED Dataframe(s) Row Count!"
+            mismatch_validation_msg_2 = f"""'{rds_tbl_name} - {df_rds_count}:{df_prq_count} {mismatch_validation_msg_1}' as validation_msg"""
+            LOGGER.warn(f"df_rds_row_count={df_rds_count} ; df_prq_row_count={df_prq_count} ; {mismatch_validation_msg_1}")
+            df_dv_output = df_dv_output.selectExpr(
+                                            "current_timestamp as run_datetime", 
+                                            "'' as json_row",
+                                            mismatch_validation_msg_2,
+                                            f"""'{rds_db_name}' as database_name""",
+                                            f"""'{db_sch_tbl}' as full_table_name""",
+                                            """'False' as table_in_ap"""
+                                )
             LOGGER.warn(f"Validation Failed - 3")
             LOGGER.info(final_validation_msg)
             return df_dv_output
@@ -398,6 +402,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         if rds_df_trim_str_col_list:
             LOGGER.warn(f"""rds_df_trim_str_col_list = {rds_df_trim_str_col_list}""")
             additional_validation_msg =f"""{rds_df_trim_str_col_list} - extra spaces trimmed."""
+        # -------------------------------------------------------
         
         validated_colmn_msg_list = list()
 
@@ -415,8 +420,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             LOGGER.info(f"""Using 'select' column list: {temp_select_list}""")
 
             df_rds_temp = df_rds.select(*temp_select_list)
-
             # -------------------------------------------------------
+
             rds_column_trimmed = 0
             if rds_column in rds_df_trim_str_col_list:
                 rds_column_trimmed = 1
@@ -428,15 +433,12 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             # -------------------------------------------------------
 
             df_prq_temp = df_prq.select(*temp_select_list)            
-
             df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
-
-            # -------------------------------------------------------
 
             df_rds_prq_subtract_transform = df_rds_temp_t2.subtract(df_prq_temp_t1).cache()
             df_rds_prq_subtract_row_count = df_rds_prq_subtract_transform.count()
-
             # -------------------------------------------------------
+
             if df_rds_prq_subtract_row_count == 0:
                 validated_colmn_msg = f"""'{rds_column}'-spaces trimmed""" if rds_column_trimmed == 1 else rds_column
                 validated_colmn_msg_list.append(validated_colmn_msg)
@@ -447,14 +449,15 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                            .selectExpr("json_row")
                            .limit(5))
 
-                validation_msg = f""" "'{rds_tbl_name}.{rds_column}' - dataframe-subtract-op ->> {df_rds_prq_subtract_row_count} row-count !" as validation_msg"""
-                df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
-                                             "json_row",
-                                             validation_msg,
-                                             f"""'{rds_db_name}' as database_name""",
-                                             f"""'{db_sch_tbl}' as full_table_name""",
-                                             """'False' as table_in_ap"""
-                                             )
+                subtract_validation_msg = f"""'{rds_tbl_name}.{rds_column}' - {df_rds_prq_subtract_row_count}"""
+                df_temp = df_temp.selectExpr(
+                                    "current_timestamp as run_datetime",
+                                    "json_row",
+                                    f"""'{subtract_validation_msg} - Dataframe-Subtract Non-Zero Row Count!' as validation_msg""",
+                                    f"""'{rds_db_name}' as database_name""",
+                                    f"""'{db_sch_tbl}' as full_table_name""",
+                                    """'False' as table_in_ap"""
+                            )
                 LOGGER.warn(f"Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_temp)
             # -------------------------------------------------------
@@ -462,42 +465,45 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             df_rds_prq_subtract_transform.unpersist(True)
 
         # -------------------------------------------------------
+
         if validated_colmn_msg_list:
             df_temp = get_pyspark_empty_df(df_dv_output_schema)
             total_non_primary_key_columns = len(df_rds_temp.columns) - len(rds_db_tbl_primary_key_list)
             if total_non_primary_key_columns == len(validated_colmn_msg_list):
-                df_temp = df_temp.selectExpr("current_timestamp as run_datetime", 
-                                             "'' as json_row",
-                                            f"""'{rds_tbl_name} - Validated.\n{additional_validation_msg}' as validation_msg""",
-                                            f"""'{rds_db_name}' as database_name""",
-                                            f"""'{db_sch_tbl}' as full_table_name""",
-                                            """'False' as table_to_ap"""
-                                            )
+                df_temp = df_temp.selectExpr(
+                                    "current_timestamp as run_datetime", 
+                                    "'' as json_row",
+                                    f"""'{rds_tbl_name} - Validated.\n{additional_validation_msg}' as validation_msg""",
+                                    f"""'{rds_db_name}' as database_name""",
+                                    f"""'{db_sch_tbl}' as full_table_name""",
+                                    """'False' as table_to_ap"""
+                            )
                 LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
             else:
                 # depupe list --> list(dict.fromkeys(validated_colmn_msg_list)))
-                df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
-                                             "'' as json_row",
-                                            f""" "{' ; '.join(validated_colmn_msg_list)} - Validated" as validation_msg""",
-                                            f"""'{rds_db_name}' as database_name""",
-                                            f"""'{db_sch_tbl}' as full_table_name""",
-                                            """'False' as table_in_ap"""
-                                            )
-                LOGGER.info(f"Not all table columns validated - 1b")
+                df_temp = df_temp.selectExpr(
+                                    "current_timestamp as run_datetime",
+                                    "'' as json_row",
+                                    f""" "{' ; '.join(validated_colmn_msg_list)} - Specified Columns Validated." as validation_msg""",
+                                    f"""'{rds_db_name}' as database_name""",
+                                    f"""'{db_sch_tbl}' as full_table_name""",
+                                    """'False' as table_in_ap"""
+                            )
+                LOGGER.warn(f"Not all table columns validated - 1b")
                 df_dv_output = df_dv_output.union(df_temp)
-
+            # -------------------------------------------------------
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
-        df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                          "'' as json_row",
-                                          f"""'{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
-                                          f"""'{rds_db_name}' as database_name""",
-                                          f"""'{db_sch_tbl}' as full_table_name""",
-                                          """'False' as table_in_ap"""
-                                          )
+        df_dv_output = df_dv_output.selectExpr(
+                                        "current_timestamp as run_datetime",
+                                        "'' as json_row",
+                                        f"""'{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
+                                        f"""'{rds_db_name}' as database_name""",
+                                        f"""'{db_sch_tbl}' as full_table_name""",
+                                        """'False' as table_in_ap"""
+                        )
         LOGGER.warn(f"Validation not applicable - 4")
-        df_dv_output = df_dv_output.union(df_temp)
     # -------------------------------------------------------
 
     LOGGER.info(final_validation_msg)
