@@ -477,7 +477,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                 df_temp_row = spark.sql(f"""select 
                                             current_timestamp() as run_datetime, 
                                             '' as json_row,
-                                            '{rds_tbl_name} - Validated.\n{additional_validation_msg}' as validation_msg,
+                                            "{rds_tbl_name} - Validated.\n{additional_validation_msg}" as validation_msg,
                                             '{rds_db_name}' as database_name,
                                             '{db_sch_tbl}' as full_table_name,
                                             'False' as table_in_ap
@@ -520,8 +520,9 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
 def write_parquet_to_s3(df_dv_output: DataFrame, database, db_sch_tbl_name):
 
-    df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
-    LOGGER.info(f"""database={database} ; db_sch_tbl_name={db_sch_tbl_name}""")
+    df_dv_output = df_dv_output.repartition(1)
+    #LOGGER.info(f"""database={database} ; db_sch_tbl_name={db_sch_tbl_name}""")
+
     if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                       f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={db_sch_tbl_name}'''
                                       ):

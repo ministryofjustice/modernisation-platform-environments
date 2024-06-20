@@ -393,10 +393,10 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                            .selectExpr("json_row")
                            .limit(100))
 
-                validation_msg = f""" "'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_prq_subtract_row_count} row-count !" as validation_msg"""
+                subtract_validation_msg = f"""'{rds_tbl_name}' - {df_rds_prq_subtract_row_count}"""
                 df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
                                              "json_row",
-                                             validation_msg,
+                                             f""""{subtract_validation_msg} - Dataframe-Subtract Non-Zero Row Count!" as validation_msg""",
                                              f"""'{rds_db_name}' as database_name""",
                                              f"""'{db_sch_tbl}' as full_table_name""",
                                              """'False' as table_to_ap"""
@@ -406,10 +406,12 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
             # -------------------------------------------------------
 
         else:
-            validation_msg = f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_prq_temp_count} MISMATCHED !' as validation_msg"""
+            mismatch_validation_msg_1 = "MISMATCHED Dataframe(s) Row Count!"
+            mismatch_validation_msg_2 = f"""'{rds_tbl_name} - {df_rds_temp_count}:{df_prq_temp_count} {mismatch_validation_msg_1}' as validation_msg"""
+            LOGGER.warn(f"df_rds_row_count={df_rds_temp_count} ; df_prq_row_count={df_prq_temp_count} ; {mismatch_validation_msg_1}")
             df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
                                               "'' as json_row",
-                                              validation_msg,
+                                              mismatch_validation_msg_2,
                                               f"""'{rds_db_name}' as database_name""",
                                               f"""'{db_sch_tbl}' as full_table_name""",
                                               """'False' as table_to_ap"""
