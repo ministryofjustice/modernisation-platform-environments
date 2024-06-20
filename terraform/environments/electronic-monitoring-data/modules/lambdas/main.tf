@@ -8,7 +8,9 @@ resource "aws_sqs_queue" "lambda_dlq" {
 }
 
 data "external" "latest_image_update_log_table" {
-  program = ["bash", "${path.root}/scripts/echo-hello.sh"] # var.ecr_repo_name, var.function_name
+  program = [
+    "bash", "-c",
+    "echo 'hello world'"]
 }
 
 resource "aws_kms_key" "lambda_env_key" {
