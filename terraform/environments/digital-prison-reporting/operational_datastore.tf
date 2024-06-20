@@ -16,7 +16,7 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
   }
 }
 
-resource aws_security_group "glue_vpc_access_connection_sg" {
+resource aws_security_group "glue_operational_datastore_connection_sg" {
   count       = (local.environment == "development" ? 1 : 0)
   name        = "${local.project}-operational-datastore-connection_sg"
   description = "Security group to allow glue access to Operational Datastore via JDBC Connection"
