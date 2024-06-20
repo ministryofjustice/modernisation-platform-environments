@@ -384,15 +384,16 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         # -------------------------------------------------------
 
         if args.get('rds_db_tbl_primary_key_list', None) is None:
-            rds_db_tbl_primary_key_list = [column.strip() for column in RECORDED_PKEYS_LIST[rds_tbl_name]]
+            try:
+                rds_db_tbl_primary_key_list = [column.strip() 
+                                               for column in RECORDED_PKEYS_LIST[rds_tbl_name]]
+            except Exception as e:
+                LOGGER.error(f"""rds_db_tbl_primary_key_list - value(s) not given!""")
+                LOGGER.error(f"""Global Dictionary - 'RECORDED_PKEYS_LIST' has no key '{rds_tbl_name}'!""")
+                sys.exit(1)
         else:
             rds_db_tbl_primary_key_list = [f"""{column.strip().strip("'").strip('"')}""" 
                                            for column in args['rds_db_tbl_primary_key_list'].split(",")]
-        # -------------------------------------------------------
-
-        if not rds_db_tbl_primary_key_list:
-            LOGGER.error(f"""rds_db_tbl_primary_key_list - value(s) not given! Exiting ...""")
-            sys.exit(1)
         # -------------------------------------------------------
 
         rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
@@ -416,7 +417,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             temp_select_list.append(rds_column)
             
             LOGGER.info(f"""{for_loop_count}-Processing - {rds_tbl_name}.{rds_column}.""")
-            LOGGER.info(f"""Using 'select' column list: {temp_select_list}""")
+            LOGGER.info(f"""Using Dataframe-'select' column list: {temp_select_list}""")
 
             df_rds_temp = df_rds.select(*temp_select_list)
             # -------------------------------------------------------
