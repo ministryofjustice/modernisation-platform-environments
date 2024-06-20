@@ -56,6 +56,15 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
   retention_in_days = "7"
 }
 
+resource "aws_cloudwatch_log_group" "application_logs" {
+  name = "cdpt-ifs-std-logs"
+  retention_in_days = 1
+
+  lifecycle {
+    ignore_changes = [name]
+  }
+}
+
 resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.ec2_instance_policy.arn
@@ -427,7 +436,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
-    version = aws_launch_template.ec2-launch-template.latest_version
+    version = "$Latest"
   }
 
   tag {
