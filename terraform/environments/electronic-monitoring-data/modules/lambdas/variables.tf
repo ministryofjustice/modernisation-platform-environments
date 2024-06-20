@@ -1,3 +1,9 @@
+variable "is_image" {
+  description = "Whether the object is an image or not"
+  type        = bool
+  default = false
+}
+
 variable "filename" {
   description = "The path to the function's deployment package within the local filesystem."
   type        = string

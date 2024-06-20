@@ -120,18 +120,32 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
+data "external" "latest_image_update_log_table" {
+  count = var.is_image ? 1 : 0
+
+  program = ["bash", "${path.module}/bash_scripts/get_latest_image.sh", module.ecr_lambdas_repo.repository_name, var.function_name]
+  query = {
+    latest_image_uri = ""
+  }
+}
+
 
 resource "aws_lambda_function" "this" {
-  #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
-  filename         = var.filename
+  # Zip File config
+  filename         = var.is_image ? null : var.filename
+  handler          = var.is_image ? null : var.handler
+  layers           = var.is_image ? null : var.layers
+  source_code_hash = var.is_image ? null : var.source_code_hash
+  runtime          = var.is_image ? null : var.runtime
+  # Image config
+  image_uri        = var.is_image ? data.external.latest_image_update_log_table.result["latest_image_uri"] : null
+  package_type     = var.is_image ? "Image" : null
+  architectures    = var.is_image ? ["arm64"] : null
+  # Constants
   function_name    = var.function_name
   role             = var.role_arn
-  handler          = var.handler
-  layers           = var.layers
-  source_code_hash = var.source_code_hash
   timeout          = var.timeout
   memory_size      = var.memory_size
-  runtime          = var.runtime
 
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []
