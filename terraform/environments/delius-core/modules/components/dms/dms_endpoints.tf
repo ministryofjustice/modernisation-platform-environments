@@ -67,7 +67,8 @@ locals {
 #    endpoint_type                   = "source"
 #    engine_name                     = "oracle"
 #    secrets_manager_access_role_arn = "arn:aws:iam::${local.delius_account_id}:role/DMSSecretsManagerAccessRole"
-#    secrets_manager_arn             = 
+#    secrets_manager_arn             = aws_secretsmanager_secret.dms_audit_endpoint_source.arn
+
 
 # resource "aws_dms_endpoint" "source_endpoint" {
 #   database_name               = local.standbydb2_database_name
