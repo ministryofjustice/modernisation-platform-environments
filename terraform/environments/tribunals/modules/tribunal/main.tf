@@ -1,4 +1,5 @@
 locals {
+  target_group_attachment_port = var.target_group_attachment_port
   app                    = var.app_name
   app_url                = var.app_url
   sql_migration_path     = var.sql_migration_path
@@ -17,14 +18,15 @@ locals {
     cluster_name = "${local.app}_app_cluster"
   }))
   app_container_definition = templatefile("container_definition.json", {
-    app_name                   = "${local.app}"
-    awslogs-group              = "${local.app}-ecs-log-group"
-    supportEmail               = "${var.application_data.support_email}"
-    supportTeam                = "${var.application_data.support_team}"
-    CurServer                  = "${var.application_data.curserver}"
-    container_definition_image = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
-    rds_password               = "${local.app_rds_password}"
-    documents_location         = "${local.documents_location}"
+    app_name                     = "${local.app}"
+    awslogs-group                = "${local.app}-ecs-log-group"
+    supportEmail                 = "${var.application_data.support_email}"
+    supportTeam                  = "${var.application_data.support_team}"
+    CurServer                    = "${var.application_data.curserver}"
+    container_definition_image   = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
+    rds_password                 = "${local.app_rds_password}"
+    documents_location           = "${local.documents_location}"
+    target_group_attachment_port = "${local.target_group_attachment_port}"
   })
   app_ec2_ingress_rules = {
     "cluster_ec2_lb_ingress_2" = {

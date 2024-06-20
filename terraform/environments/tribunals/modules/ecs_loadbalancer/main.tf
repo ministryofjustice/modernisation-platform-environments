@@ -113,8 +113,8 @@ data "aws_instances" "tribunals_instance" {
 
 resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
   target_group_arn = aws_lb_target_group.tribunals_target_group.arn
-  target_id        = element(data.aws_instances.tribunals_instance.ids, 0)  # Attach the first instance ID
-  port             = 80
+  target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
+  port             = var.target_group_attachment_port
 }
 
 resource "aws_lb_target_group" "tribunals_target_group_sftp" {

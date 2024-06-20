@@ -11,7 +11,7 @@
     "essential": true,
     "portMappings": [
       {
-        "hostPort": 0,
+        "hostPort": "${target_group_attachment_port}",
         "containerPort": 80,
         "protocol": "tcp"
       }
