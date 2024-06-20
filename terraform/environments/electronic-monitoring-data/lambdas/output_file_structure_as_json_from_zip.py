@@ -9,6 +9,17 @@ from aws_lambda_powertools.utilities.streaming.s3_object import S3Object
 logger = getLogger(__name__)
 
 
+import boto3
+import json
+import datetime
+import gzip
+from logging import getLogger
+from aws_lambda_powertools.utilities.streaming.transformations import ZipTransform
+from aws_lambda_powertools.utilities.streaming.s3_object import S3Object
+
+logger = getLogger(__name__)
+
+
 def handler(event, context):
     """
     Read contents of a zip file to create a json file convertable into tabular format consumable by Athena. 
@@ -60,10 +71,12 @@ def handler(event, context):
     logger.info(f"\n\nNumber of files processed in zip file:\n{file_count}")
 
     # Saving JSON content to a new file with .json extension
+    new_file_base_name = object_key.split(".zip")[0]
+    uncompressed_object_key = new_file_base_name + "_uncompressed_file_structure.json"
+    compressed_object_key = new_file_base_name + "_compressed_file_structure.json"
 
+    #Uncompressed variant for testing
     logger.info(f"Attempting conversion of large dictionary into an uncompressed json file")
-
-    uncompressed_object_key = object_key + "_uncompressed.file_structure.json"
 
     json_str = json.dumps(json_structure)
     json_bytes = json_str.encode('utf-8')
@@ -71,13 +84,11 @@ def handler(event, context):
     s3_client.put_object(
         Bucket=bucket, Key=uncompressed_object_key, Body=json_bytes
     )
-    logger.info(f"Uncompressed JSON saved to {compressed_object_key}")
+    logger.info(f"Uncompressed JSON saved to {uncompressed_object_key}")
 
-    # Compressing json for comparison
+    #Compressed json for comparison
 
     logger.info(f"\n\nPerforming JSON compression")
-
-    compressed_object_key = object_key + "_compressed.file_structure.json"
 
     with gzip.open(object_key + "_compressed.file_structure.json.gz") as gzip_object:
         gzip_object.write(json_bytes)
