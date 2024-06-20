@@ -5,7 +5,7 @@
       "container_port": 80,
       "client_id": "7ee6af8d-ea3c-4349-8765-644f2a1edf3b",
       "ami_image_id": "ami-0a7921d5c255156f2",
-      "instance_type": "t3.xlarge",
+      "instance_type": "t3.medium",
       "app_count": 1,
       "ec2_desired_capacity": 1,
       "ec2_max_size": 3,
@@ -17,7 +17,7 @@
       "env_name": "DEVELOPMENT",
       "db_instance_identifier": "db-ifs-dev",
       "s3_bucket_name": "ifs-dev-bucket",
-      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:425030398367:snapshot:dev-staging-db-11-june-24-updated"
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:224131490563:snapshot:june-20-rds-ifs-manual"
     },
     "preproduction": {
       "environment_name": "staging",
