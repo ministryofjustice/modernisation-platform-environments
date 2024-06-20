@@ -56,7 +56,8 @@ resource "aws_secretsmanager_secret_version" "dps" {
 # Operational DataStore Secrets for use in DataHub
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "operational_datastore" {
-  name = "external/operational_data_store"
+  count = (local.environment == "development" ? 1 : 0)
+  name  = "external/operational_data_store"
 
   tags = merge(
     local.all_tags,
@@ -68,11 +69,12 @@ resource "aws_secretsmanager_secret" "operational_datastore" {
 }
 
 resource "aws_secretsmanager_secret_version" "operational_datastore" {
-  secret_id     = aws_secretsmanager_secret.operational_datastore.id
+  count     = (local.environment == "development" ? 1 : 0)
+  secret_id = aws_secretsmanager_secret.operational_datastore[0].id
   secret_string = jsonencode(local.operational_datastore_secrets_placeholder)
 
   lifecycle {
-    ignore_changes = [secret_string, ]
+    ignore_changes = [secret_string,]
   }
 }
 

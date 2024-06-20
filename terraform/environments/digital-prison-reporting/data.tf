@@ -31,15 +31,17 @@ data "aws_secretsmanager_secret_version" "datamart" {
 
 # Operational DataStore Secrets for use in DataHub
 data "aws_secretsmanager_secret" "operational_datastore" {
-  name = aws_secretsmanager_secret.operational_datastore.id
+  count = (local.environment == "development" ? 1 : 0)
+  name  = aws_secretsmanager_secret.operational_datastore[0].id
 
-  depends_on = [aws_secretsmanager_secret_version.operational_datastore]
+  depends_on = [aws_secretsmanager_secret_version.operational_datastore[0]]
 }
 
 data "aws_secretsmanager_secret_version" "operational_datastore" {
-  secret_id = data.aws_secretsmanager_secret.operational_datastore.id
+  count     = (local.environment == "development" ? 1 : 0)
+  secret_id = data.aws_secretsmanager_secret.operational_datastore[0].id
 
-  depends_on = [aws_secretsmanager_secret.operational_datastore]
+  depends_on = [aws_secretsmanager_secret.operational_datastore[0]]
 }
 
 
