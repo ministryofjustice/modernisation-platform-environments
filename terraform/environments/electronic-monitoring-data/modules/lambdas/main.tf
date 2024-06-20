@@ -7,6 +7,10 @@ resource "aws_sqs_queue" "lambda_dlq" {
   kms_master_key_id = aws_kms_key.lambda_env_key.id
 }
 
+data "external" "latest_image_update_log_table" {
+  program = ["bash", "${path.root}/bash_scripts/echo_hello.sh"] # var.ecr_repo_name, var.function_name
+}
+
 resource "aws_kms_key" "lambda_env_key" {
   description         = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
   enable_key_rotation = true
