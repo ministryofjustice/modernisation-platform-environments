@@ -7,6 +7,12 @@ resource "aws_sqs_queue" "lambda_dlq" {
   kms_master_key_id = aws_kms_key.lambda_env_key.id
 }
 
+data "external" "latest_image_update_log_table" {
+  program = [
+    "bash", "-c",
+    "echo {}"]
+}
+
 resource "aws_kms_key" "lambda_env_key" {
   description         = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
   enable_key_rotation = true
@@ -120,32 +126,18 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
-data "external" "latest_image_update_log_table" {
-  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
-
-  program = [
-    "bash", "-c",
-    "echo 'hello world'"
-  ]
-}
 
 resource "aws_lambda_function" "this" {
   #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
-  # Zip File config
-  filename         = var.is_image ? null : var.filename
-  handler          = var.is_image ? null : var.handler
-  layers           = var.is_image ? null : var.layers
-  source_code_hash = var.is_image ? null : var.source_code_hash
-  runtime          = var.is_image ? null : var.runtime
-  # Image config
-  image_uri        = var.is_image ? data.external.latest_image_update_log_table["image"].result["latest_image_uri"] : null
-  package_type     = var.is_image ? "Image" : null
-  architectures    = var.is_image ? ["arm64"] : null
-  # Constants
+  filename         = var.filename
   function_name    = var.function_name
   role             = var.role_arn
+  handler          = var.handler
+  layers           = var.layers
+  source_code_hash = var.source_code_hash
   timeout          = var.timeout
   memory_size      = var.memory_size
+  runtime          = var.runtime
 
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []
