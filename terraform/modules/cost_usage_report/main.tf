@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "cur_bucket_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values   = ["${var.account_number}"]
+      values   = [var.account_number]
     }
 
     principals {
@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "cur_bucket_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values   = ["${var.account_number}"]
+      values   = [var.account_number]
     }
 
     principals {
