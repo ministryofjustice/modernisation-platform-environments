@@ -23,4 +23,8 @@ foreach ($identity in $identities) {
 # Restart IIS to apply any changes
 Restart-Service -Name "W3SVC"
 
+#Verify ECS agent is installed and running 
+Start-Service -Name AmazonECS
+Get-Service -Name AmazonECS | Select-Object -Property Status, Name, DisplayName
+
 </powershell>
