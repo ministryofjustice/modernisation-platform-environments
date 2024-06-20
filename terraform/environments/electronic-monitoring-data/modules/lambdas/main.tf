@@ -121,9 +121,9 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
 }
 
 data "external" "latest_image_update_log_table" {
-  count = var.is_image ? 1 : 0
+  for_each = var.is_image ? { image = 1 } : {}  # Use empty map if not fetching image
 
-  program = ["bash", "${path.module}/bash_scripts/get_latest_image.sh", module.ecr_lambdas_repo.repository_name, var.function_name]
+  program = ["bash", "${path.root}/bash_scripts/get_latest_image.sh", var.ecr_repo_name, var.function_name]
   query = {
     latest_image_uri = ""
   }
@@ -138,7 +138,7 @@ resource "aws_lambda_function" "this" {
   source_code_hash = var.is_image ? null : var.source_code_hash
   runtime          = var.is_image ? null : var.runtime
   # Image config
-  image_uri        = var.is_image ? data.external.latest_image_update_log_table.result["latest_image_uri"] : null
+  image_uri        = var.is_image ? data.external.latest_image_update_log_table["image"].result["latest_image_uri"] : null
   package_type     = var.is_image ? "Image" : null
   architectures    = var.is_image ? ["arm64"] : null
   # Constants

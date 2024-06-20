@@ -215,27 +215,20 @@ module "query_output_to_list" {
 # Update log table
 # ------------------------------------------------------
 
-data "external" "latest_image_update_log_table" {
-  program = ["bash", "${path.module}/bash_scripts/get_latest_image.sh", module.ecr_lambdas_repo.repository_name, "update_log_table"]
-  query = {
-    latest_image_uri = ""
-  }
-}
-
-resource "aws_lambda_function" "update_log_table" {
+module "update_log_table" {
+    source = "./modules/lambdas"
     function_name = "update_log_table"
-    role = aws_iam_role.update_log_table.arn
+    is_image = true
+    role_name = aws_iam_role.update_log_table.name
+    role_arn = aws_iam_role.update_log_table.arn
     memory_size = 1024
     timeout = 900
-    package_type  = "Image"
-    image_uri =  data.external.latest_image_update_log_table.result["latest_image_uri"]
-    architectures = ["arm64"]
-    environment {
-      variables = {
+    env_account_id = local.env_account_id
+    ecr_repo_name = module.ecr_lambdas_repo.repository_name
+    environment_variables = {
       S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
       DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
       TABLE_NAME = "glue_df_output"
       }
-    }
 }
 
