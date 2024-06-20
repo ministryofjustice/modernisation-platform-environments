@@ -451,12 +451,12 @@ resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attac
 }
 
 resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_vpc_access_execution" {
-  role       = aws_iam_role.get_file_keys_for_table.name
+  role       = aws_iam_role.output_fs_json_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.get_file_keys_for_table.name
+  role       = aws_iam_role.output_fs_json_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
