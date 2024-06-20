@@ -1,15 +1,39 @@
 <powershell>
-Import-Module ECSTools
-[Environment]::SetEnvironmentVariable("ECS_CONTAINER_START_TIMEOUT", "15m", [System.EnvironmentVariableTarget]::Machine)
-[Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
-[Environment]::SetEnvironmentVariable("ECS_ENABLE_TASK_IAM_ROLE", "true", "Machine")
 
-Initialize-ECSAgent –Cluster ${cluster_name} -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]' -EnableTaskENI
+# Define the log file
+$logfile = "C:\ProgramData\Amazon\ECS\ecs_install.log"
+Add-Content $logfile "Starting ECS agent installation..."
+
+Import-Module ECSTools
+[Environment]::SetEnvironmentVariable("ECS_CONTAINER_START_TIMEOUT", "15m", [System.EnvironmentVariableTarget]::Machine) | Out-File -Append -FilePath $logfile
+[Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine") | Out-File -Append -FilePath $logfile
+[Environment]::SetEnvironmentVariable("ECS_ENABLE_TASK_IAM_ROLE", "true", "Machine") | Out-File -Append -FilePath $logfile
+
+# Download and install the ECS agent
+Add-Content $logfile "Downloading ECS agent..."
+Invoke-WebRequest -Uri "https://amazon-ecs-agent.s3.amazonaws.com/ecs-agent-windows-latest.zip" -OutFile "C:\ProgramData\Amazon\ECS\ecs-agent.zip" | Out-File -Append -FilePath $logfile
+Expand-Archive -Path "C:\ProgramData\Amazon\ECS\ecs-agent.zip" -DestinationPath "C:\ProgramData\Amazon\ECS" | Out-File -Append -FilePath $logfile
+
+# Create ECS configuration file
+Add-Content $logfile "Creating ECS config file..."
+New-Item -Path "C:\ProgramData\Amazon\ECS" -Name "ecs.config" -ItemType "file" -Force | Out-File -Append -FilePath $logfile
+Add-Content -Path "C:\ProgramData\Amazon\ECS\ecs.config" -Value "ECS_CLUSTER=${cluster_name}" | Out-File -Append -FilePath $logfile
+
+# Install ECS agent service
+Add-Content $logfile "Installing ECS agent service..."
+& "C:\ProgramData\Amazon\ECS\install.ps1" | Out-File -Append -FilePath $logfile
+
+# Start ECS agent service
+Add-Content $logfile "Starting ECS agent service..."
+Start-Service -Name AmazonECS | Out-File -Append -FilePath $logfile
+
+# Initialize-ECSAgent –Cluster ${cluster_name} -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]' -EnableTaskENI
 
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-# create log file for sentry error trapping
-New-Item -Path "C:\\Logs" -ItemType "Directory" -Force
+# create log file for sentry error 
+Add-Content $logfile "Creating log directory..."
+New-Item -Path "C:\\Logs" -ItemType "Directory" -Force | Out-File -Append -FilePath $logfile
 $directory = "C:\\Logs"
 $identities = @("IIS APPPOOL\\DefaultAppPool", "NT AUTHORITY\\NETWORK SERVICE", "NT AUTHORITY\\SYSTEM")
 
@@ -21,10 +45,13 @@ foreach ($identity in $identities) {
 }
 
 # Restart IIS to apply any changes
+Add-Content $logfile "Restarting IIS..."
 Restart-Service -Name "W3SVC"
 
-#Verify ECS agent is installed and running 
-Start-Service -Name AmazonECS
-Get-Service -Name AmazonECS | Select-Object -Property Status, Name, DisplayName
+# Verify ECS agent service status
+Add-Content $logfile "Verifying ECS agent service status..."
+Get-Service -Name AmazonECS | Select-Object -Property Status, Name, DisplayName | Out-File -Append -FilePath $logfile
+
+Add-Content $logfile "ECS agent installation complete."
 
 </powershell>
