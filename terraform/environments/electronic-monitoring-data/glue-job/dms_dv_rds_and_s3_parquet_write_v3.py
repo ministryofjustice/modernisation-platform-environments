@@ -466,39 +466,37 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         # -------------------------------------------------------
 
         if validated_colmn_msg_list:
-            LOGGER.info(f"""validated_colmn_msg_list = {validated_colmn_msg_list}""")
-
-            df_temp = get_pyspark_empty_df(df_dv_output_schema)
+            #LOGGER.info(f"""validated_colmn_msg_list = {validated_colmn_msg_list}""")
 
             total_non_primary_key_columns = len(df_rds_temp.columns) - len(rds_db_tbl_primary_key_list)
             # -------------------------------------------------------
 
             if total_non_primary_key_columns == len(validated_colmn_msg_list):
-                df_temp = df_temp.selectExpr(
-                                    "current_timestamp as run_datetime", 
-                                    "'' as json_row",
-                                    f"""'{rds_tbl_name} - Validated.\n{additional_validation_msg}' as validation_msg""",
-                                    f"""'{rds_db_name}' as database_name""",
-                                    f"""'{db_sch_tbl}' as full_table_name""",
-                                    """'False' as table_to_ap"""
-                            )
-                LOGGER.warn(f"""{df_temp.show(truncate=False)}""")
+                df_temp_row = spark.sql(f"""select 
+                                            current_timestamp() as run_datetime, 
+                                            '' as json_row,
+                                            '{rds_tbl_name} - Validated.\n{additional_validation_msg}' as validation_msg,
+                                            '{rds_db_name}' as database_name,
+                                            '{db_sch_tbl}' as full_table_name,
+                                            'False' as table_in_ap
+                                        """.strip())
+                # df_temp_row.show(truncate=False)
                 LOGGER.info(f"Validation Successful - 1")
             else:
                 # depupe list --> list(dict.fromkeys(validated_colmn_msg_list)))
-                df_temp = df_temp.selectExpr(
-                                    "current_timestamp as run_datetime",
-                                    "'' as json_row",
-                                    f""" "{' ; '.join(validated_colmn_msg_list)} - Specified Columns Validated." as validation_msg""",
-                                    f"""'{rds_db_name}' as database_name""",
-                                    f"""'{db_sch_tbl}' as full_table_name""",
-                                    """'False' as table_in_ap"""
-                            )
-                LOGGER.warn(f"""{df_temp.show(truncate=False)}""")
+                df_temp_row = spark.sql(f"""select 
+                                            current_timestamp() as run_datetime, 
+                                            '' as json_row,
+                                            "{' ; '.join(validated_colmn_msg_list)} - Specified Columns Validated." as validation_msg,
+                                            '{rds_db_name}' as database_name,
+                                            '{db_sch_tbl}' as full_table_name,
+                                            'False' as table_in_ap
+                                        """.strip())
+                # df_temp_row.show(truncate=False)
                 LOGGER.warn(f"Not all table columns validated - 1b")
             # -------------------------------------------------------
 
-            df_dv_output = df_dv_output.union(df_temp)
+            df_dv_output = df_dv_output.union(df_temp_row)
         # -------------------------------------------------------
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
@@ -565,9 +563,14 @@ if __name__ == "__main__":
     if args.get("rds_sqlserver_db_table", None) is None:
         LOGGER.error(f"""'rds_sqlserver_db_table' runtime input is missing! Exiting ...""")
         sys.exit(1)
+    # -------------------------------------------------------
 
     given_rds_sqlserver_table = args["rds_sqlserver_db_table"]
     db_sch_tbl = f"""{rds_sqlserver_db_str}_{given_rds_sqlserver_db_schema}_{given_rds_sqlserver_table}"""
+
+    LOGGER.info(f"""Given RDS SqlServer-DB Table: {given_rds_sqlserver_table}, {type(given_rds_sqlserver_table)}""")
+    # -------------------------------------------------------
+    
     if not rds_sqlserver_db_tbl_list:
         LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty! Exiting ...""")
         sys.exit(1)
@@ -575,8 +578,6 @@ if __name__ == "__main__":
         LOGGER.error(f"""'{db_sch_tbl}' - is not an existing table! Exiting ...""")
         sys.exit(1)
     # -------------------------------------------------------
-
-    LOGGER.info(f"""Given RDS-database table: {given_rds_sqlserver_table}, {type(given_rds_sqlserver_table)}""")
 
     total_files, total_size = get_s3_folder_info(PRQ_FILES_SRC_S3_BUCKET_NAME, 
                                                  f"{rds_sqlserver_db_str}/{given_rds_sqlserver_db_schema}/{given_rds_sqlserver_table}")
