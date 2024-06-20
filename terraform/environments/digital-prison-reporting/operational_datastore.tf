@@ -26,7 +26,7 @@ resource aws_security_group "glue_operational_datastore_connection_sg" {
   # Allow all traffic in from this security group
   ingress {
     from_port = 0
-    to_port   = 65535
+    to_port   = 0
     protocol  = "-1"
     self      = true
     description = "Security Group can Ingress to itself on all ports - required by Glue"
@@ -35,7 +35,7 @@ resource aws_security_group "glue_operational_datastore_connection_sg" {
   # Allow all traffic out to this security group
   egress {
     from_port = 0
-    to_port   = 65535
+    to_port   = 0
     protocol  = "-1"
     self      = true
   }
@@ -43,7 +43,7 @@ resource aws_security_group "glue_operational_datastore_connection_sg" {
   # Allow all traffic out
   egress {
     from_port = 0
-    to_port   = 65535
+    to_port   = 0
     protocol  = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
