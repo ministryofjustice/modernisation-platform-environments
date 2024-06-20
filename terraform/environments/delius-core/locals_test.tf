@@ -168,4 +168,9 @@ locals {
     environment             = local.environment
     extra_user_data_content = "yum install -y openldap-clients"
   }
+
+  dms_config_test = {
+    replication_instance_class = "dms.t3.medium"
+    engine_version             = "3.5.1"
+  }
 }

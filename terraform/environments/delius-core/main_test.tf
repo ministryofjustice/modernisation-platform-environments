@@ -35,4 +35,6 @@ module "environment_test" {
   tags = local.tags
 
   pagerduty_integration_key = local.pagerduty_integration_key
+
+  dms_config = local.dms_config_test
 }

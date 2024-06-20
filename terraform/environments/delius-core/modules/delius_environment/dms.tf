@@ -5,14 +5,11 @@ module "dms" {
   tags                        = var.tags
   env_name                    = var.env_name
   platform_vars               = var.platform_vars
+  dms_config                  = var.dms_config
 
   delius_core_application_passwords_arn = module.oracle_db_shared.delius_core_application_passwords_arn
   oracle_db_server_names                = local.oracle_db_server_names
 
-  dms_config = lookup(local.dms_config, terraform.workspace, {
-    replication_instance_class = "dms.t3.small"
-    engine_version             = "3.5.1"
-  })
   providers = {
     aws                       = aws
     aws.bucket-replication    = aws

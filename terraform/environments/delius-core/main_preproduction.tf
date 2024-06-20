@@ -35,6 +35,8 @@ module "environment_stage" {
   tags = local.tags
 
   pagerduty_integration_key = local.pagerduty_integration_key
+
+  dms_config = local.dms_config_stage
 }
 
 module "environment_preprod" {
@@ -69,4 +71,6 @@ module "environment_preprod" {
   tags = local.tags
 
   pagerduty_integration_key = local.pagerduty_integration_key
+
+  dms_config = local.dms_config_preprod
 }
