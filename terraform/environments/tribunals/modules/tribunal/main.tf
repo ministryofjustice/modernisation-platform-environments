@@ -1,33 +1,72 @@
 locals {
   target_group_attachment_port = var.target_group_attachment_port
-  app                    = var.app_name
-  app_url                = var.app_url
-  sql_migration_path     = var.sql_migration_path
-  app_db_name            = var.app_db_name
-  app_db_login_name      = var.app_db_login_name
-  app_source_db_name     = var.app_source_db_name
-  app_rds_url            = var.app_rds_url
-  app_rds_user           = var.app_rds_user
-  app_rds_port           = var.app_rds_port
-  app_rds_password       = var.app_rds_password
-  app_source_db_url      = var.app_source_db_url
-  app_source_db_user     = var.app_source_db_user
-  app_source_db_password = var.app_source_db_password
-  documents_location     = var.documents_location
+  app                          = var.app_name
+  app_url                      = var.app_url
+  sql_migration_path           = var.sql_migration_path
+  app_db_name                  = var.app_db_name
+  app_db_login_name            = var.app_db_login_name
+  app_source_db_name           = var.app_source_db_name
+  app_rds_url                  = var.app_rds_url
+  app_rds_user                 = var.app_rds_user
+  app_rds_port                 = var.app_rds_port
+  app_rds_password             = var.app_rds_password
+  app_source_db_url            = var.app_source_db_url
+  app_source_db_user           = var.app_source_db_user
+  app_source_db_password       = var.app_source_db_password
+  documents_location           = var.documents_location
   app_user_data = base64encode(templatefile("user_data.sh", {
     cluster_name = "${local.app}_app_cluster"
   }))
-  app_container_definition = templatefile("container_definition.json", {
-    app_name                     = "${local.app}"
-    awslogs-group                = "${local.app}-ecs-log-group"
-    supportEmail                 = "${var.application_data.support_email}"
-    supportTeam                  = "${var.application_data.support_team}"
-    CurServer                    = "${var.application_data.curserver}"
-    container_definition_image   = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
-    rds_password                 = "${local.app_rds_password}"
-    documents_location           = "${local.documents_location}"
-    target_group_attachment_port = "${local.target_group_attachment_port}"
-  })
+  app_container_definition = jsonencode([{
+    command : [
+      "New-Item -Path C:\\inetpub\\wwwroot\\index.html -Type file -Value '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p>'; C:\\ServiceMonitor.exe w3svc"
+    ],
+    entryPoint : ["powershell", "-Command"],
+    name : "${local.app}-container",
+    image : "${aws_ecr_repository.app-ecr-repo.repository_url}:latest",
+    cpu : 512,
+    memory : 1024,
+    essential : true,
+    portMappings : [
+      {
+        hostPort : "${local.target_group_attachment_port}",
+        containerPort : 80,
+        protocol : "tcp"
+      }
+    ],
+    logConfiguration : {
+      logDriver : "awslogs",
+      options : {
+        "awslogs-group" : "${local.app}-ecs-log-group",
+        "awslogs-region" : "eu-west-2",
+        "awslogs-stream-prefix" : "ecs"
+      }
+    },
+    mountPoints : [
+      {
+        sourceVolume : "tribunals",
+        containerPath : "C:/inetpub/wwwroot/${local.documents_location}"
+      }
+    ],
+    environment : [
+      {
+        name : "supportEmail",
+        value : "${var.application_data.support_email}"
+      },
+      {
+        name : "supportTeam",
+        value : "${var.application_data.support_team}"
+      },
+      {
+        name : "CurServer",
+        value : "${var.application_data.curserver}"
+      },
+      {
+        name : "RDS_PASSWORD",
+        value : "${local.app_rds_password}"
+      }
+    ]
+  }])
   app_ec2_ingress_rules = {
     "cluster_ec2_lb_ingress_2" = {
       description     = "Cluster EC2 ingress rule 2"
