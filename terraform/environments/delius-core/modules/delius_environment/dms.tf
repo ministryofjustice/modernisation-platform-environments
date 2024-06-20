@@ -4,11 +4,6 @@ module "dms" {
   account_info                = var.account_info
   tags                        = var.tags
   env_name                    = var.env_name
-  bastion_config              = var.bastion_config
-  environment_config          = var.environment_config
-  app_name                    = var.app_name
-  delius_microservice_configs = var.delius_microservice_configs
-  db_config                   = var.db_config
   platform_vars               = var.platform_vars
 
   delius_core_application_passwords_secret_arn = aws_secretsmanager_secret.delius_core_application_passwords_secret.arn
