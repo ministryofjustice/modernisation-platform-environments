@@ -5,5 +5,5 @@ module "ecr_lambda_repo" {
 
 module "ecr_lambdas_repo" {
     source = "./modules/ecr"
-    ecr_name = "lambdas/lambda-functions-repo"
+    ecr_name = "lambda-functions-repo"
 }
