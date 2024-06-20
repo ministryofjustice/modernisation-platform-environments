@@ -449,6 +449,16 @@ resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attac
   policy_arn = aws_iam_policy.output_fs_json_lambda_s3_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_vpc_access_execution" {
+  role       = aws_iam_role.get_file_keys_for_table.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.get_file_keys_for_table.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
 resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zip" {
   statement_id  = "AllowOutputFileStructureAsJsonFromZipExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
