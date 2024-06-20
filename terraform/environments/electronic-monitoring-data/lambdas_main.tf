@@ -225,7 +225,7 @@ resource "aws_lambda_function" "update_log_table" {
     memory_size = 1024
     timeout = 900
     package_type  = "Image"
-    image_uri =  data.external.latest_image.result
+    image_uri =  data.external.latest_image_update_log_table.result
     architectures = ["arm64"]
     environment {
       variables = {
