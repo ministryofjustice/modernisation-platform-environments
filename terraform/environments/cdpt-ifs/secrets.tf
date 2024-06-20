@@ -1,5 +1,5 @@
 resource "aws_secretsmanager_secret" "db_pass" {
-  name = "database_password"
+  name = "db_password"
 }
 
 resource "random_password" "password_long" {
