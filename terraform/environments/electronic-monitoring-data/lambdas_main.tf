@@ -290,7 +290,7 @@ resource "aws_iam_role_policy" "output_fs_json_lambda_s3_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attachment" {
-  role       = aws_iam_role.output_fs_json_lambda_s3_iam_role.name
+  role       = module.output_file_structure_as_json_from_zip.lambda_function_name
   policy_arn = aws_iam_policy.output_fs_json_lambda_s3_policy.arn
 }
 
