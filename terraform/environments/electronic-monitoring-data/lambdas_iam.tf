@@ -440,7 +440,7 @@ resource "aws_iam_policy" "output_fs_json_lambda_s3_policy" {
 
 resource "aws_iam_role_policy" "output_fs_json_lambda_s3_policy" {
   name   = "output_fs_json_lambda_s3_policy"
-  role   = aws_iam_role.output_fs_json_lambda_s3_iam_role.id
+  role   = aws_iam_role.output_fs_json_lambda.id
   policy = data.aws_iam_policy_document.output_fs_json_lambda_s3_policy_document.json
 }
 
