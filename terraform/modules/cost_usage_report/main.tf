@@ -14,6 +14,7 @@ resource "aws_cur_report_definition" "cost_usage_report" {
   depends_on                 = [module.s3_bucket] #ensures bucket permissions are applied before athena bucket access validation checks run
 }
 
+#tfsec:ignore:avd-aws-0132 - The bucket policy is attached to the bucket
 module "s3_bucket" {
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
 
