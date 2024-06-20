@@ -402,6 +402,7 @@ module "charity_tribunal_decisions" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49110
 }
 
 module "claims_management_decisions" {
@@ -426,6 +427,7 @@ module "claims_management_decisions" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49111
 }
 
 module "consumer_credit_appeals" {
@@ -450,6 +452,7 @@ module "consumer_credit_appeals" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49112
 }
 
 module "estate_agent_appeals" {
@@ -474,6 +477,7 @@ module "estate_agent_appeals" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49113
 }
 
 module "primary_health_lists" {
@@ -498,6 +502,7 @@ module "primary_health_lists" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49114
 }
 
 module "siac" {
@@ -522,6 +527,7 @@ module "siac" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49115
 }
 
 module "sscs_venue_pages" {
@@ -546,6 +552,7 @@ module "sscs_venue_pages" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49116
 }
 
 module "tax_chancery_decisions" {
@@ -570,6 +577,7 @@ module "tax_chancery_decisions" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49117
 }
 
 module "tax_tribunal_decisions" {
@@ -594,6 +602,7 @@ module "tax_tribunal_decisions" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49118
 }
 
 module "ftp_admin_appeals" {
@@ -618,4 +627,5 @@ module "ftp_admin_appeals" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = 49119
 }

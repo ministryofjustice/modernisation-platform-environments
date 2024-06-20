@@ -51,5 +51,5 @@ module "ecs_loadbalancer" {
   aws_acm_certificate_external = var.aws_acm_certificate_external
   is_ftp_app                   = var.is_ftp_app
   waf_arn                      = var.waf_arn
-  target_group_attachment_port = ""
+  target_group_attachment_port = var.target_group_attachment_port
 }
