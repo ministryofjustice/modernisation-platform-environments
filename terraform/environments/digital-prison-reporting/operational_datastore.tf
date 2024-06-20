@@ -11,7 +11,7 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
 
   physical_connection_requirements {
     availability_zone = data.aws_subnet.private_subnets_a.availability_zone
-    security_group_id_list = [aws_security_group.glue_vpc_access_connection_sg[0].id]
+    security_group_id_list = [aws_security_group.glue_operational_datastore_connection_sg[0].id]
     subnet_id         = data.aws_subnet.private_subnets_a.id
   }
 }
