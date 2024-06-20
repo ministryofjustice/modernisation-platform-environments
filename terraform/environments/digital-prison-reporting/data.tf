@@ -29,6 +29,19 @@ data "aws_secretsmanager_secret_version" "datamart" {
   depends_on = [aws_secretsmanager_secret.redshift]
 }
 
+# Operational DataStore Secrets for use in DataHub
+data "aws_secretsmanager_secret" "operational_datastore" {
+  name = aws_secretsmanager_secret.operational_datastore.id
+
+  depends_on = [aws_secretsmanager_secret_version.operational_datastore]
+}
+
+data "aws_secretsmanager_secret_version" "operational_datastore" {
+  secret_id = data.aws_secretsmanager_secret.operational_datastore.id
+
+  depends_on = [aws_secretsmanager_secret.operational_datastore]
+}
+
 
 # AWS _IAM_ Policy
 data "aws_iam_policy" "rds_full_access" {
