@@ -130,7 +130,7 @@ resource "aws_lb_listener" "tribunals_lb" {
   load_balancer_arn = aws_lb.tribunals_lb.arn
   port              = var.application_data.server_port_2
   protocol          = var.application_data.lb_listener_protocol_2
-  ssl_policy        = var.application_data.lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+  ssl_policy        = var.application_data.lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     type             = "forward"

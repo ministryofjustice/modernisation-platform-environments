@@ -17,6 +17,7 @@ variable "acm_certificates" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -140,6 +141,7 @@ variable "cloudwatch_metric_alarms" {
     statistic           = string
     threshold           = number
     alarm_actions       = optional(list(string), [])
+    ok_actions          = optional(list(string), [])
     actions_enabled     = optional(bool, false)
     alarm_description   = optional(string)
     datapoints_to_alarm = optional(number)
@@ -297,6 +299,7 @@ variable "ec2_autoscaling_groups" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -403,6 +406,7 @@ variable "ec2_instances" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -466,105 +470,6 @@ variable "efs" {
       })), [])
     })))
     tags = optional(map(string), {})
-  }))
-  default = {}
-}
-
-variable "rds_instances" {
-  description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
-  type = map(object({
-    config = object({
-      iam_resource_names_prefix = optional(string, "rds_db")
-      instance_profile_policies = list(string)
-      ssm_parameters_prefix     = optional(string, "")
-    })
-    instance = object({
-      allocated_storage                   = number
-      allow_major_version_upgrade         = optional(bool, false)
-      apply_immediately                   = optional(bool, false)
-      auto_minor_version_upgrade          = optional(bool, false)
-      backup_retention_period             = optional(number, 1)
-      backup_window                       = optional(string)
-      character_set_name                  = optional(string)
-      copy_tags_to_snapshot               = optional(bool, false)
-      create                              = optional(bool, true)
-      db_name                             = optional(string)
-      db_subnet_group_name                = optional(string)
-      deletion_protection                 = optional(bool, true)
-      enabled_cloudwatch_logs_exports     = optional(list(string))
-      engine                              = string
-      engine_version                      = optional(string)
-      final_snapshot_identifier           = optional(bool, false)
-      iam_database_authentication_enabled = optional(bool, false)
-      identifier                          = string
-      instance_class                      = string
-      iops                                = optional(number, 0)
-      kms_key_id                          = string
-      license_model                       = optional(string)
-      maintenance_window                  = optional(string)
-      max_allocated_storage               = optional(number)
-      monitoring_interval                 = optional(number, 0)
-      monitoring_role_arn                 = optional(string)
-      multi_az                            = optional(bool, false)
-      option_group_name                   = optional(string)
-      parameter_group_name                = optional(string)
-      password                            = string
-      port                                = optional(string)
-      publicly_accessible                 = optional(bool, false)
-      replicate_source_db                 = optional(string)
-      skip_final_snapshot                 = optional(bool, false)
-      snapshot_identifier                 = optional(string)
-      storage_encrypted                   = optional(bool, false)
-      storage_type                        = optional(string, "gp2")
-      username                            = string
-      vpc_security_group_ids              = optional(list(string))
-    })
-    option_group = object({
-      create                   = bool
-      name_prefix              = optional(string)
-      option_group_description = optional(string)
-      engine_name              = string
-      major_engine_version     = string
-      options = optional(list(object({
-        option_name                    = string
-        port                           = optional(number)
-        version                        = optional(string)
-        db_security_group_memberships  = optional(list(string))
-        vpc_security_group_memberships = optional(list(string))
-        option_settings = optional(list(object({
-          name  = optional(string)
-          value = optional(string)
-        })))
-      })))
-      tags = optional(list(string))
-    })
-    parameter_group = object({
-      name_prefix = optional(string)
-      description = optional(string)
-      family      = string
-      parameters = optional(list(object({
-        name         = string
-        value        = string
-        apply_method = optional(string, "immediate")
-      })))
-      tags = optional(list(string))
-    })
-    subnet_group = object({
-      name_prefix = optional(string)
-      description = optional(string)
-      subnet_ids  = list(string)
-      tags        = optional(list(string))
-    })
-    ssm_kms_key_id = optional(string)
-    ssm_parameters = optional(map(object({
-      random = object({
-        length  = number
-        special = bool
-      })
-      description = string
-    })))
-    route53_record = optional(bool, true)
-    tags           = optional(map(string), {})
   }))
   default = {}
 }
@@ -823,6 +728,7 @@ variable "lbs" {
         statistic           = string
         threshold           = number
         alarm_actions       = optional(list(string), [])
+        ok_actions          = optional(list(string), [])
         actions_enabled     = optional(bool, false)
         alarm_description   = optional(string)
         datapoints_to_alarm = optional(number)
@@ -1117,6 +1023,37 @@ variable "sns_topics" {
   default = {}
 }
 
+variable "ssm_associations" {
+  description = "A map of ssm associations to create where map key is the association name"
+  type = map(object({
+    apply_only_at_cron_interval = optional(bool)
+    name                        = string
+    max_concurrency             = optional(number)
+    max_errors                  = optional(number)
+    schedule_expression         = optional(string)
+    output_location = optional(object({
+      s3_bucket_name = string # or s3_buckets map key
+      s3_key_prefix  = optional(string)
+    }))
+    targets = optional(list(object({
+      key    = string       # 'tag:my_tag_name' or 'InstanceIds'
+      values = list(string) # [my_tag_value] or [ec2_instance map key]
+    })), [])
+  }))
+  default = {}
+}
+
+variable "ssm_documents" {
+  description = "A map of ssm documents to create where map key is the document name"
+  type = map(object({
+    content         = string
+    document_format = optional(string)
+    document_type   = string
+    tags            = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "ssm_parameters" {
   # Example usage:
   # my_ec2_params = {
@@ -1158,20 +1095,8 @@ variable "ssm_parameters" {
   default = {}
 }
 
-variable "ssm_documents" {
-  description = "A map of ssm documents to create where map key is the document name"
-  type = map(object({
-    content         = string
-    document_format = optional(string)
-    document_type   = string
-    tags            = optional(map(string), {})
-  }))
-  default = {}
-}
-
 variable "tags" {
   description = "Any additional tags to apply to all resources, in addition to those provided by environment module"
   type        = map(string)
   default     = {}
 }
-

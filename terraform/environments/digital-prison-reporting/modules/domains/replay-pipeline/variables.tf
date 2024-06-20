@@ -16,8 +16,22 @@ variable "pipeline_additional_policies" {
   default     = []
 }
 
+variable "dms_replication_task_arn" {
+  type = string
+}
+
+variable "replication_task_id" {
+  type = string
+}
+
 variable "glue_stop_glue_instance_job" {
   description = "Name of job to stop the current running instance of the streaming job"
+  type        = string
+  default     = ""
+}
+
+variable "stop_dms_task_job" {
+  description = "Name of job to stop a running DMS task"
   type        = string
   default     = ""
 }

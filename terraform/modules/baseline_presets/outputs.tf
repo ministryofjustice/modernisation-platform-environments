@@ -34,9 +34,9 @@ output "cloudwatch_dashboards" {
 output "cloudwatch_log_groups" {
   description = "Map of log groups"
 
-  value = var.options.cloudwatch_log_groups != null ? {
-    for key, value in local.cloudwatch_log_groups : key => value if contains(var.options.cloudwatch_log_groups, key)
-  } : local.cloudwatch_log_groups
+  value = {
+    for key, value in local.cloudwatch_log_groups : key => value if contains(local.cloudwatch_log_groups_filter, key)
+  }
 }
 
 output "cloudwatch_metric_alarms" {
@@ -169,6 +169,13 @@ output "secretsmanager_secrets" {
   description = "Map of common secretsmanager secrets to create"
   value = {
     for key, value in local.secretsmanager_secrets : key => value if contains(local.secretsmanager_secrets_filter, key)
+  }
+}
+
+output "ssm_associations" {
+  description = "Map of common ssm associations to create"
+  value = {
+    for key, value in local.ssm_associations : key => value if contains(local.ssm_associations_filter, key)
   }
 }
 

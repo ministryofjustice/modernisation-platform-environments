@@ -84,7 +84,7 @@ module "nextcloud_service" {
   rds_port                 = 3306
   rds_parameter_group_name = "default.mariadb10.5"
   rds_license_model        = "general-public-license"
-  snapshot_identifier      = "nextcloud-dev-db-final-532c"
+  snapshot_identifier      = "nextcloud-rds-19062024"
 
   rds_allow_major_version_upgrade = true
   rds_apply_immediately           = true

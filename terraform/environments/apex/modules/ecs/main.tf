@@ -457,7 +457,7 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
   name              = "${var.app_name}-ecs-container-logs"
   retention_in_days = 90
-  kms_key_id = var.log_group_kms_key
+  kms_key_id        = var.log_group_kms_key
   tags = merge(
     var.tags_common,
     {
@@ -474,7 +474,7 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
 resource "aws_cloudwatch_log_group" "ec2" {
   name              = "${var.app_name}-ecs-ec2-logs"
   retention_in_days = 90
-  kms_key_id = var.log_group_kms_key
+  kms_key_id        = var.log_group_kms_key
   tags = merge(
     var.tags_common,
     {
@@ -502,6 +502,8 @@ resource "aws_appautoscaling_policy" "ecs_target_cpu" {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
     target_value = var.ecs_scaling_cpu_threshold
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
   }
 }
 
@@ -516,6 +518,8 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
     }
     target_value = var.ecs_scaling_mem_threshold
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
   }
 }
 
@@ -531,6 +535,7 @@ resource "aws_ecs_capacity_provider" "apex" {
       # minimum_scaling_step_size = 1
       status          = "ENABLED"
       target_capacity = var.ecs_target_capacity
+      instance_warmup_period = var.ec2_instance_warmup_period
     }
     managed_draining = "ENABLED"
   }

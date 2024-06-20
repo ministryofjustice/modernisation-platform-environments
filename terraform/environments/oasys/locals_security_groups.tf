@@ -75,6 +75,8 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
+      module.ip_addresses.moj_cidr.vodafone_dia_networks,
+      module.ip_addresses.moj_cidr.palo_alto_primsa_access_corporate,
       module.ip_addresses.external_cidrs.cloud_platform,
       module.ip_addresses.azure_studio_hosting_public.prod,
       "35.177.125.252/32", "35.177.137.160/32",                                                     # trusted_appgw_external_client_ips infra_ip.j5_phones
