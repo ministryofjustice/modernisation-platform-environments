@@ -216,7 +216,7 @@ module "query_output_to_list" {
 # ------------------------------------------------------
 
 data "external" "latest_image_update_log_table" {
-  program = ["bash", "${path.module}/bash_scripts/get_latest_image.sh", module.ecr_lambdas_repo.repository_url, "update_log_table"]
+  program = ["bash", "${path.module}/bash_scripts/get_latest_image.sh", module.ecr_lambdas_repo.repository_name, "update_log_table"]
   query = {
     latest_image_uri = ""
   }
