@@ -388,7 +388,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                 rds_db_tbl_primary_key_list = [column.strip() 
                                                for column in RECORDED_PKEYS_LIST[rds_tbl_name]]
             except Exception as e:
-                LOGGER.error(f"""rds_db_tbl_primary_key_list - value(s) not given!""")
+                LOGGER.error(f"""Runtime Parameter 'rds_db_tbl_primary_key_list' - value(s) not given!""")
                 LOGGER.error(f"""Global Dictionary - 'RECORDED_PKEYS_LIST' has no key '{rds_tbl_name}'!""")
                 sys.exit(1)
         else:
