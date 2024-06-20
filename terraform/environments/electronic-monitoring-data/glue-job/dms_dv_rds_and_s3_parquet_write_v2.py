@@ -489,16 +489,19 @@ if __name__ == "__main__":
 
     # -------------------------------------------------------
     if args.get("select_rds_db_tbls", None) is None:
- 
+        # -------------------------------------------------------
         if args.get("exclude_rds_db_tbls", None) is None:
             exclude_rds_db_tbls_list = list()
         else:
             exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}"""
                                         for tbl in args['exclude_rds_db_tbls'].split(",")]
             LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
+        # -------------------------------------------------------
+
         filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in rds_sqlserver_db_tbl_list
                                               if tbl not in exclude_rds_db_tbls_list]
- 
+        # -------------------------------------------------------
+
         if not filtered_rds_sqlserver_db_tbl_list:
             LOGGER.error(
                 f"""filtered_rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
@@ -506,7 +509,7 @@ if __name__ == "__main__":
         else:
             LOGGER.info(
                 f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
- 
+        # -------------------------------------------------------
 
         for db_sch_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[0], \
@@ -518,7 +521,6 @@ if __name__ == "__main__":
 
             dv_ctlg_tbl_partition_path = f'''
                 {GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_sch_tbl}/'''.strip()
-            
             # -------------------------------------------------------
 
             if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, dv_ctlg_tbl_partition_path):
