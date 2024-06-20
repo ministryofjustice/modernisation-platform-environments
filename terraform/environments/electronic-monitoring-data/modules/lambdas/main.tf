@@ -2,10 +2,6 @@ locals {
   use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null)
 }
 
-data "external" "latest_image_update_log_table" {
-  program = []
-}
-
 resource "aws_sqs_queue" "lambda_dlq" {
   name              = "${var.function_name}-dlq"
   kms_master_key_id = aws_kms_key.lambda_env_key.id
