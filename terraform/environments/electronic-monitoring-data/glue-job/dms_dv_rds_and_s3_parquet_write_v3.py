@@ -327,7 +327,7 @@ def get_altered_df_schema_object(in_df_rds: DataFrame, in_transformed_column_lis
 
 
 def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, input_repartition_factor) -> DataFrame:
-    given_rds_sqlserver_db_schema = {args['rds_sqlserver_db_schema']}
+    given_rds_sqlserver_db_schema = args['rds_sqlserver_db_schema']
     rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[1]
 
     default_repartition_factor = input_repartition_factor \
