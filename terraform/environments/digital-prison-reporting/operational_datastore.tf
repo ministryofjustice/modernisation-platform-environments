@@ -39,12 +39,4 @@ resource aws_security_group "glue_operational_datastore_connection_sg" {
     protocol  = "-1"
     self      = true
   }
-
-  # Allow all traffic out
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
