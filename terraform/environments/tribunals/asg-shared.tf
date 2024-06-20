@@ -182,6 +182,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
     resource_type = "instance"
     tags = {
       Environment = local.environment
+      Name        = "tribunals-instance"
     }
   }
 
@@ -200,6 +201,12 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   launch_template {
     id      = aws_launch_template.tribunals-all-lt.id
     version = "$Latest"
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "tribunals-instance"
+    propagate_at_launch = true
   }
 }
 
