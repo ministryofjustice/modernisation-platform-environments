@@ -1,0 +1,8 @@
+#!/bin/bash
+
+REPO_NAME=$1
+FUNCTION_NAME=$2
+
+LATEST_IMAGE=$(aws ecr describe-images --repository-name "$REPO_NAME" --query "sort_by(imageDetails,& imagePushedAt)[*].{ImageURI:imageUri,Tag:ImageTags[0]}" --output json | jq -r --arg FUNCTION_NAME "$FUNCTION_NAME" '[.[] | select(.Tag | startswith($FUNCTION_NAME))] | last | .ImageURI')
+
+echo $LATEST_IMAGE

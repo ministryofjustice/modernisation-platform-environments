@@ -215,6 +215,9 @@ module "query_output_to_list" {
 # Update log table
 # ------------------------------------------------------
 
+data "external" "latest_image_update_log_table" {
+  program = ["bash", "${path.module}/bash_scripts/get_latest_image.sh", module.ecr_lambdas_repo.ecr_name, "update_log_table"]
+}
 
 resource "aws_lambda_function" "update_log_table" {
     function_name = "update_log_table"
@@ -222,7 +225,7 @@ resource "aws_lambda_function" "update_log_table" {
     memory_size = 1024
     timeout = 900
     package_type  = "Image"
-    image_uri = "${module.ecr_lambda_repo.repository_url}:${local.env_name}"
+    image_uri =  data.external.latest_image.result
     architectures = ["arm64"]
     environment {
       variables = {
