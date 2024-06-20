@@ -194,6 +194,12 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "sns_topics", {}),
   )
 
+  ssm_associations = merge(
+    module.baseline_presets.ssm_associations,
+    lookup(local.baseline_all_environments, "ssm_associations", {}),
+    lookup(local.baseline_environment_specific, "ssm_associations", {}),
+  )
+
   ssm_documents = merge(
     module.baseline_presets.ssm_documents,
     lookup(local.baseline_all_environments, "ssm_documents", {}),

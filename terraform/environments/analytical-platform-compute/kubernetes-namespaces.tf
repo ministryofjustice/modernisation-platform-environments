@@ -34,6 +34,12 @@ resource "kubernetes_namespace" "ingress_nginx" {
   }
 }
 
+resource "kubernetes_namespace" "external_secrets" {
+  metadata {
+    name = "external-secrets"
+  }
+}
+
 resource "kubernetes_namespace" "actions_runners" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 

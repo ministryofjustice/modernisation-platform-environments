@@ -837,34 +837,140 @@ locals {
     }
 
     network_lb = {
-      unhealthy-network-load-balancer-host = {
+
+      #UnHealthyHostCount
+      load-balancer-unhealthy-host-count = {
+        height : 6
+        width : 24,
+        type = "metric"
+        properties = {
+          view    = "singleValue"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB unhealthy-host-count"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,TargetGroup} MetricName=\"UnHealthyHostCount\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "unhealthy host count"
+            }
+          }
+        }
+      }
+
+      #ActiveFlowCount
+      load-balancer-active-flow-count = {
         type = "metric"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "NLB unhealthy-network-load-balancer-host"
-          stat    = "Maximum"
+          title   = "NLB active-flow-count"
+          stat    = "Average"
           metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,TargetGroup} MetricName=\"UnHealthyHostCount\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ActiveFlowCount\"','Average'),AVG,DESC)", "label" : "", "id" : "q1" }],
           ]
-          #annotations = {
-          #  horizontal = [{
-          #    label = "Alarm Threshold"
-          #    value = local.cloudwatch_metric_alarms.network_lb.unhealthy-network-load-balancer-host.threshold
-          #    fill  = "above"
-          #  }]
-          #}
+
           yAxis = {
             left = {
               showUnits = false,
-              label     = "host count"
+              label     = "active flow count"
+            }
+          }
+        }
+      }
+
+      #NewFlowCount
+      load-balancer-new-flow-count = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB new-flow-count"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"NewFlowCount\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
+          ]
+
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "new flow count"
+            }
+          }
+        }
+      }
+
+      #PeakPacketsPerSecond
+      load-balancer-peak-packets-per-second = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB peak-packets-per-second"
+          stat    = "Maximum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"PeakPacketsPerSecond\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
+          ]
+
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "peak packets per second"
+            }
+          }
+        }
+      }
+
+      #ProcessedBytes
+      load-balancer-processed-bytes = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB processed-bytes"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedBytes\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
+          ]
+
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "processed bytes"
+            }
+          }
+        }
+      }
+
+      #ProcessedPackets
+      load-balancer-processed-packets = {
+        type = "metric"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB processed-packets"
+          stat    = "Sum"
+          metrics = [
+            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedPackets\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
+          ]
+
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "processed packets"
             }
           }
         }
       }
     }
-
   }
 
   cloudwatch_dashboard_widget_groups = {
@@ -987,7 +1093,12 @@ locals {
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.network_lb.unhealthy-network-load-balancer-host,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-unhealthy-host-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-active-flow-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-new-flow-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-peak-packets-per-second,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-bytes,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-packets,
         null,
         null,
       ]

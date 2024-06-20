@@ -42,7 +42,7 @@ EOF
 
   idm_2_userdata = <<EOF
 #!/bin/bash
-hostnamectl set-hostname ${local.application_name}-ods2-ms.${local.portal_hosted_zone}
+hostnamectl set-hostname ${local.application_name}-ods2-ms
 EOF
 }
 

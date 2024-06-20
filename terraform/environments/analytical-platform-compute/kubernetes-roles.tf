@@ -46,6 +46,7 @@ resource "kubernetes_role" "airflow_serviceaccount_management" {
       "delete",
       "get",
       "list",
+      "patch",
       "update"
     ]
   }

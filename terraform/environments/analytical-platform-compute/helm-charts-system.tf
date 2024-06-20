@@ -4,7 +4,7 @@ resource "helm_release" "kyverno" {
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
-  version    = "3.2.3"
+  version    = "3.2.4"
   namespace  = kubernetes_namespace.kyverno.metadata[0].name
   values = [
     templatefile(
@@ -68,7 +68,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "59.1.0"
+  version    = "60.1.0"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -116,7 +116,7 @@ resource "helm_release" "external_dns" {
   name       = "external-dns"
   repository = "https://kubernetes-sigs.github.io/external-dns"
   chart      = "external-dns"
-  version    = "1.14.4"
+  version    = "1.14.5"
   namespace  = kubernetes_namespace.external_dns.metadata[0].name
   values = [
     templatefile(
@@ -137,7 +137,7 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.14.5"
+  version    = "v1.15.0"
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   values = [
     templatefile(
@@ -203,4 +203,31 @@ resource "helm_release" "ingress_nginx" {
     )
   ]
   depends_on = [helm_release.ingress_nginx_default_certificate]
+}
+
+/* External Secrets */
+resource "helm_release" "external_secrets" {
+  /* https://artifacthub.io/packages/helm/external-secrets-operator/external-secrets */
+  name       = "external-secrets"
+  repository = "https://charts.external-secrets.io"
+  chart      = "external-secrets"
+  version    = "0.9.19"
+  namespace  = kubernetes_namespace.external_secrets.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/external-secrets/values.yml.tftpl",
+      {
+        eks_role_arn = module.external_secrets_iam_role.iam_role_arn
+      }
+    )
+  ]
+  depends_on = [module.external_secrets_iam_role]
+}
+
+resource "helm_release" "external_secrets_cluster_secret_store" {
+  name      = "external-secrets-cluster-secret-store"
+  chart     = "./src/helm/charts/external-secrets-cluster-secret-store"
+  namespace = kubernetes_namespace.external_secrets.metadata[0].name
+
+  depends_on = [helm_release.external_secrets]
 }

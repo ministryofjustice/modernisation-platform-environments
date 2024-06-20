@@ -31,6 +31,7 @@ module "apex-ecs" {
   ecs_scaling_cpu_threshold = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
   ecs_target_capacity       = local.ecs_target_capacity
+  ec2_instance_warmup_period = local.application_data.accounts[local.environment].ec2_instance_warmup_period
   log_group_kms_key         = aws_kms_key.cloudwatch_logs_key.arn
   environment               = local.environment
 

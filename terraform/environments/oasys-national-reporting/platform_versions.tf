@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      version = "~> 5.0"
+      version = "5.53.0" # hardcoded from "~> 5.0" as currently broken, fix expected in 5.57.0 - change back when this is released
       source  = "hashicorp/aws"
     }
     http = {
