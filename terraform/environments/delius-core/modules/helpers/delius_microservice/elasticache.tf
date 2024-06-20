@@ -7,7 +7,7 @@ resource "aws_elasticache_subnet_group" "this" {
 
 resource "aws_elasticache_cluster" "this" {
   count                      = var.create_elasticache ? 1 : 0
-  cluster_id                 = var.name
+  cluster_id                 = "${var.name}-${var.env_name}"
   engine                     = var.elasticache_engine
   node_type                  = var.elasticache_node_type
   num_cache_nodes            = var.elasticache_num_cache_nodes
@@ -65,7 +65,7 @@ resource "aws_elasticache_cluster" "this" {
 
 resource "aws_security_group" "elasticache" {
   count       = var.create_elasticache ? 1 : 0
-  name        = "${var.name}--${var.env_name}-elasticache-security-group"
+  name        = "${var.name}-${var.env_name}-elasticache-security-group"
   description = "controls access to elasticache"
   vpc_id      = var.account_config.shared_vpc_id
 
