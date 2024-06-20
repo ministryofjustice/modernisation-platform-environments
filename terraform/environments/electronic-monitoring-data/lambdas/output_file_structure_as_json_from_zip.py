@@ -2,23 +2,20 @@ import boto3
 import json
 import datetime
 import gzip
+import base64
+from io import BytesIO
 from logging import getLogger
 from aws_lambda_powertools.utilities.streaming.transformations import ZipTransform
 from aws_lambda_powertools.utilities.streaming.s3_object import S3Object
 
-logger = getLogger(__name__)
-
-
-import boto3
-import json
-import datetime
-import gzip
-from logging import getLogger
-from aws_lambda_powertools.utilities.streaming.transformations import ZipTransform
-from aws_lambda_powertools.utilities.streaming.s3_object import S3Object
+# def gzip_b64encode(data):
+#     compressed = BytesIO()
+#     with gzip.GzipFile(fileobj=compressed, mode='w') as f:
+#         json_response = json.dumps(data)
+#         f.write(json_response.encode('utf-8'))
+#     return base64.b64encode(compressed.getvalue()).decode('ascii')
 
 logger = getLogger(__name__)
-
 
 def handler(event, context):
     """
@@ -73,7 +70,7 @@ def handler(event, context):
     # Saving JSON content to a new file with .json extension
     new_file_base_name = object_key.split(".zip")[0]
     uncompressed_object_key = new_file_base_name + "_uncompressed_file_structure.json"
-    compressed_object_key = new_file_base_name + "_compressed_file_structure.json"
+    compressed_object_key = new_file_base_name + "_compressed_file_structure.json.gz"
 
     #Uncompressed variant for testing
     logger.info(f"Attempting conversion of large dictionary into an uncompressed json file")
@@ -89,12 +86,12 @@ def handler(event, context):
     #Compressed json for comparison
 
     logger.info(f"\n\nPerforming JSON compression")
+    
+    s3_object = S3Object(bucket=bucket, key=compressed_object_key)
 
-    with gzip.open(object_key + "_compressed.file_structure.json.gz") as gzip_object:
-        gzip_object.write(json_bytes)
-        s3_client.put_object(
-            Bucket=bucket, Key=compressed_object_key, Body=gzip_object
-        )
+    s3_client.put_object(
+        Bucket=bucket, Key=compressed_object_key, Body=gzip.compress(json_str)
+    )
 
     logger.info(f"Compressed JSON saved to {compressed_object_key}")
 
