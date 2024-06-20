@@ -4,6 +4,11 @@
 $logfile = "C:\ProgramData\Amazon\ECS\ecs_install.log"
 Add-Content $logfile "Starting ECS agent installation..."
 
+# Create the directory for the log file if it doesn't exist
+if (-not (Test-Path -Path "C:\ProgramData\Amazon\ECS")) {
+    New-Item -Path "C:\ProgramData\Amazon\ECS" -ItemType Directory -Force
+}
+
 Import-Module ECSTools
 [Environment]::SetEnvironmentVariable("ECS_CONTAINER_START_TIMEOUT", "15m", [System.EnvironmentVariableTarget]::Machine) | Out-File -Append -FilePath $logfile
 [Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine") | Out-File -Append -FilePath $logfile
