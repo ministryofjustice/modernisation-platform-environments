@@ -99,5 +99,3 @@ def handler(event, context):
     logger.info(f"Compressed JSON saved to {compressed_object_key}")
 
     return None
-
-  # Should we store the json data in a different bucket?
