@@ -276,8 +276,14 @@ def get_s3_table_folder_path(in_database_name, in_table_name):
         return None
 
 
-def get_s3_parquet_df(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
+def get_s3_parquet_df_v1(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
     return spark.createDataFrame(spark.read.parquet(in_s3_parquet_folder_path).rdd, in_rds_df_schema)
+
+def get_s3_parquet_df_v2(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
+    return spark.read.schema(in_rds_df_schema).parquet(in_s3_parquet_folder_path)
+
+def get_s3_parquet_df_v3(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
+    return spark.read.format("parquet").load(in_s3_parquet_folder_path, schema=in_rds_df_schema)
 
 
 def get_altered_df_schema_object(in_df_rds: DataFrame, in_transformed_column_list):
@@ -326,41 +332,46 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     if tbl_prq_s3_folder_path is not None:
 
         df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
-        LOGGER.info(
-            f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
+        rds_df_created_msg_1 = f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}']"""
+        rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds.rdd.getNumPartitions()}"""
+        LOGGER.info(f"""{rds_df_created_msg_1}\n{rds_df_created_msg_2}""")
         
         # -------------------------------------------------------
         if args.get("trim_rds_df_str_columns", "false") == "true":
             LOGGER.info(
                 f"""Given -> trim_rds_df_str_columns = {args["trim_rds_df_str_columns"]}, {type(args["trim_rds_df_str_columns"])}""")
             df_rds_temp_t1 = df_rds_temp.transform(trim_rds_df_str_columns)
-            additional_message = " - [After trimming RDS-DB-string column(s) spaces]"
+            additional_message = " - [After trimming string column(s) spaces]"
             df_rds_temp_t2 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
         else:
             df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
         # -------------------------------------------------------
 
-        prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] -- {total_size_mb}MB"""
+        prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}']"""
+        prq_df_created_msg_2 = f""" >> {total_size_mb}MB ; parquet_read_df_partitions = {df_prq.rdd.getNumPartitions()}"""
 
         # -------------------------------------------------------
         if args.get("transformed_column_list_1", None) is not None:
+            # This case scenario not found to be tested for migration to parquet
             given_transformed_colmn_list_1 = [e.strip().strip("'") for e in args["transformed_column_list_1"].split(",")]
             LOGGER.info(f"given_transformed_colmn_list_1 = {given_transformed_colmn_list_1}, {type(given_transformed_colmn_list_1)}")
 
             altered_schema_object = get_altered_df_schema_object(df_rds_temp, given_transformed_colmn_list_1)
-            df_prq_temp = get_s3_parquet_df(tbl_prq_s3_folder_path, altered_schema_object).repartition(default_repartition_factor)
-            prq_df_created_msg_2 = f"""\n >> parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
-            LOGGER.info(f"""{prq_df_created_msg_1}{prq_df_created_msg_2}""")
+            df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, altered_schema_object).repartition(default_repartition_factor)
+            LOGGER.info(f"""{prq_df_created_msg_1}\n{prq_df_created_msg_2}""")
 
             LOGGER.info(f"stripping {args['rds_tbl_col_replace_char_1']} from rds-dataframe-column(s)\n {given_transformed_colmn_list_1}")
-            df_rds_temp_t3 = (strip_rds_tbl_col_chars(df_rds_temp_t2, given_transformed_colmn_list_1, args['rds_tbl_col_replace_char_1'])
-                                .cache())
+
+            df_rds_temp_t3 = (strip_rds_tbl_col_chars(df_rds_temp_t2, 
+                                                      given_transformed_colmn_list_1, 
+                                                      args['rds_tbl_col_replace_char_1']
+                                ).cache()
+            )
             
             additional_message = f" - [After stripping '{args['rds_tbl_col_replace_char_1']}' from RDS-DB-tranformed column(s)]"
         else:
-            df_prq_temp = get_s3_parquet_df(tbl_prq_s3_folder_path, df_rds_temp.schema).repartition(default_repartition_factor)
-            prq_df_created_msg_2 = f"""\n >> parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
-            LOGGER.info(f"""{prq_df_created_msg_1}{prq_df_created_msg_2}""")
+            df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema).repartition(default_repartition_factor)
+            LOGGER.info(f"""{prq_df_created_msg_1}\n{prq_df_created_msg_2}""")
             
             df_rds_temp_t3 = df_rds_temp_t2.cache()
         # -------------------------------------------------------
@@ -396,7 +407,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                 subtract_validation_msg = f"""'{rds_tbl_name}' - {df_rds_prq_subtract_row_count}"""
                 df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
                                              "json_row",
-                                             f""""{subtract_validation_msg} - Dataframe-Subtract Non-Zero Row Count!" as validation_msg""",
+                                             f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
                                              f"""'{rds_db_name}' as database_name""",
                                              f"""'{db_sch_tbl}' as full_table_name""",
                                              """'False' as table_to_ap"""

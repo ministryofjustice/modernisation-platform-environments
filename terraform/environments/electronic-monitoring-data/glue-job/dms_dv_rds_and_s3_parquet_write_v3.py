@@ -53,7 +53,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db",
                        "rds_sqlserver_db_schema",
                        "rds_sqlserver_db_table",
-                       "rds_db_tbl_primary_key_list",
+                       "rds_db_tbl_pkeys_col_list",
                        "rds_df_trim_str_col_list",
                        "repartition_factor"
                        ]
@@ -384,17 +384,17 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             return df_dv_output
         # -------------------------------------------------------
 
-        if args.get('rds_db_tbl_primary_key_list', None) is None:
+        if args.get('rds_db_tbl_pkeys_col_list', None) is None:
             try:
-                rds_db_tbl_primary_key_list = [column.strip() 
+                rds_db_tbl_pkeys_col_list = [column.strip() 
                                                for column in RECORDED_PKEYS_LIST[rds_tbl_name]]
             except Exception as e:
-                LOGGER.error(f"""Runtime Parameter 'rds_db_tbl_primary_key_list' - value(s) not given!""")
+                LOGGER.error(f"""Runtime Parameter 'rds_db_tbl_pkeys_col_list' - value(s) not given!""")
                 LOGGER.error(f"""Global Dictionary - 'RECORDED_PKEYS_LIST' has no key '{rds_tbl_name}'!""")
                 sys.exit(1)
         else:
-            rds_db_tbl_primary_key_list = [f"""{column.strip().strip("'").strip('"')}""" 
-                                           for column in args['rds_db_tbl_primary_key_list'].split(",")]
+            rds_db_tbl_pkeys_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
+                                           for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
         # -------------------------------------------------------
 
         rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
@@ -410,11 +410,11 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         for_loop_count = 0
         for rds_column in df_rds_columns_list:
             for_loop_count += 1
-            if rds_column in rds_db_tbl_primary_key_list:
+            if rds_column in rds_db_tbl_pkeys_col_list:
                 continue
 
             temp_select_list = list()
-            temp_select_list = temp_select_list+rds_db_tbl_primary_key_list
+            temp_select_list = temp_select_list+rds_db_tbl_pkeys_col_list
             temp_select_list.append(rds_column)
             
             LOGGER.info(f"""{for_loop_count}-Processing - {rds_tbl_name}.{rds_column}.""")
@@ -454,7 +454,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                 df_temp = df_temp.selectExpr(
                                     "current_timestamp as run_datetime",
                                     "json_row",
-                                    f""""{subtract_validation_msg} - Dataframe-Subtract Non-Zero Row Count!" as validation_msg""",
+                                    f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
                                     f"""'{rds_db_name}' as database_name""",
                                     f"""'{db_sch_tbl}' as full_table_name""",
                                     """'False' as table_in_ap"""
@@ -470,7 +470,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         if validated_colmn_msg_list:
             #LOGGER.info(f"""validated_colmn_msg_list = {validated_colmn_msg_list}""")
 
-            total_non_primary_key_columns = len(df_rds_columns_list) - len(rds_db_tbl_primary_key_list)
+            total_non_primary_key_columns = len(df_rds_columns_list) - len(rds_db_tbl_pkeys_col_list)
             # -------------------------------------------------------
 
             if total_non_primary_key_columns == len(validated_colmn_msg_list):
