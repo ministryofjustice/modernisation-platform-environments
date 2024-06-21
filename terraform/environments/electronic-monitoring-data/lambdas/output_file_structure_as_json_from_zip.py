@@ -3,15 +3,15 @@ import datetime
 import gzip
 import io
 import json
-from logging import getLogger
+import logging
 
 from aws_lambda_powertools.utilities.streaming.transformations import ZipTransform
 from aws_lambda_powertools.utilities.streaming.s3_object import S3Object
 import boto3
 
 
-logger = getLogger(__name__)
-
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 def upload_json_gz(s3client, bucket, key, obj, default=None, encoding='utf-8'):
     ''' upload python dict into s3 bucket with gzip archive '''
