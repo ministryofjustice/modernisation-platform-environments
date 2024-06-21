@@ -1,3 +1,7 @@
+locals {
+  glue_connection_names = (local.environment == "development" ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : [])
+}
+
 resource "aws_glue_connection" "glue_operational_datastore_connection" {
   count           = (local.environment == "development" ? 1 : 0)
   name            = "${local.project}-operational-datastore-connection"

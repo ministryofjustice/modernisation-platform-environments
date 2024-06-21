@@ -7,22 +7,26 @@ locals {
   s3_buckets = merge(
 
     # if enable_shared_s3 set, create a bucket in test and production which can be used by dev and test / preprod and prod respectively
-    var.options.enable_shared_s3 && var.environment.environment == "production" ? { "prodpreprod-${var.environment.application_name}-" = {
-      bucket_policy_v2 = [
-        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-        local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy
-      ]
-      custom_kms_key = var.environment.kms_keys["general"].arn
-      iam_policies   = local.requested_s3_iam_policies
-    } } : {},
-    var.options.enable_shared_s3 && var.environment.environment == "test" ? { "devtest-${var.environment.application_name}-" = {
-      bucket_policy_v2 = [
-        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-        local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
-      ]
-      custom_kms_key = var.environment.kms_keys["general"].arn
-      iam_policies   = local.requested_s3_iam_policies
-    } } : {},
+    var.options.enable_shared_s3 && var.environment.environment == "production" ? {
+      (substr("prodpreprod-${var.environment.application_name}-", 0, 37)) = {
+        bucket_policy_v2 = [
+          local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy
+        ]
+        custom_kms_key = var.environment.kms_keys["general"].arn
+        iam_policies   = local.requested_s3_iam_policies
+      }
+    } : {},
+    var.options.enable_shared_s3 && var.environment.environment == "test" ? {
+      (substr("devtest-${var.environment.application_name}-", 0, 37)) = {
+        bucket_policy_v2 = [
+          local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
+        ]
+        custom_kms_key = var.environment.kms_keys["general"].arn
+        iam_policies   = local.requested_s3_iam_policies
+      }
+    } : {},
 
     # If db_backup_s3 enabled, create db_backups in all environments.
     # Dev and Test can both access each other: Preprod can access prod but not vice-versa
