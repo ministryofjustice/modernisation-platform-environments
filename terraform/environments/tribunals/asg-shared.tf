@@ -4,18 +4,6 @@ locals {
   instance_profile_name = join("-", [local.app_name, "ec2-instance-profile"])
   ec2_instance_policy   = join("-", [local.app_name, "ec2-instance-policy"])
   tags_common           = local.tags
-  modules = {
-    appeals = module.appeals,
-    ahmlr = module.ahmlr,
-    care_standards = module.care_standards,
-    cicap = module.cicap,
-    employment_appeals = module.employment_appeals
-    finance_and_tax = module.finance_and_tax
-    immigration_services = module.immigration_services
-    information_tribunal = module.information_tribunal
-    lands_tribunal = module.lands_tribunal
-    transport = module.transport
-  }
 }
 
 # Create an IAM policy for the custom permissions required by the EC2 hosting instance
