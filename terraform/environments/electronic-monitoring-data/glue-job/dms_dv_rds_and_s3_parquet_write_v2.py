@@ -126,7 +126,7 @@ def check_if_rds_db_exists(in_rds_db_str):
                             .option("driver", RDS_DB_INSTANCE_DRIVER)
                             .load()
                   )
-    return [row[0] for row in df_rds_sys.collect()]
+    return [row[0] for row in df_rds_sys.collect()][0]
 
 
 def get_rds_tables_dataframe(in_rds_db_name) -> DataFrame:
@@ -149,18 +149,19 @@ def get_rds_tables_dataframe(in_rds_db_name) -> DataFrame:
             .load()
             )
 
-
-def get_rds_db_tbl_list(in_rds_sqlserver_db_list):
+def get_rds_db_tbl_list(in_rds_sqlserver_db_str):
     rds_db_tbl_temp_list = list()
-    for db in in_rds_sqlserver_db_list:
-        rds_sqlserver_db_tbls = get_rds_tables_dataframe(db)
-        rds_sqlserver_db_tbls = (rds_sqlserver_db_tbls.select(
-            F.concat(rds_sqlserver_db_tbls.table_catalog,
-                     F.lit('_'), rds_sqlserver_db_tbls.table_schema,
-                     F.lit('_'), rds_sqlserver_db_tbls.table_name).alias("full_table_name"))
-        )
-        rds_db_tbl_temp_list = rds_db_tbl_temp_list + \
-            [row[0] for row in rds_sqlserver_db_tbls.collect()]
+
+    df_rds_sqlserver_db_tbls = get_rds_tables_dataframe(in_rds_sqlserver_db_str)
+
+    df_rds_sqlserver_db_tbls = (df_rds_sqlserver_db_tbls.select(
+                                    F.concat(df_rds_sqlserver_db_tbls.table_catalog,
+                                    F.lit('_'), df_rds_sqlserver_db_tbls.table_schema,
+                                    F.lit('_'), df_rds_sqlserver_db_tbls.table_name).alias("full_table_name"))
+    )
+
+    rds_db_tbl_temp_list = rds_db_tbl_temp_list + \
+                            [row[0] for row in df_rds_sqlserver_db_tbls.collect()]
 
     return rds_db_tbl_temp_list
 
