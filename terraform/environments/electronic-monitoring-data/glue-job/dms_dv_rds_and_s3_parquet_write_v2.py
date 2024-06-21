@@ -58,11 +58,9 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        ]
 
 OPTIONAL_INPUTS = [
-    "select_rds_db_tbls",
-    "exclude_rds_db_tbls",
+    "rds_select_db_tbls",
+    "rds_exclude_db_tbls",
     "rds_df_trim_micro_sec_ts_col_list"
-    "transformed_column_list_1",
-    "rds_tbl_col_replace_char_1"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -383,33 +381,10 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
             df_rds_temp_t4 = df_rds_temp_t1
         # -------------------------------------------------------
 
-        if args.get("transformed_column_list_1", None) is not None:
-            # This case scenario not found to be tested for migration to parquet
-            transformed_column_str_1 = args["transformed_column_list_1"]
-            given_transformed_colmn_list_1 = [e.strip().strip("'").strip('"') 
-                                              for e in transformed_column_str_1.split(",")]
-            msg_prefix = f"given_transformed_colmn_list_1"
-            LOGGER.info(f"{msg_prefix} = {given_transformed_colmn_list_1}, {type(given_transformed_colmn_list_1)}")
+        df_rds_temp_t5 = df_rds_temp_t4.cache()
 
-            altered_schema_object = get_altered_df_schema_object(df_rds_temp, given_transformed_colmn_list_1)
-
-            df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, 
-                                               altered_schema_object).repartition(default_repartition_factor)
-
-            rds_tbl_col_replace_char_1 = args['rds_tbl_col_replace_char_1']
-            LOGGER.info(f"stripping {rds_tbl_col_replace_char_1} from rds-dataframe-column(s)\n {given_transformed_colmn_list_1}")
-            df_rds_temp_t5 = (strip_rds_tbl_col_chars(df_rds_temp_t4, 
-                                                      given_transformed_colmn_list_1, 
-                                                      rds_tbl_col_replace_char_1)
-            ).cache()
-            
-            additional_message = f" - [After stripping '{args['rds_tbl_col_replace_char_1']}' from RDS-DB-tranformed column(s)]"
-        else:
-            df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, 
-                                               df_rds_temp.schema).repartition(default_repartition_factor)
-            
-            df_rds_temp_t5 = df_rds_temp_t4.cache()
-        # -------------------------------------------------------
+        df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, 
+                                            df_rds_temp.schema).repartition(default_repartition_factor)
 
         prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}']"""
         prq_df_created_msg_2 = f""" >> {total_size_mb}MB ; parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
@@ -561,14 +536,14 @@ if __name__ == "__main__":
     LOGGER.info(f"""{message_prefix}\n{rds_sqlserver_db_tbl_list}""")
     
     # -------------------------------------------------------
-    if args.get("select_rds_db_tbls", None) is None:
+    if args.get("rds_select_db_tbls", None) is None:
         # -------------------------------------------------------
-        if args.get("exclude_rds_db_tbls", None) is None:
+        if args.get("rds_exclude_db_tbls", None) is None:
             exclude_rds_db_tbls_list = list()
         else:
             table_name_prefix = f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}"""
             exclude_rds_db_tbls_list = [f"""{table_name_prefix}_{tbl.strip().strip("'").strip('"')}"""
-                                        for tbl in args['exclude_rds_db_tbls'].split(",")]
+                                        for tbl in args['rds_exclude_db_tbls'].split(",")]
             LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
         # -------------------------------------------------------
 
@@ -617,7 +592,7 @@ if __name__ == "__main__":
             write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
 
     else:
-        given_rds_sqlserver_tbls_str = args["select_rds_db_tbls"]
+        given_rds_sqlserver_tbls_str = args["rds_select_db_tbls"]
 
         LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
 
