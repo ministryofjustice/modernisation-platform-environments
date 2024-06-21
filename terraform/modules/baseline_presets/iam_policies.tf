@@ -206,27 +206,27 @@ locals {
         {
           effect = "Allow"
           actions = [
-              "s3:GetBucketLocation",
-              "s3:GetObject",
-              "s3:ListBucket",
-              "s3:PutObject",
-              "s3:GetBucketAcl"
+            "s3:GetBucketLocation",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:PutObject",
+            "s3:GetBucketAcl"
           ],
           resources = [
-              "arn:aws:s3:::*",
-              "arn:aws:s3:::*/*",
-              "arn:aws:s3:::*/*/*"
+            "arn:aws:s3:::*",
+            "arn:aws:s3:::*/*",
+            "arn:aws:s3:::*/*/*"
           ]
         },
         {
           effect = "Allow"
           actions = [
-              "ec2:ModifySnapshotAttribute",
-              "ec2:CopySnapshot",
-              "ec2:RegisterImage",
-              "ec2:Describe*"
+            "ec2:ModifySnapshotAttribute",
+            "ec2:CopySnapshot",
+            "ec2:RegisterImage",
+            "ec2:Describe*"
           ],
-          resources = [ "*" ]
+          resources = ["*"]
         },
         {
           effect = "Allow"
@@ -238,10 +238,10 @@ locals {
             "kms:GenerateDataKey*",
             "kms:ReEncrypt*"
           ],
-          resources = [ "*" ]
+          resources = ["*"]
         }
       ]
     }
-    
+
   }
 }
