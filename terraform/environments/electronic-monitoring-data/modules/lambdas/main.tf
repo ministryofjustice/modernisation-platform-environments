@@ -131,6 +131,7 @@ data "external" "latest_image_update_log_table" {
 
 
 resource "aws_lambda_function" "this" {
+  #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
   # Zip File config
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
