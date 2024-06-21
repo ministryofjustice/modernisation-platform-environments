@@ -1,5 +1,5 @@
 locals {
-  glue_connection_ids = (local.environment == "development" ? [aws_glue_connection.glue_operational_datastore_connection[0].id] : [])
+  glue_connection_names = (local.environment == "development" ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : [])
 }
 
 resource "aws_glue_connection" "glue_operational_datastore_connection" {
