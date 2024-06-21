@@ -225,7 +225,7 @@ module "unzipped-s3-data-store" {
 module "unzipped_store_log_bucket" {
   source = "./modules/s3_log_bucket"
 
-  source_bucket = aws_s3_bucket.unzipped_store
+  source_bucket = module.unzipped-s3-data-store.bucket
   account_id    = data.aws_caller_identity.current.account_id
   local_tags    = local.tags
 }
