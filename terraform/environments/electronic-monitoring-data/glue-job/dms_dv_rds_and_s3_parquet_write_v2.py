@@ -126,7 +126,7 @@ def check_if_rds_db_exists(in_rds_db_str):
                             .option("driver", RDS_DB_INSTANCE_DRIVER)
                             .load()
                   )
-    return [row[0] for row in df_rds_sys.collect()][0]
+    return [row[0] for row in df_rds_sys.collect()]
 
 
 def get_rds_tables_dataframe(in_rds_db_name) -> DataFrame:
@@ -500,11 +500,12 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, table):
 if __name__ == "__main__":
 
     LOGGER.info(f"""Given database: {args.get("rds_sqlserver_db", None)}""")
-    rds_sqlserver_db_str = check_if_rds_db_exists(args.get("rds_sqlserver_db", None))
+    rds_sqlserver_db_list = check_if_rds_db_exists(args.get("rds_sqlserver_db", None))
+    rds_sqlserver_db_str = '' if len(rds_sqlserver_db_list) == 0 else rds_sqlserver_db_list[0]
     
     # -------------------------------------------------------
     
-    if rds_sqlserver_db_str == '' or rds_sqlserver_db_str is None:
+    if rds_sqlserver_db_str == '':
         LOGGER.error(f"""Given database name not found! >> {args['rds_sqlserver_db']} <<""")
         sys.exit(1)
     # -------------------------------------------------------
@@ -515,8 +516,16 @@ if __name__ == "__main__":
     LOGGER.info(f"""Given rds_sqlserver_db_schema = {given_rds_sqlserver_db_schema}""")
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_str)
-    LOGGER.info(f"""Total List of tables available in {rds_sqlserver_db_str}.{given_rds_sqlserver_db_schema}\n{rds_sqlserver_db_tbl_list}""")
 
+    # -------------------------------------------------------
+    if not rds_sqlserver_db_tbl_list:
+            LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
+            sys.exit(1)
+    # -------------------------------------------------------
+
+    message_prefix = f"""Total List of tables available in {rds_sqlserver_db_str}.{given_rds_sqlserver_db_schema}"""
+    LOGGER.info(f"""{message_prefix}\n{rds_sqlserver_db_tbl_list}""")
+    
     # -------------------------------------------------------
     if args.get("select_rds_db_tbls", None) is None:
         # -------------------------------------------------------
@@ -574,26 +583,26 @@ if __name__ == "__main__":
             write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
 
     else:
-        # -------------------------------------------------------
-        if not rds_sqlserver_db_tbl_list:
-                LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
-                sys.exit(1)
-        else:
-            LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
-        # -------------------------------------------------------
-
         given_rds_sqlserver_tbls_str = args["select_rds_db_tbls"]
 
         LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
 
-        given_rds_sqlserver_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}"""
+        table_name_prefix = f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}"""
+        given_rds_sqlserver_tbls_list = [f"""{table_name_prefix}_{tbl.strip().strip("'").strip('"')}"""
                                          for tbl in given_rds_sqlserver_tbls_str.split(",")]
 
         LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
+        # ---------------------------------------------------------------------------
+        selected_tables_not_found_list = [tbl for tbl in given_rds_sqlserver_tbls_list 
+                                          if tbl not in rds_sqlserver_db_tbl_list]
+        if selected_tables_not_found_list:
+            LOGGER.error(f"""{selected_tables_not_found_list} - NOT FOUND ! Exiting ...""")
+            sys.exit(1)
+        # ---------------------------------------------------------------------------
+        
         filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list 
                                               if tbl in rds_sqlserver_db_tbl_list]
-
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
 
         for db_sch_tbl in filtered_rds_sqlserver_db_tbl_list:

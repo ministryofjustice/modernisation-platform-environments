@@ -141,7 +141,7 @@ def check_if_rds_db_exists(in_rds_db_str):
                             .option("driver", RDS_DB_INSTANCE_DRIVER)
                             .load()
                   )
-    return [row[0] for row in df_rds_sys.collect()][0]
+    return [row[0] for row in df_rds_sys.collect()]
 
 
 def get_rds_tables_dataframe(in_rds_db_name) -> DataFrame:
@@ -557,11 +557,12 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, db_sch_tbl_name):
 if __name__ == "__main__":
 
     LOGGER.info(f"""Given database(s): {args.get("rds_sqlserver_db", None)}""")
-    rds_sqlserver_db_str = check_if_rds_db_exists(args.get("rds_sqlserver_db", None))
+    rds_sqlserver_db_list = check_if_rds_db_exists(args.get("rds_sqlserver_db", None))
+    rds_sqlserver_db_str = '' if len(rds_sqlserver_db_list) == 0 else rds_sqlserver_db_list[0]
 
     # -------------------------------------------------------
     
-    if rds_sqlserver_db_str == '' or rds_sqlserver_db_str is None:
+    if rds_sqlserver_db_str == '':
         LOGGER.error(f"""Given database name not found! >> {args['rds_sqlserver_db']} <<""")
         sys.exit(1)
     # -------------------------------------------------------
@@ -572,7 +573,15 @@ if __name__ == "__main__":
     LOGGER.info(f"""Given rds_sqlserver_db_schema = {given_rds_sqlserver_db_schema}""")
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_str)
-    LOGGER.info(f"""Total List of tables existing: {rds_sqlserver_db_str}.{given_rds_sqlserver_db_schema}\n{rds_sqlserver_db_tbl_list}""")
+    
+    # -------------------------------------------------------
+    if not rds_sqlserver_db_tbl_list:
+            LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
+            sys.exit(1)
+    # -------------------------------------------------------
+
+    message_prefix = f"""Total List of tables available in {rds_sqlserver_db_str}.{given_rds_sqlserver_db_schema}"""
+    LOGGER.info(f"""{message_prefix}\n{rds_sqlserver_db_tbl_list}""")
 
     # -------------------------------------------------------
     if args.get("rds_sqlserver_db_table", None) is None:
@@ -586,10 +595,7 @@ if __name__ == "__main__":
     LOGGER.info(f"""Given RDS SqlServer-DB Table: {given_rds_sqlserver_table}, {type(given_rds_sqlserver_table)}""")
     # -------------------------------------------------------
     
-    if not rds_sqlserver_db_tbl_list:
-        LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty! Exiting ...""")
-        sys.exit(1)
-    elif db_sch_tbl not in rds_sqlserver_db_tbl_list:
+    if db_sch_tbl not in rds_sqlserver_db_tbl_list:
         LOGGER.error(f"""'{db_sch_tbl}' - is not an existing table! Exiting ...""")
         sys.exit(1)
     # -------------------------------------------------------
