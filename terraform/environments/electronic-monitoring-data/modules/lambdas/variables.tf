@@ -84,6 +84,7 @@ variable "environment_variables" {
   description = "A map that defines environment variables for the Lambda function."
   type        = map(string)
   default = null
+  nullable = true
 }
 
 variable "reserved_concurrent_executions" {
@@ -101,4 +102,5 @@ variable "ecr_repo_name" {
   description = "Default name of ECR repo to get image from"
   type = string
   default = null
+  nullable = true
 }
