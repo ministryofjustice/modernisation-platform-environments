@@ -498,8 +498,16 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, table):
 
 if __name__ == "__main__":
 
-    LOGGER.info(f"""Given database(s): {args.get("rds_sqlserver_db", None)}""")
+    LOGGER.info(f"""Given database: {args.get("rds_sqlserver_db", None)}""")
     rds_sqlserver_db_str = check_if_rds_db_exists(args.get("rds_sqlserver_db", None))
+    
+    # -------------------------------------------------------
+    
+    if rds_sqlserver_db_str == '' or rds_sqlserver_db_str is None:
+        LOGGER.error(f"""Given database name not found! >> {args['rds_sqlserver_db']} <<""")
+        sys.exit(1)
+    # -------------------------------------------------------
+    
     LOGGER.info(f"""Using database(s): {rds_sqlserver_db_str}""")
     
     given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
@@ -514,7 +522,8 @@ if __name__ == "__main__":
         if args.get("exclude_rds_db_tbls", None) is None:
             exclude_rds_db_tbls_list = list()
         else:
-            exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}"""
+            table_name_prefix = f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}"""
+            exclude_rds_db_tbls_list = [f"""{table_name_prefix}_{tbl.strip().strip("'").strip('"')}"""
                                         for tbl in args['exclude_rds_db_tbls'].split(",")]
             LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
         # -------------------------------------------------------

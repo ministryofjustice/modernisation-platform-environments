@@ -558,6 +558,14 @@ if __name__ == "__main__":
 
     LOGGER.info(f"""Given database(s): {args.get("rds_sqlserver_db", None)}""")
     rds_sqlserver_db_str = check_if_rds_db_exists(args.get("rds_sqlserver_db", None))
+
+    # -------------------------------------------------------
+    
+    if rds_sqlserver_db_str == '' or rds_sqlserver_db_str is None:
+        LOGGER.error(f"""Given database name not found! >> {args['rds_sqlserver_db']} <<""")
+        sys.exit(1)
+    # -------------------------------------------------------
+
     LOGGER.info(f"""Using database(s): {rds_sqlserver_db_str}""")
     
     given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
