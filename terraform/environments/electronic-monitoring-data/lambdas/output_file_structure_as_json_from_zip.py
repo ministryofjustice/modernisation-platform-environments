@@ -9,13 +9,6 @@ from aws_lambda_powertools.utilities.streaming.transformations import ZipTransfo
 from aws_lambda_powertools.utilities.streaming.s3_object import S3Object
 import boto3
 
-# def gzip_b64encode(data):
-#     compressed = io.BytesIO()
-#     with gzip.GzipFile(fileobj=compressed, mode='w') as f:
-#         json_response = json.dumps(data)
-#         f.write(json_response.encode('utf-8'))
-#     return base64.b64encode(compressed.getvalue()).decode('ascii')
-
 def upload_json_gz(s3client, bucket, key, obj, default=None, encoding='utf-8'):
     ''' upload python dict into s3 bucket with gzip archive '''
     inmem = io.BytesIO()
