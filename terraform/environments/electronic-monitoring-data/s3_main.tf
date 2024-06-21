@@ -119,16 +119,16 @@ module "athena-s3-bucket" {
 
       transition = [
         {
-          days          = 365
+          days          = 30
           storage_class = "STANDARD_IA"
           }, {
-          days          = 730
+          days          = 90
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 1000
+        days = 365
       }
 
       noncurrent_version_transition = [
@@ -189,16 +189,16 @@ module "unzipped-s3-data-store" {
 
       transition = [
         {
-          days          = 30
+          days          = 365
           storage_class = "STANDARD_IA"
           }, {
-          days          = 90
+          days          = 730
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 365
+        days = 1000
       }
 
       noncurrent_version_transition = [
