@@ -55,7 +55,7 @@ resource "aws_athena_workgroup" "default" {
     }
 
     result_configuration {
-      output_location = "s3://${module.athena-s3-bucket.bucket}/output/"
+      output_location = "s3://${module.athena-s3-bucket.bucket.id}/output/"
 
       encryption_configuration {
         encryption_option = "SSE_KMS"
