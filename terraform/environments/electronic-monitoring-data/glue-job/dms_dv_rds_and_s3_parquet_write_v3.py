@@ -54,11 +54,11 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_schema",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
-                       "rds_df_trim_str_col_list",
                        "repartition_factor"
                        ]
 
 OPTIONAL_INPUTS = [
+    "rds_df_trim_str_col_list"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -89,7 +89,8 @@ PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
 GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
 
-CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
+CATALOG_DB_TABLE_PATH = f"""{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}"""
+CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{CATALOG_DB_TABLE_PATH}'''
 
 NVL_DTYPE_DICT = {
     'tinyint': 0, 'smallint': 0, 'int': 0, 'bigint':0,
@@ -441,17 +442,19 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             # -------------------------------------------------------
 
             if df_rds_prq_subtract_row_count == 0:
-                validated_colmn_msg = f"""'{rds_column}'-spaces trimmed""" if rds_column_trimmed == 1 else rds_column
+                validated_colmn_msg = f"""'{rds_column}'-spaces trimmed""" \
+                                        if rds_column_trimmed == 1 else rds_column
+                
                 validated_colmn_msg_list.append(validated_colmn_msg)
 
             else:
-                df_temp = (df_rds_prq_subtract_transform
+                df_subtract_temp = (df_rds_prq_subtract_transform
                            .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
                            .selectExpr("json_row")
                            .limit(5))
 
                 subtract_validation_msg = f"""'{rds_tbl_name}.{rds_column}' - {df_rds_prq_subtract_row_count}"""
-                df_temp = df_temp.selectExpr(
+                df_subtract_temp = df_subtract_temp.selectExpr(
                                     "current_timestamp as run_datetime",
                                     "json_row",
                                     f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
@@ -460,7 +463,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                     """'False' as table_in_ap"""
                             )
                 LOGGER.warn(f"Validation Failed - 2")
-                df_dv_output = df_dv_output.union(df_temp)
+                df_dv_output = df_dv_output.union(df_subtract_temp)
             # -------------------------------------------------------
 
             df_rds_prq_subtract_transform.unpersist(True)
@@ -502,15 +505,16 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         # -------------------------------------------------------
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
-        df_dv_output = df_dv_output.selectExpr(
-                                        "current_timestamp as run_datetime",
-                                        "'' as json_row",
-                                        f"""'{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
-                                        f"""'{rds_db_name}' as database_name""",
-                                        f"""'{db_sch_tbl}' as full_table_name""",
-                                        """'False' as table_in_ap"""
-                        )
+        df_temp_row = spark.sql(f"""select
+                                    current_timestamp as run_datetime,
+                                    '' as json_row,
+                                    '{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg,
+                                    '{rds_db_name}' as database_name,
+                                    '{db_sch_tbl}' as full_table_name,
+                                    'False' as table_in_ap
+                                """.strip())
         LOGGER.warn(f"Validation not applicable - 4")
+        df_dv_output = df_dv_output.union(df_temp_row)
     # -------------------------------------------------------
 
     LOGGER.info(final_validation_msg)
@@ -524,7 +528,7 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, db_sch_tbl_name):
     #LOGGER.info(f"""database={database} ; db_sch_tbl_name={db_sch_tbl_name}""")
 
     if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                      f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={db_sch_tbl_name}'''
+                                      f'''{CATALOG_DB_TABLE_PATH}/database_name={database}/full_table_name={db_sch_tbl_name}'''
                                       ):
         LOGGER.info(f"""Purging S3-path: {CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={db_sch_tbl_name}""")
 

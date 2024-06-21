@@ -92,7 +92,8 @@ PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
 GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
 
-CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
+CATALOG_DB_TABLE_PATH = f"""{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}"""
+CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{CATALOG_DB_TABLE_PATH}'''
 
 NVL_DTYPE_DICT = {'string': "''", 'int': 0, 'double': 0, 'float': 0, 'smallint': 0, 'bigint':0,
                   'boolean': False,
@@ -399,13 +400,13 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                 LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
             else:
-                df_temp = (df_rds_prq_subtract_t1
+                df_subtract_temp = (df_rds_prq_subtract_t1
                            .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
                            .selectExpr("json_row")
                            .limit(100))
 
                 subtract_validation_msg = f"""'{rds_tbl_name}' - {df_rds_prq_subtract_row_count}"""
-                df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
+                df_subtract_temp = df_subtract_temp.selectExpr("current_timestamp as run_datetime",
                                              "json_row",
                                              f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
                                              f"""'{rds_db_name}' as database_name""",
@@ -413,7 +414,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                              """'False' as table_to_ap"""
                                              )
                 LOGGER.warn(f"Validation Failed - 2")
-                df_dv_output = df_dv_output.union(df_temp)
+                df_dv_output = df_dv_output.union(df_subtract_temp)
             # -------------------------------------------------------
 
         else:
@@ -459,7 +460,7 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, table):
     df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
 
     if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                      f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={table}'''
+                                      f'''{CATALOG_DB_TABLE_PATH}/database_name={database}/full_table_name={table}'''
                                       ):
         LOGGER.info(f"""Purging S3-path: {CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""")
 
