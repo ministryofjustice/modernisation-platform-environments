@@ -1,12 +1,13 @@
-import boto3
-import json
+import base64
 import datetime
 import gzip
-import base64
 import io
+import json
 from logging import getLogger
+
 from aws_lambda_powertools.utilities.streaming.transformations import ZipTransform
 from aws_lambda_powertools.utilities.streaming.s3_object import S3Object
+import boto3
 
 # def gzip_b64encode(data):
 #     compressed = io.BytesIO()
