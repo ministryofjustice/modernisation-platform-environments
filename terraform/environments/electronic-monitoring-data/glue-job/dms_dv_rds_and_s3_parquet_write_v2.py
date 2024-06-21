@@ -54,12 +54,13 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_schema",
                        "repartition_factor",
                        "max_table_size_mb",
-                       "trim_rds_df_str_columns"
+                       "rds_df_trim_str_columns"
                        ]
 
 OPTIONAL_INPUTS = [
     "select_rds_db_tbls",
     "exclude_rds_db_tbls",
+    "rds_df_trim_micro_sec_ts_col_list"
     "transformed_column_list_1",
     "rds_tbl_col_replace_char_1"
 ]
@@ -195,12 +196,17 @@ def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name) -> DataFrame:
             )
 
 
-def trim_rds_df_str_columns(in_rds_df: DataFrame) -> DataFrame:
+def rds_df_trim_str_columns(in_rds_df: DataFrame) -> DataFrame:
     return (in_rds_df.select(
             *[F.trim(F.col(c[0])).alias(c[0]) if c[1] == 'string' else F.col(c[0])
               for c in in_rds_df.dtypes])
             )
 
+def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, in_col_list) -> DataFrame:
+    return (in_rds_df.select(
+            *[F.col(c[0]).alias(c[0]) if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
+              for c in in_rds_df.dtypes])
+            )
 
 def strip_rds_tbl_col_chars(in_rds_df: DataFrame, 
                             in_transformed_colmn_list_1, 
@@ -337,44 +343,72 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
         rds_df_created_msg_1 = f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}']"""
         rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds_temp.rdd.getNumPartitions()}"""
         LOGGER.info(f"""{rds_df_created_msg_1}\n{rds_df_created_msg_2}""")
-        
-        # -------------------------------------------------------
-        if args.get("trim_rds_df_str_columns", "false") == "true":
-            LOGGER.info(
-                f"""Given -> trim_rds_df_str_columns = {args["trim_rds_df_str_columns"]}, {type(args["trim_rds_df_str_columns"])}""")
-            df_rds_temp_t1 = df_rds_temp.transform(trim_rds_df_str_columns)
-            additional_message = " - [After trimming string column(s) spaces]"
-            df_rds_temp_t2 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
-        else:
-            df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+
+        df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
         # -------------------------------------------------------
 
+        t2 = False
+        if args.get("rds_df_trim_str_columns", "false") == "true":
+            msg_prefix = f"""Given -> rds_df_trim_str_columns"""
+            LOGGER.info(
+                f"""{msg_prefix} = {args["rds_df_trim_str_columns"]}, {type(args["rds_df_trim_str_columns"])}""")
+            df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_str_columns)
+            additional_message = " - [After trimming string column(s) spaces]"
+            t2 = True
         # -------------------------------------------------------
+
+        t3 = False
+        if args.get("rds_df_trim_micro_sec_ts_col_list", None) is not None:
+            msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list"""
+            given_rds_df_trim_micro_seconds_col_str = args["rds_df_trim_micro_sec_ts_col_list"]
+            given_rds_df_trim_micro_seconds_col_list = [
+                f"""{table_name_prefix}_{tbl.strip().strip("'").strip('"')}"""
+                for tbl in given_rds_df_trim_micro_seconds_col_str.split(",")
+                ]
+            LOGGER.info(
+                f"""{msg_prefix} = {given_rds_df_trim_micro_seconds_col_list}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
+            if t2 == True:
+                df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t2, given_rds_df_trim_micro_seconds_col_list)
+            else:
+                df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t1, given_rds_df_trim_micro_seconds_col_list)
+            additional_message = " - [After trimming timestamp micro-seconds]"
+            t3 = True
+        # -------------------------------------------------------
+
+        if t3:
+            df_rds_temp_t4 = df_rds_temp_t3
+        elif t2:
+            df_rds_temp_t4 = df_rds_temp_t2
+        else:
+            df_rds_temp_t4 = df_rds_temp_t1
+        # -------------------------------------------------------
+
         if args.get("transformed_column_list_1", None) is not None:
             # This case scenario not found to be tested for migration to parquet
+            transformed_column_str_1 = args["transformed_column_list_1"]
             given_transformed_colmn_list_1 = [e.strip().strip("'").strip('"') 
-                                              for e in args["transformed_column_list_1"].split(",")]
-            
-            LOGGER.info(f"given_transformed_colmn_list_1 = {given_transformed_colmn_list_1}, {type(given_transformed_colmn_list_1)}")
+                                              for e in transformed_column_str_1.split(",")]
+            msg_prefix = f"given_transformed_colmn_list_1"
+            LOGGER.info(f"{msg_prefix} = {given_transformed_colmn_list_1}, {type(given_transformed_colmn_list_1)}")
 
             altered_schema_object = get_altered_df_schema_object(df_rds_temp, given_transformed_colmn_list_1)
 
             df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, 
                                                altered_schema_object).repartition(default_repartition_factor)
 
-            LOGGER.info(f"stripping {args['rds_tbl_col_replace_char_1']} from rds-dataframe-column(s)\n {given_transformed_colmn_list_1}")
-            df_rds_temp_t3 = (strip_rds_tbl_col_chars(df_rds_temp_t2, 
+            rds_tbl_col_replace_char_1 = args['rds_tbl_col_replace_char_1']
+            LOGGER.info(f"stripping {rds_tbl_col_replace_char_1} from rds-dataframe-column(s)\n {given_transformed_colmn_list_1}")
+            df_rds_temp_t5 = (strip_rds_tbl_col_chars(df_rds_temp_t4, 
                                                       given_transformed_colmn_list_1, 
-                                                      args['rds_tbl_col_replace_char_1']
-                                ).cache()
-            )
+                                                      rds_tbl_col_replace_char_1)
+            ).cache()
             
             additional_message = f" - [After stripping '{args['rds_tbl_col_replace_char_1']}' from RDS-DB-tranformed column(s)]"
         else:
             df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, 
                                                df_rds_temp.schema).repartition(default_repartition_factor)
             
-            df_rds_temp_t3 = df_rds_temp_t2.cache()
+            df_rds_temp_t5 = df_rds_temp_t4.cache()
         # -------------------------------------------------------
 
         prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}']"""
@@ -385,13 +419,13 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                         *get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)
                             ).cache()
 
-        df_rds_temp_count = df_rds_temp_t3.count()
+        df_rds_temp_count = df_rds_temp_t5.count()
         df_prq_temp_count = df_prq_temp_t1.count()
 
         # -------------------------------------------------------
         if df_rds_temp_count == df_prq_temp_count:
 
-            df_rds_prq_subtract_t1 = df_rds_temp_t2.subtract(df_prq_temp_t1)
+            df_rds_prq_subtract_t1 = df_rds_temp_t5.subtract(df_prq_temp_t1)
             df_rds_prq_subtract_row_count = df_rds_prq_subtract_t1.count()
 
             # -------------------------------------------------------
