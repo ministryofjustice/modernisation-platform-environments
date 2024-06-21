@@ -4,6 +4,18 @@ locals {
   instance_profile_name = join("-", [local.app_name, "ec2-instance-profile"])
   ec2_instance_policy   = join("-", [local.app_name, "ec2-instance-policy"])
   tags_common           = local.tags
+  modules = {
+    appeals = module.appeals,
+    ahmlr = module.ahmlr,
+    care_standards = module.care_standards,
+    cicap = module.cicap,
+    employment_appeals = module.employment_appeals
+    finance_and_tax = module.finance_and_tax
+    immigration_services = module.immigration_services
+    information_tribunal = module.information_tribunal
+    lands_tribunal = module.lands_tribunal
+    transport = module.transport
+  }
 }
 
 # Create an IAM policy for the custom permissions required by the EC2 hosting instance
@@ -197,8 +209,9 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   max_size            = 1
   min_size            = 1
   name                = local.app_name
-  target_group_arns   = [module.tribunal.tribunals_target_group_arn]
-
+  target_group_arns   = [
+    for module_instance in local.modules : module_instance.target_group_arn
+  ]
   launch_template {
     id      = aws_launch_template.tribunals-all-lt.id
     version = "$Latest"
