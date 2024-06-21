@@ -31,7 +31,6 @@ resource "aws_secretsmanager_secret_policy" "database_dba_passwords" {
 }
 
 # Oracle Database Application Secret
-
 resource "aws_secretsmanager_secret" "database_application_passwords" {
   name        = local.application_secret_name
   description = "Application Users Credentials"
