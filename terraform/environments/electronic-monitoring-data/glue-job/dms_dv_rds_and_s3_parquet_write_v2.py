@@ -334,7 +334,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
 
         df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
         rds_df_created_msg_1 = f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}']"""
-        rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds.rdd.getNumPartitions()}"""
+        rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds_temp.rdd.getNumPartitions()}"""
         LOGGER.info(f"""{rds_df_created_msg_1}\n{rds_df_created_msg_2}""")
         
         # -------------------------------------------------------
