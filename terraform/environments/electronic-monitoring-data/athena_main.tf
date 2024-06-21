@@ -1,5 +1,5 @@
 resource "aws_kms_key" "athena_workspace_result_encryption_key" {
-  description         = "KMS key for encrypting the ${aws_athena_workgroup.default.name} Athena Workspace's results"
+  description         = "KMS key for encrypting the default Athena Workspace's results"
   enable_key_rotation = true
 
   policy = jsonencode(
@@ -37,7 +37,7 @@ resource "aws_kms_key" "athena_workspace_result_encryption_key" {
   tags = merge(
     local.tags,
     {
-      Resource_Type = "KMS key for query result encryption used with ${aws_athena_workgroup.default.name} Athena Workgroup",
+      Resource_Type = "KMS key for query result encryption used with default Athena Workgroup",
     }
   )
 }
