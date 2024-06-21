@@ -128,7 +128,9 @@ locals {
           "arn:aws:s3:::mod-platform-image-artefact-bucket*/*",
           "arn:aws:s3:::mod-platform-image-artefact-bucket*",
           "arn:aws:s3:::modernisation-platform-software*/*",
-          "arn:aws:s3:::modernisation-platform-software*"
+          "arn:aws:s3:::modernisation-platform-software*",
+          "arn:aws:s3:::s3-bucket*/*",
+          "arn:aws:s3:::s3-bucket*"
         ])
       }
     ]

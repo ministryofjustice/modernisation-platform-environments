@@ -201,6 +201,12 @@ locals {
     }
 
     ec2_instances = {
+      audit_vault_image_creator = merge(local.audit_vault_image_creator, {
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 300 }
+        }
+      })
+
       t1-oasys-bip-a = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
           instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
