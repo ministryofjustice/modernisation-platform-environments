@@ -50,7 +50,6 @@ resource "aws_athena_workgroup" "default" {
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
 
-        selected_engine_version = "AUTO"
     }
 
     result_configuration {
