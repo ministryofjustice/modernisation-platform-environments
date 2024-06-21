@@ -153,8 +153,8 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
     ]
     effect = "Allow"
     resources = [
-      aws_secretsmanager_secret.delius_core_dba_passwords.arn,
-      aws_secretsmanager_secret.delius_core_application_passwords.arn,
+      aws_secretsmanager_secret.database_dba_passwords.arn,
+      aws_secretsmanager_secret.database_application_passwords.arn,
     ]
   }
 }
