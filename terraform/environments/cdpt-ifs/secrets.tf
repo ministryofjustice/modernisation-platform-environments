@@ -1,5 +1,5 @@
-resource "aws_secretsmanager_secret" "db_password" {
-  name = "database_password"
+resource "aws_secretsmanager_secret" "dbase_password" {
+  name = "dbase_password"
 }
 
 resource "random_password" "password_long" {
@@ -7,7 +7,7 @@ resource "random_password" "password_long" {
   special = false
 }
 
-resource "aws_secretsmanager_secret_version" "db_password" {
-  secret_id     = aws_secretsmanager_secret.db_password.id
+resource "aws_secretsmanager_secret_version" "dbase_password" {
+  secret_id     = aws_secretsmanager_secret.dbase_password.id
   secret_string = random_password.password_long.result
 }
