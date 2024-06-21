@@ -197,9 +197,9 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   max_size            = 1
   min_size            = 1
   name                = local.app_name
-  target_group_arns   = [
-    for module_instance in local.modules : module_instance.tribunals_target_group_arn
-  ]
+  # target_group_arns   = [
+  #   for module_instance in local.modules : module_instance.tribunals_target_group_arn
+  # ]
   launch_template {
     id      = aws_launch_template.tribunals-all-lt.id
     version = "$Latest"

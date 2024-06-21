@@ -29,7 +29,7 @@ locals {
     essential : true,
     portMappings : [
       {
-        hostPort : "${local.target_group_attachment_port}",
+        hostPort : 0,
         containerPort : 80,
         protocol : "tcp"
       }
