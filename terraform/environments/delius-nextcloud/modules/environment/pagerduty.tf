@@ -1,13 +1,8 @@
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "delius_nextcloud_alarms" {
-  name = var.sns_topic_name
+  name = "delius-nextcloud-${var.env_name}-alarms-topic"
 
-  tags = merge(
-    var.tags,
-    {
-      Name = "${var.app_name}-${var.env_name}-sns-topic"
-    }
-  )
+  tags = var.tags
 }
 
 # link the sns topic to the service
