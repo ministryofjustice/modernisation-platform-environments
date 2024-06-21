@@ -1,5 +1,8 @@
 locals {
 
+  devtest_or_prodpreprod = var.environment.environment == "development" || var.environment.environment == "test" ? "devtest" : "prodpreprod"
+  shared_s3_name_prefix  = substr("${local.devtest_or_prodpreprod}-${var.environment.application_name}-", 0, 37)
+
   requested_s3_iam_policies = var.options.s3_iam_policies != null ? {
     for key, value in local.s3_iam_policies : key => value if contains(var.options.s3_iam_policies, key)
   } : local.s3_iam_policies
@@ -8,7 +11,7 @@ locals {
 
     # if enable_shared_s3 set, create a bucket in test and production which can be used by dev and test / preprod and prod respectively
     var.options.enable_shared_s3 && var.environment.environment == "production" ? {
-      (substr("prodpreprod-${var.environment.application_name}-", 0, 37)) = {
+      (local.shared_s3_name_prefix) = {
         bucket_policy_v2 = [
           local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
           local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy
@@ -18,7 +21,7 @@ locals {
       }
     } : {},
     var.options.enable_shared_s3 && var.environment.environment == "test" ? {
-      (substr("devtest-${var.environment.application_name}-", 0, 37)) = {
+      (local.shared_s3_name_prefix) = {
         bucket_policy_v2 = [
           local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
           local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy

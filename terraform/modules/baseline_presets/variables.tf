@@ -1,4 +1,4 @@
- # tflint-ignore: terraform_typed_variables
+# tflint-ignore: terraform_typed_variables
 variable "environment" {
   # Not defining 'type' as it is defined in the output of the environment module
   description = "Standard environmental data resources from the environment module"
