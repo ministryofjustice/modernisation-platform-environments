@@ -105,6 +105,12 @@ variable "glue_batch_job_num_workers" {
   description = "(Optional) The number of workers of a defined workerType that are allocated when a job runs."
 }
 
+variable "glue_batch_job_connections" {
+  type        = list(string)
+  default     = []
+  description = "The list of Glue connections used for the batch job."
+}
+
 variable "glue_batch_additional_policies" {
   type        = string
   default     = ""
@@ -234,6 +240,12 @@ variable "glue_cdc_job_num_workers" {
   type        = number
   default     = 2
   description = "(Optional) The number of workers of a defined workerType that are allocated when a job runs."
+}
+
+variable "glue_cdc_job_connections" {
+  type        = list(string)
+  default     = []
+  description = "The list of Glue connections used for the batch job."
 }
 
 variable "glue_cdc_additional_policies" {
