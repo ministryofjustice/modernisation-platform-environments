@@ -41,7 +41,7 @@ module "glue_reporting_hub_job" {
   region                       = local.account_region
   account                      = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
-  connections                  = [aws_glue_connection.glue_operational_datastore_connection.id]
+  connections                  = local.glue_connection_ids
 
   tags = merge(
     local.all_tags,
