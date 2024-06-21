@@ -44,7 +44,7 @@ resource "aws_kms_key" "athena_workspace_result_encryption_key" {
 
 resource "aws_athena_workgroup" "default" {
   name = "default"
-  description = "A default Athena workgroup to set query limits and link to the default query location bucket: ${module.athena-s3-bucket.name}"
+  description = "A default Athena workgroup to set query limits and link to the default query location bucket: ${module.athena-s3-bucket.bucket.id}"
 
   configuration {
     enforce_workgroup_configuration    = true
@@ -63,7 +63,7 @@ resource "aws_athena_workgroup" "default" {
       }
     }
 
-    bytes_scanned_cutoff_per_query = 107374182400 # 100 GB
+    bytes_scanned_cutoff_per_query = 1073741824 # 1 GB
   }
   tags = merge(
     local.tags,
