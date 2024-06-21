@@ -202,7 +202,7 @@ def rds_df_trim_str_columns(in_rds_df: DataFrame) -> DataFrame:
 
 def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, in_col_list) -> DataFrame:
     return (in_rds_df.select(
-            *[F.col(c[0]).alias(c[0]) if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
+            *[F.col(c[0]).alias(c[0]).cast('timestamp') if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
               for c in in_rds_df.dtypes])
             )
 
@@ -360,8 +360,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
             msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list"""
             given_rds_df_trim_micro_seconds_col_str = args["rds_df_trim_micro_sec_ts_col_list"]
             given_rds_df_trim_micro_seconds_col_list = [
-                f"""{table_name_prefix}_{tbl.strip().strip("'").strip('"')}"""
-                for tbl in given_rds_df_trim_micro_seconds_col_str.split(",")
+                f"""{col.strip().strip("'").strip('"')}"""
+                for col in given_rds_df_trim_micro_seconds_col_str.split(",")
                 ]
             LOGGER.info(
                 f"""{msg_prefix} = {given_rds_df_trim_micro_seconds_col_list}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
