@@ -96,7 +96,8 @@ CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{CATALOG_D
 
 NVL_DTYPE_DICT = {'string': "''", 'int': 0, 'double': 0, 'float': 0, 'smallint': 0, 'bigint':0,
                   'boolean': False,
-                  'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')", 'date': "to_date('1900-01-01', 'yyyy-MM-dd')"}
+                  'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')", 
+                  'date': "to_date('1900-01-01', 'yyyy-MM-dd')"}
 
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
@@ -202,7 +203,8 @@ def rds_df_trim_str_columns(in_rds_df: DataFrame) -> DataFrame:
 
 def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, in_col_list) -> DataFrame:
     return (in_rds_df.select(
-            *[F.col(c[0]).alias(c[0]).cast('timestamp') if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
+            *[F.col(c[0]).alias(c[0]).cast('timestamp') 
+              if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
               for c in in_rds_df.dtypes])
             )
 
@@ -212,10 +214,12 @@ def strip_rds_tbl_col_chars(in_rds_df: DataFrame,
     count = 0
     for transform_colmn in in_transformed_colmn_list_1:
         if count == 0:
-            rds_df = in_rds_df.withColumn(transform_colmn, F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
+            rds_df = in_rds_df.withColumn(transform_colmn, 
+                                          F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
             count += 1
         else:
-            rds_df = rds_df.withColumn(transform_colmn, F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
+            rds_df = rds_df.withColumn(transform_colmn, 
+                                       F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
     return rds_df
 
 
@@ -275,6 +279,7 @@ def check_s3_folder_path_if_exists(in_bucket_name, in_folder_path):
 def get_s3_table_folder_path(in_database_name, in_table_name):
     dir_path_str = f"{in_database_name}/{args['rds_sqlserver_db_schema']}/{in_table_name}"
     tbl_full_dir_path_str = f"s3://{PRQ_FILES_SRC_S3_BUCKET_NAME}/{dir_path_str}/"
+
     if check_s3_folder_path_if_exists(PRQ_FILES_SRC_S3_BUCKET_NAME, dir_path_str):
         return tbl_full_dir_path_str
     else:
@@ -315,8 +320,8 @@ def get_altered_df_schema_object(in_df_rds: DataFrame, in_transformed_column_lis
 
 def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, input_repartition_factor) -> DataFrame:
 
-    default_repartition_factor = input_repartition_factor if total_files <= 1 \
-        else total_files * input_repartition_factor
+    default_repartition_factor = input_repartition_factor \
+                                    if total_files <= 1 else total_files * input_repartition_factor
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime,
@@ -338,6 +343,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     if tbl_prq_s3_folder_path is not None:
 
         df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
+
         rds_df_created_msg_1 = f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}']"""
         rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds_temp.rdd.getNumPartitions()}"""
         LOGGER.info(f"""{rds_df_created_msg_1}\n{rds_df_created_msg_2}""")
@@ -357,6 +363,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
 
         t3 = False
         if args.get("rds_df_trim_micro_sec_ts_col_list", None) is not None:
+
             msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list"""
             given_rds_df_trim_micro_seconds_col_str = args["rds_df_trim_micro_sec_ts_col_list"]
             given_rds_df_trim_micro_seconds_col_list = [
@@ -366,9 +373,11 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
             LOGGER.info(
                 f"""{msg_prefix} = {given_rds_df_trim_micro_seconds_col_list}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
             if t2 == True:
-                df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t2, given_rds_df_trim_micro_seconds_col_list)
+                df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t2, 
+                                                                    given_rds_df_trim_micro_seconds_col_list)
             else:
-                df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t1, given_rds_df_trim_micro_seconds_col_list)
+                df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t1, 
+                                                                    given_rds_df_trim_micro_seconds_col_list)
             additional_message = " - [After trimming timestamp micro-seconds]"
             t3 = True
         # -------------------------------------------------------
@@ -383,8 +392,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
 
         df_rds_temp_t5 = df_rds_temp_t4.cache()
 
-        df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, 
-                                            df_rds_temp.schema).repartition(default_repartition_factor)
+        df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)\
+                            .repartition(default_repartition_factor)
 
         prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}']"""
         prq_df_created_msg_2 = f""" >> {total_size_mb}MB ; parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
@@ -423,12 +432,12 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
 
                 subtract_validation_msg = f"""'{rds_tbl_name}' - {df_rds_prq_subtract_row_count}"""
                 df_subtract_temp = df_subtract_temp.selectExpr(
-                                            "current_timestamp as run_datetime",
-                                             "json_row",
-                                             f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
-                                             f"""'{rds_db_name}' as database_name""",
-                                             f"""'{db_sch_tbl}' as full_table_name""",
-                                             """'False' as table_to_ap"""
+                                        "current_timestamp as run_datetime",
+                                        "json_row",
+                                        f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
+                                        f"""'{rds_db_name}' as database_name""",
+                                        f"""'{db_sch_tbl}' as full_table_name""",
+                                        """'False' as table_to_ap"""
                                     )
                 LOGGER.warn(f"Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_subtract_temp)
@@ -587,7 +596,11 @@ if __name__ == "__main__":
 
             input_repartition_factor = int(args["repartition_factor"])
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, input_repartition_factor)
+            df_dv_output = process_dv_for_table(rds_db_name, 
+                                                rds_tbl_name, 
+                                                total_files, 
+                                                total_size_mb, 
+                                                input_repartition_factor)
 
             write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
 
@@ -629,7 +642,11 @@ if __name__ == "__main__":
 
             input_repartition_factor = int(args["repartition_factor"])
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, input_repartition_factor)
+            df_dv_output = process_dv_for_table(rds_db_name, 
+                                                rds_tbl_name, 
+                                                total_files, 
+                                                total_size_mb, 
+                                                input_repartition_factor)
 
             write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
     # -------------------------------------------------------
