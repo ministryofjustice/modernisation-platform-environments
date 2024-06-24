@@ -14,13 +14,13 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
     security_group_id_list = [aws_security_group.glue_operational_datastore_connection_sg[0].id]
-    subnet_id         = data.aws_subnet.private_subnets_a.id
+    subnet_id              = data.aws_subnet.private_subnets_a.id
   }
 }
 
-resource aws_security_group "glue_operational_datastore_connection_sg" {
+resource "aws_security_group" "glue_operational_datastore_connection_sg" {
   count       = (local.environment == "development" ? 1 : 0)
   name        = "${local.project}-operational-datastore-connection_sg"
   description = "Security group to allow glue access to Operational Datastore via JDBC Connection"
@@ -31,18 +31,18 @@ resource aws_security_group "glue_operational_datastore_connection_sg" {
 
   # A self-referencing inbound rule for all TCP ports to enable AWS Glue to communicate between its components
   ingress {
-    from_port = 0
-    to_port   = 65535
-    protocol  = "TCP"
-    self      = true
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "TCP"
+    self        = true
     description = "Security Group can Ingress to itself on all ports - required for Glue to communicate with itself"
   }
 
   # Allow all traffic out
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all traffic out from this Security Group"
   }
