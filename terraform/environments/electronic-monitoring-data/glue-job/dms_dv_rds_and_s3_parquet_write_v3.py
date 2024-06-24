@@ -58,7 +58,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        ]
 
 OPTIONAL_INPUTS = [
-    "rds_df_trim_str_col_list"
+    "rds_df_trim_str_col_list",
+    "rds_df_trim_micro_sec_ts_col_list"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -213,6 +214,14 @@ def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name) -> DataFrame:
 def trim_rds_df_str_columns(in_rds_df: DataFrame) -> DataFrame:
     return (in_rds_df.select(
             *[F.trim(F.col(c[0])).alias(c[0]) if c[1] == 'string' else F.col(c[0])
+              for c in in_rds_df.dtypes])
+            )
+
+
+def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, in_col_list) -> DataFrame:
+    return (in_rds_df.select(
+            *[F.date_format(F.col(c[0]),'yyyy-MM-dd HH:mm:ss.SSS').alias(c[0]).cast('timestamp') 
+              if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
               for c in in_rds_df.dtypes])
             )
 
@@ -398,14 +407,28 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                            for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
         # -------------------------------------------------------
 
+        df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+
+
         rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
                                     for column in args.get('rds_df_trim_str_col_list', '').split(",")]
-        
+        transform_msg_1 = ""
         if rds_df_trim_str_col_list:
             LOGGER.warn(f"""rds_df_trim_str_col_list = {rds_df_trim_str_col_list}""")
-            additional_validation_msg =f"""{rds_df_trim_str_col_list} - extra spaces trimmed."""
+            transform_msg_1 =f"""- extra spaces trimmed."""
         # -------------------------------------------------------
-        
+
+        given_rds_df_trim_micro_seconds_col_str = args.get('rds_df_trim_micro_sec_ts_col_list', '')
+        given_rds_df_trim_micro_seconds_col_list = [f"""{col.strip().strip("'").strip('"')}"""
+                                                    for col in given_rds_df_trim_micro_seconds_col_str.split(",")]
+        transform_msg_2 = ""
+        if given_rds_df_trim_micro_seconds_col_list:
+            msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list"""
+            LOGGER.info(
+                f"""{msg_prefix} = {given_rds_df_trim_micro_seconds_col_list}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
+            transform_msg_2 =f"""- micro-seconds trimmed."""
+        # -------------------------------------------------------
+
         validated_colmn_msg_list = list()
 
         for_loop_count = 0
@@ -424,27 +447,45 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             df_rds_temp = df_rds.select(*temp_select_list)
             # -------------------------------------------------------
 
-            rds_column_trimmed = 0
+            t2_rds_str_col_trimmed = False
             if rds_column in rds_df_trim_str_col_list:
-                rds_column_trimmed = 1
-                df_rds_temp_t1 = df_rds_temp.transform(trim_rds_df_str_columns)
-                
-                df_rds_temp_t2 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+                df_rds_temp_t2 = df_rds_temp_t1.transform(trim_rds_df_str_columns)
+                t2_rds_str_col_trimmed = True
+            # -------------------------------------------------------
+            
+            t3_rds_ts_col_msec_trimmed = False
+            if rds_column in given_rds_df_trim_micro_seconds_col_list:
+
+                if t2_rds_str_col_trimmed is True:
+                    df_rds_temp_t3 = df_rds_temp_t2.transform(rds_df_trim_microseconds_timestamp, 
+                                                              given_rds_df_trim_micro_seconds_col_list)
+                else:
+                    df_rds_temp_t3 = df_rds_temp_t1.transform(rds_df_trim_microseconds_timestamp, 
+                                                              given_rds_df_trim_micro_seconds_col_list)
+                # -------------------------------------------------------
+
+                t3_rds_ts_col_msec_trimmed = True
+            # -------------------------------------------------------
+
+            if t3_rds_ts_col_msec_trimmed:
+                validated_colmn_msg = f"""'{rds_column}'{transform_msg_2}"""
+                df_rds_temp_t4 = df_rds_temp_t3.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+            elif t2_rds_str_col_trimmed:
+                validated_colmn_msg = f"""'{rds_column}'{transform_msg_1}"""
+                df_rds_temp_t4 = df_rds_temp_t2.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
             else:
-                df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+                validated_colmn_msg = rds_column
+                df_rds_temp_t4 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
             # -------------------------------------------------------
 
             df_prq_temp = df_prq.select(*temp_select_list)            
             df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
 
-            df_rds_prq_subtract_transform = df_rds_temp_t2.subtract(df_prq_temp_t1).cache()
+            df_rds_prq_subtract_transform = df_rds_temp_t4.subtract(df_prq_temp_t1).cache()
             df_rds_prq_subtract_row_count = df_rds_prq_subtract_transform.count()
             # -------------------------------------------------------
 
             if df_rds_prq_subtract_row_count == 0:
-                validated_colmn_msg = f"""'{rds_column}'-spaces trimmed""" \
-                                        if rds_column_trimmed == 1 else rds_column
-                
                 validated_colmn_msg_list.append(validated_colmn_msg)
 
             else:

@@ -136,27 +136,28 @@ resource "aws_glue_job" "dms_dv_glue_job_v3" {
   worker_type       = "G.2X"
   number_of_workers = 4
   default_arguments = {
-    "--script_bucket_name"               = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
-    "--rds_sqlserver_db"                 = ""
-    "--rds_sqlserver_db_schema"          = ""
-    "--rds_sqlserver_db_table"           = ""
-    "--rds_db_tbl_pkeys_col_list"        = ""
-    "--rds_df_trim_str_col_list"         = ""
-    "--repartition_factor"               = 8
-    "--parquet_src_bucket_name"          = aws_s3_bucket.dms_target_ep_s3_bucket.id
-    "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
-    "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
-    "--glue_catalog_tbl_name"            = "glue_df_output"
-    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
-    "--enable-continuous-cloudwatch-log" = "true"
-    "--enable-continuous-log-filter"     = "true"
-    "--enable-spark-ui"                  = "false"
-    "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
-    "--enable-metrics"                   = "true"
-    "--enable-auto-scaling"              = "true"
-    "--conf"                             = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=1g --conf spark.sql.adaptive.enabled=true --conf spark.sql.adaptive.coalescePartitions.enabled=true --conf spark.sql.adaptive.skewJoin.enabled=true --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED"
+    "--script_bucket_name"                = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
+    "--rds_db_pwd"                        = aws_db_instance.database_2022.password
+    "--rds_sqlserver_db"                  = ""
+    "--rds_sqlserver_db_schema"           = ""
+    "--rds_sqlserver_db_table"            = ""
+    "--rds_db_tbl_pkeys_col_list"         = ""
+    "--rds_df_trim_str_col_list"          = ""
+    "--rds_df_trim_micro_sec_ts_col_list" = ""
+    "--repartition_factor"                = 8
+    "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+    "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_tbl_name"             = "glue_df_output"
+    "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
+    "--enable-continuous-cloudwatch-log"  = "true"
+    "--enable-continuous-log-filter"      = "true"
+    "--enable-spark-ui"                   = "false"
+    "--spark-event-logs-path"             = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
+    "--enable-metrics"                    = "true"
+    "--enable-auto-scaling"               = "true"
+    "--conf"                              = "spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=1g --conf spark.sql.adaptive.enabled=true --conf spark.sql.adaptive.coalescePartitions.enabled=true --conf spark.sql.adaptive.skewJoin.enabled=true --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED"
   }
 
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
