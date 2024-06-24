@@ -89,7 +89,7 @@ module "pwm" {
     "JAVA_OPTS"    = "-Xmx1536m -Xms512m"
   }
   container_vars_env_specific            = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
-  ignore_changes_service_task_definition = true
+  ignore_changes_service_task_definition = false
 
   providers = {
     aws.core-vpc              = aws.core-vpc
