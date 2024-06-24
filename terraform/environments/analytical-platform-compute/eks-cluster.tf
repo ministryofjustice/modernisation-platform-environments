@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.13.1"
+  version = "20.14.0"
 
   cluster_name    = local.eks_cluster_name
   cluster_version = local.environment_configuration.eks_cluster_version

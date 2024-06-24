@@ -3,7 +3,7 @@ module "eks_log_group" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
-  version = "5.3.1"
+  version = "5.4.0"
 
   name              = local.eks_cloudwatch_log_group_name
   kms_key_id        = module.eks_cluster_logs_kms.key_arn
