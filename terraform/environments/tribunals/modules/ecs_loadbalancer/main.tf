@@ -140,7 +140,7 @@ resource "aws_lb_listener" "tribunals_lb_ftp" {
 
 resource "aws_lb_listener" "tribunals_lb_health" {
   load_balancer_arn = var.app_load_balancer.arn
-  port              = "80"
+  port              = var.target_group_attachment_port
   protocol          = "HTTP"
 
   default_action {
