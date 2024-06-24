@@ -159,7 +159,9 @@ module "eks" {
     }
   }
 
-  tags = local.tags
+  tags = merge(local.tags, {
+    "karpenter.sh/discovery" = local.eks_cluster_name
+  })
 }
 
 module "karpenter" {
