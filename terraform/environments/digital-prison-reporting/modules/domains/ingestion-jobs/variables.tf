@@ -269,12 +269,6 @@ variable "setup_unprocessed_raw_files_check_job" {
   default     = false
 }
 
-variable "glue_unprocessed_raw_files_check_job_schedule" {
-  description = "Cron schedule for the Unprocessed Raw Files Check job"
-  default     = "cron(0 0/3 ? * * *)"
-  type        = string
-}
-
 variable "glue_unprocessed_raw_files_check_job_name" {
   description = "Name of the Glue Unprocessed Raw Files Check Job"
   default     = ""
