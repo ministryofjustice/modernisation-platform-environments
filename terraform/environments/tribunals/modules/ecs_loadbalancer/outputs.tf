@@ -18,11 +18,6 @@ output "tribunals_lb_listener" {
   value       = aws_lb_listener.tribunals_lb
 }
 
-output "tribunals_lb" {
-  description = "LB"
-  value       = aws_lb.tribunals_lb
-}
-
 output "tribunals_lb_ftp" {
   description = "SFTP LB"
   value       = aws_lb.tribunals_lb_ftp
