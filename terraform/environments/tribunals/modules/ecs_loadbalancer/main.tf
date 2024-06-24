@@ -60,15 +60,15 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
 }
 
 //noinspection HILUnresolvedReference
-resource "aws_lb" "tribunals_lb" {
-  name                       = "${var.app_name}-lb"
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tribunals_lb_sc.id]
-  subnets                    = var.subnets_shared_public_ids
-  enable_deletion_protection = false
-  internal                   = false
-  depends_on                 = [aws_security_group.tribunals_lb_sc]
-}
+# resource "aws_lb" "tribunals_lb" {
+#   name                       = "${var.app_name}-lb"
+#   load_balancer_type         = "application"
+#   security_groups            = [aws_security_group.tribunals_lb_sc.id]
+#   subnets                    = var.subnets_shared_public_ids
+#   enable_deletion_protection = false
+#   internal                   = false
+#   depends_on                 = [aws_security_group.tribunals_lb_sc]
+# }
 
 resource "aws_lb" "tribunals_lb_ftp" {
   count                      = var.is_ftp_app ? 1 : 0
@@ -140,7 +140,7 @@ resource "aws_lb_listener" "tribunals_lb" {
     var.aws_acm_certificate_external
   ]
   certificate_arn   = var.aws_acm_certificate_external.arn
-  load_balancer_arn = aws_lb.tribunals_lb.arn
+  load_balancer_arn = var.app_load_balancer.arn
   port              = var.application_data.server_port_2
   protocol          = var.application_data.lb_listener_protocol_2
   ssl_policy        = var.application_data.lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
@@ -152,7 +152,7 @@ resource "aws_lb_listener" "tribunals_lb" {
 }
 
 resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
-  resource_arn = aws_lb.tribunals_lb.arn
+  resource_arn = var.app_load_balancer.arn
   web_acl_arn  = var.waf_arn
 }
 
@@ -169,7 +169,7 @@ resource "aws_lb_listener" "tribunals_lb_ftp" {
 }
 
 resource "aws_lb_listener" "tribunals_lb_health" {
-  load_balancer_arn = aws_lb.tribunals_lb.arn
+  load_balancer_arn = var.app_load_balancer.arn
   port              = "80"
   protocol          = "HTTP"
 

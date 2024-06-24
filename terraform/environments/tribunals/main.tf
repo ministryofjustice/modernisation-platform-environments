@@ -1,5 +1,6 @@
 locals {
   rds_url            = aws_db_instance.rdsdb.address
+  app_load_balancer  = aws_lb.tribunals_lb
   rds_user           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
   rds_port           = "1433"
   rds_password       = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
@@ -26,6 +27,7 @@ module "appeals" {
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
+  app_load_balancer            = local.app_load_balancer
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -63,6 +65,7 @@ module "ahmlr" {
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
+  app_load_balancer            = local.app_load_balancer
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -100,6 +103,7 @@ module "care_standards" {
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
+  app_load_balancer            = local.app_load_balancer
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -134,6 +138,7 @@ module "cicap" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -171,6 +176,7 @@ module "employment_appeals" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -208,6 +214,7 @@ module "finance_and_tax" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -245,6 +252,7 @@ module "immigration_services" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -282,6 +290,7 @@ module "information_tribunal" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -319,6 +328,7 @@ module "lands_tribunal" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -356,6 +366,7 @@ module "transport" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -403,6 +414,7 @@ module "charity_tribunal_decisions" {
   documents_location           = "documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49110
+  app_load_balancer            = local.app_load_balancer
 }
 
 module "claims_management_decisions" {
@@ -428,6 +440,7 @@ module "claims_management_decisions" {
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49111
+  app_load_balancer            = local.app_load_balancer
 }
 
 module "consumer_credit_appeals" {
@@ -453,6 +466,7 @@ module "consumer_credit_appeals" {
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49112
+  app_load_balancer            = local.app_load_balancer
 }
 
 module "estate_agent_appeals" {
@@ -478,6 +492,7 @@ module "estate_agent_appeals" {
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49113
+  app_load_balancer            = local.app_load_balancer
 }
 
 module "primary_health_lists" {
@@ -503,6 +518,7 @@ module "primary_health_lists" {
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49114
+  app_load_balancer            = local.app_load_balancer
 }
 
 module "siac" {
@@ -528,6 +544,7 @@ module "siac" {
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49115
+  app_load_balancer            = local.app_load_balancer
 }
 
 module "sscs_venue_pages" {
@@ -553,6 +570,7 @@ module "sscs_venue_pages" {
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49116
+  app_load_balancer            = local.app_load_balancer
 }
 
 module "tax_chancery_decisions" {
@@ -578,6 +596,7 @@ module "tax_chancery_decisions" {
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49117
+  app_load_balancer            = local.app_load_balancer
 }
 
 module "tax_tribunal_decisions" {
@@ -603,6 +622,7 @@ module "tax_tribunal_decisions" {
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49118
+  app_load_balancer            = local.app_load_balancer
 }
 
 module "ftp_admin_appeals" {
@@ -628,4 +648,5 @@ module "ftp_admin_appeals" {
   documents_location           = "Documents"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49119
+  app_load_balancer            = local.app_load_balancer
 }

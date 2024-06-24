@@ -38,6 +38,9 @@ variable "app_source_db_user" {
 variable "app_source_db_password" {
 }
 
+variable "app_load_balancer" {
+}
+
 variable "environment" {
 }
 
