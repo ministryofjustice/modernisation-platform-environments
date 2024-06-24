@@ -44,7 +44,7 @@ locals {
         "data-engineering" = {
           "identity_centre_team" = "data-engineering",
           "aws_accounts" = {
-            "analytical-platform-data-engineering-sandbox-a" = {
+            "analytical-platform-data-engineering-sandboxa" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
