@@ -58,7 +58,6 @@ locals {
       os-type          = "Linux"
       os-major-version = 7
       os-version       = "RHEL 7.9"
-      "Patch Group"    = "RHEL"
       server-type      = "oasys-web"
     }
   }
@@ -157,7 +156,6 @@ locals {
       os-type                     = "Linux"
       os-major-version            = 8
       os-version                  = "RHEL 8.5"
-      "Patch Group"               = "RHEL"
       server-type                 = "oasys-db"
     }
   }
@@ -239,7 +237,6 @@ locals {
       os-type                     = "Linux"
       os-major-version            = 8
       os-version                  = "RHEL 8.5"
-      "Patch Group"               = "RHEL"
       server-type                 = "onr-db"
     }
   }
@@ -300,7 +297,6 @@ locals {
       os-major-version    = 7
       os-type             = "Linux"
       os-version          = "RHEL 7.9"
-      "Patch Group"       = "RHEL"
       server-type         = "oasys-bip"
     }
   }
@@ -309,5 +305,39 @@ locals {
       availability_zone = "eu-west-2b"
     })
   })
+
+  # audit vault
+
+  audit_vault = {
+    config = merge(module.baseline_presets.ec2_instance.config.db, {
+      ami_name          = "OL8.9-x86_64-HVM-2024-02-02"
+      availability_zone = "eu-west-2b"
+      instance_profile_policies = flatten([
+        module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
+      ])
+    })
+    instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
+      instance_type = "r6i.4xlarge"
+      tags = {
+        backup-plan = "daily-and-weekly"
+      }
+    })
+    user_data_cloud_init   = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
+    route53_records        = module.baseline_presets.ec2_instance.route53_records.internal_and_external
+    secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
+    tags = {
+      backup                      = "false" # opt out of mod platform default backup plan
+      component                   = "data"
+      description                 = "${local.environment} oasys audit vault"
+      environment-name            = terraform.workspace # used in provisioning script to select group vars
+      licence-requirements        = "Oracle Database"
+      monitored                   = false
+      OracleDbLTS-ManagedInstance = true # oracle license tracking
+      os-type                     = "Oracle"
+      os-major-version            = 8
+      os-version                  = "Oracle Linux 8.9"
+      server-type                 = "oasys-av"
+    }
+  }
 
 }
