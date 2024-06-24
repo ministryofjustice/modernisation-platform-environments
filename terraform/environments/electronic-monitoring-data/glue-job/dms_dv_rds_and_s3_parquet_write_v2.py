@@ -351,17 +351,17 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
         df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
         # -------------------------------------------------------
 
-        t2 = False
+        t2_rds_str_col_trimmed = False
         if args.get("rds_df_trim_str_columns", "false") == "true":
             msg_prefix = f"""Given -> rds_df_trim_str_columns"""
             LOGGER.info(
                 f"""{msg_prefix} = {args["rds_df_trim_str_columns"]}, {type(args["rds_df_trim_str_columns"])}""")
             df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_str_columns)
-            additional_message = " - [After trimming string column(s) spaces]"
-            t2 = True
+            additional_message = " - [str column(s) extra spaces trimmed]"
+            t2_rds_str_col_trimmed = True
         # -------------------------------------------------------
 
-        t3 = False
+        t3_rds_ts_col_msec_trimmed = False
         if args.get("rds_df_trim_micro_sec_ts_col_list", None) is not None:
 
             msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list"""
@@ -372,19 +372,19 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                 ]
             LOGGER.info(
                 f"""{msg_prefix} = {given_rds_df_trim_micro_seconds_col_list}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
-            if t2 == True:
+            if t2_rds_str_col_trimmed == True:
                 df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t2, 
                                                                     given_rds_df_trim_micro_seconds_col_list)
             else:
                 df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t1, 
                                                                     given_rds_df_trim_micro_seconds_col_list)
             additional_message = " - [After trimming timestamp micro-seconds]"
-            t3 = True
+            t3_rds_ts_col_msec_trimmed = True
         # -------------------------------------------------------
 
-        if t3:
+        if t3_rds_ts_col_msec_trimmed:
             df_rds_temp_t4 = df_rds_temp_t3
-        elif t2:
+        elif t2_rds_str_col_trimmed:
             df_rds_temp_t4 = df_rds_temp_t2
         else:
             df_rds_temp_t4 = df_rds_temp_t1

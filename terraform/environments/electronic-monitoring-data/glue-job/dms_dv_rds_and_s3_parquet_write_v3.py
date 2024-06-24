@@ -211,7 +211,7 @@ def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name) -> DataFrame:
             )
 
 
-def trim_rds_df_str_columns(in_rds_df: DataFrame) -> DataFrame:
+def rds_df_trim_str_columns(in_rds_df: DataFrame) -> DataFrame:
     return (in_rds_df.select(
             *[F.trim(F.col(c[0])).alias(c[0]) if c[1] == 'string' else F.col(c[0])
               for c in in_rds_df.dtypes])
@@ -406,12 +406,13 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             rds_db_tbl_pkeys_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
                                          for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
         # -------------------------------------------------------
-
+        rds_df_trim_str_col_str = args.get('rds_df_trim_str_col_list', '')
         rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
-                                    for column in args.get('rds_df_trim_str_col_list', '').split(",")]
+                                    for column in rds_df_trim_str_col_str.split(",")]
         transform_msg_1 = ""
         if rds_df_trim_str_col_list:
-            LOGGER.warn(f"""rds_df_trim_str_col_list = {rds_df_trim_str_col_list}""")
+            msg_prefix = f"""Given -> rds_df_trim_str_col_list = {rds_df_trim_str_col_list}"""
+            LOGGER.warn(f"""{msg_prefix}, {type(rds_df_trim_str_col_list)}""")
             transform_msg_1 =f"""- extra spaces trimmed."""
         # -------------------------------------------------------
 
@@ -420,9 +421,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                                     for col in given_rds_df_trim_micro_seconds_col_str.split(",")]
         transform_msg_2 = ""
         if given_rds_df_trim_micro_seconds_col_list:
-            msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list"""
-            LOGGER.warn(
-                f"""{msg_prefix} = {given_rds_df_trim_micro_seconds_col_list}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
+            msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list = {given_rds_df_trim_micro_seconds_col_list}"""
+            LOGGER.warn(f"""{msg_prefix}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
             transform_msg_2 =f"""- micro-seconds trimmed."""
         # -------------------------------------------------------
 
@@ -446,7 +446,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             t1_rds_str_col_trimmed = False
             if rds_column in rds_df_trim_str_col_list:
-                df_rds_temp_t1 = df_rds_temp.transform(trim_rds_df_str_columns)
+                df_rds_temp_t1 = df_rds_temp.transform(rds_df_trim_str_columns)
                 t1_rds_str_col_trimmed = True
             # -------------------------------------------------------
             
@@ -458,7 +458,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                                               given_rds_df_trim_micro_seconds_col_list)
                 else:
                     df_rds_temp_t2 = df_rds_temp.transform(rds_df_trim_microseconds_timestamp, 
-                                                              given_rds_df_trim_micro_seconds_col_list)
+                                                           given_rds_df_trim_micro_seconds_col_list)
                 # -------------------------------------------------------
 
                 t2_rds_ts_col_msec_trimmed = True
