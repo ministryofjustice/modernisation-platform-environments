@@ -179,6 +179,8 @@ module "karpenter" {
   queue_name              = "${module.eks.cluster_name}-karpenter"
   queue_kms_master_key_id = module.karpenter_sqs_kms.key_arn
 
+  node_iam_role_use_name_prefix = false
+
   node_iam_role_additional_policies = {
     AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
