@@ -324,13 +324,13 @@ resource "aws_iam_role_policy_attachment" "send_table_to_ap_get_parquet_files" {
 # ------------------------------------------------
 
 resource "aws_iam_role" "query_output_to_list" {
-    name                = "query_output_to_list"
-    assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  name               = "query_output_to_list"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "query_output_to_list_lambda_sqs_queue_access_execution" {
-    role = aws_iam_role.query_output_to_list.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+  role       = aws_iam_role.query_output_to_list.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
 
@@ -375,13 +375,13 @@ resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_list_target_s
 # ------------------------------------------
 
 resource "aws_iam_role" "update_log_table" {
-  name = "update_log_table"
-  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  name               = "update_log_table"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "update_log_table_lambda_sqs_queue_access_execution" {
-    role = aws_iam_role.update_log_table.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+  role       = aws_iam_role.update_log_table.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
 data "aws_iam_policy_document" "get_log_s3_files" {
@@ -393,21 +393,21 @@ data "aws_iam_policy_document" "get_log_s3_files" {
       "s3:PutObject",
       "s3:GetBucketLocation",
       "s3:DeleteObject"
-      ]
+    ]
     resources = [
       aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
       "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*"
-      ]
+    ]
   }
 }
 
 resource "aws_iam_policy" "get_log_s3_files" {
-  name = "get_log_s3_files"
+  name   = "get_log_s3_files"
   policy = data.aws_iam_policy_document.get_log_s3_files.json
 }
 resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
-    role = aws_iam_role.update_log_table.name
-    policy_arn = aws_iam_policy.get_log_s3_files.arn
+  role       = aws_iam_role.update_log_table.name
+  policy_arn = aws_iam_policy.get_log_s3_files.arn
 }
 
 # ------------------------------------------
@@ -415,7 +415,7 @@ resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
 # ------------------------------------------
 
 resource "aws_iam_role" "output_fs_json_lambda" {
-  name = "output_fs_json_lambda"
+  name                = "output_fs_json_lambda"
   assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
@@ -434,9 +434,9 @@ data "aws_iam_policy_document" "output_fs_json_lambda_s3_policy_document" {
 }
 
 resource "aws_iam_policy" "output_fs_json_lambda_s3_policy" {
-  name                = "output-fs-json-lambda-s3-policy"
-  description         = "Policy for Lambda to use S3 for ${local.output_fs_json_lambda}"
-  policy              = data.aws_iam_policy_document.output_fs_json_lambda_s3_policy_document.json
+  name        = "output-fs-json-lambda-s3-policy"
+  description = "Policy for Lambda to use S3 for ${local.output_fs_json_lambda}"
+  policy      = data.aws_iam_policy_document.output_fs_json_lambda_s3_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attachment" {

@@ -97,5 +97,5 @@ output "account_id" {
 }
 
 output "account_suffix" {
-  value = local.is-production? "production": "development"
+  value = local.is-production ? "production" : "development"
 }
