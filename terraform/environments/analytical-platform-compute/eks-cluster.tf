@@ -178,6 +178,7 @@ module "karpenter" {
 
   queue_name              = "${module.eks.cluster_name}-karpenter"
   queue_kms_master_key_id = module.karpenter_sqs_kms.key_arn
+  sqs_managed_sse_enabled = false
 
   node_iam_role_name            = "karpenter-node-${module.eks.cluster_name}"
   node_iam_role_use_name_prefix = false
