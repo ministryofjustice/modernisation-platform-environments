@@ -5,11 +5,15 @@ exec > /tmp/userdata.log 2>&1
 # ENV Variables, 
 namespace="dpr-nomis-port-forwarder"
 app="nomis-port-forwarder"
+bodmis_namespace="dpr-bodmis-port-forwarder"
+bodmis_app="bodmis-port-forwarder"
 local_port="1521"
+bodmis_local_port="1522"
 remote_port="1521"
 # Location of script that will be used to launch the domain builder jar.
 nomis_portforwarder_script="/usr/bin/nomis-port-forwarder.sh"
 kubeconfig="/home/ssm-user/.kube/config"
+bodmis_kubeconfig="/home/ssm-user/.kube/bodmis_config"
 
 # Setup Required Directories
 touch /tmp/hello-ec2
@@ -99,13 +103,13 @@ sleep 300
 aws ec2 assign-private-ip-addresses --network-interface-id $interface_id --private-ip-addresses ${static_ip}
 
 # Get Secrets
-cp_k8s_server=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_server)
-cp_k8s_cert_auth=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_certificate_auth)
-cp_k8s_cluster_name=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_name)
-cp_k8s_cluster_context=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_context)
-cp_k8s_cluster_token=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_token)
+nomis_cp_k8s_server=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_server)
+nomis_cp_k8s_cert_auth=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_certificate_auth)
+nomis_cp_k8s_cluster_name=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_name)
+nomis_cp_k8s_cluster_context=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_context)
+nomis_cp_k8s_cluster_token=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_token)
 
-echo "SERVER_NAME....$cp_k8s_server"
+echo "SERVER_NAME....$nomis_cp_k8s_server"
 # Install KUBECTL Libs
 ## Download Libs
 curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.1/2023-04-19/bin/linux/amd64/kubectl
@@ -114,36 +118,40 @@ cp ./kubectl /usr/bin/kubectl
 
 mkdir -p /home/ssm-user/.kube
 
+# NOMIS
 ## Add Kubeconfig
 cat <<EOF > $kubeconfig
 apiVersion: v1
 clusters:
 - cluster:
-    certificate-authority-data: $cp_k8s_cert_auth
-    server: $cp_k8s_server
-  name: $cp_k8s_cluster_name
+    certificate-authority-data: $nomis_cp_k8s_cert_auth
+    server: $nomis_cp_k8s_server
+  name: $nomis_cp_k8s_cluster_name
 contexts:
 - context:
-    cluster: $cp_k8s_cluster_name
+    cluster: $nomis_cp_k8s_cluster_name
     namespace: dpr-nomis-port-forwarder
     user: nomis-port-forwarder-migrated
-  name: $cp_k8s_cluster_name
-current-context: $cp_k8s_cluster_context
+  name: $nomis_cp_k8s_cluster_name
+current-context: $nomis_cp_k8s_cluster_context
 kind: Config
 preferences: {}
 users:
 - name: nomis-port-forwarder-migrated
   user:
-    token: $cp_k8s_cluster_token
+    token: $nomis_cp_k8s_cluster_token
 EOF
 
-# Configure Kubernetes Cluster for CP
+# NOMIS
 ## Permission for Config
 chmod 666 $kubeconfig
 
+# NOMIS
 # Generate a Port forwarder script 
 sudo cat <<EOF > $nomis_portforwarder_script
 #!/bin/bash
+
+export KUBE_CONFIG=$kubeconfig
 
 ## Set Kube Config
 
@@ -158,9 +166,69 @@ kubectl get pods
 export POD=\$(kubectl get pod -n $namespace -l app=$app -o jsonpath="{.items[0].metadata.name}")
 kubectl port-forward pods/\$POD $remote_port:$local_port --address='0.0.0.0'
 EOF
+###
+
+# BODMIS PortForwarding
+# Get Secrets
+bodmis_cp_k8s_server=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_server)
+bodmis_cp_k8s_cert_auth=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_certificate_auth)
+bodmis_cp_k8s_cluster_name=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_name)
+bodmis_cp_k8s_cluster_context=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_context)
+bodmis_cp_k8s_cluster_token=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_token)
+
+echo "SERVER_NAME....$bodmis_cp_k8s_server"
+## Add Kubeconfig
+cat <<EOF > $bodmis_kubeconfig
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: $bodmis_cp_k8s_cert_auth
+    server: $bodmis_cp_k8s_server
+  name: $bodmis_cp_k8s_cluster_name
+contexts:
+- context:
+    cluster: $bodmis_cp_k8s_cluster_name
+    namespace: dpr-bodmis-port-forwarder
+    user: bodmis-port-forwarder-migrated
+  name: $bodmis_cp_k8s_cluster_name
+current-context: $bodmis_cp_k8s_cluster_context
+kind: Config
+preferences: {}
+users:
+- name: bodmis-port-forwarder-migrated
+  user:
+    token: $bodmis_cp_k8s_cluster_token
+EOF
+
+###
+
+# Configure Kubernetes Cluster for CP
+## Permission for Config
+chmod 666 $bodmis_kubeconfig
+
+# BODMIS
+# Generate a Port forwarder script 
+sudo cat <<EOF > $bodmis_portforwarder_script
+#!/bin/bash
+
+export KUBE_CONFIG=$bodmis_kubeconfig
+
+## Set Kube Config
+
+kubectl config use-context live.cloud-platform.service.justice.gov.uk           
+kubectl config set-cluster live.cloud-platform.service.justice.gov.uk        
+kubectl config current-context
+
+## Verify Connectivity CP K8s Cluster,
+kubectl get pods
+
+## Port forward from CP to MP
+export POD=\$(kubectl get pod -n $bodmis_namespace -l app=$bodmis_app -o jsonpath="{.items[0].metadata.name}")
+kubectl port-forward pods/\$POD $remote_port:$bodmis_local_port --address='0.0.0.0'
+EOF
 
 ## Add Permissions and Execute the Forwarder
-chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
+chmod 0755 $bodmis_portforwarder_script; su -c $bodmis_portforwarder_script ssm-user
 fi
 
 # Start Stream at Start of the EC2 

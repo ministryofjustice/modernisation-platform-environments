@@ -323,12 +323,6 @@ locals {
     port     = "5432"
   }
 
-  # Operational DataStore Secrets PlaceHolder
-  operational_datastore_secrets_placeholder = {
-    username = "placeholder"
-    password = "placeholder"
-  }
-
   # biprws Secrets Placeholder
   enable_biprws_secrets = local.application_data.accounts[local.environment].biprws.enable
   biprws_secrets_placeholder = {
@@ -340,6 +334,16 @@ locals {
   # cp_k8s_secrets_placeholder
   enable_cp_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_k8s_secrets
   cp_k8s_secrets_placeholder = {
+    cloud_platform_k8s_token           = "placeholder"
+    cloud_platform_certificate_auth    = "placeholder"
+    cloud_platform_k8s_server          = "placeholder"
+    cloud_platform_k8s_cluster_name    = "placeholder"
+    cloud_platform_k8s_cluster_context = "placeholder"
+  }
+
+  # cp_bodmis_k8s_secrets_placeholder
+  enable_cp_bodmis_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_bodmis_k8s_secrets
+  cp_bodmis_k8s_secrets_placeholder = {
     cloud_platform_k8s_token           = "placeholder"
     cloud_platform_certificate_auth    = "placeholder"
     cloud_platform_k8s_server          = "placeholder"
