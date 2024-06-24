@@ -16,6 +16,12 @@ resource "kubernetes_namespace" "cluster_autoscaler" {
   }
 }
 
+resource "kubernetes_namespace" "karpenter" {
+  metadata {
+    name = "karpernter"
+  }
+}
+
 resource "kubernetes_namespace" "external_dns" {
   metadata {
     name = "external-dns"

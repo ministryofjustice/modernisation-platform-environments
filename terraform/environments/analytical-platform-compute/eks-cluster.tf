@@ -161,3 +161,29 @@ module "eks" {
 
   tags = local.tags
 }
+
+module "karpenter" {
+  source  = "terraform-aws-modules/eks/aws//modules/karpenter"
+  version = "20.14.0"
+
+  cluster_name = module.eks.cluster_name
+
+  enable_pod_identity             = true
+  create_pod_identity_association = true
+
+  iam_policy_name_prefix = "karpenter"
+  iam_role_name          = "karpenter"
+
+  namespace = kubernetes_namespace.karpenter.metadata[0].name
+
+  queue_name              = "${module.eks.cluster_name}-karpenter"
+  queue_kms_master_key_id = module.karpenter_sqs_kms.key_arn
+
+  node_iam_role_additional_policies = {
+    AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
+  }
+
+  tags = local.tags
+}
