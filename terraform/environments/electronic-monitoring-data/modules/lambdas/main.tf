@@ -10,7 +10,7 @@ resource "aws_sqs_queue" "lambda_dlq" {
 data "external" "latest_image_update_log_table" {
   program = [
     "bash", "-c",
-    "echo {}"]
+  "echo {}"]
 }
 
 resource "aws_kms_key" "lambda_env_key" {
