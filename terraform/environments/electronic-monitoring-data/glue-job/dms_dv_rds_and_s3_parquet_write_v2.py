@@ -203,7 +203,7 @@ def rds_df_trim_str_columns(in_rds_df: DataFrame) -> DataFrame:
 
 def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, in_col_list) -> DataFrame:
     return (in_rds_df.select(
-            *[F.col(c[0]).alias(c[0]).cast('timestamp') 
+            *[F.date_format(F.col(c[0]),'yyyy-MM-dd HH:mm:ss.SSS').alias(c[0]).cast('timestamp') 
               if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
               for c in in_rds_df.dtypes])
             )
@@ -297,7 +297,7 @@ def get_s3_parquet_df_v3(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFra
     return spark.read.format("parquet").load(in_s3_parquet_folder_path, schema=in_rds_df_schema)
 
 
-def get_altered_df_schema_object(in_df_rds: DataFrame, in_transformed_column_list):
+def get_reordered_columns_schema_object(in_df_rds: DataFrame, in_transformed_column_list):
     altered_schema_object = T.StructType([])
     rds_df_column_list = in_df_rds.schema.fields
 

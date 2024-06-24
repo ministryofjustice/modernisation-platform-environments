@@ -306,7 +306,7 @@ def get_s3_parquet_df_v2(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFra
 def get_s3_parquet_df_v3(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
     return spark.read.format("parquet").load(in_s3_parquet_folder_path, schema=in_rds_df_schema)
 
-def get_altered_df_schema_object(in_df_rds: DataFrame, in_transformed_column_list):
+def get_reordered_columns_schema_object(in_df_rds: DataFrame, in_transformed_column_list):
     altered_schema_object = T.StructType([])
     rds_df_column_list = in_df_rds.schema.fields
 
