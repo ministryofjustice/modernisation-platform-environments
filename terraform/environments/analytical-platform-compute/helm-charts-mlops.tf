@@ -11,13 +11,12 @@ resource "helm_release" "mlflow" {
       {
         mlflow_hostname = "mlflow.${local.environment_configuration.route53_zone}"
         eks_role_arn    = module.mlflow_iam_role.iam_role_arn
-        s3_bucket_name  = module.mlflow_bucket.s3_bucket_id
+        s3_bucket_name  = local.environment_configuration.mlflow_s3_bucket_name
       }
     )
   ]
   depends_on = [
     module.mlflow_iam_role,
-    module.mlflow_bucket,
     kubernetes_secret.mlflow_admin,
     kubernetes_secret.mlflow_auth_rds,
     kubernetes_secret.mlflow_rds
