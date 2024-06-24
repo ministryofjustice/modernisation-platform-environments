@@ -171,17 +171,15 @@ module "karpenter" {
   enable_pod_identity             = true
   create_pod_identity_association = true
 
-  iam_policy_name = "karpenter"
-  iam_role_name   = "karpenter"
-
   namespace = kubernetes_namespace.karpenter.metadata[0].name
 
   queue_name                = "${module.eks.cluster_name}-karpenter"
   queue_kms_master_key_id   = module.karpenter_sqs_kms.key_arn
   queue_managed_sse_enabled = false
 
-  node_iam_role_name            = "karpenter-node-${module.eks.cluster_name}"
-  node_iam_role_use_name_prefix = false
+  iam_policy_name    = "karpenter"
+  iam_role_name      = "karpenter"
+  node_iam_role_name = "karpenter"
 
   node_iam_role_additional_policies = {
     AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
