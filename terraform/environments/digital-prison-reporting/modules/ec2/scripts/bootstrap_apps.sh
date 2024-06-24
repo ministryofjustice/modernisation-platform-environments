@@ -12,6 +12,7 @@ bodmis_local_port="1522"
 remote_port="1521"
 # Location of script that will be used to launch the domain builder jar.
 nomis_portforwarder_script="/usr/bin/nomis-port-forwarder.sh"
+bodmis_portforwarder_script="/usr/bin/bodmis-port-forwarder.sh"
 kubeconfig="/home/ssm-user/.kube/config"
 bodmis_kubeconfig="/home/ssm-user/.kube/bodmis_config"
 
