@@ -152,7 +152,8 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 # Create the Launch Template and assign the instance profile
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix            = "tribunals-all"
-  image_id               = "ami-0a83b58c0b4dd7fde"
+  // To find the correct AMI, search in the console for "windows ecs optmized" and choose a "Windows_Server-2019-English-Core-ECS_Optimized" from the list
+  image_id               = "ami-000ba7057dcf8e43f"
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
