@@ -174,4 +174,14 @@ locals {
     replication_instance_class = "dms.t3.small"
     engine_version             = "3.5.1"
   }
+
+  # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
+  # Please ensure any changes made here are consistent with Ansible variables.
+  dms_audit_endpoint_client_config_dev = {
+    read_host              = "standbydb2"
+    read_database          = "DMDNDAS2"
+    write_database         = "DMDNDA"
+    repository_environment = "test"
+  }
+  dms_audit_endpoint_repository_config_dev = {}
 }

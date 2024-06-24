@@ -112,3 +112,22 @@ variable "db_suffix" {
   type        = string
   default     = "db"
 }
+
+variable "dms_audit_endpoint_client_config" {
+type = object({
+    read_host              = optional(string)
+    read_database          = optional(string)
+    write_database         = optional(string)
+    repository_environment = optional(string)
+    })
+default = {}
+}
+
+variable "dms_audit_endpoint_repository_config" {
+type = object({
+    read_host             = optional(string)
+    read_database         = optional(string)
+    write_database        = optional(string)
+  })
+default = {}
+}

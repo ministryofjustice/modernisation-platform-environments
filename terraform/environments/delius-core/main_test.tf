@@ -37,4 +37,7 @@ module "environment_test" {
   pagerduty_integration_key = local.pagerduty_integration_key
 
   dms_config = local.dms_config_test
+
+  dms_audit_endpoint_client_config = local.dms_audit_endpoint_client_config_test
+  dms_audit_endpoint_repository_config = local.dms_audit_endpoint_repository_config_test
 }

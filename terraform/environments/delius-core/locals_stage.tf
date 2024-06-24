@@ -173,4 +173,15 @@ locals {
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.1"
   }
+
+  # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
+  # Please ensure any changes made here are consistent with Ansible variables.
+  dms_audit_endpoint_client_config_stage = {
+    read_host              = "primarydb"
+    read_database          = "STGNDA"
+    write_database         = "STGNDA"
+    repository_environment = "prod"
+  }
+
+  dms_audit_endpoint_repository_config_stage = {}
 }

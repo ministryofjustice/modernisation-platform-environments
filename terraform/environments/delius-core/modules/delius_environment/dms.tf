@@ -9,6 +9,8 @@ module "dms" {
 
   delius_core_application_passwords_arn = module.oracle_db_shared.delius_core_application_passwords_arn
   oracle_db_server_names                = local.oracle_db_server_names
+  dms_audit_endpoint_client_config      = var.dms_audit_endpoint_client_config
+  dms_audit_endpoint_repository_config  = var.dms_audit_endpoint_repository_config
 
   providers = {
     aws                       = aws
@@ -19,17 +21,6 @@ module "dms" {
 }
 
 locals {
-  dms_config = {
-    "delius-core-development" = {
-      replication_instance_class = "dms.t3.small"
-      engine_version             = "3.5.1"
-    }
-    "delius-core-test" = {
-      replication_instance_class = "dms.t3.medium"
-      engine_version             = "3.5.1"
-    }
-  }
-
   oracle_db_server_names = {
      primarydb = module.oracle_db_primary[0].oracle_db_server_name,
      standbydb1 = try(module.oracle_db_standby[0].oracle_db_server_name,"none"),

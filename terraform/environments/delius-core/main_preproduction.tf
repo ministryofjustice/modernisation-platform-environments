@@ -37,6 +37,9 @@ module "environment_stage" {
   pagerduty_integration_key = local.pagerduty_integration_key
 
   dms_config = local.dms_config_stage
+
+  dms_audit_endpoint_client_config = local.dms_audit_endpoint_client_config_stage
+  dms_audit_endpoint_repository_config = local.dms_audit_endpoint_repository_config_stage
 }
 
 module "environment_preprod" {
@@ -73,4 +76,7 @@ module "environment_preprod" {
   pagerduty_integration_key = local.pagerduty_integration_key
 
   dms_config = local.dms_config_preprod
+
+  dms_audit_endpoint_client_config = local.dms_audit_endpoint_client_config_preprod
+  dms_audit_endpoint_repository_config = local.dms_audit_endpoint_repository_config_preprod
 }

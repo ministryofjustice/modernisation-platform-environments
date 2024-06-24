@@ -38,7 +38,7 @@ resource "aws_secretsmanager_secret_version" "dms_audit_endpoint_source" {
     username = "delius_audit_dms_pool"
     password = jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"]
     port = "1521"
-    host = var.oracle_db_server_names[local.read_target]
+    host = var.oracle_db_server_names[coalesce(var.dms_audit_endpoint_client_config.read_host,var.dms_audit_endpoint_repository_config.read_host)]
   })
 }
 

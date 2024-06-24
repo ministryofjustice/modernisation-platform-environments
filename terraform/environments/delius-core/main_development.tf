@@ -36,4 +36,7 @@ module "environment_dev" {
   pagerduty_integration_key = local.pagerduty_integration_key
 
   dms_config = local.dms_config_dev
+
+  dms_audit_endpoint_client_config = local.dms_audit_endpoint_client_config_dev
+  dms_audit_endpoint_repository_config = local.dms_audit_endpoint_repository_config_dev
 }

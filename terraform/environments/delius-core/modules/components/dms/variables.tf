@@ -63,3 +63,19 @@ variable "platform_vars" {
     environment_management = any
   })
 }
+variable "dms_audit_endpoint_client_config" {
+type = object({
+    read_host              = string
+    read_database          = string
+    write_database         = string
+    repository_environment = string
+    })
+}
+
+variable "dms_audit_endpoint_repository_config" {
+type = object({
+    read_host              = string
+    read_database          = string
+    write_database         = string
+    })
+}
