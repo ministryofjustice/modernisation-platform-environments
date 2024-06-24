@@ -24,6 +24,30 @@ variable "replication_task_id" {
   type = string
 }
 
+variable "glue_unprocessed_raw_files_check_job" {
+  description = "Name of job to ensure raw files have been processed"
+  type        = string
+  default     = ""
+}
+
+variable "glue_trigger_activation_job" {
+  description = "Name of job to which activates/deactivates a glue trigger"
+  type        = string
+  default     = ""
+}
+
+variable "archive_job_trigger_name" {
+  description = "Name of the trigger for a glue trigger"
+  type        = string
+  default     = ""
+}
+
+variable "glue_archive_job" {
+  description = "Name of the glue job which archives the raw data"
+  type        = string
+  default     = ""
+}
+
 variable "glue_stop_glue_instance_job" {
   description = "Name of job to stop the current running instance of the streaming job"
   type        = string

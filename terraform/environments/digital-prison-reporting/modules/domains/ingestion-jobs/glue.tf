@@ -74,3 +74,88 @@ module "glue_reporting_hub_batch_job" {
   )
 }
 
+# Glue Job, Check All Raw Files Have Been Processed Job
+module "unprocessed_raw_files_check_job" {
+  source                        = "../../glue_job"
+  create_job                    = var.setup_unprocessed_raw_files_check_job
+  create_role                   = var.glue_unprocessed_raw_files_check_create_role # Needs to Set to TRUE
+  name                          = var.glue_unprocessed_raw_files_check_job_name
+  short_name                    = var.glue_unprocessed_raw_files_check_job_short_name
+  command_type                  = "glueetl"
+  description                   = var.glue_unprocessed_raw_files_check_description
+  create_security_configuration = var.glue_unprocessed_raw_files_check_create_sec_conf
+  job_language                  = var.glue_unprocessed_raw_files_check_language
+  temp_dir                      = var.glue_unprocessed_raw_files_check_temp_dir
+  spark_event_logs              = var.glue_unprocessed_raw_files_check_spark_event_logs
+  script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
+  enable_continuous_log_filter  = var.glue_unprocessed_raw_files_check_enable_cont_log_filter
+  project_id                    = var.project_id
+  aws_kms_key                   = var.s3_kms_arn
+  execution_class               = var.glue_unprocessed_raw_files_check_execution_class
+  additional_policies           = var.glue_unprocessed_raw_files_check_additional_policies
+  worker_type                   = var.glue_unprocessed_raw_files_check_job_worker_type
+  number_of_workers             = var.glue_unprocessed_raw_files_check_job_num_workers
+  max_concurrent                = var.glue_unprocessed_raw_files_check_max_concurrent #64
+  region                        = var.account_region
+  account                       = var.account_id
+  log_group_retention_in_days   = var.glue_log_group_retention_in_days
+
+  arguments = var.glue_unprocessed_raw_files_check_arguments
+
+  tags = merge(
+    var.tags,
+    {
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-713"
+    }
+  )
+}
+
+# Archive JOB
+# Glue Job, Reporting Hub Archive
+module "glue_archive_job" {
+  source                        = "../../glue_job"
+  create_job                    = var.setup_archive_job
+  create_role                   = var.glue_archive_create_role # Needs to Set to TRUE
+  name                          = var.glue_archive_job_name
+  short_name                    = var.glue_archive_job_short_name
+  command_type                  = "glueetl"
+  description                   = var.glue_archive_description
+  create_security_configuration = var.glue_archive_create_sec_conf
+  job_language                  = var.glue_archive_language
+  temp_dir                      = var.glue_archive_temp_dir
+  spark_event_logs              = var.glue_archive_spark_event_logs
+  script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
+  enable_continuous_log_filter  = var.glue_archive_enable_cont_log_filter
+  project_id                    = var.project_id
+  aws_kms_key                   = var.s3_kms_arn
+  execution_class               = var.glue_archive_execution_class
+  additional_policies           = var.glue_archive_additional_policies
+  worker_type                   = var.glue_archive_job_worker_type
+  number_of_workers             = var.glue_archive_job_num_workers
+  max_concurrent                = var.glue_archive_max_concurrent #64
+  region                        = var.account_region
+  account                       = var.account_id
+  log_group_retention_in_days   = var.glue_log_group_retention_in_days
+
+  arguments = var.glue_archive_arguments
+
+  tags = merge(
+    var.tags,
+    {
+      Resource_Type = "Glue Job"
+    }
+  )
+}
+
+resource "aws_glue_trigger" "glue_file_archive_job_trigger" {
+  count    = var.setup_archive_job ? 1 : 0
+  name     = "${module.glue_archive_job.name}-trigger"
+  schedule = var.glue_archive_job_schedule
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_archive_job.name
+  }
+}
+
