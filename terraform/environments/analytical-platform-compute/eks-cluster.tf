@@ -171,8 +171,8 @@ module "karpenter" {
   enable_pod_identity             = true
   create_pod_identity_association = true
 
-  iam_policy_name_prefix = "karpenter"
-  iam_role_name          = "karpenter"
+  iam_policy_name = "karpenter"
+  iam_role_name   = "karpenter"
 
   namespace = kubernetes_namespace.karpenter.metadata[0].name
 
