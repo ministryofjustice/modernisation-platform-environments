@@ -304,28 +304,3 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
     }
   )
 }
-
-# Operational DataStore Secrets for use in DataHub
-# PlaceHolder Secrets
-resource "aws_secretsmanager_secret" "operational_datastore" {
-  count = (local.environment == "development" ? 1 : 0)
-  name  = "external/operational_data_store"
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "external/operational_data_store"
-      Resource_Type = "Secrets"
-    }
-  )
-}
-
-resource "aws_secretsmanager_secret_version" "operational_datastore" {
-  count     = (local.environment == "development" ? 1 : 0)
-  secret_id = aws_secretsmanager_secret.operational_datastore[0].id
-  secret_string = jsonencode(local.operational_datastore_secrets_placeholder)
-
-  lifecycle {
-    ignore_changes = [secret_string,]
-  }
-}
