@@ -9,8 +9,10 @@ module "dms" {
 
   delius_core_application_passwords_arn = module.oracle_db_shared.delius_core_application_passwords_arn
   oracle_db_server_names                = local.oracle_db_server_names
-  dms_audit_endpoint_client_config      = var.dms_audit_endpoint_client_config
-  dms_audit_endpoint_repository_config  = var.dms_audit_endpoint_repository_config
+  dms_audit_source_endpoint             = var.dms_audit_source_endpoint
+  dms_audit_target_endpoint             = var.dms_audit_target_endpoint
+  dms_user_source_endpoint              = var.dms_user_source_endpoint
+  dms_user_target_endpoint              = var.dms_user_target_endpoint
 
   providers = {
     aws                       = aws

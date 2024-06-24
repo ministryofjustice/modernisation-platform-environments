@@ -63,19 +63,29 @@ variable "platform_vars" {
     environment_management = any
   })
 }
-variable "dms_audit_endpoint_client_config" {
+
+variable "dms_audit_source_endpoint" {
 type = object({
-    read_host              = string
-    read_database          = string
-    write_database         = string
-    repository_environment = string
+    read_host              = optional(string)
+    read_database          = optional(string)
     })
 }
 
-variable "dms_audit_endpoint_repository_config" {
+variable "dms_audit_target_endpoint" {
 type = object({
-    read_host              = string
-    read_database          = string
-    write_database         = string
+    write_database          = optional(string)
     })
+}
+
+variable "dms_user_source_endpoint" {
+type = object({
+    read_host             = optional(string)
+    read_database         = optional(string)
+  })
+}
+
+variable "dms_user_target_endpoint" {
+type = object({
+    write_database         = optional(string)
+  })
 }

@@ -38,8 +38,10 @@ module "environment_stage" {
 
   dms_config = local.dms_config_stage
 
-  dms_audit_endpoint_client_config = local.dms_audit_endpoint_client_config_stage
-  dms_audit_endpoint_repository_config = local.dms_audit_endpoint_repository_config_stage
+  dms_audit_source_endpoint = local.dms_audit_source_endpoint_stage
+  dms_audit_target_endpoint = local.dms_audit_target_endpoint_stage
+  dms_user_source_endpoint = local.dms_user_source_endpoint_stage
+  dms_user_target_endpoint = local.dms_user_target_endpoint_stage
 }
 
 module "environment_preprod" {
@@ -77,6 +79,8 @@ module "environment_preprod" {
 
   dms_config = local.dms_config_preprod
 
-  dms_audit_endpoint_client_config = local.dms_audit_endpoint_client_config_preprod
-  dms_audit_endpoint_repository_config = local.dms_audit_endpoint_repository_config_preprod
+  dms_audit_source_endpoint = local.dms_audit_source_endpoint_preprod
+  dms_audit_target_endpoint = local.dms_audit_target_endpoint_preprod
+  dms_user_source_endpoint = local.dms_user_source_endpoint_preprod
+  dms_user_target_endpoint = local.dms_user_target_endpoint_preprod
 }

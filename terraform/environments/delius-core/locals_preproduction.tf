@@ -174,13 +174,14 @@ locals {
 
   # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
   # Please ensure any changes made here are consistent with Ansible variables.
-  dms_audit_endpoint_client_config_preprod = {
+  dms_audit_source_endpoint_preprod = {
     read_host              = "standbydb1"
     read_database          = "PRENDAS1"
-    write_database         = "PRENDA"
-    repository_environment = "prod"
   }
-
-  dms_audit_endpoint_repository_config_preprod = {}
+  dms_audit_target_endpoint_preprod = {}
+  dms_user_source_endpoint_preprod = {}
+  dms_user_target_endpoint_preprod = {
+    write_database         = "PRENDA"
+  }
 
 }

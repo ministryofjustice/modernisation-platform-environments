@@ -32,16 +32,27 @@ data "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
   secret_id = data.aws_secretsmanager_secret.delius_core_application_passwords.id
 }
 
-resource "aws_secretsmanager_secret_version" "dms_audit_endpoint_source" {
+resource "aws_secretsmanager_secret_version" "dms_audit_endpoint_source_db" {
+  count = var.dms_audit_source_endpoint.read_host == null ? 0 : 1
   secret_id = aws_secretsmanager_secret.dms_audit_endpoint_source.id
   secret_string = jsonencode({
     username = "delius_audit_dms_pool"
     password = jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"]
     port = "1521"
-    host = var.oracle_db_server_names[coalesce(var.dms_audit_endpoint_client_config.read_host,var.dms_audit_endpoint_repository_config.read_host)]
+    host = var.oracle_db_server_names[var.dms_audit_source_endpoint.read_host]
   })
 }
 
+resource "aws_secretsmanager_secret_version" "dms_user_endpoint_source_db" {
+  count = var.dms_user_source_endpoint.read_host == null ? 0 : 1
+  secret_id = aws_secretsmanager_secret.dms_audit_endpoint_source.id
+  secret_string = jsonencode({
+    username = "delius_audit_dms_pool"
+    password = jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"]
+    port = "1521"
+    host = var.oracle_db_server_names[var.dms_user_source_endpoint.read_host]
+  })
+}
 
 # Although we could also create a Secret for the ASM Configuration
 # this is not currently supported by Terraform aws_dms_endpoint

@@ -177,11 +177,13 @@ locals {
 
   # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
   # Please ensure any changes made here are consistent with Ansible variables.
-  dms_audit_endpoint_client_config_dev = {
+  dms_audit_source_endpoint_dev = {
     read_host              = "standbydb2"
     read_database          = "DMDNDAS2"
-    write_database         = "DMDNDA"
-    repository_environment = "test"
   }
-  dms_audit_endpoint_repository_config_dev = {}
+  dms_audit_target_endpoint_dev = {}
+  dms_user_source_endpoint_dev = {}
+  dms_user_target_endpoint_dev = {
+    write_database         = "DMDNDA"
+  }
 }

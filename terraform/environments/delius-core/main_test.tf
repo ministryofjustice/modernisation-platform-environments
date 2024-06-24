@@ -38,6 +38,8 @@ module "environment_test" {
 
   dms_config = local.dms_config_test
 
-  dms_audit_endpoint_client_config = local.dms_audit_endpoint_client_config_test
-  dms_audit_endpoint_repository_config = local.dms_audit_endpoint_repository_config_test
+  dms_audit_source_endpoint = local.dms_audit_source_endpoint_test
+  dms_audit_target_endpoint = local.dms_audit_target_endpoint_test
+  dms_user_source_endpoint = local.dms_user_source_endpoint_test
+  dms_user_target_endpoint = local.dms_user_target_endpoint_test
 }

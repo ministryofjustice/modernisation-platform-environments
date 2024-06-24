@@ -37,6 +37,8 @@ module "environment_dev" {
 
   dms_config = local.dms_config_dev
 
-  dms_audit_endpoint_client_config = local.dms_audit_endpoint_client_config_dev
-  dms_audit_endpoint_repository_config = local.dms_audit_endpoint_repository_config_dev
+  dms_audit_source_endpoint = local.dms_audit_source_endpoint_dev
+  dms_audit_target_endpoint = local.dms_audit_target_endpoint_dev
+  dms_user_source_endpoint = local.dms_user_source_endpoint_dev
+  dms_user_target_endpoint = local.dms_user_target_endpoint_dev 
 }
