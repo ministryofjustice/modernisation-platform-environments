@@ -1,8 +1,3 @@
-output "tribunals_lb_sc_id" {
-  description = "LB Security Group Id"
-  value       = module.ecs_loadbalancer.tribunals_lb_sc_id
-}
-
 output "tribunals_lb_sc_id_sftp" {
   description = "LB Security Group Id"
   value       = module.ecs_loadbalancer.tribunals_lb_sc_id_sftp
