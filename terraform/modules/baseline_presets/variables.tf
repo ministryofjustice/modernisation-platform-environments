@@ -1,11 +1,11 @@
+# tflint-ignore: terraform_typed_variables
 variable "environment" {
-  # tflint-ignore: terraform_typed_variables
   # Not defining 'type' as it is defined in the output of the environment module
   description = "Standard environmental data resources from the environment module"
 }
 
+# tflint-ignore: terraform_typed_variables
 variable "ip_addresses" {
-  # tflint-ignore: terraform_typed_variables
   # Not defining 'type' as it is defined in the output of the ip_addresses module
   description = "ip address resources from the ip_address module"
 }
@@ -37,6 +37,7 @@ variable "options" {
     enable_ec2_user_keypair                      = optional(bool, false)           # create secret and key-pair for ec2-user
     enable_shared_s3                             = optional(bool, false)           # create devtest and preprodprod S3 bucket
     enable_observability_platform_monitoring     = optional(bool, false)           # create role for observability platform monitroing
+    enable_vmimport                              = optional(bool, false)           # create role for vm imports
     db_backup_s3                                 = optional(bool, false)           # create db-backup S3 buckets
     db_backup_more_permissions                   = optional(bool, false)           # additional permissions for db-backup S3 buckets
     route53_resolver_rules                       = optional(map(list(string)), {}) # create route53 resolver rules; list of map keys to filter local.route53_resolver_rules_all

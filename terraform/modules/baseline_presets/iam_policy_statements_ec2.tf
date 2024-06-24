@@ -114,13 +114,9 @@ locals {
           "s3:PutObject",
           "s3:PutObjectAcl",
         ]
-        resources = concat(var.environment.environment == "production" || var.environment.environment == "preproduction" ? [
-          "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*/*",
-          "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*"
-          ] : [
-          "arn:aws:s3:::devtest-${var.environment.application_name}-*/*",
-          "arn:aws:s3:::devtest-${var.environment.application_name}-*"
-          ], [
+        resources = [
+          "arn:aws:s3:::${local.shared_s3_name_prefix}*/*",
+          "arn:aws:s3:::${local.shared_s3_name_prefix}*",
           "arn:aws:s3:::ec2-image-builder-*/*",
           "arn:aws:s3:::ec2-image-builder-*",
           "arn:aws:s3:::*-software*/*",
@@ -129,7 +125,7 @@ locals {
           "arn:aws:s3:::mod-platform-image-artefact-bucket*",
           "arn:aws:s3:::modernisation-platform-software*/*",
           "arn:aws:s3:::modernisation-platform-software*"
-        ])
+        ]
       }
     ]
 

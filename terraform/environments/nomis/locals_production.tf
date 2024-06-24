@@ -86,7 +86,7 @@ locals {
       # ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
-          desired_capacity = 8
+          desired_capacity = 6
           max_size         = 8
 
           # instance_refresh = {
@@ -168,8 +168,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+          data  = { total_size = 4000, iops = 9000, throughput = 250 }
+          flash = { total_size = 1000, iops = 3000, throughput = 250 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -200,8 +200,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+          data  = { total_size = 4000, iops = 9000, throughput = 250 }
+          flash = { total_size = 1000, iops = 3000, throughput = 125 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -233,8 +233,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 6000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+          data  = { total_size = 6000, iops = 9000, throughput = 250 }
+          flash = { total_size = 1000, iops = 3000, throughput = 250 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -267,8 +267,10 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 6000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+          data  = { total_size = 6000, iops = 3000, throughput = 125 }
+          flash = { total_size = 1000, iops = 3000, throughput = 125 }
+          # data  = { total_size = 6000, iops = 9000, throughput = 250 } # replace above with this on failover
+          # flash = { total_size = 1000, iops = 3000, throughput = 250 } # replace above with this on failover
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true

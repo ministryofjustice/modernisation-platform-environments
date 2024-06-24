@@ -17,6 +17,8 @@ locals {
 
   delius_account_id = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
 
+  has_mis_environment = lookup(var.environment_config, "has_mis_environment", false)
+
   oracle_statistics_map = {
     "dev" = {
       #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
@@ -64,6 +66,5 @@ locals {
   }
 
   oracle_backup_bucket_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
-
 
 }

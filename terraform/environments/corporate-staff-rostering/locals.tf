@@ -38,6 +38,7 @@ locals {
       enable_ec2_self_provision                   = true
       enable_ec2_oracle_enterprise_managed_server = true
       enable_ec2_user_keypair                     = true
+      enable_shared_s3                            = true
       iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]

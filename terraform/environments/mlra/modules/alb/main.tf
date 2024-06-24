@@ -388,7 +388,7 @@ resource "aws_cloudfront_distribution" "external" {
   #checkov:skip=CKV2_AWS_47:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_305:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_310:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  http_version        = var.cloudfront_http_version
+  http_version = var.cloudfront_http_version
   origin {
     domain_name = aws_lb.loadbalancer.dns_name
     origin_id   = aws_lb.loadbalancer.id

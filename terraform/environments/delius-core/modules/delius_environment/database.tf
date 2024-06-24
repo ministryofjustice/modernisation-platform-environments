@@ -124,52 +124,24 @@ module "oracle_db_standby" {
   }
 }
 
-resource "aws_secretsmanager_secret" "delius_core_application_passwords_secret" {
-  count = local.has_mis_environment ? 1 : 0
+# Allow Access To Delius Core Application Secret From MIS Primary EC2 Instance Role
 
-  name        = local.application_secret_name
-  description = "Application Users Credentials"
-  kms_key_id  = var.account_config.kms_keys.general_shared
-  tags        = var.tags
-}
-
-data "aws_iam_policy_document" "delius_core_application_passwords_policy_doc" {
-
-  count = local.has_mis_environment ? 1 : 0
+data "aws_iam_policy_document" "database_application_passwords" {
+  count = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
   statement {
     sid    = "MisAWSAccountToReadTheSecret"
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.mis_account_id}:role/instance-role-delius-mis-${var.env_name}-mis-db-1"]
+      identifiers = ["arn:aws:iam::${var.platform_vars.environment_management.account_ids[join("-", ["delius-mis", var.account_info.mp_environment])]}:role/instance-role-delius-mis-${var.env_name}-mis-db-1"]
     }
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = [aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn]
+    resources = [module.oracle_db_shared.database_application_passwords_secret_arn]
   }
 }
 
-resource "aws_secretsmanager_secret_policy" "delius_core_application_passwords_pol" {
-  count = local.has_mis_environment ? 1 : 0
-
-  secret_arn = aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn
-  policy     = data.aws_iam_policy_document.delius_core_application_passwords_policy_doc[count.index].json
-}
-
-data "aws_iam_policy_document" "db_access_to_secrets_manager" {
-  count = local.has_mis_environment ? 1 : 0
-  statement {
-    sid = "DbAccessToSecretsManager"
-    actions = [
-      "secretsmanager:Describe*",
-      "secretsmanager:Get*",
-      "secretsmanager:ListSecret*",
-      "secretsmanager:Put*",
-      "secretsmanager:RestoreSecret",
-      "secretsmanager:Update*"
-    ]
-    effect = "Allow"
-    resources = [
-      aws_secretsmanager_secret.delius_core_application_passwords_secret[count.index].arn
-    ]
-  }
+resource "aws_secretsmanager_secret_policy" "database_application_passwords" {
+  count      = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
+  secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
+  policy     = data.aws_iam_policy_document.database_application_passwords[0].json
 }

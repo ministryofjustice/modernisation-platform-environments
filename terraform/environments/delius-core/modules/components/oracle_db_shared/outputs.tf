@@ -25,3 +25,7 @@ output "instance_policies" {
     "instance_ssm"                        = aws_iam_policy.instance_ssm
   }
 }
+
+output "database_application_passwords_secret_arn" {
+  value = aws_secretsmanager_secret.database_application_passwords.arn
+}

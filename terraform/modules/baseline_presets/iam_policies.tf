@@ -12,6 +12,7 @@ locals {
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
+    var.options.enable_vmimport ? ["vmimportPolicy"] : [],
     var.options.iam_policies_filter,
     "EC2Default",
     "EC2Db",
@@ -198,5 +199,49 @@ locals {
       description = "AmazonSSMManagedInstanceCore minus GetParameters"
       statements  = local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced
     }
+
+    vmimportPolicy = {
+      description = "vm import permissions"
+      statements = [
+        {
+          effect = "Allow"
+          actions = [
+            "s3:GetBucketLocation",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:PutObject",
+            "s3:GetBucketAcl"
+          ],
+          resources = [
+            "arn:aws:s3:::*",
+            "arn:aws:s3:::*/*",
+            "arn:aws:s3:::*/*/*"
+          ]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "ec2:ModifySnapshotAttribute",
+            "ec2:CopySnapshot",
+            "ec2:RegisterImage",
+            "ec2:Describe*"
+          ],
+          resources = ["*"]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "kms:CreateGrant",
+            "kms:Decrypt",
+            "kms:DescribeKey",
+            "kms:Encrypt",
+            "kms:GenerateDataKey*",
+            "kms:ReEncrypt*"
+          ],
+          resources = ["*"]
+        }
+      ]
+    }
+
   }
 }
