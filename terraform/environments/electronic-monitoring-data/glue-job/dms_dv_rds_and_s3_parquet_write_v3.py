@@ -407,7 +407,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                            for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
         # -------------------------------------------------------
 
-        df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+        df_rds_temp_t1 = df_rds.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
 
 
         rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
@@ -444,7 +444,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             LOGGER.info(f"""{for_loop_count}-Processing - {rds_tbl_name}.{rds_column}.""")
             LOGGER.info(f"""Using Dataframe-'select' column list: {temp_select_list}""")
 
-            df_rds_temp = df_rds.select(*temp_select_list)
+            df_rds_temp_t1 = df_rds_temp_t1.select(*temp_select_list)
             # -------------------------------------------------------
 
             t2_rds_str_col_trimmed = False
@@ -469,17 +469,17 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             if t3_rds_ts_col_msec_trimmed:
                 validated_colmn_msg = f"""'{rds_column}'{transform_msg_2}"""
-                df_rds_temp_t4 = df_rds_temp_t3.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+                df_rds_temp_t4 = df_rds_temp_t3.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
             elif t2_rds_str_col_trimmed:
                 validated_colmn_msg = f"""'{rds_column}'{transform_msg_1}"""
-                df_rds_temp_t4 = df_rds_temp_t2.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+                df_rds_temp_t4 = df_rds_temp_t2.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
             else:
                 validated_colmn_msg = rds_column
-                df_rds_temp_t4 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+                df_rds_temp_t4 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
             # -------------------------------------------------------
 
             df_prq_temp = df_prq.select(*temp_select_list)            
-            df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+            df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
 
             df_rds_prq_subtract_transform = df_rds_temp_t4.subtract(df_prq_temp_t1).cache()
             df_rds_prq_subtract_row_count = df_rds_prq_subtract_transform.count()
@@ -490,7 +490,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             else:
                 df_subtract_temp = (df_rds_prq_subtract_transform
-                           .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
+                           .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds.columns])))
                            .selectExpr("json_row")
                            .limit(5))
 
