@@ -18,7 +18,7 @@ resource "kubernetes_namespace" "cluster_autoscaler" {
 
 resource "kubernetes_namespace" "karpenter" {
   metadata {
-    name = "karpernter"
+    name = "karpenter"
   }
 }
 

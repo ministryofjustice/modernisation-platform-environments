@@ -263,6 +263,23 @@ module "karpenter_sqs_kms" {
   aliases               = ["sqs/karpenter"]
   description           = "Karpenter SQS KMS key"
   enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowAmazonEventBridge"
+      actions = [
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["events.amazonaws.com"]
+        }
+      ]
+    }
+  ]
 
   deletion_window_in_days = 7
 
