@@ -237,6 +237,41 @@ resource "aws_secretsmanager_secret" "cp_k8s_secrets" {
   )
 }
 
+# BODMIS CP k8s Token
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "cp_bodmis_k8s_secrets" {
+  count = local.enable_cp_bodmis_k8s_secrets ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.cp_bodmis_k8s_secrets[0].id
+  secret_string = jsonencode(local.cp_bodmis_k8s_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+
+  depends_on = [aws_secretsmanager_secret.cp_bodmis_k8s_secrets]
+}
+
+# DPS Source Secrets
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret" "cp_bodmis_k8s_secrets" {
+  count = local.enable_cp_bodmis_k8s_secrets ? 1 : 0
+
+  name = "external/cloud_platform/bodmis_k8s_auth"
+
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/cloud_platform/bodmis_k8s_auth"
+      Resource_Type = "Secrets"
+      Source        = "CP"
+      Jira          = "DPR2-908"
+    }
+  )
+}
+
 ## DBT Analytics EKS Cluster Identifier
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "dbt_secrets" {
@@ -268,4 +303,29 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
       Jira          = "DPR2-751"
     }
   )
+}
+
+# Operational DataStore Secrets for use in DataHub
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret" "operational_datastore" {
+  count = (local.environment == "development" ? 1 : 0)
+  name  = "external/operational_data_store"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/operational_data_store"
+      Resource_Type = "Secrets"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "operational_datastore" {
+  count     = (local.environment == "development" ? 1 : 0)
+  secret_id = aws_secretsmanager_secret.operational_datastore[0].id
+  secret_string = jsonencode(local.operational_datastore_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string,]
+  }
 }

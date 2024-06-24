@@ -347,6 +347,16 @@ locals {
     cloud_platform_k8s_cluster_context = "placeholder"
   }
 
+  # cp_bodmis_k8s_secrets_placeholder
+  enable_cp_bodmis_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_bodmis_k8s_secrets
+  cp_bodmis_k8s_secrets_placeholder = {
+    cloud_platform_k8s_token           = "placeholder"
+    cloud_platform_certificate_auth    = "placeholder"
+    cloud_platform_k8s_server          = "placeholder"
+    cloud_platform_k8s_cluster_name    = "placeholder"
+    cloud_platform_k8s_cluster_context = "placeholder"
+  }
+
   # Analytics Platform, DBT Secrets 
   enable_dbt_k8s_secrets = local.application_data.accounts[local.environment].enable_dbt_k8s_secrets
   dbt_k8s_secrets_placeholder = {
