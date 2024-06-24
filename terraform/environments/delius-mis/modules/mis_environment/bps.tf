@@ -54,7 +54,7 @@ module "bps_instance" {
   availability_zone = "eu-west-2a"
   subnet_id         = var.account_config.private_subnet_ids[count.index]
   tags              = var.tags
-  
+
   cloudwatch_metric_alarms = merge(
     local.cloudwatch_metric_alarms.ec2
   )

@@ -501,7 +501,7 @@ resource "aws_appautoscaling_policy" "ecs_target_cpu" {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
-    target_value = var.ecs_scaling_cpu_threshold
+    target_value       = var.ecs_scaling_cpu_threshold
     scale_in_cooldown  = 300
     scale_out_cooldown = 300
   }
@@ -517,7 +517,7 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
     }
-    target_value = var.ecs_scaling_mem_threshold
+    target_value       = var.ecs_scaling_mem_threshold
     scale_in_cooldown  = 300
     scale_out_cooldown = 300
   }
@@ -533,8 +533,8 @@ resource "aws_ecs_capacity_provider" "apex" {
     managed_scaling {
       # maximum_scaling_step_size = 1000
       # minimum_scaling_step_size = 1
-      status          = "ENABLED"
-      target_capacity = var.ecs_target_capacity
+      status                 = "ENABLED"
+      target_capacity        = var.ecs_target_capacity
       instance_warmup_period = var.ec2_instance_warmup_period
     }
     managed_draining = "ENABLED"
