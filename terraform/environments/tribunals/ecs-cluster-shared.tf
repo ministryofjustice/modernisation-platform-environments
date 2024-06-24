@@ -121,16 +121,7 @@ resource "aws_security_group" "ecs_service" {
     protocol    = "tcp"
     description = "Allow traffic on port 80 from load balancer"
     security_groups = [
-      module.appeals.tribunals_lb_sc_id,
-      module.ahmlr.tribunals_lb_sc_id,
-      module.care_standards.tribunals_lb_sc_id,
-      module.cicap.tribunals_lb_sc_id,
-      module.employment_appeals.tribunals_lb_sc_id,
-      module.finance_and_tax.tribunals_lb_sc_id,
-      module.immigration_services.tribunals_lb_sc_id,
-      module.information_tribunal.tribunals_lb_sc_id,
-      module.lands_tribunal.tribunals_lb_sc_id,
-      module.transport.tribunals_lb_sc_id,
+      aws_security_group.tribunals_lb_sc.id,
       module.charity_tribunal_decisions.tribunals_lb_sc_id,
       module.claims_management_decisions.tribunals_lb_sc_id,
       module.consumer_credit_appeals.tribunals_lb_sc_id,

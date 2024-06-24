@@ -1,29 +1,38 @@
 resource "aws_lb" "tribunals_lb" {
-  name               = "tribunals-lb"
-  load_balancer_type = "application"
-  security_groups = [
-    module.appeals.tribunals_lb_sc_id,
-    module.ahmlr.tribunals_lb_sc_id,
-    module.care_standards.tribunals_lb_sc_id,
-    module.cicap.tribunals_lb_sc_id,
-    module.employment_appeals.tribunals_lb_sc_id,
-    module.finance_and_tax.tribunals_lb_sc_id,
-    module.immigration_services.tribunals_lb_sc_id,
-    module.information_tribunal.tribunals_lb_sc_id,
-    module.lands_tribunal.tribunals_lb_sc_id,
-    module.transport.tribunals_lb_sc_id,
-    module.charity_tribunal_decisions.tribunals_lb_sc_id,
-    module.claims_management_decisions.tribunals_lb_sc_id,
-    module.consumer_credit_appeals.tribunals_lb_sc_id,
-    module.estate_agent_appeals.tribunals_lb_sc_id,
-    module.primary_health_lists.tribunals_lb_sc_id,
-    module.siac.tribunals_lb_sc_id,
-    module.sscs_venue_pages.tribunals_lb_sc_id,
-    module.tax_chancery_decisions.tribunals_lb_sc_id,
-    module.tax_tribunal_decisions.tribunals_lb_sc_id,
-    module.ftp_admin_appeals.tribunals_lb_sc_id
-  ]
+  name                       = "tribunals-lb"
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+}
+
+resource "aws_security_group" "tribunals_lb_sc" {
+  name        = "tribunals-load-balancer-sg"
+  description = "control access to the load balancer"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    description = "allow all traffic on HTTPS port 443"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "allow all traffic on HTTP port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "allow all outbound traffic from the load balancer - needed due to dynamic port mapping on ec2 instance"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }

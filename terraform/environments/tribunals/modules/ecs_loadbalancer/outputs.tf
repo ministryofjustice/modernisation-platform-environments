@@ -1,13 +1,3 @@
-output "tribunals_lb_sc_id" {
-  description = "LB Security Group Id"
-  value       = aws_security_group.tribunals_lb_sc.id
-}
-
-output "tribunals_lb_sc" {
-  description = "LB Security Group"
-  value       = aws_security_group.tribunals_lb_sc
-}
-
 output "tribunals_target_group_arn" {
   description = "LB Target Group arn"
   value       = aws_lb_target_group.tribunals_target_group.arn
