@@ -208,7 +208,7 @@ def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, in_col_list) -> Dat
               for c in in_rds_df.dtypes])
             )
 
-def strip_rds_tbl_col_chars(in_rds_df: DataFrame, 
+def rds_df_strip_tbl_col_chars(in_rds_df: DataFrame, 
                             in_transformed_colmn_list_1, 
                             replace_substring) -> DataFrame:
     count = 0
@@ -353,32 +353,31 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
 
         t2_rds_str_col_trimmed = False
         if args.get("rds_df_trim_str_columns", "false") == "true":
-            msg_prefix = f"""Given -> rds_df_trim_str_columns"""
-            LOGGER.info(
-                f"""{msg_prefix} = {args["rds_df_trim_str_columns"]}, {type(args["rds_df_trim_str_columns"])}""")
+            rds_df_trim_str_columns = args["rds_df_trim_str_columns"]
+            msg_prefix = f"""Given -> rds_df_trim_str_columns = {rds_df_trim_str_columns}"""
+            LOGGER.info(f"""{msg_prefix}, {type(rds_df_trim_str_columns)}""")
+
             df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_str_columns)
-            additional_message = " - [str column(s) extra spaces trimmed]"
+            additional_message = "- [str column(s) extra spaces trimmed]"
             t2_rds_str_col_trimmed = True
         # -------------------------------------------------------
 
         t3_rds_ts_col_msec_trimmed = False
         if args.get("rds_df_trim_micro_sec_ts_col_list", None) is not None:
 
-            msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list"""
+            msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list = {given_rds_df_trim_micro_seconds_col_list}"""
             given_rds_df_trim_micro_seconds_col_str = args["rds_df_trim_micro_sec_ts_col_list"]
-            given_rds_df_trim_micro_seconds_col_list = [
-                f"""{col.strip().strip("'").strip('"')}"""
-                for col in given_rds_df_trim_micro_seconds_col_str.split(",")
-                ]
-            LOGGER.info(
-                f"""{msg_prefix} = {given_rds_df_trim_micro_seconds_col_list}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
+            given_rds_df_trim_micro_seconds_col_list = [f"""{col.strip().strip("'").strip('"')}"""
+                                                        for col in given_rds_df_trim_micro_seconds_col_str.split(",")]
+            LOGGER.info(f"""{msg_prefix}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
+
             if t2_rds_str_col_trimmed == True:
                 df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t2, 
                                                                     given_rds_df_trim_micro_seconds_col_list)
             else:
                 df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t1, 
                                                                     given_rds_df_trim_micro_seconds_col_list)
-            additional_message = " - [After trimming timestamp micro-seconds]"
+            additional_message = "- [selected timestamp columns micro-seconds trimmed]"
             t3_rds_ts_col_msec_trimmed = True
         # -------------------------------------------------------
 
@@ -536,6 +535,7 @@ if __name__ == "__main__":
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_str)
 
     # -------------------------------------------------------
+
     if not rds_sqlserver_db_tbl_list:
             LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
             sys.exit(1)
@@ -545,8 +545,10 @@ if __name__ == "__main__":
     LOGGER.info(f"""{message_prefix}\n{rds_sqlserver_db_tbl_list}""")
     
     # -------------------------------------------------------
+
     if args.get("rds_select_db_tbls", None) is None:
         # -------------------------------------------------------
+        
         if args.get("rds_exclude_db_tbls", None) is None:
             exclude_rds_db_tbls_list = list()
         else:
@@ -616,6 +618,7 @@ if __name__ == "__main__":
         LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
         # ---------------------------------------------------------------------------
+
         selected_tables_not_found_list = [tbl for tbl in given_rds_sqlserver_tbls_list 
                                           if tbl not in rds_sqlserver_db_tbl_list]
         if selected_tables_not_found_list:
@@ -634,8 +637,8 @@ if __name__ == "__main__":
             total_files, total_size = get_s3_folder_info(PRQ_FILES_SRC_S3_BUCKET_NAME, 
                                                          f"{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}")
             total_size_mb = total_size/1024/1024
-
             # -------------------------------------------------------
+
             if total_size_mb > int(args["max_table_size_mb"]):
                 LOGGER.warn(f""">> Size greaterthan {args["max_table_size_mb"]}MB ({total_size_mb}MB) <<""")
             # -------------------------------------------------------

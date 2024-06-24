@@ -226,7 +226,7 @@ def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, in_col_list) -> Dat
             )
 
 
-def strip_rds_tbl_col_chars(in_rds_df: DataFrame, 
+def rds_df_strip_tbl_col_chars(in_rds_df: DataFrame, 
                             in_transformed_colmn_list_1, 
                             replace_substring) -> DataFrame:
     count = 0
