@@ -110,6 +110,29 @@ resource "helm_release" "cluster_autoscaler" {
   depends_on = [module.cluster_autoscaler_iam_role]
 }
 
+/* Karpenter */
+resource "helm_release" "karpenter" {
+  /* https://github.com/aws/karpenter-provider-aws/releases */
+  name       = "karpenter"
+  repository = "oci://public.ecr.aws/karpenter"
+  chart      = "karpenter"
+  version    = "0.37.0"
+  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/karpenter/values.yml.tftpl",
+      {
+        service_account_name = module.karpenter.service_account
+        cluster_name         = module.eks.cluster_name
+        cluster_endpoint     = module.eks.cluster_endpoint
+        interruption_queue   = module.karpenter.queue_name
+      }
+    )
+  ]
+  depends_on = [module.karpenter]
+}
+
 /* External DNS */
 resource "helm_release" "external_dns" {
   /* https://artifacthub.io/packages/helm/external-dns/external-dns */
