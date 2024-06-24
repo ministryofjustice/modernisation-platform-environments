@@ -487,7 +487,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             else:
                 df_subtract_temp = (df_rds_prq_subtract_transform
-                           .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds.columns])))
+                           .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp_t3.columns])))
                            .selectExpr("json_row")
                            .limit(5))
 
