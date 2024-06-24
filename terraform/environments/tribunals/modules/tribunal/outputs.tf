@@ -12,8 +12,3 @@ output "tribunals_lb_listener" {
   description = "LB Listener"
   value       = module.ecs_loadbalancer.tribunals_lb_listener
 }
-
-output "tribunals_lb" {
-  description = "LB"
-  value       = module.ecs_loadbalancer.tribunals_lb
-}

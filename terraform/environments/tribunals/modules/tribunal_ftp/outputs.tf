@@ -18,11 +18,6 @@ output "tribunals_lb_listener" {
   value       = module.ecs_loadbalancer.tribunals_lb_listener
 }
 
-output "tribunals_lb" {
-  description = "LB"
-  value       = module.ecs_loadbalancer.tribunals_lb
-}
-
 output "tribunals_lb_ftp" {
   description = "SFTP LB"
   value       = module.ecs_loadbalancer.tribunals_lb_ftp
