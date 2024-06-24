@@ -397,18 +397,15 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         if args.get('rds_db_tbl_pkeys_col_list', None) is None:
             try:
                 rds_db_tbl_pkeys_col_list = [column.strip() 
-                                               for column in RECORDED_PKEYS_LIST[rds_tbl_name]]
+                                             for column in RECORDED_PKEYS_LIST[rds_tbl_name]]
             except Exception as e:
                 LOGGER.error(f"""Runtime Parameter 'rds_db_tbl_pkeys_col_list' - value(s) not given!""")
                 LOGGER.error(f"""Global Dictionary - 'RECORDED_PKEYS_LIST' has no key '{rds_tbl_name}'!""")
                 sys.exit(1)
         else:
             rds_db_tbl_pkeys_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
-                                           for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
+                                         for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
         # -------------------------------------------------------
-
-        df_rds_temp_t1 = df_rds.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
-
 
         rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
                                     for column in args.get('rds_df_trim_str_col_list', '').split(",")]
@@ -424,7 +421,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         transform_msg_2 = ""
         if given_rds_df_trim_micro_seconds_col_list:
             msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list"""
-            LOGGER.info(
+            LOGGER.warn(
                 f"""{msg_prefix} = {given_rds_df_trim_micro_seconds_col_list}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
             transform_msg_2 =f"""- micro-seconds trimmed."""
         # -------------------------------------------------------
@@ -444,44 +441,44 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             LOGGER.info(f"""{for_loop_count}-Processing - {rds_tbl_name}.{rds_column}.""")
             LOGGER.info(f"""Using Dataframe-'select' column list: {temp_select_list}""")
 
-            df_rds_temp_t1 = df_rds_temp_t1.select(*temp_select_list)
+            df_rds_temp = df_rds.select(*temp_select_list)
             # -------------------------------------------------------
 
-            t2_rds_str_col_trimmed = False
+            t1_rds_str_col_trimmed = False
             if rds_column in rds_df_trim_str_col_list:
-                df_rds_temp_t2 = df_rds_temp_t1.transform(trim_rds_df_str_columns)
-                t2_rds_str_col_trimmed = True
+                df_rds_temp_t1 = df_rds_temp.transform(trim_rds_df_str_columns)
+                t1_rds_str_col_trimmed = True
             # -------------------------------------------------------
             
-            t3_rds_ts_col_msec_trimmed = False
+            t2_rds_ts_col_msec_trimmed = False
             if rds_column in given_rds_df_trim_micro_seconds_col_list:
 
-                if t2_rds_str_col_trimmed is True:
-                    df_rds_temp_t3 = df_rds_temp_t2.transform(rds_df_trim_microseconds_timestamp, 
+                if t1_rds_str_col_trimmed is True:
+                    df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_microseconds_timestamp, 
                                                               given_rds_df_trim_micro_seconds_col_list)
                 else:
-                    df_rds_temp_t3 = df_rds_temp_t1.transform(rds_df_trim_microseconds_timestamp, 
+                    df_rds_temp_t2 = df_rds_temp.transform(rds_df_trim_microseconds_timestamp, 
                                                               given_rds_df_trim_micro_seconds_col_list)
                 # -------------------------------------------------------
 
-                t3_rds_ts_col_msec_trimmed = True
+                t2_rds_ts_col_msec_trimmed = True
             # -------------------------------------------------------
 
-            if t3_rds_ts_col_msec_trimmed:
+            if t2_rds_ts_col_msec_trimmed:
                 validated_colmn_msg = f"""'{rds_column}'{transform_msg_2}"""
-                df_rds_temp_t4 = df_rds_temp_t3.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
-            elif t2_rds_str_col_trimmed:
+                df_rds_temp_t3 = df_rds_temp_t2.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+            elif t1_rds_str_col_trimmed:
                 validated_colmn_msg = f"""'{rds_column}'{transform_msg_1}"""
-                df_rds_temp_t4 = df_rds_temp_t2.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
+                df_rds_temp_t3 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
             else:
                 validated_colmn_msg = rds_column
-                df_rds_temp_t4 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
+                df_rds_temp_t3 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
             # -------------------------------------------------------
 
             df_prq_temp = df_prq.select(*temp_select_list)            
-            df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds, rds_db_name, rds_tbl_name))
+            df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
 
-            df_rds_prq_subtract_transform = df_rds_temp_t4.subtract(df_prq_temp_t1).cache()
+            df_rds_prq_subtract_transform = df_rds_temp_t3.subtract(df_prq_temp_t1).cache()
             df_rds_prq_subtract_row_count = df_rds_prq_subtract_transform.count()
             # -------------------------------------------------------
 
