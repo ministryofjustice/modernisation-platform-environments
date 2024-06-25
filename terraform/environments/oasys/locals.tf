@@ -33,7 +33,6 @@ locals {
       cloudwatch_metric_alarms_default_actions   = ["dso_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
       # cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
-      db_backup_s3                                = true # adds db backup buckets
       db_backup_more_permissions                  = true
       enable_azure_sas_token                      = true
       enable_backup_plan_daily_and_weekly         = true
@@ -43,7 +42,8 @@ locals {
       enable_ec2_oracle_enterprise_managed_server = true
       enable_ec2_self_provision                   = true
       enable_ec2_user_keypair                     = true
-      enable_shared_s3                            = true
+      enable_s3_db_backup_bucket                  = true
+      enable_s3_shared_bucket                     = true
       enable_vmimport                             = true
       iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy", "Ec2OracleEnterpriseManagerPolicy"]
       iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]

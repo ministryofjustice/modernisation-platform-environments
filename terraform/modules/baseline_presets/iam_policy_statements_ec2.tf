@@ -115,8 +115,8 @@ locals {
           "s3:PutObjectAcl",
         ]
         resources = [
-          "arn:aws:s3:::${local.shared_s3_name_prefix}*/*",
-          "arn:aws:s3:::${local.shared_s3_name_prefix}*",
+          "arn:aws:s3:::${local.s3_environment_specific.shared_bucket_name}*/*",
+          "arn:aws:s3:::${local.s3_environment_specific.shared_bucket_name}*",
           "arn:aws:s3:::ec2-image-builder-*/*",
           "arn:aws:s3:::ec2-image-builder-*",
           "arn:aws:s3:::*-software*/*",
@@ -347,20 +347,20 @@ locals {
         ]
         resources = flatten([
           var.environment.environment == "production" ? [
-            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*/*",
-            "arn:aws:s3:::prod-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::prod-${var.environment.application_name}-db-backup-bucket-*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.preproduction.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.preproduction.db_backup_bucket_name}*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.production.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.production.db_backup_bucket_name}*/*",
           ] : [],
           var.environment.environment == "preproduction" ? [
-            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.preproduction.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.preproduction.db_backup_bucket_name}*/*",
           ] : [],
           contains(["development", "test"], var.environment.environment) ? [
-            "arn:aws:s3:::dev-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::dev-${var.environment.application_name}-db-backup-bucket-*/*",
-            "arn:aws:s3:::devtest-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::devtest-${var.environment.application_name}-db-backup-bucket-*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.development.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.development.db_backup_bucket_name}*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.test.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.test.db_backup_bucket_name}*/*",
           ] : [],
         ])
       }
