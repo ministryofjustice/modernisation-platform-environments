@@ -9,7 +9,7 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_delius_dba_secrets_access ? ["DeliusDbaSecretsPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
-    var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_s3_shared_bucket ? ["Ec2AccessSharedS3Policy"] : [],
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_vmimport ? ["vmimportPolicy"] : [],
@@ -36,7 +36,7 @@ locals {
     var.options.enable_business_unit_kms_cmks ? local.iam_policy_statements_ec2.business_unit_kms_cmk : [],
     var.options.enable_ec2_cloud_watch_agent ? local.iam_policy_statements_ec2.CloudWatchAgentServerReduced : [],
     var.options.enable_ec2_self_provision ? local.iam_policy_statements_ec2.Ec2SelfProvision : [],
-    var.options.enable_shared_s3 ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
+    var.options.enable_s3_shared_bucket ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
     var.options.enable_ec2_reduced_ssm_policy ? local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? local.iam_policy_statements_ec2.OracleEnterpriseManagedServer : [],
   ])
@@ -56,7 +56,7 @@ locals {
       statements = flatten([
         local.iam_policy_statements_in_ec2_default,
         local.iam_policy_statements_ec2.OracleLicenseTracking,
-        var.options.db_backup_s3 ? local.iam_policy_statements_ec2.S3DbBackupRead : [],
+        var.options.enable_s3_db_backup_bucket ? local.iam_policy_statements_ec2.S3DbBackupRead : [],
       ])
     }
 
