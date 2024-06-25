@@ -156,3 +156,13 @@ module "ecs_loadbalancer" {
   is_ftp_app                   = var.is_ftp_app
   waf_arn                      = var.waf_arn
 }
+
+module "frontend_loadbalancer" {
+  source                    = "../application_lb"
+  app_name                  = local.app
+  app_urls                  = ["app-1", "app-2", "app-3"]
+  application_data          = var.application_data
+  certificate_arns          = var.aws_acm_certificate_external
+  subnets_shared_public_ids = var.subnets_shared_public_ids
+  vpc_shared_id             = var.vpc_shared_id
+}

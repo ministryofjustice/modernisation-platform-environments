@@ -3,23 +3,23 @@ locals {
   listener_rules = {
     admin_access_1 = {
       path_patterns = ["*/Admin*", "*/admin*"]
-      source_ips = ["195.59.75.0/24", "194.33.192.0/25"]
+      source_ips    = ["195.59.75.0/24", "194.33.192.0/25"]
     }
     admin_access_2 = {
       path_patterns = ["*/Admin*", "*/admin*"]
-      source_ips = ["194.33.193.0/25", "194.33.196.0/25"]
+      source_ips    = ["194.33.193.0/25", "194.33.196.0/25"]
     }
     admin_access_3 = {
       path_patterns = ["*/Admin*", "*/admin*"]
-      source_ips = ["194.33.197.0/25"]
+      source_ips    = ["194.33.197.0/25"]
     }
     secure_access_1 = {
       path_patterns = ["*/Secure*", "*/secure*"]
-      source_ips = ["195.59.75.0/24", "194.33.192.0/25"]
+      source_ips    = ["195.59.75.0/24", "194.33.192.0/25"]
     }
     secure_access_2 = {
       path_patterns = ["*/Secure*", "*/secure*"]
-      source_ips = ["194.33.193.0/25"]
+      source_ips    = ["194.33.193.0/25"]
     }
   }
   combined_rules = merge([
@@ -59,12 +59,12 @@ resource "aws_security_group_rule" "ingress-https" {
   type              = "ingress"
 }
 resource "aws_security_group_rule" "egress-all" {
-  from_port                = -1
-  protocol                 = "all"
-  security_group_id        = aws_security_group.tribunals_lb_sg.id
-  source_security_group_id = var.ec2-sg
-  to_port                  = -1
-  type                     = "egress"
+  from_port         = -1
+  protocol          = "all"
+  security_group_id = aws_security_group.tribunals_lb_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
+  to_port           = -1
+  type              = "egress"
 }
 
 resource "aws_lb" "tribunals_lb" {
@@ -77,7 +77,7 @@ resource "aws_lb" "tribunals_lb" {
 }
 
 resource "aws_lb_target_group" "tribunals_target_group" {
-  for_each = local.listener_headers
+  for_each             = local.listener_headers
   name                 = "${each.key}-tg"
   port                 = 80
   protocol             = "HTTP"
@@ -153,7 +153,7 @@ resource "aws_lb_listener_rule" "tribunals_lb_listener_rule_1" {
   }
   condition {
     source_ip {
-      values = [each.value.source_ips)]
+      values = [each.value.source_ips]
     }
   }
 }
