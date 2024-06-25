@@ -78,17 +78,6 @@ data "aws_iam_policy_document" "bucket_policy" {
       identifiers = ["athena.amazonaws.com"]
     }
   }
-
-  statement {
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/*",
-      ]
-    }
-    actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::${module.s3-bucket.bucket.arn}/*"]
-  }
 }
 
 
