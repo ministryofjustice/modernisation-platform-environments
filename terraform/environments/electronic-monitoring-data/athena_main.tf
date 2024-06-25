@@ -19,11 +19,4 @@ resource "aws_athena_workgroup" "default" {
       }
     }
   }
-  
-  tags = merge(
-    local.tags,
-    {
-      Resource_Type = "Athena Workgroup for default Query Result Location results, logs and query limits",
-    }
-  )
 }
