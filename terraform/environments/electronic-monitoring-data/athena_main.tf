@@ -1,14 +1,14 @@
 resource "aws_athena_workgroup" "default" {
   name = format("%s-default", local.env_account_id)
-  description = "A default Athena workgroup to set query limits and link to the default query location bucket: ${module.athena-s3-bucket.bucket.id}"
+  description = "A default Athena workgroup to set query limits and link to the default query location bucket"
 
   configuration {
-    bytes_scanned_cutoff_per_query = 1073741824 # 1 GB
+    bytes_scanned_cutoff_per_query     = 1073741824 # 1 GB
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
     
     result_configuration {
-      output_location = "s3://${module.athena-s3-bucket.bucket.id}/output/"
+      output_location = "s3://${module.athena-s3-bucket.bucket.id}"
 
       encryption_configuration {
         encryption_option = "SSE_S3"
