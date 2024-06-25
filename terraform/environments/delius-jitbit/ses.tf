@@ -89,6 +89,26 @@ resource "aws_route53_record" "jitbit_amazonses_mail_from_txt_record_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
+  name     = aws_sesv2_email_identity.jitbit.email_identity
+  type     = "TXT"
+  ttl      = "600"
+  records  = ["v=spf1 include:amazonses.com ~all"]
+}
+
+resource "aws_route53_record" "jitbit_amazonses_mail_from_txt_record" {
+  count    = local.is-production ? 0 : 1
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = aws_sesv2_email_identity.jitbit.email_identity
+  type     = "TXT"
+  ttl      = "600"
+  records  = ["v=spf1 include:amazonses.com ~all"]
+}
+
+resource "aws_route53_record" "jitbit_amazonses_mail_from_txt_record_prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
   name     = "mail.${aws_sesv2_email_identity.jitbit.email_identity}"
   type     = "TXT"
   ttl      = "600"
