@@ -9,7 +9,7 @@ data "aws_ami" "ecs_optimized_windows_ami" {
   
   filter {
     name = "name"
-    values =  [*Windows_Server-2019-English-Full-ECS_Optimized-*]
+    values =  ["*Windows_Server-2019-English-Full-ECS_Optimized-*"]
   }
 
   filter {
