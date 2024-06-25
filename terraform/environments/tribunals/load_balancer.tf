@@ -39,13 +39,13 @@ resource "aws_security_group" "tribunals_lb_sc" {
 
 resource "aws_lb_listener" "tribunals_lb" {
   depends_on = [
-    aws_acm_certificate_external
+    aws_acm_certificate.external
   ]
-  certificate_arn   = aws_acm_certificate_external.arn
+  certificate_arn   = aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.tribunals_lb.arn
   port              = 443
-  protocol          = HTTPS
-  ssl_policy        = application_data.lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  protocol          = "HTTPS"
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     type = "forward"
