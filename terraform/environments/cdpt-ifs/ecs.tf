@@ -3,18 +3,34 @@ data "aws_ecs_task_definition" "task_definition" {
   depends_on      = [aws_ecs_task_definition.ifs_task_definition]
 }
 
-data "aws_ssm_parameter" "ecs_optimized_windows_ami" {
-  name = "/aws/service/ecs/optimized-ami/windows_server/2019/recommended"
-}
-
 data "aws_ami" "ecs_optimized_windows_ami" {
   most_recent = true 
-  filter {
-    name = "image-id"
-    values =  [jsondecode(data.aws_ssm_parameter.ecs_optimized_windows_ami.value).image_id]
-  }
   owners = ["amazon"]
+  
+  filter {
+    name = "name"
+    values =  [*Windows_Server-2019-English-Full-ECS_Optimized-*]
+  }
+
+  filter {
+    name = "state"
+    values = ["available"]
+  }
 }
+
+ data "aws_launch_template" "ifs_lt" {
+  name = "ifs-ec2-launch-template"
+ }
+
+ locals {
+  current_ami_id = data.aws_launch_template.ifs_lt.latest_version.ami_id
+  latest_ami_id  = data.aws_ami.ecs_optimized_windows_ami.id
+  ami_outdated   = local.current_ami_id != local.latest_ami_id 
+ }
+ 
+ output "ami_comparison" {
+  value = local.ami_outdated ? "A new AMI is available: ${local.latest_ami_id}" : "You are using hte latest AMI."
+ }
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
