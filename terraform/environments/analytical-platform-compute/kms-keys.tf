@@ -185,6 +185,39 @@ module "ebs_kms" {
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
     module.eks.cluster_iam_role_arn
   ]
+  key_statements = [
+    {
+      sid = "AllowEC2"
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:CreateGrant",
+        "kms:DescribeKey"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["ec2.${data.aws_region.current.name}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:CallerAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        }
+      ]
+    }
+  ]
 
   tags = local.tags
 }
