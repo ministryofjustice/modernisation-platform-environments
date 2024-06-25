@@ -33,7 +33,7 @@ locals {
       ]
     }
     production = {
-      db_backup_bucket_name   = coalesce(var.options.db_backup_bucket_name, substr("prod-${var.environment.application_name}-db-backup-bucket", 0, 37))
+      db_backup_bucket_name   = coalesce(var.options.db_backup_bucket_name, substr("prod-${var.environment.application_name}-db-backup-bucket-", 0, 37))
       db_backup_bucket_policy = [var.options.db_backup_more_permissions ? local.s3_bucket_policies.ProdPreprodReadWriteDeleteBucketPolicy : local.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy]
       shared_bucket_name      = substr("prodpreprod-${var.environment.application_name}-", 0, 37)
       shared_bucket_policy = [
