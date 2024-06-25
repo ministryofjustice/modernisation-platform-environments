@@ -57,7 +57,7 @@ resource "aws_lb_listener" "tribunals_lb" {
       dynamic "target_group" {
         for_each = aws_lb_target_group.tribunals_target_group
         content {
-          arn = each.value.arn
+          arn = "${each.value.arn}"
         }
       }
     }
