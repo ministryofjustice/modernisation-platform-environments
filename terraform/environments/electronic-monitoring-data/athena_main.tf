@@ -1,3 +1,4 @@
+
 resource "aws_athena_workgroup" "default" {
   name = format("%s-default", local.env_account_id)
   description = "A default Athena workgroup to set query limits and link to the default query location bucket"
@@ -8,7 +9,7 @@ resource "aws_athena_workgroup" "default" {
     publish_cloudwatch_metrics_enabled = true
     
     result_configuration {
-      output_location = "s3://${module.athena-s3-bucket.bucket.id}"
+      output_location = "s3://aws-athena-query-results-800964199911-eu-west-2/output/"
 
       encryption_configuration {
         encryption_option = "SSE_S3"
