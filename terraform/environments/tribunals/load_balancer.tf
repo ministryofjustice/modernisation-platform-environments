@@ -57,7 +57,7 @@ resource "aws_lb_listener" "tribunals_lb" {
       dynamic "target_group" {
         for_each = local.target_group_arns
         content {
-          arn = each.value
+          arn = target_group.value
         }
       }
     }
