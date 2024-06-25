@@ -62,6 +62,10 @@ module "eks" {
     }
   }
 
+  node_security_group_tags = {
+    "karpenter.sh/discovery" = local.eks_cluster_name
+  }
+
   eks_managed_node_group_defaults = {
     ami_release_version = local.environment_configuration.eks_node_version
     ami_type            = "BOTTLEROCKET_x86_64"
@@ -159,9 +163,7 @@ module "eks" {
     }
   }
 
-  tags = merge(local.tags, {
-    "karpenter.sh/discovery" = local.eks_cluster_name
-  })
+  tags = local.tags
 }
 
 module "karpenter" {
