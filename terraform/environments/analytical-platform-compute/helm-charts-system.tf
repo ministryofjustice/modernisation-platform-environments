@@ -138,7 +138,7 @@ resource "helm_release" "karpenter" {
 
 resource "helm_release" "karpenter_configuration" {
   name      = "karpenter-configuration"
-  chart     = "./src/helm/charts/arpenter-configuration"
+  chart     = "./src/helm/charts/karpenter-configuration"
   namespace = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
