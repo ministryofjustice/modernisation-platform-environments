@@ -701,7 +701,7 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/raw/*",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/structured",
-      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/structured/*"              
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/structured/*"
     ]
   }
 }

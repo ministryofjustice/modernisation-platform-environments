@@ -92,10 +92,13 @@ data "aws_iam_policy_document" "mlflow" {
     resources = [module.mlflow_s3_kms.key_arn]
   }
   statement {
-    sid       = "AllowS3List"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [module.mlflow_bucket.s3_bucket_arn]
+    sid     = "AllowS3List"
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [
+      module.mlflow_bucket.s3_bucket_arn,
+      "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}"
+    ]
   }
   statement {
     sid    = "AllowS3Write"
@@ -105,7 +108,10 @@ data "aws_iam_policy_document" "mlflow" {
       "s3:GetObject",
       "s3:DeleteObject"
     ]
-    resources = ["${module.mlflow_bucket.s3_bucket_arn}/*"]
+    resources = [
+      "${module.mlflow_bucket.s3_bucket_arn}/*",
+      "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}"
+    ]
   }
 }
 

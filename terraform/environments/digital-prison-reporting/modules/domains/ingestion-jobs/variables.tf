@@ -24,16 +24,19 @@ variable "setup_batch_job" {
 variable "glue_batch_job_name" {
   description = "Name of the Glue CDC Job"
   default     = ""
+  type        = string
 }
 
 variable "glue_batch_job_short_name" {
   description = "Name of the Glue CDC Job"
   default     = ""
+  type        = string
 }
 
 variable "glue_batch_description" {
   description = "Job Description"
   default     = ""
+  type        = string
 }
 
 variable "glue_batch_create_sec_conf" {
@@ -86,6 +89,7 @@ variable "glue_batch_enable_cont_log_filter" {
 variable "glue_batch_execution_class" {
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
+  type        = string
 }
 
 variable "glue_batch_job_worker_type" {
@@ -148,16 +152,19 @@ variable "setup_cdc_job" {
 variable "glue_cdc_job_name" {
   description = "Name of the Glue CDC Job"
   default     = ""
+  type        = string
 }
 
 variable "glue_cdc_job_short_name" {
   description = "Name of the Glue CDC Job"
   default     = ""
+  type        = string
 }
 
 variable "glue_cdc_description" {
   description = "Job Description"
   default     = ""
+  type        = string
 }
 
 variable "glue_cdc_create_sec_conf" {
@@ -165,13 +172,6 @@ variable "glue_cdc_create_sec_conf" {
   default     = false
   description = "(Optional) Create AWS Glue Security Configuration associated with the job."
 }
-
-variable "glue_log_group_retention_in_days" {
-  type        = number
-  default     = 7
-  description = "(Optional) The default number of days log events retained in the glue job log group."
-}
-
 
 variable "glue_cdc_language" {
   type        = string
@@ -214,15 +214,10 @@ variable "glue_cdc_enable_cont_log_filter" {
   description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
-variable "s3_kms_arn" {
-  type        = string
-  default     = ""
-  description = "(Optional) The ARN of the kMS Key associated to S3"
-}
-
 variable "glue_cdc_execution_class" {
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
+  type        = string
 }
 
 variable "glue_cdc_job_worker_type" {
@@ -260,20 +255,277 @@ variable "glue_cdc_max_concurrent" {
   description = "(Optional) The maximum number of concurrent runs allowed for a job."
 }
 
+variable "glue_cdc_create_role" {
+  type        = bool
+  default     = false
+  description = "(Optional) Create AWS IAM role associated with the job."
+}
+
+
+# Unprocessed Raw Files Check Job
+variable "setup_unprocessed_raw_files_check_job" {
+  description = "Enable Job to Check If All Raw Files Have Been Processed, True or False"
+  type        = bool
+  default     = false
+}
+
+variable "glue_unprocessed_raw_files_check_job_name" {
+  description = "Name of the Glue Unprocessed Raw Files Check Job"
+  default     = ""
+  type        = string
+}
+
+variable "glue_unprocessed_raw_files_check_job_short_name" {
+  description = "Name of the Glue Unprocessed Raw Files Check Job"
+  default     = ""
+  type        = string
+}
+
+variable "glue_unprocessed_raw_files_check_description" {
+  description = "Job Description"
+  default     = ""
+  type        = string
+}
+
+variable "glue_unprocessed_raw_files_check_create_sec_conf" {
+  type        = bool
+  default     = false
+  description = "(Optional) Create AWS Glue Security Configuration associated with the job."
+}
+
+variable "glue_unprocessed_raw_files_check_language" {
+  type        = string
+  default     = "python"
+  description = "(Optional) The script programming language."
+
+  validation {
+    condition     = contains(["scala", "python"], var.glue_unprocessed_raw_files_check_language)
+    error_message = "Accepts a value of 'scala' or 'python'."
+  }
+}
+
+variable "glue_unprocessed_raw_files_check_temp_dir" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a temporary directory for the job."
+}
+
+variable "glue_unprocessed_raw_files_check_checkpoint_dir" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Checkoint directory for the job."
+}
+
+variable "glue_unprocessed_raw_files_check_spark_event_logs" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the job."
+}
+
+variable "glue_unprocessed_raw_files_check_script_location" {
+  type        = string
+  description = "(Optional) Specifies the S3 path to a script that executes a job."
+  default     = ""
+}
+
+variable "glue_unprocessed_raw_files_check_enable_cont_log_filter" {
+  type        = bool
+  default     = false
+  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
+}
+
+variable "glue_unprocessed_raw_files_check_execution_class" {
+  default     = "STANDARD"
+  description = "Execution CLass Standard or FLex"
+}
+
+variable "glue_unprocessed_raw_files_check_job_worker_type" {
+  type        = string
+  default     = "G.1X"
+  description = "(Optional) The type of predefined worker that is allocated when a job runs."
+
+  validation {
+    condition     = contains(["Standard", "G.1X", "G.2X"], var.glue_unprocessed_raw_files_check_job_worker_type)
+    error_message = "Accepts a value of Standard, G.1X, or G.2X."
+  }
+}
+
+variable "glue_unprocessed_raw_files_check_job_num_workers" {
+  type        = number
+  default     = 2
+  description = "(Optional) The number of workers of a defined workerType that are allocated when a job runs."
+}
+
+variable "glue_unprocessed_raw_files_check_additional_policies" {
+  type        = string
+  default     = ""
+  description = "(Optional) The list of Policies used for this job."
+}
+
+variable "glue_unprocessed_raw_files_check_max_concurrent" {
+  type        = number
+  default     = 1
+  description = "(Optional) The maximum number of concurrent runs allowed for a job."
+}
+
+variable "glue_unprocessed_raw_files_check_create_role" {
+  type        = bool
+  default     = false
+  description = "(Optional) Create AWS IAM role associated with the job."
+}
+
+variable "glue_unprocessed_raw_files_check_arguments" {
+  type    = map(any)
+  default = {}
+}
+
+
+# Archive Job
+variable "setup_archive_job" {
+  description = "Enable Archive Job, True or False"
+  type        = bool
+  default     = false
+}
+
+variable "glue_archive_job_schedule" {
+  description = "Cron schedule for the archive job"
+  default     = "cron(0 0/3 ? * * *)"
+  type        = string
+}
+
+variable "glue_archive_job_name" {
+  description = "Name of the Glue Archive Job"
+  default     = ""
+  type        = string
+}
+
+variable "glue_archive_job_short_name" {
+  description = "Name of the Glue Archive Job"
+  default     = ""
+  type        = string
+}
+
+variable "glue_archive_description" {
+  description = "Job Description"
+  default     = ""
+  type        = string
+}
+
+variable "glue_archive_create_sec_conf" {
+  type        = bool
+  default     = false
+  description = "(Optional) Create AWS Glue Security Configuration associated with the job."
+}
+
+variable "glue_archive_language" {
+  type        = string
+  default     = "python"
+  description = "(Optional) The script programming language."
+
+  validation {
+    condition     = contains(["scala", "python"], var.glue_archive_language)
+    error_message = "Accepts a value of 'scala' or 'python'."
+  }
+}
+
+variable "glue_archive_temp_dir" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a temporary directory for the job."
+}
+
+variable "glue_archive_checkpoint_dir" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Checkoint directory for the job."
+}
+
+variable "glue_archive_spark_event_logs" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the job."
+}
+
+variable "glue_archive_script_location" {
+  type        = string
+  description = "(Optional) Specifies the S3 path to a script that executes a job."
+  default     = ""
+}
+
+variable "glue_archive_enable_cont_log_filter" {
+  type        = bool
+  default     = false
+  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
+}
+
+variable "glue_archive_execution_class" {
+  default     = "STANDARD"
+  description = "Execution CLass Standard or FLex"
+}
+
+variable "glue_archive_job_worker_type" {
+  type        = string
+  default     = "G.1X"
+  description = "(Optional) The type of predefined worker that is allocated when a job runs."
+
+  validation {
+    condition     = contains(["Standard", "G.1X", "G.2X"], var.glue_archive_job_worker_type)
+    error_message = "Accepts a value of Standard, G.1X, or G.2X."
+  }
+}
+
+variable "glue_archive_job_num_workers" {
+  type        = number
+  default     = 2
+  description = "(Optional) The number of workers of a defined workerType that are allocated when a job runs."
+}
+
+variable "glue_archive_additional_policies" {
+  type        = string
+  default     = ""
+  description = "(Optional) The list of Policies used for this job."
+}
+
+variable "glue_archive_max_concurrent" {
+  type        = number
+  default     = 1
+  description = "(Optional) The maximum number of concurrent runs allowed for a job."
+}
+
+variable "glue_archive_create_role" {
+  type        = bool
+  default     = false
+  description = "(Optional) Create AWS IAM role associated with the job."
+}
+
+variable "glue_archive_arguments" {
+  type    = map(any)
+  default = {}
+}
+
+
+variable "s3_kms_arn" {
+  type        = string
+  default     = ""
+  description = "(Optional) The ARN of the kMS Key associated to S3"
+}
+
+variable "glue_log_group_retention_in_days" {
+  type        = number
+  default     = 7
+  description = "(Optional) The default number of days log events retained in the glue job log group."
+}
+
 variable "account_region" {
   description = "Current AWS Region."
   default     = "eu-west-2"
+  type        = string
 }
 
 variable "account_id" {
   description = "AWS Account ID."
   default     = ""
-}
-
-variable "glue_cdc_create_role" {
-  type        = bool
-  default     = false
-  description = "(Optional) Create AWS IAM role associated with the job."
+  type        = string
 }
 
 # Lambda
@@ -348,6 +600,10 @@ variable "env" {
   description = "Env Type"
 }
 
-variable "script_version" {}
-variable "jar_version" {}
+variable "script_version" {
+  type = string
+}
+variable "jar_version" {
+  type = string
+}
 

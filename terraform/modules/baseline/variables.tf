@@ -86,7 +86,7 @@ variable "bastion_linux" {
 # cannot define a type without fully defining the entire cloudwatch dashboard json structure
 # tflint-ignore: terraform_typed_variables
 variable "cloudwatch_dashboards" {
-  
+
   description = "map of cloudwatch dashboards where key is the dashboard name. Use widget_groups if you want baseline to work out x,y,width,height"
   #type = map(object({
   #  account_name   = optional(string)        # for monitoring account, limit to given account
@@ -475,8 +475,8 @@ variable "efs" {
   default = {}
 }
 
-  # tflint-ignore: terraform_typed_variables
-  variable "environment" {
+# tflint-ignore: terraform_typed_variables
+variable "environment" {
   # Not defining 'type' as it is defined in the output of the environment module
   description = "Standard environmental data resources from the environment module"
 }

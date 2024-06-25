@@ -54,14 +54,13 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_schema",
                        "repartition_factor",
                        "max_table_size_mb",
-                       "trim_rds_df_str_columns"
+                       "rds_df_trim_str_columns"
                        ]
 
 OPTIONAL_INPUTS = [
-    "select_rds_db_tbls",
-    "exclude_rds_db_tbls",
-    "transformed_column_list_1",
-    "rds_tbl_col_replace_char_1"
+    "rds_select_db_tbls",
+    "rds_exclude_db_tbls",
+    "rds_df_trim_micro_sec_ts_col_list"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -92,11 +91,13 @@ PARQUET_OUTPUT_S3_BUCKET_NAME = args["parquet_output_bucket_name"]
 GLUE_CATALOG_DB_NAME = args["glue_catalog_db_name"]
 GLUE_CATALOG_TBL_NAME = args["glue_catalog_tbl_name"]
 
-CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}'''
+CATALOG_DB_TABLE_PATH = f"""{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}"""
+CATALOG_TABLE_S3_FULL_PATH = f'''s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{CATALOG_DB_TABLE_PATH}'''
 
 NVL_DTYPE_DICT = {'string': "''", 'int': 0, 'double': 0, 'float': 0, 'smallint': 0, 'bigint':0,
                   'boolean': False,
-                  'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')", 'date': "to_date('1900-01-01', 'yyyy-MM-dd')"}
+                  'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')", 
+                  'date': "to_date('1900-01-01', 'yyyy-MM-dd')"}
 
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
@@ -148,18 +149,19 @@ def get_rds_tables_dataframe(in_rds_db_name) -> DataFrame:
             .load()
             )
 
-
-def get_rds_db_tbl_list(in_rds_sqlserver_db_list):
+def get_rds_db_tbl_list(in_rds_sqlserver_db_str):
     rds_db_tbl_temp_list = list()
-    for db in in_rds_sqlserver_db_list:
-        rds_sqlserver_db_tbls = get_rds_tables_dataframe(db)
-        rds_sqlserver_db_tbls = (rds_sqlserver_db_tbls.select(
-            F.concat(rds_sqlserver_db_tbls.table_catalog,
-                     F.lit('_'), rds_sqlserver_db_tbls.table_schema,
-                     F.lit('_'), rds_sqlserver_db_tbls.table_name).alias("full_table_name"))
-        )
-        rds_db_tbl_temp_list = rds_db_tbl_temp_list + \
-            [row[0] for row in rds_sqlserver_db_tbls.collect()]
+
+    df_rds_sqlserver_db_tbls = get_rds_tables_dataframe(in_rds_sqlserver_db_str)
+
+    df_rds_sqlserver_db_tbls = (df_rds_sqlserver_db_tbls.select(
+                                    F.concat(df_rds_sqlserver_db_tbls.table_catalog,
+                                    F.lit('_'), df_rds_sqlserver_db_tbls.table_schema,
+                                    F.lit('_'), df_rds_sqlserver_db_tbls.table_name).alias("full_table_name"))
+    )
+
+    rds_db_tbl_temp_list = rds_db_tbl_temp_list + \
+                            [row[0] for row in df_rds_sqlserver_db_tbls.collect()]
 
     return rds_db_tbl_temp_list
 
@@ -193,23 +195,31 @@ def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name) -> DataFrame:
             )
 
 
-def trim_rds_df_str_columns(in_rds_df: DataFrame) -> DataFrame:
+def rds_df_trim_str_columns(in_rds_df: DataFrame) -> DataFrame:
     return (in_rds_df.select(
             *[F.trim(F.col(c[0])).alias(c[0]) if c[1] == 'string' else F.col(c[0])
               for c in in_rds_df.dtypes])
             )
 
+def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, in_col_list) -> DataFrame:
+    return (in_rds_df.select(
+            *[F.date_format(F.col(c[0]),'yyyy-MM-dd HH:mm:ss.SSS').alias(c[0]).cast('timestamp') 
+              if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
+              for c in in_rds_df.dtypes])
+            )
 
-def strip_rds_tbl_col_chars(in_rds_df: DataFrame, 
+def rds_df_strip_tbl_col_chars(in_rds_df: DataFrame, 
                             in_transformed_colmn_list_1, 
                             replace_substring) -> DataFrame:
     count = 0
     for transform_colmn in in_transformed_colmn_list_1:
         if count == 0:
-            rds_df = in_rds_df.withColumn(transform_colmn, F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
+            rds_df = in_rds_df.withColumn(transform_colmn, 
+                                          F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
             count += 1
         else:
-            rds_df = rds_df.withColumn(transform_colmn, F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
+            rds_df = rds_df.withColumn(transform_colmn, 
+                                       F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
     return rds_df
 
 
@@ -269,6 +279,7 @@ def check_s3_folder_path_if_exists(in_bucket_name, in_folder_path):
 def get_s3_table_folder_path(in_database_name, in_table_name):
     dir_path_str = f"{in_database_name}/{args['rds_sqlserver_db_schema']}/{in_table_name}"
     tbl_full_dir_path_str = f"s3://{PRQ_FILES_SRC_S3_BUCKET_NAME}/{dir_path_str}/"
+
     if check_s3_folder_path_if_exists(PRQ_FILES_SRC_S3_BUCKET_NAME, dir_path_str):
         return tbl_full_dir_path_str
     else:
@@ -276,11 +287,17 @@ def get_s3_table_folder_path(in_database_name, in_table_name):
         return None
 
 
-def get_s3_parquet_df(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
+def get_s3_parquet_df_v1(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
     return spark.createDataFrame(spark.read.parquet(in_s3_parquet_folder_path).rdd, in_rds_df_schema)
 
+def get_s3_parquet_df_v2(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
+    return spark.read.schema(in_rds_df_schema).parquet(in_s3_parquet_folder_path)
 
-def get_altered_df_schema_object(in_df_rds: DataFrame, in_transformed_column_list):
+def get_s3_parquet_df_v3(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
+    return spark.read.format("parquet").load(in_s3_parquet_folder_path, schema=in_rds_df_schema)
+
+
+def get_reordered_columns_schema_object(in_df_rds: DataFrame, in_transformed_column_list):
     altered_schema_object = T.StructType([])
     rds_df_column_list = in_df_rds.schema.fields
 
@@ -303,8 +320,8 @@ def get_altered_df_schema_object(in_df_rds: DataFrame, in_transformed_column_lis
 
 def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, input_repartition_factor) -> DataFrame:
 
-    default_repartition_factor = input_repartition_factor if total_files <= 1 \
-        else total_files * input_repartition_factor
+    default_repartition_factor = input_repartition_factor \
+                                    if total_files <= 1 else total_files * input_repartition_factor
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime,
@@ -326,110 +343,134 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     if tbl_prq_s3_folder_path is not None:
 
         df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
-        LOGGER.info(
-            f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}'] partitions --> {df_rds_temp.rdd.getNumPartitions()}""")
-        
+
+        rds_df_created_msg_1 = f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}']"""
+        rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds_temp.rdd.getNumPartitions()}"""
+        LOGGER.info(f"""{rds_df_created_msg_1}\n{rds_df_created_msg_2}""")
+
+        df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
         # -------------------------------------------------------
-        if args.get("trim_rds_df_str_columns", "false") == "true":
-            LOGGER.info(
-                f"""Given -> trim_rds_df_str_columns = {args["trim_rds_df_str_columns"]}, {type(args["trim_rds_df_str_columns"])}""")
-            df_rds_temp_t1 = df_rds_temp.transform(trim_rds_df_str_columns)
-            additional_message = " - [After trimming RDS-DB-string column(s) spaces]"
-            df_rds_temp_t2 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+
+        t2_rds_str_col_trimmed = False
+        if args.get("rds_df_trim_str_columns", "false") == "true":
+            rds_df_trim_str_columns = args["rds_df_trim_str_columns"]
+            msg_prefix = f"""Given -> rds_df_trim_str_columns = {rds_df_trim_str_columns}"""
+            LOGGER.info(f"""{msg_prefix}, {type(rds_df_trim_str_columns)}""")
+
+            df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_str_columns)
+            additional_message = "- [str column(s) extra spaces trimmed]"
+            t2_rds_str_col_trimmed = True
+        # -------------------------------------------------------
+
+        t3_rds_ts_col_msec_trimmed = False
+        if args.get("rds_df_trim_micro_sec_ts_col_list", None) is not None:
+
+            msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list = {given_rds_df_trim_micro_seconds_col_list}"""
+            given_rds_df_trim_micro_seconds_col_str = args["rds_df_trim_micro_sec_ts_col_list"]
+            given_rds_df_trim_micro_seconds_col_list = [f"""{col.strip().strip("'").strip('"')}"""
+                                                        for col in given_rds_df_trim_micro_seconds_col_str.split(",")]
+            LOGGER.info(f"""{msg_prefix}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
+
+            if t2_rds_str_col_trimmed == True:
+                df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t2, 
+                                                                    given_rds_df_trim_micro_seconds_col_list)
+            else:
+                df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t1, 
+                                                                    given_rds_df_trim_micro_seconds_col_list)
+            additional_message = "- [selected timestamp columns micro-seconds trimmed]"
+            t3_rds_ts_col_msec_trimmed = True
+        # -------------------------------------------------------
+
+        if t3_rds_ts_col_msec_trimmed:
+            df_rds_temp_t4 = df_rds_temp_t3
+        elif t2_rds_str_col_trimmed:
+            df_rds_temp_t4 = df_rds_temp_t2
         else:
-            df_rds_temp_t2 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+            df_rds_temp_t4 = df_rds_temp_t1
         # -------------------------------------------------------
 
-        prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}'] -- {total_size_mb}MB"""
+        df_rds_temp_t5 = df_rds_temp_t4.cache()
 
-        # -------------------------------------------------------
-        if args.get("transformed_column_list_1", None) is not None:
-            given_transformed_colmn_list_1 = [e.strip().strip("'") for e in args["transformed_column_list_1"].split(",")]
-            LOGGER.info(f"given_transformed_colmn_list_1 = {given_transformed_colmn_list_1}, {type(given_transformed_colmn_list_1)}")
+        df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)\
+                            .repartition(default_repartition_factor)
 
-            altered_schema_object = get_altered_df_schema_object(df_rds_temp, given_transformed_colmn_list_1)
-            df_prq_temp = get_s3_parquet_df(tbl_prq_s3_folder_path, altered_schema_object).repartition(default_repartition_factor)
-            prq_df_created_msg_2 = f"""\n >> parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
-            LOGGER.info(f"""{prq_df_created_msg_1}{prq_df_created_msg_2}""")
+        prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}']"""
+        prq_df_created_msg_2 = f""" >> {total_size_mb}MB ; parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
+        LOGGER.info(f"""{prq_df_created_msg_1}\n{prq_df_created_msg_2}""")
 
-            LOGGER.info(f"stripping {args['rds_tbl_col_replace_char_1']} from rds-dataframe-column(s)\n {given_transformed_colmn_list_1}")
-            df_rds_temp_t3 = (strip_rds_tbl_col_chars(df_rds_temp_t2, given_transformed_colmn_list_1, args['rds_tbl_col_replace_char_1'])
-                                .cache())
-            
-            additional_message = f" - [After stripping '{args['rds_tbl_col_replace_char_1']}' from RDS-DB-tranformed column(s)]"
-        else:
-            df_prq_temp = get_s3_parquet_df(tbl_prq_s3_folder_path, df_rds_temp.schema).repartition(default_repartition_factor)
-            prq_df_created_msg_2 = f"""\n >> parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
-            LOGGER.info(f"""{prq_df_created_msg_1}{prq_df_created_msg_2}""")
-            
-            df_rds_temp_t3 = df_rds_temp_t2.cache()
-        # -------------------------------------------------------
+        df_prq_temp_t1 = df_prq_temp.selectExpr(
+                                        *get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)
+                            ).cache()
 
-        df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)).cache()
-
-        df_rds_temp_count = df_rds_temp_t3.count()
+        df_rds_temp_count = df_rds_temp_t5.count()
         df_prq_temp_count = df_prq_temp_t1.count()
 
         # -------------------------------------------------------
         if df_rds_temp_count == df_prq_temp_count:
 
-            df_rds_prq_subtract_t1 = df_rds_temp_t2.subtract(df_prq_temp_t1)
+            df_rds_prq_subtract_t1 = df_rds_temp_t5.subtract(df_prq_temp_t1)
             df_rds_prq_subtract_row_count = df_rds_prq_subtract_t1.count()
 
             # -------------------------------------------------------
             if df_rds_prq_subtract_row_count == 0:
-                df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                                  "'' as json_row",
-                                                  f"""'{rds_tbl_name} - Validated.{additional_message}' as validation_msg""",
-                                                  f"""'{rds_db_name}' as database_name""",
-                                                  f"""'{db_sch_tbl}' as full_table_name""",
-                                                  """'False' as table_to_ap"""
-                                                  )
+                df_temp = df_dv_output.selectExpr(
+                                        "current_timestamp as run_datetime",
+                                        "'' as json_row",
+                                        f"""'{rds_tbl_name} - Validated.{additional_message}' as validation_msg""",
+                                        f"""'{rds_db_name}' as database_name""",
+                                        f"""'{db_sch_tbl}' as full_table_name""",
+                                        """'False' as table_to_ap"""
+                            )
                 LOGGER.info(f"Validation Successful - 1")
                 df_dv_output = df_dv_output.union(df_temp)
             else:
-                df_temp = (df_rds_prq_subtract_t1
+                df_subtract_temp = (df_rds_prq_subtract_t1
                            .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
                            .selectExpr("json_row")
                            .limit(100))
 
-                validation_msg = f""" "'{rds_tbl_name}' - dataframe-subtract-op ->> {df_rds_prq_subtract_row_count} row-count !" as validation_msg"""
-                df_temp = df_temp.selectExpr("current_timestamp as run_datetime",
-                                             "json_row",
-                                             validation_msg,
-                                             f"""'{rds_db_name}' as database_name""",
-                                             f"""'{db_sch_tbl}' as full_table_name""",
-                                             """'False' as table_to_ap"""
-                                             )
+                subtract_validation_msg = f"""'{rds_tbl_name}' - {df_rds_prq_subtract_row_count}"""
+                df_subtract_temp = df_subtract_temp.selectExpr(
+                                        "current_timestamp as run_datetime",
+                                        "json_row",
+                                        f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
+                                        f"""'{rds_db_name}' as database_name""",
+                                        f"""'{db_sch_tbl}' as full_table_name""",
+                                        """'False' as table_to_ap"""
+                                    )
                 LOGGER.warn(f"Validation Failed - 2")
-                df_dv_output = df_dv_output.union(df_temp)
+                df_dv_output = df_dv_output.union(df_subtract_temp)
             # -------------------------------------------------------
 
         else:
-            validation_msg = f"""'{rds_tbl_name} - Table row-count {df_rds_temp_count}:{df_prq_temp_count} MISMATCHED !' as validation_msg"""
-            df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                              "'' as json_row",
-                                              validation_msg,
-                                              f"""'{rds_db_name}' as database_name""",
-                                              f"""'{db_sch_tbl}' as full_table_name""",
-                                              """'False' as table_to_ap"""
-                                              )
+            mismatch_validation_msg_1 = "MISMATCHED Dataframe(s) Row Count!"
+            mismatch_validation_msg_2 = f"""'{rds_tbl_name} - {df_rds_temp_count}:{df_prq_temp_count} {mismatch_validation_msg_1}' as validation_msg"""
+            LOGGER.warn(f"df_rds_row_count={df_rds_temp_count} ; df_prq_row_count={df_prq_temp_count} ; {mismatch_validation_msg_1}")
+            df_temp = df_dv_output.selectExpr(
+                                    "current_timestamp as run_datetime",
+                                    "'' as json_row",
+                                    mismatch_validation_msg_2,
+                                    f"""'{rds_db_name}' as database_name""",
+                                    f"""'{db_sch_tbl}' as full_table_name""",
+                                    """'False' as table_to_ap"""
+                        )
             LOGGER.warn(f"Validation Failed - 3")
             df_dv_output = df_dv_output.union(df_temp)
         # -------------------------------------------------------
 
-        df_rds_temp_t3.unpersist()
+        df_rds_temp_t5.unpersist()
         df_prq_temp_t1.unpersist()
 
     else:
 
-        df_temp = df_dv_output.selectExpr("current_timestamp as run_datetime",
-                                          "'' as json_row",
-                                          f"""'{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
-                                          f"""'{rds_db_name}' as database_name""",
-                                          f"""'{db_sch_tbl}' as full_table_name""",
-                                          """'False' as table_to_ap"""
-                                          )
+        df_temp = df_dv_output.selectExpr(
+                                "current_timestamp as run_datetime",
+                                "'' as json_row",
+                                f"""'{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg""",
+                                f"""'{rds_db_name}' as database_name""",
+                                f"""'{db_sch_tbl}' as full_table_name""",
+                                """'False' as table_to_ap"""
+                    )
         LOGGER.warn(f"Validation not applicable - 4")
         df_dv_output = df_dv_output.union(df_temp)
     # -------------------------------------------------------
@@ -446,7 +487,7 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, table):
     df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
 
     if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                      f'''{GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={database}/full_table_name={table}'''
+                                      f'''{CATALOG_DB_TABLE_PATH}/database_name={database}/full_table_name={table}'''
                                       ):
         LOGGER.info(f"""Purging S3-path: {CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={table}""")
 
@@ -475,28 +516,52 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, table):
 
 if __name__ == "__main__":
 
-    LOGGER.info(f"""Given database(s): {args.get("rds_sqlserver_db", None)}""")
-    rds_sqlserver_db_str = check_if_rds_db_exists(args.get("rds_sqlserver_db", None))
+    LOGGER.info(f"""Given database: {args.get("rds_sqlserver_db", None)}""")
+    rds_sqlserver_db_list = check_if_rds_db_exists(args.get("rds_sqlserver_db", None))
+    rds_sqlserver_db_str = '' if len(rds_sqlserver_db_list) == 0 else rds_sqlserver_db_list[0]
+    
+    # -------------------------------------------------------
+    
+    if rds_sqlserver_db_str == '':
+        LOGGER.error(f"""Given database name not found! >> {args['rds_sqlserver_db']} <<""")
+        sys.exit(1)
+    # -------------------------------------------------------
+    
     LOGGER.info(f"""Using database(s): {rds_sqlserver_db_str}""")
     
     given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
     LOGGER.info(f"""Given rds_sqlserver_db_schema = {given_rds_sqlserver_db_schema}""")
 
     rds_sqlserver_db_tbl_list = get_rds_db_tbl_list(rds_sqlserver_db_str)
-    LOGGER.info(f"""Total List of tables available in {rds_sqlserver_db_str}.{given_rds_sqlserver_db_schema}\n{rds_sqlserver_db_tbl_list}""")
 
     # -------------------------------------------------------
-    if args.get("select_rds_db_tbls", None) is None:
- 
-        if args.get("exclude_rds_db_tbls", None) is None:
+
+    if not rds_sqlserver_db_tbl_list:
+            LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
+            sys.exit(1)
+    # -------------------------------------------------------
+
+    message_prefix = f"""Total List of tables available in {rds_sqlserver_db_str}.{given_rds_sqlserver_db_schema}"""
+    LOGGER.info(f"""{message_prefix}\n{rds_sqlserver_db_tbl_list}""")
+    
+    # -------------------------------------------------------
+
+    if args.get("rds_select_db_tbls", None) is None:
+        # -------------------------------------------------------
+        
+        if args.get("rds_exclude_db_tbls", None) is None:
             exclude_rds_db_tbls_list = list()
         else:
-            exclude_rds_db_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}"""
-                                        for tbl in args['exclude_rds_db_tbls'].split(",")]
+            table_name_prefix = f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}"""
+            exclude_rds_db_tbls_list = [f"""{table_name_prefix}_{tbl.strip().strip("'").strip('"')}"""
+                                        for tbl in args['rds_exclude_db_tbls'].split(",")]
             LOGGER.warn(f"""Given list of tables being exluded:\n{exclude_rds_db_tbls_list}""")
+        # -------------------------------------------------------
+
         filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in rds_sqlserver_db_tbl_list
                                               if tbl not in exclude_rds_db_tbls_list]
- 
+        # -------------------------------------------------------
+
         if not filtered_rds_sqlserver_db_tbl_list:
             LOGGER.error(
                 f"""filtered_rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
@@ -504,7 +569,7 @@ if __name__ == "__main__":
         else:
             LOGGER.info(
                 f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
- 
+        # -------------------------------------------------------
 
         for db_sch_tbl in filtered_rds_sqlserver_db_tbl_list:
             rds_db_name, rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[0], \
@@ -516,7 +581,6 @@ if __name__ == "__main__":
 
             dv_ctlg_tbl_partition_path = f'''
                 {GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_sch_tbl}/'''.strip()
-            
             # -------------------------------------------------------
 
             if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, dv_ctlg_tbl_partition_path):
@@ -534,31 +598,36 @@ if __name__ == "__main__":
 
             input_repartition_factor = int(args["repartition_factor"])
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, input_repartition_factor)
+            df_dv_output = process_dv_for_table(rds_db_name, 
+                                                rds_tbl_name, 
+                                                total_files, 
+                                                total_size_mb, 
+                                                input_repartition_factor)
 
             write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
 
     else:
-        # -------------------------------------------------------
-        if not rds_sqlserver_db_tbl_list:
-                LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
-                sys.exit(1)
-        else:
-            LOGGER.info(f"""List of tables available: {rds_sqlserver_db_tbl_list}""")
-        # -------------------------------------------------------
-
-        given_rds_sqlserver_tbls_str = args["select_rds_db_tbls"]
+        given_rds_sqlserver_tbls_str = args["rds_select_db_tbls"]
 
         LOGGER.info(f"""Given specific tables: {given_rds_sqlserver_tbls_str}, {type(given_rds_sqlserver_tbls_str)}""")
 
-        given_rds_sqlserver_tbls_list = [f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}_{tbl.strip().strip("'").strip('"')}"""
+        table_name_prefix = f"""{args['rds_sqlserver_db']}_{given_rds_sqlserver_db_schema}"""
+        given_rds_sqlserver_tbls_list = [f"""{table_name_prefix}_{tbl.strip().strip("'").strip('"')}"""
                                          for tbl in given_rds_sqlserver_tbls_str.split(",")]
 
         LOGGER.info(f"""Given specific tables list: {given_rds_sqlserver_tbls_list}, {type(given_rds_sqlserver_tbls_list)}""")
 
+        # ---------------------------------------------------------------------------
+
+        selected_tables_not_found_list = [tbl for tbl in given_rds_sqlserver_tbls_list 
+                                          if tbl not in rds_sqlserver_db_tbl_list]
+        if selected_tables_not_found_list:
+            LOGGER.error(f"""{selected_tables_not_found_list} - NOT FOUND ! Exiting ...""")
+            sys.exit(1)
+        # ---------------------------------------------------------------------------
+        
         filtered_rds_sqlserver_db_tbl_list = [tbl for tbl in given_rds_sqlserver_tbls_list 
                                               if tbl in rds_sqlserver_db_tbl_list]
-
         LOGGER.info(f"""List of tables to be processed: {filtered_rds_sqlserver_db_tbl_list}""")
 
         for db_sch_tbl in filtered_rds_sqlserver_db_tbl_list:
@@ -568,15 +637,19 @@ if __name__ == "__main__":
             total_files, total_size = get_s3_folder_info(PRQ_FILES_SRC_S3_BUCKET_NAME, 
                                                          f"{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}")
             total_size_mb = total_size/1024/1024
-
             # -------------------------------------------------------
+
             if total_size_mb > int(args["max_table_size_mb"]):
                 LOGGER.warn(f""">> Size greaterthan {args["max_table_size_mb"]}MB ({total_size_mb}MB) <<""")
             # -------------------------------------------------------
 
             input_repartition_factor = int(args["repartition_factor"])
 
-            df_dv_output = process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, input_repartition_factor)
+            df_dv_output = process_dv_for_table(rds_db_name, 
+                                                rds_tbl_name, 
+                                                total_files, 
+                                                total_size_mb, 
+                                                input_repartition_factor)
 
             write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
     # -------------------------------------------------------

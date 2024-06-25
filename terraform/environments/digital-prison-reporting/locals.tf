@@ -242,8 +242,6 @@ locals {
   # s3 transfer
   scheduled_s3_file_transfer_retention_period_amount = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_amount
   scheduled_s3_file_transfer_retention_period_unit   = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_unit
-  scheduled_s3_file_transfer_schedule                = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_schedule
-  enable_s3_file_transfer_trigger                    = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
 
   # step function notification lambda
   step_function_notification_lambda_handler = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
@@ -340,6 +338,16 @@ locals {
   # cp_k8s_secrets_placeholder
   enable_cp_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_k8s_secrets
   cp_k8s_secrets_placeholder = {
+    cloud_platform_k8s_token           = "placeholder"
+    cloud_platform_certificate_auth    = "placeholder"
+    cloud_platform_k8s_server          = "placeholder"
+    cloud_platform_k8s_cluster_name    = "placeholder"
+    cloud_platform_k8s_cluster_context = "placeholder"
+  }
+
+  # cp_bodmis_k8s_secrets_placeholder
+  enable_cp_bodmis_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_bodmis_k8s_secrets
+  cp_bodmis_k8s_secrets_placeholder = {
     cloud_platform_k8s_token           = "placeholder"
     cloud_platform_certificate_auth    = "placeholder"
     cloud_platform_k8s_server          = "placeholder"
