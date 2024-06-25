@@ -18,7 +18,7 @@ resource "aws_route53_record" "jitbit_amazonses_dkim_record" {
   provider = aws.core-vpc
   count    = local.is-production ? 0 : 3
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${local.app_url}"
+  name     = "${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${aws_sesv2_email_identity.jitbit.email_identity}"
   type     = "CNAME"
   ttl      = "600"
   records  = ["${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"]
@@ -28,7 +28,7 @@ resource "aws_route53_record" "jitbit_amazonses_dkim_record_prod" {
   provider = aws.core-network-services
   count    = local.is-production ? 3 : 0
   zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
-  name     = "${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${local.app_url}"
+  name     = "${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${aws_sesv2_email_identity.jitbit.email_identity}"
   type     = "CNAME"
   ttl      = "600"
   records  = ["${aws_sesv2_email_identity.jitbit.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"]
@@ -38,7 +38,7 @@ resource "aws_route53_record" "jitbit_amazonses_dmarc_record" {
   count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "_dmarc.${local.app_url}"
+  name     = "_dmarc.${aws_sesv2_email_identity.jitbit.email_identity}"
   type     = "TXT"
   ttl      = "600"
   records  = ["v=DMARC1; p=none;"]
@@ -48,7 +48,7 @@ resource "aws_route53_record" "jitbit_amazonses_dmarc_record_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
-  name     = "_dmarc.${local.app_url}"
+  name     = "_dmarc.${aws_sesv2_email_identity.jitbit.email_identity}"
   type     = "TXT"
   ttl      = "600"
   records  = ["v=DMARC1; p=none;"]
