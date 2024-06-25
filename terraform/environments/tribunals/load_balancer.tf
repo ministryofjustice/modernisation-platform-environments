@@ -1,5 +1,12 @@
 locals {
   target_group_arns = { for k, v in aws_lb_target_group.tribunals_target_group : k => v.arn }
+  listener_headers  = toset([for k, v in var.services : v.name_prefix])
+
+  # Create a mapping between listener headers and target group ARNs
+  listener_header_to_target_group = {
+    for k, v in var.services :
+    v.name_prefix => aws_lb_target_group.tribunals_target_group[k].arn
+  }
 }
 
 resource "aws_lb" "tribunals_lb" {
@@ -52,14 +59,29 @@ resource "aws_lb_listener" "tribunals_lb" {
   ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
-    type = "forward"
-    forward {
-      dynamic "target_group" {
-        for_each = local.target_group_arns
-        content {
-          arn = target_group.value
-        }
-      }
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "No matching rule found"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "tribunals_lb_rule" {
+  for_each = local.listener_header_to_target_group
+
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
+
+  action {
+    type             = "forward"
+    target_group_arn = each.value
+  }
+
+  condition {
+    path_pattern  {
+      values = [each.key]
     }
   }
 }
@@ -70,8 +92,15 @@ resource "aws_lb_listener" "tribunals_lb" {
 #   protocol          = "HTTP"
 
 #   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.tribunals_target_group.arn
+#     type = "forward"
+#     forward {
+#       dynamic "target_group" {
+#         for_each = local.target_group_arns
+#         content {
+#           arn = target_group.value
+#         }
+#       }
+#     }
 #   }
 # }
 
@@ -106,10 +135,10 @@ data "aws_instances" "tribunals_instance" {
 }
 
 resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
-  for_each            = aws_lb_target_group.tribunals_target_group
-  target_group_arn    = each.value.arn
-  target_id           = element(data.aws_instances.tribunals_instance.ids, 0)
-  port                = each.value.port
+  for_each         = aws_lb_target_group.tribunals_target_group
+  target_group_arn = each.value.arn
+  target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
+  port             = each.value.port
 }
 
 # resource "aws_lb_listener_rule" "admin_access_1" {
