@@ -266,24 +266,24 @@ locals {
         })
       })
 
-      pp-ncr-client-a = merge(local.jumpserver_ec2_default, {
-        # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
-        config = merge(local.jumpserver_ec2_default.config, {
-          ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.jumpserver_ec2_default.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        instance = merge(local.jumpserver_ec2_default.instance, {
-          instance_type = "t3.large",
-        })
-        tags = merge(local.jumpserver_ec2_default.tags, {
-          description                          = "PreProd Jumpserver and Client Tools"
-          instance-scheduling                  = "skip-scheduling"
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
+      # pp-ncr-client-a = merge(local.jumpserver_ec2_default, {
+      #   # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
+      #   config = merge(local.jumpserver_ec2_default.config, {
+      #     ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
+      #     availability_zone = "eu-west-2a"
+      #     instance_profile_policies = concat(local.jumpserver_ec2_default.config.instance_profile_policies, [
+      #       "Ec2PPReportingPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.jumpserver_ec2_default.instance, {
+      #     instance_type = "t3.large",
+      #   })
+      #   tags = merge(local.jumpserver_ec2_default.tags, {
+      #     description                          = "PreProd Jumpserver and Client Tools"
+      #     instance-scheduling                  = "skip-scheduling"
+      #     nomis-combined-reporting-environment = "pp"
+      #   })
+      # })
 
       pp-ncr-etl-a = merge(local.etl_ec2_default, {
         # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
