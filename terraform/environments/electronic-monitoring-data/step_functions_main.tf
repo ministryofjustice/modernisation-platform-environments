@@ -150,8 +150,7 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
                       "ResultPath": "$.final_result",
                       "End": true
                     }
-                  },
-                  "End" : true
+                  }
                 }
               }
             }
