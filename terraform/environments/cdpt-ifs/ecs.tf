@@ -9,9 +9,9 @@ data "aws_ecs_task_definition" "task_definition" {
   name = "ifs-ec2-launch-template"
  }
 
- data "aws_launch_template" "ifs_lt_latest" {
-  launch_template_id = data.aws_launch_template.ifs_lt.name
-  latest_version     = true
+ data "aws_ec2_launch_template" "latest" {
+  launch_template_id = data.aws_launch_template.ifs_lt.id
+  version = data.aws_launch_template.ifs_lt.latest_version_number
 }
 
 data "aws_ami" "ecs_optimized_windows_ami" {
@@ -30,7 +30,7 @@ data "aws_ami" "ecs_optimized_windows_ami" {
 }
 
  locals {
-  current_ami_id = data.aws_launch_template.ifs_lt_latest.latest_version
+  current_ami_id = data.aws_ec2_launch_template.latest.image_id
   latest_ami_id  = data.aws_ami.ecs_optimized_windows_ami.id
   ami_outdated   = local.current_ami_id != local.latest_ami_id 
  }
