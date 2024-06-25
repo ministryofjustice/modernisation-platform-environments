@@ -147,7 +147,7 @@ resource "helm_release" "karpenter_configuration" {
       {
         cluster_name    = module.eks.cluster_name
         cluster_version = module.eks.cluster_version
-        ebs_kms_key_id  = module.eks_ebs_kms.key_arn
+        ebs_kms_key_id  = module.eks_ebs_kms.key_id
         node_role       = module.karpenter.node_iam_role_name
         node_version    = local.environment_configuration.eks_node_version
       }

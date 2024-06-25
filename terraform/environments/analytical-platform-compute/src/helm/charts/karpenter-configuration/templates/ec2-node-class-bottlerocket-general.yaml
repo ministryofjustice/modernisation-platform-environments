@@ -13,7 +13,7 @@ spec:
     - tags:
         karpenter.sh/discovery: {{ .Values.clusterName }} # analytical-platform-compute-development
   amiSelectorTerms:
-    - name: "bottlerocket-aws-k8s-{{ .Values.clusterVersion }}-x86_64-v{{ .Values.nodeVersion }}" # bottlerocket-aws-k8s-1.30-x86_64-v1.20.2-536d69d0
+    - name: "bottlerocket-aws-k8s-{{ .Values.clusterVersion  }}-x86_64-v{{ .Values.nodeVersion }}" # bottlerocket-aws-k8s-1.30-x86_64-v1.20.2-536d69d0
   metadataOptions:
     httpEndpoint: enabled
     httpPutResponseHopLimit: 1
