@@ -12,7 +12,7 @@ module "athena_workgroup_dpr_generic" {
     {
         Resource_Group   = "Athena"
         Resource_Type    = "Athena-Workgroup"
-        Jira             = DPR2-716
+        Jira             = "DPR2-716"
         project          = local.project
         Name             = format("%s-generic-athena-workgroup", local.project )
     }
@@ -34,7 +34,7 @@ module "athena_workgroup_analytics_generic" {
     {
         Resource_Group   = "Athena"    
         Resource_Type    = "Athena-Workgroup"
-        Jira             = DPR2-716
+        Jira             = "DPR2-716"
         project          = local.analytics_project_id
         Name             = format("%s-generic-athena-workgroup", local.analytics_project_id )
     }
