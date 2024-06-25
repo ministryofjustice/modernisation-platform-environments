@@ -151,7 +151,8 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
                       "End": true
                     }
                   }
-                }
+                },
+                "End" : true
               }
             }
           }
