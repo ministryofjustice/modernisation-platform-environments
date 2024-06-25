@@ -184,10 +184,13 @@ module "karpenter" {
   queue_kms_master_key_id   = module.karpenter_sqs_kms.key_arn
   queue_managed_sse_enabled = false
 
-  iam_policy_name    = "karpenter"
-  iam_role_name      = "karpenter"
-  node_iam_role_name = "karpenter"
+  iam_policy_name = "karpenter"
+  iam_role_name   = "karpenter"
+  iam_role_policies = {
+    KarpenterSQSKMSAccess = module.karpenter_sqs_kms_access_iam_policy.arn
+  }
 
+  node_iam_role_name = "karpenter"
   node_iam_role_additional_policies = {
     AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
