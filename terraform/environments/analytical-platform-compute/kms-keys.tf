@@ -5,7 +5,7 @@ module "vpc_flow_logs_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
-  aliases                 = ["vpc-flow-logs"]
+  aliases                 = ["vpc/flow-logs"]
   description             = "VPC flow logs KMS key"
   enable_default_policy   = true
   deletion_window_in_days = 7
@@ -47,7 +47,7 @@ module "managed_prometheus_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
-  aliases                 = ["managed-prometheus"]
+  aliases                 = ["amp/default"]
   description             = "AMP KMS key"
   enable_default_policy   = true
   deletion_window_in_days = 7
@@ -93,7 +93,7 @@ module "managed_prometheus_logs_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
-  aliases                 = ["managed-prometheus-logs"]
+  aliases                 = ["amp/logs"]
   description             = "AMP logs KMS key"
   enable_default_policy   = true
   deletion_window_in_days = 7
@@ -135,7 +135,7 @@ module "eks_cluster_logs_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
-  aliases                 = ["eks-cluster-logs"]
+  aliases                 = ["eks/cluster-logs"]
   description             = "EKS cluster logs KMS key"
   enable_default_policy   = true
   deletion_window_in_days = 7
@@ -170,14 +170,14 @@ module "eks_cluster_logs_kms" {
   tags = local.tags
 }
 
-module "ebs_kms" {
+module "eks_ebs_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
-  aliases                 = ["eks-ebs"]
+  aliases                 = ["eks/ebs"]
   description             = "EKS EBS KMS key"
   enable_default_policy   = true
   deletion_window_in_days = 7
@@ -220,6 +220,11 @@ module "ebs_kms" {
   ]
 
   tags = local.tags
+}
+
+moved {
+  from = module.ebs_kms
+  to   = module.eks_ebs_kms
 }
 
 module "mlflow_auth_rds_kms" {
