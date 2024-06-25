@@ -1,0 +1,31 @@
+---
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
+metadata:
+  name: bottlerocket-general
+spec:
+  amiFamily: Bottlerocket
+  role: {{ .Values.nodeRole }} # karpenter-20240624183657747400000001
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: {{ .Values.clusterName }} # analytical-platform-compute-development
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: {{ .Values.clusterName }} # analytical-platform-compute-development
+  amiSelectorTerms:
+    - name: "bottlerocket-aws-k8s-{{ .Values.clusterVersion }}-x86_64-v{{ .Values.nodeVersion }}" # bottlerocket-aws-k8s-1.30-x86_64-v1.20.2-536d69d0
+  metadataOptions:
+    httpEndpoint: enabled
+    httpPutResponseHopLimit: 1
+    httpTokens: required
+  blockDeviceMappings:
+    - deviceName: /dev/xvdb
+      ebs:
+        volumeSize: 100Gi
+        volumeType: gp3
+        iops: 3000
+        encrypted: true
+        kmsKeyID: {{ .Values.ebsKmsKeyId }} # 30b0a8b7-26d7-4307-9943-f28421dbed7f
+        deleteOnTermination: true
+        throughput: 125
+  detailedMonitoring: true
