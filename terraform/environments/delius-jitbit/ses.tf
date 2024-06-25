@@ -105,7 +105,7 @@ resource "aws_route53_record" "jitbit_amazonses_txt_record" {
   records  = ["v=spf1 include:amazonses.com ~all"]
 }
 
-resource "aws_route53_record" "jitbit_amazonsestxt_record_prod" {
+resource "aws_route53_record" "jitbit_amazonses_txt_record_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
