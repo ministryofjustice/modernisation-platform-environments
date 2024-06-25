@@ -82,7 +82,7 @@ module "eks" {
           iops                  = 3000
           throughput            = 150
           encrypted             = true
-          kms_key_id            = module.ebs_kms.key_arn
+          kms_key_id            = module.eks_ebs_kms.key_arn
           delete_on_termination = true
         }
       }
@@ -126,7 +126,7 @@ module "eks" {
             iops                  = 3000
             throughput            = 250
             encrypted             = true
-            kms_key_id            = module.ebs_kms.key_arn
+            kms_key_id            = module.eks_ebs_kms.key_arn
             delete_on_termination = true
           }
         }

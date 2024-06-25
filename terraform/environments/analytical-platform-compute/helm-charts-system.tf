@@ -130,7 +130,10 @@ resource "helm_release" "karpenter" {
       }
     )
   ]
-  depends_on = [module.karpenter]
+  depends_on = [
+    aws_iam_service_linked_role.spot,
+    module.karpenter
+  ]
 }
 
 /* External DNS */
