@@ -32,7 +32,6 @@ module "app_ecs_task" {
   ecs_scaling_mem_threshold = var.ecs_scaling_mem_threshold
   app_count                 = var.app_count
   server_port               = var.server_port
-  lb_listener               = module.ecs_loadbalancer.tribunals_lb_listener
   cluster_id                = var.cluster_id
   cluster_name              = var.cluster_name
   is_ftp_app                = var.is_ftp_app
