@@ -333,7 +333,7 @@ locals {
       licence-requirements        = "Oracle Database"
       monitored                   = false
       OracleDbLTS-ManagedInstance = true # oracle license tracking
-      os-type                     = "Oracle"
+      os-type                     = "Linux"
       os-major-version            = 8
       os-version                  = "Oracle Linux 8.9"
       server-type                 = "oasys-av"
