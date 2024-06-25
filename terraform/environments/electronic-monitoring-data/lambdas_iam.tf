@@ -410,6 +410,7 @@ resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
   policy_arn = aws_iam_policy.get_log_s3_files.arn
 }
 
+
 # ------------------------------------------
 # output_file_structure_as_json_from_zip
 # ------------------------------------------

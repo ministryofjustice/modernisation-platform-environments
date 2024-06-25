@@ -104,3 +104,9 @@ variable "ecr_repo_name" {
   default = null
   nullable = true
 }
+variable "ecr_repo_url" {
+  description = "Default url name of ECR repo to get image from"
+  type = string
+  default = null
+  nullable = true
+}

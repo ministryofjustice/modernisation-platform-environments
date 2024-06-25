@@ -56,8 +56,8 @@ def write_meta_to_s3(meta):
     db_name = meta.database_name
     table_name = meta.name
     temp_path = "/tmp/temp.json"
-    s3_path = f"s3://{METADATA_STORE_BUCKET}/database={db_name}/table_name={table_name}/metadata.yaml"
-    meta.to_yaml(temp_path)
+    s3_path = f"s3://{METADATA_STORE_BUCKET}/database={db_name}/table_name={table_name}/metadata.json"
+    meta.to_json(temp_path)
     upload_to_s3(temp_path, s3_path)
 
 
