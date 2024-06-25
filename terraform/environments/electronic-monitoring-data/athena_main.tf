@@ -1,7 +1,7 @@
-
 resource "aws_athena_workgroup" "default" {
-  name = format("%s-default", local.env_account_id)
+  name        = format("%s-default", local.env_account_id)
   description = "A default Athena workgroup to set query limits and link to the default query location bucket"
+  state       = "ENABLED"
 
   configuration {
     bytes_scanned_cutoff_per_query     = 1073741824 # 1 GB
@@ -20,10 +20,4 @@ resource "aws_athena_workgroup" "default" {
     }
 
   }
-  tags = merge(
-    local.tags,
-    {
-      Resource_Type = "Athena Workgroup for default Query Result Location results, logs and query limits",
-    }
-  )
 }
