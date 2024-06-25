@@ -252,7 +252,7 @@ module "output_file_structure_as_json_from_zip" {
   role_arn              = aws_iam_role.output_fs_json_lambda.arn
   role_name             = aws_iam_role.output_fs_json_lambda.name
   handler               = "${local.output_fs_json_lambda}.handler"
-  source_code_hash      = "${module.ecr_lambda_repo.repository_url}:${data.archive_file.output_file_structure_as_json_from_zip.output_base64sha256}"
+  source_code_hash      = data.archive_file.output_file_structure_as_json_from_zip.output_base64sha256
   layers                = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
   timeout               = 900
   memory_size           = 1024
@@ -262,5 +262,4 @@ module "output_file_structure_as_json_from_zip" {
   env_account_id        = local.env_account_id
   environment_variables = null
 }
-
 
