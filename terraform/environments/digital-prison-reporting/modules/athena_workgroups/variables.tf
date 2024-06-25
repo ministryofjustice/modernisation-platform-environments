@@ -15,6 +15,12 @@ variable "state_enabled" {
   default     = true
 }
 
+variable "setup_athena_workgroup" {
+  type        = bool
+  description = "Whether the workgroup to be Setup."
+  default     = true
+}
+
 variable "enforce_workgroup_configuration" {
   type        = bool
   description = "Boolean whether the settings for the workgroup override client-side settings."
