@@ -75,7 +75,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     resources = ["${module.s3-bucket.bucket.arn}/*"]
     principals {
       type        = "AWS"
-      identifiers = [athena.amazonaws.com]
+      identifiers = ["athena.amazonaws.com"]
     }
   }
 
