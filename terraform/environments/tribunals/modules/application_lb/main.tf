@@ -1,15 +1,37 @@
 locals {
   listener_headers = toset(var).app_urls
   listener_rules = {
-    admin_access = {
+    admin_access_1 = {
       path_patterns = ["*/Admin*", "*/admin*"]
-      source_ips    = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25", "194.33.196.0/25", "194.33.197.0/25"]
+      source_ips = ["195.59.75.0/24", "194.33.192.0/25"]
     }
-    secure_access = {
+    admin_access_2 = {
+      path_patterns = ["*/Admin*", "*/admin*"]
+      source_ips = ["194.33.193.0/25", "194.33.196.0/25"]
+    }
+    admin_access_3 = {
+      path_patterns = ["*/Admin*", "*/admin*"]
+      source_ips = ["194.33.197.0/25"]
+    }
+    secure_access_1 = {
       path_patterns = ["*/Secure*", "*/secure*"]
-      source_ips    = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25"]
+      source_ips = ["195.59.75.0/24", "194.33.192.0/25"]
+    }
+    secure_access_2 = {
+      path_patterns = ["*/Secure*", "*/secure*"]
+      source_ips = ["194.33.193.0/25"]
     }
   }
+  combined_rules = merge([
+    for header in local.listener_headers : {
+      for rule_name, rule in local.listener_rules :
+      "${header}_${rule_name}" => {
+        host_header   = "${header}.*"
+        path_patterns = rule.path_patterns
+        source_ips    = rule.source_ips
+      }
+    }
+  ]...)
 }
 
 resource "aws_security_group" "tribunals_lb_sg" {
@@ -112,83 +134,32 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
 }
 
 resource "aws_lb_listener_rule" "tribunals_lb_listener_rule_1" {
-  for_each     = local.listener_rules
+  for_each     = local.combined_rules
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 0
+  priority     = index(keys(local.combined_rules), each.key) + 1
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
   }
   condition {
     host_header {
-      values = [each.key]
+      values = [each.value.host_header]
     }
   }
   condition {
     path_pattern {
-      values = [local.listener_rules.admin_access.path_patterns]
+      values = [each.value.path_patterns]
     }
   }
   condition {
     source_ip {
-      values = [slice(local.listener_rules.admin_access.source_ips, 0, 1)]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "tribunals_lb_listener_rule_2" {
-  for_each     = local.listener_rules
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 0
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
-  }
-  condition {
-    host_header {
-      values = [each.key]
-    }
-  }
-  condition {
-    path_pattern {
-      values = [local.listener_rules.admin_access.path_patterns]
-    }
-  }
-  condition {
-    source_ip {
-      values = [slice(local.listener_rules.admin_access.source_ips, 2, 3)]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "tribunals_lb_listener_rule_3" {
-  for_each     = local.listener_rules
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 0
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
-  }
-  condition {
-    host_header {
-      values = [each.key]
-    }
-  }
-  condition {
-    path_pattern {
-      values = [local.listener_rules.admin_access.path_patterns]
-    }
-  }
-  condition {
-    source_ip {
-      values = [slice(local.listener_rules.admin_access.source_ips, 4, 4)]
+      values = [each.value.source_ips)]
     }
   }
 }
 
 resource "aws_lb_listener_rule" "admin_secure_fixed_response" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 5
   action {
     type = "fixed-response"
     fixed_response {
