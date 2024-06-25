@@ -3,6 +3,19 @@ data "aws_ecs_task_definition" "task_definition" {
   depends_on      = [aws_ecs_task_definition.ifs_task_definition]
 }
 
+data "aws_ssm_parameter" "ecs_optimized_windows_ami" {
+  name = "/aws/service/ecs/optimized-ami/windows_server/2019/recommended"
+}
+
+data "aws_ami" "ecs_optimized_windows_ami" {
+  most_recent = true 
+  filter {
+    name = "image-id"
+    values =  [jsondecode(data.aws_ssm_parameter.ecs_optimized_windows_ami.value).image_id]
+  }
+  owners = ["amazon"]
+}
+
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
 
