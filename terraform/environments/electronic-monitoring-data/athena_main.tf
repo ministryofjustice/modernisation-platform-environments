@@ -58,6 +58,9 @@ resource "aws_athena_workgroup" "default" {
         encryption_option = "SSE_KMS"
         kms_key_arn       = aws_kms_key.athena_workspace_result_encryption_key.arn
       }
+      acl_configuration {
+        s3_acl_option = "BUCKET_OWNER_FULL_CONTROL"
+      }
     }
 
     bytes_scanned_cutoff_per_query = 1073741824 # 1 GB
