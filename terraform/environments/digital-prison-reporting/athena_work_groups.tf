@@ -1,4 +1,4 @@
-module "athena_federated_query_connector_oracle" {
+module "athena_workgroup_dpr_generic" {
   source = "./modules/athena_workgroups"
 
   setup_athena_workgroup = local.setup_dpr_generic_athena_workgroup
@@ -20,7 +20,7 @@ module "athena_federated_query_connector_oracle" {
 
 }
 
-module "athena_federated_query_connector_oracle" {
+module "athena_workgroup_analytics_generic" {
   source = "./modules/athena_workgroups"
 
   setup_athena_workgroup = local.setup_analytics_generic_athena_workgroup
