@@ -144,12 +144,11 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
                       "ResultPath" : "$.db_info",
                       "Next" : "UpdateLogTable"
                     },
-                    "UpdateLogTable" : {
-                      "Type" : "Task",
-                      "Resource" : "${aws_lambda_function.update_log_table.arn}",
-                      "ResultPath" : "$.final_result",
-                      "End" : true
-                    }
+                  "UpdateLogTable": {
+                    "Type": "Task",
+                    "Resource": "${module.update_log_table.lambda_function_arn}",
+                    "ResultPath": "$.final_result",
+                    "End": true
                   }
                 },
                 "End" : true
@@ -157,6 +156,7 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
             }
           },
           "Next" : "FixLogTable"
+        }
         },
         "FixLogTable" : {
           "Type" : "Task",

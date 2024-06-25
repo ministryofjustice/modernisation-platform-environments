@@ -218,22 +218,21 @@ module "query_output_to_list" {
 # Update log table
 # ------------------------------------------------------
 
-
-resource "aws_lambda_function" "update_log_table" {
-  function_name = "update_log_table"
-  role          = aws_iam_role.update_log_table.arn
-  memory_size   = 1024
-  timeout       = 900
-  package_type  = "Image"
-  image_uri     = "${module.ecr_lambda_repo.repository_url}:${local.env_name}"
-  architectures = ["arm64"]
-  environment {
-    variables = {
+module "update_log_table" {
+    source = "./modules/lambdas"
+    function_name = "update_log_table"
+    is_image = true
+    role_name = aws_iam_role.update_log_table.name
+    role_arn = aws_iam_role.update_log_table.arn
+    memory_size = 1024
+    timeout = 900
+    env_account_id = local.env_account_id
+    ecr_repo_name = module.ecr_lambdas_repo.repository_name
+    environment_variables = {
       S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
       DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
-      TABLE_NAME    = "glue_df_output"
-    }
-  }
+      TABLE_NAME = "glue_df_output"
+      }
 }
 
 #-----------------------------------------------------------------------------------
@@ -262,4 +261,25 @@ module "output_file_structure_as_json_from_zip" {
   subnet_ids            = data.aws_subnets.shared-public.ids
   env_account_id        = local.env_account_id
   environment_variables = null
+}
+
+
+# ------------------------------------------------------
+# Get Metadata from RDS test
+# ------------------------------------------------------
+
+module "get_metadata_from_rds_test" {
+    source = "./modules/lambdas"
+    function_name = "get_metadata_from_rds_test"
+    is_image = true
+    role_name = aws_iam_role.get_metadata_from_rds.name
+    role_arn = aws_iam_role.get_metadata_from_rds.arn
+    memory_size = 1024
+    timeout = 900
+    env_account_id = local.env_account_id
+    ecr_repo_name = module.ecr_lambdas_repo.repository_name
+    environment_variables = {
+    SECRET_NAME           = aws_secretsmanager_secret.db_glue_connection.name
+    METADATA_STORE_BUCKET = module.metadata-s3-bucket.bucket.id
+  }
 }
