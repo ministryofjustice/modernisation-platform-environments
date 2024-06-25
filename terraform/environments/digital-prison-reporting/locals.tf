@@ -298,7 +298,7 @@ locals {
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 
-  # Setup Atena Workgroups 
+  # Setup Athena Workgroups 
   setup_dpr_generic_athena_workgroup = local.application_data.accounts[local.environment].dpr_generic_athena_workgroup
   setup_analytics_generic_athena_workgroup = local.application_data.accounts[local.environment].analytics_generic_athena_workgroup
 
