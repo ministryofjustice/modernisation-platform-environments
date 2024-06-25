@@ -86,7 +86,7 @@ module "pwm" {
       email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
     })),
     "SECURITY_KEY" = "${base64encode(uuid())}",
-    "JAVA_OPTS"    = "-Xmx${ceil(var.delius_microservice_configs.pwm.container_memory * 0.80)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.20)}m"
+    "JAVA_OPTS"    = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
   }
   container_vars_env_specific            = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
   ignore_changes_service_task_definition = false
