@@ -1,6 +1,6 @@
 
 module "s3-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=568694e50e03630d99cb569eafa06a0b879a1239"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
   bucket_prefix      = "athena-query-s3-bucket"
   versioning_enabled = false
@@ -74,7 +74,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
     resources = ["${module.s3-bucket.bucket.arn}/*"]
     principals {
-      type        = "AWS"
+      type        = "Service"
       identifiers = ["athena.amazonaws.com"]
     }
   }
@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/*",
       ]
     }
     actions   = ["s3:GetObject"]
