@@ -3,6 +3,17 @@ data "aws_ecs_task_definition" "task_definition" {
   depends_on      = [aws_ecs_task_definition.ifs_task_definition]
 }
 
+
+
+ data "aws_launch_template" "ifs_lt" {
+  name = "ifs-ec2-launch-template"
+ }
+
+ data "aws_launch_template_version" "latest" {
+  launch_template_id = data.aws_launch_template.ifs_lt.id
+  version            = data.aws_launch_template.ifs_lt.latest_version
+}
+
 data "aws_ami" "ecs_optimized_windows_ami" {
   most_recent = true 
   owners = ["amazon"]
@@ -17,10 +28,6 @@ data "aws_ami" "ecs_optimized_windows_ami" {
     values = ["available"]
   }
 }
-
- data "aws_launch_template" "ifs_lt" {
-  name = "ifs-ec2-launch-template"
- }
 
  locals {
   current_ami_id = data.aws_launch_template.ifs_lt.latest_version.ami_id
