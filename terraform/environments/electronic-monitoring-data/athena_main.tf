@@ -58,7 +58,7 @@ resource "aws_kms_key" "athena_workspace_result_encryption_key" {
 }
 
 resource "aws_athena_workgroup" "default" {
-  name = "default"
+  name = format("%s-default", local.env_account_id)
   description = "A default Athena workgroup to set query limits and link to the default query location bucket: ${module.athena-s3-bucket.bucket.id}"
 
   configuration {
