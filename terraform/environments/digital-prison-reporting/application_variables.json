@@ -187,7 +187,9 @@
       "setup_cw_insights": true,
       "enable_cp_k8s_secrets": true,
       "enable_cp_bodmis_k8s_secrets": true,
-      "enable_dbt_k8s_secrets": true
+      "enable_dbt_k8s_secrets": true,
+      "dpr_generic_athena_workgroup": true,
+      "analytics_generic_athena_workgroup": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -376,7 +378,9 @@
       "setup_cw_insights": false,
       "enable_cp_k8s_secrets": false,
       "enable_cp_bodmis_k8s_secrets": false,
-      "enable_dbt_k8s_secrets": true
+      "enable_dbt_k8s_secrets": true,
+      "dpr_generic_athena_workgroup": true,
+      "analytics_generic_athena_workgroup": true
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -567,7 +571,9 @@
       "setup_cw_insights": false,
       "enable_cp_k8s_secrets": false,
       "enable_cp_bodmis_k8s_secrets": false,      
-      "enable_dbt_k8s_secrets": true
+      "enable_dbt_k8s_secrets": true,
+      "dpr_generic_athena_workgroup": true,
+      "analytics_generic_athena_workgroup": true
     },
     "production": {
       "project_short_id": "dpr",
@@ -756,7 +762,9 @@
       "setup_cw_insights": false,
       "enable_cp_k8s_secrets": false,
       "enable_cp_bodmis_k8s_secrets": false,      
-      "enable_dbt_k8s_secrets": true
+      "enable_dbt_k8s_secrets": true,
+      "dpr_generic_athena_workgroup": true,
+      "analytics_generic_athena_workgroup": true
     }
   }
 }
