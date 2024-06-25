@@ -71,8 +71,8 @@ locals {
       # ACTIVE (blue deployment)
       preprod-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 2
-          max_size         = 2
+          desired_capacity = 1
+          max_size         = 1
         })
         cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
