@@ -410,28 +410,6 @@ resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
   policy_arn = aws_iam_policy.get_log_s3_files.arn
 }
 
-data "aws_iam_policy_document" "get_ecr_image" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ecr:BatchGetImage",
-      "ecr:GetDownloadUrlForLayer"
-    ]
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_policy" "get_ecr_image" {
-  name   = "get_ecr_image"
-  policy = data.aws_iam_policy_document.get_ecr_image.json
-}
-resource "aws_iam_role_policy_attachment" "update_log_table_get_ecr_image" {
-  role       = aws_iam_role.update_log_table.name
-  policy_arn = aws_iam_policy.get_ecr_image.arn
-}
 
 # ------------------------------------------
 # output_file_structure_as_json_from_zip
