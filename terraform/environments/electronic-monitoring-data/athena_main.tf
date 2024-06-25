@@ -30,6 +30,21 @@ resource "aws_kms_key" "athena_workspace_result_encryption_key" {
             "kms:Describe*"
           ],
           "Resource": "*"
+        },
+        {
+          "Sid" : "Enable log service Permissions",
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "logs.eu-west-2.amazonaws.com"
+          },
+          "Action" : [
+            "kms:Encrypt*",
+            "kms:Decrypt*",
+            "kms:ReEncrypt*",
+            "kms:GenerateDataKey*",
+            "kms:Describe*"
+          ],
+          "Resource" : "*"
         }
       ]
     }
