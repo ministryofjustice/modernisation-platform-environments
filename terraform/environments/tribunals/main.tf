@@ -16,6 +16,7 @@ module "appeals" {
   # The app_name needs to match the folder name in the volume
   app_name                     = "appeals"
   app_url                      = "administrativeappeals"
+  module_name                  = "appeals"
   sql_migration_path           = "../scripts/administrative_appeals"
   app_db_name                  = "ossc"
   app_db_login_name            = "ossc-app"
@@ -47,6 +48,7 @@ module "appeals" {
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49100
+  target_group_arns            = local.target_group_arns
 }
 
 module "ahmlr" {
@@ -54,6 +56,7 @@ module "ahmlr" {
   source                       = "./modules/tribunal"
   app_name                     = "hmlands"
   app_url                      = "landregistrationdivision"
+  module_name                  = "ahmlr"
   sql_migration_path           = "../scripts/ahmlr"
   app_db_name                  = "hmlands"
   app_db_login_name            = "hmlands-app"
@@ -85,12 +88,14 @@ module "ahmlr" {
   documents_location           = "Judgments"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49101
+  target_group_arns            = local.target_group_arns
 }
 
 module "care_standards" {
   is_ftp_app                   = false
   source                       = "./modules/tribunal"
   app_name                     = "care-standards"
+  module_name                  = "care_standards"
   app_url                      = "carestandards"
   sql_migration_path           = "../scripts/care_standards"
   app_db_name                  = "carestandards"
@@ -123,6 +128,7 @@ module "care_standards" {
   documents_location           = "Judgments"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49102
+  target_group_arns            = local.target_group_arns
 }
 
 module "cicap" {
@@ -130,6 +136,7 @@ module "cicap" {
   source                       = "./modules/tribunal"
   app_name                     = "cicap"
   app_url                      = "cicap"
+  module_name                  = "cicap"
   sql_migration_path           = "../scripts/cicap"
   app_db_name                  = "cicap"
   app_db_login_name            = "cicap-app"
@@ -161,6 +168,7 @@ module "cicap" {
   documents_location           = "CaseFiles"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49103
+  target_group_arns            = local.target_group_arns
 }
 
 module "employment_appeals" {
@@ -168,6 +176,7 @@ module "employment_appeals" {
   source                       = "./modules/tribunal"
   app_name                     = "employment-appeals"
   app_url                      = "employmentappeals"
+  module_name                  = "employment_appeals"
   sql_migration_path           = "../scripts/employment_appeals"
   app_db_name                  = "eat"
   app_db_login_name            = "eat-app"
@@ -199,6 +208,7 @@ module "employment_appeals" {
   documents_location           = "Public/Upload"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49104
+  target_group_arns            = local.target_group_arns
 }
 
 module "finance_and_tax" {
@@ -206,6 +216,7 @@ module "finance_and_tax" {
   source                       = "./modules/tribunal"
   app_name                     = "finance-and-tax"
   app_url                      = "financeandtax"
+  module_name                  = "finance_and_tax"
   sql_migration_path           = "../scripts/finance_and_tax"
   app_db_name                  = "ftt"
   app_db_login_name            = "ftt-app"
@@ -237,6 +248,7 @@ module "finance_and_tax" {
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49105
+  target_group_arns            = local.target_group_arns
 }
 
 module "immigration_services" {
@@ -244,6 +256,7 @@ module "immigration_services" {
   source                       = "./modules/tribunal"
   app_name                     = "immigration-services"
   app_url                      = "immigrationservices"
+  module_name                  = "immigration_services"
   sql_migration_path           = "../scripts/immigration_services"
   app_db_name                  = "imset"
   app_db_login_name            = "imset-app"
@@ -275,6 +288,7 @@ module "immigration_services" {
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49106
+  target_group_arns            = local.target_group_arns
 }
 
 module "information_tribunal" {
@@ -282,6 +296,7 @@ module "information_tribunal" {
   source                       = "./modules/tribunal"
   app_name                     = "information-tribunal"
   app_url                      = "informationrights"
+  module_name                  = "information_tribunal"
   sql_migration_path           = "../scripts/information_tribunal"
   app_db_name                  = "it"
   app_db_login_name            = "it-app"
@@ -313,6 +328,7 @@ module "information_tribunal" {
   documents_location           = "DBFiles"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49107
+  target_group_arns            = local.target_group_arns
 }
 
 module "lands_tribunal" {
@@ -320,6 +336,7 @@ module "lands_tribunal" {
   source                       = "./modules/tribunal"
   app_name                     = "lands-chamber"
   app_url                      = "landschamber"
+  module_name                  = "lands_tribunal"
   sql_migration_path           = "../scripts/lands_chamber"
   app_db_name                  = "lands"
   app_db_login_name            = "lands-app"
@@ -351,6 +368,7 @@ module "lands_tribunal" {
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49108
+  target_group_arns            = local.target_group_arns
 }
 
 module "transport" {
@@ -358,6 +376,7 @@ module "transport" {
   source                       = "./modules/tribunal"
   app_name                     = "transport"
   app_url                      = "transportappeals"
+  module_name                  = "transport"
   sql_migration_path           = "../scripts/transport"
   app_db_name                  = "transport"
   app_db_login_name            = "transport-app"
@@ -389,6 +408,7 @@ module "transport" {
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49109
+  target_group_arns            = local.target_group_arns
 }
 
 module "charity_tribunal_decisions" {
@@ -396,6 +416,7 @@ module "charity_tribunal_decisions" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-charity-tribunals"
   app_url                      = "charitytribunal"
+  module_name                  = "charity_tribunal_decisions"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -415,6 +436,7 @@ module "charity_tribunal_decisions" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49110
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }
 
 module "claims_management_decisions" {
@@ -422,6 +444,7 @@ module "claims_management_decisions" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-claims-management"
   app_url                      = "claimsmanagement"
+  module_name                  = "claims_management_decisions"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -441,6 +464,7 @@ module "claims_management_decisions" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49111
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }
 
 module "consumer_credit_appeals" {
@@ -448,6 +472,7 @@ module "consumer_credit_appeals" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-consumer-credit"
   app_url                      = "consumercreditappeals"
+  module_name                  = "consumer_credit_appeals"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -467,6 +492,7 @@ module "consumer_credit_appeals" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49112
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }
 
 module "estate_agent_appeals" {
@@ -474,6 +500,7 @@ module "estate_agent_appeals" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-estate-agents"
   app_url                      = "estateagentappeals"
+  module_name                  = "estate_agent_appeals"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -493,6 +520,7 @@ module "estate_agent_appeals" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49113
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }
 
 module "primary_health_lists" {
@@ -500,6 +528,7 @@ module "primary_health_lists" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-primary-health"
   app_url                      = "primaryhealthlists"
+  module_name                  = "primary_health_lists"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -519,6 +548,7 @@ module "primary_health_lists" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49114
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }
 
 module "siac" {
@@ -526,6 +556,7 @@ module "siac" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-siac"
   app_url                      = "siac"
+  module_name                  = "siac"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -545,6 +576,7 @@ module "siac" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49115
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }
 
 module "sscs_venue_pages" {
@@ -552,6 +584,7 @@ module "sscs_venue_pages" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-sscs-venues"
   app_url                      = "sscsvenues"
+  module_name                  = "sscs_venue_pages"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -571,6 +604,7 @@ module "sscs_venue_pages" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49116
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }
 
 module "tax_chancery_decisions" {
@@ -578,6 +612,7 @@ module "tax_chancery_decisions" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-tax-chancery"
   app_url                      = "taxchancerydecisions"
+  module_name                  = "tax_chancery_decisions"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -597,6 +632,7 @@ module "tax_chancery_decisions" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49117
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }
 
 module "tax_tribunal_decisions" {
@@ -604,6 +640,7 @@ module "tax_tribunal_decisions" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-tax-tribunal"
   app_url                      = "taxtribunaldecisions"
+  module_name                  = "tax_tribunal_decisions"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -623,6 +660,7 @@ module "tax_tribunal_decisions" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49118
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }
 
 module "ftp_admin_appeals" {
@@ -630,6 +668,7 @@ module "ftp_admin_appeals" {
   source                       = "./modules/tribunal_ftp"
   app_name                     = "ftp-admin-appeals"
   app_url                      = "adminappealsreports"
+  module_name                  = "ftp_admin_appeals"
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -649,4 +688,5 @@ module "ftp_admin_appeals" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = 49119
   app_load_balancer            = local.app_load_balancer
+  target_group_arns            = local.target_group_arns
 }

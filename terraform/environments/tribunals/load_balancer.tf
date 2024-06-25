@@ -1,3 +1,7 @@
+locals {
+  target_group_arns = { for k, v in aws_lb_target_group.tribunals_target_group : k => v.arn }
+}
+
 resource "aws_lb" "tribunals_lb" {
   name                       = "tribunals-lb"
   load_balancer_type         = "application"

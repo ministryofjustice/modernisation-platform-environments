@@ -1,7 +1,8 @@
 locals {
-  app                = var.app_name
-  app_url            = var.app_url
-  documents_location = var.documents_location
+  app                          = var.app_name
+  app_url                      = var.app_url
+  module_name                  = var.module_name
+  documents_location           = var.documents_location
   app_container_definition = templatefile("container_definition_ftp.json", {
     app_name                   = "${local.app}"
     awslogs-group              = "${local.app}-ecs-log-group"
@@ -30,12 +31,12 @@ module "app_ecs_task" {
   ecs_scaling_cpu_threshold = var.ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold = var.ecs_scaling_mem_threshold
   app_count                 = var.app_count
-  lb_tg_arn                 = module.ecs_loadbalancer.tribunals_target_group_arn
   server_port               = var.server_port
   lb_listener               = module.ecs_loadbalancer.tribunals_lb_listener
   cluster_id                = var.cluster_id
   cluster_name              = var.cluster_name
   is_ftp_app                = var.is_ftp_app
+  lb_tg_arn                 = var.target_group_arns["${local.module_name}"]
   sftp_lb_tg_arn            = module.ecs_loadbalancer.sftp_tribunals_target_group_arn
 }
 
