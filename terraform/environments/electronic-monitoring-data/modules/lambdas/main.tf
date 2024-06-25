@@ -141,7 +141,6 @@ resource "aws_lambda_function" "this" {
   # Image config
   image_uri        = var.is_image ? data.external.latest_image_update_log_table["image"].result["latest_image_uri"] : null
   package_type     = var.is_image ? "Image" : null
-  architectures    = var.is_image ? ["x86_64"] : null
   # Constants
   function_name    = var.function_name
   role             = var.role_arn
