@@ -229,7 +229,7 @@ resource "aws_security_group" "cluster_ec2" {
     to_port     = 0
     protocol    = "-1"
     security_groups = [
-      aws_security_group.tribunals_lb_sc.id,
+      # aws_security_group.tribunals_lb_sc.id,
       module.claims_management_decisions.tribunals_lb_sc_id_sftp,
       module.consumer_credit_appeals.tribunals_lb_sc_id_sftp,
       module.estate_agent_appeals.tribunals_lb_sc_id_sftp,
