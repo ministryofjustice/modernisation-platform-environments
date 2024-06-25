@@ -47,10 +47,10 @@ resource "aws_athena_workgroup" "default" {
   description = "A default Athena workgroup to set query limits and link to the default query location bucket: ${module.athena-s3-bucket.bucket.id}"
 
   configuration {
+    bytes_scanned_cutoff_per_query = 1073741824 # 1 GB
     enforce_workgroup_configuration    = false
     publish_cloudwatch_metrics_enabled = true
-
-
+    
     result_configuration {
       output_location = "s3://${module.athena-s3-bucket.bucket.id}/output/"
 
@@ -63,7 +63,6 @@ resource "aws_athena_workgroup" "default" {
       }
     }
 
-    bytes_scanned_cutoff_per_query = 1073741824 # 1 GB
   }
   tags = merge(
     local.tags,
