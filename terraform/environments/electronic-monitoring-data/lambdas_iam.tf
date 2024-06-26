@@ -465,3 +465,75 @@ resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zi
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.data_store.arn
 }
+
+
+# ------------------------------------------
+# load table from json to athena
+# ------------------------------------------
+
+resource "aws_iam_role" "load_json_table" {
+  name               = "load_json_table"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
+  statement {
+    sid    = "S3PermissionsForLoadingJsonTable"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${aws_s3_bucket.data_store.arn}/*",
+       aws_s3_bucket.data_store.arn
+     ]
+  }
+  statement {
+    sid   = "AthenaPermissionsForLoadingJsonTable"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid  = "GluePermissionsForLoadingJsonTable"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "load_json_table_s3_policy" {
+  name        = "load-json-table-s3-policy"
+  description = "Policy for Lambda to use S3 for lambda}"
+  policy      = data.aws_iam_policy_document.load_json_table_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_json_table_s3_policy_policy_attachment" {
+  role       = aws_iam_role.output_fs_json_lambda.name
+  policy_arn = aws_iam_policy.load_json_table.arn
+}
+
+resource "aws_iam_role_policy_attachment" "load_json_table_vpc_access_execution" {
+  role       = aws_iam_role.load_json_table.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "load_json_table_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.load_json_table.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
