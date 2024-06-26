@@ -2,44 +2,27 @@ resource "aws_glue_catalog_database" "atrium_unstructured_db" {
   name = "atrium_unstructured"
 }
 
-resource "aws_glue_catalog_table" "atrium_unstructured_table" {
-  name          = "atrium_unstructured"
+resource "aws_glue_crawler" "atrium_unstructured_crawler" {
+  name         = "atrium_unstructured_crawler"
+  role         = aws_iam_role.atrium_glue_role.arn
   database_name = aws_glue_catalog_database.atrium_unstructured_db.name
-  description   = "Table containing the queryable form of the JSON relating to the structure of the unstructured Atrium data"
 
-
-  table_type = "EXTERNAL_TABLE"
-  parameters = {
-    classification = "json"
-    EXTERNAL = "TRUE"
+  s3_target {
+    path = "s3://em-data-store-20240131094334066000000004/g4s/dev_access/2024-02-16/json/"
   }
 
+  schema_change_policy {
+    delete_behavior = "DEPRECATE_IN_DATABASE"
+    update_behavior = "UPDATE_IN_DATABASE"
+  }
 
-  storage_descriptor {
-    location      = "s3://em-data-store-20240131094334066000000004/g4s/dev_access/2024-02-16/json/" #This will change after testing to work for production and live
-    input_format  = "org.apache.hadoop.mapred.TextInputFormat"
-    output_format = "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat"
-    compressed = false
+  classifiers = [aws_glue_classifier.atrium_json_classifier.name]
+}
 
-
-    ser_de_info {
-      name                  = "s3-stream"
-      serialization_library = "org.openx.data.jsonserde.JsonSerDe"
-
-
-      parameters = {
-        "ignore.malformed.json" = "TRUE"
-        "dots.in.keys"          = "FALSE"
-        "case.insensitive"      = "TRUE"
-        "mapping"               = "TRUE"
-        "paths"                 = "data"
-      }
-    }
-
-    columns {
-      name = "data"
-      type = "struct<ParentGroup:string,SubGroup:string,PrimaryField:string,SecondaryField:string,ReportType:string,FileName:string,FileSize:int,Modified:string>"
-    }
+resource "aws_glue_classifier" "atrium_json_classifier" {
+  name           = "atrium_json_classifier"
+  json_classifier {
+    json_path = "$.data[*]"
   }
 }
 
