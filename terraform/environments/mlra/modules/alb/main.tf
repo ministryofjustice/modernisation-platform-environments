@@ -664,6 +664,51 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 }
 
+resource "aws_athena_database" "cloudfront-access-logs" {
+  name   = "cloudfront_access_logs"
+  bucket = aws_s3_bucket.cloudfront.id
+  encryption_configuration {
+    encryption_option = "SSE_S3"
+  }
+}
+
+resource "aws_athena_named_query" "cloudfront_query" {
+  name     = "${var.application_name}-create-cloudfront-logs-table"
+  database = aws_athena_database.cloudfront-access-logs.name
+  query = templatefile(
+    "${path.module}/templates/create_cloudfront_logs_table.sql",
+    {
+      bucket     = aws_s3_bucket.cloudfront.id
+      account_id = var.account_number
+      region     = var.region
+    }
+  )
+}
+
+resource "aws_athena_workgroup" "cloudfront-logs" {
+  name = "${var.application_name}-cloudfront-logs"
+
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${aws_s3_bucket.cloudfront.id}/output/"
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+    }
+  }
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.application_name}-cloudfront-access-logs"
+    }
+  )
+
+}
+
 
 
 ####### Certificates, Cert Validations & Route53 #######
