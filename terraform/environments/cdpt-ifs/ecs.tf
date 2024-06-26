@@ -3,7 +3,7 @@ data "aws_ecs_task_definition" "task_definitions" {
 }
 
 data "aws_ecs_task_definition" "latest_task_definition" {
-  task_definition = "${aws_ecs_task_definition.ifs_task_definition.family}:${date.aws_ecs_task_definition.task_definitions.revision}"
+  task_definition = "${aws_ecs_task_definition.ifs_task_definition.family}:${data.aws_ecs_task_definition.task_definitions.revision}"
 }
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
