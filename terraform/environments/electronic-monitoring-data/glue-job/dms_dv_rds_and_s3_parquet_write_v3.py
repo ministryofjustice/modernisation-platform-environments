@@ -522,7 +522,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             
             LOGGER.info(f"""{for_loop_count}-Processing - {rds_tbl_name}.{rds_column}.""")
             LOGGER.info(f"""Using Dataframe-'select' column list: {temp_select_list}""")
-            
+
             df_rds_temp = (get_df_read_rds_db_query(rds_db_name, rds_tbl_name, temp_select_list, 
                                                     num_of_jdbc_connections=total_files))
             LOGGER.info(f"""df_rds_temp: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
@@ -739,7 +739,7 @@ if __name__ == "__main__":
     LOGGER.warn(f""">> '{db_sch_tbl}' Size: {total_size_mb} MB <<""")
     # -------------------------------------------------------
 
-    input_repartition_factor = int(args["df_repartition_factor"])
+    input_repartition_factor = int(args["dataframe_repartitions"])
 
     df_dv_output = process_dv_for_table(rds_sqlserver_db_str, 
                                         db_sch_tbl, 
