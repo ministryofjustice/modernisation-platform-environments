@@ -62,6 +62,10 @@ module "eks" {
     }
   }
 
+  node_security_group_tags = {
+    "karpenter.sh/discovery" = local.eks_cluster_name
+  }
+
   eks_managed_node_group_defaults = {
     ami_release_version = local.environment_configuration.eks_node_version
     ami_type            = "BOTTLEROCKET_x86_64"
@@ -82,7 +86,7 @@ module "eks" {
           iops                  = 3000
           throughput            = 150
           encrypted             = true
-          kms_key_id            = module.ebs_kms.key_arn
+          kms_key_id            = module.eks_ebs_kms.key_arn
           delete_on_termination = true
         }
       }
@@ -126,7 +130,7 @@ module "eks" {
             iops                  = 3000
             throughput            = 250
             encrypted             = true
-            kms_key_id            = module.ebs_kms.key_arn
+            kms_key_id            = module.eks_ebs_kms.key_arn
             delete_on_termination = true
           }
         }
@@ -157,6 +161,40 @@ module "eks" {
       username          = "github-actions-mojas-airflow"
       kubernetes_groups = ["airflow-serviceaccount-management"]
     }
+  }
+
+  tags = local.tags
+}
+
+module "karpenter" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/eks/aws//modules/karpenter"
+  version = "20.14.0"
+
+  cluster_name = module.eks.cluster_name
+
+  enable_pod_identity             = true
+  create_pod_identity_association = true
+
+  namespace = kubernetes_namespace.karpenter.metadata[0].name
+
+  queue_name                = "${module.eks.cluster_name}-karpenter"
+  queue_kms_master_key_id   = module.karpenter_sqs_kms.key_arn
+  queue_managed_sse_enabled = false
+
+  iam_policy_name = "karpenter"
+  iam_role_name   = "karpenter"
+  iam_role_policies = {
+    KarpenterSQSKMSAccess = module.karpenter_sqs_kms_access_iam_policy.arn
+  }
+
+  node_iam_role_name = "karpenter"
+  node_iam_role_additional_policies = {
+    AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
   }
 
   tags = local.tags

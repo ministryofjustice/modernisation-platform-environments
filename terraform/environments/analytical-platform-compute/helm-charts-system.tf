@@ -110,6 +110,52 @@ resource "helm_release" "cluster_autoscaler" {
   depends_on = [module.cluster_autoscaler_iam_role]
 }
 
+/* Karpenter */
+resource "helm_release" "karpenter" {
+  /* https://github.com/aws/karpenter-provider-aws/releases */
+  name       = "karpenter"
+  repository = "oci://public.ecr.aws/karpenter"
+  chart      = "karpenter"
+  version    = "0.37.0"
+  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/karpenter/values.yml.tftpl",
+      {
+        service_account_name = module.karpenter.service_account
+        cluster_name         = module.eks.cluster_name
+        cluster_endpoint     = module.eks.cluster_endpoint
+        interruption_queue   = module.karpenter.queue_name
+      }
+    )
+  ]
+  depends_on = [
+    aws_iam_service_linked_role.spot,
+    module.karpenter
+  ]
+}
+
+resource "helm_release" "karpenter_configuration" {
+  name      = "karpenter-configuration"
+  chart     = "./src/helm/charts/karpenter-configuration"
+  namespace = kubernetes_namespace.karpenter.metadata[0].name
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/karpenter-configuration/values.yml.tftpl",
+      {
+        cluster_name    = module.eks.cluster_name
+        cluster_version = module.eks.cluster_version
+        ebs_kms_key_id  = module.eks_ebs_kms.key_id
+        node_role       = module.karpenter.node_iam_role_name
+        node_version    = local.environment_configuration.eks_node_version
+      }
+    )
+  ]
+  depends_on = [helm_release.karpenter]
+}
+
 /* External DNS */
 resource "helm_release" "external_dns" {
   /* https://artifacthub.io/packages/helm/external-dns/external-dns */
