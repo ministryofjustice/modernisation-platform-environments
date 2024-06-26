@@ -337,12 +337,6 @@ locals {
       }
     }
 
-    s3_buckets = {
-      oasys-preproduction = {
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-    }
-
     secretsmanager_secrets = {
       "/oracle/bip/preproduction" = local.secretsmanager_secrets_bip
       "/oracle/database/PPOASYS"  = local.secretsmanager_secrets_oasys_db

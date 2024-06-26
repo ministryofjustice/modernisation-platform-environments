@@ -23,11 +23,5 @@ locals {
       cwagent-oasys-autologoff = { retention_in_days = 1 }
       cwagent-web-logs         = { retention_in_days = 1 }
     }
-
-    s3_buckets = {
-      oasys-development = {
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-    }
   }
 }

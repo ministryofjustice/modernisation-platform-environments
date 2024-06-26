@@ -39,6 +39,7 @@ locals {
     }
   }
   s3_environment_specific = merge(local.s3_environments_specific[var.environment.environment], {
+    s3_bucket_name = coalesce(var.options.s3_bucket_name, "s3-bucket")
     software_bucket_name = coalesce(var.options.software_bucket_name, substr("${var.environment.application_name}-software", 0, 37))
     software_bucket_policy = [
       local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
@@ -48,13 +49,13 @@ locals {
 
   s3_buckets_filter = flatten([
     var.options.enable_s3_db_backup_bucket ? [local.s3_environment_specific.db_backup_bucket_name] : [],
-    var.options.enable_s3_bucket ? ["s3-bucket"] : [],
+    var.options.enable_s3_bucket ? [local.s3_environment_specific.s3_bucket_name] : [],
     var.options.enable_s3_shared_bucket && contains(["test", "production"], var.environment.environment) ? [local.s3_environment_specific.shared_bucket_name] : [],
     var.options.enable_s3_software_bucket && var.environment.environment == "test" ? [local.s3_environment_specific.software_bucket_name] : []
   ])
 
   s3_buckets = {
-    s3-bucket = {
+    (local.s3_environment_specific.s3_bucket_name) = {
       iam_policies   = local.requested_s3_iam_policies
       lifecycle_rule = [var.environment.environment == "production" ? local.s3_lifecycle_rules.general_purpose_one_year : local.s3_lifecycle_rules.general_purpose_three_months]
       tags = {
