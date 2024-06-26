@@ -91,7 +91,7 @@ resource "random_string" "ifs_target_group_name" {
 }
 
 resource "aws_lb_target_group" "ifs_target_group" {
-  name                 = "ifs_target_group"
+  name                 = "ifs-target-group"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
