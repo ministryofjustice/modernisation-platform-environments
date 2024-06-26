@@ -70,8 +70,10 @@ resource "aws_route53_record" "jitbit_amazonses_mail_from_txt_record_prod" {
   zone_id  = data.aws_route53_zone.network-services-production[0].zone_id
   name     = "mail.${aws_sesv2_email_identity.jitbit.email_identity}"
   type     = "TXT"
-  ttl      = "600"
-  records  = ["v=spf1 include:amazonses.com ~all"]
+
+
+  ttl     = "600"
+  records = ["v=spf1 include:amazonses.com ~all"]
 }
 
 resource "aws_route53_record" "jitbit_amazonses_mail_from_mx_record" {

@@ -3,7 +3,7 @@ locals {
   cluster_name = split("/", var.ecs_cluster_arn)[1]
 }
 # Alarm for high CPU usage
-resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
+resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
   alarm_name          = "ldap-${var.env_name}-ecs-cpu-threshold"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
   namespace           = "AWS/ECS"
@@ -47,9 +47,9 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
 
 }
 
-resource "aws_cloudwatch_log_metric_filter" "error" {
-  name           = "ldap-${var.env_name}-application-error"
-  pattern        = "Error in Helpdesk"
+resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
+  name           = "ldap-${var.env_name}-error"
+  pattern        = "err=([1-9][0-9]*)"
   log_group_name = aws_cloudwatch_log_group.ldap_ecs.name
 
   metric_transformation {
@@ -76,18 +76,6 @@ resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
 }
 
 
-resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
-  log_group_name = aws_cloudwatch_log_group.ldap_ecs.name
-  name           = "ldap-${var.env_name}-logged-errors"
-  pattern        = "error"
-  metric_transformation {
-    name          = "LoggedErrors"
-    namespace     = "${var.env_name}/ldap"
-    value         = 1
-    default_value = 0
-  }
-}
-
 resource "aws_cloudwatch_metric_alarm" "log_error_warning_alarm" {
   alarm_name          = "ldap-${var.env_name}-logged-errors-warning"
   alarm_description   = "Error messages were detected in the `ldap` logs."
@@ -96,7 +84,7 @@ resource "aws_cloudwatch_metric_alarm" "log_error_warning_alarm" {
   evaluation_periods  = 2
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  actions_enabled     = false # Disabled initially, while anomaly detection models are trained
+  actions_enabled     = true
 
   metric_query {
     id          = "ad1"
