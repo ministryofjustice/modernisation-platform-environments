@@ -5,15 +5,15 @@ metadata:
   name: bottlerocket-general
 spec:
   amiFamily: Bottlerocket
-  role: {{ .Values.nodeRole }} # karpenter-20240624183657747400000001
+  role: {{ .Values.nodeRole }}
   subnetSelectorTerms:
     - tags:
-        karpenter.sh/discovery: {{ .Values.clusterName }} # analytical-platform-compute-development
+        karpenter.sh/discovery: {{ .Values.clusterName }}
   securityGroupSelectorTerms:
     - tags:
-        karpenter.sh/discovery: {{ .Values.clusterName }} # analytical-platform-compute-development
+        karpenter.sh/discovery: {{ .Values.clusterName }}
   amiSelectorTerms:
-    - name: "bottlerocket-aws-k8s-{{ .Values.clusterVersion  }}-x86_64-v{{ .Values.nodeVersion }}" # bottlerocket-aws-k8s-1.30-x86_64-v1.20.2-536d69d0
+    - name: "bottlerocket-aws-k8s-{{ .Values.clusterVersion  }}-x86_64-v{{ .Values.nodeVersion }}"
   metadataOptions:
     httpEndpoint: enabled
     httpPutResponseHopLimit: 1
@@ -25,7 +25,7 @@ spec:
         volumeType: gp3
         iops: 3000
         encrypted: true
-        kmsKeyID: {{ .Values.ebsKmsKeyId }} # 30b0a8b7-26d7-4307-9943-f28421dbed7f
+        kmsKeyID: {{ .Values.ebsKmsKeyId }}
         deleteOnTermination: true
         throughput: 125
   detailedMonitoring: true
