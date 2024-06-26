@@ -60,7 +60,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 OPTIONAL_INPUTS = [
     "rds_select_db_tbls",
     "rds_exclude_db_tbls",
-    "rds_df_trim_micro_sec_ts_col_list"
+    "rds_df_trim_micro_sec_ts_col_list",
+    "rds_read_rows_fetch_size"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -172,6 +173,33 @@ def get_rds_dataframe(in_rds_db_name, in_table_name) -> DataFrame:
                            properties={"user": RDS_DB_INSTANCE_USER,
                                        "password": RDS_DB_INSTANCE_PWD,
                                        "driver": RDS_DB_INSTANCE_DRIVER})
+
+
+def get_df_read_rds_db_table(in_rds_db_name, 
+                             in_table_name, 
+                             num_of_jdbc_connections=None
+                            ) -> DataFrame:
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
+    
+    num_of_rows_per_trip = args.get("rds_read_rows_fetch_size", None)
+    fetchSize = 10000 if num_of_rows_per_trip is None else num_of_rows_per_trip
+    # The JDBC fetch size, which determines how many rows to fetch per round trip. 
+    # This can help performance on JDBC drivers which default to low fetch size (e.g. Oracle with 10 rows).
+    
+    numPartitions = 4 if num_of_jdbc_connections is None else num_of_jdbc_connections
+    # Note: numPartitions is normally equal to number of executors defined.
+    # The maximum number of partitions that can be used for parallelism in table reading and writing. 
+    # This also determines the maximum number of concurrent JDBC connections. 
+
+    return (spark.read.format("jdbc")
+                .option("url", get_rds_db_jdbc_url(in_rds_db_name))
+                .option("driver", RDS_DB_INSTANCE_DRIVER)
+                .option("user", RDS_DB_INSTANCE_USER)
+                .option("password", RDS_DB_INSTANCE_PWD)
+                .option("dbtable", in_table_name)
+                .option("fetchSize", fetchSize)
+                .option("numPartitions", numPartitions)
+                .load())
 
 
 def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name) -> DataFrame:

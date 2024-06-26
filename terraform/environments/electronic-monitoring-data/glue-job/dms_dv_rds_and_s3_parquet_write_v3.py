@@ -228,7 +228,7 @@ def get_df_read_rds_db_query(in_rds_db_name,
                             ) -> DataFrame:
     given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
     
-    num_of_rows_per_trip = args["rds_read_rows_fetch_size"]
+    num_of_rows_per_trip = args.get("rds_read_rows_fetch_size", None)
     fetchSize = 10000 if num_of_rows_per_trip is None else num_of_rows_per_trip
     # The JDBC fetch size, which determines how many rows to fetch per round trip. 
     # This can help performance on JDBC drivers which default to low fetch size (e.g. Oracle with 10 rows).
@@ -405,11 +405,13 @@ def get_reordered_columns_schema_object(in_df_rds: DataFrame, in_transformed_col
 def get_rds_db_tbl_customized_cols_schema_object(in_df_rds: DataFrame, 
                                                  in_customized_column_list):
     altered_schema_object = T.StructType([])
-    rds_df_column_list = in_df_rds.schema.fields
+    rds_df_column_list = in_df_rds.columns
 
     for colmn in in_customized_column_list:
         if colmn not in rds_df_column_list:
-            LOGGER.error(f"""Given pprimary-key column '{colmn}' is not an existing RDS-DB-Table-Column!\n Exiting ...""")
+            LOGGER.error(f"""Given primary-key column '{colmn}' is not an existing RDS-DB-Table-Column!""")
+            LOGGER.error(f"""rds_df_column_list = {rds_df_column_list}""")
+            LOGGER.warn("Exiting ...")
             sys.exit(1)
 
     for field_obj in in_df_rds.schema.fields:

@@ -97,6 +97,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--rds_select_db_tbls"                = ""
     "--rds_df_trim_str_columns"           = "false"
     "--rds_df_trim_micro_sec_ts_col_list" = ""
+    "--rds_read_rows_fetch_size"          = ""
     "--repartition_factor"                = 8
     "--max_table_size_mb"                 = 4000
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
