@@ -1,5 +1,5 @@
-data "aws_ecs_task_definition" "task_definition" {
-  task_definition = aws_ecs_task_definition.ifs_task_definition.family
+data "aws_ecs_task_definition" "latest_task_definition" {
+  task_definition = "${aws_ecs_task_definition.ifs_task_definition.family}:latest"
   depends_on      = [aws_ecs_task_definition.ifs_task_definition]
 }
 
@@ -359,7 +359,7 @@ resource "aws_ecs_service" "ecs_service" {
   depends_on                        = [aws_lb_listener.https_listener]
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.ifs_task_definition.arn
+  task_definition                   = data.aws_ecs_task_definition.latest_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   capacity_provider_strategy {
