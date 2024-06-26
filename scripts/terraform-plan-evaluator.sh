@@ -22,7 +22,8 @@ RESOURCES_TO_CHECK_FOR=(
   "aws_cloudformation_stack",
   "aws_cloudformation_stack_set",
   "aws_cloudformation_stack_set_instance",
-  "aws_cloudformation_type"
+  "aws_cloudformation_type",
+  "aws_ec2_transit_gateway_vpc_attachment"
 )
 
 resourcesFound=false
