@@ -62,7 +62,7 @@ resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
 
 resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
   alarm_name          = "ldap-${var.env_name}-high-error-count"
-  alarm_description   = "Triggers alarm if there are more than 5 errors in the last 5 minutes"
+  alarm_description   = "Triggers alarm if there are more than 10 errors in the last 5 minutes"
   namespace           = "ldapMetrics"
   metric_name         = "ErrorCount"
   statistic           = "Sum"
@@ -77,15 +77,15 @@ resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
 
 resource "aws_cloudwatch_metric_alarm" "warning_error_volume" {
   alarm_name          = "ldap-${var.env_name}-warning-error-count"
-  alarm_description   = "Triggers alarm if there are more than 5 errors in the last 5 minutes"
+  alarm_description   = "Triggers alarm if there are more than 5 errors in the last 2 minutes"
   namespace           = "ldapMetrics"
   metric_name         = "ErrorCount"
   statistic           = "Sum"
-  period              = "300"
+  period              = "120"
   evaluation_periods  = "1"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  threshold           = "10"
+  threshold           = "5"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
 }
