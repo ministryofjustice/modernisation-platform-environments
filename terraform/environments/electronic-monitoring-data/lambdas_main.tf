@@ -280,6 +280,9 @@ module "load_json_table" {
     ecr_repo_name = module.ecr_lambdas_repo.repository_name
     ecr_repo_url = module.ecr_lambdas_repo.repository_url
     environment_variables = {
+      DLT_PROJECT_DIR: "/tmp"
+      DLT_DATA_DIR: "/tmp"
+      DLT_PIPELINE_DIR: "/tmp"
       BUCKET_URL = "${aws_s3_bucket.data_store.id}/g4s/dev_access/2024-02-16/json/"
       STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "${module.athena-s3-bucket.bucket.id}/output"
       }
