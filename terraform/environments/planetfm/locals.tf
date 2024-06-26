@@ -60,6 +60,6 @@ locals {
       }
     }
     resource_explorer = true
-    security_groups = local.security_groups
+    security_groups   = local.security_groups
   }
 }
