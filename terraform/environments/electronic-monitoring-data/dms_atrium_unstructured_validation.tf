@@ -32,6 +32,7 @@ resource "aws_glue_catalog_table" "atrium_unstructured_table" {
         "dots.in.keys"          = "FALSE"
         "case.insensitive"      = "TRUE"
         "mapping"               = "TRUE"
+        "paths"                 = "data"
       }
     }
 
