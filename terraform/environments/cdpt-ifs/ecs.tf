@@ -1,6 +1,9 @@
+data "aws_ecs_task_definition" "task_definitions" {
+  task_definition = aws_ecs_task_definition.ifs_task_definition.family
+}
+
 data "aws_ecs_task_definition" "latest_task_definition" {
-  task_definition = "${aws_ecs_task_definition.ifs_task_definition.family}:latest"
-  depends_on      = [aws_ecs_task_definition.ifs_task_definition]
+  task_definition = "${aws_ecs_task_definition.ifs_task_definition.family}:${date.aws_ecs_task_definition.task_definitions.revision}"
 }
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
@@ -366,6 +369,8 @@ resource "aws_ecs_service" "ecs_service" {
     capacity_provider = aws_ecs_capacity_provider.ifs.name
     weight            = 1
   }
+
+  depends_on = [aws_ecs_task_definition.ifs_task_definition]
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
