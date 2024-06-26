@@ -283,8 +283,8 @@ module "load_json_table" {
       DLT_PROJECT_DIR: "/tmp"
       DLT_DATA_DIR: "/tmp"
       DLT_PIPELINE_DIR: "/tmp"
-      BUCKET_URL = "${aws_s3_bucket.data_store.id}/g4s/dev_access/2024-02-16/json/"
-      STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "${module.athena-s3-bucket.bucket.id}/output"
+      BUCKET_URL = "s3://${aws_s3_bucket.data_store.id}/g4s/dev_access/2024-02-16/json/"
+      STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${module.athena-s3-bucket.bucket.id}/output"
       }
 }
 
