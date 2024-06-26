@@ -81,6 +81,7 @@ module "lb_access_logs_enabled" {
   region                     = "eu-west-2"
   enable_deletion_protection = false
   idle_timeout               = 60
+  drop_invalid_header_fields = false
   tags                       = { Name = "lb_module" }
 
 }
