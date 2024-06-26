@@ -118,6 +118,7 @@ chmod +x ./kubectl
 cp ./kubectl /usr/bin/kubectl
 
 mkdir -p /home/ssm-user/.kube
+chmod -R 666 /home/ssm-user/.kube
 
 # NOMIS
 ## Add Kubeconfig
@@ -152,7 +153,10 @@ chmod 666 $kubeconfig
 sudo cat <<EOF > $nomis_portforwarder_script
 #!/bin/bash
 
+unset KUBE_CONFIG; unset KUBECONFIG
+
 export KUBE_CONFIG=$kubeconfig
+export KUBECONFIG=$kubeconfig
 
 ## Set Kube Config
 
@@ -165,7 +169,7 @@ kubectl get pods
 
 ## Port forward from CP to MP
 export POD=\$(kubectl get pod -n $namespace -l app=$app -o jsonpath="{.items[0].metadata.name}")
-kubectl port-forward pods/\$POD $remote_port:$local_port --address='0.0.0.0'
+kubectl port-forward pods/\$POD $local_port:$remote_port --address='0.0.0.0'
 EOF
 ###
 
@@ -212,7 +216,10 @@ chmod 666 $bodmis_kubeconfig
 sudo cat <<EOF > $bodmis_portforwarder_script
 #!/bin/bash
 
-export KUBE_CONFIG=$bodmis_kubeconfig
+unset KUBE_CONFIG; unset KUBECONFIG
+
+export KUBE_CONFIG=$kubeconfig
+export KUBECONFIG=$kubeconfig
 
 ## Set Kube Config
 
@@ -225,10 +232,11 @@ kubectl get pods
 
 ## Port forward from CP to MP
 export POD=\$(kubectl get pod -n $bodmis_namespace -l app=$bodmis_app -o jsonpath="{.items[0].metadata.name}")
-kubectl port-forward pods/\$POD $remote_port:$bodmis_local_port --address='0.0.0.0'
+kubectl port-forward pods/\$POD $bodmis_local_port:$remote_port --address='0.0.0.0'
 EOF
 
-## Add Permissions and Execute the Forwarder
+## Add Permissions and Execute the Nomis and Bodmis Port Forwarders
+chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
 chmod 0755 $bodmis_portforwarder_script; su -c $bodmis_portforwarder_script ssm-user
 fi
 
