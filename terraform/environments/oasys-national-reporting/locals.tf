@@ -25,6 +25,7 @@ locals {
       enable_ec2_cloud_watch_agent  = true
       enable_ec2_self_provision     = true
       enable_ec2_user_keypair       = true
+      enable_s3_bucket              = true
       enable_s3_shared_bucket       = true
       iam_policies_filter           = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       iam_policies_ec2_default      = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
@@ -44,11 +45,6 @@ locals {
           ]
           resources = ["*"]
         }]
-      }
-    }
-    s3_buckets = {
-      s3-bucket = {
-        iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
     security_groups = local.security_groups

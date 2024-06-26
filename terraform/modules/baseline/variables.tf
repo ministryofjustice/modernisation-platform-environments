@@ -852,44 +852,12 @@ variable "s3_buckets" {
     })), [])
     custom_kms_key             = optional(string)
     custom_replication_kms_key = optional(string)
-    lifecycle_rule = optional(any, [{
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-      expiration = {
-        days = 730
-      }
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }])
-    log_bucket           = optional(string, "")
-    log_prefix           = optional(string, "")
-    replication_role_arn = optional(string, "")
-    force_destroy        = optional(bool, false)
-    sse_algorithm        = optional(string, "aws:kms")
+    lifecycle_rule             = any # see module baseline_presets.s3 for examples
+    log_bucket                 = optional(string, "")
+    log_prefix                 = optional(string, "")
+    replication_role_arn       = optional(string, "")
+    force_destroy              = optional(bool, false)
+    sse_algorithm              = optional(string, "aws:kms")
     iam_policies = optional(map(list(object({
       sid     = optional(string, null)
       effect  = string

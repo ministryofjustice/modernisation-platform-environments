@@ -466,6 +466,9 @@ locals {
         lifecycle_rule = [
           module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
         ]
+        tags = {
+          backup = "false"
+        }
       }
     }
 
