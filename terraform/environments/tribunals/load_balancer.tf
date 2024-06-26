@@ -80,29 +80,11 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   }
 
   condition {
-    path_pattern  {
-      values = [each.key]
+    host_header  {
+      values = ["*${each.key}*"]
     }
   }
 }
-
-# resource "aws_lb_listener" "tribunals_lb_health" {
-#   load_balancer_arn = var.app_load_balancer.arn
-#   port              = 80
-#   protocol          = "HTTP"
-
-#   default_action {
-#     type = "forward"
-#     forward {
-#       dynamic "target_group" {
-#         for_each = local.target_group_arns
-#         content {
-#           arn = target_group.value
-#         }
-#       }
-#     }
-#   }
-# }
 
 resource "aws_lb_target_group" "tribunals_target_group" {
   for_each             = var.services
