@@ -203,7 +203,7 @@ locals {
     finance_and_tax             = module.finance_and_tax
     immigration_services        = module.immigration_services
     information_tribunal        = module.information_tribunal
-    # lands_tribunal              = module.lands_tribunal
+    lands_tribunal              = module.lands_tribunal
     # transport                   = module.transport
     # charity_tribunal_decisions  = module.charity_tribunal_decisions
     # claims_management_decisions = module.claims_management_decisions
