@@ -267,21 +267,15 @@ locals {
 
     s3_buckets = {
       nomis-combined-reporting-bip-packages = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.AllEnvironmentsReadOnlyAccessBucketPolicy
         ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-
-      # the shared image builder bucket is just created in test
-      nomis-combined-reporting-software = {
         custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
+        iam_policies   = module.baseline_presets.s3_iam_policies
+        lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.software]
+        tags = {
+          backup = "false"
+        }
       }
     }
 
