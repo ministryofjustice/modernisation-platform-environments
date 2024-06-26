@@ -95,26 +95,26 @@ resource "aws_dms_endpoint" "source" {
 }
 
 # Uncomment modernisation_dms_access for first time creation of the Security Group in AWS DSD Account
-resource "aws_security_group" "modernisation_dms_access" {
-  provider    = aws.mojdsd
-  name        = "modernisation_dms_access_${local.environment}"
-  description = "allow dms access to the database for the modernisation platform"
+# resource "aws_security_group" "modernisation_dms_access" {
+#   provider    = aws.mojdsd
+#   name        = "modernisation_dms_access_${local.environment}"
+#   description = "allow dms access to the database for the modernisation platform"
 
-  ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    description = "Allow DMS to connect to source database"
-    cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
-  }
+#   ingress {
+#     from_port   = 1433
+#     to_port     = 1433
+#     protocol    = "tcp"
+#     description = "Allow DMS to connect to source database"
+#     cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
+#   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
 // Uncomment setup_target_rds_security_group for first time setup of DMS
 // executes a local script to set up the security group for the target RDS instance in the source db aws account
