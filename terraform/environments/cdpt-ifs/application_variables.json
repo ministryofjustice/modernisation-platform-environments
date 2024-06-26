@@ -9,7 +9,7 @@
       "app_count": 1,
       "ec2_desired_capacity": 1,
       "ec2_max_size": 3,
-      "ec2_min_size": 1,
+      "ec2_min_size": 2,
       "db_instance_class": "db.t3.small",
       "db_user": "dbadmin",
       "db_allocated_storage": "100",
