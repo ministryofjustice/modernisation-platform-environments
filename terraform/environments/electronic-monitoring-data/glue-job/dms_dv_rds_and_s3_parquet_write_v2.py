@@ -169,7 +169,7 @@ def get_rds_db_tbl_list(in_rds_sqlserver_db_str):
 
 def get_rds_dataframe(in_rds_db_name, in_table_name) -> DataFrame:
     return spark.read.jdbc(url=get_rds_db_jdbc_url(in_rds_db_name),
-                           table=in_table_name,
+                           table=f"""{given_rds_sqlserver_db_schema}.[{in_table_name}]""",
                            properties={"user": RDS_DB_INSTANCE_USER,
                                        "password": RDS_DB_INSTANCE_PWD,
                                        "driver": RDS_DB_INSTANCE_DRIVER})
@@ -196,7 +196,7 @@ def get_df_read_rds_db_table(in_rds_db_name,
                 .option("driver", RDS_DB_INSTANCE_DRIVER)
                 .option("user", RDS_DB_INSTANCE_USER)
                 .option("password", RDS_DB_INSTANCE_PWD)
-                .option("dbtable", in_table_name)
+                .option("dbtable", f"""{given_rds_sqlserver_db_schema}.[{in_table_name}]""")
                 .option("fetchSize", fetchSize)
                 .option("numPartitions", numPartitions)
                 .load())

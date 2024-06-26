@@ -189,7 +189,7 @@ def get_rds_db_table_empty_df(in_rds_db_name,
     
     query_str = f"""
     SELECT *
-    FROM {given_rds_sqlserver_db_schema}.{in_table_name}
+    FROM {given_rds_sqlserver_db_schema}.[{in_table_name}]
     WHERE 1 = 2
     """.strip()
 
@@ -209,7 +209,7 @@ def get_rds_db_table_row_count(in_rds_db_name,
     
     query_str = f"""
     SELECT count({', '.join(in_pkeys_col_list)}) as row_count
-    FROM {given_rds_sqlserver_db_schema}.{in_table_name}
+    FROM {given_rds_sqlserver_db_schema}.[{in_table_name}]
     """.strip()
 
     return (spark.read.format("jdbc")
@@ -240,7 +240,7 @@ def get_df_read_rds_db_query(in_rds_db_name,
     
     query_str = f"""
     SELECT {', '.join(select_col_list)}
-    FROM {given_rds_sqlserver_db_schema}.{in_table_name}
+    FROM {given_rds_sqlserver_db_schema}.[{in_table_name}]
     """.strip()
     
     # .option("partitionColumn", pkey_col_list[0])
