@@ -81,7 +81,7 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
 
   condition {
     host_header  {
-      values = [each.key]
+      values = [string(each.key)]
     }
   }
 }
