@@ -359,11 +359,13 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  name                              = var.networking[0].application
-  cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = data.aws_ecs_task_definition.latest_task_definition.arn
-  desired_count                     = local.application_data.accounts[local.environment].app_count
-  health_check_grace_period_seconds = 300
+  name                               = var.networking[0].application
+  cluster                            = aws_ecs_cluster.ecs_cluster.id
+  task_definition                    = data.aws_ecs_task_definition.latest_task_definition.arn
+  desired_count                      = local.application_data.accounts[local.environment].app_count
+  health_check_grace_period_seconds  = 300
+  deployment_minimum_healthy_percent = 50  # Ensure at least 50% of tasks are healthy during deployments
+  deployment_maximum_percent         = 200 # Allow up to 200% of the desired count during deployments
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.ifs.name
     weight            = 1
