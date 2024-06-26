@@ -118,23 +118,23 @@ resource "aws_dms_endpoint" "source" {
 
 // Uncomment setup_target_rds_security_group for first time setup of DMS
 // executes a local script to set up the security group for the target RDS instance in the source db aws account
-resource "null_resource" "setup_target_rds_security_group" {
-  depends_on = [aws_dms_replication_instance.tribunals_replication_instance]
+# resource "null_resource" "setup_target_rds_security_group" {
+#   depends_on = [aws_dms_replication_instance.tribunals_replication_instance]
 
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command     = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
 
-    environment = {
-      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
-      EC2_INSTANCE_ID               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["ec2-instance-id"]
-      DMS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_access_key"]
-      DMS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_secret_key"]
-      AWS_REGION                    = "eu-west-1"
+#     environment = {
+#       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
+#       EC2_INSTANCE_ID               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["ec2-instance-id"]
+#       DMS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_access_key"]
+#       DMS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_secret_key"]
+#       AWS_REGION                    = "eu-west-1"
 
-    }
-  }
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
+#     }
+#   }
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+# }
