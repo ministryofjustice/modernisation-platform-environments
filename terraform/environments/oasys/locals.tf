@@ -49,7 +49,7 @@ locals {
       iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy", "Ec2OracleEnterpriseManagerPolicy"]
       iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       iam_service_linked_roles                    = [] # ASG must have been created automatically by AWS
-      s3_bucket_name                              = "${local.application_name}-bucket"
+      s3_bucket_name                              = "${local.application_name}-${local.environment}"
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }
