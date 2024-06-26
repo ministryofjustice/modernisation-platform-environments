@@ -9,6 +9,6 @@ terraform {
     encrypt              = true
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
-    workspace_key_prefix = "environments/members/$application_name" # This will store the object as environments/members/$application_name/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/panda-cyber-appsec-lab" # This will store the object as environments/members/panda-cyber-appsec-lab/${workspace}/terraform.tfstate
   }
 }
