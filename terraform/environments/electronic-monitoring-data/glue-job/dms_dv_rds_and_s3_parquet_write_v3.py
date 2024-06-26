@@ -433,7 +433,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
          T.StructField("validation_msg", T.StringType(), True),
          T.StructField("database_name", T.StringType(), True),
          T.StructField("full_table_name", T.StringType(), True),
-         T.StructField("table_in_ap", T.StringType(), True)])
+         T.StructField("table_to_ap", T.StringType(), True)])
 
     additional_validation_msg = ''
     
@@ -482,7 +482,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                     '{mismatch_validation_msg_2}' as validation_msg,
                                     '{rds_db_name}' as database_name,
                                     '{db_sch_tbl}' as full_table_name,
-                                    'False' as table_in_ap
+                                    'False' as table_to_ap
                                 """.strip())
             LOGGER.warn(f"Validation Failed - 3")
             LOGGER.info(final_validation_msg)
@@ -593,7 +593,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                     f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
                                     f"""'{rds_db_name}' as database_name""",
                                     f"""'{db_sch_tbl}' as full_table_name""",
-                                    """'False' as table_in_ap"""
+                                    """'False' as table_to_ap"""
                             )
                 LOGGER.warn(f"Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_subtract_temp)
@@ -616,7 +616,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                             "{rds_tbl_name} - Validated.\n{additional_validation_msg}" as validation_msg,
                                             '{rds_db_name}' as database_name,
                                             '{db_sch_tbl}' as full_table_name,
-                                            'False' as table_in_ap
+                                            'False' as table_to_ap
                                         """.strip())
                 # df_temp_row.show(truncate=False)
                 LOGGER.info(f"Validation Successful - 1")
@@ -628,7 +628,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                             "{' ; '.join(validated_colmn_msg_list)} - Specified Columns Validated." as validation_msg,
                                             '{rds_db_name}' as database_name,
                                             '{db_sch_tbl}' as full_table_name,
-                                            'False' as table_in_ap
+                                            'False' as table_to_ap
                                         """.strip())
                 # df_temp_row.show(truncate=False)
                 LOGGER.warn(f"Not all table columns validated - 1b")
@@ -644,7 +644,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                     '{db_sch_tbl} - S3-Parquet folder path does not exist !' as validation_msg,
                                     '{rds_db_name}' as database_name,
                                     '{db_sch_tbl}' as full_table_name,
-                                    'False' as table_in_ap
+                                    'False' as table_to_ap
                                 """.strip())
         LOGGER.warn(f"Validation not applicable - 4")
         df_dv_output = df_dv_output.union(df_temp_row)
