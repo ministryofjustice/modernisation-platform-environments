@@ -525,10 +525,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             df_rds_temp = (get_df_read_rds_db_query(rds_db_name, rds_tbl_name, temp_select_list, 
                                                     num_of_jdbc_connections=total_files))
-            LOGGER.info(f"""df_rds_temp: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+            LOGGER.info(f"""df_rds_temp-{rds_column}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
 
             df_rds_temp = df_rds_temp.repartition(input_repartition_factor)
-            LOGGER.info(f"""df_rds_temp: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+            LOGGER.info(f"""df_rds_temp-{rds_column}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
             # -------------------------------------------------------
 
             t1_rds_str_col_trimmed = False
@@ -564,10 +564,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             df_prq_temp = (get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
                             .select(*temp_select_list))
-            LOGGER.info(f"""df_prq_temp: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
+            LOGGER.info(f"""df_prq_temp-{rds_column}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
             df_prq_temp = df_prq_temp.repartition(input_repartition_factor)
-            LOGGER.info(f"""df_prq_temp: RE-PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
+            LOGGER.info(f"""df_prq_temp-{rds_column}: RE-PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
             df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
 
