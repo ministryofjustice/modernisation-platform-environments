@@ -515,7 +515,8 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "glue:CreateTable",
       "glue:DeleteTable",
       "glue:CreateDatabase",
-      "glue:DeleteDatabase"
+      "glue:DeleteDatabase",
+      "glue:UpdateTable"
     ]
     resources = ["*"]
   }
