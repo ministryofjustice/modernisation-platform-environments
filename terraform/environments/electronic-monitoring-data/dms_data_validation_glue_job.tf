@@ -117,7 +117,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     --conf spark.sql.adaptive.enabled=true 
     --conf spark.sql.adaptive.coalescePartitions.enabled=true 
     --conf spark.sql.adaptive.skewJoin.enabled=true 
-    --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED
+    --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
     --conf spark.sql.parquet.aggregatePushdown=true
     EOF
   }
