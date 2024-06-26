@@ -123,7 +123,7 @@ module "glue_reporting_hub_batch_job" {
     }
   )
 
-  arguments = merge(glue_batch_job_extra_args, {
+  arguments = merge(local.glue_batch_job_extra_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
