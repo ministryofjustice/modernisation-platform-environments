@@ -147,12 +147,10 @@ locals {
         rule      = "log"
         autoclean = "true"
       }
-      expiration = {
-        days = 31
-      }
-      noncurrent_version_expiration = {
-        days = 7
-      }
+      transition                    = []
+      expiration                    = { days = 31 }
+      noncurrent_version_transition = []
+      noncurrent_version_expiration = { days = 7 }
     }
 
     rman_backup_one_year = {
@@ -163,18 +161,10 @@ locals {
         rule      = "log"
         autoclean = "true"
       }
-      transition = [
-        {
-          days          = 30
-          storage_class = "GLACIER"
-        }
-      ]
-      expiration = {
-        days = 365
-      }
-      noncurrent_version_expiration = {
-        days = 7
-      }
+      transition                    = [{ days = 30, storage_class = "GLACIER" }]
+      expiration                    = { days = 365 }
+      noncurrent_version_transition = []
+      noncurrent_version_expiration = { days = 7 }
     }
 
     ninety_day_standard_ia_ten_year_expiry = {
@@ -185,26 +175,13 @@ locals {
         rule      = "log"
         autoclean = "true"
       }
-      transition = [{
-        days          = 90
-        storage_class = "STANDARD_IA"
-      }]
-      expiration = {
-        days = 3650
-      }
+      transition = [{ days = 90, storage_class = "STANDARD_IA" }]
+      expiration = { days = 3650 }
       noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        },
-        {
-          days          = 365
-          storage_class = "GLACIER"
-        }
+        { days = 90, storage_class = "STANDARD_IA" },
+        { days = 365, storage_class = "GLACIER" },
       ]
-      noncurrent_version_expiration = {
-        days = 3650
-      }
+      noncurrent_version_expiration = { days = 3650 }
     }
   }
 }
