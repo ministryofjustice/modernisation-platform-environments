@@ -430,7 +430,10 @@ data "aws_iam_policy_document" "output_fs_json_lambda_s3_policy_document" {
       "s3:PutObject",
       "s3:ListBucket"
     ]
-    resources = ["${aws_s3_bucket.data_store.arn}/*", aws_s3_bucket.data_store.arn]
+    resources = [
+      "${aws_s3_bucket.data_store.arn}/*",
+       aws_s3_bucket.data_store.arn
+     ]
   }
 }
 
