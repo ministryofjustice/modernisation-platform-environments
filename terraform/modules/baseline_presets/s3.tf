@@ -10,7 +10,6 @@ locals {
       db_backup_bucket_policy = [local.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy]
       shared_bucket_name      = substr("devtest-${var.environment.application_name}-", 0, 37)
       shared_bucket_policy = [
-        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
         local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy,
       ]
     }
@@ -19,7 +18,6 @@ locals {
       db_backup_bucket_policy = [local.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy]
       shared_bucket_name      = substr("devtest-${var.environment.application_name}-", 0, 37)
       shared_bucket_policy = [
-        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
         local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy,
       ]
     }
@@ -28,7 +26,6 @@ locals {
       db_backup_bucket_policy = null
       shared_bucket_name      = substr("prodpreprod-${var.environment.application_name}-", 0, 37)
       shared_bucket_policy = [
-        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
         local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy,
       ]
     }
@@ -37,23 +34,29 @@ locals {
       db_backup_bucket_policy = [var.options.db_backup_more_permissions ? local.s3_bucket_policies.ProdPreprodReadWriteDeleteBucketPolicy : local.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy]
       shared_bucket_name      = substr("prodpreprod-${var.environment.application_name}-", 0, 37)
       shared_bucket_policy = [
-        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
         local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy,
       ]
     }
   }
-  s3_environment_specific = local.s3_environments_specific[var.environment.environment]
+  s3_environment_specific = merge(local.s3_environments_specific[var.environment.environment], {
+    software_bucket_name = coalesce(var.options.software_bucket_name, substr("${var.environment.application_name}-software", 0, 37))
+    software_bucket_policy = [
+      local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+      local.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
+    ]
+  })
 
   s3_buckets_filter = flatten([
     var.options.enable_s3_db_backup_bucket ? [local.s3_environment_specific.db_backup_bucket_name] : [],
     var.options.enable_s3_bucket ? ["s3-bucket"] : [],
     var.options.enable_s3_shared_bucket && contains(["test", "production"], var.environment.environment) ? [local.s3_environment_specific.shared_bucket_name] : [],
+    var.options.enable_s3_software_bucket && var.environment.environment == "test" ? [local.s3_environment_specific.software_bucket_name] : []
   ])
 
   s3_buckets = {
     s3-bucket = {
       iam_policies   = local.requested_s3_iam_policies
-      lifecycle_rule = [local.s3_lifecycle_rules.default]
+      lifecycle_rule = [var.environment.environment == "production" ? local.s3_lifecycle_rules.general_purpose_one_year : local.s3_lifecycle_rules.general_purpose_three_months]
       tags = {
         backup = "false"
       }
@@ -71,7 +74,16 @@ locals {
       bucket_policy_v2 = local.s3_environment_specific.shared_bucket_policy
       custom_kms_key   = var.environment.kms_keys["general"].arn
       iam_policies     = local.requested_s3_iam_policies
-      lifecycle_rule   = [local.s3_lifecycle_rules.default]
+      lifecycle_rule   = [var.environment.environment == "production" ? local.s3_lifecycle_rules.general_purpose_one_year : local.s3_lifecycle_rules.general_purpose_three_months]
+      tags = {
+        backup = "false"
+      }
+    }
+    (local.s3_environment_specific.software_bucket_name) = {
+      bucket_policy_v2 = local.s3_environment_specific.software_bucket_policy
+      custom_kms_key   = var.environment.kms_keys["general"].arn
+      iam_policies     = local.requested_s3_iam_policies
+      lifecycle_rule   = [local.s3_lifecycle_rules.software]
       tags = {
         backup = "false"
       }
@@ -104,77 +116,66 @@ locals {
 
     # the default from modernisation-platform-terraform-s3-bucket module
     default = {
-      id      = "main"
       enabled = "Enabled"
+      id      = "main"
       prefix  = ""
       tags = {
         rule      = "log"
         autoclean = "true"
       }
+
       transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        },
-        {
-          days          = 365
-          storage_class = "GLACIER"
-        }
+        { days = 90, storage_class = "STANDARD_IA" },
+        { days = 365, storage_class = "GLACIER" }
       ]
-      expiration = {
-        days = 730
-      }
+      expiration = { days = 730 }
       noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        },
-        {
-          days          = 365
-          storage_class = "GLACIER"
-        }
+        { days = 90, storage_class = "STANDARD_IA" },
+        { days = 365, storage_class = "GLACIER" }
       ]
-      noncurrent_version_expiration = {
-        days = 730
-      }
+      noncurrent_version_expiration = { days = 730 }
     }
 
-    rman_backup_one_month = {
-      id      = "rman_backup_one_month"
+    general_purpose_three_months = {
       enabled = "Enabled"
+      id      = "general_purpose_three_months"
       prefix  = ""
       tags = {
         rule      = "log"
         autoclean = "true"
       }
-      transition                    = []
-      expiration                    = { days = 31 }
+
+      transition                    = [{ days = 30, storage_class = "STANDARD_IA" }]
+      expiration                    = { days = 90 }
       noncurrent_version_transition = []
       noncurrent_version_expiration = { days = 7 }
     }
 
-    rman_backup_one_year = {
-      id      = "rman_backup_one_year"
+    general_purpose_one_year = {
       enabled = "Enabled"
+      id      = "general_purpose_one_year"
       prefix  = ""
       tags = {
         rule      = "log"
         autoclean = "true"
       }
-      transition                    = [{ days = 30, storage_class = "GLACIER" }]
+
+      transition                    = [{ days = 30, storage_class = "STANDARD_IA" }]
       expiration                    = { days = 365 }
       noncurrent_version_transition = []
       noncurrent_version_expiration = { days = 7 }
     }
 
+
     ninety_day_standard_ia_ten_year_expiry = {
-      id      = "ninety_day_standard_ia_ten_year_expiry"
       enabled = "Enabled"
+      id      = "ninety_day_standard_ia_ten_year_expiry"
       prefix  = ""
       tags = {
         rule      = "log"
         autoclean = "true"
       }
+
       transition = [{ days = 90, storage_class = "STANDARD_IA" }]
       expiration = { days = 3650 }
       noncurrent_version_transition = [
@@ -182,6 +183,52 @@ locals {
         { days = 365, storage_class = "GLACIER" },
       ]
       noncurrent_version_expiration = { days = 3650 }
+    }
+
+    rman_backup_one_month = {
+      enabled = "Enabled"
+      id      = "rman_backup_one_month"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition                    = []
+      expiration                    = { days = 31 }
+      noncurrent_version_transition = []
+      noncurrent_version_expiration = { days = 7 }
+    }
+
+    rman_backup_one_year = {
+      enabled = "Enabled"
+      id      = "rman_backup_one_year"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition                    = [{ days = 30, storage_class = "GLACIER" }]
+      expiration                    = { days = 365 }
+      noncurrent_version_transition = []
+      noncurrent_version_expiration = { days = 7 }
+    }
+
+
+    software = {
+      enabled = "Enabled"
+      id      = "software"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition                    = [{ days = 30, storage_class = "STANDARD_IA" }]
+      expiration                    = { days = 36500 } # have to put something to keep terraform happy
+      noncurrent_version_transition = [{ days = 30, storage_class = "GLACIER" }]
+      noncurrent_version_expiration = { days = 365 }
     }
   }
 }
