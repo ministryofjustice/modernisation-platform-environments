@@ -370,7 +370,11 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     # -------------------------------------------------------
     if tbl_prq_s3_folder_path is not None:
 
-        df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name).repartition(default_repartition_factor)
+        df_rds_temp = get_df_read_rds_db_table(rds_db_name, rds_tbl_name, total_files)
+        LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+        
+        df_rds_temp = df_rds_temp.repartition(default_repartition_factor)
+        LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
 
         rds_df_created_msg_1 = f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}']"""
         rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds_temp.rdd.getNumPartitions()}"""
@@ -419,8 +423,11 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
 
         df_rds_temp_t5 = df_rds_temp_t4.cache()
 
-        df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)\
-                            .repartition(default_repartition_factor)
+        df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
+        LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
+
+        df_prq_temp = df_prq_temp.repartition(default_repartition_factor)
+        LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: RE-PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
         prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}']"""
         prq_df_created_msg_2 = f""" >> {total_size_mb}MB ; parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
