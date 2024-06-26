@@ -196,7 +196,7 @@ variable "sftp_services" {
 locals {
   modules = {
     appeals                     = module.appeals
-    # ahmlr                       = module.ahmlr
+    ahmlr                       = module.ahmlr
     # care_standards              = module.care_standards
     # cicap                       = module.cicap
     # employment_appeals          = module.employment_appeals
