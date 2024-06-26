@@ -39,7 +39,6 @@ locals {
       enable_ec2_user_keypair                     = true
       enable_s3_db_backup_bucket                  = true
       enable_s3_bucket                            = true
-      enable_s3_shared_bucket                     = true
       enable_s3_software_bucket                   = true
       iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
