@@ -20,4 +20,6 @@ locals {
     cluster_name = "${local.application_name}-ecs-cluster"
   }))
 
+
+
 }
