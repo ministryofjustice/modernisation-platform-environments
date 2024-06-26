@@ -81,7 +81,6 @@ module "lb_access_logs_enabled" {
   region                     = "eu-west-2"
   enable_deletion_protection = false
   idle_timeout               = 60
-  drop_invalid_header_fields = false
   tags                       = { Name = "lb_module" }
 
 }
@@ -110,6 +109,7 @@ resource "aws_lb_target_group" "ifs_target_group" {
     unhealthy_threshold = "2"
     matcher             = "200-499"
     timeout             = "15"
+    path                = /health
   }
 
   lifecycle {
