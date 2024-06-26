@@ -123,12 +123,12 @@ locals {
           domain-name = "azure.hmpp.root"
         })
       })
-      # # BEING USED FOR TESTING
-      # prod-nomis-client-b = merge(local.ec2_autoscaling_groups.client, {
-      #   tags = merge(local.ec2_autoscaling_groups.client.tags, {
-      #     domain-name = "azure.hmpp.root"
-      #   })
-      # })
+      # BEING USED FOR TESTING
+      prod-nomis-client-b = merge(local.ec2_autoscaling_groups.client, {
+        tags = merge(local.ec2_autoscaling_groups.client.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
     }
 
     ec2_instances = {
