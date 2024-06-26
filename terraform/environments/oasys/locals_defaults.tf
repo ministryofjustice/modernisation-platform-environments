@@ -311,7 +311,7 @@ locals {
   audit_vault = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name          = "base_ol_8_5_*"
-      availability_zone = "eu-west-2b"
+      availability_zone = "eu-west-2a"
       instance_profile_policies = flatten([
         module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
       ])
