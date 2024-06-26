@@ -363,7 +363,7 @@ resource "aws_ecs_service" "ecs_service" {
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = data.aws_ecs_task_definition.latest_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
-  health_check_grace_period_seconds = 60
+  health_check_grace_period_seconds = 300
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.ifs.name
     weight            = 1
