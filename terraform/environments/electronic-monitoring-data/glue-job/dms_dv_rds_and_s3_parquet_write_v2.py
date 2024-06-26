@@ -370,15 +370,12 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     # -------------------------------------------------------
     if tbl_prq_s3_folder_path is not None:
 
-        df_rds_temp = get_df_read_rds_db_table(rds_db_name, rds_tbl_name, total_files)
+        df_rds_temp = get_df_read_rds_db_table(rds_db_name, rds_tbl_name, 
+                                               num_of_jdbc_connections=total_files)
         LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
         
         df_rds_temp = df_rds_temp.repartition(default_repartition_factor)
         LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
-
-        rds_df_created_msg_1 = f"""RDS-Read-dataframe['{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}']"""
-        rds_df_created_msg_2 = f""" >> rds_read_df_partitions = {df_rds_temp.rdd.getNumPartitions()}"""
-        LOGGER.info(f"""{rds_df_created_msg_1}\n{rds_df_created_msg_2}""")
 
         df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
         # -------------------------------------------------------
@@ -429,12 +426,11 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
         df_prq_temp = df_prq_temp.repartition(default_repartition_factor)
         LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: RE-PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
-        prq_df_created_msg_1 = f"""S3-Folder-Parquet-Read-['{rds_db_name}/{given_rds_sqlserver_db_schema}/{rds_tbl_name}']"""
-        prq_df_created_msg_2 = f""" >> {total_size_mb}MB ; parquet_read_df_partitions = {df_prq_temp.rdd.getNumPartitions()}"""
-        LOGGER.info(f"""{prq_df_created_msg_1}\n{prq_df_created_msg_2}""")
+        LOGGER.info(f"""S3-Folder-Parquet-Read: Total Size >> {total_size_mb}MB""")
 
-        df_prq_temp_t1 = df_prq_temp.selectExpr(
-                                        *get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name)
+        df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, 
+                                                                     rds_db_name, 
+                                                                     rds_tbl_name)
                             ).cache()
 
         df_rds_temp_count = df_rds_temp_t5.count()
