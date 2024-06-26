@@ -54,18 +54,27 @@ locals {
     s3-bucket = {
       iam_policies   = local.requested_s3_iam_policies
       lifecycle_rule = [local.s3_lifecycle_rules.default]
+      tags = {
+        backup = "false"
+      }
     }
     (local.s3_environment_specific.db_backup_bucket_name) = {
       bucket_policy_v2 = local.s3_environment_specific.db_backup_bucket_policy
       custom_kms_key   = var.environment.kms_keys["general"].arn
       iam_policies     = local.requested_s3_iam_policies
-      lifecycle_rule   = [local.s3_lifecycle_rules.default]
+      lifecycle_rule   = [var.environment.environment == "production" ? local.s3_lifecycle_rules.rman_backup_one_year : local.s3_lifecycle_rules.rman_backup_one_month]
+      tags = {
+        backup = "false"
+      }
     }
     (local.s3_environment_specific.shared_bucket_name) = {
       bucket_policy_v2 = local.s3_environment_specific.shared_bucket_policy
       custom_kms_key   = var.environment.kms_keys["general"].arn
       iam_policies     = local.requested_s3_iam_policies
       lifecycle_rule   = [local.s3_lifecycle_rules.default]
+      tags = {
+        backup = "false"
+      }
     }
   }
 
@@ -89,8 +98,11 @@ locals {
     EC2S3BucketWriteAndDeleteAccessPolicy = local.iam_policy_statements_s3.S3ReadWriteDelete
   }
 
+  # STANDARD_IA: transition days must be >= 30
+  # GLACIER:     minimum storage period of 90 days
   s3_lifecycle_rules = {
 
+    # the default from modernisation-platform-terraform-s3-bucket module
     default = {
       id      = "main"
       enabled = "Enabled"
@@ -103,7 +115,8 @@ locals {
         {
           days          = 90
           storage_class = "STANDARD_IA"
-          }, {
+        },
+        {
           days          = 365
           storage_class = "GLACIER"
         }
@@ -126,6 +139,34 @@ locals {
       }
     }
 
+    rman_backup_one_month = {
+      id      = "rman_backup_one_month"
+      enabled = "Enabled"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+      transition                    = []
+      expiration                    = { days = 31 }
+      noncurrent_version_transition = []
+      noncurrent_version_expiration = { days = 7 }
+    }
+
+    rman_backup_one_year = {
+      id      = "rman_backup_one_year"
+      enabled = "Enabled"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+      transition                    = [{ days = 30, storage_class = "GLACIER" }]
+      expiration                    = { days = 365 }
+      noncurrent_version_transition = []
+      noncurrent_version_expiration = { days = 7 }
+    }
+
     ninety_day_standard_ia_ten_year_expiry = {
       id      = "ninety_day_standard_ia_ten_year_expiry"
       enabled = "Enabled"
@@ -134,23 +175,13 @@ locals {
         rule      = "log"
         autoclean = "true"
       }
-      transition = [{
-        days          = 90
-        storage_class = "STANDARD_IA"
-      }]
-      expiration = {
-        days = 3650
-      }
-      noncurrent_version_transition = [{
-        days          = 90
-        storage_class = "STANDARD_IA"
-        }, {
-        days          = 365
-        storage_class = "GLACIER"
-      }]
-      noncurrent_version_expiration = {
-        days = 3650
-      }
+      transition = [{ days = 90, storage_class = "STANDARD_IA" }]
+      expiration = { days = 3650 }
+      noncurrent_version_transition = [
+        { days = 90, storage_class = "STANDARD_IA" },
+        { days = 365, storage_class = "GLACIER" },
+      ]
+      noncurrent_version_expiration = { days = 3650 }
     }
   }
 }

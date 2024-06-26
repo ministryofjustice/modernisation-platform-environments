@@ -483,13 +483,6 @@ locals {
       }
     }
 
-    s3_buckets = {
-      ncr-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-      }
-    }
-
     secretsmanager_secrets = {
       "/ec2/ncr-bip/pp"           = local.bip_secretsmanager_secrets
       "/ec2/ncr-web/pp"           = local.web_secretsmanager_secrets

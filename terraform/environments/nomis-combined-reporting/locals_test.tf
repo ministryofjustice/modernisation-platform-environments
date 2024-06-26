@@ -283,14 +283,6 @@ locals {
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
-
-      ncr-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
     }
 
     secretsmanager_secrets = {

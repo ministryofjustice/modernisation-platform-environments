@@ -3,6 +3,8 @@ locals {
 
   baseline_presets_development = {
     options = {
+      cloudwatch_metric_oam_links_ssm_parameters = [] # disable in dev as environment gets nuked
+      cloudwatch_metric_oam_links                = [] # disable in dev as environment gets nuked
     }
   }
 
