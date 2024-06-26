@@ -511,6 +511,7 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
     actions = [
       "glue:GetTable",
       "glue:GetDatabase",
+      "glue:GetDatabases",
       "glue:CreateTable",
       "glue:DeleteTable",
       "glue:CreateDatabase",
