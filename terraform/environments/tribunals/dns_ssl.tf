@@ -200,7 +200,7 @@ locals {
     care_standards              = module.care_standards
     cicap                       = module.cicap
     employment_appeals          = module.employment_appeals
-    # finance_and_tax             = module.finance_and_tax
+    finance_and_tax             = module.finance_and_tax
     # immigration_services        = module.immigration_services
     # information_tribunal        = module.information_tribunal
     # lands_tribunal              = module.lands_tribunal
