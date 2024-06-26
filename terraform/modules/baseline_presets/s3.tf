@@ -98,6 +98,8 @@ locals {
     EC2S3BucketWriteAndDeleteAccessPolicy = local.iam_policy_statements_s3.S3ReadWriteDelete
   }
 
+  # STANDARD_IA: transition days must be >= 30
+  # GLACIER:     minimum storage period of 90 days
   s3_lifecycle_rules = {
 
     # the default from modernisation-platform-terraform-s3-bucket module
@@ -145,21 +147,9 @@ locals {
         rule      = "log"
         autoclean = "true"
       }
-      transition = [
-        {
-          days          = 1
-          storage_class = "STANDARD_IA"
-        }
-      ]
       expiration = {
         days = 31
       }
-      noncurrent_version_transition = [
-        {
-          days          = 1
-          storage_class = "GLACIER"
-        }
-      ]
       noncurrent_version_expiration = {
         days = 7
       }
@@ -175,25 +165,15 @@ locals {
       }
       transition = [
         {
-          days          = 1
-          storage_class = "STANDARD_IA"
-        },
-        {
-          days          = 31
+          days          = 30
           storage_class = "GLACIER"
         }
       ]
       expiration = {
         days = 365
       }
-      noncurrent_version_transition = [
-        {
-          days          = 1
-          storage_class = "GLACIER"
-        }
-      ]
       noncurrent_version_expiration = {
-        days = 365
+        days = 7
       }
     }
 
