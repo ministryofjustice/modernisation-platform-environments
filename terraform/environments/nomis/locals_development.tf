@@ -476,15 +476,15 @@ locals {
     }
 
     s3_buckets = {
-      nomis-audit-archives = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-        lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.default]
-      }
+      # nomis-audit-archives = {
+      #   custom_kms_key = module.environment.kms_keys["general"].arn
+      #   iam_policies   = module.baseline_presets.s3_iam_policies
+      #   lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.rman_backup_one_month]
+      # }
       syscon-bucket = {
         custom_kms_key = module.environment.kms_keys["general"].arn
         iam_policies   = module.baseline_presets.s3_iam_policies
-        lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.default]
+        lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.software]
       }
     }
 
