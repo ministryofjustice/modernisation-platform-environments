@@ -47,43 +47,43 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
-# resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-#   name = "${var.app_name}-ecs-task-execution-s3-policy"
-#   tags = merge(
-#     var.tags_common,
-#     {
-#       Name = "${var.app_name}-ecs-task-execution-s3-policy"
-#     }
-#   )
-#   policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Effect": "Allow",
-#       "Action": [
-#         "s3:ListBucket",
-#         "s3:*Object*",
-#         "kms:Decrypt",
-#         "kms:Encrypt",
-#         "kms:GenerateDataKey",
-#         "kms:ReEncrypt",
-#         "kms:GenerateDataKey",
-#         "kms:DescribeKey",
-#         "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-#         "elasticloadbalancing:DeregisterTargets",
-#         "elasticloadbalancing:Describe*",
-#         "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-#         "elasticloadbalancing:RegisterTargets",
-#         "ec2:Describe*",
-#         "ec2:AuthorizeSecurityGroupIngress"
-#       ],
-#       "Resource": ["*"]
-#     }
-#   ]
-# }
-# EOF
-# }
+resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = "${var.app_name}-ecs-task-execution-s3-policy"
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-task-execution-s3-policy"
+    }
+  )
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:*Object*",
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "kms:ReEncrypt",
+        "kms:GenerateDataKey",
+        "kms:DescribeKey",
+        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+        "elasticloadbalancing:DeregisterTargets",
+        "elasticloadbalancing:Describe*",
+        "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+        "elasticloadbalancing:RegisterTargets",
+        "ec2:Describe*",
+        "ec2:AuthorizeSecurityGroupIngress"
+      ],
+      "Resource": ["*"]
+    }
+  ]
+}
+EOF
+}
 
 
 # ECS task execution role
@@ -107,10 +107,10 @@ resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
-# resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
-#   role       = aws_iam_role.ecs_task_execution_role.name
-#   policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
-# }
+resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
+}
 
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
