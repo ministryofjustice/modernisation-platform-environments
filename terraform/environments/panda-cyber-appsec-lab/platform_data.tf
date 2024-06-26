@@ -4,10 +4,10 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 # Route53 DNS data
-data "aws_route53_zone" "external" {
-  provider = ws.core-network-services
+data "aws_route53_zone" "network-services" {
+  provider = aws.core-network-services
 
-  name         = "modernisation-platform.service.justice.gov.uk."  
+  name         = "modernisation-platform.service.justice.gov.uk."
   private_zone = false
 }
 
