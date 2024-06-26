@@ -198,7 +198,7 @@ locals {
     appeals                     = module.appeals
     ahmlr                       = module.ahmlr
     care_standards              = module.care_standards
-    # cicap                       = module.cicap
+    cicap                       = module.cicap
     # employment_appeals          = module.employment_appeals
     # finance_and_tax             = module.finance_and_tax
     # immigration_services        = module.immigration_services
