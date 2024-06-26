@@ -526,7 +526,7 @@ resource "aws_iam_policy" "load_json_table" {
 }
 
 resource "aws_iam_role_policy_attachment" "load_json_table_s3_policy_policy_attachment" {
-  role       = aws_iam_role.output_fs_json_lambda.name
+  role       = aws_iam_role.load_json_table.name
   policy_arn = aws_iam_policy.load_json_table.arn
 }
 
