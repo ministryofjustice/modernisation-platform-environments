@@ -517,7 +517,7 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
   }
 }
 
-resource "aws_iam_policy" "load_json_table_s3_policy" {
+resource "aws_iam_policy" "load_json_table" {
   name        = "load-json-table-s3-policy"
   description = "Policy for Lambda to use S3 for lambda}"
   policy      = data.aws_iam_policy_document.load_json_table_s3_policy_document.json
