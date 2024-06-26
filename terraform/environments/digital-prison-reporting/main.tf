@@ -6,6 +6,10 @@
 locals {
   glue_avro_registry           = split("/", module.glue_registry_avro.registry_name)
   shared_log4j_properties_path = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${aws_s3_object.glue_job_shared_custom_log4j_properties.key}"
+  # We only want to include the connection arg in the dev environment for now
+  glue_job_extra_args = (local.environment == "development" ? {
+    "--dpr.operational.data.store.glue.connection.name" = aws_glue_connection.glue_operational_datastore_connection.name
+  } : {})
 }
 
 resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
@@ -119,7 +123,7 @@ module "glue_reporting_hub_batch_job" {
     }
   )
 
-  arguments = {
+  arguments = merge(glue_job_extra_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
@@ -136,7 +140,7 @@ module "glue_reporting_hub_batch_job" {
     "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_batch_job_retry_max_wait_millis
     "--dpr.schema.cache.max.size"           = local.reporting_hub_batch_job_schema_cache_max_size
     "--dpr.log.level"                       = local.reporting_hub_batch_job_log_level
-  }
+  })
 }
 
 # Glue Job, Reporting Hub CDC
