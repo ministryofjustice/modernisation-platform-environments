@@ -484,7 +484,8 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
     ]
     resources = [
       "${aws_s3_bucket.data_store.arn}/*",
@@ -521,7 +522,7 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
 
 resource "aws_iam_policy" "load_json_table" {
   name        = "load-json-table-s3-policy"
-  description = "Policy for Lambda to use S3 for lambda}"
+  description = "Policy for Lambda to use S3 for lambda"
   policy      = data.aws_iam_policy_document.load_json_table_s3_policy_document.json
 }
 
