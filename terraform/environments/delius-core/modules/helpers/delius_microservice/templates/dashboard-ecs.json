@@ -9,8 +9,8 @@
       "properties": {
         "metrics": [
           [
-            "ECS/ContainerInsights",
-            "CpuUtilized",
+            "AWS/ECS",
+            "CPUUtilization",
             "ServiceName",
             "${ecs_service_name}",
             "ClusterName",
@@ -46,7 +46,7 @@
       "properties": {
         "metrics": [
           [
-            "ECS/ContainerInsights",
+            "AWS/ECS",
             "MemoryUtilized",
             "ServiceName",
             "${ecs_service_name}",

@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
   metric_query {
     id          = "e1"
     expression  = "ANOMALY_DETECTION_BAND(m1)"
-    label       = "CpuUtilized (Expected)"
+    label       = "CPUUtilization (Expected)"
     return_data = "true"
   }
 
@@ -25,8 +25,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
     id          = "m1"
     return_data = "true"
     metric {
-      metric_name = "CpuUtilized"
-      namespace   = "ECS/ContainerInsights"
+      metric_name = "CPUUtilization"
+      namespace   = "AWS/ECS"
       period      = "60"
       stat        = "Average"
       unit        = "Count"
@@ -63,7 +63,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
     return_data = "true"
     metric {
       metric_name = "MemoryUtilized"
-      namespace   = "ECS/ContainerInsights"
+      namespace   = "AWS/ECS"
       period      = "60"
       stat        = "Average"
       unit        = "Count"
@@ -249,7 +249,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
     id          = "m1"
     return_data = false
     metric {
-      namespace   = "ECS/ContainerInsights"
+      namespace   = "AWS/ECS"
       metric_name = "RunningTaskCount"
       dimensions = {
         ServiceName = var.name
@@ -264,7 +264,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
     id          = "m2"
     return_data = false
     metric {
-      namespace   = "ECS/ContainerInsights"
+      namespace   = "AWS/ECS"
       metric_name = "DesiredTaskCount"
       dimensions = {
         ServiceName = var.name
