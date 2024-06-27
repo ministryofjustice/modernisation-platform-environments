@@ -542,6 +542,15 @@ variable "log_error_threshold_config" {
   }
 }
 
+variable "ecs_monitoring_anomaly_detection_thresholds" {
+  description = "The threshold for the anomaly detection"
+  type        = map(number)
+  default = {
+    memory = 5
+    cpu    = 5
+  }
+}
+
 variable "sns_topic_arn" {
   description = "Used by alarms"
   type        = string

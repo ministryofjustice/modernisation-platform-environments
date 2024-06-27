@@ -107,6 +107,10 @@ module "pwm" {
       period    = 180
     }
   }
+  ecs_monitoring_anomaly_detection_thresholds = {
+    memory = 2
+    cpu    = 20
+  }
 
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_ancillary.arn_suffix

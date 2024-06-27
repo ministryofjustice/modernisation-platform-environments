@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
     id          = "ad1"
     label       = "CPUUtilization (expected)"
     return_data = true
-    expression  = "ANOMALY_DETECTION_BAND(m1, 10)"
+    expression  = "ANOMALY_DETECTION_BAND(m1, 50)"
   }
 }
 
@@ -70,7 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
     id          = "ad1"
     label       = "MemoryUtilization (expected)"
     return_data = true
-    expression  = "ANOMALY_DETECTION_BAND(m1, 10)"
+    expression  = "ANOMALY_DETECTION_BAND(m1, 20)"
   }
 }
 
