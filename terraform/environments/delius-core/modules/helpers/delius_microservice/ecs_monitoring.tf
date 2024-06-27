@@ -128,7 +128,6 @@ resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
   evaluation_periods  = "1"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  actions_enabled     = false # Disabled initially, while anomaly detection models are trained
   threshold           = "10"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
