@@ -41,35 +41,31 @@ resource "aws_glue_catalog_table" "atrium_unstructured_table" {
       type = "string"
     }
     columns {
-      name = "parentgroup"
+      name = "SubGroup"
       type = "string"
     }
     columns {
-      name = "subgroup"
+      name = "PrimaryField"
       type = "string"
     }
     columns {
-      name = "primaryfield"
+      name = "SecondaryField"
       type = "string"
     }
     columns {
-      name = "secondaryfield"
+      name = "ReportType"
       type = "string"
     }
     columns {
-      name = "reporttype"
+      name = "FileName"
       type = "string"
     }
     columns {
-      name = "filename"
-      type = "string"
-    }
-    columns {
-      name = "filesize"
+      name = "FileSize"
       type = "int"
     }
     columns {
-      name = "modified"
+      name = "Modified"
       type = "datetime"
     }
   }
