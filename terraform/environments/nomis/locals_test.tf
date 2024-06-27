@@ -204,6 +204,12 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
+      # Temporary client to test RDP and OU default changes
+      test-nomis-client-b = merge(local.ec2_autoscaling_groups.client, {
+        tags = merge(local.ec2_autoscaling_groups.client.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
     }
 
     ec2_instances = {
