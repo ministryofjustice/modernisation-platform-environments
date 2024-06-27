@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
     id          = "ad1"
     label       = "CPUUtilization (expected)"
     return_data = true
-    expression  = "ANOMALY_DETECTION_BAND(m1, 2)"
+    expression  = "ANOMALY_DETECTION_BAND(m1, 10)"
   }
 }
 
@@ -70,7 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
     id          = "ad1"
     label       = "MemoryUtilization (expected)"
     return_data = true
-    expression  = "ANOMALY_DETECTION_BAND(m1, 2)"
+    expression  = "ANOMALY_DETECTION_BAND(m1, 10)"
   }
 }
 
@@ -125,14 +125,14 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
   evaluation_periods  = 1
   datapoints_to_alarm = 1
   threshold           = 0
-  comparison_operator = "LessThanOrEqualToThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "missing"
 
   metric_query {
     id          = "e1"
     label       = "Expression1"
     return_data = true
-    expression  = "IF(m1 < m2, 0, 1)"
+    expression  = "IF(m1 < m2, 1, 10)"
   }
 
   metric_query {
