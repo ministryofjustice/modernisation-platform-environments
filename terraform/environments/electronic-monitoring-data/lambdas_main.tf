@@ -3,7 +3,7 @@ locals {
   env_name    = local.is-production ? "prod" : "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
 
-  output_fs_json_lambda = "output_file_structure_as_json_from_zip"
+  extract_metadata_from_atrium_unstructured = "output_file_structure_as_json_from_zip"
 }
 
 # ------------------------------------------------------
@@ -240,27 +240,18 @@ module "update_log_table" {
 # S3 lambda function to perform zip file structure extraction into json for Athena
 #-----------------------------------------------------------------------------------
 
-data "archive_file" "output_file_structure_as_json_from_zip" {
-  type        = "zip"
-  source_file = "${local.lambda_path}/${local.output_fs_json_lambda}.py"
-  output_path = "${local.lambda_path}/${local.output_fs_json_lambda}.zip"
-}
-
 module "output_file_structure_as_json_from_zip" {
   source                = "./modules/lambdas"
-  filename              = "${local.lambda_path}/${local.output_fs_json_lambda}.zip"
-  function_name         = local.output_fs_json_lambda
-  role_arn              = aws_iam_role.output_fs_json_lambda.arn
-  role_name             = aws_iam_role.output_fs_json_lambda.name
-  handler               = "${local.output_fs_json_lambda}.handler"
-  source_code_hash      = data.archive_file.output_file_structure_as_json_from_zip.output_base64sha256
-  layers                = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
-  timeout               = 900
+  function_name         = local.extract_metadata_from_atrium_unstructured
+  is_image              = true
+  role_arn              = aws_iam_role.extract_metadata_from_atrium_unstructured.arn
+  role_name             = aws_iam_role.extract_metadata_from_atrium_unstructured.name
+  ecr_repo_name         = module.ecr_lambdas_repo.repository_name
+  ecr_repo_url          = module.ecr_lambdas_repo.repository_url
   memory_size           = 1024
-  runtime               = "python3.12"
+  timeout               = 900
   security_group_ids    = [aws_security_group.lambda_db_security_group.id]
   subnet_ids            = data.aws_subnets.shared-public.ids
   env_account_id        = local.env_account_id
   environment_variables = null
 }
-
