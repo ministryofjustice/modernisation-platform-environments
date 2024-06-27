@@ -39,7 +39,7 @@ locals {
     }
   }
   s3_environment_specific = merge(local.s3_environments_specific[var.environment.environment], {
-    s3_bucket_name = coalesce(var.options.s3_bucket_name, "s3-bucket")
+    s3_bucket_name       = coalesce(var.options.s3_bucket_name, "s3-bucket")
     software_bucket_name = coalesce(var.options.software_bucket_name, substr("${var.environment.application_name}-software", 0, 37))
     software_bucket_policy = [
       local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
@@ -210,12 +210,12 @@ locals {
         autoclean = "true"
       }
 
-      transition                    = [{ days = 30, storage_class = "GLACIER" }]
+      # rman backup cross-checks historic backups so don't move into glacier too soon
+      transition                    = [{ days = 60, storage_class = "GLACIER" }]
       expiration                    = { days = 365 }
       noncurrent_version_transition = []
       noncurrent_version_expiration = { days = 7 }
     }
-
 
     software = {
       enabled = "Enabled"
