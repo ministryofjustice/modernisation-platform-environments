@@ -219,8 +219,8 @@ sudo cat <<EOF > $bodmis_portforwarder_script
 
 unset KUBE_CONFIG; unset KUBECONFIG
 
-export KUBE_CONFIG=$kubeconfig
-export KUBECONFIG=$kubeconfig
+export KUBE_CONFIG=$bodmis_kubeconfig
+export KUBECONFIG=$bodmis_kubeconfig
 
 ## Set Kube Config
 
