@@ -113,7 +113,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
     spark.memory.offHeap.enabled=true 
-    --conf spark.memory.offHeap.size=2g 
+    --conf spark.memory.offHeap.size=4g 
     --conf spark.sql.adaptive.enabled=true 
     --conf spark.sql.adaptive.coalescePartitions.enabled=true 
     --conf spark.sql.adaptive.skewJoin.enabled=true 
@@ -173,14 +173,12 @@ resource "aws_glue_job" "dms_dv_glue_job_v3" {
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-spark.memory.offHeap.enabled=true 
---conf spark.memory.offHeap.size=8g 
---conf spark.sql.adaptive.enabled=true 
+spark.sql.adaptive.enabled=true 
 --conf spark.sql.adaptive.coalescePartitions.enabled=true 
 --conf spark.sql.adaptive.skewJoin.enabled=true 
 --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.sql.files.maxPartitionBytes=1047527424
+--conf spark.sql.files.maxPartitionBytes=256m
 EOF
 
   }

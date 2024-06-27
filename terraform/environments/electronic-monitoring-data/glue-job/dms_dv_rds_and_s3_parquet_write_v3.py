@@ -6,6 +6,7 @@ import pandas as pd
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
+from pyspark.conf import SparkConf
 from awsglue.context import GlueContext
 from awsglue.dynamicframe import DynamicFrame
 from awsglue.job import Job
@@ -16,7 +17,13 @@ from pyspark.sql import DataFrame
 
 # ===============================================================================
 
-sc = SparkContext.getOrCreate()
+sc = SparkContext()
+sc._jsc.hadoopConfiguration().set("spark.driver.memory", "4g")
+sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.enabled", "true")
+sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "2g")
+sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.enabled", "true")
+sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.minExecutors", "2")
+
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
@@ -616,7 +623,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             LOGGER.info(f"""df_rds_temp-{rds_column}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
 
             if int(args["dataframe_repartitions"]) != 0:
-                df_rds_temp = df_rds_temp.repartition(input_repartition_factor)
+                df_rds_temp = df_rds_temp.repartition(jdbc_partition_column, input_repartition_factor)
                 LOGGER.info(f"""df_rds_temp-{rds_column}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
             # -------------------------------------------------------
 
@@ -656,7 +663,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             LOGGER.info(f"""df_prq_temp-{rds_column}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
             if int(args["dataframe_repartitions"]) != 0:
-                df_prq_temp = df_prq_temp.repartition(input_repartition_factor)
+                df_prq_temp = df_prq_temp.repartition(jdbc_partition_column, input_repartition_factor)
                 LOGGER.info(f"""df_prq_temp-{rds_column}: RE-PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
             df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
