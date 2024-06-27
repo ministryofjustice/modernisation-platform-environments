@@ -119,7 +119,7 @@ cp ./kubectl /usr/bin/kubectl
 
 mkdir -p /home/ssm-user/.kube
 chown -R ssm-user:ssm-user /home/ssm-user/.kube
-chmod -R 666 /home/ssm-user/.kube
+chmod -R 755 /home/ssm-user/.kube
 
 # NOMIS
 ## Add Kubeconfig
@@ -147,7 +147,7 @@ EOF
 
 # NOMIS
 ## Permission for Config
-chmod 666 $kubeconfig
+chmod 0755 $kubeconfig
 
 # NOMIS
 # Generate a Port forwarder script 
@@ -210,7 +210,7 @@ EOF
 
 # Configure Kubernetes Cluster for CP
 ## Permission for Config
-chmod 666 $bodmis_kubeconfig
+chmod 0755 $bodmis_kubeconfig
 
 # BODMIS
 # Generate a Port forwarder script 
