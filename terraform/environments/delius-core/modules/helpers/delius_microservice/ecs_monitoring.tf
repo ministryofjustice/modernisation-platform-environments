@@ -119,8 +119,6 @@ resource "aws_cloudwatch_metric_alarm" "warning_error_volume" {
   comparison_operator = "GreaterThanThreshold"
 }
 
-
-
 resource "aws_cloudwatch_metric_alarm" "healthy_hosts_fatal_alarm" {
   alarm_name          = "${var.name}-${var.env_name}-healthy-hosts-fatal"
   alarm_description   = "All `${var.name}` instances stopped responding."
@@ -138,7 +136,6 @@ resource "aws_cloudwatch_metric_alarm" "healthy_hosts_fatal_alarm" {
     TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
-
 
 # Response time alarms
 resource "aws_cloudwatch_metric_alarm" "response_time_critical_alarm" {
@@ -195,7 +192,6 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_critical_alarm" {
     TargetGroup  = aws_lb_target_group.frontend.arn_suffix
   }
 }
-
 
 resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
   alarm_name          = "${var.name}-${var.env_name}-running-tasks-lt-desired"

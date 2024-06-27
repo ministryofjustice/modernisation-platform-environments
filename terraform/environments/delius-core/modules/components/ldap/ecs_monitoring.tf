@@ -19,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
 
   dimensions = {
     ClusterName = local.cluster_name
-    ServiceName = local.cluster_name
+    ServiceName = "openldap"
   }
 
   tags = var.tags
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
 
   dimensions = {
     ClusterName = local.cluster_name
-    ServiceName = local.cluster_name
+    ServiceName = "openldap"
   }
 
 }
@@ -90,33 +90,51 @@ resource "aws_cloudwatch_metric_alarm" "warning_error_volume" {
   comparison_operator = "GreaterThanThreshold"
 }
 
+resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
+  alarm_name          = "ldap-${var.env_name}-running-tasks-lt-desired"
+  actions_enabled     = true
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "LessThanOrEqualToThreshold"
+  treat_missing_data  = "missing"
 
-# resource "aws_cloudwatch_metric_alarm" "log_error_warning_alarm" {
-#   alarm_name          = "ldap-${var.env_name}-logged-errors-warning"
-#   alarm_description   = "Error messages were detected in the `ldap` logs."
-#   comparison_operator = "GreaterThanUpperThreshold"
-#   threshold_metric_id = "ad1"
-#   evaluation_periods  = 2
-#   alarm_actions       = [var.sns_topic_arn]
-#   ok_actions          = [var.sns_topic_arn]
-#   actions_enabled     = true
-#
-#   metric_query {
-#     id          = "ad1"
-#     expression  = "ANOMALY_DETECTION_BAND(m1)"
-#     label       = "${aws_cloudwatch_log_metric_filter.log_error_filter.metric_transformation.0.name} (expected)"
-#     return_data = true
-#   }
-#
-#   metric_query {
-#     id          = "m1"
-#     label       = aws_cloudwatch_log_metric_filter.log_error_filter.metric_transformation.0.name
-#     return_data = true
-#     metric {
-#       namespace   = aws_cloudwatch_log_metric_filter.log_error_filter.metric_transformation.0.namespace
-#       metric_name = aws_cloudwatch_log_metric_filter.log_error_filter.metric_transformation.0.name
-#       period      = 300
-#       stat        = "Sum"
-#     }
-#   }
-# }
+  metric_query {
+    id          = "e1"
+    label       = "Expression1"
+    return_data = true
+    expression  = "IF(m1 < m2, 0, 1)"
+  }
+
+  metric_query {
+    id          = "m1"
+    return_data = false
+    metric {
+      namespace   = "ECS/ContainerInsights"
+      metric_name = "RunningTaskCount"
+      dimensions = {
+        ServiceName = "openldap"
+        ClusterName = local.cluster_name
+      }
+      period = 300
+      stat   = "Sum"
+    }
+  }
+
+  metric_query {
+    id          = "m2"
+    return_data = false
+    metric {
+      namespace   = "ECS/ContainerInsights"
+      metric_name = "DesiredTaskCount"
+      dimensions = {
+        ServiceName = "openldap"
+        ClusterName = local.cluster_name
+      }
+      period = 300
+      stat   = "Sum"
+    }
+  }
+}
