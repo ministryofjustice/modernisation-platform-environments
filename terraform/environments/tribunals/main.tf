@@ -438,6 +438,7 @@ module "charity_tribunal_decisions" {
   target_group_attachment_port_sftp = var.sftp_services["charity_tribunal_decisions"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "claims_management_decisions" {
@@ -467,6 +468,7 @@ module "claims_management_decisions" {
   target_group_attachment_port_sftp = var.sftp_services["claims_management_decisions"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "consumer_credit_appeals" {
@@ -496,6 +498,7 @@ module "consumer_credit_appeals" {
   target_group_attachment_port_sftp = var.sftp_services["consumer_credit_appeals"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "estate_agent_appeals" {
@@ -525,6 +528,7 @@ module "estate_agent_appeals" {
   target_group_attachment_port_sftp = var.sftp_services["estate_agent_appeals"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "primary_health_lists" {
@@ -554,6 +558,7 @@ module "primary_health_lists" {
   target_group_attachment_port_sftp = var.sftp_services["primary_health_lists"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "siac" {
@@ -583,6 +588,7 @@ module "siac" {
   target_group_attachment_port_sftp = var.sftp_services["siac"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "sscs_venue_pages" {
@@ -612,6 +618,7 @@ module "sscs_venue_pages" {
   target_group_attachment_port_sftp = var.sftp_services["sscs_venue_pages"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "tax_chancery_decisions" {
@@ -641,6 +648,7 @@ module "tax_chancery_decisions" {
   target_group_attachment_port_sftp = var.sftp_services["tax_chancery_decisions"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "tax_tribunal_decisions" {
@@ -670,6 +678,7 @@ module "tax_tribunal_decisions" {
   target_group_attachment_port_sftp = var.sftp_services["tax_tribunal_decisions"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "ftp_admin_appeals" {
@@ -699,4 +708,5 @@ module "ftp_admin_appeals" {
   target_group_attachment_port_sftp = var.sftp_services["ftp_admin_appeals"].sftp_port
   app_load_balancer                 = local.app_load_balancer
   target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
