@@ -19,7 +19,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table" {
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        replicaCount         = 2
+        replicaCount         = 5
         github_organisation  = "moj-analytical-services"
         github_repository    = "create-a-derived-table"
         github_token         = data.aws_secretsmanager_secret_version.actions_runners_create_a_derived_table[0].secret_string
@@ -75,7 +75,7 @@ resource "helm_release" "actions_runner_mojas_airflow" {
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow/values.yml.tftpl",
       {
-        replicaCount         = 2
+        replicaCount         = 5
         github_organisation  = "moj-analytical-services"
         github_repository    = "airflow"
         github_token         = data.aws_secretsmanager_secret_version.actions_runners_airflow[0].secret_string
