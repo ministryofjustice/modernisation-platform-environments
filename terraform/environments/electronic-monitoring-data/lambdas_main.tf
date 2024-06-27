@@ -2,8 +2,6 @@ locals {
   lambda_path = "lambdas"
   env_name    = local.is-production ? "prod" : "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
-
-  extract_metadata_from_atrium_unstructured = "extract_metadata_from_atrium_unstructured"
 }
 
 # ------------------------------------------------------
@@ -242,7 +240,7 @@ module "update_log_table" {
 
 module "output_file_structure_as_json_from_zip" {
   source                = "./modules/lambdas"
-  function_name         = local.extract_metadata_from_atrium_unstructured
+  function_name         = "extract_metadata_from_atrium_unstructured"
   is_image              = true
   role_arn              = aws_iam_role.extract_metadata_from_atrium_unstructured.arn
   role_name             = aws_iam_role.extract_metadata_from_atrium_unstructured.name

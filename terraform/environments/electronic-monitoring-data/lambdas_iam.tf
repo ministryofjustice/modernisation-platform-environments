@@ -416,7 +416,7 @@ resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
 # ------------------------------------------
 
 resource "aws_iam_role" "extract_metadata_from_atrium_unstructured" {
-  name                = local.extract_metadata_from_atrium_unstructured
+  name                = "extract_metadata_from_atrium_unstructured"
   assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
@@ -439,7 +439,7 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
 
 resource "aws_iam_policy" "extract_metadata_from_atrium_unstructured_s3_policy" {
   name        = "output-fs-json-lambda-s3-policy"
-  description = "Policy for Lambda to use S3 for ${local.extract_metadata_from_atrium_unstructured}"
+  description = "Policy for Lambda to use S3 for extract_metadata_from_atrium_unstructured"
   policy      = data.aws_iam_policy_document.extract_metadata_from_atrium_unstructured_s3_policy_document.json
 }
 
