@@ -11,8 +11,8 @@ local_port="1521"
 bodmis_local_port="1522"
 remote_port="1521"
 # Location of script that will be used to launch the domain builder jar.
-nomis_portforwarder_script="/usr/bin/nomis-port-forwarder.sh"
-bodmis_portforwarder_script="/usr/bin/bodmis-port-forwarder.sh"
+nomis_portforwarder_script="/usr/bin/nomispf.sh"
+bodmis_portforwarder_script="/usr/bin/bodmispf.sh"
 kubeconfig="/home/ssm-user/.kube/config"
 bodmis_kubeconfig="/home/ssm-user/.kube/bodmis_config"
 
@@ -237,12 +237,52 @@ kubectl port-forward pods/\$POD $bodmis_local_port:$remote_port --address='0.0.0
 EOF
 
 ## Add Permissions and Execute the Nomis and Bodmis Port Forwarders
-chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
-chmod 0755 $bodmis_portforwarder_script; su -c $bodmis_portforwarder_script ssm-user
+#chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
+#chmod 0755 $bodmis_portforwarder_script; su -c $bodmis_portforwarder_script ssm-user
+chmod 0755 $nomis_portforwarder_script; chmod 0755 $bodmis_portforwarder_script
+
+# Create a systemd service for Nomis PortForward
+cat <<EOL > /etc/systemd/system/nomispf.service
+[Unit]
+Description=NOMIS PortForward Service
+
+[Service]
+ExecStart=$nomis_portforwarder_script
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+# Create a systemd service for Bodmis PortForward
+cat <<EOL > /etc/systemd/system/bodmispf.service
+[Unit]
+Description=BODMIS PortForward Service
+
+[Service]
+ExecStart=$bodmis_portforwarder_script
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+
 fi
 
 # Start Stream at Start of the EC2 
-sudo chkconfig aws-kinesis-agent on
-sudo service aws-kinesis-agent start
+# sudo chkconfig aws-kinesis-agent on
+# sudo service aws-kinesis-agent start
+systemctl daemon-reload
+
+# NOMIS PF Service 
+sudo systemctl enable nomispf
+sudo systemctl start nomispf
+
+# BODMIS PF Service 
+sudo systemctl enable bodmispf
+sudo systemctl start bodmispf
+
+# AMAZON SSM SGENT
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
