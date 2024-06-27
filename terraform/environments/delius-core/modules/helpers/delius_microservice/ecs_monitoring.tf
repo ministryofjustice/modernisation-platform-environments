@@ -33,6 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
 
       dimensions = {
         ClusterName = local.cluster_name
+        serviceName = var.name
       }
     }
   }
@@ -69,6 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
 
       dimensions = {
         ClusterName = local.cluster_name
+        serviceName = var.name
       }
     }
   }
@@ -224,3 +226,52 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_critical_alarm" {
   }
 }
 
+
+resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
+  alarm_name          = "${var.name}-running-tasks-less-than-desired"
+  actions_enabled     = true
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "LessThanOrEqualToThreshold"
+  treat_missing_data  = "missing"
+
+  metric_query {
+    id          = "e1"
+    label       = "Expression1"
+    return_data = true
+    expression  = "IF(m1 < m2, 0, 1)"
+  }
+
+  metric_query {
+    id          = "m1"
+    return_data = false
+    metric {
+      namespace   = "ECS/ContainerInsights"
+      metric_name = "RunningTaskCount"
+      dimensions = {
+        ServiceName = var.name
+        ClusterName = local.cluster_name
+      }
+      period = 300
+      stat   = "Sum"
+    }
+  }
+
+  metric_query {
+    id          = "m2"
+    return_data = false
+    metric {
+      namespace   = "ECS/ContainerInsights"
+      metric_name = "DesiredTaskCount"
+      dimensions = {
+        ServiceName = var.name
+        ClusterName = local.cluster_name
+      }
+      period = 300
+      stat   = "Sum"
+    }
+  }
+}
