@@ -260,7 +260,8 @@ jobs:
               owner: owner,
               repo: repo,
               issue_number: context.payload.pull_request.number,
-              body: `@${context.actor} Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance`
+              body: `@${context.actor} Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance\n
+              Guidance on approving these PRs is available at https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/reviewing-mp-environments-prs.html#process-for-approving-prs`
             });
 
   apply:
