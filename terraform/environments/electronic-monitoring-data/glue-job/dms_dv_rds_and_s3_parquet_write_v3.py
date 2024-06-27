@@ -55,7 +55,9 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
                        "dataframe_repartitions",
-                       "jdbc_read_500mb_partitions",
+                       "jdbc_read_128mb_partitions",
+                       "jdbc_read_256mb_partitions",
+                       "jdbc_read_512mb_partitions",
                        "jdbc_read_1gb_partitions",
                        "jdbc_read_2gb_partitions",
                        "rds_read_rows_fetch_size"
@@ -555,8 +557,12 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             sys.exit(1)
         # -------------------------------------------------------
 
-        if args.get("jdbc_read_500mb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(total_size_mb/500)
+        if args.get("jdbc_read_128mb_partitions", "false") == "true":
+            jdbc_read_partitions_num = int(total_size_mb/128)
+        elif args.get("jdbc_read_256mb_partitions", "false") == "true":
+            jdbc_read_partitions_num = int(total_size_mb/256)
+        elif args.get("jdbc_read_512mb_partitions", "false") == "true":
+            jdbc_read_partitions_num = int(total_size_mb/512)
         elif args.get("jdbc_read_1gb_partitions", "false") == "true":
             jdbc_read_partitions_num = int(total_size_mb/1024)
         elif args.get("jdbc_read_2gb_partitions", "false") == "true":
@@ -576,9 +582,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                                 else rows_per_partition_v2
         LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
+        rds_read_rows_fetch_size = int(args["rds_read_rows_fetch_size"])
         jdbc_rows_fetch_size = jdbc_partition_col_upperbound \
-                                if args["rds_read_rows_fetch_size"] < jdbc_partition_col_upperbound \
-                                    else args["rds_read_rows_fetch_size"]
+                                if rds_read_rows_fetch_size < jdbc_partition_col_upperbound \
+                                    else rds_read_rows_fetch_size
         
         LOGGER.info(f"""jdbc_rows_fetch_size = {jdbc_rows_fetch_size}""")
 
@@ -606,7 +613,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                                            jdbc_rows_fetch_size))
             LOGGER.info(f"""df_rds_temp-{rds_column}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
 
-            if args["dataframe_repartitions"] != 0:
+            if int(args["dataframe_repartitions"]) != 0:
                 df_rds_temp = df_rds_temp.repartition(input_repartition_factor)
                 LOGGER.info(f"""df_rds_temp-{rds_column}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
             # -------------------------------------------------------
@@ -646,7 +653,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                             .select(*temp_select_list))
             LOGGER.info(f"""df_prq_temp-{rds_column}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
-            if args["dataframe_repartitions"] != 0:
+            if int(args["dataframe_repartitions"]) != 0:
                 df_prq_temp = df_prq_temp.repartition(input_repartition_factor)
                 LOGGER.info(f"""df_prq_temp-{rds_column}: RE-PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 

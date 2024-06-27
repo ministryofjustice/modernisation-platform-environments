@@ -154,8 +154,10 @@ resource "aws_glue_job" "dms_dv_glue_job_v3" {
     "--rds_db_tbl_pkeys_col_list"         = ""
     "--rds_df_trim_str_col_list"          = ""
     "--rds_df_trim_micro_sec_ts_col_list" = ""
-    "--jdbc_read_500mb_partitions"        = "false"
-    "--jdbc_read_1gb_partitions"          = "true"
+    "--jdbc_read_128mb_partitions"        = "false"
+    "--jdbc_read_256mb_partitions"        = "false"
+    "--jdbc_read_512mb_partitions"        = "false"
+    "--jdbc_read_1gb_partitions"          = "false"
     "--jdbc_read_2gb_partitions"          = "false"
     "--rds_read_rows_fetch_size"          = 100000
     "--dataframe_repartitions"            = 0
