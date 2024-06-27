@@ -145,7 +145,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
         ServiceName = "openldap"
         ClusterName = local.cluster_name
       }
-      period = 300
+      period = 60
       stat   = "Sum"
     }
   }
@@ -160,7 +160,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
         ServiceName = "openldap"
         ClusterName = local.cluster_name
       }
-      period = 300
+      period = 60
       stat   = "Sum"
     }
   }
