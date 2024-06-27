@@ -124,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
   ok_actions          = [var.sns_topic_arn]
   evaluation_periods  = 1
   datapoints_to_alarm = 1
-  threshold           = 0
+  threshold           = 1
   comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "missing"
 
@@ -132,7 +132,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
     id          = "e1"
     label       = "Expression1"
     return_data = true
-    expression  = "IF(m1 < m2, 1, 10)"
+    expression  = "IF(m1 < m2, 1, 0)"
   }
 
   metric_query {
