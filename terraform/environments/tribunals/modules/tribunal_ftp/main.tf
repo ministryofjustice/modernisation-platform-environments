@@ -1,14 +1,48 @@
 locals {
-  app                          = var.app_name
-  app_url                      = var.app_url
-  module_name                  = var.module_name
-  documents_location           = var.documents_location
-  app_container_definition = templatefile("container_definition_ftp.json", {
-    app_name                   = "${local.app}"
-    awslogs-group              = "${local.app}-ecs-log-group"
-    container_definition_image = "${aws_ecr_repository.app-ecr-repo.repository_url}:latest"
-    documents_location         = "${local.documents_location}"
-  })
+  target_group_attachment_port      = var.target_group_attachment_port
+  target_group_attachment_port_sftp = var.target_group_attachment_port_sftp
+  app                               = var.app_name
+  app_url                           = var.app_url
+  module_name                       = var.module_name
+  documents_location                = var.documents_location
+  //Convert the container definition first
+  app_container_definition = jsonencode([{
+    command : [
+      "C:\\ServiceMonitor.exe w3svc"
+    ],
+    entryPoint : ["powershell", "-Command"],
+    name : "${local.app}-container",
+    image : "${aws_ecr_repository.app-ecr-repo.repository_url}:latest",
+    cpu : 512,
+    memory : 1024,
+    essential : true,
+    portMappings : [
+      {
+        hostPort : "${local.target_group_attachment_port_sftp}",
+        containerPort : 22,
+        protocol : "tcp"
+      },
+      {
+        "hostPort" : "${local.target_group_attachment_port}",
+        "containerPort" : 80,
+        "protocol" : "tcp"
+      }
+    ],
+    logConfiguration : {
+      logDriver : "awslogs",
+      options : {
+        "awslogs-group" : "${local.app}-ecs-log-group",
+        "awslogs-region" : "eu-west-2",
+        "awslogs-stream-prefix" : "ecs"
+      }
+    },
+    mountPoints : [
+      {
+        sourceVolume : "tribunals",
+        containerPath : "C:/inetpub/wwwroot/${local.documents_location}"
+      }
+    ]
+  }])
 }
 
 ####################### ECR #########################################

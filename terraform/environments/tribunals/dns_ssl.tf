@@ -153,42 +153,52 @@ variable "sftp_services" {
     "charity_tribunal_decisions" = {
       name_prefix = "charitytribunal"
       module_key  = "charity_tribunal_decisions"
+      sftp_port   = 10022
     },
     "claims_management_decisions" = {
       name_prefix = "claimsmanagement"
       module_key  = "claims_management_decisions"
+      sftp_port   = 10023
     },
     "consumer_credit_appeals" = {
       name_prefix = "consumercreditappeals"
       module_key  = "consumer_credit_appeals"
+      sftp_port   = 10024
     },
     "estate_agent_appeals" = {
       name_prefix = "estateagentappeals"
       module_key  = "estate_agent_appeals"
+      sftp_port   = 10025
     },
     "primary_health_lists" = {
       name_prefix = "primaryhealthlists"
       module_key  = "primary_health_lists"
+      sftp_port   = 10026
     },
     "siac" = {
       name_prefix = "siac"
       module_key  = "siac"
+      sftp_port   = 10027
     },
     "sscs_venue_pages" = {
       name_prefix = "sscsvenues"
       module_key  = "sscs_venue_pages"
+      sftp_port   = 10028
     },
     "tax_chancery_decisions" = {
       name_prefix = "taxchancerydecisions"
       module_key  = "tax_chancery_decisions"
+      sftp_port   = 10029
     },
     "tax_tribunal_decisions" = {
       name_prefix = "taxtribunaldecisions"
       module_key  = "tax_tribunal_decisions"
+      sftp_port   = 10030
     },
     "ftp_admin_appeals" = {
       name_prefix = "adminappealsreports"
       module_key  = "ftp_admin_appeals"
+      sftp_port   = 10031
     }
   }
 }
