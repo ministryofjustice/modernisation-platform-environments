@@ -41,11 +41,18 @@ resource "aws_lb_target_group" "ifs_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "2"
-    interval            = "30"
-    unhealthy_threshold = "3"
+    # healthy_threshold   = "2"
+    # interval            = "30"
+    # unhealthy_threshold = "3"
+    # matcher             = "200-499"
+    # timeout             = "20"
+    # path                = "/health"
+    healthy_threshold   = "5"
+    interval            = "60"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
     matcher             = "200-499"
-    timeout             = "20"
+    timeout             = "15"
     path                = "/health"
   }
 }
