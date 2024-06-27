@@ -276,12 +276,12 @@ fi
 systemctl daemon-reload
 
 # NOMIS PF Service 
-sudo systemctl enable nomispf
-sudo systemctl start nomispf
+sudo systemctl enable nomispf.service
+sudo systemctl start nomispf.service
 
 # BODMIS PF Service 
-sudo systemctl enable bodmispf
-sudo systemctl start bodmispf
+sudo systemctl enable bodmispf.service
+sudo systemctl start bodmispf.service
 
 # AMAZON SSM SGENT
 sudo systemctl start amazon-ssm-agent
