@@ -15,7 +15,6 @@ resource "aws_lb" "tribunals_lb_sftp" {
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
-  depends_on                 = [aws_security_group.tribunals_lb_sc_sftp]
 }
 
 resource "aws_security_group" "tribunals_lb_sc_sftp" {
@@ -75,7 +74,6 @@ resource "aws_lb_target_group" "error_response_tg" {
     unhealthy_threshold = 3
     timeout             = 10
     port                = "traffic-port"
-    path                = "/"
   }
 }
 
