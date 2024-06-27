@@ -49,6 +49,7 @@ module "appeals" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["appeals"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "ahmlr" {
@@ -89,6 +90,7 @@ module "ahmlr" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["ahmlr"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "care_standards" {
@@ -129,6 +131,7 @@ module "care_standards" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["care_standards"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "cicap" {
@@ -169,6 +172,7 @@ module "cicap" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["cicap"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "employment_appeals" {
@@ -209,6 +213,7 @@ module "employment_appeals" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["employment_appeals"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "finance_and_tax" {
@@ -249,6 +254,7 @@ module "finance_and_tax" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["finance_and_tax"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "immigration_services" {
@@ -289,6 +295,7 @@ module "immigration_services" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["immigration_services"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "information_tribunal" {
@@ -329,6 +336,7 @@ module "information_tribunal" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["information_tribunal"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "lands_tribunal" {
@@ -369,6 +377,7 @@ module "lands_tribunal" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["lands_tribunal"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "transport" {
@@ -409,6 +418,7 @@ module "transport" {
   waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["transport"].port
   target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "charity_tribunal_decisions" {
