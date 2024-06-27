@@ -80,7 +80,7 @@ resource "helm_release" "actions_runner_mojas_airflow" {
         github_repository    = "airflow"
         github_token         = data.aws_secretsmanager_secret_version.actions_runners_airflow[0].secret_string
         github_runner_labels = "analytical-platform"
-        eks_role_arn         = "arn:aws:iam::593291632749:role/TBC"
+        eks_role_arn         = "arn:aws:iam::593291632749:role/data-iam-creator"
       }
     )
   ]
