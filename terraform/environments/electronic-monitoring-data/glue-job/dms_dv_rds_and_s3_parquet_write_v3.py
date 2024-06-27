@@ -558,17 +558,19 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         # -------------------------------------------------------
 
         if args.get("jdbc_read_128mb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(total_size_mb/128)
+            int_partitions_evaluated = int(total_size_mb/128)
         elif args.get("jdbc_read_256mb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(total_size_mb/256)
+            int_partitions_evaluated = int(total_size_mb/256)
         elif args.get("jdbc_read_512mb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(total_size_mb/512)
+            int_partitions_evaluated = int(total_size_mb/512)
         elif args.get("jdbc_read_1gb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(total_size_mb/1024)
+            int_partitions_evaluated = int(total_size_mb/1024)
         elif args.get("jdbc_read_2gb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int((total_size_mb/1024)/2)
+            int_partitions_evaluated = int((total_size_mb/1024)/2)
         else:
-            jdbc_read_partitions_num = total_files
+            int_partitions_evaluated = total_files
+
+        jdbc_read_partitions_num = 1 if int_partitions_evaluated < 1 else int_partitions_evaluated
         LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
 
         rows_per_partition_v1 = int(df_rds_count/jdbc_read_partitions_num)
