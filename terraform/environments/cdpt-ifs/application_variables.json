@@ -7,7 +7,7 @@
       "ami_image_id": "ami-0e2606e2f0acb32c4",
       "instance_type": "t3.xlarge",
       "app_count": 1,
-      "ec2_desired_capacity": 2,
+      "ec2_desired_capacity": 1,
       "ec2_max_size": 5,
       "ec2_min_size": 1,
       "db_instance_class": "db.t3.small",
