@@ -2,7 +2,51 @@
 locals {
   cluster_name = split("/", var.ecs_cluster_arn)[1]
 }
+
 # Alarm for high CPU usage
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_critical_threshold" {
+  alarm_name          = "${var.name}-${var.env_name}-ecs-cpu-critical-threshold"
+  alarm_description   = "Triggers alarm if ECS CPU crosses a critical threshold"
+  namespace           = "AWS/ECS"
+  metric_name         = "CPUUtilization"
+  statistic           = "Average"
+  period              = "60"
+  evaluation_periods  = "5"
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  threshold           = "80"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    ServiceName = var.name
+    ClusterName = local.cluster_name
+  }
+}
+
+# Alarm for high memory usage
+resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_critical_threshold" {
+  alarm_name          = "${var.name}-${var.env_name}-ecs-memory-critical-threshold"
+  alarm_description   = "Triggers alarm if ECS memory crosses a critical threshold"
+  namespace           = "AWS/ECS"
+  metric_name         = "MemoryUtilization"
+  statistic           = "Average"
+  period              = "60"
+  evaluation_periods  = "5"
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  threshold           = "80"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    ServiceName = var.name
+    ClusterName = local.cluster_name
+  }
+
+}
+
+# Alarm for high CPU usage anomaly detection
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
   alarm_name          = "${var.name}-${var.env_name}-ecs-cpu-threshold"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
@@ -38,8 +82,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
   }
 }
 
-# Alarm for high memory usage
-resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
+# Alarm for high memory usage anomaly detection
+resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_threshold" {
   alarm_name          = "${var.name}-${var.env_name}-ecs-memory-threshold"
   alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
   actions_enabled     = true
@@ -74,7 +118,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
+resource "aws_cloudwatch_log_metric_filter" "ecs_log_error_filter" {
   count          = var.log_error_pattern != "" ? 1 : 0
   log_group_name = aws_cloudwatch_log_group.ecs.name
   name           = "${var.name}-${var.env_name}-logged-errors"
@@ -87,7 +131,7 @@ resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "critical_error_volume" {
+resource "aws_cloudwatch_metric_alarm" "ecs_critical_error_volume" {
   count               = var.log_error_pattern != "" ? 1 : 0
   alarm_name          = "${var.name}-${var.env_name}-critical-error-count"
   alarm_description   = "Critical alarm for log error threshold"
@@ -103,7 +147,7 @@ resource "aws_cloudwatch_metric_alarm" "critical_error_volume" {
   comparison_operator = "GreaterThanThreshold"
 }
 
-resource "aws_cloudwatch_metric_alarm" "warning_error_volume" {
+resource "aws_cloudwatch_metric_alarm" "ecs_warning_error_volume" {
   count               = var.log_error_pattern != "" ? 1 : 0
   alarm_name          = "${var.name}-${var.env_name}-warning-error-count"
   alarm_description   = "Warning alarm for log error threshold"
@@ -119,7 +163,7 @@ resource "aws_cloudwatch_metric_alarm" "warning_error_volume" {
   comparison_operator = "GreaterThanThreshold"
 }
 
-resource "aws_cloudwatch_metric_alarm" "healthy_hosts_fatal_alarm" {
+resource "aws_cloudwatch_metric_alarm" "ecs_healthy_hosts_fatal_alarm" {
   alarm_name          = "${var.name}-${var.env_name}-healthy-hosts-fatal"
   alarm_description   = "All `${var.name}` instances stopped responding."
   namespace           = "AWS/ApplicationELB"
@@ -138,7 +182,7 @@ resource "aws_cloudwatch_metric_alarm" "healthy_hosts_fatal_alarm" {
 }
 
 # Response time alarms
-resource "aws_cloudwatch_metric_alarm" "response_time_critical_alarm" {
+resource "aws_cloudwatch_metric_alarm" "alb_response_time_critical_alarm" {
   alarm_name          = "${var.name}-${var.env_name}-response-time-critical"
   alarm_description   = "Average response time for the `${var.name}` service exceeded 5 seconds."
   namespace           = "AWS/ApplicationELB"
@@ -157,7 +201,7 @@ resource "aws_cloudwatch_metric_alarm" "response_time_critical_alarm" {
 }
 
 # Response code alarms
-resource "aws_cloudwatch_metric_alarm" "response_code_5xx_warning_alarm" {
+resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_warning_alarm" {
   alarm_name          = "${var.name}-${var.env_name}-5xx-response-warning"
   alarm_description   = "The `${var.name}` service responded with 5xx errors."
   namespace           = "AWS/ApplicationELB"
@@ -175,7 +219,7 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_warning_alarm" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "response_code_5xx_critical_alarm" {
+resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_critical_alarm" {
   alarm_name          = "${var.name}-${var.env_name}-5xx-response-critical"
   alarm_description   = "The `${var.name}` service responded with 5xx errors at an elevated rate (over 10/minute)."
   namespace           = "AWS/ApplicationELB"
