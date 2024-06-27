@@ -1,6 +1,9 @@
-data "aws_ecs_task_definition" "task_definition" {
+data "aws_ecs_task_definition" "task_definitions" {
   task_definition = aws_ecs_task_definition.ifs_task_definition.family
-  depends_on      = [aws_ecs_task_definition.ifs_task_definition]
+}
+
+data "aws_ecs_task_definition" "latest_task_definition" {
+  task_definition = "${aws_ecs_task_definition.ifs_task_definition.family}:${data.aws_ecs_task_definition.task_definitions.revision}"
 }
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
@@ -356,7 +359,6 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  depends_on                        = [aws_lb_listener.https_listener]
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
   task_definition                   = aws_ecs_task_definition.ifs_task_definition.arn
@@ -366,6 +368,11 @@ resource "aws_ecs_service" "ecs_service" {
     capacity_provider = aws_ecs_capacity_provider.ifs.name
     weight            = 1
   }
+
+  depends_on = [
+    aws_lb_listener.https_listener,
+    aws_ecs_task_definition.ifs_task_definition
+  ]
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
