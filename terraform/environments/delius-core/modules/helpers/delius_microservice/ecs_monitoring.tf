@@ -54,7 +54,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
   metric_query {
     id          = "e1"
     expression  = "ANOMALY_DETECTION_BAND(m1)"
-    label       = "MemoryUtilized (Expected)"
+    label       = "MemoryUtilization (Expected)"
     return_data = "true"
   }
 
@@ -62,7 +62,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
     id          = "m1"
     return_data = "true"
     metric {
-      metric_name = "MemoryUtilized"
+      metric_name = "MemoryUtilization"
       namespace   = "AWS/ECS"
       period      = "60"
       stat        = "Average"

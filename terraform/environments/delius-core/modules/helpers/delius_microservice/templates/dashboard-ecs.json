@@ -47,7 +47,7 @@
         "metrics": [
           [
             "AWS/ECS",
-            "MemoryUtilized",
+            "MemoryUtilization",
             "ServiceName",
             "${ecs_service_name}",
             "ClusterName",
