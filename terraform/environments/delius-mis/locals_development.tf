@@ -6,7 +6,7 @@ locals {
     legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
     legacy_ad_domain_name                  = "delius-mis-dev.local"
     legacy_ad_ip_list                      = ["10.162.36.235", "10.162.35.251"]
-    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+#    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     migration_environment_full_name        = "dmd-mis-dev"
     migration_environment_abbreviated_name = "dmd"
     migration_environment_short_name       = "mis-dev"
