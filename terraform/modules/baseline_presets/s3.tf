@@ -210,8 +210,8 @@ locals {
         autoclean = "true"
       }
 
-      # rman backup cross-checks historic backups so don't move into glacier too soon
-      transition                    = [{ days = 60, storage_class = "GLACIER" }]
+      # rman backup cross-checks historic backups so don't use Glacier
+      transition                    = [{ days = 30, storage_class = "STANDARD_IA" }]
       expiration                    = { days = 365 }
       noncurrent_version_transition = []
       noncurrent_version_expiration = { days = 7 }
