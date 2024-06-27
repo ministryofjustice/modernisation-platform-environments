@@ -118,6 +118,7 @@ chmod +x ./kubectl
 cp ./kubectl /usr/bin/kubectl
 
 mkdir -p /home/ssm-user/.kube
+chown -R ssm-user:ssm-user /home/ssm-user/.kube
 chmod -R 666 /home/ssm-user/.kube
 
 # NOMIS
