@@ -113,7 +113,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
     spark.memory.offHeap.enabled=true 
-    --conf spark.memory.offHeap.size=2g 
+    --conf spark.memory.offHeap.size=4g 
     --conf spark.sql.adaptive.enabled=true 
     --conf spark.sql.adaptive.coalescePartitions.enabled=true 
     --conf spark.sql.adaptive.skewJoin.enabled=true 
@@ -154,8 +154,13 @@ resource "aws_glue_job" "dms_dv_glue_job_v3" {
     "--rds_db_tbl_pkeys_col_list"         = ""
     "--rds_df_trim_str_col_list"          = ""
     "--rds_df_trim_micro_sec_ts_col_list" = ""
+    "--jdbc_read_128mb_partitions"        = "false"
+    "--jdbc_read_256mb_partitions"        = "false"
+    "--jdbc_read_512mb_partitions"        = "false"
+    "--jdbc_read_1gb_partitions"          = "false"
+    "--jdbc_read_2gb_partitions"          = "false"
     "--rds_read_rows_fetch_size"          = 100000
-    "--dataframe_repartitions"            = 8
+    "--dataframe_repartitions"            = 0
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
@@ -168,14 +173,12 @@ resource "aws_glue_job" "dms_dv_glue_job_v3" {
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-spark.memory.offHeap.enabled=true 
---conf spark.memory.offHeap.size=8g 
---conf spark.sql.adaptive.enabled=true 
+spark.sql.adaptive.enabled=true 
 --conf spark.sql.adaptive.coalescePartitions.enabled=true 
 --conf spark.sql.adaptive.skewJoin.enabled=true 
 --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.sql.files.maxPartitionBytes=1047527424
+--conf spark.sql.files.maxPartitionBytes=256m
 EOF
 
   }
