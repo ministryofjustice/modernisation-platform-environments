@@ -91,11 +91,13 @@ jobs:
       - name: Get AWS Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Get Backend AWS Account Number
         run: |
           BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$BACKEND_NUMBER"
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
@@ -204,11 +206,13 @@ jobs:
       - name: Get AWS Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Get Backend AWS Account Number
         run: |
           BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$BACKEND_NUMBER"
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
@@ -236,11 +240,13 @@ jobs:
       - name: Get AWS Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Get Backend AWS Account Number
         run: |
           BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$BACKEND_NUMBER"
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
@@ -296,11 +302,13 @@ jobs:
       - name: Get AWS Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Get Backend AWS Account Number
         run: |
           BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$BACKEND_NUMBER"
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
