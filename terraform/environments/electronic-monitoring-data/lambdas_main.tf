@@ -3,7 +3,7 @@ locals {
   env_name    = local.is-production ? "prod" : "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
 
-  extract_metadata_from_atrium_unstructured = "output_file_structure_as_json_from_zip"
+  extract_metadata_from_atrium_unstructured = "extract_metadata_from_atrium_unstructured"
 }
 
 # ------------------------------------------------------
