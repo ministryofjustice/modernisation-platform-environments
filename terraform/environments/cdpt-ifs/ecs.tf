@@ -90,8 +90,6 @@ resource "aws_ecs_task_definition" "ifs_task_definition" {
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
-  cpu                      = "2048"
-  memory                   = "2048"
   container_definitions = jsonencode([
     {
       name      = "${local.application_name}-container"
