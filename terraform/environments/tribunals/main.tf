@@ -47,7 +47,7 @@ module "appeals" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
-  target_group_attachment_port = 49100
+  target_group_attachment_port = var.services["appeals"].port
   target_group_arns            = local.target_group_arns
 }
 
@@ -87,7 +87,7 @@ module "ahmlr" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
   waf_arn                      = local.waf_arn
-  target_group_attachment_port = 49101
+  target_group_attachment_port = var.services["ahmlr"].port
   target_group_arns            = local.target_group_arns
 }
 
@@ -127,7 +127,7 @@ module "care_standards" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
   waf_arn                      = local.waf_arn
-  target_group_attachment_port = 49102
+  target_group_attachment_port = var.services["care_standards"].port
   target_group_arns            = local.target_group_arns
 }
 
