@@ -484,9 +484,9 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                 LOGGER.error(f"""Global Dictionary - 'RECORDED_PKEYS_LIST' has no key '{rds_tbl_name}'!""")
                 sys.exit(1)
         else:
-            LOGGER.info(f"""rds_db_tbl_pkeys_col_list = {rds_db_tbl_pkeys_col_list}""")
             rds_db_tbl_pkeys_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
                                          for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
+            LOGGER.info(f"""rds_db_tbl_pkeys_col_list = {rds_db_tbl_pkeys_col_list}""")
         # -------------------------------------------------------
 
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
