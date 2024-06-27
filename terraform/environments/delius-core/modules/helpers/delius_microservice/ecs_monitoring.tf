@@ -247,7 +247,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
     id          = "m1"
     return_data = false
     metric {
-      namespace   = "AWS/ECS"
+      namespace   = "AWS/ContainerInsights"
       metric_name = "RunningTaskCount"
       dimensions = {
         ServiceName = var.name
@@ -262,7 +262,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
     id          = "m2"
     return_data = false
     metric {
-      namespace   = "AWS/ECS"
+      namespace   = "AWS/ContainerInsights"
       metric_name = "DesiredTaskCount"
       dimensions = {
         ServiceName = var.name
