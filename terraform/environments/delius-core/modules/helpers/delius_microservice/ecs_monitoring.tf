@@ -226,7 +226,7 @@ resource "aws_cloudwatch_metric_alarm" "response_code_5xx_critical_alarm" {
 
 
 resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
-  alarm_name          = "${var.name}-running-tasks-less-than-desired"
+  alarm_name          = "${var.name}-${var.env_name}-running-tasks-lt-desired"
   actions_enabled     = true
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
