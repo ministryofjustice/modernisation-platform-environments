@@ -262,6 +262,6 @@ resource "aws_route53_record" "sftp_external_services" {
   zone_id         = data.aws_route53_zone.external.zone_id
   name            = "sftp.${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
-  records         = [local.sftp_modules[each.value.module_key].tribunals_lb_sftp.dns_name]
+  records         = [local.sftp_modules[each.value.module_key].tribunals_lb_sftp[0].dns_name]
   ttl             = 60
 }
