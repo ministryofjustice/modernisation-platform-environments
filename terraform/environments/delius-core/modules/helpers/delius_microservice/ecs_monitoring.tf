@@ -32,8 +32,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
       unit        = "Count"
 
       dimensions = {
-        ClusterName = local.cluster_name
         ServiceName = var.name
+        ClusterName = local.cluster_name
       }
     }
   }
@@ -69,8 +69,8 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
       unit        = "Count"
 
       dimensions = {
-        ClusterName = local.cluster_name
         ServiceName = var.name
+        ClusterName = local.cluster_name
       }
     }
   }
