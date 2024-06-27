@@ -438,7 +438,7 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
 }
 
 resource "aws_iam_policy" "extract_metadata_from_atrium_unstructured_s3_policy" {
-  name        = "output-fs-json-lambda-s3-policy"
+  name        = "extract-metadata-from-atrium-unstructured-lambda-s3-policy"
   description = "Policy for Lambda to use S3 for extract_metadata_from_atrium_unstructured"
   policy      = data.aws_iam_policy_document.extract_metadata_from_atrium_unstructured_s3_policy_document.json
 }
