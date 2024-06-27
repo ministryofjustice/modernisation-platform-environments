@@ -7,7 +7,7 @@ resource "aws_instance" "ec2_ebsapps" {
   subnet_id              = local.private_subnets[count.index]
   #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
-  ebs_optimized               = true
+  ebs_optimized               = local.application_data.accounts[local.environment].ebs_optimized
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
