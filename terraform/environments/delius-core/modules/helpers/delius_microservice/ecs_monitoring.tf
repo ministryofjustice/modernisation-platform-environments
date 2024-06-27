@@ -265,7 +265,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
         ServiceName = var.name
         ClusterName = local.cluster_name
       }
-      period = 60
+      period = var.ecs_monitoring_running_tasks_less_than_desired_period
       stat   = "Sum"
     }
   }
@@ -280,7 +280,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
         ServiceName = var.name
         ClusterName = local.cluster_name
       }
-      period = 60
+      period = var.ecs_monitoring_running_tasks_less_than_desired_period
       stat   = "Sum"
     }
   }

@@ -551,6 +551,12 @@ variable "ecs_monitoring_anomaly_detection_thresholds" {
   }
 }
 
+variable "ecs_monitoring_running_tasks_less_than_desired_period" {
+  description = "The period for the running tasks less than desired alarm"
+  type        = number
+  default     = 60
+}
+
 variable "sns_topic_arn" {
   description = "Used by alarms"
   type        = string
