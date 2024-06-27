@@ -484,7 +484,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                 LOGGER.error(f"""Global Dictionary - 'RECORDED_PKEYS_LIST' has no key '{rds_tbl_name}'!""")
                 sys.exit(1)
         else:
-            LOGGER.info("""rds_db_tbl_pkeys_col_list = {rds_db_tbl_pkeys_col_list}""")
+            LOGGER.info(f"""rds_db_tbl_pkeys_col_list = {rds_db_tbl_pkeys_col_list}""")
             rds_db_tbl_pkeys_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
                                          for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
         # -------------------------------------------------------
@@ -516,6 +516,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             LOGGER.info(final_validation_msg)
             df_dv_output = df_dv_output.union(df_temp_row)
             return df_dv_output
+        else:
+            LOGGER.info(f"""df_rds_count = {df_rds_count}""")
         # -------------------------------------------------------
 
         rds_df_trim_str_col_str = args.get('rds_df_trim_str_col_list', '')
@@ -561,18 +563,18 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             jdbc_read_partitions_num = int((total_size_mb/1024)/2)
         else:
             jdbc_read_partitions_num = total_files
-        LOGGER.info("""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
+        LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
 
         rows_per_partition_v1 = int(df_rds_count/jdbc_read_partitions_num)
-        LOGGER.info("""rows_per_partition_v1 = {rows_per_partition_v1}""")
+        LOGGER.info(f"""rows_per_partition_v1 = {rows_per_partition_v1}""")
 
         rows_per_partition_v2 = int(pkey_max_value/jdbc_read_partitions_num)
-        LOGGER.info("""rows_per_partition_v2 = {rows_per_partition_v2}""")
+        LOGGER.info(f"""rows_per_partition_v2 = {rows_per_partition_v2}""")
 
         jdbc_partition_col_upperbound = rows_per_partition_v1 \
                                             if rows_per_partition_v1 > rows_per_partition_v2 \
                                                 else rows_per_partition_v2
-        LOGGER.info("""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
+        LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
         jdbc_rows_fetch_size = jdbc_partition_col_upperbound \
                                 if args["rds_read_rows_fetch_size"] < jdbc_partition_col_upperbound \
