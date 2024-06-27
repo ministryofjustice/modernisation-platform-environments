@@ -3,48 +3,75 @@ locals {
   cluster_name = split("/", var.ecs_cluster_arn)[1]
 }
 # Alarm for high CPU usage
-resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
   alarm_name          = "ldap-${var.env_name}-ecs-cpu-threshold"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
-  namespace           = "AWS/ECS"
-  metric_name         = "CPUUtilization"
-  statistic           = "Average"
-  period              = "60"
-  evaluation_periods  = "5"
+  actions_enabled     = true
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  threshold           = "80"
+  evaluation_periods  = 5
+  datapoints_to_alarm = 5
+  threshold_metric_id = "ad1"
+  comparison_operator = "GreaterThanUpperThreshold"
   treat_missing_data  = "missing"
-  comparison_operator = "GreaterThanThreshold"
 
-  dimensions = {
-    ClusterName = local.cluster_name
-    ServiceName = "openldap"
+  metric_query {
+    id          = "m1"
+    return_data = true
+    metric {
+      namespace   = "AWS/ECS"
+      metric_name = "CPUUtilization"
+      dimensions = {
+        ServiceName = "openldap"
+        ClusterName = local.cluster_name
+      }
+      period = 60
+      stat   = "Average"
+    }
   }
 
-  tags = var.tags
+  metric_query {
+    id          = "ad1"
+    label       = "CPUUtilization (expected)"
+    return_data = true
+    expression  = "ANOMALY_DETECTION_BAND(m1, 2)"
+  }
 }
 
 # Alarm for high memory usage
 resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
   alarm_name          = "ldap-${var.env_name}-ecs-memory-threshold"
   alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
-  namespace           = "AWS/ECS"
-  metric_name         = "MemoryUtilization"
-  statistic           = "Average"
-  period              = "60"
-  evaluation_periods  = "5"
+  actions_enabled     = true
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  threshold           = "80"
+  evaluation_periods  = 5
+  datapoints_to_alarm = 5
+  threshold_metric_id = "ad1"
+  comparison_operator = "GreaterThanUpperThreshold"
   treat_missing_data  = "missing"
-  comparison_operator = "GreaterThanThreshold"
 
-  dimensions = {
-    ClusterName = local.cluster_name
-    ServiceName = "openldap"
+  metric_query {
+    id          = "m1"
+    return_data = true
+    metric {
+      namespace   = "AWS/ECS"
+      metric_name = "MemoryUtilization"
+      dimensions = {
+        ServiceName = "openldap"
+        ClusterName = local.cluster_name
+      }
+      period = 60
+      stat   = "Average"
+    }
   }
 
+  metric_query {
+    id          = "ad1"
+    label       = "MemoryUtilization (expected)"
+    return_data = true
+    expression  = "ANOMALY_DETECTION_BAND(m1, 2)"
+  }
 }
 
 resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
