@@ -16,7 +16,7 @@ resource "aws_glue_catalog_table" "atrium_unstructured_table" {
 
 
   storage_descriptor {
-    location      = "${aws_s3_bucket.data_store.arn}/g4s/dev_access/2024-02-16/json_luke/" #This will change after testing to work for production and live
+    location      = "${aws_s3_bucket.data_store.id}/g4s/dev_access/2024-02-16/json_luke/" #This will change after testing to work for production and live
     input_format  = "org.apache.hadoop.mapred.TextInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat"
     compressed = false
@@ -81,7 +81,7 @@ resource "aws_glue_crawler" "atrium_unstructured_crawler" {
   database_name = aws_glue_catalog_database.atrium_unstructured_db.name
 
   s3_target {
-    path = "${aws_s3_bucket.data_store.arn}/g4s/dev_access/2024-02-16/json_luke/"
+    path = "${aws_s3_bucket.data_store.id}/g4s/dev_access/2024-02-16/json_luke/"
   }
 
   schema_change_policy {
