@@ -7,7 +7,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
   alarm_name                = "${var.name}-${var.env_name}-ecs-cpu-threshold"
   comparison_operator       = "GreaterThanUpperThreshold"
   evaluation_periods        = "5"
-  threshold_metric_id       = "e1"
+  threshold_metric_id       = "ad1"
   alarm_description         = "Triggers alarm if ECS CPU crosses a threshold"
   insufficient_data_actions = []
   alarm_actions             = [var.sns_topic_arn]
@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
   treat_missing_data        = "missing"
 
   metric_query {
-    id          = "e1"
+    id          = "ad1"
     expression  = "ANOMALY_DETECTION_BAND(m1)"
     label       = "CPUUtilization (Expected)"
     return_data = "true"
@@ -44,7 +44,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
   alarm_name                = "${var.name}-${var.env_name}-ecs-memory-threshold"
   comparison_operator       = "GreaterThanUpperThreshold"
   evaluation_periods        = "5"
-  threshold_metric_id       = "e1"
+  threshold_metric_id       = "ad1"
   alarm_description         = "Triggers alarm if ECS memory crosses a threshold"
   insufficient_data_actions = []
   alarm_actions             = [var.sns_topic_arn]
@@ -52,7 +52,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
   treat_missing_data        = "missing"
 
   metric_query {
-    id          = "e1"
+    id          = "ad1"
     expression  = "ANOMALY_DETECTION_BAND(m1)"
     label       = "MemoryUtilization (Expected)"
     return_data = "true"
