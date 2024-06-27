@@ -79,7 +79,7 @@ variable "target_group_attachment_port_sftp" {
 variable "app_load_balancer" {
 }
 
-variable "target_group_arns" {
-  description = "Map of target group ARNs"
+variable "target_group_arns_sftp" {
+  description = "Map of target group ARNs for sftp"
   type        = map(string)
 }

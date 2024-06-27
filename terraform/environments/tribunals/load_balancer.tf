@@ -1,6 +1,5 @@
 locals {
   target_group_arns = { for k, v in aws_lb_target_group.tribunals_target_group : k => v.arn }
-  listener_headers  = toset([for k, v in var.services : v.name_prefix])
 
   # Create a mapping between listener headers and target group ARNs
   listener_header_to_target_group = {
