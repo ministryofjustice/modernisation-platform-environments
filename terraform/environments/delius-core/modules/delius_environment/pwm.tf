@@ -96,7 +96,18 @@ module "pwm" {
     aws.core-network-services = aws.core-network-services
   }
 
-  log_error_pattern       = "ERROR"
+  log_error_pattern = "ERROR"
+  log_error_threshold_config = {
+    warning = {
+      threshold = 10
+      period    = 60
+    }
+    critical = {
+      threshold = 20
+      period    = 180
+    }
+  }
+
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_ancillary.arn_suffix
   enable_platform_backups = var.enable_platform_backups

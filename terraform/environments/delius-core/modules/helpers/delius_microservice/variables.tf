@@ -524,6 +524,24 @@ variable "log_error_pattern" {
   type        = string
 }
 
+variable "log_error_threshold_config" {
+  description = "Used by log error alarms"
+  type = map(object({
+    threshold = number
+    period    = number
+  }))
+  default = {
+    warning = {
+      threshold = 5
+      period    = 120
+    }
+    critical = {
+      threshold = 10
+      period    = 300
+    }
+  }
+}
+
 variable "sns_topic_arn" {
   description = "Used by alarms"
   type        = string

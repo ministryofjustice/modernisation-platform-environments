@@ -87,18 +87,18 @@ resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
+resource "aws_cloudwatch_metric_alarm" "critical_error_volume" {
   count               = var.log_error_pattern != "" ? 1 : 0
-  alarm_name          = "${var.name}-${var.env_name}-high-error-count"
-  alarm_description   = "Triggers alarm if there are more than 10 errors in the last 5 minutes"
+  alarm_name          = "${var.name}-${var.env_name}-critical-error-count"
+  alarm_description   = "Critical alarm for log error threshold"
   namespace           = "${var.env_name}/${var.name}"
   metric_name         = "${var.name}-${var.env_name}-logged-errors"
   statistic           = "Sum"
-  period              = "300"
+  period              = var.log_error_threshold_config.critical.period
   evaluation_periods  = "1"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  threshold           = "10"
+  threshold           = var.log_error_threshold_config.critical.threshold
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
 }
@@ -106,15 +106,15 @@ resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
 resource "aws_cloudwatch_metric_alarm" "warning_error_volume" {
   count               = var.log_error_pattern != "" ? 1 : 0
   alarm_name          = "${var.name}-${var.env_name}-warning-error-count"
-  alarm_description   = "Triggers alarm if there are more than 5 errors in the last 2 minutes"
+  alarm_description   = "Warning alarm for log error threshold"
   namespace           = "${var.env_name}/${var.name}"
   metric_name         = "${var.name}-${var.env_name}-logged-errors"
   statistic           = "Sum"
-  period              = "120"
+  period              = var.log_error_threshold_config.warning.period
   evaluation_periods  = "1"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  threshold           = "5"
+  threshold           = var.log_error_threshold_config.warning.threshold
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
 }
