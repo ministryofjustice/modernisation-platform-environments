@@ -4,17 +4,16 @@ data "aws_ec2_transit_gateway" "pttp" {
   id = "tgw-026162f1ba39ce704"
 }
 
-data "aws_ram_resource_share" "moj_tgw" {
-  resource_owner = "OTHER-ACCOUNTS"
-  filter {
-    name   = "resourceType"
-    values = ["ec2:TransitGateway"]
-  }
-}
+# data "aws_ram_resource_share" "moj_tgw" {
+#   filter {
+#     name   = "resourceType"
+#     values = ["ec2:TransitGateway"]
+#   }
+# }
 
-data "aws_arn" "moj_tgw" {
-  arn = data.aws_ram_resource_share.moj_tgw.resource_arns[0]
-}
+# data "aws_arn" "moj_tgw" {
+#   arn = data.aws_ram_resource_share.moj_tgw.resource_arns[0]
+# }
 
 # TODO: revisit this to unhardcode the tgw ID above
 # data "aws_ram_resource_share" "tgw_moj" {
