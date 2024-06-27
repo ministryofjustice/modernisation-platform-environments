@@ -50,7 +50,7 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
 resource "aws_lb_listener" "tribunals_lb_sftp" {
   load_balancer_arn = aws_lb.tribunals_lb_sftp.arn
   port              = 10022
-  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_3
+  protocol          = "TCP"
 
   default_action {
     type             = "forward"
