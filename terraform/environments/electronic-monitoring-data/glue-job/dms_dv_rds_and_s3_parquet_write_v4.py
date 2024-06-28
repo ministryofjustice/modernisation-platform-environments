@@ -722,7 +722,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                     continue
                 # ---------------------------------
 
-                df_subtract_temp_join = (df_subtract_temp_join
+                df_subtract_temp = (df_subtract_temp
                                             .withColumn('json_row', 
                                                         F.to_json(F.struct(*[F.col(c) for c in df_subtract_select_cols.columns])))
                                             .selectExpr("json_row")
@@ -730,15 +730,17 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
                 subtract_msg_prefix = f"""'{rds_tbl_name}.{rds_column}' - {df_subtract_temp_join_count}"""
                 subtract_msg_suffix = """Dataframe(s)-Subtract Non-Zero Row Count!"""
-                df_subtract_temp_final = df_subtract_temp_join.selectExpr(
-                                        "current_timestamp as run_datetime",
-                                        "json_row",
-                                        f""""{subtract_msg_prefix} - {subtract_msg_suffix}" as validation_msg""",
-                                        f"""'{rds_db_name}' as database_name""",
-                                        f"""'{db_sch_tbl}' as full_table_name""",
-                                        """'False' as table_to_ap"""
-                                        )
+                
+                df_subtract_temp_final = df_subtract_temp.selectExpr(
+                                                "current_timestamp as run_datetime",
+                                                "json_row",
+                                                f""""{subtract_msg_prefix} - {subtract_msg_suffix}" as validation_msg""",
+                                                f"""'{rds_db_name}' as database_name""",
+                                                f"""'{db_sch_tbl}' as full_table_name""",
+                                                """'False' as table_to_ap"""
+                                            )
                 LOGGER.warn(f"{rds_tbl_name}.{rds_column}: Validation Failed - 2")
+
                 df_dv_output = df_dv_output.union(df_subtract_temp_final)
 
             df_prq_temp_t1_persisted.unpersist(True)
