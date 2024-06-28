@@ -1,8 +1,8 @@
 locals {
 
   lb_maintenance_message_preproduction = {
-    maintenance_title   = "Prison-NOMIS Maintenance Window"
-    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+    maintenance_title   = "Prison-NOMIS Environment Not Started"
+    maintenance_message = "Lsast weblogic is rarely used so is started on demand. Preprod is available during working hours. Please see <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> or contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel for more information"
   }
 
   baseline_presets_preproduction = {
@@ -46,7 +46,7 @@ locals {
       # ACTIVE (blue deployment)
       lsast-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0 # started on demand
         })
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -407,7 +407,7 @@ locals {
             # weblogic servers can alter priorities to enable maintenance message
             rules = {
               lsast-nomis-web-a-http-7777 = {
-                priority = 100
+                priority = 1150 # reduce by 1000 to make active
                 actions = [{
                   type              = "forward"
                   target_group_name = "lsast-nomis-web-a-http-7777"
