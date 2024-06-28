@@ -14,7 +14,7 @@ from awsglue.job import Job
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 from pyspark.sql import DataFrame
-
+from pyspark.storagelevel import StorageLevel
 # ===============================================================================
 
 sc = SparkContext()
@@ -252,7 +252,7 @@ def get_rds_db_table_pkey_col_max_value(in_rds_db_name, in_table_name,
                     .load()).collect()[0].max_value
 
 
-def get_df_read_rds_db_tbl_int_pkey(in_rds_db_name, in_table_name, select_col_list,
+def get_df_read_rds_db_tbl_int_pkey(in_rds_db_name, in_table_name,
                                     jdbc_partition_column, 
                                     jdbc_partition_col_upperbound, 
                                     jdbc_read_partitions_num,
@@ -272,7 +272,7 @@ def get_df_read_rds_db_tbl_int_pkey(in_rds_db_name, in_table_name, select_col_li
     # Too Large: => Consume a lot of memory
 
     query_str = f"""
-    SELECT {', '.join(select_col_list)}
+    SELECT *
     FROM {given_rds_sqlserver_db_schema}.[{in_table_name}]
     """.strip()
     
@@ -315,14 +315,25 @@ def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name) -> DataFrame:
             )
 
 
-def rds_df_trim_str_columns(in_rds_df: DataFrame) -> DataFrame:
-    return (in_rds_df.select(
-            *[F.trim(F.col(c[0])).alias(c[0]) if c[1] == 'string' else F.col(c[0])
-              for c in in_rds_df.dtypes])
-            )
+def rds_df_trim_str_columns(in_rds_df: DataFrame, 
+                            in_rds_df_trim_str_col_list) -> DataFrame:
+    string_dtype_columns = [c[0] for c in in_rds_df.dtypes 
+                            if c[1] == 'string']
+    count = 0
+    for trim_colmn in in_rds_df_trim_str_col_list:
+        if trim_colmn in string_dtype_columns:
+            if count == 0:
+                rds_df = in_rds_df.withColumn(trim_colmn, F.trim(F.col(trim_colmn)))
+                count += 1
+            else:
+                rds_df = rds_df.withColumn(trim_colmn, F.trim(F.col(trim_colmn)))
+        else:
+            LOGGER.warn(f"""rds_df_trim_str_columns: {trim_colmn} is not a string dtype column.""")
+    return rds_df
 
 
-def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, in_col_list) -> DataFrame:
+def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, 
+                                       in_col_list) -> DataFrame:
     return (in_rds_df.select(
             *[F.date_format(F.col(c[0]),'yyyy-MM-dd HH:mm:ss.SSS').alias(c[0]).cast('timestamp') 
               if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
@@ -470,8 +481,6 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
          T.StructField("database_name", T.StringType(), True),
          T.StructField("full_table_name", T.StringType(), True),
          T.StructField("table_to_ap", T.StringType(), True)])
-
-    additional_validation_msg = ''
     
     msg_prefix = f"""{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}"""
     final_validation_msg = f"""{msg_prefix} -- Validation Completed."""
@@ -520,40 +529,25 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                     '{db_sch_tbl}' as full_table_name,
                                     'False' as table_to_ap
                                 """.strip())
+            
+            df_dv_output = df_dv_output.union(df_temp_row)
+
             LOGGER.warn(f"Validation Failed - 3")
             LOGGER.info(final_validation_msg)
-            df_dv_output = df_dv_output.union(df_temp_row)
             return df_dv_output
         else:
             LOGGER.info(f"""df_rds_count = {df_rds_count}""")
-        # -------------------------------------------------------
-
-        rds_df_trim_str_col_str = args.get('rds_df_trim_str_col_list', '')
-        rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
-                                    for column in rds_df_trim_str_col_str.split(",")]
-        transform_msg_1 = ""
-        if rds_df_trim_str_col_list:
-            msg_prefix = f"""Given -> rds_df_trim_str_col_list = {rds_df_trim_str_col_list}"""
-            LOGGER.warn(f"""{msg_prefix}, {type(rds_df_trim_str_col_list)}""")
-            transform_msg_1 =f"""- extra spaces trimmed."""
-        # -------------------------------------------------------
-
-        given_rds_df_trim_micro_seconds_col_str = args.get('rds_df_trim_micro_sec_ts_col_list', '')
-        given_rds_df_trim_micro_seconds_col_list = [f"""{col.strip().strip("'").strip('"')}"""
-                                                    for col in given_rds_df_trim_micro_seconds_col_str.split(",")]
-        transform_msg_2 = ""
-        if given_rds_df_trim_micro_seconds_col_list:
-            msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list = {given_rds_df_trim_micro_seconds_col_list}"""
-            LOGGER.warn(f"""{msg_prefix}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
-            transform_msg_2 =f"""- micro-seconds trimmed."""
         # -------------------------------------------------------
 
         df_rds_columns_list = rds_db_table_empty_df.columns
         df_rds_dtype_dict = get_dtypes_dict(rds_db_table_empty_df)
         int_dtypes_colname_list = [colname for colname, dtype in df_rds_dtype_dict.items() 
                                    if dtype in INT_DATATYPES_LIST]
+        # -------------------------------------------------------
+
         if len(rds_db_tbl_pkeys_col_list) == 1 and \
             (rds_db_tbl_pkeys_col_list[0] in int_dtypes_colname_list):
+
             jdbc_partition_column = rds_db_tbl_pkeys_col_list[0]
             pkey_max_value = get_rds_db_table_pkey_col_max_value(rds_db_name, rds_tbl_name, 
                                                                  jdbc_partition_column)
@@ -597,141 +591,155 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         
         LOGGER.info(f"""jdbc_rows_fetch_size = {jdbc_rows_fetch_size}""")
 
-        validated_colmn_msg_list = list()
+        df_rds_temp = (get_df_read_rds_db_tbl_int_pkey(rds_db_name, 
+                                                        rds_tbl_name, 
+                                                        jdbc_partition_column,
+                                                        jdbc_partition_col_upperbound,
+                                                        jdbc_read_partitions_num,
+                                                        jdbc_rows_fetch_size))
+        LOGGER.info(f"""df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+        # -------------------------------------------------------
 
-        for_loop_count = 0
-        for rds_column in df_rds_columns_list:
-            for_loop_count += 1
-            if rds_column in rds_db_tbl_pkeys_col_list:
-                continue
+        rds_df_trim_str_col_str = args.get('rds_df_trim_str_col_list', '')
+        rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
+                                    for column in rds_df_trim_str_col_str.split(",")]
+        trim_str_msg = ""
 
-            temp_select_list = list()
-            temp_select_list = temp_select_list+rds_db_tbl_pkeys_col_list
-            temp_select_list.append(rds_column)
-            
-            LOGGER.info(f"""{for_loop_count}-Processing - {rds_tbl_name}.{rds_column}.""")
-            LOGGER.info(f"""Using Dataframe-'select' column list: {temp_select_list}""")
+        t1_rds_str_col_trimmed = False
+        if rds_df_trim_str_col_list:
 
-            df_rds_temp = (get_df_read_rds_db_tbl_int_pkey(rds_db_name, 
-                                                           rds_tbl_name, 
-                                                           temp_select_list, 
-                                                           jdbc_partition_column,
-                                                           jdbc_partition_col_upperbound,
-                                                           jdbc_read_partitions_num,
-                                                           jdbc_rows_fetch_size))
-            LOGGER.info(f"""df_rds_temp-{rds_column}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
-            # -------------------------------------------------------
+            trim_msg_prefix = f"""Given -> rds_df_trim_str_col_list = {rds_df_trim_str_col_list}"""
+            LOGGER.warn(f"""{trim_msg_prefix}, {type(rds_df_trim_str_col_list)}""")
+            trim_str_msg = f"""[string - extra spaces trimmed]"""
 
-            t1_rds_str_col_trimmed = False
-            if rds_column in rds_df_trim_str_col_list:
-                df_rds_temp_t1 = df_rds_temp.transform(rds_df_trim_str_columns)
-                t1_rds_str_col_trimmed = True
-            # -------------------------------------------------------
-            
-            t2_rds_ts_col_msec_trimmed = False
-            if rds_column in given_rds_df_trim_micro_seconds_col_list:
+            df_rds_temp_t1 = df_rds_temp.transform(rds_df_trim_str_columns, 
+                                                   rds_df_trim_str_col_list)
+            t1_rds_str_col_trimmed = True
+        # -------------------------------------------------------
 
-                if t1_rds_str_col_trimmed is True:
-                    df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_microseconds_timestamp, 
-                                                              given_rds_df_trim_micro_seconds_col_list)
-                else:
-                    df_rds_temp_t2 = df_rds_temp.transform(rds_df_trim_microseconds_timestamp, 
-                                                           given_rds_df_trim_micro_seconds_col_list)
-                # -------------------------------------------------------
+        given_rds_df_trim_micro_seconds_col_str = args.get('rds_df_trim_micro_sec_ts_col_list', '')
+        given_rds_df_trim_micro_seconds_col_list = [f"""{col.strip().strip("'").strip('"')}"""
+                                                    for col in given_rds_df_trim_micro_seconds_col_str.split(",")]
+        trim_ts_ms_msg = ""
 
-                t2_rds_ts_col_msec_trimmed = True
-            # -------------------------------------------------------
+        t2_rds_ts_col_msec_trimmed = False
+        if given_rds_df_trim_micro_seconds_col_list:
 
-            if t2_rds_ts_col_msec_trimmed:
-                validated_colmn_msg = f"""'{rds_column}'{transform_msg_2}"""
-                df_rds_temp_t3 = df_rds_temp_t2.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
-            elif t1_rds_str_col_trimmed:
-                validated_colmn_msg = f"""'{rds_column}'{transform_msg_1}"""
-                df_rds_temp_t3 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+            trim_msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list = {given_rds_df_trim_micro_seconds_col_list}"""
+            LOGGER.warn(f"""{trim_msg_prefix}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
+            trim_ts_ms_msg = f"""[timestamp - micro-seconds trimmed]"""
+
+            if t1_rds_str_col_trimmed is True:
+                df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_microseconds_timestamp, 
+                                                          given_rds_df_trim_micro_seconds_col_list)
             else:
-                validated_colmn_msg = rds_column
-                df_rds_temp_t3 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+                df_rds_temp_t2 = df_rds_temp.transform(rds_df_trim_microseconds_timestamp, 
+                                                       given_rds_df_trim_micro_seconds_col_list)
             # -------------------------------------------------------
 
-            df_prq_temp = (get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
-                            .select(*temp_select_list))
-            LOGGER.info(f"""df_prq_temp-{rds_column}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
+            t2_rds_ts_col_msec_trimmed = True
+        # -------------------------------------------------------
 
-            if args.get("parquet_pkey_repartition", "false") == "true":
-                LOGGER.info(f"""parquet_pkey_repartition = {args['parquet_pkey_repartition']}""")
-                df_prq_temp = df_prq_temp.repartition(jdbc_read_partitions_num, jdbc_partition_column)
-                LOGGER.info(f"""df_prq_temp-{rds_column}: RE-PARTITION on {jdbc_partition_column} = {df_prq_temp.rdd.getNumPartitions()}""")
-            else:
-                df_prq_temp_t1 = df_prq_temp_t1.coalesce(jdbc_read_partitions_num)
-                LOGGER.info(f"""{msg_prefix}: coalesce PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
-            # -------------------------------------------------------
+        if t2_rds_ts_col_msec_trimmed:
+            df_rds_temp_t3 = df_rds_temp_t2.selectExpr(*get_nvl_select_list(df_rds_temp, 
+                                                                            rds_db_name, 
+                                                                            rds_tbl_name))
+        elif t1_rds_str_col_trimmed:
+            df_rds_temp_t3 = df_rds_temp_t1.selectExpr(*get_nvl_select_list(df_rds_temp, 
+                                                                            rds_db_name, 
+                                                                            rds_tbl_name))
+        else:
+            df_rds_temp_t3 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, 
+                                                                         rds_db_name, 
+                                                                         rds_tbl_name))
+        # -------------------------------------------------------
 
-            df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
-            # -------------------------------------------------------
+        df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
+        LOGGER.info(f"""{msg_prefix}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
-            df_rds_prq_subtract_transform = df_rds_temp_t3.subtract(df_prq_temp_t1).cache()
-            df_rds_prq_subtract_row_count = df_rds_prq_subtract_transform.count()
-            # -------------------------------------------------------
+        df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, 
+                                                                     rds_db_name, 
+                                                                     rds_tbl_name))
+        
+        msg_prefix = f"""df_prq_temp_t1-{rds_tbl_name}"""
+        if args.get("parquet_pkey_repartition", "false") == "true":
+            LOGGER.info(f"""parquet_pkey_repartition = {args['parquet_pkey_repartition']}""")
+            df_prq_temp_t1 = df_prq_temp_t1.repartition(jdbc_read_partitions_num, jdbc_partition_column)
+            LOGGER.info(f"""{msg_prefix}: RE-PARTITION on {jdbc_partition_column} = {df_prq_temp.rdd.getNumPartitions()}""")
+        else:
+            df_prq_temp_t1 = df_prq_temp_t1.coalesce(jdbc_read_partitions_num)
+            LOGGER.info(f"""{msg_prefix}: coalesce PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
+        # -------------------------------------------------------
 
-            if df_rds_prq_subtract_row_count == 0:
-                validated_colmn_msg_list.append(validated_colmn_msg)
+        df_rds_prq_subtract_transform = df_rds_temp_t3.subtract(df_prq_temp_t1).cache()
+        df_rds_prq_subtract_row_count = df_rds_prq_subtract_transform.count()
+        # -------------------------------------------------------
 
-            else:
-                df_subtract_temp = (df_rds_prq_subtract_transform
-                           .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp_t3.columns])))
-                           .selectExpr("json_row")
-                           .limit(5))
-
-                subtract_validation_msg = f"""'{rds_tbl_name}.{rds_column}' - {df_rds_prq_subtract_row_count}"""
-                df_subtract_temp = df_subtract_temp.selectExpr(
+        if df_rds_prq_subtract_row_count == 0:
+            df_temp = df_dv_output.selectExpr(
                                     "current_timestamp as run_datetime",
-                                    "json_row",
-                                    f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
+                                    "'' as json_row",
+                                    f"""'{rds_tbl_name} - Validated.\n{trim_str_msg}\n{trim_ts_ms_msg}' as validation_msg""",
                                     f"""'{rds_db_name}' as database_name""",
                                     f"""'{db_sch_tbl}' as full_table_name""",
                                     """'False' as table_to_ap"""
                             )
-                LOGGER.warn(f"Validation Failed - 2")
-                df_dv_output = df_dv_output.union(df_subtract_temp)
-            # -------------------------------------------------------
+            LOGGER.info(f"{rds_tbl_name}: Validation Successful - 1")
+            df_dv_output = df_dv_output.union(df_temp)
 
-            df_rds_prq_subtract_transform.unpersist(True)
+        else:
+            LOGGER.warn(f"""{df_rds_prq_subtract_row_count}Rows - FOUND POST SUBTRACT OPERATION !""")
+            df_rds_temp_t3_persisted = df_rds_temp_t3.join(df_rds_prq_subtract_transform, 
+                                                           rds_db_tbl_pkeys_col_list, 
+                                                           how='inner').persist(StorageLevel.MEMORY_AND_DISK)
+            for rds_column in df_rds_columns_list:
 
+                if rds_column in rds_db_tbl_pkeys_col_list:
+                    continue
+                # ----------------------------------------
+
+                temp_select_list = list()
+                temp_select_list = temp_select_list+rds_db_tbl_pkeys_col_list
+                temp_select_list.append(rds_column)
+                
+                df_rds_temp_select_cols = df_rds_temp_t3_persisted.select(*temp_select_list)
+                df_subtract_select_cols = df_rds_prq_subtract_transform.select(*temp_select_list)
+
+                df_subtract_temp_join = df_subtract_select_cols.join(df_rds_temp_select_cols, 
+                                                                     temp_select_list, 
+                                                                     how='inner')
+
+                df_subtract_temp_join_count = df_subtract_temp_join.count()
+
+                if df_subtract_temp_join_count == 0:
+                    continue
+                # ---------------------------------
+
+                df_subtract_temp_join = (df_subtract_temp_join
+                                        .withColumn('json_row', 
+                                                    F.to_json(F.struct(*[F.col(c) 
+                                                                         for c in df_rds_temp_select_cols.columns])))
+                                        .selectExpr("json_row")
+                                        .limit(5))
+
+                subtract_msg_prefix = f"""'{rds_tbl_name}.{rds_column}' - {df_subtract_temp_join_count}"""
+                subtract_msg_suffix = """Dataframe(s)-Subtract Non-Zero Row Count!"""
+                df_subtract_temp_final = df_subtract_temp_join.selectExpr(
+                                        "current_timestamp as run_datetime",
+                                        "json_row",
+                                        f""""{subtract_msg_prefix} - {subtract_msg_suffix}" as validation_msg""",
+                                        f"""'{rds_db_name}' as database_name""",
+                                        f"""'{db_sch_tbl}' as full_table_name""",
+                                        """'False' as table_to_ap"""
+                                        )
+                LOGGER.warn(f"{rds_tbl_name}.{rds_column}: Validation Failed - 2")
+                df_dv_output = df_dv_output.union(df_subtract_temp_final)
+
+            df_rds_temp_t3_persisted.unpersist(True)
         # -------------------------------------------------------
 
-        if validated_colmn_msg_list:
-            #LOGGER.info(f"""validated_colmn_msg_list = {validated_colmn_msg_list}""")
-
-            total_non_primary_key_columns = len(df_rds_columns_list) - len(rds_db_tbl_pkeys_col_list)
-            # -------------------------------------------------------
-
-            if total_non_primary_key_columns == len(validated_colmn_msg_list):
-                df_temp_row = spark.sql(f"""select 
-                                            current_timestamp() as run_datetime, 
-                                            '' as json_row,
-                                            "{rds_tbl_name} - Validated.\n{additional_validation_msg}" as validation_msg,
-                                            '{rds_db_name}' as database_name,
-                                            '{db_sch_tbl}' as full_table_name,
-                                            'False' as table_to_ap
-                                        """.strip())
-                # df_temp_row.show(truncate=False)
-                LOGGER.info(f"Validation Successful - 1")
-            else:
-                # depupe list --> list(dict.fromkeys(validated_colmn_msg_list)))
-                df_temp_row = spark.sql(f"""select 
-                                            current_timestamp() as run_datetime, 
-                                            '' as json_row,
-                                            "{' ; '.join(validated_colmn_msg_list)} - Specified Columns Validated." as validation_msg,
-                                            '{rds_db_name}' as database_name,
-                                            '{db_sch_tbl}' as full_table_name,
-                                            'False' as table_to_ap
-                                        """.strip())
-                # df_temp_row.show(truncate=False)
-                LOGGER.warn(f"Not all table columns validated - 1b")
-            # -------------------------------------------------------
-
-            df_dv_output = df_dv_output.union(df_temp_row)
-        # -------------------------------------------------------
+        df_rds_prq_subtract_transform.uncache(True)
+    # -------------------------------------------------------
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
         df_temp_row = spark.sql(f"""select
