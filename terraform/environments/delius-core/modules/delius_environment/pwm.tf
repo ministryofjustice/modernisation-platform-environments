@@ -97,6 +97,7 @@ module "pwm" {
   }
 
   log_error_pattern = "ERROR"
+
   log_error_threshold_config = {
     warning = {
       threshold = 10
