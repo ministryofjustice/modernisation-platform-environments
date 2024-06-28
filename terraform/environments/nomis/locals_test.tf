@@ -500,7 +500,7 @@ locals {
             # weblogic servers can alter priorities to enable maintenance message
             rules = {
               t1-nomis-web-a-http-7777 = {
-                priority = 300
+                priority = 1300
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-nomis-web-a-http-7777"
