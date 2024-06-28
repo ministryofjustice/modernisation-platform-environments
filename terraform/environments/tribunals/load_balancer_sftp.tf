@@ -1,11 +1,5 @@
 locals {
   target_group_arns_sftp = { for k, v in aws_lb_target_group.tribunals_target_group_sftp : k => v.arn }
-
-  # Create a mapping between listener headers and target group ARNs
-  listener_header_to_target_group_sftp = {
-    for k, v in var.sftp_services :
-    v.name_prefix => aws_lb_target_group.tribunals_target_group_sftp[k].arn
-  }
 }
 
 resource "aws_lb" "tribunals_lb_sftp" {
