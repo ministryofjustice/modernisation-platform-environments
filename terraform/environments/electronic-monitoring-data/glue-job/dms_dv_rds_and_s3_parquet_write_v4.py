@@ -676,16 +676,17 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         # -------------------------------------------------------
 
         if df_rds_prq_subtract_row_count == 0:
-            df_temp = df_dv_output.selectExpr(
-                                    "current_timestamp as run_datetime",
-                                    "'' as json_row",
-                                    f"""'{rds_tbl_name} - Validated.\n{trim_str_msg}\n{trim_ts_ms_msg}' as validation_msg""",
-                                    f"""'{rds_db_name}' as database_name""",
-                                    f"""'{db_sch_tbl}' as full_table_name""",
-                                    """'False' as table_to_ap"""
-                            )
+            df_temp_row = spark.sql(f"""select 
+                                        current_timestamp() as run_datetime, 
+                                        '' as json_row,
+                                        "{rds_tbl_name} - Validated.\n{trim_str_msg}\n{trim_ts_ms_msg}" as validation_msg,
+                                        '{rds_db_name}' as database_name,
+                                        '{db_sch_tbl}' as full_table_name,
+                                        'False' as table_to_ap
+                                    """.strip())
+            
             LOGGER.info(f"{rds_tbl_name}: Validation Successful - 1")
-            df_dv_output = df_dv_output.union(df_temp)
+            df_dv_output = df_dv_output.union(df_temp_row)
 
         else:
             LOGGER.warn(f"""{df_rds_prq_subtract_row_count}Rows - FOUND POST SUBTRACT OPERATION !""")
