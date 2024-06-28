@@ -536,5 +536,6 @@ resource "aws_iam_role_policy_attachment" "bastion_managed" {
 }
 
 output "ami_id" {
-  value = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  sensitive = true
 }
