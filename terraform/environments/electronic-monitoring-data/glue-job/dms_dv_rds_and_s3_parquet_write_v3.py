@@ -655,7 +655,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             # -------------------------------------------------------
 
             if int(args["dataframe_repartitions"]) != 0:
-                df_rds_temp_t3 = df_rds_temp_t3.repartition(jdbc_partition_column, input_repartition_factor)
+                df_rds_temp_t3 = df_rds_temp_t3.repartition(jdbc_read_partitions_num, jdbc_partition_column)
                 LOGGER.info(f"""df_rds_temp_t3-{rds_column}: RE-PARTITIONS = {df_rds_temp_t3.rdd.getNumPartitions()}""")
             # -------------------------------------------------------
 
@@ -665,7 +665,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             if args.get("parquet_pkey_repartition", "false") == "true":
                 LOGGER.info(f"""parquet_pkey_repartition = {args['parquet_pkey_repartition']}""")
-                df_prq_temp = df_prq_temp.repartition(jdbc_partition_column, jdbc_read_partitions_num)
+                df_prq_temp = df_prq_temp.repartition(jdbc_read_partitions_num, jdbc_partition_column)
                 LOGGER.info(f"""df_prq_temp-{rds_column}: RE-PARTITION on {jdbc_partition_column} = {df_prq_temp.rdd.getNumPartitions()}""")
             # -------------------------------------------------------
 
@@ -673,7 +673,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
 
             if int(args["dataframe_repartitions"]) != 0:
                 LOGGER.info(f"""dataframe_repartitions = {args['dataframe_repartitions']}""")
-                df_prq_temp_t1 = df_prq_temp_t1.repartition(jdbc_partition_column, input_repartition_factor)
+                df_prq_temp_t1 = df_prq_temp_t1.repartition(jdbc_read_partitions_num, jdbc_partition_column)
                 LOGGER.info(f"""df_prq_temp_t1-{rds_column}: RE-PARTITIONS = {df_prq_temp_t1.rdd.getNumPartitions()}""")
             # -------------------------------------------------------
 
