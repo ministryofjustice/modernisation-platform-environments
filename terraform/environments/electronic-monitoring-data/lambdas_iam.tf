@@ -522,6 +522,16 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
     ]
     resources = ["*"]
   }
+    statement {
+    sid  = "SecretGetSlackKey"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:ListSecrets",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = ["arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:dlt-slack-test/*"]
+  }
 }
 
 resource "aws_iam_policy" "load_json_table" {
