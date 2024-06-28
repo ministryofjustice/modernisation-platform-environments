@@ -696,6 +696,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                                                       *rds_db_tbl_pkeys_col_list, 
                                                                       how='leftsemi')
                                             ).persist(StorageLevel.MEMORY_AND_DISK)
+            
             for rds_column in df_rds_columns_list:
 
                 if rds_column in rds_db_tbl_pkeys_col_list:
