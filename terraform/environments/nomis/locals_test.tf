@@ -1,8 +1,8 @@
 locals {
 
   lb_maintenance_message_test = {
-    maintenance_title   = "Prison-NOMIS Maintenance Window"
-    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+    maintenance_title   = "Prison-NOMIS Environment Not Started"
+    maintenance_message = "T1 and T2 are rarely used so are started on demand. T3 is available during working hours. Please see <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> or contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel for more information"
   }
 
   baseline_presets_test = {
@@ -44,7 +44,7 @@ locals {
       # NOT-ACTIVE (blue deployment)
       t1-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
