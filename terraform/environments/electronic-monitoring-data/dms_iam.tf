@@ -58,7 +58,7 @@ resource "aws_iam_policy" "dms_ep_s3_role_policy" {
         		"s3:ListMultipartUploadParts"
         	],
         	"Effect": "Allow",
-        	"Resource": "arn:aws:s3:::dms-rds-to-parquet-20240606144708618700000001",
+        	"Resource": "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}",
         	"Sid": "DMSAccess"
         },
         {
@@ -71,7 +71,7 @@ resource "aws_iam_policy" "dms_ep_s3_role_policy" {
         		"s3:ListMultipartUploadParts"
         	],
         	"Effect": "Allow",
-        	"Resource": "arn:aws:s3:::dms-rds-to-parquet-20240606144708618700000001/*",
+        	"Resource": "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*",
         	"Sid": "DMSObjectActions"
         }
       ]
