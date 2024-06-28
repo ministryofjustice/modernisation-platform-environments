@@ -44,7 +44,7 @@ locals {
       # NOT-ACTIVE (blue deployment)
       t1-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
