@@ -26,6 +26,7 @@ module "athena_federated_query_connector_oracle" {
   # A map that links catalog names to database connection strings
   connection_strings = {
     nomis = local.connection_string_nomis
+    bodmis = nomis = local.connection_string_bodmis
   }
 }
 
@@ -40,27 +41,6 @@ resource "aws_athena_data_catalog" "nomis_catalog" {
   }
 }
 
-module "athena_federated_query_connector_oracle_bodmis" {
-  source = "./modules/athena_federated_query_connectors/oracle"
-
-  connector_jar_bucket_key              = "third-party/athena-connectors/athena-oracle-2022.47.1.jar"
-  connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
-  spill_bucket_name                     = module.s3_working_bucket.bucket_id
-  credentials_secret_arns               = [aws_secretsmanager_secret.bodmis.arn]
-  project_prefix                        = local.project
-  account_id                            = local.account_id
-  region                                = local.account_region
-  vpc_id                                = data.aws_vpc.shared.id
-  subnet_id                             = data.aws_subnet.private_subnets_a.id
-  lambda_memory_allocation_mb           = local.federated_query_lambda_memory_mb
-  lambda_timeout_seconds                = local.federated_query_lambda_timeout_seconds
-  lambda_reserved_concurrent_executions = local.federated_query_lambda_concurrent_executions
-
-  # A map that links catalog names to database connection strings
-  connection_strings = {
-    bodmis = local.connection_string_bodmis
-  }
-}
 
 # Adds an Athena data source / catalog for Bodmis
 resource "aws_athena_data_catalog" "bodmis_catalog" {
