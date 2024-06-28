@@ -29,7 +29,7 @@ module "athena_federated_query_connector_oracle" {
   }
 }
 
-# Adds an Athena data source / catalog for BODMIS
+# Adds an Athena data source / catalog for NOMIS
 resource "aws_athena_data_catalog" "nomis_catalog" {
   name        = "nomis"
   description = "NOMIS Athena data catalog"
@@ -71,20 +71,4 @@ resource "aws_athena_data_catalog" "bodmis_catalog" {
   parameters = {
     "function" = module.athena_federated_query_connector_oracle.lambda_function_arn
   }
-
 }
-# Nomis Secrets PlaceHolder
-# cp_bodmis_k8s_secrets_placeholder
-enable_cp_bodmis_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_bodmis_k8s_secrets
-cp_bodmis_k8s_secrets_placeholder = {
-  cloud_platform_k8s_token           = "placeholder"
-  cloud_platform_certificate_auth    = "placeholder"
-  cloud_platform_k8s_server          = "placeholder"
-  cloud_platform_k8s_cluster_name    = "placeholder"
-  cloud_platform_k8s_cluster_context = "placeholder"
-  parameters = {
-    "function" = module.athena_federated_query_connector_oracle_bodmis
-
-  }
-}
-

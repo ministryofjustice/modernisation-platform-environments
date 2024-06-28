@@ -313,6 +313,16 @@ locals {
     port     = "1521"
   }
 
+  # Bodmis Secrets PlaceHolder 
+  bodmis_secrets_placeholder = {
+    db_name  = "bodmis"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
+    port     = "1522"
+  }
+
   # DPS Secrets PlaceHolder
   dps_domains_list = local.application_data.accounts[local.environment].dps_domains
   dps_secrets_placeholder = {
