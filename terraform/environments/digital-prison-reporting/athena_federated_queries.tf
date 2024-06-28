@@ -26,7 +26,7 @@ module "athena_federated_query_connector_oracle" {
   # A map that links catalog names to database connection strings
   connection_strings = {
     nomis = local.connection_string_nomis
-    bodmis = nomis = local.connection_string_bodmis
+    bodmis = local.connection_string_bodmis
   }
 }
 
