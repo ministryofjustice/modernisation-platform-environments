@@ -597,6 +597,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                                         jdbc_partition_col_upperbound,
                                                         jdbc_read_partitions_num,
                                                         jdbc_rows_fetch_size))
+        
         LOGGER.info(f"""df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
         # -------------------------------------------------------
 
@@ -781,6 +782,7 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, db_sch_tbl_name):
         glueContext.purge_s3_path(f"""{CATALOG_TABLE_S3_FULL_PATH}/database_name={database}/full_table_name={db_sch_tbl_name}""",
                                   options={"retentionPeriod": 0}
                                   )
+    # ---------------------------------------------------------------------
 
     dydf = DynamicFrame.fromDF(df_dv_output, glueContext, "final_spark_df")
 
@@ -850,9 +852,7 @@ if __name__ == "__main__":
                                                  f"{rds_sqlserver_db_str}/{given_rds_sqlserver_db_schema}/{given_rds_sqlserver_table}")
     total_size_mb = total_size/1024/1024
 
-    # -------------------------------------------------------
     LOGGER.warn(f""">> '{db_sch_tbl}' Size: {total_size_mb} MB <<""")
-    # -------------------------------------------------------
 
     df_dv_output = process_dv_for_table(rds_sqlserver_db_str, 
                                         db_sch_tbl, 
