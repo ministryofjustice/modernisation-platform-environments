@@ -18,11 +18,10 @@ from pyspark.sql import DataFrame
 # ===============================================================================
 
 sc = SparkContext()
-sc._jsc.hadoopConfiguration().set("spark.driver.memory", "4g")
+sc._jsc.hadoopConfiguration().set("spark.executor.cores", "3")
 sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.enabled", "true")
-sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "2g")
+sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "3g")
 sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.enabled", "true")
-sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.minExecutors", "2")
 
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
@@ -62,11 +61,12 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
                        "dataframe_repartitions",
-                       "jdbc_read_128mb_partitions",
+                       "parquet_pkey_repartition",
                        "jdbc_read_256mb_partitions",
                        "jdbc_read_512mb_partitions",
                        "jdbc_read_1gb_partitions",
                        "jdbc_read_2gb_partitions",
+                       "jdbc_read_3gb_partitions",
                        "rds_read_rows_fetch_size"
                        ]
 
@@ -564,9 +564,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             sys.exit(1)
         # -------------------------------------------------------
 
-        if args.get("jdbc_read_128mb_partitions", "false") == "true":
-            int_partitions_evaluated = int(total_size_mb/128)
-        elif args.get("jdbc_read_256mb_partitions", "false") == "true":
+        if args.get("jdbc_read_256mb_partitions", "false") == "true":
             int_partitions_evaluated = int(total_size_mb/256)
         elif args.get("jdbc_read_512mb_partitions", "false") == "true":
             int_partitions_evaluated = int(total_size_mb/512)
@@ -574,6 +572,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
             int_partitions_evaluated = int(total_size_mb/1024)
         elif args.get("jdbc_read_2gb_partitions", "false") == "true":
             int_partitions_evaluated = int((total_size_mb/1024)/2)
+        elif args.get("jdbc_read_3gb_partitions", "false") == "true":
+            int_partitions_evaluated = int((total_size_mb/1024)/3)
         else:
             int_partitions_evaluated = total_files
 
@@ -592,8 +592,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
         LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
         rds_read_rows_fetch_size = int(args["rds_read_rows_fetch_size"])
-        jdbc_rows_fetch_size = jdbc_partition_col_upperbound \
-                                if rds_read_rows_fetch_size < jdbc_partition_col_upperbound \
+        jdbc_rows_fetch_size = rows_per_partition_v1 \
+                                if rows_per_partition_v1 > rds_read_rows_fetch_size \
                                     else rds_read_rows_fetch_size
         
         LOGGER.info(f"""jdbc_rows_fetch_size = {jdbc_rows_fetch_size}""")
@@ -621,10 +621,6 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                                                            jdbc_read_partitions_num,
                                                            jdbc_rows_fetch_size))
             LOGGER.info(f"""df_rds_temp-{rds_column}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
-
-            if int(args["dataframe_repartitions"]) != 0:
-                df_rds_temp = df_rds_temp.repartition(jdbc_partition_column, input_repartition_factor)
-                LOGGER.info(f"""df_rds_temp-{rds_column}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
             # -------------------------------------------------------
 
             t1_rds_str_col_trimmed = False
@@ -658,15 +654,28 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, in
                 df_rds_temp_t3 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
             # -------------------------------------------------------
 
+            if int(args["dataframe_repartitions"]) != 0:
+                df_rds_temp_t3 = df_rds_temp_t3.repartition(jdbc_partition_column, input_repartition_factor)
+                LOGGER.info(f"""df_rds_temp_t3-{rds_column}: RE-PARTITIONS = {df_rds_temp_t3.rdd.getNumPartitions()}""")
+            # -------------------------------------------------------
+
             df_prq_temp = (get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
                             .select(*temp_select_list))
             LOGGER.info(f"""df_prq_temp-{rds_column}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
-            if int(args["dataframe_repartitions"]) != 0:
-                df_prq_temp = df_prq_temp.repartition(jdbc_partition_column, input_repartition_factor)
-                LOGGER.info(f"""df_prq_temp-{rds_column}: RE-PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
+            if args.get("parquet_pkey_repartition", "false") == "true":
+                LOGGER.info(f"""parquet_pkey_repartition = {args['parquet_pkey_repartition']}""")
+                df_prq_temp = df_prq_temp.repartition(jdbc_partition_column, jdbc_read_partitions_num)
+                LOGGER.info(f"""df_prq_temp-{rds_column}: RE-PARTITION on {jdbc_partition_column} = {df_prq_temp.rdd.getNumPartitions()}""")
+            # -------------------------------------------------------
 
             df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
+
+            if int(args["dataframe_repartitions"]) != 0:
+                LOGGER.info(f"""dataframe_repartitions = {args['dataframe_repartitions']}""")
+                df_prq_temp_t1 = df_prq_temp_t1.repartition(jdbc_partition_column, input_repartition_factor)
+                LOGGER.info(f"""df_prq_temp_t1-{rds_column}: RE-PARTITIONS = {df_prq_temp_t1.rdd.getNumPartitions()}""")
+            # -------------------------------------------------------
 
             df_rds_prq_subtract_transform = df_rds_temp_t3.subtract(df_prq_temp_t1).cache()
             df_rds_prq_subtract_row_count = df_rds_prq_subtract_transform.count()
