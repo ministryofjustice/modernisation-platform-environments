@@ -71,7 +71,7 @@ locals {
       # ACTIVE (green deployment)
       t1-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0 # started on demand
         })
         cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -489,7 +489,7 @@ locals {
 
             alarm_target_group_names = [
               # "t1-nomis-web-a-http-7777",
-              "t1-nomis-web-b-http-7777",
+              # "t1-nomis-web-b-http-7777",
               # "t2-nomis-web-a-http-7777",
               "t2-nomis-web-b-http-7777",
               # "t3-nomis-web-a-http-7777",
@@ -500,7 +500,7 @@ locals {
             # weblogic servers can alter priorities to enable maintenance message
             rules = {
               t1-nomis-web-a-http-7777 = {
-                priority = 1300
+                priority = 1300 # reduce by 1000 to make active
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-nomis-web-a-http-7777"
@@ -514,7 +514,7 @@ locals {
                 }]
               }
               t1-nomis-web-b-http-7777 = {
-                priority = 450
+                priority = 1450 # reduce by 1000 to make active
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-nomis-web-b-http-7777"
