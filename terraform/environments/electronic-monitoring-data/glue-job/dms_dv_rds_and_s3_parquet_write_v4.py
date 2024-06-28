@@ -713,8 +713,11 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 df_prq_temp_select_cols = df_prq_temp_t1_persisted.select(*temp_select_list)
                 df_subtract_select_cols = df_rds_prq_subtract_persisted.select(*temp_select_list)
 
-                df_subtract_temp_join = df_subtract_select_cols.alias('L').join(
-                                            df_prq_temp_select_cols.alias('R'), temp_select_list, how='leftsemi')
+                df_subtract_temp_join = df_subtract_select_cols.alias('L').join(df_prq_temp_select_cols.alias('R'), 
+                                                                                temp_select_list, 
+                                                                                how='leftsemi')
+                
+                # df_subtract_temp_join = df_subtract_select_cols.subtract(df_prq_temp_select_cols)
 
                 df_subtract_temp_join_count = df_subtract_temp_join.count()
 
@@ -723,11 +726,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 # ---------------------------------
 
                 df_subtract_temp_join = (df_subtract_temp_join
-                                        .withColumn('json_row', 
-                                                    F.to_json(F.struct(*[F.col(c) 
-                                                                         for c in df_prq_temp_select_cols.columns])))
-                                        .selectExpr("json_row")
-                                        .limit(5))
+                                            .withColumn('json_row', 
+                                                        F.to_json(F.struct(*[F.col(c) for c in df_subtract_select_cols.columns])))
+                                            .selectExpr("json_row")
+                                            .limit(5))
 
                 subtract_msg_prefix = f"""'{rds_tbl_name}.{rds_column}' - {df_subtract_temp_join_count}"""
                 subtract_msg_suffix = """Dataframe(s)-Subtract Non-Zero Row Count!"""
