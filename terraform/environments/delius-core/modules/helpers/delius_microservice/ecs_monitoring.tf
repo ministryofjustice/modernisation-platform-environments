@@ -14,7 +14,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_critical_threshold" {
   evaluation_periods  = "5"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  threshold           = "80"
+  threshold           = "90"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
 
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_critical_threshold" {
   evaluation_periods  = "5"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  threshold           = "80"
+  threshold           = "90"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
 

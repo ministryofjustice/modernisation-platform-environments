@@ -108,7 +108,7 @@ module "pwm" {
     }
   }
   ecs_monitoring_anomaly_detection_thresholds = {
-    memory = 2
+    memory = 5
     cpu    = 20
   }
 
