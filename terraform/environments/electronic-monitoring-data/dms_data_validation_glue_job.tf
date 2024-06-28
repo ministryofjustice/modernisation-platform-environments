@@ -166,7 +166,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v3" {
     "--jdbc_read_2gb_partitions"          = "false"
     "--jdbc_read_3gb_partitions"          = "false"
     "--rds_read_rows_fetch_size"          = 100000
-    "--parquet_pkey_repartition"          = "true"
+    "--parquet_pkey_repartition"          = "false"
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
