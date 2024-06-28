@@ -1,8 +1,8 @@
 locals {
 
   lb_maintenance_message_test = {
-    maintenance_title   = "Prison-NOMIS Maintenance Window"
-    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+    maintenance_title   = "Prison-NOMIS Environment Not Started"
+    maintenance_message = "T1 and T2 are rarely used so are started on demand. T3 is available during working hours. Please see <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> or contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel for more information"
   }
 
   baseline_presets_test = {
@@ -71,7 +71,7 @@ locals {
       # ACTIVE (green deployment)
       t1-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0 # started on demand
         })
         cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -489,7 +489,7 @@ locals {
 
             alarm_target_group_names = [
               # "t1-nomis-web-a-http-7777",
-              "t1-nomis-web-b-http-7777",
+              # "t1-nomis-web-b-http-7777",
               # "t2-nomis-web-a-http-7777",
               "t2-nomis-web-b-http-7777",
               # "t3-nomis-web-a-http-7777",
@@ -500,7 +500,7 @@ locals {
             # weblogic servers can alter priorities to enable maintenance message
             rules = {
               t1-nomis-web-a-http-7777 = {
-                priority = 300
+                priority = 1300 # reduce by 1000 to make active
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-nomis-web-a-http-7777"
@@ -514,7 +514,7 @@ locals {
                 }]
               }
               t1-nomis-web-b-http-7777 = {
-                priority = 450
+                priority = 1450 # reduce by 1000 to make active
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-nomis-web-b-http-7777"
