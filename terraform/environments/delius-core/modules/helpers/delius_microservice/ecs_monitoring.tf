@@ -245,8 +245,9 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
   evaluation_periods  = 1
   datapoints_to_alarm = 1
   threshold           = 1
+  period              = 30
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "ignore"
 
   metric_query {
     id          = "e1"
@@ -266,7 +267,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
         ClusterName = local.cluster_name
       }
       period = var.ecs_monitoring_running_tasks_less_than_desired_period
-      stat   = "Sum"
+      stat   = "Minimum"
     }
   }
 
@@ -281,7 +282,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
         ClusterName = local.cluster_name
       }
       period = var.ecs_monitoring_running_tasks_less_than_desired_period
-      stat   = "Sum"
+      stat   = "Maximum"
     }
   }
 }
