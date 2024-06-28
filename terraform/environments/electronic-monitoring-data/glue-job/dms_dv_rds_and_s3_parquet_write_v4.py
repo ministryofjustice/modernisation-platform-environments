@@ -20,7 +20,7 @@ from pyspark.storagelevel import StorageLevel
 sc = SparkContext()
 sc._jsc.hadoopConfiguration().set("spark.executor.cores", "3")
 sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.enabled", "true")
-sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "3g")
+sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "4g")
 sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.enabled", "true")
 
 glueContext = GlueContext(sc)
@@ -673,8 +673,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             LOGGER.info(f"""{msg_prefix}: coalesce PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
         # -------------------------------------------------------
 
-        df_rds_prq_subtract_transform = df_rds_temp_t3.subtract(df_prq_temp_t1).cache()
-        df_rds_prq_subtract_row_count = df_rds_prq_subtract_transform.count()
+        df_rds_prq_subtract_persisted = df_rds_temp_t3.subtract(df_prq_temp_t1)\
+                                            .persist(StorageLevel.MEMORY_AND_DISK)
+        
+        df_rds_prq_subtract_row_count = df_rds_prq_subtract_persisted.count()
         # -------------------------------------------------------
 
         if df_rds_prq_subtract_row_count == 0:
@@ -692,9 +694,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
         else:
             LOGGER.warn(f"""{df_rds_prq_subtract_row_count}Rows - FOUND POST SUBTRACT OPERATION !""")
-            df_rds_temp_t3_persisted = (df_rds_temp_t3.alias('L').join(df_rds_prq_subtract_transform.alias('R'), 
-                                                                      *rds_db_tbl_pkeys_col_list, 
-                                                                      how='leftsemi')
+
+            df_prq_temp_t1_persisted = (df_prq_temp_t1.alias('L').join(df_rds_prq_subtract_persisted.alias('R'), 
+                                                                       rds_db_tbl_pkeys_col_list, 
+                                                                       how='leftsemi')
                                             ).persist(StorageLevel.MEMORY_AND_DISK)
             
             for rds_column in df_rds_columns_list:
@@ -707,11 +710,11 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 temp_select_list = temp_select_list+rds_db_tbl_pkeys_col_list
                 temp_select_list.append(rds_column)
                 
-                df_rds_temp_select_cols = df_rds_temp_t3_persisted.select(*temp_select_list)
-                df_subtract_select_cols = df_rds_prq_subtract_transform.select(*temp_select_list)
+                df_prq_temp_select_cols = df_prq_temp_t1_persisted.select(*temp_select_list)
+                df_subtract_select_cols = df_rds_prq_subtract_persisted.select(*temp_select_list)
 
                 df_subtract_temp_join = df_subtract_select_cols.alias('L').join(
-                                            df_rds_temp_select_cols.alias('R'), temp_select_list, how='leftsemi')
+                                            df_prq_temp_select_cols.alias('R'), temp_select_list, how='leftsemi')
 
                 df_subtract_temp_join_count = df_subtract_temp_join.count()
 
@@ -722,7 +725,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 df_subtract_temp_join = (df_subtract_temp_join
                                         .withColumn('json_row', 
                                                     F.to_json(F.struct(*[F.col(c) 
-                                                                         for c in df_rds_temp_select_cols.columns])))
+                                                                         for c in df_prq_temp_select_cols.columns])))
                                         .selectExpr("json_row")
                                         .limit(5))
 
@@ -739,10 +742,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 LOGGER.warn(f"{rds_tbl_name}.{rds_column}: Validation Failed - 2")
                 df_dv_output = df_dv_output.union(df_subtract_temp_final)
 
-            df_rds_temp_t3_persisted.unpersist(True)
+            df_prq_temp_t1_persisted.unpersist(True)
         # -------------------------------------------------------
 
-        df_rds_prq_subtract_transform.unpersist(True)
+        df_rds_prq_subtract_persisted.unpersist(True)
     # -------------------------------------------------------
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
