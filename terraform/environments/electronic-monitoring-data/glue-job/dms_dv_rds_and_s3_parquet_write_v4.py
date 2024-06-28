@@ -693,7 +693,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         else:
             LOGGER.warn(f"""{df_rds_prq_subtract_row_count}Rows - FOUND POST SUBTRACT OPERATION !""")
             df_rds_temp_t3_persisted = df_rds_temp_t3.join(df_rds_prq_subtract_transform, 
-                                                           rds_db_tbl_pkeys_col_list, 
+                                                           [f"'{col}'" for col in rds_db_tbl_pkeys_col_list], 
                                                            how='inner').persist(StorageLevel.MEMORY_AND_DISK)
             for rds_column in df_rds_columns_list:
 
@@ -709,7 +709,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 df_subtract_select_cols = df_rds_prq_subtract_transform.select(*temp_select_list)
 
                 df_subtract_temp_join = df_subtract_select_cols.join(df_rds_temp_select_cols, 
-                                                                     temp_select_list, 
+                                                                     [f"'{col}'" for col in temp_select_list], 
                                                                      how='inner')
 
                 df_subtract_temp_join_count = df_subtract_temp_join.count()
