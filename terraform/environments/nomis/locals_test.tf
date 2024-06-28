@@ -1,8 +1,8 @@
 locals {
 
   lb_maintenance_message_test = {
-    maintenance_title   = "Prison-NOMIS Maintenance Window"
-    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+    maintenance_title   = "Prison-NOMIS Environment Not Started"
+    maintenance_message = "T1 and T2 are rarely used so are started on demand. T3 is available during working hours. Please see <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> or contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel for more information"
   }
 
   baseline_presets_test = {
@@ -500,7 +500,7 @@ locals {
             # weblogic servers can alter priorities to enable maintenance message
             rules = {
               t1-nomis-web-a-http-7777 = {
-                priority = 300
+                priority = 1300
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-nomis-web-a-http-7777"
