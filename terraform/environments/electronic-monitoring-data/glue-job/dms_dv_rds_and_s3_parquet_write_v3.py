@@ -460,7 +460,7 @@ def get_rds_db_tbl_customized_cols_schema_object(in_df_rds: DataFrame,
 # ===================================================================================================
 
 
-def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb, input_repartition_factor) -> DataFrame:
+def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) -> DataFrame:
     given_rds_sqlserver_db_schema = args['rds_sqlserver_db_schema']
     rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[1]
 
@@ -845,13 +845,10 @@ if __name__ == "__main__":
     LOGGER.warn(f""">> '{db_sch_tbl}' Size: {total_size_mb} MB <<""")
     # -------------------------------------------------------
 
-    input_repartition_factor = int(args["dataframe_repartitions"])
-
     df_dv_output = process_dv_for_table(rds_sqlserver_db_str, 
                                         db_sch_tbl, 
                                         total_files, 
-                                        total_size_mb, 
-                                        input_repartition_factor)
+                                        total_size_mb)
 
     write_parquet_to_s3(df_dv_output, rds_sqlserver_db_str, db_sch_tbl)
 
