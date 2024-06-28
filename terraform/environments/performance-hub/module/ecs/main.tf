@@ -227,6 +227,13 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.ec2_instance_policy.arn
 }
+
+# Attach policy to allow SSM agent to be exposed (SSM agent is intalled on Windows Server ECS Optimised AMIs)
+resource "aws_iam_role_policy_attachment" "ecs_ssm_policy_attachment" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 //ECS cluster
 
 resource "aws_ecs_cluster" "ecs_cluster" {
