@@ -741,7 +741,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             df_rds_temp_t3_persisted.unpersist(True)
         # -------------------------------------------------------
 
-        df_rds_prq_subtract_transform.uncache(True)
+        df_rds_prq_subtract_transform.unpersist(True)
     # -------------------------------------------------------
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
