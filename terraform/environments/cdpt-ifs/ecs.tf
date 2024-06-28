@@ -6,6 +6,10 @@ data "aws_ecs_task_definition" "latest_task_definition" {
   task_definition = "${aws_ecs_task_definition.ifs_task_definition.family}:${data.aws_ecs_task_definition.task_definitions.revision}"
 }
 
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized"
+}
+
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
 
@@ -261,7 +265,7 @@ resource "aws_iam_role_policy" "app_execution" {
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = local.application_data.accounts[local.environment].ami_image_id
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"] #local.application_data.accounts[local.environment].ami_image_id
   instance_type = local.application_data.accounts[local.environment].instance_type
   key_name      = "${local.application_name}-ec2"
   ebs_optimized = true
@@ -536,4 +540,9 @@ resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
 resource "aws_iam_role_policy_attachment" "bastion_managed" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   role       = aws_iam_role.ec2_instance_role.name
+}
+
+output "ami_id" {
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  sensitive = true
 }
