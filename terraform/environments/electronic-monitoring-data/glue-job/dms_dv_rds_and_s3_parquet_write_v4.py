@@ -713,14 +713,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 
                 df_prq_temp_select_cols = df_prq_temp_t1_persisted.select(*temp_select_list)
                 df_subtract_select_cols = df_rds_prq_subtract_persisted.select(*temp_select_list)
-
-                df_subtract_temp_join = df_subtract_select_cols.alias('L').join(df_prq_temp_select_cols.alias('R'), 
-                                                                                temp_select_list, 
-                                                                                how='leftsemi')
                 
-                # df_subtract_temp_join = df_subtract_select_cols.subtract(df_prq_temp_select_cols)
+                df_subtract_temp = df_subtract_select_cols.subtract(df_prq_temp_select_cols)
 
-                df_subtract_temp_join_count = df_subtract_temp_join.count()
+                df_subtract_temp_join_count = df_subtract_temp.count()
 
                 if df_subtract_temp_join_count == 0:
                     continue
