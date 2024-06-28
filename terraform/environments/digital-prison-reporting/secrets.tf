@@ -40,7 +40,7 @@ resource "aws_secretsmanager_secret" "bodmis" {
 
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "bodmis" {
-  secret_id     = aws_secretsmanager_secret.nomis.id
+  secret_id     = aws_secretsmanager_secret.bodmis.id
   secret_string = jsonencode(local.bodmis_secrets_placeholder)
 
   lifecycle {
