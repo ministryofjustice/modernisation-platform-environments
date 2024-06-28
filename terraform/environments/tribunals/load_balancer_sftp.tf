@@ -59,7 +59,7 @@ resource "aws_lb_listener" "tribunals_lb_sftp" {
 
   default_action {
     type             = "forward"
-    target_group_arn = each.aws_lb_target_group.tribunals_target_group_sftp.arn
+    target_group_arn = aws_lb_target_group.tribunals_target_group_sftp[each.key].arn
   }
 }
 
