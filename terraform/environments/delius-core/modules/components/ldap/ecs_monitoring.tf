@@ -126,7 +126,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
   datapoints_to_alarm = 1
   threshold           = 1
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "ignore"
 
   metric_query {
     id          = "e1"
@@ -145,7 +145,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
         ServiceName = "openldap"
         ClusterName = local.cluster_name
       }
-      period = 30
+      period = 60
       stat   = "Minimum"
     }
   }
@@ -160,7 +160,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
         ServiceName = "openldap"
         ClusterName = local.cluster_name
       }
-      period = 30
+      period = 60
       stat   = "Maximum"
     }
   }
