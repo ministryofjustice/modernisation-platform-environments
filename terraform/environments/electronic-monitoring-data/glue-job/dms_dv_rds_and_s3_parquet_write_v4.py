@@ -657,6 +657,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                                                          rds_tbl_name))
         # -------------------------------------------------------
 
+        df_rds_temp_t3 = df_rds_temp_t3.sort(jdbc_partition_column)
+        
         df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
         LOGGER.info(f"""{msg_prefix}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
@@ -670,11 +672,13 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             df_prq_temp_t1 = df_prq_temp_t1.repartition(jdbc_read_partitions_num, jdbc_partition_column)
             LOGGER.info(f"""{msg_prefix}: RE-PARTITION on {jdbc_partition_column} = {df_prq_temp.rdd.getNumPartitions()}""")
         else:
-            df_prq_temp_t1 = df_prq_temp_t1.coalesce(jdbc_read_partitions_num)
+            df_prq_temp_t1 = (df_prq_temp_t1.coalesce(jdbc_read_partitions_num)
+                                            .sort(jdbc_partition_column))
             LOGGER.info(f"""{msg_prefix}: coalesce PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
         # -------------------------------------------------------
 
         df_rds_prq_subtract_persisted = df_rds_temp_t3.subtract(df_prq_temp_t1)\
+                                            .orderBy(jdbc_partition_column)\
                                             .persist(StorageLevel.MEMORY_AND_DISK)
         
         df_rds_prq_subtract_row_count = df_rds_prq_subtract_persisted.count()
@@ -699,6 +703,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             df_prq_temp_t1_persisted = (df_prq_temp_t1.alias('L').join(df_rds_prq_subtract_persisted.alias('R'), 
                                                                        rds_db_tbl_pkeys_col_list, 
                                                                        how='leftsemi')
+                                                .orderBy(jdbc_partition_column)
                                             ).persist(StorageLevel.MEMORY_AND_DISK)
             
             for rds_column in df_rds_columns_list:
