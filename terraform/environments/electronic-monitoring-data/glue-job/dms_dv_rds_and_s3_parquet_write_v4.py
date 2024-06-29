@@ -275,10 +275,6 @@ def get_df_read_rds_db_tbl_int_pkey(in_rds_db_name, in_table_name,
     SELECT *
     FROM {given_rds_sqlserver_db_schema}.[{in_table_name}]
     """.strip()
-    
-    # .option("partitionColumn", pkey_col_list[0])
-    # .option("lowerBound", 1)
-    # .option("upperBound", NUMBER_OF_ROWS_FROM_TABLE)
 
     return (spark.read.format("jdbc")
                 .option("url", get_rds_db_jdbc_url(in_rds_db_name))
@@ -388,6 +384,7 @@ def get_nvl_select_list(in_rds_df: DataFrame, in_rds_db_name, in_rds_tbl_name):
 def get_pyspark_empty_df(in_empty_df_schema) -> DataFrame:
     return spark.createDataFrame(sc.emptyRDD(), schema=in_empty_df_schema)
 
+
 def get_s3_folder_info(bucket_name, prefix):
     paginator = S3_CLIENT.get_paginator('list_objects_v2')
 
@@ -430,6 +427,7 @@ def get_s3_parquet_df_v2(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFra
 def get_s3_parquet_df_v3(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
     return spark.read.format("parquet").load(in_s3_parquet_folder_path, schema=in_rds_df_schema)
 
+
 def get_reordered_columns_schema_object(in_df_rds: DataFrame, in_transformed_column_list):
     altered_schema_object = T.StructType([])
     rds_df_column_list = in_df_rds.schema.fields
@@ -469,9 +467,9 @@ def get_rds_db_tbl_customized_cols_schema_object(in_df_rds: DataFrame,
 
 # ===================================================================================================
 
-
 def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) -> DataFrame:
     given_rds_sqlserver_db_schema = args['rds_sqlserver_db_schema']
+
     rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[1]
 
     df_dv_output_schema = T.StructType(
@@ -513,8 +511,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         df_rds_count = get_rds_db_table_row_count(rds_db_name, 
                                                   rds_tbl_name, 
                                                   rds_db_tbl_pkeys_col_list)
+        
         prq_pk_schema = get_rds_db_tbl_customized_cols_schema_object(rds_db_table_empty_df, 
                                                                      rds_db_tbl_pkeys_col_list)
+        
         df_prq_count = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, prq_pk_schema).count()
 
         if not (df_rds_count == df_prq_count):
@@ -536,7 +536,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             LOGGER.info(final_validation_msg)
             return df_dv_output
         else:
-            LOGGER.info(f"""df_rds_count = {df_rds_count}""")
+            LOGGER.info(f"""df_rds_count = df_prq_count = {df_rds_count}""")
         # -------------------------------------------------------
 
         df_rds_columns_list = rds_db_table_empty_df.columns
@@ -658,7 +658,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         # -------------------------------------------------------
 
         df_rds_temp_t3 = df_rds_temp_t3.sort(jdbc_partition_column)
-        
+
         df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
         LOGGER.info(f"""{msg_prefix}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
@@ -682,9 +682,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                             .persist(StorageLevel.MEMORY_AND_DISK)
         
         df_rds_prq_subtract_row_count = df_rds_prq_subtract_persisted.count()
-        # -------------------------------------------------------
+       
 
         if df_rds_prq_subtract_row_count == 0:
+
             df_temp_row = spark.sql(f"""select 
                                         current_timestamp() as run_datetime, 
                                         '' as json_row,
@@ -695,6 +696,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                     """.strip())
             
             LOGGER.info(f"{rds_tbl_name}: Validation Successful - 1")
+
             df_dv_output = df_dv_output.union(df_temp_row)
 
         else:
@@ -705,7 +707,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                                                        how='leftsemi')
                                                 .orderBy(jdbc_partition_column)
                                             ).persist(StorageLevel.MEMORY_AND_DISK)
-            
+        
             for rds_column in df_rds_columns_list:
 
                 if rds_column in rds_db_tbl_pkeys_col_list:
@@ -716,24 +718,23 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 temp_select_list = temp_select_list+rds_db_tbl_pkeys_col_list
                 temp_select_list.append(rds_column)
                 
-                df_prq_temp_select_cols = df_prq_temp_t1_persisted.select(*temp_select_list)
-                df_subtract_select_cols = df_rds_prq_subtract_persisted.select(*temp_select_list)
-                
-                df_subtract_temp = df_subtract_select_cols.subtract(df_prq_temp_select_cols)
+                df_subtract_selected_cols = df_rds_prq_subtract_persisted.select(*temp_select_list)\
+                                                .subtract(df_prq_temp_t1_persisted.select(*temp_select_list))
 
-                df_subtract_temp_join_count = df_subtract_temp.count()
+                df_subtract_selected_cols_count = df_subtract_selected_cols.count()
 
-                if df_subtract_temp_join_count == 0:
+                if df_subtract_selected_cols_count == 0:
                     continue
                 # ---------------------------------
 
-                df_subtract_temp = (df_subtract_temp
-                                            .withColumn('json_row', 
-                                                        F.to_json(F.struct(*[F.col(c) for c in df_subtract_select_cols.columns])))
-                                            .selectExpr("json_row")
-                                            .limit(5))
+                df_subtract_temp = (df_subtract_selected_cols
+                                        .withColumn('json_row', 
+                                                    F.to_json(F.struct(*[F.col(c) 
+                                                                         for c in df_subtract_selected_cols.columns])))
+                                        .selectExpr("json_row")
+                                        .limit(5))
 
-                subtract_msg_prefix = f"""'{rds_tbl_name}.{rds_column}' - {df_subtract_temp_join_count}"""
+                subtract_msg_prefix = f"""'{rds_tbl_name}.{rds_column}' - {df_subtract_selected_cols_count}"""
                 subtract_msg_suffix = """Dataframe(s)-Subtract Non-Zero Row Count!"""
                 
                 df_subtract_temp_final = df_subtract_temp.selectExpr(
@@ -755,6 +756,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
     # -------------------------------------------------------
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
+
         df_temp_row = spark.sql(f"""select
                                     current_timestamp as run_datetime,
                                     '' as json_row,
@@ -775,7 +777,6 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 def write_parquet_to_s3(df_dv_output: DataFrame, database, db_sch_tbl_name):
 
     df_dv_output = df_dv_output.repartition(1)
-    #LOGGER.info(f"""database={database} ; db_sch_tbl_name={db_sch_tbl_name}""")
 
     if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                       f'''{CATALOG_DB_TABLE_PATH}/database_name={database}/full_table_name={db_sch_tbl_name}'''
