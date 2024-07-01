@@ -244,44 +244,16 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
   ok_actions          = [var.sns_topic_arn]
   evaluation_periods  = 1
   datapoints_to_alarm = 1
-  threshold           = 1
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  treat_missing_data  = "ignore"
+  period              = 60
+  comparison_operator = "LessThanThreshold"
+  threshold           = var.desired_count
+  treat_missing_data  = "missing"
+  metric_name         = "RunningTaskCount"
+  namespace           = "ECS/ContainerInsights"
+  statistic           = "Minimum"
 
-  metric_query {
-    id          = "e1"
-    label       = "Expression1"
-    return_data = true
-    expression  = "IF(m1 < m2, 1, 0)"
-  }
-
-  metric_query {
-    id          = "m1"
-    return_data = false
-    metric {
-      namespace   = "ECS/ContainerInsights"
-      metric_name = "RunningTaskCount"
-      dimensions = {
-        ServiceName = var.name
-        ClusterName = local.cluster_name
-      }
-      period = var.ecs_monitoring_running_tasks_less_than_desired_period
-      stat   = "Minimum"
-    }
-  }
-
-  metric_query {
-    id          = "m2"
-    return_data = false
-    metric {
-      namespace   = "ECS/ContainerInsights"
-      metric_name = "DesiredTaskCount"
-      dimensions = {
-        ServiceName = var.name
-        ClusterName = local.cluster_name
-      }
-      period = var.ecs_monitoring_running_tasks_less_than_desired_period
-      stat   = "Maximum"
-    }
+  dimensions = {
+    ServiceName = var.name
+    ClusterName = local.cluster_name
   }
 }
