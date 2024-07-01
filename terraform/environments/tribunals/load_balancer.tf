@@ -122,26 +122,26 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   }
 }
 
-# resource "aws_lb_listener_rule" "admin_access_1" {
-#   for_each     = var.web_app_services
-#   listener_arn = aws_lb_listener.tribunals_lb.arn
-#   priority     = index(keys(var.web_app_services), each.key) + 21
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
-#   }
-#   condition {
-#     path_pattern {
-#       values = ["*/admin*", "*/secure*"]
-#     }
-#   }
+resource "aws_lb_listener_rule" "admin_access_1" {
+  for_each     = var.web_app_services
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = index(keys(var.web_app_services), each.key) + 21
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
+  }
+  condition {
+    path_pattern {
+      values = ["*/admin*", "*/secure*"]
+    }
+  }
 
-#   condition {
-#     source_ip {
-#       values = ["20.26.11.71/32", "20.26.11.108/32", "20.49.214.199/32"]
-#     }
-#   }
-# }
+  condition {
+    source_ip {
+      values = ["20.26.11.71/32", "20.26.11.108/32", "20.49.214.199/32"]
+    }
+  }
+}
 
 # resource "aws_lb_listener_rule" "admin_access_1" {
 #   listener_arn = aws_lb_listener.tribunals_lb.arn
