@@ -67,24 +67,6 @@ resource "aws_lb_listener" "tribunals_lb" {
   }
 }
 
-resource "aws_lb_listener_rule" "tribunals_lb_rule" {
-  for_each = local.listener_header_to_target_group
-
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
-
-  action {
-    type             = "forward"
-    target_group_arn = each.value
-  }
-
-  condition {
-    host_header  {
-      values = ["*${each.key}.*"]
-    }
-  }
-}
-
 resource "aws_lb_target_group" "tribunals_target_group" {
   for_each             = var.services
   name                 = "${each.value.name_prefix}-tg"
@@ -120,6 +102,45 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
   target_group_arn = each.value.arn
   target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
   port             = each.value.port
+}
+
+resource "aws_lb_listener_rule" "tribunals_lb_rule" {
+  for_each = local.listener_header_to_target_group
+
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
+
+  action {
+    type             = "forward"
+    target_group_arn = each.value
+  }
+
+  condition {
+    host_header  {
+      values = ["*${each.key}.*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "admin_access_1" {
+  for_each     = local.listener_header_to_target_group
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = index(keys(local.listener_header_to_target_group), each.key) + 21
+  action {
+    type             = "forward"
+    target_group_arn = each.value
+  }
+  condition {
+    path_pattern {
+      values = ["*/Admin*", "*/admin*"]
+    }
+  }
+
+  condition {
+    source_ip {
+      values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25"]
+    }
+  }
 }
 
 # resource "aws_lb_listener_rule" "admin_access_1" {
