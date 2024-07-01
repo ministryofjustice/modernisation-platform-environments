@@ -755,7 +755,7 @@
         }
       },
       "biprws": {
-        "enable": false,
+        "enable": true,
         "endpoint": "placeholder",
         "endpoint_type": "load_balancer"
       },
