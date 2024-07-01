@@ -239,7 +239,28 @@ resource "aws_lb_listener_rule" "admin_access_5" {
 
   condition {
     source_ip {
-      values = ["194.33.249.0/29"]
+      values = ["194.33.249.0/29", "195.59.75.0/24", "194.33.192.0/25"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "admin_access_6" {
+  for_each     = var.web_app_services
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = index(keys(var.web_app_services), each.key) + 72
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
+  }
+  condition {
+    path_pattern {
+      values = ["*/admin*", "*/secure*"]
+    }
+  }
+
+  condition {
+    source_ip {
+      values = ["194.33.196.0/25", "194.33.193.0/25", "194.33.197.0/25"]
     }
   }
 }
