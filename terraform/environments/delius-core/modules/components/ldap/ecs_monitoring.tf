@@ -125,7 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_one" {
   evaluation_periods  = 1
   datapoints_to_alarm = 1
   period              = 60
-  comparison_operator = "LessThanOrEqualToThreshold"
+  comparison_operator = "LessThanThreshold"
   threshold           = 1
   treat_missing_data  = "missing"
   metric_name         = "DesiredTaskCount"
