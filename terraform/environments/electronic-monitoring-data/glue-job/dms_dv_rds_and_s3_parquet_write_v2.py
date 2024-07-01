@@ -60,6 +60,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 OPTIONAL_INPUTS = [
     "rds_select_db_tbls",
     "rds_exclude_db_tbls",
+    "rds_db_tbl_pkeys_col_list",
     "rds_df_trim_micro_sec_ts_col_list",
     "rds_read_rows_fetch_size"
 ]
@@ -99,6 +100,8 @@ NVL_DTYPE_DICT = {'string': "''", 'int': 0, 'double': 0, 'float': 0, 'smallint':
                   'boolean': False,
                   'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')", 
                   'date': "to_date('1900-01-01', 'yyyy-MM-dd')"}
+
+INT_DATATYPES_LIST = ['tinyint', 'smallint', 'int', 'bigint']
 
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
@@ -175,31 +178,80 @@ def get_rds_dataframe(in_rds_db_name, in_table_name) -> DataFrame:
                                        "driver": RDS_DB_INSTANCE_DRIVER})
 
 
-def get_df_read_rds_db_table(in_rds_db_name, 
-                             in_table_name, 
-                             num_of_jdbc_connections=None
-                            ) -> DataFrame:
+def get_rds_db_table_empty_df(in_rds_db_name, 
+                              in_table_name) -> DataFrame:
     given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
     
-    num_of_rows_per_trip = args.get("rds_read_rows_fetch_size", None)
-    fetchSize = 10000 if num_of_rows_per_trip is None else num_of_rows_per_trip
-    # The JDBC fetch size, which determines how many rows to fetch per round trip. 
-    # This can help performance on JDBC drivers which default to low fetch size (e.g. Oracle with 10 rows).
-    
-    numPartitions = 4 if num_of_jdbc_connections is None else num_of_jdbc_connections
-    # Note: numPartitions is normally equal to number of executors defined.
-    # The maximum number of partitions that can be used for parallelism in table reading and writing. 
-    # This also determines the maximum number of concurrent JDBC connections. 
+    query_str = f"""
+    SELECT *
+    FROM {given_rds_sqlserver_db_schema}.[{in_table_name}]
+    WHERE 1 = 2
+    """.strip()
 
     return (spark.read.format("jdbc")
                 .option("url", get_rds_db_jdbc_url(in_rds_db_name))
                 .option("driver", RDS_DB_INSTANCE_DRIVER)
                 .option("user", RDS_DB_INSTANCE_USER)
                 .option("password", RDS_DB_INSTANCE_PWD)
-                .option("dbtable", f"""{given_rds_sqlserver_db_schema}.[{in_table_name}]""")
-                .option("fetchSize", fetchSize)
-                .option("numPartitions", numPartitions)
+                .option("query", f"""{query_str}""")
                 .load())
+
+
+def get_df_read_rds_db_tbl_int_pkey(in_rds_db_name, in_table_name,
+                                    jdbc_partition_column, 
+                                    jdbc_partition_col_upperbound, 
+                                    jdbc_read_partitions_num,
+                                    jdbc_rows_fetch_size
+                                    ) -> DataFrame:
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
+    
+    numPartitions = jdbc_read_partitions_num
+    # Note: numPartitions is normally equal to number of executors defined.
+    # The maximum number of partitions that can be used for parallelism in table reading and writing. 
+    # This also determines the maximum number of concurrent JDBC connections. 
+
+    fetchSize = jdbc_rows_fetch_size
+    # The JDBC fetch size, which determines how many rows to fetch per round trip. 
+    # This can help performance on JDBC drivers which default to low fetch size (e.g. Oracle with 10 rows).
+    # Too Small: => frequent round trips to database
+    # Too Large: => Consume a lot of memory
+
+    query_str = f"""
+    SELECT *
+    FROM {given_rds_sqlserver_db_schema}.[{in_table_name}]
+    """.strip()
+
+    return (spark.read.format("jdbc")
+                .option("url", get_rds_db_jdbc_url(in_rds_db_name))
+                .option("driver", RDS_DB_INSTANCE_DRIVER)
+                .option("user", RDS_DB_INSTANCE_USER)
+                .option("password", RDS_DB_INSTANCE_PWD)
+                .option("dbtable", f"""({query_str}) as t""")
+                .option("partitionColumn", jdbc_partition_column)
+                .option("lowerBound", "0")
+                .option("upperBound", jdbc_partition_col_upperbound)
+                .option("numPartitions", numPartitions)
+                .option("fetchSize", fetchSize)
+                .load())
+
+
+def get_rds_db_table_row_count(in_rds_db_name, 
+                               in_table_name, 
+                               in_pkeys_col_list) -> DataFrame:
+    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
+    
+    query_str = f"""
+    SELECT count({', '.join(in_pkeys_col_list)}) as row_count
+    FROM {given_rds_sqlserver_db_schema}.[{in_table_name}]
+    """.strip()
+
+    return (spark.read.format("jdbc")
+                    .option("url", get_rds_db_jdbc_url(in_rds_db_name))
+                    .option("driver", RDS_DB_INSTANCE_DRIVER)
+                    .option("user", RDS_DB_INSTANCE_USER)
+                    .option("password", RDS_DB_INSTANCE_PWD)
+                    .option("query", f"""{query_str}""")
+                    .load()).collect()[0].row_count
 
 
 def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name) -> DataFrame:
@@ -368,10 +420,50 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
 
     # -------------------------------------------------------
-    if tbl_prq_s3_folder_path is not None:
 
-        df_rds_temp = get_df_read_rds_db_table(rds_db_name, rds_tbl_name, 
-                                               num_of_jdbc_connections=total_files)
+    if tbl_prq_s3_folder_path is not None:
+        # -------------------------------------------------------
+
+        if args.get('rds_db_tbl_pkeys_col_list', None) is None:
+            df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
+        else:
+            rds_db_tbl_pkeys_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
+                                         for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
+            
+            rds_db_table_empty_df = get_rds_db_table_empty_df(rds_db_name, rds_tbl_name)
+            df_rds_dtype_dict = get_dtypes_dict(rds_db_table_empty_df)
+            int_dtypes_colname_list = [colname for colname, dtype in df_rds_dtype_dict.items() 
+                                        if dtype in INT_DATATYPES_LIST]
+            
+            if len(rds_db_tbl_pkeys_col_list) == 1 and \
+                (rds_db_tbl_pkeys_col_list[0] in int_dtypes_colname_list):
+
+                jdbc_partition_column = rds_db_tbl_pkeys_col_list[0]
+            else:
+                LOGGER.error(f"""int_dtypes_colname_list = {int_dtypes_colname_list}""")
+                LOGGER.error(f"""PrimaryKey column(s) are more than one (OR) not an integer datatype column!""")
+                sys.exit(1)
+        
+            jdbc_read_partitions_num = total_files
+
+            df_rds_count = get_rds_db_table_row_count(rds_db_name, rds_tbl_name, 
+                                                      rds_db_tbl_pkeys_col_list)
+            jdbc_partition_col_upperbound = int(df_rds_count/jdbc_read_partitions_num)
+
+            rds_read_rows_fetch_size = int(args["rds_read_rows_fetch_size"])
+            jdbc_rows_fetch_size = jdbc_partition_col_upperbound \
+                                        if jdbc_partition_col_upperbound > rds_read_rows_fetch_size \
+                                            else rds_read_rows_fetch_size
+        
+            df_rds_temp = get_df_read_rds_db_tbl_int_pkey(rds_db_name, 
+                                                          rds_tbl_name, 
+                                                          rds_db_tbl_pkeys_col_list, 
+                                                          jdbc_partition_column,
+                                                          jdbc_partition_col_upperbound,
+                                                          jdbc_read_partitions_num,
+                                                          jdbc_rows_fetch_size)
+        # -------------------------------------------------------
+
         LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
         
         df_rds_temp = df_rds_temp.repartition(default_repartition_factor)
@@ -387,7 +479,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
             LOGGER.info(f"""{msg_prefix}, {type(rds_df_trim_str_columns)}""")
 
             df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_str_columns)
-            additional_message = "- [str column(s) extra spaces trimmed]"
+            additional_message = "- [str column(s) - extra spaces trimmed]"
             t2_rds_str_col_trimmed = True
         # -------------------------------------------------------
 
@@ -406,7 +498,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
             else:
                 df_rds_temp_t3 = rds_df_trim_microseconds_timestamp(df_rds_temp_t1, 
                                                                     given_rds_df_trim_micro_seconds_col_list)
-            additional_message = "- [selected timestamp columns micro-seconds trimmed]"
+            additional_message = "- [timestamp column(s) - micro-seconds trimmed]"
             t3_rds_ts_col_msec_trimmed = True
         # -------------------------------------------------------
 
