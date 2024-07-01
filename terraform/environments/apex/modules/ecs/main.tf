@@ -325,12 +325,12 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
-resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = "${var.app_name}-ecs-task-execution-s3-policy"
+resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = "${var.app_name}-ecs-task-execution-policy"
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-task-execution-s3-policy"
+      Name = "${var.app_name}-ecs-task-execution-policy"
     }
   )
   policy = <<EOF
@@ -340,24 +340,9 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam
     {
       "Effect": "Allow",
       "Action": [
-        "s3:ListBucket",
-        "s3:*Object*",
-        "kms:Decrypt",
-        "kms:Encrypt",
-        "kms:GenerateDataKey",
-        "kms:ReEncrypt",
-        "kms:GenerateDataKey",
-        "kms:DescribeKey",
-        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-        "elasticloadbalancing:DeregisterTargets",
-        "elasticloadbalancing:Describe*",
-        "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-        "elasticloadbalancing:RegisterTargets",
-        "ec2:Describe*",
-        "ec2:AuthorizeSecurityGroupIngress",
         "ssm:GetParameters"
       ],
-      "Resource": ["*"]
+      "Resource": ["${var.database_tad_password_arn}"]
     }
   ]
 }
@@ -381,13 +366,13 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
-resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
+# resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
+#   role       = aws_iam_role.ecs_task_execution_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+# }
+resource "aws_iam_role_policy_attachment" "ecs_task_execution" {
   role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-}
-resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
+  policy_arn = aws_iam_policy.ecs_task_execution_policy.arn
 }
 
 resource "aws_ecs_service" "ecs_service" {
