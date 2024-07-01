@@ -47,26 +47,6 @@ resource "aws_security_group" "tribunals_lb_sc" {
   }
 }
 
-resource "aws_lb_listener" "tribunals_lb" {
-  depends_on = [
-    aws_acm_certificate.external
-  ]
-  certificate_arn   = aws_acm_certificate.external.arn
-  load_balancer_arn = aws_lb.tribunals_lb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
-
-  default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "No matching rule found"
-      status_code  = "404"
-    }
-  }
-}
-
 resource "aws_lb_target_group" "tribunals_target_group" {
   for_each             = var.services
   name                 = "${each.value.name_prefix}-tg"
@@ -104,11 +84,48 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
   port             = each.value.port
 }
 
+resource "aws_lb_listener" "tribunals_lb" {
+  depends_on = [
+    aws_acm_certificate.external
+  ]
+  certificate_arn   = aws_acm_certificate.external.arn
+  load_balancer_arn = aws_lb.tribunals_lb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
+
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "No matching rule found"
+      status_code  = "404"
+    }
+  }
+}
+resource "aws_lb_listener_rule" "admin_secure_fixed_response" {
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = 1
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/html"
+      message_body = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"
+      status_code  = "403"
+    }
+  }
+  condition {
+    path_pattern {
+      values = ["/Admin*", "/admin*", "/Secure*", "/secure*"]
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
+  priority     = index(keys(local.listener_header_to_target_group), each.key) + 2
 
   action {
     type             = "forward"
@@ -125,7 +142,7 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
 resource "aws_lb_listener_rule" "admin_access_1" {
   for_each     = var.web_app_services
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 21
+  priority     = index(keys(var.web_app_services), each.key) + 22
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
@@ -146,7 +163,7 @@ resource "aws_lb_listener_rule" "admin_access_1" {
 resource "aws_lb_listener_rule" "admin_access_2" {
   for_each     = var.web_app_services
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 31
+  priority     = index(keys(var.web_app_services), each.key) + 32
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
@@ -167,7 +184,7 @@ resource "aws_lb_listener_rule" "admin_access_2" {
 resource "aws_lb_listener_rule" "admin_access_3" {
   for_each     = var.web_app_services
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 41
+  priority     = index(keys(var.web_app_services), each.key) + 42
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
@@ -188,7 +205,7 @@ resource "aws_lb_listener_rule" "admin_access_3" {
 resource "aws_lb_listener_rule" "admin_access_4" {
   for_each     = var.web_app_services
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 51
+  priority     = index(keys(var.web_app_services), each.key) + 52
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
@@ -209,7 +226,7 @@ resource "aws_lb_listener_rule" "admin_access_4" {
 resource "aws_lb_listener_rule" "admin_access_5" {
   for_each     = var.web_app_services
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 61
+  priority     = index(keys(var.web_app_services), each.key) + 62
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
@@ -223,24 +240,6 @@ resource "aws_lb_listener_rule" "admin_access_5" {
   condition {
     source_ip {
       values = ["194.33.249.0/29"]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "admin_secure_fixed_response" {
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 71
-  action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/html"
-      message_body = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"
-      status_code  = "403"
-    }
-  }
-  condition {
-    path_pattern {
-      values = ["/Admin*", "/admin*", "/Secure*", "/secure*"]
     }
   }
 }
