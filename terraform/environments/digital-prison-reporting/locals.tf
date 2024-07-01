@@ -1,7 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 #### DPR Specific ####
 locals {
-  project = local.application_data.accounts[local.environment].project_short_id
+  project              = local.application_data.accounts[local.environment].project_short_id
   analytics_project_id = "analytics"
 
   other_log_retention_in_days = local.application_data.accounts[local.environment].other_log_retention_in_days
@@ -299,7 +299,7 @@ locals {
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 
   # Setup Athena Workgroups 
-  setup_dpr_generic_athena_workgroup = local.application_data.accounts[local.environment].dpr_generic_athena_workgroup
+  setup_dpr_generic_athena_workgroup       = local.application_data.accounts[local.environment].dpr_generic_athena_workgroup
   setup_analytics_generic_athena_workgroup = local.application_data.accounts[local.environment].analytics_generic_athena_workgroup
 
   # Sonatype Secrets
