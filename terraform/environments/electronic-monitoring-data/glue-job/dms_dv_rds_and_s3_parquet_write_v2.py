@@ -444,7 +444,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                 LOGGER.error(f"""PrimaryKey column(s) are more than one (OR) not an integer datatype column!""")
                 sys.exit(1)
         
-            jdbc_read_partitions_num = total_files
+            jdbc_read_partitions_num = 3 if total_files < 3 else total_files
 
             df_rds_count = get_rds_db_table_row_count(rds_db_name, rds_tbl_name, 
                                                       rds_db_tbl_pkeys_col_list)
