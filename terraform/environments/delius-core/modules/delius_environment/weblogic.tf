@@ -12,6 +12,8 @@ module "weblogic" {
     "LDAP_CREDENTIAL" : module.ldap.delius_core_ldap_bind_password_arn
   }
 
+  desired_count = 0
+
   container_secrets_default      = {}
   container_secrets_env_specific = try(var.delius_microservice_configs.weblogic.container_secrets_env_specific, {})
   container_vars_env_specific    = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
