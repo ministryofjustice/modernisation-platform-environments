@@ -148,6 +148,61 @@ variable "services" {
   }
 }
 
+variable "web_app_services" {
+  default = {
+    "appeals" = {
+      name_prefix = "administrativeappeals"
+      module_key  = "appeals"
+      port        = 49100
+    },
+    "ahmlr" = {
+      name_prefix = "landregistrationdivision"
+      module_key  = "ahmlr"
+      port        = 49101
+    }
+    "care_standards" = {
+      name_prefix = "carestandards"
+      module_key  = "care_standards"
+      port        = 49102
+    },
+    "cicap" = {
+      name_prefix = "cicap"
+      module_key  = "cicap"
+      port        = 49103
+    },
+    "employment_appeals" = {
+      name_prefix = "employmentappeals"
+      module_key  = "employment_appeals"
+      port        = 49104
+    },
+    "finance_and_tax" = {
+      name_prefix = "financeandtax"
+      module_key  = "finance_and_tax"
+      port        = 49105
+    },
+    "immigration_services" = {
+      name_prefix = "immigrationservices"
+      module_key  = "immigration_services"
+      port        = 49106
+    },
+    "information_tribunal" = {
+      name_prefix = "informationrights"
+      module_key  = "information_tribunal"
+      port        = 49107
+    },
+    "lands_tribunal" = {
+      name_prefix = "landschamber"
+      module_key  = "lands_tribunal"
+      port        = 49108
+    },
+    "transport" = {
+      name_prefix = "transportappeals"
+      module_key  = "transport"
+      port        = 49109
+    }
+  }
+}
+
 variable "sftp_services" {
   default = {
     "charity_tribunal_decisions" = {
