@@ -624,20 +624,20 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         t2_rds_ts_col_msec_trimmed = False
         if args.get('rds_df_trim_micro_sec_ts_col_list', None) is not None:
 
-            given_rds_df_trim_micro_seconds_col_str = args['rds_df_trim_micro_sec_ts_col_list']
-            given_rds_df_trim_micro_seconds_col_list = [f"""{col.strip().strip("'").strip('"')}"""
-                                                        for col in given_rds_df_trim_micro_seconds_col_str.split(",")]
+            given_rds_df_trim_ms_ts_cols_str = args['rds_df_trim_micro_sec_ts_col_list']
+            given_rds_df_trim_ms_ts_cols_list = [f"""{col.strip().strip("'").strip('"')}"""
+                                                        for col in given_rds_df_trim_ms_ts_cols_str.split(",")]
 
-            trim_msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list = {given_rds_df_trim_micro_seconds_col_list}"""
-            LOGGER.warn(f"""{trim_msg_prefix}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
+            trim_msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list = {given_rds_df_trim_ms_ts_cols_list}"""
+            LOGGER.warn(f"""{trim_msg_prefix}, {type(given_rds_df_trim_ms_ts_cols_list)}""")
             trim_ts_ms_msg = f"""[timestamp - micro-seconds trimmed]"""
 
             if t1_rds_str_col_trimmed is True:
                 df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_microseconds_timestamp, 
-                                                          given_rds_df_trim_micro_seconds_col_list)
+                                                          given_rds_df_trim_ms_ts_cols_list)
             else:
                 df_rds_temp_t2 = df_rds_temp.transform(rds_df_trim_microseconds_timestamp, 
-                                                       given_rds_df_trim_micro_seconds_col_list)
+                                                       given_rds_df_trim_ms_ts_cols_list)
             # -------------------------------------------------------
 
             t2_rds_ts_col_msec_trimmed = True
