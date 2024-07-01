@@ -128,7 +128,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_one" {
   comparison_operator = "LessThanThreshold"
   threshold           = 1
   treat_missing_data  = "missing"
-  metric_name         = "DesiredTaskCount"
+  metric_name         = "RunningTaskCount"
   namespace           = "ECS/ContainerInsights"
   statistic           = "Minimum"
 
