@@ -125,7 +125,7 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
 resource "aws_lb_listener_rule" "admin_access_1" {
   for_each     = var.services
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(local.listener_header_to_target_group), each.key) + 21
+  priority     = index(keys(var.services), each.key) + 21
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
