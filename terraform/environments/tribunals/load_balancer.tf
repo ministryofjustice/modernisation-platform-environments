@@ -143,7 +143,7 @@ resource "aws_lb_listener_rule" "admin_access_1" {
   }
 }
 
-resource "aws_lb_listener_rule" "admin_access_1" {
+resource "aws_lb_listener_rule" "admin_access_2" {
   for_each     = var.web_app_services
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = index(keys(var.web_app_services), each.key) + 31
@@ -164,7 +164,7 @@ resource "aws_lb_listener_rule" "admin_access_1" {
   }
 }
 
-resource "aws_lb_listener_rule" "admin_access_1" {
+resource "aws_lb_listener_rule" "admin_access_3" {
   for_each     = var.web_app_services
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = index(keys(var.web_app_services), each.key) + 41
@@ -185,7 +185,7 @@ resource "aws_lb_listener_rule" "admin_access_1" {
   }
 }
 
-resource "aws_lb_listener_rule" "admin_access_1" {
+resource "aws_lb_listener_rule" "admin_access_4" {
   for_each     = var.web_app_services
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = index(keys(var.web_app_services), each.key) + 51
@@ -206,7 +206,7 @@ resource "aws_lb_listener_rule" "admin_access_1" {
   }
 }
 
-resource "aws_lb_listener_rule" "admin_access_1" {
+resource "aws_lb_listener_rule" "admin_access_5" {
   for_each     = var.web_app_services
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = index(keys(var.web_app_services), each.key) + 61
