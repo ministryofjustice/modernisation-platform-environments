@@ -34,6 +34,13 @@ locals {
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
 
+      /* Transit Gateway */
+      transit_gateway_routes = [
+        "10.26.0.0/15", # modernisation-platform
+        "10.40.0.0/18", # noms-live-vnet
+        "10.205.0.0/20" # laa-lz-prod
+      ]
+
       /* Route53 */
       route53_zone = "compute.development.analytical-platform.service.justice.gov.uk"
 
@@ -75,6 +82,13 @@ locals {
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
 
+      /* Transit Gateway */
+      transit_gateway_routes = [
+        "10.26.0.0/15", # modernisation-platform
+        "10.40.0.0/18", # noms-live-vnet
+        "10.205.0.0/20" # laa-lz-prod
+      ]
+
       /* Route53 */
       route53_zone = "compute.test.analytical-platform.service.justice.gov.uk"
 
@@ -115,6 +129,12 @@ locals {
       vpc_enable_nat_gateway     = true
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
+
+      /* Transit Gateway */
+      transit_gateway_routes = [
+        "10.26.0.0/15", # modernisation-platform
+        "10.40.0.0/18"  # noms-live-vnet
+      ]
 
       /* Route53 */
       route53_zone = "compute.analytical-platform.service.justice.gov.uk"
