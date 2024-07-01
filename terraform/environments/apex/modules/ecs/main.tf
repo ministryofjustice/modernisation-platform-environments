@@ -448,11 +448,11 @@ data "aws_iam_policy_document" "ecs_service" {
 }
 
 resource "aws_iam_policy" "ecs_service" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = "${var.app_name}-ecs-task-execution-s3-policy"
+  name = "${var.app_name}-ecs-service-policy"
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-task-execution-s3-policy"
+      Name = "${var.app_name}-ecs-service-policy"
     }
   )
   policy = <<EOF
