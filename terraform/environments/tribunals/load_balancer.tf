@@ -123,12 +123,12 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
 }
 
 resource "aws_lb_listener_rule" "admin_access_1" {
-  for_each     = local.listener_header_to_target_group
+  for_each     = var.services
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = index(keys(local.listener_header_to_target_group), each.key) + 21
   action {
     type             = "forward"
-    target_group_arn = each.value
+    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
   }
   condition {
     path_pattern {
@@ -138,7 +138,7 @@ resource "aws_lb_listener_rule" "admin_access_1" {
 
   condition {
     source_ip {
-      values = ["195.59.75.0/24", "194.33.192.0/25", "194.33.193.0/25"]
+      values = ["20.26.11.71/32", "20.26.11.108/32", "20.49.214.199/32"]
     }
   }
 }
