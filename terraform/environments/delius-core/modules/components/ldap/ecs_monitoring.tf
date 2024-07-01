@@ -117,51 +117,23 @@ resource "aws_cloudwatch_metric_alarm" "warning_error_volume" {
   comparison_operator = "GreaterThanThreshold"
 }
 
-resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
-  alarm_name          = "ldap-${var.env_name}-running-tasks-lt-desired"
+resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_one" {
+  alarm_name          = "ldap-${var.env_name}-no-running-tasks"
   actions_enabled     = true
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   evaluation_periods  = 1
   datapoints_to_alarm = 1
+  period              = 60
+  comparison_operator = "LessThanThreshold"
   threshold           = 1
-  comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "missing"
+  metric_name         = "RunningTaskCount"
+  namespace           = "ECS/ContainerInsights"
+  statistic           = "Minimum"
 
-  metric_query {
-    id          = "e1"
-    label       = "Expression1"
-    return_data = true
-    expression  = "IF(m1 < m2, 1, 0)"
-  }
-
-  metric_query {
-    id          = "m1"
-    return_data = false
-    metric {
-      namespace   = "ECS/ContainerInsights"
-      metric_name = "RunningTaskCount"
-      dimensions = {
-        ServiceName = "openldap"
-        ClusterName = local.cluster_name
-      }
-      period = 30
-      stat   = "Minimum"
-    }
-  }
-
-  metric_query {
-    id          = "m2"
-    return_data = false
-    metric {
-      namespace   = "ECS/ContainerInsights"
-      metric_name = "DesiredTaskCount"
-      dimensions = {
-        ServiceName = "openldap"
-        ClusterName = local.cluster_name
-      }
-      period = 30
-      stat   = "Maximum"
-    }
+  dimensions = {
+    ServiceName = "openldap"
+    ClusterName = local.cluster_name
   }
 }

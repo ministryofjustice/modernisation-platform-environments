@@ -21,6 +21,8 @@ module "pdf_creation" {
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.pdf_creation.container_secrets_env_specific, {})
 
+  desired_count = 0
+
   ecs_cluster_arn            = module.ecs.ecs_cluster_arn
   db_ingress_security_groups = []
   cluster_security_group_id  = aws_security_group.cluster.id
