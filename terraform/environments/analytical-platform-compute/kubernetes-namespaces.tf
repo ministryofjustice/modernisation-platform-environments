@@ -46,6 +46,12 @@ resource "kubernetes_namespace" "external_secrets" {
   }
 }
 
+resource "kubernetes_namespace" "keda" {
+  metadata {
+    name = "keda"
+  }
+}
+
 resource "kubernetes_namespace" "actions_runners" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
