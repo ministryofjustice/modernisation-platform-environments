@@ -89,14 +89,30 @@ module "pwm" {
     "JAVA_OPTS"    = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
   }
   container_vars_env_specific            = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
-  ignore_changes_service_task_definition = false
+  ignore_changes_service_task_definition = true
 
   providers = {
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
 
-  log_error_pattern       = "ERROR"
+  log_error_pattern = "ERROR"
+
+  log_error_threshold_config = {
+    warning = {
+      threshold = 10
+      period    = 60
+    }
+    critical = {
+      threshold = 20
+      period    = 180
+    }
+  }
+  ecs_monitoring_anomaly_detection_thresholds = {
+    memory = 5
+    cpu    = 20
+  }
+
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_ancillary.arn_suffix
   enable_platform_backups = var.enable_platform_backups

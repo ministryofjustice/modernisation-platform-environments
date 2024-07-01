@@ -121,7 +121,7 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
 }
 
 data "external" "latest_image_update_log_table" {
-  for_each = var.is_image ? { image = 1 } : {}  # Use empty map if not fetching image
+  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
 
   program = ["bash", "${path.root}/bash_scripts/get_latest_image.sh", var.ecr_repo_name, var.function_name]
   query = {
@@ -139,13 +139,13 @@ resource "aws_lambda_function" "this" {
   source_code_hash = var.is_image ? null : var.source_code_hash
   runtime          = var.is_image ? null : var.runtime
   # Image config
-  image_uri        = var.is_image ? "${var.ecr_repo_url}:${data.external.latest_image_update_log_table["image"].result["latest_image_uri"]}" : null
-  package_type     = var.is_image ? "Image" : null
+  image_uri    = var.is_image ? "${var.ecr_repo_url}:${data.external.latest_image_update_log_table["image"].result["latest_image_uri"]}" : null
+  package_type = var.is_image ? "Image" : null
   # Constants
-  function_name    = var.function_name
-  role             = var.role_arn
-  timeout          = var.timeout
-  memory_size      = var.memory_size
+  function_name = var.function_name
+  role          = var.role_arn
+  timeout       = var.timeout
+  memory_size   = var.memory_size
 
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []

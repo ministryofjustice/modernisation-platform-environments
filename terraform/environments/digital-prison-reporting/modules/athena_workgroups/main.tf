@@ -6,7 +6,7 @@
 */
 
 resource "aws_athena_workgroup" "main" {
-  count       = var.setup_athena_workgroup ? 1 : 0
+  count = var.setup_athena_workgroup ? 1 : 0
 
   name        = var.name
   description = length(var.description) > 0 ? var.description : format("The workgroup for %s.", var.name)
