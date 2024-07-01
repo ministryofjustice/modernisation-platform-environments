@@ -263,7 +263,6 @@ resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
   count              = var.container_instance_type == "windows" ? 1 : 0
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn # grants the Amazon ECS container agents permission to make AWS API calls on your behalf
   task_role_arn      = aws_iam_role.ecs_task_execution_role.arn # assumed by the containers running in the task, allowing your application code (on the container) to use other AWS services
-  # the task IAM role is set the same as the execution role, from the Console it does not look like there is a task role set in the task definition
   requires_compatibilities = [
     "EC2",
   ]
@@ -286,7 +285,7 @@ resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
   family             = "${var.app_name}-task-definition"
   # network_mode       = var.network_mode
   count              = var.container_instance_type == "linux" ? 1 : 0
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn # grants the Amazon ECS container agents permission to make AWS API calls on your behalf
   requires_compatibilities = [
     "EC2",
   ]
