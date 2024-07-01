@@ -16,7 +16,12 @@ from pyspark.sql import DataFrame
 
 # ===============================================================================
 
-sc = SparkContext.getOrCreate()
+sc = SparkContext()
+sc._jsc.hadoopConfiguration().set("spark.executor.cores", "3")
+sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.enabled", "true")
+sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "2g")
+sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.enabled", "true")
+
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
@@ -52,7 +57,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "glue_catalog_tbl_name",
                        "rds_sqlserver_db",
                        "rds_sqlserver_db_schema",
-                       "repartition_factor",
+                       "num_of_repartitions",
+                       "read_partition_size_mb",
                        "max_table_size_mb",
                        "rds_df_trim_str_columns"
                        ]
@@ -400,8 +406,9 @@ def get_reordered_columns_schema_object(in_df_rds: DataFrame, in_transformed_col
 
 def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, input_repartition_factor) -> DataFrame:
 
-    default_repartition_factor = input_repartition_factor \
-                                    if total_files <= 1 else total_files * input_repartition_factor
+    read_partitions = int(total_size_mb/int(args['read_partition_size_mb']))
+    
+    num_of_repartitions = int(args['num_of_repartitions'])
 
     sql_select_str = f"""
     select cast(null as timestamp) as run_datetime,
@@ -424,8 +431,16 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     if tbl_prq_s3_folder_path is not None:
         # -------------------------------------------------------
 
+        jdbc_partition_column = ''
+
         if args.get('rds_db_tbl_pkeys_col_list', None) is None:
             df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
+            LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+
+            if num_of_repartitions != 0:
+                df_rds_temp = df_rds_temp.repartition(num_of_repartitions)
+                LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+
         else:
             rds_db_tbl_pkeys_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
                                          for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
@@ -444,7 +459,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                 LOGGER.error(f"""PrimaryKey column(s) are more than one (OR) not an integer datatype column!""")
                 sys.exit(1)
         
-            jdbc_read_partitions_num = 3 if total_files < 3 else total_files
+            jdbc_read_partitions_num = read_partitions \
+                                        if read_partitions > total_files else total_files
 
             df_rds_count = get_rds_db_table_row_count(rds_db_name, rds_tbl_name, 
                                                       rds_db_tbl_pkeys_col_list)
@@ -462,12 +478,12 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
                                                           jdbc_partition_col_upperbound,
                                                           jdbc_read_partitions_num,
                                                           jdbc_rows_fetch_size)
-        # -------------------------------------------------------
+            LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
 
-        LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
-        
-        df_rds_temp = df_rds_temp.repartition(default_repartition_factor)
-        LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+            if num_of_repartitions != 0:
+                df_rds_temp = df_rds_temp.repartition(num_of_repartitions, jdbc_partition_column)
+                LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+            # -------------------------------------------------------
 
         df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
         # -------------------------------------------------------
@@ -512,13 +528,17 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
 
         df_rds_temp_t5 = df_rds_temp_t4.cache()
 
+        LOGGER.info(f"""S3-Folder-Parquet-Read: Total Size >> {total_size_mb}MB""")
         df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
         LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
-        df_prq_temp = df_prq_temp.repartition(default_repartition_factor)
-        LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: RE-PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
-
-        LOGGER.info(f"""S3-Folder-Parquet-Read: Total Size >> {total_size_mb}MB""")
+        if num_of_repartitions != 0:
+            if jdbc_partition_column.strip() != '':
+                df_prq_temp = df_prq_temp.repartition(num_of_repartitions, jdbc_partition_column)
+                LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+            else:
+                df_prq_temp = df_prq_temp.repartition(num_of_repartitions)
+                LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
 
         df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, 
                                                                      rds_db_name, 
