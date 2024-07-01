@@ -1,22 +1,22 @@
-# Terraform configuration data for environments in delius-mis development account
+# Terraform configuration data for environments in delius-mis preproduction account
 
 locals {
-  environment_config_dev = {
+  environment_config_preprod = {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
-    legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
-    legacy_ad_domain_name                  = "delius-mis-dev.local"
-    legacy_ad_ip_list                      = ["10.162.36.235", "10.162.35.251"]
+    legacy_counterpart_vpc_cidr            = "10.160.0.0/20"
+    legacy_ad_domain_name                  = "delius-mis-preprod.local"
+    legacy_ad_ip_list                      = ["10.160.0.163", "10.160.6.66"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
-    migration_environment_full_name        = "dmd-mis-dev"
+    migration_environment_full_name        = "dmd-mis-preprod"
     migration_environment_abbreviated_name = "dmd"
-    migration_environment_short_name       = "mis-dev"
+    migration_environment_short_name       = "mis-preprod"
   }
 
-  bastion_config_dev = {
+  bastion_config_preprod = {
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-  bcs_config_dev = {
+  bcs_config_preprod = {
     instance_count = 1
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
@@ -61,7 +61,7 @@ locals {
     }
   }
 
-  bps_config_dev = {
+  bps_config_preprod = {
     instance_count = 1
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
@@ -106,7 +106,7 @@ locals {
     }
   }
 
-  bws_config_dev = {
+  bws_config_preprod = {
     instance_count = 1
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
@@ -151,7 +151,7 @@ locals {
     }
   }
 
-  dis_config_dev = {
+  dis_config_preprod = {
     instance_count = 2
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
@@ -197,7 +197,7 @@ locals {
   }
 
   # base config for each database
-  base_db_config_dev = {
+  base_db_config_preprod = {
     instance_type  = "t3.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -240,11 +240,11 @@ locals {
   }
 
   # use slightly different config for each database
-  dsd_db_config_dev = local.base_db_config_dev
+  dsd_db_config_preprod = local.base_db_config_preprod
 
-  boe_db_config_dev = local.base_db_config_dev
+  boe_db_config_preprod = local.base_db_config_preprod
 
-  mis_db_config_dev = merge(local.base_db_config_dev, {
+  mis_db_config_preprod = merge(local.base_db_config_preprod, {
     ebs_volume_config = {
       data = {
         iops       = 5000
