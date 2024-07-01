@@ -6,8 +6,9 @@
     "test": {
       "georget": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFMvFEa8HMnXQzOZydY/eKiEdOeP/poWbWo3konsabOw george.taylor@digital.justice.gov.uk"
     },
+    "stage": {
+    },
     "preprod": {
-      "georget": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFMvFEa8HMnXQzOZydY/eKiEdOeP/poWbWo3konsabOw george.taylor@digital.justice.gov.uk"
     }
   }
 }
