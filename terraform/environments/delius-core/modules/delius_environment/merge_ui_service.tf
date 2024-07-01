@@ -12,6 +12,8 @@ module "merge_ui_service" {
   container_secrets_default      = {}
   container_secrets_env_specific = try(var.delius_microservice_configs.merge_ui.container_secrets_env_specific, {})
 
+  desired_count = 0
+
   container_port_config = [
     {
       containerPort = var.delius_microservice_configs.merge_ui.container_port

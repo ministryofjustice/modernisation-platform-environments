@@ -17,6 +17,8 @@ module "gdpr_api_service" {
     "SECURITY_OAUTH2_CLIENT_CLIENT-SECRET" : aws_ssm_parameter.delius_core_gdpr_api_client_secret.arn
   }
 
+  desired_count = 0
+
   container_secrets_env_specific = try(var.delius_microservice_configs.gdpr_api.container_secrets_env_specific, {})
 
   db_ingress_security_groups = []
