@@ -115,12 +115,13 @@ data "aws_instances" "tribunals_instance" {
   }
 }
 
-# resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
-#   for_each         = aws_lb_target_group.tribunals_target_group
-#   target_group_arn = each.value.arn
-#   target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
-#   port             = each.value.port
-# }
+resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
+  depends_on       = [ aws_launch_template.tribunals-all-lt ]
+  for_each         = aws_lb_target_group.tribunals_target_group
+  target_group_arn = each.value.arn
+  target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
+  port             = each.value.port
+}
 
 # resource "aws_lb_listener_rule" "admin_access_1" {
 #   listener_arn = aws_lb_listener.tribunals_lb.arn
