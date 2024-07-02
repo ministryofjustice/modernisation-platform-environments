@@ -87,6 +87,7 @@ resource "aws_iam_policy" "allow_describe_repo_image" {
 
 resource "aws_iam_role_policy_attachment" "allow_describe_repo_image_policy_attachment" {
   depends_on = [aws_iam_policy.allow_describe_repo_image]
+  for_each = var.is_image ? { "image": 1 } : {}
   role       = var.role_name
   policy_arn = aws_iam_policy.allow_describe_repo_image.arn
 }
