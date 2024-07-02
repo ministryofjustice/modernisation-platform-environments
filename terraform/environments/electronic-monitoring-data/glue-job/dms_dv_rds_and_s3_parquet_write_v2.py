@@ -415,9 +415,7 @@ def get_df_jdbc_read_rds_partitions(rds_db_name,
                                 if jdbc_partition_col_upperbound > rds_read_rows_fetch_size \
                                     else rds_read_rows_fetch_size
 
-    df_rds_temp = get_df_read_rds_db_tbl_int_pkey(rds_db_name, 
-                                                  rds_tbl_name, 
-                                                  rds_tbl_pkeys_list, 
+    df_rds_temp = get_df_read_rds_db_tbl_int_pkey(rds_db_name, rds_tbl_name, 
                                                   jdbc_partition_column,
                                                   jdbc_partition_col_upperbound,
                                                   jdbc_read_partitions_num,
