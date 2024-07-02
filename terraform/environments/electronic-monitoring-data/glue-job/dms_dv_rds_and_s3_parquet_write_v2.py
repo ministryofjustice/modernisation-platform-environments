@@ -427,7 +427,7 @@ def get_df_jdbc_read_rds_partitions(rds_db_name,
     return df_rds_temp
 
 
-def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, input_repartition_factor) -> DataFrame:
+def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) -> DataFrame:
 
     read_partitions = int(total_size_mb/int(args['read_partition_size_mb']))
     
@@ -442,7 +442,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb, 
     cast(null as string) as table_to_ap
     """.strip()
 
-    df_dv_output = spark.sql(sql_select_str).repartition(input_repartition_factor)
+    df_dv_output = spark.sql(sql_select_str).repartition(3)
 
     tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
 
@@ -767,13 +767,10 @@ if __name__ == "__main__":
                 continue
             # -------------------------------------------------------
 
-            input_repartition_factor = int(args["repartition_factor"])
-
             df_dv_output = process_dv_for_table(rds_db_name, 
                                                 rds_tbl_name, 
                                                 total_files, 
-                                                total_size_mb, 
-                                                input_repartition_factor)
+                                                total_size_mb)
 
             write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
 
@@ -814,13 +811,10 @@ if __name__ == "__main__":
                 LOGGER.warn(f""">> Size greaterthan {args["max_table_size_mb"]}MB ({total_size_mb}MB) <<""")
             # -------------------------------------------------------
 
-            input_repartition_factor = int(args["repartition_factor"])
-
             df_dv_output = process_dv_for_table(rds_db_name, 
                                                 rds_tbl_name, 
                                                 total_files, 
-                                                total_size_mb, 
-                                                input_repartition_factor)
+                                                total_size_mb)
 
             write_parquet_to_s3(df_dv_output, rds_db_name, db_sch_tbl)
     # -------------------------------------------------------
