@@ -3,20 +3,17 @@ locals {
 #!/bin/bash
 
 ### Temp install of AWS CLI - removed once actual AMI is used
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo yum install -y unzip
-unzip awscliv2.zip
-sudo ./aws/install
-##############
-
-### Temp command to use V2 of metadata to get userdata - removed once actual AMI is used
-TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
-PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# sudo yum install -y unzip
+# unzip awscliv2.zip
+# sudo ./aws/install
 ##############
 
 hostnamectl set-hostname ${local.cm_hostname}
 
-# PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
+PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 APP1_IP=""
 DB_IP=""
 
@@ -36,17 +33,18 @@ sudo bash -c "echo '$PRIVATE_IP	${local.application_name_short}-app2.${data.aws_
 
 
 ## Mounting to EFS - uncomment when AMI has been applied
-# echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# mount -a
-# mount_status=$?
-# while [[ $mount_status != 0 ]]
-# do
-#   sleep 10
-#   mount -a
-#   mount_status=$?
-# done
+echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
 
-
+## Update SSH key allowed
+echo "${local.cwa_ec2_key}" > .ssh/authorized_keys
 
 EOF
 
@@ -135,7 +133,7 @@ resource "aws_ebs_volume" "concurrent_manager" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].concurrent_manager_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].concurrent_manager_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]

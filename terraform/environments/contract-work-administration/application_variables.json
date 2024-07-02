@@ -13,10 +13,10 @@
       "ebs_oratmp_size": "100",
       "ebs_oraredo_size": "100",
       "ebs_share_size": "50",
-      "cm_ami_id": "ami-035cecbff25e0d91e",
+      "cm_ami_id": "ami-07139570f6fafb6e4",
       "cm_instance_type": "m4.xlarge",
       "ebs_concurrent_manager_size": "200",
-      "app_ami_id": "ami-035cecbff25e0d91e",
+      "app_ami_id": "ami-07139570f6fafb6e4",
       "app_instance_type": "m4.xlarge",
       "ebs_app_size": "200",
       "cwa_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC92LfXDL43cbcigHidm0PIm2gxZa82nu6F/p8XTMbCZzD6NJKgzA5voB/htRuK8FVlhYf89TXDeiabLBJgH9666W99m/Su3Tn4YX2NcOshKelVMt6cQIRdRv35s2nhPl+a6lVE2JxeK8hmkrrSAs4h1JoUQeK//SeVTzLQz2SOe9v0l3yB8EN0hGt/0VyOyMkP5KHxywvBQd0hA3k/1zTadtCWkh0YcGO0kYo7uQ6rG1joeKCYZFYjw7H8bgx1DyrB0+baRqxkwfCw+YdynKXLK4IvakjBuNfybrs8qnmTKUZx8nb9ALKM6D9vZ1my/zi0GxQaK9nStgwp7Dqkz96n8B0riuyMK6TPIhoGebSdcVZWmyYAEeMzcf6yOLZkIgKw42hxgjZ+m9GE8FgWU0XDFf50FlACcR/KXBmNu0mskzoD3kDkssVfVeIUpfi/yluMtEmHeLLVIudNPLe96g8GnYEpjRc3fxoRjUCk/U0qrjQG/LDcoSsQuKI76PvcLnc= vincent.cheung@MJ004609",
@@ -32,7 +32,9 @@
       "oraarch_snapshot_id": "snap-0c0c14e6fe5572f9b",
       "oratmp_snapshot_id": "snap-0f9052f7f68ba8d25",
       "oraredo_snapshot_id": "snap-0e05faeec41ffd5be",
-      "share_snapshot_id": "snap-0e4f93177b88c076f"
+      "share_snapshot_id": "snap-0e4f93177b88c076f",
+      "app_snapshot_id": "snap-0713966f6fbd5d43c",
+      "concurrent_manager_snapshot_id": "snap-012a415b26337ede1"
 
     },
     "test": {
