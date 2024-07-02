@@ -630,8 +630,8 @@ def process_dv_for_table(rds_db_name,
             df_dv_output = df_dv_output.union(df_temp)
         # -------------------------------------------------------
 
-        df_rds_temp_t5.unpersist()
-        df_prq_temp_t1.unpersist()
+        df_rds_temp_t5.unpersist(True)
+        df_prq_temp_t1.unpersist(True)
 
     else:
 
