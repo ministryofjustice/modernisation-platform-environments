@@ -7,6 +7,12 @@ resource "aws_sqs_queue" "lambda_dlq" {
   kms_master_key_id = aws_kms_key.lambda_env_key.id
 }
 
+data "external" "empty_bash_script" {
+  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
+
+  program = ["bash", "bash_scripts/empty_bash.sh"]
+}
+
 resource "aws_kms_key" "lambda_env_key" {
   description         = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
   enable_key_rotation = true
@@ -120,15 +126,6 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
-data "external" "latest_image_update_log_table" {
-  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
-
-  program = ["bash", "${path.root}/bash_scripts/get_latest_image.sh", var.ecr_repo_name, var.function_name]
-  query = {
-    latest_image_uri = ""
-  }
-}
-
 
 resource "aws_lambda_function" "this" {
   #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
@@ -139,7 +136,7 @@ resource "aws_lambda_function" "this" {
   source_code_hash = var.is_image ? null : var.source_code_hash
   runtime          = var.is_image ? null : var.runtime
   # Image config
-  image_uri    = var.is_image ? "${var.ecr_repo_url}:${data.external.latest_image_update_log_table["image"].result["latest_image_uri"]}" : null
+  image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic_monitoring_data_lambdas:${var.function_name}-${var.production_dev}" : null
   package_type = var.is_image ? "Image" : null
   # Constants
   function_name = var.function_name
