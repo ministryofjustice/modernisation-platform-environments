@@ -149,59 +149,72 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   )
 }
 
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  // This will find the latest AMI, but if it stops working, you need to find the latest AMI.
+  // Search in the console for "windows ecs optmized" and choose a "Windows_Server-2019-English-Core-ECS_Optimized" from the list
+  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized"
+}
+
 # Create the Launch Template and assign the instance profile
-resource "aws_launch_template" "tribunals-all-lt" {
-  name_prefix            = "tribunals-all"
-  image_id               = "ami-0b145c21f0f71b68c"
-  instance_type          = "m5.4xlarge"
-  update_default_version = true
+# resource "aws_launch_template" "tribunals-all-lt" {
+#   name_prefix            = "tribunals-all"
+#   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+#   instance_type          = "m5.4xlarge"
+#   update_default_version = true
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ec2_instance_profile.name
-  }
+#   iam_instance_profile {
+#     name = aws_iam_instance_profile.ec2_instance_profile.name
+#   }
 
-  block_device_mappings {
-    device_name = "/dev/sda1"
+#   block_device_mappings {
+#     device_name = "/dev/sda1"
 
-    ebs {
-      volume_size = 80
-      volume_type = "gp2"
-    }
-  }
-  ebs_optimized = true
+#     ebs {
+#       volume_size = 80
+#       volume_type = "gp2"
+#     }
+#   }
+#   ebs_optimized = true
 
-  network_interfaces {
-    device_index                = 0
-    security_groups             = [aws_security_group.cluster_ec2.id]
-    subnet_id                   = data.aws_subnet.public_subnets_a.id
-    delete_on_termination       = true
-    associate_public_ip_address = true
-  }
+#   network_interfaces {
+#     device_index                = 0
+#     security_groups             = [aws_security_group.cluster_ec2.id]
+#     subnet_id                   = data.aws_subnet.public_subnets_a.id
+#     delete_on_termination       = true
+#     associate_public_ip_address = true
+#   }
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Environment = local.environment
-    }
-  }
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = {
+#       Environment = local.environment
+#       Name        = "tribunals-instance"
+#     }
+#   }
 
-  user_data = filebase64("ec2-shared-user-data.sh")
+#   user_data = filebase64("ec2-shared-user-data.sh")
 
-}
+# }
 
-# # Finally, create the Auto scaling group for the launch template
-resource "aws_autoscaling_group" "tribunals-all-asg" {
-  vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
-  desired_capacity    = 1
-  max_size            = 1
-  min_size            = 1
-  name                = local.app_name
+# # # Finally, create the Auto scaling group for the launch template
+# resource "aws_autoscaling_group" "tribunals-all-asg" {
+#   vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
+#   desired_capacity    = 1
+#   max_size            = 1
+#   min_size            = 1
+#   name                = local.app_name
 
-  launch_template {
-    id      = aws_launch_template.tribunals-all-lt.id
-    version = "$Latest"
-  }
-}
+#   launch_template {
+#     id      = aws_launch_template.tribunals-all-lt.id
+#     version = "$Latest"
+#   }
+
+#   tag {
+#     key                 = "Name"
+#     value               = "tribunals-instance"
+#     propagate_at_launch = true
+#   }
+# }
 
 ###########################################################################
 
@@ -221,26 +234,8 @@ resource "aws_security_group" "cluster_ec2" {
     to_port     = 0
     protocol    = "-1"
     security_groups = [
-      module.appeals.tribunals_lb_sc_id,
-      module.ahmlr.tribunals_lb_sc_id,
-      module.care_standards.tribunals_lb_sc_id,
-      module.cicap.tribunals_lb_sc_id,
-      module.employment_appeals.tribunals_lb_sc_id,
-      module.finance_and_tax.tribunals_lb_sc_id,
-      module.immigration_services.tribunals_lb_sc_id,
-      module.information_tribunal.tribunals_lb_sc_id,
-      module.lands_tribunal.tribunals_lb_sc_id,
-      module.transport.tribunals_lb_sc_id,
-      module.charity_tribunal_decisions.tribunals_lb_sc_id, module.charity_tribunal_decisions.tribunals_lb_sc_id_sftp,
-      module.claims_management_decisions.tribunals_lb_sc_id, module.claims_management_decisions.tribunals_lb_sc_id_sftp,
-      module.consumer_credit_appeals.tribunals_lb_sc_id, module.consumer_credit_appeals.tribunals_lb_sc_id_sftp,
-      module.estate_agent_appeals.tribunals_lb_sc_id, module.estate_agent_appeals.tribunals_lb_sc_id_sftp,
-      module.primary_health_lists.tribunals_lb_sc_id, module.primary_health_lists.tribunals_lb_sc_id_sftp,
-      module.siac.tribunals_lb_sc_id, module.siac.tribunals_lb_sc_id_sftp,
-      module.sscs_venue_pages.tribunals_lb_sc_id, module.sscs_venue_pages.tribunals_lb_sc_id_sftp,
-      module.tax_chancery_decisions.tribunals_lb_sc_id, module.tax_chancery_decisions.tribunals_lb_sc_id_sftp,
-      module.tax_tribunal_decisions.tribunals_lb_sc_id, module.tax_tribunal_decisions.tribunals_lb_sc_id_sftp,
-      module.ftp_admin_appeals.tribunals_lb_sc_id, module.ftp_admin_appeals.tribunals_lb_sc_id_sftp
+      aws_security_group.tribunals_lb_sc.id,
+      aws_security_group.tribunals_lb_sc_sftp.id
     ]
   }
 

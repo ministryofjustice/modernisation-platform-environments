@@ -48,82 +48,157 @@ variable "services" {
     "appeals" = {
       name_prefix = "administrativeappeals"
       module_key  = "appeals"
+      port        = 49100
     },
     "ahmlr" = {
       name_prefix = "landregistrationdivision"
       module_key  = "ahmlr"
+      port        = 49101
     }
     "care_standards" = {
       name_prefix = "carestandards"
       module_key  = "care_standards"
+      port        = 49102
     },
     "cicap" = {
       name_prefix = "cicap"
       module_key  = "cicap"
+      port        = 49103
     },
     "employment_appeals" = {
       name_prefix = "employmentappeals"
       module_key  = "employment_appeals"
+      port        = 49104
     },
     "finance_and_tax" = {
       name_prefix = "financeandtax"
       module_key  = "finance_and_tax"
+      port        = 49105
     },
     "immigration_services" = {
       name_prefix = "immigrationservices"
       module_key  = "immigration_services"
+      port        = 49106
     },
     "information_tribunal" = {
       name_prefix = "informationrights"
       module_key  = "information_tribunal"
+      port        = 49107
     },
     "lands_tribunal" = {
       name_prefix = "landschamber"
       module_key  = "lands_tribunal"
+      port        = 49108
     },
     "transport" = {
       name_prefix = "transportappeals"
       module_key  = "transport"
+      port        = 49109
     },
     "charity_tribunal_decisions" = {
       name_prefix = "charitytribunal"
       module_key  = "charity_tribunal_decisions"
+      port        = 49110
     },
     "claims_management_decisions" = {
       name_prefix = "claimsmanagement"
       module_key  = "claims_management_decisions"
+      port        = 49111
     },
     "consumer_credit_appeals" = {
       name_prefix = "consumercreditappeals"
       module_key  = "consumer_credit_appeals"
+      port        = 49112
     },
     "estate_agent_appeals" = {
       name_prefix = "estateagentappeals"
       module_key  = "estate_agent_appeals"
+      port        = 49113
     },
     "primary_health_lists" = {
       name_prefix = "primaryhealthlists"
       module_key  = "primary_health_lists"
+      port        = 49114
     },
     "siac" = {
       name_prefix = "siac"
       module_key  = "siac"
+      port        = 49115
     },
     "sscs_venue_pages" = {
       name_prefix = "sscsvenues"
       module_key  = "sscs_venue_pages"
+      port        = 49116
     },
     "tax_chancery_decisions" = {
       name_prefix = "taxchancerydecisions"
       module_key  = "tax_chancery_decisions"
+      port        = 49117
     },
     "tax_tribunal_decisions" = {
       name_prefix = "taxtribunaldecisions"
       module_key  = "tax_tribunal_decisions"
+      port        = 49118
     },
     "ftp_admin_appeals" = {
       name_prefix = "adminappealsreports"
       module_key  = "ftp_admin_appeals"
+      port        = 49119
+    }
+  }
+}
+
+variable "web_app_services" {
+  default = {
+    "appeals" = {
+      name_prefix = "administrativeappeals"
+      module_key  = "appeals"
+      port        = 49100
+    },
+    "ahmlr" = {
+      name_prefix = "landregistrationdivision"
+      module_key  = "ahmlr"
+      port        = 49101
+    }
+    "care_standards" = {
+      name_prefix = "carestandards"
+      module_key  = "care_standards"
+      port        = 49102
+    },
+    "cicap" = {
+      name_prefix = "cicap"
+      module_key  = "cicap"
+      port        = 49103
+    },
+    "employment_appeals" = {
+      name_prefix = "employmentappeals"
+      module_key  = "employment_appeals"
+      port        = 49104
+    },
+    "finance_and_tax" = {
+      name_prefix = "financeandtax"
+      module_key  = "finance_and_tax"
+      port        = 49105
+    },
+    "immigration_services" = {
+      name_prefix = "immigrationservices"
+      module_key  = "immigration_services"
+      port        = 49106
+    },
+    "information_tribunal" = {
+      name_prefix = "informationrights"
+      module_key  = "information_tribunal"
+      port        = 49107
+    },
+    "lands_tribunal" = {
+      name_prefix = "landschamber"
+      module_key  = "lands_tribunal"
+      port        = 49108
+    },
+    "transport" = {
+      name_prefix = "transportappeals"
+      module_key  = "transport"
+      port        = 49109
     }
   }
 }
@@ -133,42 +208,52 @@ variable "sftp_services" {
     "charity_tribunal_decisions" = {
       name_prefix = "charitytribunal"
       module_key  = "charity_tribunal_decisions"
+      sftp_port   = 10022
     },
     "claims_management_decisions" = {
       name_prefix = "claimsmanagement"
       module_key  = "claims_management_decisions"
+      sftp_port   = 10023
     },
     "consumer_credit_appeals" = {
       name_prefix = "consumercreditappeals"
       module_key  = "consumer_credit_appeals"
+      sftp_port   = 10024
     },
     "estate_agent_appeals" = {
       name_prefix = "estateagentappeals"
       module_key  = "estate_agent_appeals"
+      sftp_port   = 10025
     },
     "primary_health_lists" = {
       name_prefix = "primaryhealthlists"
       module_key  = "primary_health_lists"
+      sftp_port   = 10026
     },
     "siac" = {
       name_prefix = "siac"
       module_key  = "siac"
+      sftp_port   = 10027
     },
     "sscs_venue_pages" = {
       name_prefix = "sscsvenues"
       module_key  = "sscs_venue_pages"
+      sftp_port   = 10028
     },
     "tax_chancery_decisions" = {
       name_prefix = "taxchancerydecisions"
       module_key  = "tax_chancery_decisions"
+      sftp_port   = 10029
     },
     "tax_tribunal_decisions" = {
       name_prefix = "taxtribunaldecisions"
       module_key  = "tax_tribunal_decisions"
+      sftp_port   = 10030
     },
     "ftp_admin_appeals" = {
       name_prefix = "adminappealsreports"
       module_key  = "ftp_admin_appeals"
+      sftp_port   = 10031
     }
   }
 }
@@ -219,8 +304,8 @@ resource "aws_route53_record" "external_services" {
   type     = "A"
 
   alias {
-    name                   = local.modules[each.value.module_key].tribunals_lb.dns_name
-    zone_id                = local.modules[each.value.module_key].tribunals_lb.zone_id
+    name                   = aws_lb.tribunals_lb.dns_name
+    zone_id                = aws_lb.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
@@ -232,6 +317,6 @@ resource "aws_route53_record" "sftp_external_services" {
   zone_id         = data.aws_route53_zone.external.zone_id
   name            = "sftp.${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
-  records         = [local.sftp_modules[each.value.module_key].tribunals_lb_ftp[0].dns_name]
+  records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60
 }
