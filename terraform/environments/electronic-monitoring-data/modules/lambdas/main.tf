@@ -66,11 +66,11 @@ data "aws_iam_policy_document" "allow_describe_repo_image" {
     effect = "Allow"
 
     actions = [
+      "ecr:BatchCheckLayerAvailability",
       "ecr:BatchGetImage",
       "ecr:GetDownloadUrlForLayer",
-      "ecr:SetRepositoryPolicy",
-      "ecr:DeleteRepositoryPolicy",
-      "ecr:GetRepositoryPolicy"
+      "ecr:DescribeRepositories",
+      "ecr:ListImages"
     ]
 
     resources = [
