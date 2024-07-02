@@ -3,20 +3,33 @@ locals {
 #!/bin/bash
 
 ### Temp install of AWS CLI - removed once actual AMI is used
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo yum install -y unzip
-unzip awscliv2.zip
-sudo ./aws/install
-##############
-
-### Temp command to use V2 of metadata to get userdata - removed once actual AMI is used
-TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
-PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# sudo yum install -y unzip
+# unzip awscliv2.zip
+# sudo ./aws/install
 ##############
 
 hostnamectl set-hostname ${local.database_hostname}
 
-#PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+## Mounting to EFS - uncomment when AMI has been applied
+echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
+
+## Update SSH key allowed
+echo "${local.application_data.accounts[local.environment].cwa_ec2_key}" > .ssh/authorized_keys
+
+
+
+
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
 APP1_IP=""
 CM_IP=""
 
@@ -34,16 +47,6 @@ sudo bash -c "echo '$PRIVATE_IP	${local.application_name_short}-db.${data.aws_ro
 sudo bash -c "echo '$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}' >> /etc/hosts"
 sudo bash -c "echo '$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}' >> /etc/hosts"
 
-## Mounting to EFS - uncomment when AMI has been applied
-# echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# mount -a
-# mount_status=$?
-# while [[ $mount_status != 0 ]]
-# do
-#   sleep 10
-#   mount -a
-#   mount_status=$?
-# done
 
 EOF
 
@@ -274,7 +277,7 @@ resource "aws_ebs_volume" "oradata" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -298,7 +301,7 @@ resource "aws_ebs_volume" "oracle" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oracle_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oracle_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -322,7 +325,7 @@ resource "aws_ebs_volume" "oraarch" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oraarch_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -346,7 +349,7 @@ resource "aws_ebs_volume" "oratmp" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oratmp_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oratmp_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -370,7 +373,7 @@ resource "aws_ebs_volume" "oraredo" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -394,7 +397,7 @@ resource "aws_ebs_volume" "share" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].share_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].share_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
