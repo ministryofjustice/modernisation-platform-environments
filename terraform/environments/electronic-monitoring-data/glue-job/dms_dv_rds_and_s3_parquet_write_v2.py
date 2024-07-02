@@ -454,7 +454,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
         if args.get('rds_db_tbl_pkeys_col_list', None) is None:
             
             if RECORDED_PKEYS_LIST.get(rds_db_name, None) is None:
-                
+                LOGGER.warn(f"""No READ-partition columns given !""")
                 df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
 
             else:
@@ -462,7 +462,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
                 if isinstance(RECORDED_PKEYS_LIST[rds_db_name], list):
 
                     jdbc_partition_column = get_jdbc_partition_column(rds_db_name, rds_tbl_name, RECORDED_PKEYS_LIST[rds_db_name])
-                    LOGGER.info(f"""jdbc_partition_column = {jdbc_partition_column}""")
+                    LOGGER.info(f"""RECORDED_PKEYS_LIST[rds_db_name] = {RECORDED_PKEYS_LIST[rds_db_name]}""")
 
                     df_rds_temp = get_df_jdbc_read_rds_partitions(rds_db_name, 
                                                                   rds_tbl_name, 
@@ -486,7 +486,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
 
             jdbc_partition_column = get_jdbc_partition_column(rds_db_name, rds_tbl_name, rds_db_tbl_pkeys_col_list)
             LOGGER.info(f"""jdbc_partition_column = {jdbc_partition_column}""")
-            
+
             df_rds_temp = get_df_jdbc_read_rds_partitions(rds_db_name, 
                                                           rds_tbl_name, 
                                                           rds_db_tbl_pkeys_col_list,
