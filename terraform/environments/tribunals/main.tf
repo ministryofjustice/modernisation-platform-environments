@@ -1,5 +1,6 @@
 locals {
   rds_url            = aws_db_instance.rdsdb.address
+  app_load_balancer  = aws_lb.tribunals_lb
   rds_user           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
   rds_port           = "1433"
   rds_password       = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
@@ -15,6 +16,7 @@ module "appeals" {
   # The app_name needs to match the folder name in the volume
   app_name                     = "appeals"
   app_url                      = "administrativeappeals"
+  module_name                  = "appeals"
   sql_migration_path           = "../scripts/administrative_appeals"
   app_db_name                  = "ossc"
   app_db_login_name            = "ossc-app"
@@ -26,6 +28,7 @@ module "appeals" {
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
+  app_load_balancer            = local.app_load_balancer
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -44,6 +47,9 @@ module "appeals" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["appeals"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "ahmlr" {
@@ -51,6 +57,7 @@ module "ahmlr" {
   source                       = "./modules/tribunal"
   app_name                     = "hmlands"
   app_url                      = "landregistrationdivision"
+  module_name                  = "ahmlr"
   sql_migration_path           = "../scripts/ahmlr"
   app_db_name                  = "hmlands"
   app_db_login_name            = "hmlands-app"
@@ -62,6 +69,7 @@ module "ahmlr" {
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
+  app_load_balancer            = local.app_load_balancer
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -80,12 +88,16 @@ module "ahmlr" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["ahmlr"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "care_standards" {
   is_ftp_app                   = false
   source                       = "./modules/tribunal"
   app_name                     = "care-standards"
+  module_name                  = "care_standards"
   app_url                      = "carestandards"
   sql_migration_path           = "../scripts/care_standards"
   app_db_name                  = "carestandards"
@@ -98,6 +110,7 @@ module "care_standards" {
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
+  app_load_balancer            = local.app_load_balancer
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -116,6 +129,9 @@ module "care_standards" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["care_standards"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "cicap" {
@@ -123,6 +139,7 @@ module "cicap" {
   source                       = "./modules/tribunal"
   app_name                     = "cicap"
   app_url                      = "cicap"
+  module_name                  = "cicap"
   sql_migration_path           = "../scripts/cicap"
   app_db_name                  = "cicap"
   app_db_login_name            = "cicap-app"
@@ -131,6 +148,7 @@ module "cicap" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -152,6 +170,9 @@ module "cicap" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "CaseFiles"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["cicap"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "employment_appeals" {
@@ -159,6 +180,7 @@ module "employment_appeals" {
   source                       = "./modules/tribunal"
   app_name                     = "employment-appeals"
   app_url                      = "employmentappeals"
+  module_name                  = "employment_appeals"
   sql_migration_path           = "../scripts/employment_appeals"
   app_db_name                  = "eat"
   app_db_login_name            = "eat-app"
@@ -167,6 +189,7 @@ module "employment_appeals" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -188,6 +211,9 @@ module "employment_appeals" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Public/Upload"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["employment_appeals"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "finance_and_tax" {
@@ -195,6 +221,7 @@ module "finance_and_tax" {
   source                       = "./modules/tribunal"
   app_name                     = "finance-and-tax"
   app_url                      = "financeandtax"
+  module_name                  = "finance_and_tax"
   sql_migration_path           = "../scripts/finance_and_tax"
   app_db_name                  = "ftt"
   app_db_login_name            = "ftt-app"
@@ -203,6 +230,7 @@ module "finance_and_tax" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -224,6 +252,9 @@ module "finance_and_tax" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["finance_and_tax"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "immigration_services" {
@@ -231,6 +262,7 @@ module "immigration_services" {
   source                       = "./modules/tribunal"
   app_name                     = "immigration-services"
   app_url                      = "immigrationservices"
+  module_name                  = "immigration_services"
   sql_migration_path           = "../scripts/immigration_services"
   app_db_name                  = "imset"
   app_db_login_name            = "imset-app"
@@ -239,6 +271,7 @@ module "immigration_services" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -260,6 +293,9 @@ module "immigration_services" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["immigration_services"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "information_tribunal" {
@@ -267,6 +303,7 @@ module "information_tribunal" {
   source                       = "./modules/tribunal"
   app_name                     = "information-tribunal"
   app_url                      = "informationrights"
+  module_name                  = "information_tribunal"
   sql_migration_path           = "../scripts/information_tribunal"
   app_db_name                  = "it"
   app_db_login_name            = "it-app"
@@ -275,6 +312,7 @@ module "information_tribunal" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -296,6 +334,9 @@ module "information_tribunal" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "DBFiles"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["information_tribunal"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "lands_tribunal" {
@@ -303,6 +344,7 @@ module "lands_tribunal" {
   source                       = "./modules/tribunal"
   app_name                     = "lands-chamber"
   app_url                      = "landschamber"
+  module_name                  = "lands_tribunal"
   sql_migration_path           = "../scripts/lands_chamber"
   app_db_name                  = "lands"
   app_db_login_name            = "lands-app"
@@ -311,6 +353,7 @@ module "lands_tribunal" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -332,6 +375,9 @@ module "lands_tribunal" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["lands_tribunal"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "transport" {
@@ -339,6 +385,7 @@ module "transport" {
   source                       = "./modules/tribunal"
   app_name                     = "transport"
   app_url                      = "transportappeals"
+  module_name                  = "transport"
   sql_migration_path           = "../scripts/transport"
   app_db_name                  = "transport"
   app_db_login_name            = "transport-app"
@@ -347,6 +394,7 @@ module "transport" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
+  app_load_balancer            = local.app_load_balancer
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -368,244 +416,307 @@ module "transport" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
+  target_group_attachment_port = var.services["transport"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
 }
 
 module "charity_tribunal_decisions" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-charity-tribunals"
-  app_url                      = "charitytribunal"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-charity-tribunals"
+  app_url                           = "charitytribunal"
+  module_name                       = "charity_tribunal_decisions"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["charity_tribunal_decisions"].port
+  target_group_attachment_port_sftp = var.sftp_services["charity_tribunal_decisions"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "claims_management_decisions" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-claims-management"
-  app_url                      = "claimsmanagement"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "Documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-claims-management"
+  app_url                           = "claimsmanagement"
+  module_name                       = "claims_management_decisions"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["claims_management_decisions"].port
+  target_group_attachment_port_sftp = var.sftp_services["claims_management_decisions"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "consumer_credit_appeals" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-consumer-credit"
-  app_url                      = "consumercreditappeals"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "Documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-consumer-credit"
+  app_url                           = "consumercreditappeals"
+  module_name                       = "consumer_credit_appeals"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["consumer_credit_appeals"].port
+  target_group_attachment_port_sftp = var.sftp_services["consumer_credit_appeals"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "estate_agent_appeals" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-estate-agents"
-  app_url                      = "estateagentappeals"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "Documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-estate-agents"
+  app_url                           = "estateagentappeals"
+  module_name                       = "estate_agent_appeals"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["estate_agent_appeals"].port
+  target_group_attachment_port_sftp = var.sftp_services["estate_agent_appeals"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "primary_health_lists" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-primary-health"
-  app_url                      = "primaryhealthlists"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "Documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-primary-health"
+  app_url                           = "primaryhealthlists"
+  module_name                       = "primary_health_lists"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["primary_health_lists"].port
+  target_group_attachment_port_sftp = var.sftp_services["primary_health_lists"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "siac" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-siac"
-  app_url                      = "siac"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "Documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-siac"
+  app_url                           = "siac"
+  module_name                       = "siac"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["siac"].port
+  target_group_attachment_port_sftp = var.sftp_services["siac"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "sscs_venue_pages" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-sscs-venues"
-  app_url                      = "sscsvenues"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "Documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-sscs-venues"
+  app_url                           = "sscsvenues"
+  module_name                       = "sscs_venue_pages"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["sscs_venue_pages"].port
+  target_group_attachment_port_sftp = var.sftp_services["sscs_venue_pages"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "tax_chancery_decisions" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-tax-chancery"
-  app_url                      = "taxchancerydecisions"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "Documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-tax-chancery"
+  app_url                           = "taxchancerydecisions"
+  module_name                       = "tax_chancery_decisions"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["tax_chancery_decisions"].port
+  target_group_attachment_port_sftp = var.sftp_services["tax_chancery_decisions"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "tax_tribunal_decisions" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-tax-tribunal"
-  app_url                      = "taxtribunaldecisions"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "Documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-tax-tribunal"
+  app_url                           = "taxtribunaldecisions"
+  module_name                       = "tax_tribunal_decisions"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["tax_tribunal_decisions"].port
+  target_group_attachment_port_sftp = var.sftp_services["tax_tribunal_decisions"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
 
 module "ftp_admin_appeals" {
-  is_ftp_app                   = true
-  source                       = "./modules/tribunal_ftp"
-  app_name                     = "ftp-admin-appeals"
-  app_url                      = "adminappealsreports"
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "Documents"
-  waf_arn                      = local.waf_arn
+  is_ftp_app                        = true
+  source                            = "./modules/tribunal_ftp"
+  app_name                          = "ftp-admin-appeals"
+  app_url                           = "adminappealsreports"
+  module_name                       = "ftp_admin_appeals"
+  environment                       = local.environment
+  application_data                  = local.application_data.accounts[local.environment]
+  tags                              = local.tags
+  task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity           = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold         = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold         = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                         = local.application_data.accounts[local.environment].app_count
+  server_port                       = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                     = data.aws_vpc.shared.id
+  subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external      = aws_acm_certificate.external
+  documents_location                = "Documents"
+  waf_arn                           = local.waf_arn
+  target_group_attachment_port      = var.services["ftp_admin_appeals"].port
+  target_group_attachment_port_sftp = var.sftp_services["ftp_admin_appeals"].sftp_port
+  app_load_balancer                 = local.app_load_balancer
+  target_group_arns                 = local.target_group_arns
+  target_group_arns_sftp            = local.target_group_arns_sftp
 }
