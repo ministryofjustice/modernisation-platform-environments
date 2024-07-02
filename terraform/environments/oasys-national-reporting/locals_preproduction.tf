@@ -14,6 +14,25 @@ locals {
   # please keep resources in alphabetical order
   baseline_preproduction = {
 
+    ec2_instances = {
+      t2-onr-bods-1-a = merge(local.defaults_bods_ec2, {
+        config = merge(local.defaults_bods_ec2.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2024-07-02T00-00-37.755Z"
+          availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.defaults_bods_ec2.instance, {
+          instance_type = "m6i.2xlarge"
+        })
+        # volumes are a direct copy of BODS in NCR
+        ebs_volumes = merge(local.defaults_bods_ec2.ebs_volumes, {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+          "/dev/sdb"  = { type = "gp3", size = 100 }
+          "/dev/sdc"  = { type = "gp3", size = 100 }
+          "/dev/sds"  = { type = "gp3", size = 100 }
+        })
+      })
+    }
+
     # Instance Type Defaults for preproduction
     # instance_type_defaults = {
     #   web = "m6i.xlarge" # 4 vCPUs, 16GB RAM x 2 instances
