@@ -121,146 +121,146 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   }
 }
 
-resource "aws_lb_listener_rule" "admin_access_1" {
-  for_each     = var.web_app_services
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 21
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
-  }
-  condition {
-    path_pattern {
-      values = ["*/admin*", "*/secure*"]
-    }
-  }
+# resource "aws_lb_listener_rule" "admin_access_1" {
+#   for_each     = var.web_app_services
+#   listener_arn = aws_lb_listener.tribunals_lb.arn
+#   priority     = index(keys(var.web_app_services), each.key) + 21
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
+#   }
+#   condition {
+#     path_pattern {
+#       values = ["*/admin*", "*/secure*"]
+#     }
+#   }
 
-  condition {
-    source_ip {
-      values = ["20.26.11.71/32", "20.26.11.108/32", "20.49.214.199/32"]
-    }
-  }
-}
+#   condition {
+#     source_ip {
+#       values = ["20.26.11.71/32", "20.26.11.108/32", "20.49.214.199/32"]
+#     }
+#   }
+# }
 
-resource "aws_lb_listener_rule" "admin_access_2" {
-  for_each     = var.web_app_services
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 31
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
-  }
-  condition {
-    path_pattern {
-      values = ["*/admin*", "*/secure*"]
-    }
-  }
+# resource "aws_lb_listener_rule" "admin_access_2" {
+#   for_each     = var.web_app_services
+#   listener_arn = aws_lb_listener.tribunals_lb.arn
+#   priority     = index(keys(var.web_app_services), each.key) + 31
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
+#   }
+#   condition {
+#     path_pattern {
+#       values = ["*/admin*", "*/secure*"]
+#     }
+#   }
 
-  condition {
-    source_ip {
-      values = ["20.49.214.228/32", "51.149.249.0/29", "51.149.249.32/29"]
-    }
-  }
-}
+#   condition {
+#     source_ip {
+#       values = ["20.49.214.228/32", "51.149.249.0/29", "51.149.249.32/29"]
+#     }
+#   }
+# }
 
-resource "aws_lb_listener_rule" "admin_access_3" {
-  for_each     = var.web_app_services
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 41
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
-  }
-  condition {
-    path_pattern {
-      values = ["*/admin*", "*/secure*"]
-    }
-  }
+# resource "aws_lb_listener_rule" "admin_access_3" {
+#   for_each     = var.web_app_services
+#   listener_arn = aws_lb_listener.tribunals_lb.arn
+#   priority     = index(keys(var.web_app_services), each.key) + 41
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
+#   }
+#   condition {
+#     path_pattern {
+#       values = ["*/admin*", "*/secure*"]
+#     }
+#   }
 
-  condition {
-    source_ip {
-      values = ["51.149.250.0/24", "128.77.75.64/26", "194.33.200.0/21"]
-    }
-  }
-}
+#   condition {
+#     source_ip {
+#       values = ["51.149.250.0/24", "128.77.75.64/26", "194.33.200.0/21"]
+#     }
+#   }
+# }
 
-resource "aws_lb_listener_rule" "admin_access_4" {
-  for_each     = var.web_app_services
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 51
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
-  }
-  condition {
-    path_pattern {
-      values = ["*/admin*", "*/secure*"]
-    }
-  }
+# resource "aws_lb_listener_rule" "admin_access_4" {
+#   for_each     = var.web_app_services
+#   listener_arn = aws_lb_listener.tribunals_lb.arn
+#   priority     = index(keys(var.web_app_services), each.key) + 51
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
+#   }
+#   condition {
+#     path_pattern {
+#       values = ["*/admin*", "*/secure*"]
+#     }
+#   }
 
-  condition {
-    source_ip {
-      values = ["194.33.216.0/23", "194.33.218.0/24", "194.33.248.0/29"]
-    }
-  }
-}
+#   condition {
+#     source_ip {
+#       values = ["194.33.216.0/23", "194.33.218.0/24", "194.33.248.0/29"]
+#     }
+#   }
+# }
 
-resource "aws_lb_listener_rule" "admin_access_5" {
-  for_each     = var.web_app_services
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 61
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
-  }
-  condition {
-    path_pattern {
-      values = ["*/admin*", "*/secure*"]
-    }
-  }
+# resource "aws_lb_listener_rule" "admin_access_5" {
+#   for_each     = var.web_app_services
+#   listener_arn = aws_lb_listener.tribunals_lb.arn
+#   priority     = index(keys(var.web_app_services), each.key) + 61
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
+#   }
+#   condition {
+#     path_pattern {
+#       values = ["*/admin*", "*/secure*"]
+#     }
+#   }
 
-  condition {
-    source_ip {
-      values = ["194.33.249.0/29", "195.59.75.0/24", "194.33.192.0/25"]
-    }
-  }
-}
+#   condition {
+#     source_ip {
+#       values = ["194.33.249.0/29", "195.59.75.0/24", "194.33.192.0/25"]
+#     }
+#   }
+# }
 
-resource "aws_lb_listener_rule" "admin_access_6" {
-  for_each     = var.web_app_services
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(var.web_app_services), each.key) + 71
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
-  }
-  condition {
-    path_pattern {
-      values = ["*/admin*", "*/secure*"]
-    }
-  }
+# resource "aws_lb_listener_rule" "admin_access_6" {
+#   for_each     = var.web_app_services
+#   listener_arn = aws_lb_listener.tribunals_lb.arn
+#   priority     = index(keys(var.web_app_services), each.key) + 71
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.tribunals_target_group[each.key].arn
+#   }
+#   condition {
+#     path_pattern {
+#       values = ["*/admin*", "*/secure*"]
+#     }
+#   }
 
-  condition {
-    source_ip {
-      values = ["194.33.196.0/25", "194.33.193.0/25", "194.33.197.0/25"]
-    }
-  }
-}
+#   condition {
+#     source_ip {
+#       values = ["194.33.196.0/25", "194.33.193.0/25", "194.33.197.0/25"]
+#     }
+#   }
+# }
 
-resource "aws_lb_listener_rule" "admin_secure_fixed_response" {
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 82
-  action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/html"
-      message_body = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"
-      status_code  = "403"
-    }
-  }
-  condition {
-    path_pattern {
-      values = ["/Admin*", "/admin*", "/Secure*", "/secure*"]
-    }
-  }
-}
+# resource "aws_lb_listener_rule" "admin_secure_fixed_response" {
+#   listener_arn = aws_lb_listener.tribunals_lb.arn
+#   priority     = 82
+#   action {
+#     type = "fixed-response"
+#     fixed_response {
+#       content_type = "text/html"
+#       message_body = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"
+#       status_code  = "403"
+#     }
+#   }
+#   condition {
+#     path_pattern {
+#       values = ["/Admin*", "/admin*", "/Secure*", "/secure*"]
+#     }
+#   }
+# }
