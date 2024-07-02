@@ -99,6 +99,7 @@ data "aws_iam_policy_document" "lambda_xray_policy" {
 }
 
 data "aws_iam_policy_document" "allow_describe_repo_image" {
+  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
   statement {
     sid    = "AllowDescribeRepoImage"
     effect = "Allow"
@@ -115,6 +116,7 @@ data "aws_iam_policy_document" "allow_describe_repo_image" {
 }
 
 resource "aws_iam_policy" "allow_describe_repo_image" {
+  depends_on = [data.aws_iam_policy_document.allow_describe_repo_image]
   name        = "AllowDescribeRepoImage"
   description = "Policy to allow describing ECR images and repositories"
 
@@ -122,6 +124,7 @@ resource "aws_iam_policy" "allow_describe_repo_image" {
 }
 
 resource "aws_iam_role_policy_attachment" "allow_describe_repo_image_policy_attachment" {
+  depends_on = [aws_iam_policy.allow_describe_repo_image]
   role       = var.role_name
   policy_arn = aws_iam_policy.allow_describe_repo_image.arn
 }
