@@ -124,10 +124,6 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
         custom_response {
           response_code = 403
           custom_response_body_key = "CustomResponseBodyKey1"
-          response_header {
-            name  = "Content-Type"
-            value = "text/html"
-          }
         }
       }
     }
