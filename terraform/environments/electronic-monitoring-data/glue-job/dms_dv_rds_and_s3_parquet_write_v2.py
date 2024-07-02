@@ -398,8 +398,7 @@ def get_df_jdbc_read_rds_partitions(rds_db_name,
                                     rds_tbl_pkeys_list,
                                     jdbc_partition_column,
                                     read_partitions,
-                                    total_files, 
-                                    total_size_mb) -> DataFrame:
+                                    total_files) -> DataFrame:
 
     jdbc_read_partitions_num = read_partitions \
                                 if read_partitions > total_files else total_files
