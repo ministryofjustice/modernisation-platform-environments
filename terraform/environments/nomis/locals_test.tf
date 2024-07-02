@@ -530,7 +530,7 @@ locals {
                 }]
               }
               t2-nomis-web-a-http-7777 = {
-                priority = 550
+                priority = 1550
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-nomis-web-a-http-7777"
@@ -544,7 +544,7 @@ locals {
                 }]
               }
               t2-nomis-web-b-http-7777 = {
-                priority = 600
+                priority = 1600
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-nomis-web-b-http-7777"
