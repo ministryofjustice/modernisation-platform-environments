@@ -3,7 +3,7 @@
     "development": {
       "example_var": "dev-data",
       "lb_access_logs_existing_bucket_name": "",
-      "db_ami_id": "ami-035cecbff25e0d91e",
+      "db_ami_id": "ami-0b6f37d7bc47eeac0",
       "db_instance_type": "m4.xlarge",
       "workspaces_local_cidr1": "10.200.2.0/24",
       "workspaces_local_cidr2": "10.200.3.0/24",
@@ -26,7 +26,14 @@
       "elb_target_response_time_alarm_threshold": "1",
       "elb_request_count_alarm_threshold": "1000",
       "status_check_alarm_threshold": "1",
-      "database_ec2_swap_alarm_threshold": "50"
+      "database_ec2_swap_alarm_threshold": "50",
+      "oradata_snapshot_id": "snap-0a14498e1aabc04f5",
+      "oracle_snapshot_id": "snap-06a2c2f2d5416ecdd",
+      "oraarch_snapshot_id": "snap-0c0c14e6fe5572f9b",
+      "oratmp_snapshot_id": "snap-0f9052f7f68ba8d25",
+      "oraredo_snapshot_id": "snap-0e05faeec41ffd5be",
+      "share_snapshot_id": "snap-0e4f93177b88c076f"
+
     },
     "test": {
       "example_var": "test-data"
