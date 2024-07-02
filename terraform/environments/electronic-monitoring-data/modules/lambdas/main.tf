@@ -81,7 +81,7 @@ resource "aws_iam_policy" "allow_describe_repo_image" {
   name        = "AllowDescribeRepoImage"
   description = "Policy to allow describing ECR images and repositories"
 
-  policy = data.aws_iam_policy_document.allow_describe_repo_image.json
+  policy = data.aws_iam_policy_document.allow_describe_repo_image["image"].json
 }
 
 resource "aws_iam_role_policy_attachment" "allow_describe_repo_image_policy_attachment" {
@@ -89,6 +89,7 @@ resource "aws_iam_role_policy_attachment" "allow_describe_repo_image_policy_atta
   role       = var.role_name
   policy_arn = aws_iam_policy.allow_describe_repo_image.arn
 }
+
 
 data "aws_iam_policy_document" "lambda_dlq_policy" {
   statement {
