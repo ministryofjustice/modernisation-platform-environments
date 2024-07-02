@@ -426,7 +426,10 @@ def get_df_jdbc_read_rds_partitions(rds_db_name,
     return df_rds_temp
 
 
-def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) -> DataFrame:
+def process_dv_for_table(rds_db_name, 
+                         rds_tbl_name, 
+                         total_files, 
+                         total_size_mb) -> DataFrame:
 
     read_partitions = int(total_size_mb/int(args['read_partition_size_mb']))
     
@@ -460,16 +463,17 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
 
                 if isinstance(RECORDED_PKEYS_LIST[rds_tbl_name], list):
 
-                    jdbc_partition_column = get_jdbc_partition_column(rds_db_name, rds_tbl_name, RECORDED_PKEYS_LIST[rds_tbl_name])
-                    LOGGER.info(f"""RECORDED_PKEYS_LIST[rds_tbl_name] = {RECORDED_PKEYS_LIST[rds_tbl_name]}""")
+                    jdbc_partition_column = get_jdbc_partition_column(rds_db_name, 
+                                                                      rds_tbl_name, 
+                                                                      RECORDED_PKEYS_LIST[rds_tbl_name])
+                    LOGGER.info(f"""RECORDED_PKEYS_LIST[{rds_tbl_name}] = {RECORDED_PKEYS_LIST[rds_tbl_name]}""")
 
                     df_rds_temp = get_df_jdbc_read_rds_partitions(rds_db_name, 
                                                                   rds_tbl_name, 
                                                                   RECORDED_PKEYS_LIST[rds_tbl_name],
                                                                   jdbc_partition_column,
                                                                   read_partitions,
-                                                                  total_files, 
-                                                                  total_size_mb)
+                                                                  total_files)
                     pkey_partion_read_used = True
                 else:
                     LOGGER.error(f"""RECORDED_PKEYS_LIST[f"{rds_tbl_name}"] = {RECORDED_PKEYS_LIST[{rds_tbl_name}]}""")
@@ -483,7 +487,9 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
             rds_db_tbl_pkeys_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
                                          for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
 
-            jdbc_partition_column = get_jdbc_partition_column(rds_db_name, rds_tbl_name, rds_db_tbl_pkeys_col_list)
+            jdbc_partition_column = get_jdbc_partition_column(rds_db_name, 
+                                                              rds_tbl_name, 
+                                                              rds_db_tbl_pkeys_col_list)
             LOGGER.info(f"""jdbc_partition_column = {jdbc_partition_column}""")
 
             df_rds_temp = get_df_jdbc_read_rds_partitions(rds_db_name, 
@@ -491,8 +497,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
                                                           rds_db_tbl_pkeys_col_list,
                                                           jdbc_partition_column,
                                                           read_partitions,
-                                                          total_files, 
-                                                          total_size_mb)
+                                                          total_files)
             pkey_partion_read_used = True
         # -------------------------------------------------------
 
