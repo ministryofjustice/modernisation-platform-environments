@@ -56,3 +56,6 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
 }
+
+provider "time" {
+}
