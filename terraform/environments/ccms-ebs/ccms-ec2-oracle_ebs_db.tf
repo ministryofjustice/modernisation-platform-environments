@@ -218,6 +218,7 @@ resource "aws_ebs_volume" "backup_clone" {
 }
 
 resource "aws_volume_attachment" "backup_clone_att" {
+  count       = length(local.application_data.accounts[local.environment].ebs_backup_snapshot_id) > 0 ? 1 : 0
   device_name = "/dev/sdz"
   volume_id   = aws_ebs_volume.backup_clone[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
