@@ -111,7 +111,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 
   custom_response_body {
     key  = "CustomResponseBodyKey1"
-    content_type = "text/html"
+    content_type = "TEXT_HTML"
     content = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"
   }
 
