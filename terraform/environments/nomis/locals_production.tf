@@ -176,10 +176,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          # data  = { total_size = 4000, iops = 9000, throughput = 250 }
-          # flash = { total_size = 1000, iops = 3000, throughput = 250 }
-          data  = { total_size = 4000, iops = 16000, throughput = 500 } # doubled for failover test. 16000 is the max iops
-          flash = { total_size = 1000, iops = 6000, throughput = 500 }
+          data  = { total_size = 4000, iops = 9000, throughput = 250 }
+          flash = { total_size = 1000, iops = 3000, throughput = 250 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
