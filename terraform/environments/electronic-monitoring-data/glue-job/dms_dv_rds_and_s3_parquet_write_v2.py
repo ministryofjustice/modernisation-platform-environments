@@ -446,9 +446,6 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
 
     tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
 
-    additional_message = ''
-    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
-
     # -------------------------------------------------------
 
     pkey_partion_read_used = False
@@ -465,6 +462,7 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
                 if isinstance(RECORDED_PKEYS_LIST[rds_db_name], list):
 
                     jdbc_partition_column = get_jdbc_partition_column(rds_db_name, rds_tbl_name, RECORDED_PKEYS_LIST[rds_db_name])
+                    LOGGER.info(f"""jdbc_partition_column = {jdbc_partition_column}""")
 
                     df_rds_temp = get_df_jdbc_read_rds_partitions(rds_db_name, 
                                                                   rds_tbl_name, 
@@ -487,7 +485,8 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
                                          for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
 
             jdbc_partition_column = get_jdbc_partition_column(rds_db_name, rds_tbl_name, rds_db_tbl_pkeys_col_list)
-
+            LOGGER.info(f"""jdbc_partition_column = {jdbc_partition_column}""")
+            
             df_rds_temp = get_df_jdbc_read_rds_partitions(rds_db_name, 
                                                           rds_tbl_name, 
                                                           rds_db_tbl_pkeys_col_list,
