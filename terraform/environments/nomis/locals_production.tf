@@ -131,6 +131,16 @@ locals {
           domain-name = "azure.hmpp.root"
         })
       })
+      # Being used for testing, capacity defaults to 0 
+      prod-nomis-client-b = merge(local.ec2_autoscaling_groups.client, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.client.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 0
+        })
+        tags = merge(local.ec2_autoscaling_groups.client.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
     }
 
     ec2_instances = {
