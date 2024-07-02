@@ -154,6 +154,24 @@ locals {
           }
         ]
       }
+
+      Ec2AuditVaultPolicy = {
+        description = "Permissions required for Audit vault ec2"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:ListBucket",
+            ]
+            resources = [
+              "arn:aws:s3:::s3-bucket*",
+              "arn:aws:s3:::s3-bucket*/*",
+            ]
+          }
+        ]
+      }
     }
 
     ec2_autoscaling_groups = {
@@ -201,6 +219,24 @@ locals {
     }
 
     ec2_instances = {
+      audit-vault = merge(local.audit_vault, {
+        config = merge(local.audit_vault.config, {
+          instance_profile_policies = concat(local.audit_vault.config.instance_profile_policies, [
+            "Ec2AuditVaultPolicy",
+          ])
+        })
+        ebs_volumes = {
+          # "/dev/sdb" = { label = "app", snapshot_id = "snap-072a42704cb38f785", size = 300 }
+          "/dev/sdb" = { label = "app", size = 300 }
+        }
+        instance = merge(local.audit_vault.instance, {
+          instance_type = "r6i.xlarge"
+        })
+        tags = merge(local.audit_vault.tags, {
+          instance-scheduling = "skip-scheduling"
+        })
+      })
+
       t1-oasys-bip-a = merge(local.bip_a, {
         config = merge(local.bip_a.config, {
           instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
