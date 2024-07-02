@@ -10,7 +10,7 @@ resource "aws_sqs_queue" "lambda_dlq" {
 data "external" "empty_bash_script" {
   for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
 
-  program = ["bash", "-c", "echo -n ''"]
+  program = ["bash", "bash_scripts/empty_bash.sh"]
 }
 
 resource "aws_kms_key" "lambda_env_key" {
