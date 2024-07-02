@@ -99,7 +99,7 @@ data "aws_iam_policy_document" "lambda_xray_policy" {
 }
 
 data "aws_iam_policy_document" "allow_describe_repo_image" {
-  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
+  count = var.is_image ? 1 : 0
   statement {
     sid    = "AllowDescribeRepoImage"
     effect = "Allow"
