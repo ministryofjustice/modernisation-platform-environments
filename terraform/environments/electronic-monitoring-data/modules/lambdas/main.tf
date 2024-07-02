@@ -67,7 +67,9 @@ data "aws_iam_policy_document" "allow_describe_repo_image" {
 
     actions = [
       "ecr:DescribeImages",
-      "ecr:DescribeRepositories"
+      "ecr:DescribeRepositories",
+      "ecr:BatchGetImage",
+      "ecr:GetDownloadUrlForLayer"
     ]
 
     resources = [
