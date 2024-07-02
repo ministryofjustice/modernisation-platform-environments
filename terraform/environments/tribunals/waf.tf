@@ -79,7 +79,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                 search_string         = "admin"
                 text_transformation {
                   priority = 0
-                  type     = "NONE"
+                  type     = "LOWERCASE"
                 }
               }
             }
@@ -92,7 +92,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                 search_string         = "secure"
                 text_transformation {
                   priority = 0
-                  type     = "NONE"
+                  type     = "LOWERCASE"
                 }
               }
             }
@@ -109,9 +109,9 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
   }
 
   custom_response_body {
-    key  = "CustomResponseBodyKey1"
+    key          = "CustomResponseBodyKey1"
     content_type = "TEXT_HTML"
-    content = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"
+    content      = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"
   }
 
   rule {
@@ -121,7 +121,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
     action {
       block {
         custom_response {
-          response_code = 403
+          response_code            = 403
           custom_response_body_key = "CustomResponseBodyKey1"
         }
       }
@@ -146,10 +146,10 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                   uri_path {}
                 }
                 positional_constraint = "CONTAINS"
-                search_string = "admin"
+                search_string         = "admin"
                 text_transformation {
                   priority = 0
-                  type     = "NONE"
+                  type     = "LOWERCASE"
                 }
               }
             }
@@ -159,10 +159,10 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                   uri_path {}
                 }
                 positional_constraint = "CONTAINS"
-                search_string = "secure"
+                search_string         = "secure"
                 text_transformation {
                   priority = 0
-                  type     = "NONE"
+                  type     = "LOWERCASE"
                 }
               }
             }
