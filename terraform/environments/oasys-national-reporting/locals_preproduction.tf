@@ -15,7 +15,7 @@ locals {
   baseline_preproduction = {
 
     ec2_instances = {
-      t2-onr-bods-1-a = merge(local.defaults_bods_ec2, {
+      pp-onr-bods-1-a = merge(local.defaults_bods_ec2, {
         config = merge(local.defaults_bods_ec2.config, {
           ami_name          = "hmpps_windows_server_2019_release_2024-07-02T00-00-37.755Z"
           availability_zone = "eu-west-2a"
