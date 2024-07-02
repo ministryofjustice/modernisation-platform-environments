@@ -78,10 +78,11 @@ data "aws_iam_policy_document" "allow_describe_repo_image" {
 
 resource "aws_iam_policy" "allow_describe_repo_image" {
   depends_on  = [data.aws_iam_policy_document.allow_describe_repo_image]
+  for_each    = var.is_image ? { "image": 1 } : {}
   name        = "AllowDescribeRepoImage"
   description = "Policy to allow describing ECR images and repositories"
 
-  policy = data.aws_iam_policy_document.allow_describe_repo_image["image"].json
+  policy = data.aws_iam_policy_document.allow_describe_repo_image[each.key].json
 }
 
 resource "aws_iam_role_policy_attachment" "allow_describe_repo_image_policy_attachment" {
