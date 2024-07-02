@@ -7,6 +7,12 @@ resource "aws_sqs_queue" "lambda_dlq" {
   kms_master_key_id = aws_kms_key.lambda_env_key.id
 }
 
+data "external" "empty_bash_script" {
+  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
+
+  program = ["bash", "-c", "echo -n ''"]
+}
+
 resource "aws_kms_key" "lambda_env_key" {
   description         = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
   enable_key_rotation = true
