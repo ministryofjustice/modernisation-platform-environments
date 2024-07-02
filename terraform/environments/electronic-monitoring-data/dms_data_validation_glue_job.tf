@@ -45,11 +45,11 @@ resource "aws_s3_object" "dms_dv_glue_job_s3_object_v2" {
   etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v2.py")
 }
 
-resource "aws_s3_object" "dms_dv_glue_job_s3_object_v3" {
+resource "aws_s3_object" "dms_dv_glue_job_s3_object_v4" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-  key    = "dms_dv_rds_and_s3_parquet_write_v3.py"
-  source = "glue-job/dms_dv_rds_and_s3_parquet_write_v3.py"
-  etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v3.py")
+  key    = "dms_dv_rds_and_s3_parquet_write_v4.py"
+  source = "glue-job/dms_dv_rds_and_s3_parquet_write_v4.py"
+  etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v4.py")
 }
 resource "aws_s3_object" "catalog_dv_table_glue_job_s3_object" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
@@ -95,10 +95,12 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--rds_sqlserver_db_schema"           = ""
     "--rds_exclude_db_tbls"               = ""
     "--rds_select_db_tbls"                = ""
+    "--rds_db_tbl_pkeys_col_list"         = ""
     "--rds_df_trim_str_columns"           = "false"
     "--rds_df_trim_micro_sec_ts_col_list" = ""
-    "--rds_read_rows_fetch_size"          = ""
-    "--repartition_factor"                = 8
+    "--rds_read_rows_fetch_size"          = 50000
+    "--num_of_repartitions"               = 0
+    "--read_partition_size_mb"            = 256
     "--max_table_size_mb"                 = 4000
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
@@ -119,6 +121,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     --conf spark.sql.adaptive.skewJoin.enabled=true 
     --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
     --conf spark.sql.parquet.aggregatePushdown=true
+    --conf spark.sql.files.maxPartitionBytes=256m
     EOF
   }
 
@@ -137,8 +140,8 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
 
 }
 
-resource "aws_glue_job" "dms_dv_glue_job_v3" {
-  name              = "dms-dv-glue-job-v3"
+resource "aws_glue_job" "dms_dv_glue_job_v4" {
+  name              = "dms-dv-glue-job-v4"
   description       = "DMS Data Validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
   glue_version      = "4.0"
@@ -160,7 +163,6 @@ resource "aws_glue_job" "dms_dv_glue_job_v3" {
     "--jdbc_read_2gb_partitions"          = "false"
     "--jdbc_read_3gb_partitions"          = "false"
     "--rds_read_rows_fetch_size"          = 100000
-    "--dataframe_repartitions"            = 0
     "--parquet_pkey_repartition"          = "true"
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
@@ -187,7 +189,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_parquet_write_v3.py"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_parquet_write_v4.py"
   }
 
   tags = merge(
