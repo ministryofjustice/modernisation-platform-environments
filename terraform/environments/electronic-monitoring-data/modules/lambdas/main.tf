@@ -98,6 +98,34 @@ data "aws_iam_policy_document" "lambda_xray_policy" {
   }
 }
 
+data "aws_iam_policy_document" "allow_describe_repo_image" {
+  statement {
+    sid    = "AllowDescribeRepoImage"
+    effect = "Allow"
+
+    actions = [
+      "ecr:DescribeImages",
+      "ecr:DescribeRepositories"
+    ]
+
+    resources = [
+      "arn:aws:ecr:eu-west-2:${var.core_shared_services_id}}:repository/electronic-monitoring-data-lambdas"  # Change to your specific ARN
+    ]
+  }
+}
+
+resource "aws_iam_policy" "allow_describe_repo_image" {
+  name        = "AllowDescribeRepoImage"
+  description = "Policy to allow describing ECR images and repositories"
+
+  policy = data.aws_iam_policy_document.allow_describe_repo_image.json
+}
+
+resource "aws_iam_role_policy_attachment" "allow_describe_repo_image_policy_attachment" {
+  role       = var.role_name
+  policy_arn = aws_iam_policy.allow_describe_repo_image.arn
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_dlq_policy_attachment" {
   role       = var.role_name
   policy_arn = aws_iam_policy.lambda_dlq_policy.arn
