@@ -98,15 +98,16 @@ variable "env_account_id" {
   type        = number
 }
 
-variable "ecr_repo_name" {
-  description = "Default name of ECR repo to get image from"
-  type        = string
+variable "core_shared_services_id" {
+  description = "The account number of the core shared services account"
+  type        = number
   default     = null
-  nullable    = true
+  nullable = true
 }
-variable "ecr_repo_url" {
-  description = "Default url name of ECR repo to get image from"
-  type        = string
+
+variable "production_dev" {
+  description = "The environment the lambda is being deployed to"
+  type = string
+  nullable = true
   default     = null
-  nullable    = true
 }

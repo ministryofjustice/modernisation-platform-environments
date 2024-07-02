@@ -227,8 +227,8 @@ module "update_log_table" {
   memory_size    = 1024
   timeout        = 900
   env_account_id = local.env_account_id
-  ecr_repo_name  = module.ecr_lambdas_repo.repository_name
-  ecr_repo_url   = module.ecr_lambdas_repo.repository_url
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev = local.is-production ? "prod" : "dev"
   environment_variables = {
     S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
