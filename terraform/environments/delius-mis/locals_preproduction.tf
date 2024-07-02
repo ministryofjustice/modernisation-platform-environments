@@ -196,8 +196,9 @@ locals {
     }
   }
 
-  # base config for each database
-  base_db_config_preprod = {
+
+  # BOE DB config
+  boe_db_config_preprod = {
     instance_type  = "t3.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -220,15 +221,15 @@ locals {
       }
       data = {
         iops       = 3000
-        throughput = 125
+        throughput = 500
         type       = "gp3"
-        total_size = 100
+        total_size = 200
       }
       flash = {
         iops       = 3000
-        throughput = 125
+        throughput = 500
         type       = "gp3"
-        total_size = 100
+        total_size = 200
       }
     }
     ansible_user_data_config = {
@@ -239,21 +240,92 @@ locals {
     }
   }
 
-  # use slightly different config for each database
-  dsd_db_config_preprod = local.base_db_config_preprod
 
-  boe_db_config_preprod = local.base_db_config_preprod
+  # DSD DB config
+  dsd_db_config_preprod = {
+    instance_type  = "t3.large"
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
-  mis_db_config_preprod = merge(local.base_db_config_preprod, {
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
+
+    ebs_volumes = {
+      "/dev/sdb" = { label = "app", size = 200 } # /u01
+      "/dev/sdc" = { label = "app", size = 100 } # /u02
+      "/dev/sde" = { label = "data" }            # DATA
+      "/dev/sdf" = { label = "flash" }           # FLASH
+      "/dev/sds" = { label = "swap" }
+    }
     ebs_volume_config = {
+      app = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
       data = {
-        iops       = 5000
-        total_size = 500
+        iops       = 3000
+        throughput = 500
+        type       = "gp3"
+        total_size = 200
       }
       flash = {
-        total_size = 500
+        iops       = 3000
+        throughput = 500
+        type       = "gp3"
+        total_size = 200
       }
     }
-  })
+    ansible_user_data_config = {
+      branch               = "main"
+      ansible_repo         = "modernisation-platform-configuration-management"
+      ansible_repo_basedir = "ansible"
+      ansible_args         = "oracle_19c_install"
+    }
+  }
+
+
+  # MIS DB config
+  mis_db_config_preprod = {
+    instance_type  = "r5.12xlarge"
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
+
+    ebs_volumes = {
+      "/dev/sdb" = { label = "app", size = 200 } # /u01
+      "/dev/sdc" = { label = "app", size = 100 } # /u02
+      "/dev/sde" = { label = "data" }            # DATA
+      "/dev/sdf" = { label = "flash" }           # FLASH
+      "/dev/sds" = { label = "swap" }
+    }
+    ebs_volume_config = {
+      app = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+      data = {
+        iops       = 5000
+        throughput = 500
+        type       = "gp3"
+        total_size = 5000
+      }
+      flash = {
+        iops       = 3000
+        throughput = 500
+        type       = "gp3"
+        total_size = 4000
+      }
+    }
+    ansible_user_data_config = {
+      branch               = "main"
+      ansible_repo         = "modernisation-platform-configuration-management"
+      ansible_repo_basedir = "ansible"
+      ansible_args         = "oracle_19c_install"
+    }
+  }
 
 }
