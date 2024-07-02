@@ -98,7 +98,7 @@ resource "aws_s3_object" "config" {
       ldap_host             = "ldap.dev.delius-core.hmpps-development.modernisation-platform.internal"
       pwm_url               = "pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
       fileshare_base_groups = "ou=Fileshare,ou=Groups,dc=moj,dc=com"
-      ldap_user             = "cn=admin,ou=Users,dc=moj,dc=com"
+      ldap_admin_user       = "cn=admin,dc=moj,dc=com"
 
     }
   )
