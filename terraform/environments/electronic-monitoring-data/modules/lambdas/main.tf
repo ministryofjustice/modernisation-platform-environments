@@ -77,6 +77,11 @@ data "aws_iam_policy_document" "allow_describe_repo_image" {
       "arn:aws:ecr:eu-west-2:${var.core_shared_services_id}:repository/electronic-monitoring-data-lambdas"
     ]
   }
+  statement {
+    actions = ["ecr:GetAuthorizationToken"]
+    effect = "Allow"
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_policy" "allow_describe_repo_image" {
