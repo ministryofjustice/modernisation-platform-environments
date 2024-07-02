@@ -453,28 +453,28 @@ def process_dv_for_table(rds_db_name, rds_tbl_name, total_files, total_size_mb) 
         
         if args.get('rds_db_tbl_pkeys_col_list', None) is None:
             
-            if RECORDED_PKEYS_LIST.get(rds_db_name, None) is None:
+            if RECORDED_PKEYS_LIST.get(rds_tbl_name, None) is None:
                 LOGGER.warn(f"""No READ-partition columns given !""")
-                df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
+                df_rds_temp = get_rds_dataframe(rds_tbl_name, rds_tbl_name)
 
             else:
 
-                if isinstance(RECORDED_PKEYS_LIST[rds_db_name], list):
+                if isinstance(RECORDED_PKEYS_LIST[rds_tbl_name], list):
 
-                    jdbc_partition_column = get_jdbc_partition_column(rds_db_name, rds_tbl_name, RECORDED_PKEYS_LIST[rds_db_name])
-                    LOGGER.info(f"""RECORDED_PKEYS_LIST[rds_db_name] = {RECORDED_PKEYS_LIST[rds_db_name]}""")
+                    jdbc_partition_column = get_jdbc_partition_column(rds_db_name, rds_tbl_name, RECORDED_PKEYS_LIST[rds_tbl_name])
+                    LOGGER.info(f"""RECORDED_PKEYS_LIST[rds_tbl_name] = {RECORDED_PKEYS_LIST[rds_tbl_name]}""")
 
                     df_rds_temp = get_df_jdbc_read_rds_partitions(rds_db_name, 
                                                                   rds_tbl_name, 
-                                                                  RECORDED_PKEYS_LIST[rds_db_name],
+                                                                  RECORDED_PKEYS_LIST[rds_tbl_name],
                                                                   jdbc_partition_column,
                                                                   read_partitions,
                                                                   total_files, 
                                                                   total_size_mb)
                     pkey_partion_read_used = True
                 else:
-                    LOGGER.error(f"""RECORDED_PKEYS_LIST[f"{rds_db_name}"] = {RECORDED_PKEYS_LIST[{rds_db_name}]}""")
-                    LOGGER.error(f"""RECORDED_PKEYS_LIST[f"{rds_db_name}"] - value is not a list""")
+                    LOGGER.error(f"""RECORDED_PKEYS_LIST[f"{rds_tbl_name}"] = {RECORDED_PKEYS_LIST[{rds_tbl_name}]}""")
+                    LOGGER.error(f"""RECORDED_PKEYS_LIST[f"{rds_tbl_name}"] - value is not a list""")
                     sys.exit(1)
                 # -------------------------------------------------------
 
