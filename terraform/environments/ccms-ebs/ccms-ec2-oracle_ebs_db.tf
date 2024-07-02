@@ -184,6 +184,7 @@ resource "aws_ebs_volume" "backup" {
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
   type              = local.application_data.accounts[local.environment].ebs_type_ebsdb_backup
+  snapshot_id       = length(local.application_data.accounts[local.environment].ebs_backup_snapshot_id) > 0 ? local.application_data.accounts[local.environment].ebs_backup_snapshot_id : null
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
