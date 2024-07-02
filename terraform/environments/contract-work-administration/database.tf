@@ -42,7 +42,7 @@ do
 done
 
 ## Update SSH key allowed
-echo "${local.cwa_ec2_key}" > .ssh/authorized_keys
+echo "${local.application_data.accounts[local.environment].cwa_ec2_key}" > .ssh/authorized_keys
 
 EOF
 
