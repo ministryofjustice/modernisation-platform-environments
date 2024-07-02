@@ -264,3 +264,28 @@ module "output_file_structure_as_json_from_zip" {
   environment_variables = null
 }
 
+#-----------------------------------------------------------------------------------
+# Load data from S3 to Athena
+#-----------------------------------------------------------------------------------
+
+module "load_json_table" {
+    source = "./modules/lambdas"
+    function_name = "load_json_table"
+    is_image = true
+    role_name = aws_iam_role.load_json_table.name
+    role_arn = aws_iam_role.load_json_table.arn
+    memory_size = 1024
+    timeout = 900
+    env_account_id = local.env_account_id
+    ecr_repo_name = module.ecr_lambdas_repo.repository_name
+    ecr_repo_url = module.ecr_lambdas_repo.repository_url
+    environment_variables = {
+      DLT_PROJECT_DIR: "/tmp"
+      DLT_DATA_DIR: "/tmp"
+      DLT_PIPELINE_DIR: "/tmp"
+      BUCKET_URL = "s3://${aws_s3_bucket.data_store.id}/g4s/dev_access/2024-02-16/json"
+      STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${module.athena-s3-bucket.bucket.id}/output"
+      SCHEMA_PATH = "s3://${module.metadata-s3-bucket.bucket.id}/dlt_schemas"
+      }
+}
+
