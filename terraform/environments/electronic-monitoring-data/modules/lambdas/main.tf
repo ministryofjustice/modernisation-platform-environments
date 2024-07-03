@@ -1,6 +1,6 @@
 locals {
   use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null)
-  refresh_lambda_dependencies = var.is_image ? [null_resource.image_refresh_trigger[0]] : []
+  force_update = var.is_image ? timestamp() : ""
 }
 
 resource "aws_sqs_queue" "lambda_dlq" {
@@ -129,22 +129,6 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
 }
 
 
-resource "null_resource" "image_refresh_trigger" {
-  count = var.is_image ? 1 : 0
-
-  triggers = {
-    always_run = "${md5("${timestamp()}-${random_id.unique_id.hex}")}"
-  }
-
-  provisioner "local-exec" {
-    command = "echo Force refresh for Lambda function"
-  }
-}
-
-resource "random_id" "unique_id" {
-  byte_length = 8
-}
-
 resource "aws_lambda_function" "this" {
   # Zip File config
   filename         = var.is_image ? null : var.filename
@@ -186,6 +170,6 @@ resource "aws_lambda_function" "this" {
   lifecycle {
     create_before_destroy = true
     ignore_changes        = [source_code_hash, filename, handler, layers, runtime, image_uri, package_type]
-    replace_triggered_by  = [null_resource.image_refresh_trigger]
+    replace_triggered_by  = [local.force_update]
   }
 }
