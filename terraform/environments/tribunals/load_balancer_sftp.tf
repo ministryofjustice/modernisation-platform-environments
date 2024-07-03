@@ -16,14 +16,6 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   description = "control access to the network load balancer for sftp"
   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    description = "allow all traffic on HTTPS port 22"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
 //Will need ingress rules for all 10 sftp ports:
   dynamic "ingress" {
     for_each = var.sftp_services
