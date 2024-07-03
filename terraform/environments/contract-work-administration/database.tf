@@ -16,6 +16,7 @@ echo "${local.database_hostname}" > /etc/hostname
 # PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)	
 ##############
 
+echo "Getting IP Addresses for /etc/hosts"
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 APP1_IP=""
 CM_IP=""
@@ -27,16 +28,18 @@ do
   CM_IP=$(/usr/local/bin/aws ec2 describe-instances --filter Name=tag:Name,Values="${local.cm_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
 done
 
-sudo sed -i '/cwa-db$/d' /etc/hosts
-sudo sed -i '/cwa-app1$/d' /etc/hosts
-sudo sed -i '/cwa-app2$/d' /etc/hosts
-sudo bash -c "echo '$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}' >> /etc/hosts"
-sudo bash -c "echo '$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}' >> /etc/hosts"
-sudo bash -c "echo '$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}' >> /etc/hosts"
+echo "Updating /etc/hosts"
+sed -i '/cwa-db$/d' /etc/hosts
+sed -i '/cwa-app1$/d' /etc/hosts
+sed -i '/cwa-app2$/d' /etc/hosts
+echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
+echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
+echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
 ## Mounting to EFS - uncomment when AMI has been applied
-sudo sed -i '/^fs-/d' /etc/fstab
-sudo sed -i '/^s3fs/d' /etc/fstab
+echo "Updating /etc/fstab"
+sed -i '/^fs-/d' /etc/fstab
+sed -i '/^s3fs/d' /etc/fstab
 echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 mount -a
 mount_status=$?
@@ -48,11 +51,13 @@ do
 done
 
 ## Remove SSH key allowed
-sudo sed -i '/development-general$/d' .ssh/authorized_keys
+echo "Removing old SSH key"
+sed -i '/development-general$/d' .ssh/authorized_keys
 
-## Update 
-sudo sed -i 's/aws.dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
-sudo sed -i 's/dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+## Update the send mail url
+echo "Updating the send mail config"
+sed -i 's/aws.dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+sed -i 's/dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
 
 EOF
 
