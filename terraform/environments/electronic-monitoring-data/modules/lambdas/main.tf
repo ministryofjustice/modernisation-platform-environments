@@ -126,6 +126,17 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
+data "aws_ecr_authorization_token" "ecr" {}
+
+data "aws_ecr_repository" "repo" {
+  name = "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas"
+}
+
+data "aws_ecr_image" "latest" {
+  repository_name = data.aws_ecr_repository.repo.name
+  image_tag     = "${var.function_name}-${var.production_dev}"
+}
+
 
 resource "aws_lambda_function" "this" {
   #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
@@ -133,10 +144,10 @@ resource "aws_lambda_function" "this" {
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
   layers           = var.is_image ? null : var.layers
-  source_code_hash = var.is_image ? null : var.source_code_hash
+  source_code_hash = var.is_image ? trimprefix(data.aws_ecr_image.latest.id, "sha256:") : var.source_code_hash
   runtime          = var.is_image ? null : var.runtime
   # Image config
-  image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic_monitoring_data_lambdas:${var.function_name}-${var.production_dev}" : null
+  image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas:${var.function_name}-${var.production_dev}" : null
   package_type = var.is_image ? "Image" : null
   # Constants
   function_name = var.function_name
