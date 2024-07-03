@@ -330,7 +330,7 @@ locals {
 
   # MIS DB config
   mis_db_config_stage = {
-    instance_type  = "r5.4xlarge"
+    instance_type  = "t3.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
