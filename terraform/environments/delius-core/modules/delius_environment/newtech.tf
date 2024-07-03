@@ -32,12 +32,12 @@ module "newtech" {
 
   alb_listener_rule_paths = ["/newtech", "/newtech/*"]
   platform_vars           = var.platform_vars
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-newtech-ecr-repo:${var.delius_microservice_configs.newtech.image_tag}"
+  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-new-tech-web:${var.delius_microservice_configs.newtech.image_tag}"
   account_config          = var.account_config
   health_check_path       = "/newtech"
   account_info            = var.account_info
 
-  ignore_changes_service_task_definition = true
+  ignore_changes_service_task_definition = false
 
   providers = {
     aws.core-vpc              = aws.core-vpc
