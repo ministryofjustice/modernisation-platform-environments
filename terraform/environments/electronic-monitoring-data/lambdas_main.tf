@@ -279,7 +279,4 @@ module "get_dms_validated_tables" {
   env_account_id = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev = local.is-production ? "prod" : "dev"
-  environment_variables = {
-    DMS_TASK_ARN = module.dms_task[local.db_name].dms_task_arn
-  }
 }
