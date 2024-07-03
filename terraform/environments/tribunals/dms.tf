@@ -129,46 +129,46 @@ resource "aws_route" "accepter_route" {
 }
 
 # Uncomment modernisation_dms_access for first time creation of the Security Group in AWS DSD Account
-resource "aws_security_group" "modernisation_dms_access" {
-  provider    = aws.mojdsd
-  name        = "modernisation_dms_access_${local.environment}"
-  description = "allow dms access to the database for the modernisation platform"
+# resource "aws_security_group" "modernisation_dms_access" {
+#   provider    = aws.mojdsd
+#   name        = "modernisation_dms_access_${local.environment}"
+#   description = "allow dms access to the database for the modernisation platform"
 
-  ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    description = "Allow DMS to connect to source database"
-    cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
-  }
+#   ingress {
+#     from_port   = 1433
+#     to_port     = 1433
+#     protocol    = "tcp"
+#     description = "Allow DMS to connect to source database"
+#     cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
+#   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
-// Uncomment setup_target_rds_security_group for first time setup of DMS
-// executes a local script to set up the security group for the target RDS instance in the source db aws account
-resource "null_resource" "setup_target_rds_security_group" {
-  depends_on = [aws_dms_replication_instance.tribunals_replication_instance]
+# // Uncomment setup_target_rds_security_group for first time setup of DMS
+# // executes a local script to set up the security group for the target RDS instance in the source db aws account
+# resource "null_resource" "setup_target_rds_security_group" {
+#   depends_on = [aws_dms_replication_instance.tribunals_replication_instance]
 
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command     = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
 
-    environment = {
-      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
-      EC2_INSTANCE_ID               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["ec2-instance-id"]
-      DMS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_access_key"]
-      DMS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_secret_key"]
-      AWS_REGION                    = "eu-west-1"
+#     environment = {
+#       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
+#       EC2_INSTANCE_ID               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["ec2-instance-id"]
+#       DMS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_access_key"]
+#       DMS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_secret_key"]
+#       AWS_REGION                    = "eu-west-1"
 
-    }
-  }
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
+#     }
+#   }
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+# }
