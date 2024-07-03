@@ -31,6 +31,8 @@
       "lambda_function_handler": "index.lambda_handler",
       "lambda_function_runtime": "python3.8",
       "lambda_function_timeout": "300",
+      "secret_rotation_frequency_days": "28",
+      "secret_id_suffix_length": "3",
       "edw_disk_path": "/oracle/dbf",
       "edw_disk_device": "/dev/xvdf",
       "edw_disk_fs_type": "ext4",
