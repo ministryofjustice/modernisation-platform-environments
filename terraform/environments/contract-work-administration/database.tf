@@ -9,18 +9,22 @@ locals {
 # sudo ./aws/install
 ##############
 
-hostnamectl set-hostname ${local.database_hostname}
+echo "${local.database_hostname}" > /etc/hostname
 
-TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
-PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
+### Command to use IMDSv2 instance to get userdata
+# TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`	
+# PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)	
+##############
+
+PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 APP1_IP=""
 CM_IP=""
 
 while [ -z "$APP1_IP" ] || [ -z "$CM_IP" ]
 do
   sleep 5
-  APP1_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values="${local.appserver1_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
-  CM_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values="${local.cm_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
+  APP1_IP=$(/usr/local/bin/aws ec2 describe-instances --filter Name=tag:Name,Values="${local.appserver1_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
+  CM_IP=$(/usr/local/bin/aws ec2 describe-instances --filter Name=tag:Name,Values="${local.cm_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
 done
 
 sudo sed -i '/cwa-db$/d' /etc/hosts
@@ -31,6 +35,8 @@ sudo bash -c "echo '$APP1_IP	${local.application_name_short}-app1.${data.aws_rou
 sudo bash -c "echo '$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}' >> /etc/hosts"
 
 ## Mounting to EFS - uncomment when AMI has been applied
+sudo sed -i '/^fs-/d' /etc/fstab
+sudo sed -i '/^s3fs/d' /etc/fstab
 echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
 mount -a
 mount_status=$?
@@ -41,8 +47,12 @@ do
   mount_status=$?
 done
 
-## Update SSH key allowed
-echo "${local.application_data.accounts[local.environment].cwa_ec2_key}" > .ssh/authorized_keys
+## Remove SSH key allowed
+sudo sed -i '/development-general$/d' .ssh/authorized_keys
+
+## Update 
+sudo sed -i 's/aws.dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+sudo sed -i 's/dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
 
 EOF
 
