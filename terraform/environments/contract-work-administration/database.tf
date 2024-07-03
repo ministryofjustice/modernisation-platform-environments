@@ -9,6 +9,7 @@ locals {
 # sudo ./aws/install
 ##############
 
+hostname ${local.database_hostname}
 echo "${local.database_hostname}" > /etc/hostname
 
 ### Command to use IMDSv2 instance to get userdata
@@ -52,7 +53,7 @@ done
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
-sed -i '/development-general$/d' .ssh/authorized_keys
+sed -i '/development-general$/d' ~/.ssh/authorized_keys
 
 ## Update the send mail url
 echo "Updating the send mail config"
