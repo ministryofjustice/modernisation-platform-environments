@@ -592,11 +592,11 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         LOGGER.info(f"""jdbc_rows_fetch_size = {jdbc_rows_fetch_size}""")
 
         df_rds_temp = (get_df_read_rds_db_tbl_int_pkey(rds_db_name, 
-                                                        rds_tbl_name, 
-                                                        jdbc_partition_column,
-                                                        jdbc_partition_col_upperbound,
-                                                        jdbc_read_partitions_num,
-                                                        jdbc_rows_fetch_size))
+                                                       rds_tbl_name, 
+                                                       jdbc_partition_column,
+                                                       jdbc_partition_col_upperbound,
+                                                       jdbc_read_partitions_num,
+                                                       jdbc_rows_fetch_size))
         
         LOGGER.info(f"""df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
         # -------------------------------------------------------
