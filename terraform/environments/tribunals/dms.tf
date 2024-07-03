@@ -94,39 +94,78 @@ resource "aws_dms_endpoint" "source" {
   username = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
 }
 
-resource "aws_vpc_peering_connection" "dms_vpc_peering" {
-  peer_owner_id = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["source_account_id"]
-  peer_vpc_id   = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["source_vpc_id"]
-  vpc_id        = data.aws_vpc.shared.id
-  auto_accept   = false
-
+resource "aws_ec2_transit_gateway" "transit_gateway" {
+  description = "Central Transit Gateway for inter-account DMS"
   tags = {
-    Name = "DMS-Replication-VPC-Peering-Connection"
+    Name = "Main Transit Gateway"
   }
 }
 
-resource "aws_route" "requester_route" {
-  route_table_id            = "rtb-094fdb19111f3ff26"
-  destination_cidr_block    = "10.26.40.0/21"
-  vpc_peering_connection_id = aws_vpc_peering_connection.dms_vpc_peering.id
+resource "aws_ram_resource_share" "transit_gateway_share" {
+  name                      = "Transit Gateway Share"
+  allow_external_principals = true
 }
 
-resource "aws_vpc_peering_connection_accepter" "peer_accepter" {
-  provider                  = aws.mojdsd
-  vpc_peering_connection_id = aws_vpc_peering_connection.dms_vpc_peering.id
-  auto_accept               = true
+resource "aws_ram_resource_association" "tgw_association" {
+  resource_share_arn = aws_ram_resource_share.transit_gateway_share.arn
+  resource_arn       = aws_ec2_transit_gateway.transit_gateway.arn
+}
+
+resource "aws_ram_principal_association" "tgw_principal_association" {
+  resource_share_arn = aws_ram_resource_share.transit_gateway_share.arn
+  principal          = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["source_account_id"]
+}
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "tgw_attachment" {
+  transit_gateway_id = aws_ec2_transit_gateway.transit_gateway.id
+  vpc_id             = data.aws_vpc.shared.id
+  subnet_ids         = data.aws_subnets.shared-public.ids
 
   tags = {
-    Name = "Accept-DMS-Replication-VPC-Peering-Connection"
+    Name = "VPC Attachment"
   }
 }
 
-resource "aws_route" "accepter_route" {
-  provider                  = aws.mojdsd
-  route_table_id            = "rtb-9f7a99f4"
-  destination_cidr_block    = "172.31.0.0/16"
-  vpc_peering_connection_id = aws_vpc_peering_connection.dms_vpc_peering.id
+resource "aws_route" "tgw_route" {
+  route_table_id         = "rtb-9f7a99f4"
+  destination_cidr_block = "172.31.0.0/16"
+  transit_gateway_id     = aws_ec2_transit_gateway.transit_gateway.id
 }
+
+// VPC peering attempt:
+# resource "aws_vpc_peering_connection" "dms_vpc_peering" {
+#   peer_owner_id = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["source_account_id"]
+#   peer_vpc_id   = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["source_vpc_id"]
+#   vpc_id        = data.aws_vpc.shared.id
+#   auto_accept   = false
+
+#   tags = {
+#     Name = "DMS-Replication-VPC-Peering-Connection"
+#   }
+# }
+
+# resource "aws_route" "requester_route" {
+#   route_table_id            = "rtb-094fdb19111f3ff26"
+#   destination_cidr_block    = "10.26.40.0/21"
+#   vpc_peering_connection_id = aws_vpc_peering_connection.dms_vpc_peering.id
+# }
+
+# resource "aws_vpc_peering_connection_accepter" "peer_accepter" {
+#   provider                  = aws.mojdsd
+#   vpc_peering_connection_id = aws_vpc_peering_connection.dms_vpc_peering.id
+#   auto_accept               = true
+
+#   tags = {
+#     Name = "Accept-DMS-Replication-VPC-Peering-Connection"
+#   }
+# }
+
+# resource "aws_route" "accepter_route" {
+#   provider                  = aws.mojdsd
+#   route_table_id            = "rtb-9f7a99f4"
+#   destination_cidr_block    = "172.31.0.0/16"
+#   vpc_peering_connection_id = aws_vpc_peering_connection.dms_vpc_peering.id
+# }
 
 # Uncomment modernisation_dms_access for first time creation of the Security Group in AWS DSD Account
 # resource "aws_security_group" "modernisation_dms_access" {
