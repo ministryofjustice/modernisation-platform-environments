@@ -34,7 +34,7 @@ resource "aws_instance" "dagster_server" {
 
 resource "aws_security_group" "dagster_sg" {
   name_prefix = "dagster-sg"
-
+  vpc_id      = data.aws_vpc.shared.id
   ingress {
     from_port   = 22
     to_port     = 22
