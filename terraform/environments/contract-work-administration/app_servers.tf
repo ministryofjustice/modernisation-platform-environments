@@ -46,14 +46,16 @@ do
   mount_status=$?
 done
 
-## Remove SSH key allowed
-echo "Removing old SSH key"
-sed -i '/development-general$/d' ~/.ssh/authorized_keys
-
 ## Update the send mail url
 echo "Updating the send mail config"
 sed -i 's/aws.dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
 sed -i 's/dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+
+## Remove SSH key allowed
+echo "Removing old SSH key"
+sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
+sed -i '/development-general$/d' /root/.ssh/authorized_keys
+sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 EOF
 
@@ -74,6 +76,9 @@ resource "aws_instance" "app1" {
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.app_userdata)
   user_data_replace_on_change = true
+  metadata_options {
+    http_tokens                 = "optional"
+  }
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },

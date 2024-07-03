@@ -51,14 +51,16 @@ do
   mount_status=$?
 done
 
-## Remove SSH key allowed
-echo "Removing old SSH key"
-sed -i '/development-general$/d' ~/.ssh/authorized_keys
-
 ## Update the send mail url
 echo "Updating the send mail config"
 sed -i 's/aws.dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
 sed -i 's/dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+
+## Remove SSH key allowed
+echo "Removing old SSH key"
+sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
+sed -i '/development-general$/d' /root/.ssh/authorized_keys
+sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 EOF
 
