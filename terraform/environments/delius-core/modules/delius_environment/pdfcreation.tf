@@ -21,7 +21,7 @@ module "pdf_creation" {
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.pdf_creation.container_secrets_env_specific, {})
 
-  desired_count = 0
+  desired_count = 1
 
   ecs_cluster_arn            = module.ecs.ecs_cluster_arn
   db_ingress_security_groups = []
@@ -34,7 +34,7 @@ module "pdf_creation" {
 
   alb_listener_rule_paths = ["/pdf/creation", "/pdf/creation/*"]
   platform_vars           = var.platform_vars
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-pdf-creation-ecr-repo:${var.delius_microservice_configs.pdf_creation.image_tag}"
+  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-new-tech-pdfgenerator:${var.delius_microservice_configs.pdf_creation.image_tag}"
   account_config          = var.account_config
   health_check_path       = "/pdf/creation/"
   account_info            = var.account_info
