@@ -268,9 +268,9 @@ module "output_file_structure_as_json_from_zip" {
 # Get DMS Validated Tables
 # ------------------------------------------------------
 
-module "get_dms_validated_tables" {
+module "get_dms_validated_state" {
   source         = "./modules/lambdas"
-  function_name  = "get_dms_validated_tables"
+  function_name  = "get_dms_validated_state"
   is_image       = true
   role_name      = aws_iam_role.get_dms_validated_tables.name
   role_arn       = aws_iam_role.get_dms_validated_tables.arn

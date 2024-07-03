@@ -235,10 +235,10 @@ module "unzipped_store_log_bucket" {
 # ------------------------------------------------------------------------
 
 
-module "dms-premigration-assessements-store" {
+module "dms-premigrate-assess-store" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=cadab51"
 
-  bucket_prefix      = "dms-premigration-assessements-store-"
+  bucket_prefix      = "dms-premigrate-assess-store-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -301,10 +301,10 @@ module "dms-premigration-assessements-store" {
   tags = local.tags
 }
 
-module "dms-premigration-assessements-store-logs" {
+module "dms-premigrate-assess-store-logs" {
   source = "./modules/s3_log_bucket"
 
-  source_bucket = module.dms-premigration-assessements-store.bucket
+  source_bucket = module.dms-premigrate-assess-store.bucket
   account_id    = data.aws_caller_identity.current.account_id
   local_tags    = local.tags
 }
