@@ -1,5 +1,20 @@
+data "aws_ami" "linux_2_image" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 resource "aws_instance" "dagster_server" {
-  ami           = "ami-0c55b159cbfafe1f0"
+  ami           = data.aws_ami.linux_2_image.id
   instance_type = "t2.micro"
   
   tags = {
