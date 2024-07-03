@@ -451,6 +451,7 @@ def process_dv_for_table(rds_db_name,
     pkey_partion_read_used = False
     if tbl_prq_s3_folder_path is not None:
         
+        # READ RDS-SQLSERVER-DB --> DATAFRAME
         if args.get('rds_db_tbl_pkeys_col_list', None) is None:
             
             if RECORDED_PKEYS_LIST.get(rds_tbl_name, None) is None:
@@ -464,7 +465,7 @@ def process_dv_for_table(rds_db_name,
                     jdbc_partition_column = get_jdbc_partition_column(rds_db_name, 
                                                                       rds_tbl_name, 
                                                                       RECORDED_PKEYS_LIST[rds_tbl_name])
-                    LOGGER.info(f"""RECORDED_PKEYS_LIST[{rds_tbl_name}] = {RECORDED_PKEYS_LIST[rds_tbl_name]}""")
+                    LOGGER.info(f"""RECORDED_PKEYS_LIST[{rds_tbl_name}] = {jdbc_partition_column}""")
 
                     df_rds_temp = get_df_jdbc_read_rds_partitions(rds_db_name, 
                                                                   rds_tbl_name, 
@@ -500,13 +501,34 @@ def process_dv_for_table(rds_db_name,
         # -------------------------------------------------------
 
         LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+        
+        # READ PARQUET --> DATAFRAME
+        LOGGER.info(f"""S3-Folder-Parquet-Read: Total Size >> {total_size_mb}MB""")
+        df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
+        LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
-        if num_of_repartitions != 0:
+
+        if num_of_repartitions != 0 and pkey_partion_read_used:
+            df_rds_temp = df_rds_temp.repartition(num_of_repartitions, jdbc_partition_column)
+            LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS-1 = {df_rds_temp.rdd.getNumPartitions()}""")
+
+            df_prq_temp = df_prq_temp.repartition(num_of_repartitions, jdbc_partition_column)
+            LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: RE-PARTITIONS-1 = {df_prq_temp.rdd.getNumPartitions()}""")
+
+        elif num_of_repartitions != 0 and (not pkey_partion_read_used):
             df_rds_temp = df_rds_temp.repartition(num_of_repartitions)
-            LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+            LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS-2 = {df_rds_temp.rdd.getNumPartitions()}""")
+
+            df_prq_temp = df_prq_temp.repartition(num_of_repartitions)
+            LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: RE-PARTITIONS-2 = {df_prq_temp.rdd.getNumPartitions()}""")
+
+        elif num_of_repartitions == 0 and (not pkey_partion_read_used):
+            df_rds_temp = df_rds_temp.repartition(df_prq_temp.rdd.getNumPartitions())
+            LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS-3 = {df_prq_temp.rdd.getNumPartitions()}""")
+        # -------------------------------------------------------
 
         df_rds_temp_t1 = df_rds_temp.selectExpr(*get_nvl_select_list(df_rds_temp, rds_db_name, rds_tbl_name))
-        # -------------------------------------------------------
+
 
         trim_str_msg = ""
         t2_rds_str_col_trimmed = False
@@ -552,23 +574,6 @@ def process_dv_for_table(rds_db_name,
         # -------------------------------------------------------
 
         df_rds_temp_t5 = df_rds_temp_t4.cache()
-
-        # -------------------------------------------------------
-
-        LOGGER.info(f"""S3-Folder-Parquet-Read: Total Size >> {total_size_mb}MB""")
-        df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
-        LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
-        # -------------------------------------------------------
-
-        if num_of_repartitions != 0:
-            if pkey_partion_read_used and jdbc_partition_column.strip() != '':
-                df_prq_temp = df_prq_temp.repartition(num_of_repartitions, jdbc_partition_column)
-                LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: RE-PARTITIONS-1 = {df_rds_temp.rdd.getNumPartitions()}""")
-            else:
-                df_prq_temp = df_prq_temp.repartition(num_of_repartitions)
-                LOGGER.info(f"""df_prq_temp-{rds_tbl_name}: RE-PARTITIONS-2 = {df_rds_temp.rdd.getNumPartitions()}""")
-            # -------------------------------------------------------
-        # -------------------------------------------------------
 
         df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, 
                                                                      rds_db_name, 
