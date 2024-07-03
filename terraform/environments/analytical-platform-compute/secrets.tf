@@ -44,6 +44,11 @@ module "actions_runners_airflow" {
   )
 }
 
+moved {
+  from = module.actions_runners_airflow
+  to   = module.actions_runners_airflow_secret
+}
+
 module "ui_sentry_dsn_secret" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
