@@ -301,7 +301,7 @@ module "dms-premigration-assessements-store" {
   tags = local.tags
 }
 
-module "dms-premigration-assessements-store" {
+module "dms-premigration-assessements-store-logs" {
   source = "./modules/s3_log_bucket"
 
   source_bucket = module.dms-premigration-assessements-store.bucket
