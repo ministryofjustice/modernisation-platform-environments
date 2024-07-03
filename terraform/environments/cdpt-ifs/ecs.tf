@@ -368,6 +368,7 @@ resource "aws_ecs_service" "ecs_service" {
   task_definition                   = data.aws_ecs_task_definition.latest_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
+  force_new_deployment = true
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.ifs.name
     weight            = 1
@@ -381,6 +382,11 @@ resource "aws_ecs_service" "ecs_service" {
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
+  }
+
+  ordered_placement_strategy {
+    field = "cpu"
+    type  = "binpack"
   }
 
   load_balancer {
@@ -473,7 +479,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.ifs_lb_sc.id]
+    security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
   egress {

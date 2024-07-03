@@ -125,7 +125,7 @@ locals {
       # ACTIVE (green deployment)
       t2-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -530,7 +530,7 @@ locals {
                 }]
               }
               t2-nomis-web-a-http-7777 = {
-                priority = 550
+                priority = 1550
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-nomis-web-a-http-7777"
@@ -544,7 +544,7 @@ locals {
                 }]
               }
               t2-nomis-web-b-http-7777 = {
-                priority = 600
+                priority = 1600
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-nomis-web-b-http-7777"
@@ -585,6 +585,7 @@ locals {
                       "t3-nomis-web-b.test.nomis.service.justice.gov.uk",
                       "c-t3.test.nomis.service.justice.gov.uk",
                       "t3-cn.hmpp-azdt.justice.gov.uk",
+                      "t3-cn-ha.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -606,6 +607,7 @@ locals {
                       "c-t1.test.nomis.service.justice.gov.uk",
                       "c-t2.test.nomis.service.justice.gov.uk",
                       "c-t3.test.nomis.service.justice.gov.uk",
+                      "t3-cn-ha.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
