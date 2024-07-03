@@ -85,7 +85,7 @@ resource "aws_instance" "edw_db_instance" {
   availability_zone      = "eu-west-2a"
   instance_type          = local.application_data.accounts[local.environment].edw_ec2_instance_type
   iam_instance_profile   = aws_iam_instance_profile.edw_ec2_instance_profile.id
-  key_name               = local.application_data.accounts[local.environment].edw_ec2_key
+  key_name               = aws_key_pair.edw_ec2_key.key_name
   subnet_id              = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids  = [aws_security_group.edw_db_security_group.id]
   user_data = base64encode(templatefile("edw-ec2-user-data.sh", {
