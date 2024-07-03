@@ -63,7 +63,9 @@ resource "aws_instance" "database" {
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
   user_data_replace_on_change = true
-  http_tokens                 = "optional"
+  metadata_options {
+    http_tokens                 = "optional"
+  }
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
