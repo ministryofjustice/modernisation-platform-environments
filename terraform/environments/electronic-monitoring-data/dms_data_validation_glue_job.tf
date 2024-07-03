@@ -100,7 +100,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--rds_df_trim_micro_sec_ts_col_list" = ""
     "--rds_read_rows_fetch_size"          = 50000
     "--num_of_repartitions"               = 0
-    "--read_partition_size_mb"            = 256
+    "--read_partition_size_mb"            = 128
     "--max_table_size_mb"                 = 4000
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
@@ -109,19 +109,15 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
     "--enable-continuous-cloudwatch-log"  = "true"
     "--enable-continuous-log-filter"      = "true"
-    "--enable-spark-ui"                   = "false"
-    "--spark-event-logs-path"             = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-    spark.memory.offHeap.enabled=true 
-    --conf spark.memory.offHeap.size=4g 
-    --conf spark.sql.adaptive.enabled=true 
+    spark.sql.adaptive.enabled=true 
     --conf spark.sql.adaptive.coalescePartitions.enabled=true 
     --conf spark.sql.adaptive.skewJoin.enabled=true 
     --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
     --conf spark.sql.parquet.aggregatePushdown=true
-    --conf spark.sql.files.maxPartitionBytes=256m
+    --conf spark.sql.files.maxPartitionBytes=128m
     EOF
   }
 
@@ -139,6 +135,10 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
   )
 
 }
+
+# "--enable-spark-ui"                   = "false"
+# "--spark-ui-event-logs-path"          = "false"
+# "--spark-event-logs-path"             = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
 
 resource "aws_glue_job" "dms_dv_glue_job_v4" {
   name              = "dms-dv-glue-job-v4"
@@ -163,7 +163,6 @@ resource "aws_glue_job" "dms_dv_glue_job_v4" {
     "--jdbc_read_2gb_partitions"          = "false"
     "--jdbc_read_3gb_partitions"          = "false"
     "--rds_read_rows_fetch_size"          = 100000
-    "--parquet_pkey_repartition"          = "true"
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
@@ -171,8 +170,6 @@ resource "aws_glue_job" "dms_dv_glue_job_v4" {
     "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
     "--enable-continuous-cloudwatch-log"  = "true"
     "--enable-continuous-log-filter"      = "true"
-    "--enable-spark-ui"                   = "false"
-    "--spark-event-logs-path"             = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
