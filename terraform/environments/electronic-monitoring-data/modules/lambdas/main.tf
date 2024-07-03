@@ -137,8 +137,7 @@ data "aws_ecr_repository" "repo" {
 }
 
 data "aws_ecr_image" "latest" {
-  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
-  repository_name = data.aws_ecr_repository.repo.name
+  repository_name = data.aws_ecr_repository.repo.name[each.image]
   image_tag     = "${var.function_name}-${var.production_dev}"
 }
 
