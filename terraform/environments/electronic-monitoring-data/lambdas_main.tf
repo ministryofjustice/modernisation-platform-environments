@@ -264,3 +264,22 @@ module "output_file_structure_as_json_from_zip" {
   environment_variables = null
 }
 
+# ------------------------------------------------------
+# Get DMS Validated Tables
+# ------------------------------------------------------
+
+module "get_dms_validated_tables" {
+  source         = "./modules/lambdas"
+  function_name  = "get_dms_validated_tables"
+  is_image       = true
+  role_name      = aws_iam_role.get_dms_validated_tables.name
+  role_arn       = aws_iam_role.get_dms_validated_tables.arn
+  memory_size    = 1024
+  timeout        = 900
+  env_account_id = local.env_account_id
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    DMS_TASK_ARN = module.dms_task[local.db_name].dms_task_arn
+  }
+}

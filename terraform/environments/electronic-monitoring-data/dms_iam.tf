@@ -60,7 +60,8 @@ resource "aws_iam_policy" "dms_ep_s3_role_policy" {
           "Effect" : "Allow",
           "Resource" : [
             "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}",
-            "${module.athena-s3-bucket.bucket.arn}"
+            "${module.athena-s3-bucket.bucket.arn}",
+            "${module.dms-premigration-assessements-store.bucket}"
           ],
           "Sid" : "DMSAccess"
         },
@@ -76,7 +77,8 @@ resource "aws_iam_policy" "dms_ep_s3_role_policy" {
           "Effect" : "Allow",
           "Resource" : [
             "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*",
-            "${module.athena-s3-bucket.bucket.arn}/*"
+            "${module.athena-s3-bucket.bucket.arn}/*",
+            "${module.dms-premigration-assessements-store.bucket}/*"
           ],
           "Sid" : "DMSObjectActions"
         }
