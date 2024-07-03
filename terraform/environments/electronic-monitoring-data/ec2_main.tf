@@ -13,12 +13,13 @@ data "aws_ami" "linux_2_image" {
   }
 }
 
-resource "aws_instance" "dagster_server" {
+resource "aws_instance" "data_load_transfer_server" {
   ami           = data.aws_ami.linux_2_image.id
   instance_type = "t2.micro"
+  subnet_id = data.aws_subnet.private_subnets_a.id
   
   tags = {
-    Name = "DagsterServer"
+    Name = "DataLoadTransformServer"
   }
 
   user_data = <<-EOF
@@ -44,11 +45,11 @@ resource "aws_instance" "dagster_server" {
               EOF
 
   # Security group to allow SSH and HTTP access
-  vpc_security_group_ids = [aws_security_group.dagster_sg.id]
+  vpc_security_group_ids = [aws_security_group.data_load_transform_sg.id]
 }
 
-resource "aws_security_group" "dagster_sg" {
-  name_prefix = "dagster-sg"
+resource "aws_security_group" "data_load_transform_sg" {
+  name_prefix = "data-load-transform-sg"
   vpc_id      = data.aws_vpc.shared.id
   ingress {
     from_port   = 22
@@ -72,8 +73,8 @@ resource "aws_security_group" "dagster_sg" {
   }
 }
 
-resource "aws_dynamodb_table" "dagster_state" {
-  name           = "dagster-state"
+resource "aws_dynamodb_table" "data_load_transform_state" {
+  name           = "data-load-transform-state"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "PK"
   range_key      = "SK"
