@@ -138,7 +138,7 @@ resource "aws_lambda_function" "this" {
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
   layers           = var.is_image ? null : var.layers
-  source_code_hash = var.is_image ? trimprefix(data.aws_ecr_image.latest["image"].image_digest, "sha256:") : var.source_code_hash
+  source_code_hash = var.is_image ? null : var.source_code_hash
   runtime          = var.is_image ? null : var.runtime
   # Image config
   image_uri        = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas:${var.function_name}-${var.production_dev}" : null
