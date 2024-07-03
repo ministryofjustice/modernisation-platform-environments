@@ -660,7 +660,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         df_rds_temp_t3 = df_rds_temp_t3.sort(jdbc_partition_column)
 
         df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
-        LOGGER.info(f"""{msg_prefix}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
+        LOGGER.info(f"""df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
 
         df_prq_temp_t1 = df_prq_temp.selectExpr(*get_nvl_select_list(df_rds_temp, 
                                                                      rds_db_name, 
@@ -670,11 +670,11 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         if args.get("parquet_pkey_repartition", "false") == "true":
             LOGGER.info(f"""parquet_pkey_repartition = {args['parquet_pkey_repartition']}""")
             df_prq_temp_t1 = df_prq_temp_t1.repartition(jdbc_read_partitions_num, jdbc_partition_column)
-            LOGGER.info(f"""{msg_prefix}: RE-PARTITION on {jdbc_partition_column} = {df_prq_temp.rdd.getNumPartitions()}""")
+            LOGGER.info(f"""{msg_prefix}: RE-PARTITION on {jdbc_partition_column} = {df_prq_temp_t1.rdd.getNumPartitions()}""")
         else:
             df_prq_temp_t1 = (df_prq_temp_t1.coalesce(jdbc_read_partitions_num)
                                             .sort(jdbc_partition_column))
-            LOGGER.info(f"""{msg_prefix}: coalesce PARTITIONS = {df_prq_temp.rdd.getNumPartitions()}""")
+            LOGGER.info(f"""{msg_prefix}: coalesce PARTITIONS = {df_prq_temp_t1.rdd.getNumPartitions()}""")
         # -------------------------------------------------------
 
         df_rds_prq_subtract_persisted = df_rds_temp_t3.subtract(df_prq_temp_t1)\
