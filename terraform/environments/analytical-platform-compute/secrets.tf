@@ -21,7 +21,7 @@ module "actions_runners_create_a_derived_table_secret" {
   )
 }
 
-module "actions_runners_airflow" {
+module "actions_runners_airflow_secret" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
