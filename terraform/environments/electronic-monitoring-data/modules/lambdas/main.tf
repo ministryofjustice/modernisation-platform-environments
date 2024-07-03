@@ -58,47 +58,47 @@ resource "aws_iam_policy" "lambda_dlq_policy" {
   policy = data.aws_iam_policy_document.lambda_dlq_policy.json
 }
 
-data "aws_iam_policy_document" "allow_describe_repo_image" {
-  for_each = var.is_image ? { "image": 1 } : {}
+# data "aws_iam_policy_document" "allow_describe_repo_image" {
+#   for_each = var.is_image ? { "image": 1 } : {}
 
-  statement {
-    sid    = "AllowDescribeRepoImage"
-    effect = "Allow"
+#   statement {
+#     sid    = "AllowDescribeRepoImage"
+#     effect = "Allow"
 
-    actions = [
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:BatchGetImage",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:DescribeRepositories",
-      "ecr:ListImages"
-    ]
+#     actions = [
+#       "ecr:BatchCheckLayerAvailability",
+#       "ecr:BatchGetImage",
+#       "ecr:GetDownloadUrlForLayer",
+#       "ecr:DescribeRepositories",
+#       "ecr:ListImages"
+#     ]
 
-    resources = [
-      "arn:aws:ecr:eu-west-2:${var.core_shared_services_id}:repository/electronic-monitoring-data-lambdas"
-    ]
-  }
-  statement {
-    actions = ["ecr:GetAuthorizationToken"]
-    effect = "Allow"
-    resources = ["*"]
-  }
-}
+#     resources = [
+#       "arn:aws:ecr:eu-west-2:${var.core_shared_services_id}:repository/electronic-monitoring-data-lambdas"
+#     ]
+#   }
+#   statement {
+#     actions = ["ecr:GetAuthorizationToken"]
+#     effect = "Allow"
+#     resources = ["*"]
+#   }
+# }
 
-resource "aws_iam_policy" "allow_describe_repo_image" {
-  depends_on  = [data.aws_iam_policy_document.allow_describe_repo_image]
-  for_each    = var.is_image ? { "image": 1 } : {}
-  name        = "AllowDescribeRepoImage"
-  description = "Policy to allow describing ECR images and repositories"
+# resource "aws_iam_policy" "allow_describe_repo_image" {
+#   depends_on  = [data.aws_iam_policy_document.allow_describe_repo_image]
+#   for_each    = var.is_image ? { "image": 1 } : {}
+#   name        = "AllowDescribeRepoImage"
+#   description = "Policy to allow describing ECR images and repositories"
 
-  policy = data.aws_iam_policy_document.allow_describe_repo_image[each.key].json
-}
+#   policy = data.aws_iam_policy_document.allow_describe_repo_image[each.key].json
+# }
 
-resource "aws_iam_role_policy_attachment" "allow_describe_repo_image_policy_attachment" {
-  for_each   = var.is_image ? { "image": 1 } : {}
-  depends_on = [aws_iam_policy.allow_describe_repo_image]
-  role       = var.role_name
-  policy_arn = aws_iam_policy.allow_describe_repo_image[each.key].arn
-}
+# resource "aws_iam_role_policy_attachment" "allow_describe_repo_image_policy_attachment" {
+#   for_each   = var.is_image ? { "image": 1 } : {}
+#   depends_on = [aws_iam_policy.allow_describe_repo_image]
+#   role       = var.role_name
+#   policy_arn = aws_iam_policy.allow_describe_repo_image[each.key].arn
+# }
 
 data "aws_iam_policy_document" "lambda_dlq_policy" {
   statement {
@@ -178,7 +178,7 @@ resource "aws_lambda_function" "this" {
   source_code_hash = var.is_image ? null : var.source_code_hash
   runtime          = var.is_image ? null : var.runtime
   # Image config
-  image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic_monitoring_data_lambdas:${var.function_name}-${var.production_dev}" : null
+  image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas:${var.function_name}-${var.production_dev}" : null
   package_type = var.is_image ? "Image" : null
   # Constants
   function_name = var.function_name
