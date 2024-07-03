@@ -32,7 +32,7 @@ module "rds_bastion" {
   subnet_set         = local.subnet_set
   environment        = local.environment
   region             = "eu-west-2"
-  volume_size        = 20
+  volume_size        = 100
   # tags
   tags_common = local.tags
   tags_prefix = terraform.workspace
