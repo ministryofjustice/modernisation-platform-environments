@@ -11,23 +11,6 @@ locals {
 
 hostnamectl set-hostname ${local.database_hostname}
 
-## Mounting to EFS - uncomment when AMI has been applied
-echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-mount -a
-mount_status=$?
-while [[ $mount_status != 0 ]]
-do
-  sleep 10
-  mount -a
-  mount_status=$?
-done
-
-## Update SSH key allowed
-echo "${local.application_data.accounts[local.environment].cwa_ec2_key}" > .ssh/authorized_keys
-
-
-
-
 TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
 PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
 APP1_IP=""
@@ -47,6 +30,19 @@ sudo bash -c "echo '$PRIVATE_IP	${local.application_name_short}-db.${data.aws_ro
 sudo bash -c "echo '$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}' >> /etc/hosts"
 sudo bash -c "echo '$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}' >> /etc/hosts"
 
+## Mounting to EFS - uncomment when AMI has been applied
+echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
+
+## Update SSH key allowed
+echo "${local.application_data.accounts[local.environment].cwa_ec2_key}" > .ssh/authorized_keys
 
 EOF
 
@@ -67,6 +63,7 @@ resource "aws_instance" "database" {
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
   user_data_replace_on_change = true
+  http_tokens                 = "optional"
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
