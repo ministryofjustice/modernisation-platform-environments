@@ -57,7 +57,9 @@
       "edw_dashboard_refresh_period": "60",
       "edw_disk_path": "/oracle/dbf",
       "edw_disk_device": "/dev/xvdf",
-      "edw_disk_fs_type": "ext4"
+      "edw_disk_fs_type": "ext4",
+      "database_ec2_name": "edw-db-instance",
+      "edw_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqJXcEXymhifpt3jSnLHVoPCwD07usEGhKCboMjMuSS2nFaSy+JDhsL/BKUQUgW88ozLzCp4XL0+jfpqzJqwrgVgfZI059w6QqLXyUF8HxQa0jolOWQZXq9+BZX6DnmPX84p40MZ38OrNiEoNuSqN1u3dqbRIageDSJuKAp39DjrQVoTPh1lchddKiucVMU0xK8Z1QQWHyoZTBYolC+hPNZ7lwT+Vq8CLywDUlBcZdbCKRMeUXD+kzg+nduCyB71gV4zlE4vD7x/RADvAfOINVQNSRQFY9QgnQylyylsRhzCGtXTPUC6Cnhmi49L/AyDd7Qh78ZEOOrs5HTJNsJmt84LuurD9dimtour2tlvDkZOurib/voKfrHxih1q5lgzn7BEZ42jO0H6UKtHv9hkkMOCfewnGHrkZ9ptgmHyR/pMWXbwiM/+osc1XLgEBJ6rFe+mtge4GzIx5ZApMGZV3LFe3ZoPGtnyORvjyI/jkOTco6gVIc87Wn0MkD5tFV9ME= fani.foteva@MJ004598"
     },
     "test": {
       "example_var": "test-data"
@@ -70,3 +72,5 @@
     }
   }
 }
+
+

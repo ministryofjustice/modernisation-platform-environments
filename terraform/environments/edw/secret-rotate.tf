@@ -1,5 +1,5 @@
 # ##################################
-# ### AWS SECRETS MANAGER SECRETS ###
+# ### AWS SECRETS MANAGER SECRETS ####
 # ##################################
 
 
@@ -19,7 +19,7 @@ resource "aws_secretsmanager_secret" "db-master-password" {
     {
       Name = "${local.application_name}-db-master-password"
     }
-  )
+  ) 
 }
 
 resource "aws_secretsmanager_secret_version" "edw_db_master_password_version" {
@@ -49,7 +49,7 @@ resource "aws_secretsmanager_secret" "edw_db_ec2_root_secret" {
     {
       Name = "${local.application_name}-ec2-system-root-password"
     }
-  )
+  ) 
 }
 
 resource "aws_secretsmanager_secret_version" "edw_db_ec2_root_password_version" {
@@ -58,9 +58,9 @@ resource "aws_secretsmanager_secret_version" "edw_db_ec2_root_password_version" 
 }
 
 resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
-  secret_id           = aws_secretsmanager_secret.edw_db_ec2_root_secret.id
-  rotation_lambda_arn = aws_lambda_function.rotate_secret_function.arn
-  rotate_immediately  = true
+  secret_id                  = aws_secretsmanager_secret.edw_db_ec2_root_secret.id
+  rotation_lambda_arn        = aws_lambda_function.rotate_secret_function.arn
+  rotate_immediately = true
 
   rotation_rules {
     automatically_after_days = local.application_data.accounts[local.environment].secret_rotation_frequency_days
@@ -74,7 +74,7 @@ resource "aws_secretsmanager_secret_rotation" "edw_db_root_rotate" {
 
 data "archive_file" "lambda_inline_code" {
   type        = "zip"
-  output_path = replace(local.application_data.accounts[local.environment].lambda_function_inline_code_filename, "py", "zip")
+  output_path = "${replace(local.application_data.accounts[local.environment].lambda_function_inline_code_filename, "py", "zip")}"
 
   source {
     filename = local.application_data.accounts[local.environment].lambda_function_inline_code_filename
@@ -104,25 +104,25 @@ resource "aws_lambda_function" "rotate_secret_function" {
     {
       Name = "${local.application_name}-edw-secret-rotate-function"
     }
-  )
+  ) 
 }
 
 resource "aws_iam_role" "edw_lambda_function_execution_role" {
   name = "${local.application_data.accounts[local.environment].lambda_function_name}-execution-role"
 
   assume_role_policy = jsonencode({
-    Version : "2012-10-17"
-    Statement : [
-      {
-        Effect : "Allow"
-        Principal : {
-          Service : "lambda.amazonaws.com"
+    Version: "2012-10-17"
+    Statement: [
+        {
+        Effect: "Allow"
+        Principal: {
+            Service: "lambda.amazonaws.com"
         },
-        Action : "sts:AssumeRole"
-      }
+        Action: "sts:AssumeRole"
+        }
     ]
   })
-}
+ } 
 
 resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_data.accounts[local.environment].lambda_function_name}-Policy"
@@ -131,7 +131,7 @@ resource "aws_iam_policy" "edw_lambda_function_execution_role_policy" { #tfsec:i
     {
       Name = "${local.application_name}-edw-secret-rotate-function"
     }
-  )
+  ) 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
