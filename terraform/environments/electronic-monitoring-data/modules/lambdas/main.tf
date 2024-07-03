@@ -126,39 +126,36 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
-data "aws_ecr_authorization_token" "ecr" {
-  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
-
-}
 
 data "aws_ecr_repository" "repo" {
-  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
-  name = "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas"
+  provider = aws.modernisation-platform
+  for_each = var.is_image ? { "image" = 1 } : {}
+  name     = "electronic-monitoring-data-lambdas"
+  registry_id = var.core_shared_services_id
 }
 
 data "aws_ecr_image" "latest" {
-  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
+  provider        = aws.modernisation-platform
+  for_each        = var.is_image ? { "image" = 1 } : {}
   repository_name = data.aws_ecr_repository.repo["image"].name
-  image_tag     = "${var.function_name}-${var.production_dev}"
+  image_tag       = "${var.function_name}-${var.production_dev}"
 }
 
-
 resource "aws_lambda_function" "this" {
-  #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
   # Zip File config
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
   layers           = var.is_image ? null : var.layers
-  source_code_hash = var.is_image ? trimprefix(data.aws_ecr_image.latest["image"].id, "sha256:") : var.source_code_hash
+  source_code_hash = var.is_image ? trimprefix(data.aws_ecr_image.latest["image"].image_digest, "sha256:") : var.source_code_hash
   runtime          = var.is_image ? null : var.runtime
   # Image config
-  image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas:${var.function_name}-${var.production_dev}" : null
-  package_type = var.is_image ? "Image" : null
+  image_uri        = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas:${var.function_name}-${var.production_dev}" : null
+  package_type     = var.is_image ? "Image" : "Zip"
   # Constants
-  function_name = var.function_name
-  role          = var.role_arn
-  timeout       = var.timeout
-  memory_size   = var.memory_size
+  function_name    = var.function_name
+  role             = var.role_arn
+  timeout          = var.timeout
+  memory_size      = var.memory_size
 
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []
@@ -167,7 +164,6 @@ resource "aws_lambda_function" "this" {
       subnet_ids         = var.subnet_ids
     }
   }
-
 
   environment {
     variables = var.environment_variables
@@ -182,6 +178,6 @@ resource "aws_lambda_function" "this" {
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_dlq.arn
   }
+  
   reserved_concurrent_executions = var.reserved_concurrent_executions
-
 }
