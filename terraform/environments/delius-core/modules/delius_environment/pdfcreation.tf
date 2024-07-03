@@ -17,7 +17,7 @@ module "pdf_creation" {
   container_vars_env_specific = try(var.delius_microservice_configs.pdf_creation.container_vars_env_specific, {})
 
   container_secrets_default = {
-    JAVA_TOOL_OPTIONS = module.ssm_params_pdf_creation.arn_map["JAVA_TOOL_OPTIONS"]
+  #  JAVA_TOOL_OPTIONS = module.ssm_params_pdf_creation.arn_map["JAVA_TOOL_OPTIONS"]
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.pdf_creation.container_secrets_env_specific, {})
 

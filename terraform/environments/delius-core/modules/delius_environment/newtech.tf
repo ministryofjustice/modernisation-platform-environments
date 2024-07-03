@@ -37,7 +37,7 @@ module "newtech" {
   health_check_path       = "/newtech"
   account_info            = var.account_info
 
-  ignore_changes_service_task_definition = true
+  ignore_changes_service_task_definition = false
 
   providers = {
     aws.core-vpc              = aws.core-vpc
