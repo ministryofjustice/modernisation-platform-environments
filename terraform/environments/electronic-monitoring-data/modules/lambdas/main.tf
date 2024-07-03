@@ -126,13 +126,18 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
-data "aws_ecr_authorization_token" "ecr" {}
+data "aws_ecr_authorization_token" "ecr" {
+  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
+
+}
 
 data "aws_ecr_repository" "repo" {
+  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
   name = "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas"
 }
 
 data "aws_ecr_image" "latest" {
+  for_each = var.is_image ? { image = 1 } : {} # Use empty map if not fetching image
   repository_name = data.aws_ecr_repository.repo.name
   image_tag     = "${var.function_name}-${var.production_dev}"
 }
