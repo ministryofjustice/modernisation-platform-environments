@@ -130,6 +130,9 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
 
 resource "null_resource" "image_refresh_trigger" {
   count = var.is_image ? 1 : 0
+  triggers = {
+    always_run = timestamp()
+  }
 }
 
 resource "aws_lambda_function" "this" {
