@@ -75,30 +75,17 @@ resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
 
 ####### DB Instance #######
 
-
-# resource "aws_instance" "apex_db_instance" {
-#   ami                         = local.application_data.accounts[local.environment].ec2amiid
-#   associate_public_ip_address = false
-#   availability_zone           = "eu-west-2a"
-#   ebs_optimized               = true
-#   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
-#   vpc_security_group_ids      = [aws_security_group.database.id]
-#   monitoring                  = true
-#   subnet_id                   = data.aws_subnet.data_subnets_a.id
-#   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
-#   key_name                    = aws_key_pair.apex.key_name
-#   user_data_base64            = base64encode(local.database-instance-userdata)
-#   user_data_replace_on_change = true
-
-
+resource "aws_key_pair" "edw_ec2_key" {
+  key_name   = "${local.application_name}-ssh-key"
+  public_key = local.application_data.accounts[local.environment].edw_ec2_key
+}
 
 resource "aws_instance" "edw_db_instance" {
   ami                    = local.application_data.accounts[local.environment].edw_ec2_ami_id
   availability_zone      = "eu-west-2a"
   instance_type          = local.application_data.accounts[local.environment].edw_ec2_instance_type
   iam_instance_profile   = aws_iam_instance_profile.edw_ec2_instance_profile.id
-  # ADD AFTER BASTION
-  # key_name               = local.application_data.accounts[local.environment].edw_ssh_key_name
+  key_name               = local.application_data.accounts[local.environment].edw_ec2_key
   subnet_id              = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids  = [aws_security_group.edw_db_security_group.id]
   user_data = base64encode(templatefile("edw-ec2-user-data.sh", {

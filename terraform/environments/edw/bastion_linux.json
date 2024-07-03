@@ -1,7 +1,7 @@
 {
   "keys": {
     "development": {
-      "fani": ""
+      "fani": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDS4MNg1CrDJmiEYQp/GO0fd29ZPEx2r7ddfhnzv8uZn0Gp8jMWfKhwS+4hUmUGRZteD1hfHxlkojcmlesrvzzONp68dU+9sdTltNWrthFU14z3mBaqIy19JS2ut4Pf7+HssFZOoYyhOyLhHtbStwEcb1JYrnP78ZPSXK9dwkNVJ701JYvB12D8h0UE+BFPCyHnhgkFoxCgTFT/Jkq2PTH5RKfQlD9Ot7QJ3at0dH0T/p3dGrnPIEmRT4Ckfm3MVw4DYXFcQcIMg0FnTcZ3XZWC/MhZjjH9bDb5wYLS95bPAKuUVNlhWe2qtB6fhhmfuylu10yrrjOHD5nJVRhdCfOhPML69n37G/pTXeFwdFJGMDer1lqBqkN20sVMEqGJ4DaTDIFrs5ZTohKEW625jwX3TGH1eXdzJzptPPCGvn+vOwHgPtWZ7o2hL0TnxY2MP6tQFqnRt2pptI94tmreeJHgHq7ilXNftOt9IXCw4O6Y7Tk+z5QvnWevmj0nNEob8ws= fani.foteva@MJ004598"
     },
     "preproduction": {},
     "production": {}
