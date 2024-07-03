@@ -128,21 +128,12 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
 }
 
 
-data "aws_ecr_repository" "repo" {
-  provider = aws.modernisation-platform
-  for_each = var.is_image ? { "image" = 1 } : {}
-  name     = "electronic-monitoring-data-lambdas"
-  registry_id = var.core_shared_services_id
-}
-
-data "aws_ecr_image" "latest" {
-  provider        = aws.modernisation-platform
-  for_each        = var.is_image ? { "image" = 1 } : {}
-  repository_name = data.aws_ecr_repository.repo["image"].name
-  image_tag       = "${var.function_name}-${var.production_dev}"
+resource "null_resource" "image_refresh_trigger" {
+  count = var.is_image ? 1 : 0
 }
 
 resource "aws_lambda_function" "this" {
+  depends_on = [null_resource.image_refresh_trigger]
   # Zip File config
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
