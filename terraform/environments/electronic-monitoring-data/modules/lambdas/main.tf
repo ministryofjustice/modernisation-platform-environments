@@ -136,7 +136,7 @@ resource "null_resource" "image_refresh_trigger" {
 }
 
 resource "aws_lambda_function" "this" {
-  depends_on = [null_resource.image_refresh_trigger]
+  depends_on = var.is_image ? [null_resource.image_refresh_trigger] : null
   # Zip File config
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
