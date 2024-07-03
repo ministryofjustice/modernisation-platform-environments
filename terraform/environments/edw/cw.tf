@@ -74,7 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailed" {
   evaluation_periods  = "1"
   metric_name         = "StatusCheckFailed"
   namespace           = "AWS/EC2"
-  period              = "1"
+  period              = "10"
   statistic           = "Sum"
   threshold           = "0"
 
@@ -93,7 +93,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWEc2CpuUtilisationTooHigh" {
   evaluation_periods  = "1"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = "1"
+  period              = "10"
   statistic           = "Average"
   threshold           = "1"
   treat_missing_data  = "breaching"
