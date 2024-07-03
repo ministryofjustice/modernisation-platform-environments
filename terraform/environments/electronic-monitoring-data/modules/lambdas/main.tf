@@ -1,5 +1,6 @@
 locals {
   use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null)
+  refresh_lambda_dependencies = var.is_image ? [null_resource.image_refresh_trigger[0]] : []
 }
 
 resource "aws_sqs_queue" "lambda_dlq" {
@@ -136,7 +137,7 @@ resource "null_resource" "image_refresh_trigger" {
 }
 
 resource "aws_lambda_function" "this" {
-  depends_on = var.is_image ? [null_resource.image_refresh_trigger] : []
+  depends_on = local.refresh_lambda_dependencies
   # Zip File config
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
