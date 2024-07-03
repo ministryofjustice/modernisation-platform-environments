@@ -94,6 +94,40 @@ resource "aws_dms_endpoint" "source" {
   username = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
 }
 
+resource "aws_vpc_peering_connection" "dms_vpc_peering" {
+  peer_owner_id = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["source_account_id"]
+  peer_vpc_id   = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["source_vpc_id"]
+  vpc_id        = data.aws_vpc.shared.id
+  auto_accept   = false
+
+  tags = {
+    Name = "DMS-Replication-VPC-Peering-Connection"
+  }
+}
+
+resource "aws_route" "requester_route" {
+  route_table_id            = "rtb-094fdb19111f3ff26"
+  destination_cidr_block    = "10.26.40.0/21"
+  vpc_peering_connection_id = aws_vpc_peering_connection.dms_vpc_peering.id
+}
+
+resource "aws_vpc_peering_connection_accepter" "peer_accepter" {
+  provider                  = aws.mojdsd
+  vpc_peering_connection_id = aws_vpc_peering_connection.dms_vpc_peering.id
+  auto_accept               = true
+
+  tags = {
+    Name = "Accept-DMS-Replication-VPC-Peering-Connection"
+  }
+}
+
+resource "aws_route" "accepter_route" {
+  provider                  = aws.mojdsd
+  route_table_id            = "rtb-9f7a99f4"
+  destination_cidr_block    = "172.31.0.0/16"
+  vpc_peering_connection_id = aws_vpc_peering_connection.dms_vpc_peering.id
+}
+
 # Uncomment modernisation_dms_access for first time creation of the Security Group in AWS DSD Account
 resource "aws_security_group" "modernisation_dms_access" {
   provider    = aws.mojdsd
