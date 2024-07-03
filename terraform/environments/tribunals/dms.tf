@@ -4,7 +4,7 @@ resource "aws_dms_replication_instance" "tribunals_replication_instance" {
   availability_zone           = "eu-west-2a"
   engine_version              = "3.5.1"
   multi_az                    = false
-  publicly_accessible         = true
+  publicly_accessible         = false
   auto_minor_version_upgrade  = true
   replication_instance_class  = "dms.t3.large"
   replication_instance_id     = "tribunals-replication-instance"
