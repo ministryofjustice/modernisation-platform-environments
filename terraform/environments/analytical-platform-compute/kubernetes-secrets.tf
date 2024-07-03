@@ -44,13 +44,13 @@ resource "kubernetes_secret" "mlflow_admin" {
 
 resource "kubernetes_secret" "ui_rds" {
   metadata {
-    name      = "mlflow-rds"
+    name      = "ui-rds"
     namespace = kubernetes_namespace.ui.metadata[0].name
   }
 
   type = "Opaque"
   data = {
-    username                   = module.mui_rds.db_instance_username
+    username                   = module.ui_rds.db_instance_username
     password                   = random_password.ui_rds.result
     address                    = module.ui_rds.db_instance_address
     port                       = module.ui_rds.db_instance_port
