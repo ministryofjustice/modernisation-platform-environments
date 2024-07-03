@@ -137,7 +137,6 @@ resource "null_resource" "image_refresh_trigger" {
 }
 
 resource "aws_lambda_function" "this" {
-  depends_on = local.refresh_lambda_dependencies
   # Zip File config
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
@@ -175,6 +174,10 @@ resource "aws_lambda_function" "this" {
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_dlq.arn
   }
-  
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = [source_code_hash, filename, handler, layers, runtime, image_uri, package_type]
+    replace_triggered_by  = var.is_image ? [null_resource.image_refresh_trigger] : []
+  }
   reserved_concurrent_executions = var.reserved_concurrent_executions
 }
