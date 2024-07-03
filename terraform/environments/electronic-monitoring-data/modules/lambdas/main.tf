@@ -58,6 +58,7 @@ resource "aws_iam_policy" "lambda_dlq_policy" {
   policy = data.aws_iam_policy_document.lambda_dlq_policy.json
 }
 
+
 data "aws_iam_policy_document" "lambda_dlq_policy" {
   statement {
     actions = [
@@ -151,6 +152,7 @@ resource "aws_lambda_function" "this" {
   # Image config
   image_uri        = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas:${var.function_name}-${var.production_dev}" : null
   package_type     = var.is_image ? "Image" : "Zip"
+
   # Constants
   function_name    = var.function_name
   role             = var.role_arn
