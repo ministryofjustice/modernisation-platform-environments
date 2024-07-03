@@ -12,7 +12,7 @@ module "newtech" {
   container_secrets_default      = {}
   container_secrets_env_specific = try(var.delius_microservice_configs.newtech.container_secrets_env_specific, {})
 
-  desired_count = 1
+  desired_count = 0
 
   container_port_config = [
     {
