@@ -6,6 +6,8 @@ module "pdf_creation" {
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   env_name              = var.env_name
 
+  target_group_protocol_version = "HTTP1"
+
   container_port_config = [
     {
       containerPort = var.delius_microservice_configs.pdf_creation.container_port
