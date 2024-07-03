@@ -58,47 +58,6 @@ resource "aws_iam_policy" "lambda_dlq_policy" {
   policy = data.aws_iam_policy_document.lambda_dlq_policy.json
 }
 
-# data "aws_iam_policy_document" "allow_describe_repo_image" {
-#   for_each = var.is_image ? { "image": 1 } : {}
-
-#   statement {
-#     sid    = "AllowDescribeRepoImage"
-#     effect = "Allow"
-
-#     actions = [
-#       "ecr:BatchCheckLayerAvailability",
-#       "ecr:BatchGetImage",
-#       "ecr:GetDownloadUrlForLayer",
-#       "ecr:DescribeRepositories",
-#       "ecr:ListImages"
-#     ]
-
-#     resources = [
-#       "arn:aws:ecr:eu-west-2:${var.core_shared_services_id}:repository/electronic-monitoring-data-lambdas"
-#     ]
-#   }
-#   statement {
-#     actions = ["ecr:GetAuthorizationToken"]
-#     effect = "Allow"
-#     resources = ["*"]
-#   }
-# }
-
-# resource "aws_iam_policy" "allow_describe_repo_image" {
-#   depends_on  = [data.aws_iam_policy_document.allow_describe_repo_image]
-#   for_each    = var.is_image ? { "image": 1 } : {}
-#   name        = "AllowDescribeRepoImage"
-#   description = "Policy to allow describing ECR images and repositories"
-
-#   policy = data.aws_iam_policy_document.allow_describe_repo_image[each.key].json
-# }
-
-# resource "aws_iam_role_policy_attachment" "allow_describe_repo_image_policy_attachment" {
-#   for_each   = var.is_image ? { "image": 1 } : {}
-#   depends_on = [aws_iam_policy.allow_describe_repo_image]
-#   role       = var.role_name
-#   policy_arn = aws_iam_policy.allow_describe_repo_image[each.key].arn
-# }
 
 data "aws_iam_policy_document" "lambda_dlq_policy" {
   statement {
