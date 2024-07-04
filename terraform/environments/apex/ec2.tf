@@ -91,6 +91,16 @@ resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
   to_port           = 1521
 }
 
+# This is a temp rule whilst OAS resides in LZ
+resource "aws_vpc_security_group_ingress_rule" "oas_lz" {
+  security_group_id = aws_security_group.database.id
+  description       = "Allow OAS in LZ to access APEX"
+  cidr_ipv4         = local.application_data.accounts[local.environment].oas_lz_cidr
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
+}
+
 resource "aws_vpc_security_group_egress_rule" "db_outbound" {
   security_group_id = aws_security_group.database.id
   cidr_ipv4         = "0.0.0.0/0"
