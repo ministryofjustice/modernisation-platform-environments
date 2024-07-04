@@ -58,7 +58,7 @@ module "aurora" {
   skip_final_snapshot = true
 
   create_db_cluster_parameter_group      = true
-  db_cluster_parameter_group_name        = "${local.name}-cluster"
+  create_db_subnet_group                 = true
   db_cluster_parameter_group_family      = "aurora-postgresql16"
   db_cluster_parameter_group_description = "${local.name} cluster parameter group"
   db_cluster_parameter_group_parameters = [
