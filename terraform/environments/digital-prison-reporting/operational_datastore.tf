@@ -46,10 +46,10 @@ module "aurora" {
   db_subnet_group_name = data.aws_subnet.private_subnets_a.id
   security_group_rules = {
     vpc_ingress = {
-      cidr_blocks = data.aws_vpc.dpr.cidr_block
+      cidr_blocks = [data.aws_vpc.dpr.cidr_block]
     }
     egress_example = {
-      cidr_blocks = ["0.0.0.0"]
+      cidr_blocks = ["0.0.0.0/0"]
       description = "Egress to corporate printer closet"
     }
   }
