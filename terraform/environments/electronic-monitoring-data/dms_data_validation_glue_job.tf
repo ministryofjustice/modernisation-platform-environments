@@ -178,6 +178,7 @@ spark.sql.adaptive.enabled=true
 --conf spark.sql.adaptive.skewJoin.enabled=true 
 --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
+--conf spark.shuffle.service.enabled=false
 --conf spark.sql.files.maxPartitionBytes=1g
 EOF
 
