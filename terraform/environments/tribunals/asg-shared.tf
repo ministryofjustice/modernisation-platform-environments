@@ -181,7 +181,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
     security_groups             = [aws_security_group.cluster_ec2.id]
     subnet_id                   = data.aws_subnet.public_subnets_a.id
     delete_on_termination       = true
-    associate_public_ip_address = true
+    associate_public_ip_address = false
   }
 
   tag_specifications {
