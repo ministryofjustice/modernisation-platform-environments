@@ -28,6 +28,7 @@ locals {
     cpu : 512,
     memory : 1024,
     essential : true,
+    readonlyRootFilesystem  : true,
     portMappings : [
       {
         hostPort : "${local.target_group_attachment_port}",
