@@ -18,6 +18,7 @@ from pyspark.storagelevel import StorageLevel
 # ===============================================================================
 
 sc = SparkContext()
+sc._jsc.hadoopConfiguration().set("spark.executor.memory", "9g")
 sc._jsc.hadoopConfiguration().set("spark.executor.cores", "3")
 sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.enabled", "true")
 sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "4g")
@@ -657,8 +658,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         # -------------------------------------------------------
 
         msg_prefix = f"""df_rds_temp_t3-{rds_tbl_name}"""
-        LOGGER.info(f"""{msg_prefix}: >> .orderBy({jdbc_partition_column}) <<""")
-        df_rds_temp_t3 = df_rds_temp_t3.orderBy(jdbc_partition_column)
+        LOGGER.info(f"""{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
+        df_rds_temp_t3 = df_rds_temp_t3.repartition(jdbc_read_partitions_num, jdbc_partition_column)
         LOGGER.info(f"""{msg_prefix}: RDS-DF-Partitions = {df_rds_temp_t3.rdd.getNumPartitions()}""")
 
         df_rds_temp_t3 = df_rds_temp_t3.persist(StorageLevel.MEMORY_AND_DISK)
@@ -701,11 +702,12 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
             df_subtract_select_cols = df_rds_temp_t3.select(*temp_select_list)\
                                             .subtract(df_prq_temp_t1.select(*temp_select_list))
+            
             df_subtract_select_cols_count = df_subtract_select_cols.count()
 
             if df_subtract_select_cols_count == 0:
                 validated_colmns_list.append(rds_column)
-                LOGGER.warn(f"{table_column_name_str}: Validated.")
+                LOGGER.info(f"{table_column_name_str}: Validated.")
             else:
                 df_subtract_temp = (df_subtract_select_cols
                                     .withColumn('json_row', F.to_json(F.struct(*[F.col(c) 
