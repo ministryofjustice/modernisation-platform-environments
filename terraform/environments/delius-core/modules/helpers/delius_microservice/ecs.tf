@@ -9,6 +9,8 @@ module "container_definition" {
 
   environment = local.calculated_container_vars_list
 
+  health_check = var.health_check
+
   secrets       = local.calculated_container_secrets_list
   port_mappings = var.container_port_config
   mount_points  = var.mount_points

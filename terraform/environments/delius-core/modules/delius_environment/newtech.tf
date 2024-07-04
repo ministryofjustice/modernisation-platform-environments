@@ -49,3 +49,16 @@ module "newtech" {
   frontend_lb_arn_suffix  = aws_lb.delius_core_frontend.arn_suffix
   enable_platform_backups = var.enable_platform_backups
 }
+
+resource "aws_ssm_parameter" "pdfcreation_secret" {
+  name  = "/${var.env_name}/delius/newtech/web/params_secret_key"
+  type  = "SecureString"
+  value = "DEFAULT"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+data "aws_ssm_parameter" "pdfcreation_secret" {
+  name = aws_ssm_parameter.pdfcreation_secret.name
+}
