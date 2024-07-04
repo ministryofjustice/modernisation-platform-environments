@@ -32,7 +32,7 @@ module "aurora" {
   instances = {
     1 = {
       identifier     = local.name
-      instance_class = "db.r5.medium"
+      instance_class = "db.t4g.medium"
     }
   }
 
@@ -97,7 +97,7 @@ module "aurora" {
   enabled_cloudwatch_logs_exports = ["postgresql"]
   create_cloudwatch_log_group     = true
 
-  create_db_cluster_activity_stream     = true
+  create_db_cluster_activity_stream     = false
   db_cluster_activity_stream_kms_key_id = local.operational_db_kms_id
   db_cluster_activity_stream_mode       = "async"
 
