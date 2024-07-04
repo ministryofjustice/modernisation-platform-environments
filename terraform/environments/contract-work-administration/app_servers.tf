@@ -9,8 +9,11 @@ locals {
 # sudo ./aws/install
 ##############
 
+echo "Setting host name"
 hostname ${local.appserver1_hostname}
 echo "${local.appserver1_hostname}" > /etc/hostname
+sed -i '/^HOSTNAME/d' /etc/sysconfig/network
+echo "HOSTNAME=${local.appserver1_hostname}" >> /etc/sysconfig/network
 
 echo "Getting IP Addresses for /etc/hosts"
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)

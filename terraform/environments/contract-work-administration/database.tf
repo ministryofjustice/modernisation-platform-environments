@@ -9,8 +9,11 @@ locals {
 # sudo ./aws/install
 ##############
 
+echo "Setting host name"
 hostname ${local.database_hostname}
 echo "${local.database_hostname}" > /etc/hostname
+sed -i '/^HOSTNAME/d' /etc/sysconfig/network
+echo "HOSTNAME=${local.database_hostname}" >> /etc/sysconfig/network
 
 ### Command to use IMDSv2 instance to get userdata
 # TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`	
