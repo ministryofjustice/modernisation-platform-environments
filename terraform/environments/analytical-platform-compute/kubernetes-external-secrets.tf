@@ -45,13 +45,13 @@ resource "kubernetes_manifest" "ui_azure_external_secret" {
       "data" = [
         {
           "remoteRef" = {
-            "key" = module.ui_azure_secret.client_id
+            "key" = module.ui_azure_client_secret.secret_id
           }
           "secretKey" = "client-id"
         },
         {
           "remoteRef" = {
-            "key" = module.ui_azure_secret.tenant_id
+            "key" = module.ui_azure_tenant_secret.secret_id
           }
           "secretKey" = "tenant-id"
         },
