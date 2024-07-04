@@ -49,12 +49,12 @@ module "ecs_service" {
 
   health_check_grace_period_seconds = var.health_check_grace_period_seconds
 
-  service_load_balancers = concat([{
-    target_group_arn = aws_lb_target_group.frontend.arn
+  service_load_balancers = var.microservice_lb != null ? concat([{
+    target_group_arn = aws_lb_target_group.frontend[0].arn
     container_name   = var.name
     container_port   = var.container_port_config[0].containerPort
     }],
-  values(local.ecs_nlbs))
+  values(local.ecs_nlbs)) : []
 
   efs_volumes = var.efs_volumes
 

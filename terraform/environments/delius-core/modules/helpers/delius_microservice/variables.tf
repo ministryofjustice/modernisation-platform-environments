@@ -255,6 +255,7 @@ variable "certificate_arn" {
 variable "microservice_lb" {
   description = "load balancer to use for the target group"
   type        = any
+  default = null
 }
 
 variable "microservice_lb_https_listener_arn" {
@@ -375,6 +376,7 @@ variable "alb_security_group_id" {
 variable "health_check_path" {
   description = "The health check path for the alb target group"
   type        = string
+  default     = "/"
 }
 
 variable "health_check_interval" {

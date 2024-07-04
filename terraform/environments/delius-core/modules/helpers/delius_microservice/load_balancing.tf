@@ -10,6 +10,7 @@ resource "random_id" "suffix" {
 
 ## ALB target group and listener rule
 resource "aws_lb_target_group" "frontend" {
+  count = var.microservice_lb != null ? 1 : 0
   # checkov:skip=CKV_AWS_261
   # https://github.com/hashicorp/terraform-provider-aws/issues/16889
   name                 = "${var.env_name}-${var.name}-${random_id.suffix.hex}"
@@ -52,7 +53,7 @@ resource "aws_lb_listener_rule" "alb_path" {
   }
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.frontend.arn
+    target_group_arn = aws_lb_target_group.frontend[0].arn
   }
 }
 
@@ -67,7 +68,7 @@ resource "aws_lb_listener_rule" "alb_header" {
   }
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.frontend.arn
+    target_group_arn = aws_lb_target_group.frontend[0].arn
   }
 }
 
