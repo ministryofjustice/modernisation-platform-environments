@@ -480,8 +480,8 @@ resource "aws_iam_role_policy_attachment" "unzip_files_lambda_sqs_queue_access_e
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_vpc_access_execution" {
-  role       = aws_iam_role.output_fs_json_lambda.name
+resource "aws_iam_role_policy_attachment" "unzip_files_lambda_vpc_access_execution" {
+  role       = aws_iam_role.unzip_files.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
