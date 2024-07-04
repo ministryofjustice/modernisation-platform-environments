@@ -52,7 +52,7 @@
       "alb_elb_5xx_alarm_threshold": "10",
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
-      "oas_lz_cidr": "10.202.4.85"
+      "oas_lz_cidr": "10.202.4.85/32"
     },
     "test": {
       "example_var": "test-data"
