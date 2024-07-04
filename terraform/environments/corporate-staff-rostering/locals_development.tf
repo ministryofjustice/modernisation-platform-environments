@@ -11,6 +11,29 @@ locals {
   # please keep resources in alphabetical order
   baseline_development = {
 
+    ec2_instances = {
+      dev-csr-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-13-a"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          pre-migration = "PPCAW00013"
+          description   = "Application Server Region 1"
+          ami           = "pp-csr-a-13-a"
+        })
+      })
+    }
+
     ec2_autoscaling_groups = {
       dev-base-ol85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
