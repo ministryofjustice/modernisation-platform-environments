@@ -25,3 +25,37 @@ resource "kubernetes_manifest" "ui_sentry_dsn_external_secret" {
     }
   }
 }
+
+resource "kubernetes_manifest" "ui_azure_external_secret" {
+  manifest = {
+    "apiVersion" = "external-secrets.io/v1beta1"
+    "kind"       = "ExternalSecret"
+    "metadata" = {
+      "name"      = "ui-azure"
+      "namespace" = kubernetes_namespace.ui.metadata[0].name
+    }
+    "spec" = {
+      "secretStoreRef" = {
+        "kind" = "ClusterSecretStore"
+        "name" = "aws-secretsmanager"
+      }
+      "target" = {
+        "name" = "ui-azure"
+      }
+      "data" = [
+        {
+          "remoteRef" = {
+            "key" = module.ui_azure_secret.client_id
+          }
+          "secretKey" = "client-id"
+        },
+        {
+          "remoteRef" = {
+            "key" = module.ui_azure_secret.tenant_id
+          }
+          "secretKey" = "tenant-id"
+        },
+      ]
+    }
+  }
+}
