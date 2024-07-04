@@ -74,12 +74,7 @@ module "aurora" {
         name         = "rds.force_ssl"
         value        = 1
         apply_method = "immediate"
-      },
-      {
-        name         = "shared_preload_libraries"
-        value        = "pg_cron"
-        apply_method = "pending-reboot"
-      }      
+      }   
   ]
 
   create_db_parameter_group      = true
@@ -91,6 +86,11 @@ module "aurora" {
       name         = "log_min_duration_statement"
       value        = 4000
       apply_method = "immediate"
+    },
+    {
+      name         = "shared_preload_libraries"
+      value        = "pg_stat_statements, pg_cron"
+      apply_method = "pending-reboot"
     }
   ]
 
