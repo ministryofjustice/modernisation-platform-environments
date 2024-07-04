@@ -43,7 +43,6 @@ module "aurora" {
   }
 
   vpc_id               = data.aws_vpc.shared.id
-  db_subnet_group_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}a" // pick it from platform_data.tf
   security_group_rules = {
     vpc_ingress = {
       cidr_blocks = [data.aws_vpc.dpr.cidr_block]
@@ -59,6 +58,7 @@ module "aurora" {
 
   create_db_cluster_parameter_group      = true
   create_db_subnet_group                 = true
+  subnets                                = local.dpr_subnets
   db_cluster_parameter_group_family      = "aurora-postgresql16"
   db_cluster_parameter_group_description = "${local.name} cluster parameter group"
   db_cluster_parameter_group_parameters = [
