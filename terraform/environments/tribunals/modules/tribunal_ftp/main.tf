@@ -16,7 +16,6 @@ locals {
     cpu : 512,
     memory : 1024,
     essential : true,
-    readonlyRootFilesystem  : true,
     portMappings : [
       {
         hostPort : "${local.target_group_attachment_port_sftp}",
@@ -40,7 +39,8 @@ locals {
     mountPoints : [
       {
         sourceVolume : "tribunals",
-        containerPath : "C:/inetpub/wwwroot/${local.documents_location}"
+        containerPath : "C:/inetpub/wwwroot/${local.documents_location}",
+        readOnly : true
       }
     ]
   }])
