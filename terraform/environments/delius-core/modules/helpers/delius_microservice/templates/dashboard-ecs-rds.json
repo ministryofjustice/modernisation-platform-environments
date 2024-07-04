@@ -337,46 +337,6 @@
         "stat": "Average",
         "period": 300
       }
-    },
-    {
-      "type": "metric",
-      "x": 0,
-      "y": 14,
-      "width": 8,
-      "height": 6,
-      "properties": {
-        "view": "timeSeries",
-        "stacked": false,
-        "metrics": [
-          [
-            "AWS/ApplicationELB",
-            "HTTPCode_Target_4XX_Count",
-            "LoadBalancer",
-            "${load_balancer_arn}"
-          ]
-        ],
-        "region": "eu-west-2"
-      }
-    },
-    {
-      "type": "metric",
-      "x": 8,
-      "y": 14,
-      "width": 8,
-      "height": 6,
-      "properties": {
-        "view": "timeSeries",
-        "stacked": false,
-        "metrics": [
-          [
-            "AWS/ApplicationELB",
-            "TargetResponseTime",
-            "LoadBalancer",
-            "${load_balancer_arn}"
-          ]
-        ],
-        "region": "eu-west-2"
-      }
     }
   ]
 }
