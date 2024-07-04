@@ -21,6 +21,6 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   alarm_actions       = [aws_sns_topic.lb_alarm_topic.arn]
 
   dimensions = {
-    LoadBalancer = "${var.application_name}-lb"
+    LoadBalancer = "${local.application_name}-lb"
   }
 }
