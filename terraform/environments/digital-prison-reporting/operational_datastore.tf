@@ -22,7 +22,7 @@ locals {
 module "aurora" {
   source = "./modules/rds/aws-aurora/"
 
-  name            = "${local.name}-cluster
+  name            = "${local.name}-cluster"
   engine          = "aurora-postgresql"
   engine_version  = "16.2"
   master_username = "dpr-admin"
