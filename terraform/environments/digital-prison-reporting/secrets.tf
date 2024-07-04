@@ -329,9 +329,7 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
   )
 }
 
-################################################################################
-# AWS Secrets Manager for RDS Credentials
-################################################################################
+# AWS Secrets Manager for Operational DB Credentials
 
 resource "random_password" "operational_db_password" {
   length  = 16
