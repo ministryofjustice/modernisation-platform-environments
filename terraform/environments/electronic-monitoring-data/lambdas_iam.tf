@@ -465,39 +465,3 @@ resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zi
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.data_store.arn
 }
-
-
-# ------------------------------------------
-# get_dms_validated_tables
-# ------------------------------------------
-
-resource "aws_iam_role" "get_dms_validated_tables" {
-  name               = "get_dms_validated_tables"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-resource "aws_iam_role_policy_attachment" "get_dms_validated_tables_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.get_dms_validated_tables.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
-data "aws_iam_policy_document" "get_dms_table_stats" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "dms:DescribeReplicationTableStatistics"
-    ]
-    resources = [
-      "arn:aws:dms:eu-west-2:${local.env_account_id}:replication-config:*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "get_dms_table_stats" {
-  name   = "get_dms_table_stats"
-  policy = data.aws_iam_policy_document.get_dms_table_stats.json
-}
-resource "aws_iam_role_policy_attachment" "get_dms_validated_tables_get_dms_table_stats" {
-  role       = aws_iam_role.get_dms_validated_tables.name
-  policy_arn = aws_iam_policy.get_dms_table_stats.arn
-}
