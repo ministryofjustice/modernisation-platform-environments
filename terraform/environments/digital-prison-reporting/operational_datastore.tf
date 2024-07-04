@@ -3,7 +3,7 @@ locals {
 
   name   = "${local.project}-operational-db"
 
-  tags = merge(
+  operational_db_tags = merge(
     local.all_tags,
     {
       Resource_Group = "Operational-DB"
@@ -98,7 +98,7 @@ module "aurora" {
   # db_cluster_activity_stream_kms_key_id = module.kms.key_id
   db_cluster_activity_stream_mode       = "async"
 
-  tags = local.tags
+  tags = local.operational_db_tags
 }
 
 
