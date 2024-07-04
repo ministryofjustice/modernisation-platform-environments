@@ -6,6 +6,8 @@ locals {
 }
 
 module "ad-clean-up-lambda" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  # This is an internal module so commit hashes are not needed
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v3.1.0"
 
   application_name = local.lambda_ad_object_cleanup.function_name
@@ -69,6 +71,8 @@ locals {
 }
 
 module "lambda_cw_logs_xml_to_json" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  # This is an internal module so commit hashes are not needed
   source = "github.com/ministryofjustice/modernisation-platform-terraform-lambda-function?ref=v3.1.0"
 
   application_name = local.lambda_cw_logs_xml_to_json.function_name
