@@ -7,9 +7,10 @@ locals {
   glue_avro_registry           = split("/", module.glue_registry_avro.registry_name)
   shared_log4j_properties_path = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${aws_s3_object.glue_job_shared_custom_log4j_properties.key}"
   # We only want to enable write to Operational DataStore in the dev environment until it is available in all environments
-  glue_batch_job_extra_args = (local.environment == "development" ? {
+  glue_datahub_job_extra_dev_env_args = (local.environment == "development" ? {
     "--dpr.operational.data.store.write.enabled"        = "true"
     "--dpr.operational.data.store.glue.connection.name" = aws_glue_connection.glue_operational_datastore_connection[0].name
+    "--dpr.operational.data.store.loading.schema.name"  = "loading"
   } : {})
 }
 
@@ -57,7 +58,7 @@ module "glue_reporting_hub_job" {
     }
   )
 
-  arguments = {
+  arguments = merge(local.glue_datahub_job_extra_dev_env_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--job-bookmark-option"                 = "job-bookmark-disable"
@@ -87,7 +88,7 @@ module "glue_reporting_hub_job" {
     "--dpr.datamart.db.name"                = "datamart"
     "--dpr.log.level"                       = local.reporting_hub_log_level
     "--dpr.domainrefresh.enabled"           = local.reporting_hub_domain_refresh_enabled
-  }
+  })
 }
 
 # Glue Job, Reporting Hub Batch
@@ -124,7 +125,7 @@ module "glue_reporting_hub_batch_job" {
     }
   )
 
-  arguments = merge(local.glue_batch_job_extra_args, {
+  arguments = merge(local.glue_datahub_job_extra_dev_env_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
@@ -179,7 +180,7 @@ module "glue_reporting_hub_cdc_job" {
     }
   )
 
-  arguments = {
+  arguments = merge(local.glue_datahub_job_extra_dev_env_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--job-bookmark-option"                 = "job-bookmark-disable"
@@ -203,7 +204,7 @@ module "glue_reporting_hub_cdc_job" {
     "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
     "--dpr.schema.cache.max.size"           = local.reporting_hub_cdc_job_schema_cache_max_size
     "--dpr.log.level"                       = local.reporting_hub_cdc_job_log_level
-  }
+  })
 }
 
 # Glue Job, Create Hive Tables
