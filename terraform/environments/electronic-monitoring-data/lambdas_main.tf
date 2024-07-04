@@ -268,12 +268,12 @@ module "output_file_structure_as_json_from_zip" {
 # Unzip single file in zip store
 # ------------------------------------------------------
 
-module "unzip_files" {
+module "unzip_unstructured_files" {
   source         = "./modules/lambdas"
-  function_name  = "unzip_files"
+  function_name  = "unzip_unstructured_files"
   is_image       = true
-  role_name      = aws_iam_role.unzip_files.name
-  role_arn       = aws_iam_role.unzip_files.arn
+  role_name      = aws_iam_role.unzip_unstructured_files.name
+  role_arn       = aws_iam_role.unzip_unstructured_files.arn
   memory_size    = 1024
   timeout        = 900
   env_account_id = local.env_account_id
