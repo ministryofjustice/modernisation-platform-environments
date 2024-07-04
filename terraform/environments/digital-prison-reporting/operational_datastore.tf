@@ -95,7 +95,7 @@ module "aurora" {
   create_cloudwatch_log_group     = true
 
   create_db_cluster_activity_stream     = true
-  # db_cluster_activity_stream_kms_key_id = module.kms.key_id
+  db_cluster_activity_stream_kms_key_id = local.operational_db_kms_id
   db_cluster_activity_stream_mode       = "async"
 
   tags = local.operational_db_tags
