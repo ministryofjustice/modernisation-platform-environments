@@ -54,7 +54,7 @@ module "ecs_service" {
     container_name   = var.name
     container_port   = var.container_port_config[0].containerPort
     }],
-  values(local.ecs_nlbs)) : []
+  values(local.ecs_nlbs)) : values(local.ecs_nlbs)
 
   efs_volumes = var.efs_volumes
 
