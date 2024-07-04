@@ -225,7 +225,7 @@ module "update_log_table" {
   role_name      = aws_iam_role.update_log_table.name
   role_arn       = aws_iam_role.update_log_table.arn
   memory_size    = 1024
-  timeout        = 900
+  timeout        = 901
   env_account_id = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev = local.is-production ? "prod" : "dev"
