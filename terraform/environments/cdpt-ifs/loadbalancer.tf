@@ -118,7 +118,7 @@ resource "aws_lb_target_group" "ifs_target_group" {
     unhealthy_threshold = "2"
     matcher             = "200-499"
     timeout             = "15"
-    path                = "/health"
+    path                = "/test-lb-alert"
   }
 
   lifecycle {
