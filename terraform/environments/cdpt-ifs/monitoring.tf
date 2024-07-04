@@ -22,4 +22,5 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
 
   dimensions = {
     LoadBalancer = "${var.application_name}-lb"
+  }
 }
