@@ -1,6 +1,5 @@
 locals {
   use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null)
-  force_update = var.is_image ? timestamp() : ""
 }
 
 resource "aws_sqs_queue" "lambda_dlq" {
@@ -130,6 +129,7 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
 
 
 resource "aws_lambda_function" "this" {
+  #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
   # Zip File config
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
@@ -137,14 +137,13 @@ resource "aws_lambda_function" "this" {
   source_code_hash = var.is_image ? null : var.source_code_hash
   runtime          = var.is_image ? null : var.runtime
   # Image config
-  image_uri        = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas:${var.function_name}-${var.production_dev}" : null
-  package_type     = var.is_image ? "Image" : "Zip"
-
+  image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas:${var.function_name}-${var.production_dev}" : null
+  package_type = var.is_image ? "Image" : null
   # Constants
-  function_name    = var.function_name
-  role             = var.role_arn
-  timeout          = var.timeout
-  memory_size      = var.memory_size
+  function_name = var.function_name
+  role          = var.role_arn
+  timeout       = var.timeout
+  memory_size   = var.memory_size
 
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []
@@ -153,6 +152,7 @@ resource "aws_lambda_function" "this" {
       subnet_ids         = var.subnet_ids
     }
   }
+
 
   environment {
     variables = var.environment_variables
@@ -167,9 +167,6 @@ resource "aws_lambda_function" "this" {
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_dlq.arn
   }
-  lifecycle {
-    create_before_destroy = true
-    ignore_changes        = [source_code_hash, filename, handler, layers, runtime, image_uri, package_type]
-    replace_triggered_by  = [local.force_update]
-  }
+  reserved_concurrent_executions = var.reserved_concurrent_executions
+
 }
