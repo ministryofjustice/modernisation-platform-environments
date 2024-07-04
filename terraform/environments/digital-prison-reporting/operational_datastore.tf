@@ -1,6 +1,106 @@
 locals {
   glue_connection_names = (local.environment == "development" ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : [])
+
+  name   = "${local.project}-operational-db"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "Operational-DB"
+      Resource_Type  = "RDS"
+      Jira           = "DPR2-892"
+      project        = local.project
+      Name           = "operational-db"
+    }
+  )
 }
+
+################################################################################
+# RDS Aurora Cluster
+################################################################################
+
+module "aurora" {
+  source = "./modules/rds/aws-aurora/"
+
+  name            = "${local.name}-cluster
+  engine          = "aurora-postgresql"
+  engine_version  = "16.2"
+  master_username = "dpr-admin"
+  instances = {
+    1 = {
+      identifier     = local.name
+      instance_class = "db.t4g.medium"
+    }
+  }
+
+  endpoints = {
+    static = {
+      identifier     = "operational-db-static-any-endpoint"
+      type           = "ANY"
+      static_members = ["${local.name}"]
+      tags           = { Endpoint = "Operational-DB-Any" }
+    }
+  }
+
+  vpc_id               = data.aws_vpc.shared.id
+  db_subnet_group_name = data.aws_subnet.private_subnets_a.id
+  security_group_rules = {
+    vpc_ingress = {
+      cidr_blocks = data.aws_vpc.dpr.cidr_block
+    }
+    egress_example = {
+      cidr_blocks = ["0.0.0.0"]
+      description = "Egress to corporate printer closet"
+    }
+  }
+
+  apply_immediately   = true
+  skip_final_snapshot = true
+
+  create_db_cluster_parameter_group      = true
+  db_cluster_parameter_group_name        = "${local.name}-cluster"
+  db_cluster_parameter_group_family      = "aurora-postgresql16"
+  db_cluster_parameter_group_description = "${local.name} cluster parameter group"
+  db_cluster_parameter_group_parameters = [
+    {
+        name         = "log_min_duration_statement"
+        value        = 4000
+        apply_method = "immediate"
+      }, 
+      {
+        name         = "rds.force_ssl"
+        value        = 1
+        apply_method = "immediate"
+      },
+      {
+        name         = "shared_preload_libraries"
+        value        = "pg_cron"
+        apply_method = "pending-reboot"
+      }      
+  ]
+
+  create_db_parameter_group      = true
+  db_parameter_group_name        = "${local.name}-instance"
+  db_parameter_group_family      = "aurora-postgresql16"
+  db_parameter_group_description = "${local.name} DB parameter group"
+  db_parameter_group_parameters = [
+    {
+      name         = "log_min_duration_statement"
+      value        = 4000
+      apply_method = "immediate"
+    }
+  ]
+
+  enabled_cloudwatch_logs_exports = ["postgresql"]
+  create_cloudwatch_log_group     = true
+
+  create_db_cluster_activity_stream     = true
+  # db_cluster_activity_stream_kms_key_id = module.kms.key_id
+  db_cluster_activity_stream_mode       = "async"
+
+  tags = local.tags
+}
+
 
 resource "aws_glue_connection" "glue_operational_datastore_connection" {
   count           = (local.environment == "development" ? 1 : 0)
