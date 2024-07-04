@@ -8,6 +8,17 @@ module "pdf_creation" {
 
   target_group_protocol_version = "HTTP1"
 
+  health_check = {
+    command                = [
+      "CMD-SHELL",
+      "health=$(curl -sf http://localhost:8080/healthcheck || exit 1) && echo $health | jq -e '.status == \"OK\"'"
+    ]
+    interval            = 30
+    timeout             = 5
+    retries   = 2
+    startPeriod = 30
+  }
+
   container_port_config = [
     {
       containerPort = var.delius_microservice_configs.pdf_creation.container_port
