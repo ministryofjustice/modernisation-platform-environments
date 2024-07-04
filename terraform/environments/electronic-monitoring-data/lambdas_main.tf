@@ -264,3 +264,25 @@ module "output_file_structure_as_json_from_zip" {
   environment_variables = null
 }
 
+# ------------------------------------------------------
+# Unzip single file in zip store
+# ------------------------------------------------------
+
+module "unzip_files" {
+  source         = "./modules/lambdas"
+  function_name  = "unzip_files"
+  is_image       = true
+  role_name      = aws_iam_role.unzip_files.name
+  role_arn       = aws_iam_role.unzip_files.arn
+  memory_size    = 1024
+  timeout        = 900
+  env_account_id = local.env_account_id
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    UNSTRUCTURED_BUCKET_NAME = module.unzipped-s3-data-store.bucket.id
+    DATA_STORE_BUCKET_NAME = aws_s3_bucket.data_store.id
+  }
+  security_group_ids    = [aws_security_group.lambda_db_security_group.id]
+  subnet_ids            = data.aws_subnets.shared-public.ids
+}
