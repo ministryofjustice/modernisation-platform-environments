@@ -328,3 +328,30 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
     }
   )
 }
+
+################################################################################
+# AWS Secrets Manager for RDS Credentials
+################################################################################
+
+resource "random_password" "operational_db_password" {
+  length  = 16
+  special = true
+}
+
+resource "aws_secretsmanager_secret" "operational_db_secret" {
+  name = "${local.project}-rds-operational-db-secret"
+  description = "Secret for RDS master username and password"
+
+  tags = {
+    Name = "${local.project}-rds-operational-db-secret"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "operational_db_secret_version" {
+  secret_id = aws_secretsmanager_secret.operational_db_secret.id
+
+  secret_string = jsonencode({
+    username = "dpradmin"
+    password = random_password.operational_db_password.result
+  })
+}

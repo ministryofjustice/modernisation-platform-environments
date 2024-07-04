@@ -13,6 +13,8 @@ locals {
       Name           = "operational-db"
     }
   )
+
+  operational_db_credentials = jsondecode(data.aws_secretsmanager_secret_version.operational_db_secret_version.secret_string)
 }
 
 ################################################################################
@@ -25,7 +27,8 @@ module "aurora" {
   name            = "${local.name}-cluster"
   engine          = "aurora-postgresql"
   engine_version  = "16.2"
-  master_username = "dpr-admin"
+  master_username = local.operational_db_credentials.username
+  master_password = local.operational_db_credentials.password
   instances = {
     1 = {
       identifier     = local.name
