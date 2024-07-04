@@ -16,7 +16,7 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   description = "control access to the network load balancer for sftp"
   vpc_id      = data.aws_vpc.shared.id
 
-//Will need ingress rules for all 10 sftp ports:
+//Might need to update this to just the DOM1 IP range
   dynamic "ingress" {
     for_each = var.sftp_services
     content {
