@@ -32,7 +32,7 @@ module "aurora" {
   instances = {
     1 = {
       identifier     = local.name
-      instance_class = "db.t4g.medium"
+      instance_class = "db.r5.medium"
     }
   }
 
