@@ -2,13 +2,6 @@ locals {
   db_userdata = <<EOF
 #!/bin/bash
 
-### Temp install of AWS CLI - removed once actual AMI is used
-# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-# sudo yum install -y unzip
-# unzip awscliv2.zip
-# sudo ./aws/install
-##############
-
 echo "Setting host name"
 hostname ${local.database_hostname}
 echo "${local.database_hostname}" > /etc/hostname
