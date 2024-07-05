@@ -63,7 +63,7 @@ sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 ## Add custom metric script
 echo "Adding the custom metrics script for CloudWatch"
-echo '${data.local_file.cm_custom_metrics.content}' > /var/cm-cw-custom.json
+echo '${data.local_file.cm_custom_metrics.content}' > /var/cw-custom.json
 # This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
 
 EOF

@@ -77,6 +77,17 @@ resource "aws_iam_policy" "cwa" {
             ],
             "Resource": "*",
             "Effect": "Allow"
+        },
+        {
+            "Effect":"Allow",
+            "Action":[
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:DeleteObject"
+            ],
+            "Resource":"arn:aws:s3:::${aws_s3_bucket.backup_lambda.id}/db-cw-custom.sh"
         }
     ]
 }

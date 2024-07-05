@@ -8,11 +8,6 @@ echo "${local.database_hostname}" > /etc/hostname
 sed -i '/^HOSTNAME/d' /etc/sysconfig/network
 echo "HOSTNAME=${local.database_hostname}" >> /etc/sysconfig/network
 
-### Command to use IMDSv2 instance to get userdata
-# TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`	
-# PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)	
-##############
-
 echo "Getting IP Addresses for /etc/hosts"
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 APP1_IP=""
@@ -60,13 +55,26 @@ sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 ## Add custom metric script
 echo "Adding the custom metrics script for CloudWatch"
-echo '${data.local_file.database_custom_metrics.content}' > /var/db-cw-custom.json
-# This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
 
+# This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+rm /var/cw-custom.sh
+/usr/local/bin/aws s3 cp s3:/${aws_s3_bucket.backup_lambda.id}/db-cw-custom.sh /var/cw-custom.sh
 EOF
 
 }
 
+### Load custom metric script into an S3 bucket
+resource "aws_s3_object" "db_custom_script" {
+    bucket = aws_s3_bucket.backup_lambda.id
+    key    = "db-cw-custom.sh"
+    source = "./db-cw-custom.sh"
+    source_hash  = filemd5("./db-cw-custom.sh")
+}
+
+resource "time_sleep" "wait_db_custom_script" {
+  create_duration = "1m"
+  depends_on      = [aws_s3_object.db_custom_script]
+}
 ######################################
 # Database Instance
 ######################################
@@ -91,6 +99,7 @@ resource "aws_instance" "database" {
     local.tags,
     { "Name" = local.database_ec2_name }
   )
+  depends_on          = [time_sleep.wait_db_custom_script]
 }
 
 resource "aws_key_pair" "cwa" {
