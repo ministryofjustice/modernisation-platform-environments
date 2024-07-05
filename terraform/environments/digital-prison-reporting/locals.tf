@@ -240,6 +240,8 @@ locals {
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
+  lambda_transfercomp_ods_name = "${local.project}-transfer-component-operational-datastore"
+
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
   # s3 transfer
