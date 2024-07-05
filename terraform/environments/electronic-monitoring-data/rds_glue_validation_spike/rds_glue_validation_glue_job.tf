@@ -12,7 +12,6 @@ resource "aws_glue_job" "rds_to_parquet_chunkwise_job" {
   }
 
   default_arguments = {
-    "--enable-glue-datacatalog"           = "true"
     "--script_bucket_name"                = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
@@ -41,7 +40,6 @@ resource "aws_glue_job" "simple_data_validation_of_parquet_job" {
   }
 
   default_arguments = {
-    "--enable-glue-datacatalog"           = "true"
     "--script_bucket_name"                = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                        = aws_db_instance.database_2022.password

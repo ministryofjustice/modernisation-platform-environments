@@ -7,7 +7,15 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 
 # Initialize Glue context
-args = getResolvedOptions(sys.argv, ['JOB_NAME', 'JDBC_URL', 'JDBC_TABLE', 'JDBC_USER', 'JDBC_PASSWORD', 'S3_TARGET_PATH'])
+
+args = getResolvedOptions(sys.argv, [
+    'script_bucket_name',
+    'rds_db_host_ep'
+    'rds_db_pwd'
+    'rds_sqlserver_db'
+    'parquet_output_bucket_name'
+    ]
+) ### Need to make this align with parameters below
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
