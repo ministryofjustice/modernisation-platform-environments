@@ -64,6 +64,18 @@ resource "aws_s3_object" "catalog_dv_table_glue_job_s3_object" {
   source = "glue-job/create_or_replace_dv_table.py"
   etag   = filemd5("glue-job/create_or_replace_dv_table.py")
 }
+resource "aws_s3_object" "rds_to_parquet_chunkwise_s3_object" {
+  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  key    = "rds_to_parquet_chunkwise.py"
+  source = "glue-job/rds_to_parquet_chunkwise.py"
+  etag   = filemd5("glue-job/rds_to_parquet_chunkwise.py")
+}
+resource "aws_s3_object" "simple_data_validation_of_parquet_s3_object" {
+  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  key    = "simple_data_validation_of_parquet.py"
+  source = "glue-job/simple_data_validation_of_parquet.py"
+  etag   = filemd5("glue-job/simple_data_validation_of_parquet.py")
+}
 
 # -------------------------------------------------------------------
 
