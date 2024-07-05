@@ -222,10 +222,9 @@ resource "aws_glue_job" "dms_dv_glue_job_v4b" {
     "--rds_db_tbl_pkeys_col_list"         = ""
     "--rds_df_trim_str_col_list"          = ""
     "--rds_df_trim_micro_sec_ts_col_list" = ""
-    "--jdbc_read_256mb_partitions"        = "false"
+    "--jdbc_read_256mb_partitions"        = "true"
     "--jdbc_read_512mb_partitions"        = "false"
-    "--jdbc_read_1gb_partitions"          = "true"
-    "--jdbc_read_2gb_partitions"          = "false"
+    "--jdbc_read_1gb_partitions"          = "false"
     "--rds_read_rows_fetch_size"          = 100000
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id

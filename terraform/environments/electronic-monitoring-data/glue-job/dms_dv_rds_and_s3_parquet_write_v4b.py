@@ -64,7 +64,6 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "jdbc_read_256mb_partitions",
                        "jdbc_read_512mb_partitions",
                        "jdbc_read_1gb_partitions",
-                       "jdbc_read_2gb_partitions",
                        "rds_read_rows_fetch_size"
                        ]
 
@@ -574,8 +573,6 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             int_partitions_evaluated = int(total_size_mb/512)
         elif args.get("jdbc_read_1gb_partitions", "false") == "true":
             int_partitions_evaluated = int(total_size_mb/1024)
-        elif args.get("jdbc_read_2gb_partitions", "false") == "true":
-            int_partitions_evaluated = int((total_size_mb/1024)/2)
         else:
             int_partitions_evaluated = total_files
 
