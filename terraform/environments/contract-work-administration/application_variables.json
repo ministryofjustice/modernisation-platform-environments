@@ -39,6 +39,7 @@
       "database_rx_packet_errors_alarm_threshold": "100",
       "database_oradata_read_alarm_threshold": "160000"
 
+
     },
     "test": {
       "example_var": "test-data"
