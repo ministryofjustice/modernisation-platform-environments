@@ -55,10 +55,10 @@ sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 ## Add custom metric script
 echo "Adding the custom metrics script for CloudWatch"
-
-# This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
 rm /var/cw-custom.sh
-/usr/local/bin/aws s3 cp s3:/${aws_s3_bucket.backup_lambda.id}/db-cw-custom.sh /var/cw-custom.sh
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.backup_lambda.id}/db-cw-custom.sh /var/cw-custom.sh
+#  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+
 EOF
 
 }
@@ -75,6 +75,7 @@ resource "time_sleep" "wait_db_custom_script" {
   create_duration = "1m"
   depends_on      = [aws_s3_object.db_custom_script]
 }
+
 ######################################
 # Database Instance
 ######################################
