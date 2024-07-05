@@ -19,10 +19,6 @@ locals {
       Dept = "Digital-Prison-Reporting"
     }
   )
-
-  secrets_job_needs_to_access = merge(var.additional_secret_arns, [
-    "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*"
-  ])
 }
 
 resource "aws_glue_job" "glue_job" {
@@ -148,7 +144,9 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret"
     ]
-    resources = local.secrets_job_needs_to_access
+    resources = concat(var.additional_secret_arns, [
+      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*"
+    ])
   }
   statement {
     actions = [
