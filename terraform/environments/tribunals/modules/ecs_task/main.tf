@@ -2,8 +2,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   family             = "${var.app_name}Family"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
-  //Set this to brige and disable public IP for ec2??
-  network_mode       = "bridge"
+  network_mode       = "host"
   requires_compatibilities = [
     "EC2",
   ]
