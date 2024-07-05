@@ -4,7 +4,7 @@ resource "aws_sns_topic" "lb_alarm_topic" {
 
 module "slack_alerts_url" {
   for_each = local.enable_slack_alerts ? { "enabled": "enabled" } : {}
-  source               = "./modules/baseline/secrets_manager"
+  source               = "./modules/baseline/secretsmanager"
   name                 = "${local.application_name}-slack-alerts-url-${local.environment}"
   description          = "IFS LoadBalancer slack alerts URL"
   type                 = "MONO"
