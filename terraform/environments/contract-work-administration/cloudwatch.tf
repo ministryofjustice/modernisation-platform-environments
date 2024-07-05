@@ -6,10 +6,10 @@ resource "aws_cloudwatch_metric_alarm" "efs_data_write" {
   dimensions = {
     FileSystemId = aws_efs_file_system.cwa.id
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "DataWriteIOBytes"
   namespace          = "AWS/EFS"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].efs_data_write_alarm_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -31,10 +31,10 @@ resource "aws_cloudwatch_metric_alarm" "efs_data_read" {
   dimensions = {
     FileSystemId = aws_efs_file_system.cwa.id
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "DataReadIOBytes"
   namespace          = "AWS/EFS"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].efs_data_read_alarm_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -56,10 +56,10 @@ resource "aws_cloudwatch_metric_alarm" "database_cpu" {
   dimensions = {
     InstanceId = aws_instance.database.id
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "CPUUtilization"
   namespace          = "AWS/EC2"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].database_cpu_alarm_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -84,7 +84,7 @@ resource "aws_cloudwatch_metric_alarm" "elb_target_response_time" {
   evaluation_periods = "1"
   metric_name        = "TargetResponseTime"
   namespace          = "AWS/ApplicationELB"
-  period             = 60
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].elb_target_response_time_alarm_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -106,10 +106,10 @@ resource "aws_cloudwatch_metric_alarm" "elb_request_count" {
   dimensions = {
     LoadBalancer = aws_lb.external.arn_suffix
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "RequestCount"
   namespace          = "AWS/ApplicationELB"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].elb_request_count_alarm_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -123,6 +123,32 @@ resource "aws_cloudwatch_metric_alarm" "elb_request_count" {
   )
 }
 
+resource "aws_cloudwatch_metric_alarm" "elb_unhealthy_hosts_count" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-elb-unhealthy-hosts-count"
+  alarm_description   = "CWA ELB Healthy Hosts less than Threshold"
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    TargetGroup = aws_lb_target_group.external.arn_suffix
+    LoadBalancer = aws_lb.external.arn_suffix
+  }
+  evaluation_periods = 1
+  metric_name        = "UnHealthyHostCount"
+  namespace          = "AWS/ApplicationELB"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = 0
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  treat_missing_data = "ignore"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-elb-unhealthy-hosts-count"
+    }
+  )
+}
+
 resource "aws_cloudwatch_metric_alarm" "app1_ec2_status_check" {
 
   alarm_name          = "${local.application_name_short}-${local.environment}-app1-ec2-status-check"
@@ -131,10 +157,10 @@ resource "aws_cloudwatch_metric_alarm" "app1_ec2_status_check" {
   dimensions = {
     InstanceId = aws_instance.app1.id
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "StatusCheckFailed"
   namespace          = "AWS/EC2"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -156,10 +182,10 @@ resource "aws_cloudwatch_metric_alarm" "app2_ec2_status_check" {
   dimensions = {
     InstanceId = aws_instance.app2[0].id
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "StatusCheckFailed_Instance"
   namespace          = "AWS/EC2"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -181,10 +207,10 @@ resource "aws_cloudwatch_metric_alarm" "cm_ec2_status_check" {
   dimensions = {
     InstanceId = aws_instance.concurrent_manager.id
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "StatusCheckFailed"
   namespace          = "AWS/EC2"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -206,10 +232,10 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_status_check" {
   dimensions = {
     InstanceId = aws_instance.database.id
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "StatusCheckFailed"
   namespace          = "AWS/EC2"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Sum"
   threshold          = local.application_data.accounts[local.environment].status_check_alarm_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -223,32 +249,6 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_status_check" {
   )
 }
 
-resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
-
-  alarm_name          = "${local.application_name_short}-${local.environment}-database-ec2-swap"
-  alarm_description   = "Database EC2 Instance Swap Used Too High"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  dimensions = {
-    InstanceId = aws_instance.database.id
-  }
-  evaluation_periods = "5"
-  metric_name        = "SwapUsed"
-  namespace          = "System/Linux"
-  period             = "60"
-  statistic          = "Average"
-  threshold          = local.application_data.accounts[local.environment].database_ec2_swap_alarm_threshold
-  alarm_actions      = [aws_sns_topic.cwa.arn]
-  ok_actions         = [aws_sns_topic.cwa.arn]
-  #   treat_missing_data = ""
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name_short}-${local.environment}-database-ec2-swap"
-    }
-  )
-}
-
-
 ########################################
 ### (Manual)
 ########################################
@@ -261,16 +261,17 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_memory" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
     InstanceId = aws_instance.database.id
+    ImageId = aws_instance.database.ami
+    InstanceType = aws_instance.database.instance_type
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "mem_used_percent"
   namespace          = "CustomScript"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].database_ec2_memory_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-#   ok_actions         = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data = "missing"
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   tags = merge(
     local.tags,
     {
@@ -286,16 +287,18 @@ resource "aws_cloudwatch_metric_alarm" "database_rx_packet_errors" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
     InstanceId = aws_instance.database.id
+    ImageId = aws_instance.database.ami
+    InstanceType = aws_instance.database.instance_type
+    interface = local.ec2_network_interface
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "net_err_in"
   namespace          = "CustomScript"
-  period             = "300"
-  statistic          = "Average"
-  threshold          = local.application_data.accounts[local.environment].database_rx_packet_errors_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-#   ok_actions         = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data = "missing"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = local.application_data.accounts[local.environment].database_packet_errors_alarm_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   tags = merge(
     local.tags,
     {
@@ -304,6 +307,86 @@ resource "aws_cloudwatch_metric_alarm" "database_rx_packet_errors" {
   )
 }
 
+resource "aws_cloudwatch_metric_alarm" "database_rx_packet_dropped" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-rx-packet-dropped"
+  alarm_description   = "Number of Dropped RX Packets Over Threshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    InstanceId = aws_instance.database.id
+    ImageId = aws_instance.database.ami
+    InstanceType = aws_instance.database.instance_type
+    interface = local.ec2_network_interface
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "net_drop_in"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = local.application_data.accounts[local.environment].database_packet_dropped_alarm_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-rx-packet-dropped"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_tx_packet_errors" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-tx-packet-errors"
+  alarm_description   = "Number of errors tx Packets Over Threshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    InstanceId = aws_instance.database.id
+    ImageId = aws_instance.database.ami
+    InstanceType = aws_instance.database.instance_type
+    interface = local.ec2_network_interface
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "net_err_out"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = local.application_data.accounts[local.environment].database_packet_errors_alarm_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-tx-packet-errors"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_tx_packet_dropped" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-tx-packet-dropped"
+  alarm_description   = "Number of Dropped tx Packets Over Threshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    InstanceId = aws_instance.database.id
+    ImageId = aws_instance.database.ami
+    InstanceType = aws_instance.database.instance_type
+    interface = local.ec2_network_interface
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "net_drop_out"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = local.application_data.accounts[local.environment].database_packet_dropped_alarm_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-tx-packet-dropped"
+    }
+  )
+}
 
 resource "aws_cloudwatch_metric_alarm" "database_oradata_read" {
 
@@ -318,19 +401,163 @@ resource "aws_cloudwatch_metric_alarm" "database_oradata_read" {
     device = "/dev/xvd${local.oradata_device_name_letter}"
     fstype = "ext4"
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_reads_oradata"
   namespace          = "CustomScript"
-  period             = "300"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"
-  threshold          = local.application_data.accounts[local.environment].database_oradata_read_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-#   ok_actions         = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data = "missing"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   tags = merge(
     local.tags,
     {
       Name = "${local.application_name_short}-${local.environment}-database-oradata-read"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oraredo_read" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oraredo-read"
+  alarm_description   = "EBS oraredo Volume - Reads too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oraredo"
+    ImageId = aws_instance.database.ami
+    InstanceId = aws_instance.database.id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oraredo_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_reads_oraredo"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oraredo-read"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oraarch_read" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oraarch-read"
+  alarm_description   = "EBS oraarch Volume - Reads too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oraarch"
+    ImageId = aws_instance.database.ami
+    InstanceId = aws_instance.database.id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oraarch_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_reads_oraarch"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oraarch-read"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oratmp_read" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oratmp-read"
+  alarm_description   = "EBS oratmp Volume - Reads too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oratmp"
+    ImageId = aws_instance.database.ami
+    InstanceId = aws_instance.database.id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oratmp_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_reads_oratmp"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oratmp-read"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oracle_read" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oracle-read"
+  alarm_description   = "EBS oracle Volume - Reads too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oracle"
+    ImageId = aws_instance.database.ami
+    InstanceId = aws_instance.database.id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oracle_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_reads_oracle"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oracle-read"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_root_read" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-root-read"
+  alarm_description   = "EBS root Volume - Reads too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/"
+    ImageId = aws_instance.database.ami
+    InstanceId = aws_instance.database.id
+    InstanceType = aws_instance.database.instance_type
+    device = local.root_device_name
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_reads_root"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-root-read"
     }
   )
 }
@@ -348,10 +575,10 @@ resource "aws_cloudwatch_metric_alarm" "database_oraredo_diskspace" {
     device = "/dev/xvd${local.oraredo_device_name_letter}"
     fstype = "ext4"
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "disk_used_percent_oraredo"
   namespace          = "CustomScript"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].database_diskspace_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -377,10 +604,10 @@ resource "aws_cloudwatch_metric_alarm" "database_oradata_diskspace" {
     device = "/dev/xvd${local.oradata_device_name_letter}"
     fstype = "ext4"
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "disk_used_percent_oradata"
   namespace          = "CustomScript"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].database_diskspace_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -406,10 +633,10 @@ resource "aws_cloudwatch_metric_alarm" "database_oratmp_diskspace" {
     device = "/dev/xvd${local.oratmp_device_name_letter}"
     fstype = "ext4"
   }
-  evaluation_periods = "5"
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "disk_used_percent_oratmp"
   namespace          = "CustomScript"
-  period             = "60"
+  period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"
   threshold          = local.application_data.accounts[local.environment].database_diskspace_threshold
   alarm_actions      = [aws_sns_topic.cwa.arn]
@@ -422,32 +649,465 @@ resource "aws_cloudwatch_metric_alarm" "database_oratmp_diskspace" {
   )
 }
 
-# resource "aws_cloudwatch_metric_alarm" "" {
+resource "aws_cloudwatch_metric_alarm" "database_oraarch_diskspace" {
 
-#   alarm_name          = "${local.application_name_short}-${local.environment}-"
-#   alarm_description   = ""
-#   comparison_operator = ""
-#   dimensions = {
-#     InstanceId = aws_instance.database.id
-#   }
-#   evaluation_periods = ""
-#   metric_name        = ""
-#   namespace          = ""
-#   period             = ""
-#   statistic          = ""
-#   threshold          = local.application_data.accounts[local.environment].database_oradata_read_alarm_threshold
-#   alarm_actions      = [aws_sns_topic.cwa.arn]
-#   ok_actions         = [aws_sns_topic.cwa.arn]
-#   treat_missing_data = ""
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name_short}-${local.environment}-"
-#     }
-#   )
-# }
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oraarch-diskspace"
+  alarm_description   = "EBS oraarch Volume - Disk Space is Low"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oraarch"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oraarch_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "disk_used_percent_oraarch"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_diskspace_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oraarch-diskspace"
+    }
+  )
+}
 
+resource "aws_cloudwatch_metric_alarm" "database_oracle_diskspace" {
 
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oracle-diskspace"
+  alarm_description   = "EBS oracle Volume - Disk Space is Low"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oracle"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oracle_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "disk_used_percent_oracle"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_diskspace_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oracle-diskspace"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_root_diskspace" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-root-diskspace"
+  alarm_description   = "EBS root Volume - Disk Space is Low"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = local.root_device_name
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "disk_used_percent_root"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_diskspace_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-root-diskspace"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oraarch_writes" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oraarch-writes"
+  alarm_description   = "EBS Oraarch Volume - Writes too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oraarch"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oraarch_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_writes_oraarch"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oraarch-writes"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oratmp_writes" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oratmp-writes"
+  alarm_description   = "EBS oratmp Volume - Writes too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oratmp"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oratmp_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_writes_oratmp"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oratmp-writes"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oradata_writes" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oradata-writes"
+  alarm_description   = "EBS oradata Volume - Writes too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oradata"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oradata_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_writes_oradata"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oradata-writes"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oraredo_writes" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oraredo-writes"
+  alarm_description   = "EBS oraredo Volume - Writes too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oraredo"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oraredo_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_writes_oraredo"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oraredo-writes"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oracle_writes" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oracle-writes"
+  alarm_description   = "EBS oracle Volume - Writes too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oracle"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oracle_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_writes_oracle"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oracle-writes"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_root_writes" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-root-writes"
+  alarm_description   = "EBS root Volume - Writes too high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = local.root_device_name
+    fstype = "ext4"
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "volume_writes_root"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_read_write_ops_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-root-writes"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oradata_queue_length" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oradata-queue-length"
+  alarm_description   = "Oradata Volume EBS Queue Length is High"
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    VolumeId = aws_ebs_volume.oradata.id
+  }
+  evaluation_periods = 1
+  metric_name        = "VolumeQueueLength"
+  namespace          = "AWS/EBS"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_oradata_queue_length_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oradata-queue-length"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "app1_f60srvm_process" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-app1-f60srvm-process"
+  alarm_description   = ""
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    InstanceId = aws_instance.app1.id
+  }
+  evaluation_periods = 1
+  metric_name        = "f60srvm_process"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = 0
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-app1-f60srvm-process"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "app1_cwa_process" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-app1-cwa-process"
+  alarm_description   = ""
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    InstanceId = aws_instance.app1.id
+  }
+  evaluation_periods = 1
+  metric_name        = "apps_cwa_process"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = 0
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-app1-cwa-process"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "app1_apache_process" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-app1-apache-process"
+  alarm_description   = ""
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    InstanceId = aws_instance.app1.id
+  }
+  evaluation_periods = 1
+  metric_name        = "apache_process"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = 0
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-app1-apache-process"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "app2_f60srvm_process" {
+  count = contains(["development", "testing"], local.environment) ? 0 : 1
+  alarm_name          = "${local.application_name_short}-${local.environment}-app2-f60srvm-process"
+  alarm_description   = ""
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    InstanceId = aws_instance.app2[0].id
+  }
+  evaluation_periods = 1
+  metric_name        = "f60srvm_process"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = 0
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-app2-f60srvm-process"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "app2_cwa_process" {
+  count               = contains(["development", "testing"], local.environment) ? 0 : 1
+  alarm_name          = "${local.application_name_short}-${local.environment}-app2-cwa-process"
+  alarm_description   = ""
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    InstanceId = aws_instance.app2[0].id
+  }
+  evaluation_periods = 1
+  metric_name        = "apps_cwa_process"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = 0
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-app2-cwa-process"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "app2_apache_process" {
+  count               = contains(["development", "testing"], local.environment) ? 0 : 1
+  alarm_name          = "${local.application_name_short}-${local.environment}-app2-apache-process"
+  alarm_description   = ""
+  comparison_operator = "GreaterThanThreshold"
+  dimensions = {
+    InstanceId = aws_instance.app2[0].id
+  }
+  evaluation_periods = 1
+  metric_name        = "apache_process"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = 0
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-app2-apache-process"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-ec2-swap"
+  alarm_description   = "Database EC2 Instance Swap Used Too High"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    InstanceId = aws_instance.database.id
+  }
+  evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
+  metric_name        = "swap_used"
+  namespace          = "CustomScript"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_ec2_swap_alarm_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  treat_missing_data = "missing"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-ec2-swap"
+    }
+  )
+}
 
 ################################
 ### CloudWatch Dashboard

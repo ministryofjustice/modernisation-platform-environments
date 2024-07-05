@@ -26,7 +26,7 @@
       "elb_target_response_time_alarm_threshold": "1",
       "elb_request_count_alarm_threshold": "1000",
       "status_check_alarm_threshold": "1",
-      "database_ec2_swap_alarm_threshold": "50",
+      "database_ec2_swap_alarm_threshold": "50000000",
       "oradata_snapshot_id": "snap-0a14498e1aabc04f5",
       "oracle_snapshot_id": "snap-06a2c2f2d5416ecdd",
       "oraarch_snapshot_id": "snap-0c0c14e6fe5572f9b",
@@ -35,10 +35,14 @@
       "share_snapshot_id": "snap-0e4f93177b88c076f",
       "app_snapshot_id": "snap-0713966f6fbd5d43c",
       "concurrent_manager_snapshot_id": "snap-012a415b26337ede1",
+      "alert_period": "60",
+      "alert_eval_period": "5",
       "database_ec2_memory_alarm_threshold": "95",
-      "database_rx_packet_errors_alarm_threshold": "100",
-      "database_oradata_read_alarm_threshold": "160000",
-      "database_diskspace_threshold": "95"
+      "database_packet_errors_alarm_threshold": "100",
+      "database_packet_dropped_alarm_threshold": "100",
+      "database_diskspace_threshold": "95",
+      "database_read_write_ops_threshold": "1100000",
+      "database_oradata_queue_length_threshold": "3"
 
 
     },

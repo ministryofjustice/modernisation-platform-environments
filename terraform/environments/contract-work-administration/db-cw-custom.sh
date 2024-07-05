@@ -77,6 +77,8 @@ WRITE_OPS_ORACLE=$(iostat -k | grep "$ORACLE" | awk '{print $4}')
 WRITE_OPS_NFSSHARE=$(iostat -k | grep "$NFSSHARE" | awk '{print $4}')
 WRITE_OPS_ROOT=$(iostat -k | grep "$ROOT" | awk '{print $4}')
 
+SWAP_USED=$(swapon -s | grep "/dev/mapper/VolGroup00-LogVol01" |  awk '{print $3}')
+
 #  SEND MEMORY USAGE
 /usr/local/bin/aws cloudwatch put-metric-data                                               \
 --metric-name mem_used_percent                                                              \
@@ -274,6 +276,14 @@ WRITE_OPS_ROOT=$(iostat -k | grep "$ROOT" | awk '{print $4}')
 --namespace "$CLOUDWATCH_NAMESPACE"                                                                                 \
 --dimensions  InstanceId="$INSTANCE_ID",ImageId="$IMAGE_ID",InstanceType="$INSTANCE_TYPE",interface="$INSTANCE_NIC" \
 --value "$TX_ERRORS"                                                                                                \
+--unit Count
+
+#  SEND SWAP USED
+/usr/local/bin/aws cloudwatch put-metric-data                                                                       \
+--metric-name swap_used                                                                                           \
+--namespace "$CLOUDWATCH_NAMESPACE"                                                                                 \
+--dimensions  InstanceId="$INSTANCE_ID" \
+--value "$SWAP_USED"                                                                                                \
 --unit Count
 
 exit 0

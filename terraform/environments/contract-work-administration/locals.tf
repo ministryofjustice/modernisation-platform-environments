@@ -19,5 +19,7 @@ locals {
   oratmp_device_name_letter = "h"
   oraredo_device_name_letter = "i"
   share_device_name_letter = "k"
+  root_device_name = "/dev/mapper/VolGroup00-LogVol00"
+  ec2_network_interface = "eth0"
   
 }
