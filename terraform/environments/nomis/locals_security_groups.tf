@@ -1,18 +1,5 @@
 locals {
 
-  # NOTE: Following traffic also seen 
-  # 10.0.0.0/11 (10.5.14.151/32 and 10.7.44.0/24 and 10.18.40.75/32)
-  # 10.41.16.0/21
-  # 10.148.0.0/14
-  # 10.152.0.0/15
-  # 10.171.0.0/16
-  # 10.172.0.0/16
-  # 10.208.0.0/12
-  # 172.17.0.0/16 ??
-  #
-  # Mod Platform firewall is now allowing 10.0.0.0/8 for HTTPS for
-  # production and preproduction accounts
-
   security_group_cidrs_devtest = {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
@@ -22,7 +9,7 @@ locals {
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     https = flatten([
-      "10.0.0.0/8",
+      "10.0.0.0/8", # too many end-user addresses to list
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
     http7xxx = flatten([
@@ -50,7 +37,7 @@ locals {
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     https = flatten([
-      "10.0.0.0/8",
+      "10.0.0.0/8", # too many end-user addresses to list
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
     http7xxx = flatten([
@@ -79,7 +66,7 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
-    private_lb = {
+    private-lb = {
       description = "Security group for internal load balancer"
       ingress = {
         all-from-self = {
@@ -141,7 +128,7 @@ locals {
         }
       }
     }
-    private_web = {
+    private-web = {
       description = "Security group for web servers"
       ingress = {
         all-from-self = {
@@ -199,7 +186,7 @@ locals {
         }
       }
     }
-    private_jumpserver = {
+    private-jumpserver = {
       description = "Security group for jumpservers"
       ingress = {
         all-from-self = {
@@ -222,7 +209,7 @@ locals {
       }
     }
 
-    data_db = {
+    data-db = {
       description = "Security group for databases"
       ingress = {
         all-from-self = {

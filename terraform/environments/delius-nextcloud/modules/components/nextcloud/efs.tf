@@ -1,11 +1,11 @@
 module "nextcloud_efs" {
-  for_each = toset(["html", "custom_apps", "config", "data", "themes"])
+  for_each = toset(["html", "custom_apps", "data", "themes", "config"])
 
   source = "../../../../delius-core/modules/helpers/efs"
 
-  name           = each.key
+  name           = "${each.key}-${var.env_name}"
   env_name       = var.env_name
-  creation_token = "${var.env_name}-${each.key}-efs"
+  creation_token = "${each.key}-${var.env_name}"
 
   kms_key_arn                     = var.account_config.kms_keys.general_shared
   throughput_mode                 = "bursting"

@@ -78,9 +78,18 @@
         "collect_list": [
           {
             "file_path": "/var/log/messages",
-            "log_group_name": "APEX-EC2",
-            "log_stream_name": "{instance_id}",
-            "retention_in_days": 90
+            "log_group_name": "APEX-EC2-database-alert",
+            "log_stream_name": "messages-{instance_id}"
+          },
+          {
+            "file_path": "/u01/app/oracle/diag/rdbms/apex_a/APEX/trace/alert_APEX.log",
+            "log_group_name": "APEX-EC2-database-alert",
+            "log_stream_name": "db-alert-{instance_id}"
+          },
+          {
+            "file_path": "/home/oracle/logs/pmon_status_alert.log",
+            "log_group_name": "APEX-EC2-database-pmon-status",
+            "log_stream_name": "pmon-status-{instance_id}"
           }
         ]
       }

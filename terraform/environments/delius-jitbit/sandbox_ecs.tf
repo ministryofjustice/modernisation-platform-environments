@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "alb_sandbox" {
   from_port                = local.app_port
   to_port                  = local.app_port
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.load_balancer_security_group_sandbox[0].id
+  source_security_group_id = aws_security_group.load_balancer_security_group.id
   security_group_id        = aws_security_group.jitbit_sandbox[0].id
 }
 

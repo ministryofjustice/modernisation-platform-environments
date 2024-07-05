@@ -6,6 +6,12 @@
 locals {
   glue_avro_registry           = split("/", module.glue_registry_avro.registry_name)
   shared_log4j_properties_path = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${aws_s3_object.glue_job_shared_custom_log4j_properties.key}"
+  # We only want to enable write to Operational DataStore in the dev environment until it is available in all environments
+  glue_datahub_job_extra_dev_env_args = (local.environment == "development" ? {
+    "--dpr.operational.data.store.write.enabled"        = "true"
+    "--dpr.operational.data.store.glue.connection.name" = aws_glue_connection.glue_operational_datastore_connection[0].name
+    "--dpr.operational.data.store.loading.schema.name"  = "loading"
+  } : {})
 }
 
 resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
@@ -41,6 +47,7 @@ module "glue_reporting_hub_job" {
   region                       = local.account_region
   account                      = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
+  connections                  = local.glue_connection_names
 
   tags = merge(
     local.all_tags,
@@ -51,7 +58,7 @@ module "glue_reporting_hub_job" {
     }
   )
 
-  arguments = {
+  arguments = merge(local.glue_datahub_job_extra_dev_env_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--job-bookmark-option"                 = "job-bookmark-disable"
@@ -81,7 +88,7 @@ module "glue_reporting_hub_job" {
     "--dpr.datamart.db.name"                = "datamart"
     "--dpr.log.level"                       = local.reporting_hub_log_level
     "--dpr.domainrefresh.enabled"           = local.reporting_hub_domain_refresh_enabled
-  }
+  })
 }
 
 # Glue Job, Reporting Hub Batch
@@ -108,6 +115,7 @@ module "glue_reporting_hub_batch_job" {
   region                        = local.account_region
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
+  connections                   = local.glue_connection_names
 
   tags = merge(
     local.all_tags,
@@ -117,7 +125,7 @@ module "glue_reporting_hub_batch_job" {
     }
   )
 
-  arguments = {
+  arguments = merge(local.glue_datahub_job_extra_dev_env_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
@@ -134,7 +142,7 @@ module "glue_reporting_hub_batch_job" {
     "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_batch_job_retry_max_wait_millis
     "--dpr.schema.cache.max.size"           = local.reporting_hub_batch_job_schema_cache_max_size
     "--dpr.log.level"                       = local.reporting_hub_batch_job_log_level
-  }
+  })
 }
 
 # Glue Job, Reporting Hub CDC
@@ -162,6 +170,7 @@ module "glue_reporting_hub_cdc_job" {
   region                        = local.account_region
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
+  connections                   = local.glue_connection_names
 
   tags = merge(
     local.all_tags,
@@ -171,7 +180,7 @@ module "glue_reporting_hub_cdc_job" {
     }
   )
 
-  arguments = {
+  arguments = merge(local.glue_datahub_job_extra_dev_env_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--job-bookmark-option"                 = "job-bookmark-disable"
@@ -195,7 +204,7 @@ module "glue_reporting_hub_cdc_job" {
     "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
     "--dpr.schema.cache.max.size"           = local.reporting_hub_cdc_job_schema_cache_max_size
     "--dpr.log.level"                       = local.reporting_hub_cdc_job_log_level
-  }
+  })
 }
 
 # Glue Job, Create Hive Tables
@@ -300,17 +309,18 @@ module "glue_s3_file_transfer_job" {
   )
 
   arguments = {
-    "--extra-jars"                            = local.glue_jobs_latest_jar_location
-    "--extra-files"                           = local.shared_log4j_properties_path
-    "--class"                                 = "uk.gov.justice.digital.job.S3FileTransferJob"
-    "--dpr.aws.region"                        = local.account_region
-    "--dpr.config.s3.bucket"                  = module.s3_glue_job_bucket.bucket_id,
-    "--dpr.file.transfer.source.bucket"       = module.s3_raw_bucket.bucket_id
-    "--dpr.file.transfer.destination.bucket"  = module.s3_raw_archive_bucket.bucket_id
-    "--dpr.file.transfer.retention.days"      = tostring(local.scheduled_s3_file_transfer_retention_days)
-    "--dpr.file.transfer.delete.copied.files" = true,
-    "--dpr.allowed.s3.file.extensions"        = "*",
-    "--dpr.log.level"                         = local.glue_job_common_log_level
+    "--extra-jars"                                = local.glue_jobs_latest_jar_location
+    "--extra-files"                               = local.shared_log4j_properties_path
+    "--class"                                     = "uk.gov.justice.digital.job.S3FileTransferJob"
+    "--dpr.aws.region"                            = local.account_region
+    "--dpr.config.s3.bucket"                      = module.s3_glue_job_bucket.bucket_id,
+    "--dpr.file.transfer.source.bucket"           = module.s3_raw_bucket.bucket_id
+    "--dpr.file.transfer.destination.bucket"      = module.s3_raw_archive_bucket.bucket_id
+    "--dpr.file.transfer.retention.period.amount" = tostring(local.scheduled_s3_file_transfer_retention_period_amount)
+    "--dpr.file.transfer.retention.period.unit"   = tostring(local.scheduled_s3_file_transfer_retention_period_unit)
+    "--dpr.file.transfer.delete.copied.files"     = true,
+    "--dpr.allowed.s3.file.extensions"            = "*",
+    "--dpr.log.level"                             = local.glue_job_common_log_level
   }
 
   depends_on = [
@@ -318,17 +328,6 @@ module "glue_s3_file_transfer_job" {
     module.s3_raw_archive_bucket.bucket_id,
     module.s3_glue_job_bucket
   ]
-}
-
-resource "aws_glue_trigger" "glue_s3_file_transfer_job_trigger" {
-  count    = local.enable_s3_file_transfer_trigger ? 1 : 0
-  name     = "${module.glue_s3_file_transfer_job.name}-trigger"
-  schedule = local.scheduled_s3_file_transfer_schedule
-  type     = "SCHEDULED"
-
-  actions {
-    job_name = module.glue_s3_file_transfer_job.name
-  }
 }
 
 # Glue Job, Switch Prisons Hive Data Location
@@ -484,6 +483,94 @@ module "glue_stop_glue_instance_job" {
     "--extra-jars"     = local.glue_jobs_latest_jar_location
     "--extra-files"    = local.shared_log4j_properties_path
     "--class"          = "uk.gov.justice.digital.job.StopGlueInstanceJob"
+    "--dpr.aws.region" = local.account_region
+    "--dpr.log.level"  = local.glue_job_common_log_level
+  }
+}
+
+# Glue Job, Stop DMS Task Job
+module "stop_dms_task_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-stop-dms-task-job-${local.env}"
+  short_name                    = "${local.project}-stop-dms-task-job"
+  command_type                  = "glueetl"
+  description                   = "Stops a running DMS replication task.\nArguments:\n--dpr.dms.replication.task.id: (Required) ID of the DMS replication task which is to be stopped"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-stop-dms-task-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-stop-dms-task-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-stop-dms-task-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-713"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"     = local.glue_jobs_latest_jar_location
+    "--extra-files"    = local.shared_log4j_properties_path
+    "--class"          = "uk.gov.justice.digital.job.StopDmsTaskJob"
+    "--dpr.aws.region" = local.account_region
+    "--dpr.log.level"  = local.glue_job_common_log_level
+  }
+}
+
+# Glue Job, Activate/Deactivate Glue Trigger Job
+module "activate_glue_trigger_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-activate-glue-trigger-job-${local.env}"
+  short_name                    = "${local.project}-activate-glue-trigger-job"
+  command_type                  = "glueetl"
+  description                   = "Activates/Deactivates a Glue trigger.\nArguments:\n--dpr.glue.trigger.name: (Required) Name of the Glue trigger to be activated/deactivated\n--dpr.glue.trigger.activate: (Required) when true, activates the trigger"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-activate-glue-trigger-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-activate-glue-trigger-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-activate-glue-trigger-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-713"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"     = local.glue_jobs_latest_jar_location
+    "--extra-files"    = local.shared_log4j_properties_path
+    "--class"          = "uk.gov.justice.digital.job.GlueTriggerActivationJob"
     "--dpr.aws.region" = local.account_region
     "--dpr.log.level"  = local.glue_job_common_log_level
   }
@@ -952,10 +1039,12 @@ module "ec2_kinesis_agent" {
   aws_region                  = local.account_region
   ec2_terminate_behavior      = "terminate"
   associate_public_ip_address = false
+  static_private_ip           = "10.26.24.201" # Used for Dev as a Secondary IP
   ebs_optimized               = true
   monitoring                  = true
   ebs_size                    = 20
   ebs_encrypted               = true
+  scale_down                  = local.kinesis_agent_autoscale
   ebs_delete_on_termination   = false
   # s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn # TBC
   region  = local.account_region

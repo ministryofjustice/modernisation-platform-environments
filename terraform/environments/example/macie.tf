@@ -13,12 +13,13 @@ resource "aws_macie2_classification_job" "example" {
   s3_job_definition {
     bucket_definitions {
       account_id = local.environment_management.account_ids[terraform.workspace]
-      buckets    = [
+      buckets = [
         data.aws_s3_bucket.bucket1.id,
         data.aws_s3_bucket.bucket2.id,
         data.aws_s3_bucket.bucket3.id,
       ]
     }
   }
-  depends_on = [ aws_macie2_account.example ]
+  job_status = "RUNNING"
+  depends_on = [aws_macie2_account.example]
 }

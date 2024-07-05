@@ -38,13 +38,19 @@ resource "aws_s3_bucket" "dms_dv_glue_job_s3_bucket" {
   bucket_prefix = "glue-jobs-py-scripts-"
 }
 
-resource "aws_s3_object" "dms_dv_glue_job_s3_object" {
+resource "aws_s3_object" "dms_dv_glue_job_s3_object_v2" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-  key    = "dms_dv_rds_and_s3_csv.py"
-  source = "glue-job/dms_dv_rds_and_s3_csv.py"
-  etag   = filemd5("glue-job/dms_dv_rds_and_s3_csv.py")
+  key    = "dms_dv_rds_and_s3_parquet_write_v2.py"
+  source = "glue-job/dms_dv_rds_and_s3_parquet_write_v2.py"
+  etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v2.py")
 }
 
+resource "aws_s3_object" "dms_dv_glue_job_s3_object_v4" {
+  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  key    = "dms_dv_rds_and_s3_parquet_write_v4.py"
+  source = "glue-job/dms_dv_rds_and_s3_parquet_write_v4.py"
+  etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v4.py")
+}
 resource "aws_s3_object" "catalog_dv_table_glue_job_s3_object" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
   key    = "create_or_replace_dv_table.py"
@@ -74,31 +80,113 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 # -------------------------------------------------------------------
 
-resource "aws_glue_job" "dms_dv_glue_job" {
-  name         = "dms-dv-glue-job"
-  description  = "DMS Data Validation Glue-Job (PySpark)."
-  role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
-  glue_version = "4.0"
+resource "aws_glue_job" "dms_dv_glue_job_v2" {
+  name              = "dms-dv-glue-job-v2"
+  description       = "DMS Data Validation Glue-Job (PySpark)."
+  role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 8
   default_arguments = {
-    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
-    "--rds_sqlserver_db_list"            = ""
-    "--csv_src_bucket_name"              = aws_s3_bucket.dms_target_ep_s3_bucket.id
-    "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
-    "--glue_catalog_db_name"             = "${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}"
-    "--glue_catalog_tbl_name"            = "glue_df_output"
-    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
-    "--enable-continuous-cloudwatch-log" = "true"
-    "--enable-continuous-log-filter"     = "true"
-    "--enable-spark-ui"                  = "true"
-    "--spark-event-logs-path"            = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
-    "--enable-metrics"                   = ""
+    "--script_bucket_name"                = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
+    "--rds_db_pwd"                        = aws_db_instance.database_2022.password
+    "--rds_sqlserver_db"                  = ""
+    "--rds_sqlserver_db_schema"           = ""
+    "--rds_exclude_db_tbls"               = ""
+    "--rds_select_db_tbls"                = ""
+    "--rds_db_tbl_pkeys_col_list"         = ""
+    "--rds_df_trim_str_columns"           = "false"
+    "--rds_df_trim_micro_sec_ts_col_list" = ""
+    "--rds_read_rows_fetch_size"          = 50000
+    "--num_of_repartitions"               = 0
+    "--read_partition_size_mb"            = 128
+    "--max_table_size_mb"                 = 4000
+    "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+    "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_tbl_name"             = "glue_df_output"
+    "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
+    "--enable-continuous-cloudwatch-log"  = "true"
+    "--enable-continuous-log-filter"      = "true"
+    "--enable-metrics"                    = "true"
+    "--enable-auto-scaling"               = "true"
+    "--conf"                              = <<EOF
+    spark.sql.adaptive.enabled=true 
+    --conf spark.sql.adaptive.coalescePartitions.enabled=true 
+    --conf spark.sql.adaptive.skewJoin.enabled=true 
+    --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+    --conf spark.sql.parquet.aggregatePushdown=true
+    --conf spark.sql.files.maxPartitionBytes=128m
+    EOF
   }
 
-  connections = ["${aws_glue_connection.glue_rds_sqlserver_db_connection.name}"]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_csv.py"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_parquet_write_v2.py"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
+}
+
+# "--enable-spark-ui"                   = "false"
+# "--spark-ui-event-logs-path"          = "false"
+# "--spark-event-logs-path"             = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
+
+resource "aws_glue_job" "dms_dv_glue_job_v4" {
+  name              = "dms-dv-glue-job-v4"
+  description       = "DMS Data Validation Glue-Job (PySpark)."
+  role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 16
+  default_arguments = {
+    "--script_bucket_name"                = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
+    "--rds_db_pwd"                        = aws_db_instance.database_2022.password
+    "--rds_sqlserver_db"                  = ""
+    "--rds_sqlserver_db_schema"           = ""
+    "--rds_sqlserver_db_table"            = ""
+    "--rds_db_tbl_pkeys_col_list"         = ""
+    "--rds_df_trim_str_col_list"          = ""
+    "--rds_df_trim_micro_sec_ts_col_list" = ""
+    "--jdbc_read_256mb_partitions"        = "false"
+    "--jdbc_read_512mb_partitions"        = "false"
+    "--jdbc_read_1gb_partitions"          = "true"
+    "--jdbc_read_2gb_partitions"          = "false"
+    "--rds_read_rows_fetch_size"          = 100000
+    "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+    "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_tbl_name"             = "glue_df_output"
+    "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
+    "--enable-continuous-cloudwatch-log"  = "true"
+    "--enable-continuous-log-filter"      = "true"
+    "--enable-metrics"                    = "true"
+    "--enable-auto-scaling"               = "true"
+    "--conf"                              = <<EOF
+spark.sql.adaptive.enabled=true 
+--conf spark.sql.adaptive.coalescePartitions.enabled=true 
+--conf spark.sql.adaptive.skewJoin.enabled=true 
+--conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.parquet.aggregatePushdown=true 
+--conf spark.shuffle.service.enabled=false 
+--conf spark.sql.files.maxPartitionBytes=1g
+EOF
+
+  }
+
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  command {
+    python_version  = "3"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_parquet_write_v4.py"
   }
 
   tags = merge(
@@ -111,13 +199,15 @@ resource "aws_glue_job" "dms_dv_glue_job" {
 }
 
 resource "aws_glue_job" "catalog_dv_table_glue_job" {
-  name         = "catalog-dv-table-glue-job"
-  description  = "Python script uses Boto3-Athena-Client to run sql-statements"
-  role_arn     = aws_iam_role.dms_dv_glue_job_iam_role.arn
-  glue_version = "4.0"
+  name              = "catalog-dv-table-glue-job"
+  description       = "Python script uses Boto3-Athena-Client to run sql-statements"
+  role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
   default_arguments = {
     "--parquet_output_bucket_name"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
-    "--glue_catalog_db_name"             = "${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}"
+    "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
     "--glue_catalog_tbl_name"            = "glue_df_output"
     "--continuous-log-logGroup"          = aws_cloudwatch_log_group.dms_dv_cw_log_group.name
     "--enable-continuous-cloudwatch-log" = "true"

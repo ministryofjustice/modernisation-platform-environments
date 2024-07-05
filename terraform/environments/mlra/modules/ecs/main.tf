@@ -82,7 +82,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
 # Controls access to the EC2 instances
 
 resource "aws_security_group" "cluster_ec2" {
-  #checkov:skip=CKV_AWS_23
+  #checkov:skip=CKV_AWS_23:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name        = "${var.app_name}-cluster-ec2-security-group"
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
@@ -101,10 +101,11 @@ resource "aws_security_group" "cluster_ec2" {
   dynamic "egress" {
     for_each = var.ec2_egress_rules
     content {
-      description     = lookup(egress.value, "description", null)
-      from_port       = lookup(egress.value, "from_port", null)
-      to_port         = lookup(egress.value, "to_port", null)
-      protocol        = lookup(egress.value, "protocol", null)
+      description = lookup(egress.value, "description", null)
+      from_port   = lookup(egress.value, "from_port", null)
+      to_port     = lookup(egress.value, "to_port", null)
+      protocol    = lookup(egress.value, "protocol", null)
+      #tfsec:ignore:AVD-AWS-0104:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
       cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
       security_groups = lookup(egress.value, "security_groups", null)
     }
@@ -122,7 +123,10 @@ resource "aws_security_group" "cluster_ec2" {
 # Note - when updating this you will need to manually terminate the EC2s
 # so that the autoscaling group creates new ones using the new launch template
 
+#tfsec:ignore:AVD-AWS-0130:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_launch_template" "ec2-launch-template" {
+  #checkov:skip=CKV_AWS_79:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_341:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name_prefix            = "${var.app_name}-ec2-launch-template"
   image_id               = var.ami_image_id
   instance_type          = var.instance_type
@@ -219,7 +223,11 @@ resource "aws_iam_role" "ec2_instance_role" {
 EOF
 }
 
-resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_policy" "ec2_instance_policy" {
+  #checkov:skip=CKV_AWS_288:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_289:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_290:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_355:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name = "${var.app_name}-ec2-instance-policy"
   tags = merge(
     var.tags_common,
@@ -309,6 +317,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 }
 
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
+  #checkov:skip=CKV_AWS_249:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   family             = "${var.app_name}-task-definition"
   count              = var.container_instance_type == "windows" ? 1 : 0
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
@@ -410,7 +419,12 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
-resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+
+resource "aws_iam_policy" "ecs_task_execution_s3_policy" {
+  #checkov:skip=CKV_AWS_288:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_355:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_289:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_290:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name = "${var.app_name}-ecs-task-execution-s3-policy"
   tags = merge(
     var.tags_common,
@@ -473,6 +487,13 @@ resource "aws_iam_policy" "ecs_task_execution_ssm_policy" { #tfsec:ignore:aws-ia
         "ssm:GetParameters"
       ],
       "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.ga_4_tag_id_secret_name2}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.gtm_id_secret_name}"]
     }
   ]
 }
@@ -513,6 +534,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_ssm_access" {
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
+  #checkov:skip=CKV_AWS_338:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name              = "${var.app_name}-ecs-log-group"
   retention_in_days = 30
   tags = merge(

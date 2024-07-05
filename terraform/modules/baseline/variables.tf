@@ -17,6 +17,7 @@ variable "acm_certificates" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -66,7 +67,7 @@ variable "backups" {
 variable "bastion_linux" {
   description = "set this if you want a bastion linux created"
   type = object({
-    public_key_data         = map(string)
+    public_key_data         = optional(map(string)) # if this is not set, bastion is not created
     allow_ssh_commands      = optional(bool, true)
     bucket_name             = optional(string, "bastion")
     log_auto_clean          = optional(string, "Enabled")
@@ -76,7 +77,30 @@ variable "bastion_linux" {
     extra_user_data_content = optional(string, "")
     tags                    = optional(map(string), {})
   })
-  default = null
+  default = {
+    public_key_data = null
+  }
+}
+
+# see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html
+# cannot define a type without fully defining the entire cloudwatch dashboard json structure
+# tflint-ignore: terraform_typed_variables
+variable "cloudwatch_dashboards" {
+
+  description = "map of cloudwatch dashboards where key is the dashboard name. Use widget_groups if you want baseline to work out x,y,width,height"
+  #type = map(object({
+  #  account_name   = optional(string)        # for monitoring account, limit to given account
+  #  periodOverride = optional(string)
+  #  start          = optional(string)
+  #  widgets        = optional(list(any), []) # use if you want to set x,y,width,height yourself
+  #  widget_groups = optional(list(object({   # automate x,y,width,height values
+  #    header_markdown = optional(string)     # include a header text widget if set
+  #    width           = number               # width of each widget, must be divisor of 24
+  #    height          = number               # height of each widget
+  #    widgets         = list(any)            # no need to set x,y,width,height
+  #  })), [])
+  #}))
+  default = {}
 }
 
 variable "cloudwatch_log_groups" {
@@ -118,6 +142,7 @@ variable "cloudwatch_metric_alarms" {
     statistic           = string
     threshold           = number
     alarm_actions       = optional(list(string), [])
+    ok_actions          = optional(list(string), [])
     actions_enabled     = optional(bool, false)
     alarm_description   = optional(string)
     datapoints_to_alarm = optional(number)
@@ -207,7 +232,7 @@ variable "ec2_autoscaling_groups" {
       instance_refresh = optional(object({
         strategy               = string
         min_healthy_percentage = number
-        instance_warmup        = number
+        instance_warmup        = optional(number)
       }))
       warm_pool = optional(object({
         pool_state                  = optional(string)
@@ -275,6 +300,7 @@ variable "ec2_autoscaling_groups" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -381,6 +407,7 @@ variable "ec2_instances" {
       statistic           = string
       threshold           = number
       alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
       actions_enabled     = optional(bool, false)
       alarm_description   = optional(string)
       datapoints_to_alarm = optional(number)
@@ -448,107 +475,8 @@ variable "efs" {
   default = {}
 }
 
-variable "rds_instances" {
-  description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
-  type = map(object({
-    config = object({
-      iam_resource_names_prefix = optional(string, "rds_db")
-      instance_profile_policies = list(string)
-      ssm_parameters_prefix     = optional(string, "")
-    })
-    instance = object({
-      allocated_storage                   = number
-      allow_major_version_upgrade         = optional(bool, false)
-      apply_immediately                   = optional(bool, false)
-      auto_minor_version_upgrade          = optional(bool, false)
-      backup_retention_period             = optional(number, 1)
-      backup_window                       = optional(string)
-      character_set_name                  = optional(string)
-      copy_tags_to_snapshot               = optional(bool, false)
-      create                              = optional(bool, true)
-      db_name                             = optional(string)
-      db_subnet_group_name                = optional(string)
-      deletion_protection                 = optional(bool, true)
-      enabled_cloudwatch_logs_exports     = optional(list(string))
-      engine                              = string
-      engine_version                      = optional(string)
-      final_snapshot_identifier           = optional(bool, false)
-      iam_database_authentication_enabled = optional(bool, false)
-      identifier                          = string
-      instance_class                      = string
-      iops                                = optional(number, 0)
-      kms_key_id                          = string
-      license_model                       = optional(string)
-      maintenance_window                  = optional(string)
-      max_allocated_storage               = optional(number)
-      monitoring_interval                 = optional(number, 0)
-      monitoring_role_arn                 = optional(string)
-      multi_az                            = optional(bool, false)
-      option_group_name                   = optional(string)
-      parameter_group_name                = optional(string)
-      password                            = string
-      port                                = optional(string)
-      publicly_accessible                 = optional(bool, false)
-      replicate_source_db                 = optional(string)
-      skip_final_snapshot                 = optional(bool, false)
-      snapshot_identifier                 = optional(string)
-      storage_encrypted                   = optional(bool, false)
-      storage_type                        = optional(string, "gp2")
-      username                            = string
-      vpc_security_group_ids              = optional(list(string))
-    })
-    option_group = object({
-      create                   = bool
-      name_prefix              = optional(string)
-      option_group_description = optional(string)
-      engine_name              = string
-      major_engine_version     = string
-      options = optional(list(object({
-        option_name                    = string
-        port                           = optional(number)
-        version                        = optional(string)
-        db_security_group_memberships  = optional(list(string))
-        vpc_security_group_memberships = optional(list(string))
-        option_settings = optional(list(object({
-          name  = optional(string)
-          value = optional(string)
-        })))
-      })))
-      tags = optional(list(string))
-    })
-    parameter_group = object({
-      name_prefix = optional(string)
-      description = optional(string)
-      family      = string
-      parameters = optional(list(object({
-        name         = string
-        value        = string
-        apply_method = optional(string, "immediate")
-      })))
-      tags = optional(list(string))
-    })
-    subnet_group = object({
-      name_prefix = optional(string)
-      description = optional(string)
-      subnet_ids  = list(string)
-      tags        = optional(list(string))
-    })
-    ssm_kms_key_id = optional(string)
-    ssm_parameters = optional(map(object({
-      random = object({
-        length  = number
-        special = bool
-      })
-      description = string
-    })))
-    route53_record = optional(bool, true)
-    tags           = optional(map(string), {})
-  }))
-  default = {}
-}
-
+# tflint-ignore: terraform_typed_variables
 variable "environment" {
-  # tflint-ignore: terraform_typed_variables
   # Not defining 'type' as it is defined in the output of the environment module
   description = "Standard environmental data resources from the environment module"
 }
@@ -801,6 +729,7 @@ variable "lbs" {
         statistic           = string
         threshold           = number
         alarm_actions       = optional(list(string), [])
+        ok_actions          = optional(list(string), [])
         actions_enabled     = optional(bool, false)
         alarm_description   = optional(string)
         datapoints_to_alarm = optional(number)
@@ -822,6 +751,37 @@ variable "kms_grants" {
     operations        = list(string)
   }))
   default = {}
+}
+
+variable "oam_links" {
+  description = "map of aws_oam_link resources to create where the map key is the label_template and tag.Name"
+  type = map(object({
+    label_template                     = string
+    resource_types                     = list(string) # e.g. ["AWS::CloudWatch::Metric"]
+    sink_identifier_ssm_parameter_name = string
+  }))
+  default = {}
+}
+
+variable "oam_sinks" {
+  description = "map of aws_oam_sink and ows_oam_sink_policy resources to create where the map key is the sink name"
+  type = map(object({
+    resource_types       = list(string) # e.g. ["AWS::CloudWatch::Metric"]
+    source_account_names = list(string)
+  }))
+  default = {}
+}
+
+variable "options" {
+  description = "options to enable standalone resources"
+  type = object({
+    enable_cost_usage_report = optional(bool, false)
+    enable_resource_explorer = optional(bool, false)
+  })
+  default = {
+    enable_cost_usage_report = false
+    enable_resource_explorer = false
+  }
 }
 
 variable "route53_resolvers" {
@@ -892,44 +852,12 @@ variable "s3_buckets" {
     })), [])
     custom_kms_key             = optional(string)
     custom_replication_kms_key = optional(string)
-    lifecycle_rule = optional(any, [{
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-      expiration = {
-        days = 730
-      }
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }])
-    log_bucket           = optional(string, "")
-    log_prefix           = optional(string, "")
-    replication_role_arn = optional(string, "")
-    force_destroy        = optional(bool, false)
-    sse_algorithm        = optional(string, "aws:kms")
+    lifecycle_rule             = any # see module baseline_presets.s3 for examples
+    log_bucket                 = optional(string, "")
+    log_prefix                 = optional(string, "")
+    replication_role_arn       = optional(string, "")
+    force_destroy              = optional(bool, false)
+    sse_algorithm              = optional(string, "aws:kms")
     iam_policies = optional(map(list(object({
       sid     = optional(string, null)
       effect  = string
@@ -1064,6 +992,37 @@ variable "sns_topics" {
   default = {}
 }
 
+variable "ssm_associations" {
+  description = "A map of ssm associations to create where map key is the association name"
+  type = map(object({
+    apply_only_at_cron_interval = optional(bool)
+    name                        = string
+    max_concurrency             = optional(number)
+    max_errors                  = optional(number)
+    schedule_expression         = optional(string)
+    output_location = optional(object({
+      s3_bucket_name = string # or s3_buckets map key
+      s3_key_prefix  = optional(string)
+    }))
+    targets = optional(list(object({
+      key    = string       # 'tag:my_tag_name' or 'InstanceIds'
+      values = list(string) # [my_tag_value] or [ec2_instance map key]
+    })), [])
+  }))
+  default = {}
+}
+
+variable "ssm_documents" {
+  description = "A map of ssm documents to create where map key is the document name"
+  type = map(object({
+    content         = string
+    document_format = optional(string)
+    document_type   = string
+    tags            = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "ssm_parameters" {
   # Example usage:
   # my_ec2_params = {
@@ -1105,35 +1064,8 @@ variable "ssm_parameters" {
   default = {}
 }
 
-variable "ssm_documents" {
-  description = "A map of ssm documents to create where map key is the document name"
-  type = map(object({
-    content         = string
-    document_format = optional(string)
-    document_type   = string
-    tags            = optional(map(string), {})
-  }))
-  default = {}
-}
-
 variable "tags" {
   description = "Any additional tags to apply to all resources, in addition to those provided by environment module"
   type        = map(string)
   default     = {}
-}
-
-variable "resource_explorer" {
-  description = "Enables AWS Resource Explorer"
-  type        = bool
-  default     = false
-}
-
-variable "cost_usage_report" {
-  description = "Enables AWS Cost Usage Report"
-  type = object({
-    create = bool
-  })
-  default = {
-    create = false
-  }
 }

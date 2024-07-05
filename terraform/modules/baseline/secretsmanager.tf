@@ -9,7 +9,7 @@ locals {
 
   # Policies can be defined at top-level, e.g. same for all secrets,
   # or specific to an individual secret. This code pulls out all these
-  # policies into a single map.
+  # policies into a single map.
   secretsmanager_secret_policies_top_level_list = [
     for sm_key, sm_value in var.secretsmanager_secrets : {
       key   = sm_key

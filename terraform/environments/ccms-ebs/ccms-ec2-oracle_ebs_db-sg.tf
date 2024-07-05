@@ -363,3 +363,16 @@ resource "aws_security_group_rule" "egress_traffic_ebsdb_4443" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+### SMTP
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_2525" {
+  count             = local.is-production ? 0 : 1
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "SMTP"
+  protocol          = "TCP"
+  from_port         = 2525
+  to_port           = 2525
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+

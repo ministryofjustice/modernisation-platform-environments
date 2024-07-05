@@ -4,35 +4,35 @@
 * @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-compute @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-ingestion @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
-/terraform/environments/apex @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
+/terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-chaps @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-ifs @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
 /terraform/environments/cica-copilot @ministryofjustice/cica-copilot-llm-maintainers @ministryofjustice/modernisation-platform
 /terraform/environments/cica-data-extraction @ministryofjustice/cica-extract-tool-admins @ministryofjustice/modernisation-platform
+/terraform/environments/cica-tariff @ministryofjustice/cica-mp-tariff @ministryofjustice/modernisation-platform
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-apps-and-tools @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-compute @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/data-platform-labs @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-jitbit @ministryofjustice/hmpps-delius-jitbit-devs @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-mis @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-nextcloud @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
-/terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting-non-cleared-team @ministryofjustice/modernisation-platform
+/terraform/environments/digital-prison-reporting @ministryofjustice/digital-prisons-reporting-development-data-engineer @ministryofjustice/digital-prisons-reporting-preproduction-data-engineer @ministryofjustice/digital-prisons-reporting-test-data-engineer @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting-non-cleared-team @ministryofjustice/modernisation-platform
 /terraform/environments/edw @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/electronic-monitoring-data @ministryofjustice/hmpps-electronic-monitoring-data-store @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/eric @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
-/terraform/environments/hmpps-domain-services @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
-/terraform/environments/hmpps-intelligence-management @ministryofjustice/dps-ims-tech @ministryofjustice/modernisation-platform
-/terraform/environments/hmpps-oem @ministryofjustice/csr-application-support @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/genesys-call-centre-data @ministryofjustice/ @ministryofjustice/modernisation-platform
+/terraform/environments/hmpps-domain-services @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/hmpps-oem @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-infra-azure-ad-sso @ministryofjustice/laa-ccms-webops @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
 /terraform/environments/laa-oem @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/long-term-storage @ministryofjustice/modernisation-platform-long-term-storage @ministryofjustice/modernisation-platform
@@ -41,14 +41,15 @@
 /terraform/environments/mlra @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-crime-apps-team @ministryofjustice/modernisation-platform
 /terraform/environments/mojfin @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-mojfin-developers @ministryofjustice/modernisation-platform
 /terraform/environments/ncas @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
-/terraform/environments/nomis-combined-reporting @ministryofjustice/csr-application-support @ministryofjustice/national-applications-reporting-team @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
-/terraform/environments/nomis-data-hub @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
-/terraform/environments/nomis @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/syscon-nomis @ministryofjustice/modernisation-platform
+/terraform/environments/nomis-combined-reporting @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/nomis-data-hub @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/oas @ministryofjustice/laa-aws-infrastructure @ministryofjustice/oas-migration @ministryofjustice/modernisation-platform
-/terraform/environments/oasys-national-reporting @ministryofjustice/national-applications-reporting-team @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
-/terraform/environments/oasys @ministryofjustice/oasys-operator @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/oasys-national-reporting @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/oasys @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/observability-platform @ministryofjustice/observability-platform @ministryofjustice/modernisation-platform
 /terraform/environments/operations-engineering @ministryofjustice/operations-engineering @ministryofjustice/modernisation-platform
+/terraform/environments/panda-cyber-appsec-lab @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
 /terraform/environments/planetfm @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/portal @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
@@ -56,7 +57,6 @@
 /terraform/environments/pra-register @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dashboard-access @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
 /terraform/environments/sprinkler @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
-/terraform/environments/tariff @ministryofjustice/cica @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/tribunals @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform

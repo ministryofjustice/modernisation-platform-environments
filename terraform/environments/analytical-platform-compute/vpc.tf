@@ -3,6 +3,7 @@
 #tfsec:ignore:avd-aws-0105 NACLs not restricted
 module "vpc" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.8.1"
@@ -36,6 +37,7 @@ module "vpc" {
 
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = 1
+    "karpenter.sh/discovery"          = local.eks_cluster_name
   }
 
   tags = local.tags

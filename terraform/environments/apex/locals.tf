@@ -1,6 +1,8 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
 
+  database_ec2_name = "${local.application_name} Database Server"
+
   #Lambda files
   dbsnapshot_source_file     = "dbsnapshot.js"
   deletesnapshot_source_file = "deletesnapshots.py"
@@ -62,14 +64,42 @@ locals {
 
   task_definition = templatefile("task_definition.json", {
     app_name          = local.application_name
+    memory_allocation = local.application_data.accounts[local.environment].container_memory_allocation
     ecr_url           = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/apex-ecr-repo"
     docker_image_tag  = local.application_data.accounts[local.environment].docker_image_tag
     region            = local.application_data.accounts[local.environment].region
-    app_db_url        = local.application_data.accounts[local.environment].app_db_url
+    app_db_url        = "${aws_route53_record.apex-db.fqdn}:1521:APEX"
     app_debug_enabled = local.application_data.accounts[local.environment].app_debug_enabled
     db_secret_arn     = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
   })
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
+
+  database-instance-userdata = <<EOF
+#!/bin/bash
+cd /tmp
+yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+sudo systemctl start amazon-ssm-agent
+sudo systemctl enable amazon-ssm-agent
+echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
+mount -a
+
+sudo su - oracle -c "sqlplus / as sysdba << EOF
+shutdown abort;
+startup;
+exit;
+EOF"
+sudo su - oracle -c "lsnrctl start"
+
+cd /etc
+mkdir cloudwatch_agent
+cd cloudwatch_agent
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U ./amazon-cloudwatch-agent.rpm
+echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/etc/cloudwatch_agent/cloudwatch_agent_config.json
+
+EOF
+
 }

@@ -71,6 +71,41 @@ resource "aws_iam_policy" "s3_read_access_policy" {
   })
 }
 
+# S3 Read Write Policy
+resource "aws_iam_policy" "s3_read_write_policy" {
+  name = local.s3_read_write_policy
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "AllowUserToSeeBucketListInTheConsole",
+        "Action" : ["s3:ListAllMyBuckets", "s3:GetBucketLocation"],
+        "Effect" : "Allow",
+        "Resource" : ["arn:aws:s3:::*"]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ListBucket",
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${local.project}-*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:*Object",
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${local.project}-*/*",
+          "arn:aws:s3:::${local.project}-*"
+        ]
+      }
+    ]
+  })
+}
+
 # S3 All Object Actions Policy
 resource "aws_iam_policy" "s3_all_object_actions_policy" {
   name = local.s3_all_object_actions_policy
@@ -442,7 +477,7 @@ resource "aws_iam_policy" "redshift_spectrum_policy" {
 
 resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
   for_each = toset([
-    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.s3_read_access_policy.name}",
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.s3_read_write_policy.name}",
     "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.kms_read_access_policy.name}",
     "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.redshift_spectrum_policy.name}"
   ])
@@ -492,4 +527,189 @@ resource "aws_iam_policy" "domain_builder_publish_policy" {
   name        = "${local.project}-domain-builder-publish-policy"
   description = "Additional policy to allow execution of query publish in Athena"
   policy      = data.aws_iam_policy_document.domain_builder_publish.json
+}
+
+## Redshift DataAPI Policy Document
+# Policy Document
+data "aws_iam_policy_document" "redshift_dataapi" {
+  statement {
+    actions = [
+      "redshift-data:ListTables",
+      "redshift-data:DescribeTable",
+      "redshift-data:ListSchemas",
+      "redshift-data:ListDatabases",
+      "redshift-data:ExecuteStatement"
+    ]
+    resources = [
+      "arn:aws:redshift:${local.account_region}:${local.account_id}:cluster:*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "redshift-data:GetStatementResult",
+      "redshift-data:DescribeStatement",
+      "redshift-data:ListStatements",
+      "redshift-data:CancelStatement"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:${local.account_region}:${local.account_id}:secret:*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "secretsmanager:ListSecrets"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+}
+
+# Redshift DataAPI Policy
+resource "aws_iam_policy" "redshift_dataapi_cross_policy" {
+  name        = "${local.project}-redshift-data-api-cross-policy"
+  description = "Extra Policy for AWS Redshift"
+  policy      = data.aws_iam_policy_document.redshift_dataapi.json
+}
+
+
+## Athena API Policy Document
+# Policy Document
+data "aws_iam_policy_document" "athena_api" {
+  statement {
+    actions = [
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${local.account_region}:${local.account_id}:*/*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "athena:ListWorkGroups"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+    resources = [
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function"
+    ]
+  }
+
+  statement {
+    actions = [
+      "s3:AbortMultipartUpload",
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:ListMultipartUploadParts",
+      "s3:PutObject"
+    ]
+    resources = [
+      "arn:aws:s3:::dpr-*/*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "kms:GenerateDataKey"
+    ]
+    resources = [
+      "arn:aws:kms:*:771283872747:key/*"
+    ]
+  }
+
+}
+
+# Athena API Policy
+resource "aws_iam_policy" "athena_api_cross_policy" {
+  name        = "${local.project}-athena-api-cross-policy"
+  description = "Extra Policy for AWS Athena"
+  policy      = data.aws_iam_policy_document.athena_api.json
+}
+
+## Glue Catalog ReadOnly
+# Policy Document
+data "aws_iam_policy_document" "glue_catalog_readonly" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:Get*",
+      "glue:List*",
+      "glue:DeleteTable",
+      "glue:DeleteSchema",
+      "glue:DeletePartition",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:UpdateSchema",
+      "glue:UpdatePartition",
+      "glue:UpdateDatabase",
+      "glue:CreateTable",
+      "glue:CreateSchema",
+      "glue:CreatePartition",
+      "glue:CreatePartitionIndex",
+      "glue:BatchCreatePartition",
+      "glue:CreateDatabase"
+    ]
+    resources = [
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:schema/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/*/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/*"
+    ]
+  }
+  statement {
+    effect = "Deny"
+    actions = [
+      "glue:DeleteDatabase",
+      "glue:UpdateDatabase",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:UpdateTable"
+    ]
+    resources = [
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw_archive",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/raw_archive/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/curated",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/curated/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/raw/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/structured",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/structured/*"
+    ]
+  }
+}
+
+# Athena API Policy
+resource "aws_iam_policy" "glue_catalog_readonly" {
+  name        = "${local.project}-glue-catalog-readonly"
+  description = "Glue Catalog Readonly Policy"
+  policy      = data.aws_iam_policy_document.glue_catalog_readonly.json
 }

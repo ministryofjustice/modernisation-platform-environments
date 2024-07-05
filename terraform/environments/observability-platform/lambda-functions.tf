@@ -2,10 +2,11 @@
 #tfsec:ignore:avd-aws-0066 AWS X-Ray instrumentation is not enabled in the function's code
 module "grafana_api_key_rotator" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   #checkov:skip=CKV_AWS_258:Function is not invoked by URL
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.4.0"
+  version = "7.7.0"
 
   publish        = true
   create_package = false

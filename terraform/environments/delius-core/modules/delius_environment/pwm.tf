@@ -70,9 +70,9 @@ module "pwm" {
 
   # Define secrets here - override them by adding them to the container_secrets list eg var.delius_microservice_configs.pwm.container_secrets
   container_secrets_default = {
-    "CONFIG_PASSWORD" : aws_ssm_parameter.delius_core_pwm_config_password.arn,
-    "LDAP_PASSWORD" : aws_ssm_parameter.ldap_admin_password.arn,
-    "SES_JSON" : aws_ssm_parameter.pwm_ses_smtp_user.arn
+    "CONFIG_PASSWORD" : nonsensitive(aws_ssm_parameter.delius_core_pwm_config_password.arn),
+    "LDAP_PASSWORD" : nonsensitive(aws_ssm_parameter.ldap_admin_password.arn),
+    "SES_JSON" : nonsensitive(aws_ssm_parameter.pwm_ses_smtp_user.arn)
   }
 
   container_secrets_env_specific = try(var.delius_microservice_configs.pwm.container_secrets_env_specific, {})
@@ -80,12 +80,13 @@ module "pwm" {
   container_vars_default = {
     "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
       ldap_host_url      = "ldap://${module.ldap.nlb_dns_name}:${var.ldap_config.port}"
-      ldap_user          = module.ldap.delius_core_ldap_principal_arn
+      ldap_user          = nonsensitive(module.ldap.delius_core_ldap_principal_arn)
       pwm_url            = "https://pwm.${var.env_name}.${var.account_config.dns_suffix}"
       email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
       email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
     })),
-    "SECURITY_KEY" = "${base64encode(uuid())}"
+    "SECURITY_KEY" = "${base64encode(uuid())}",
+    "JAVA_OPTS"    = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
   }
   container_vars_env_specific            = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
   ignore_changes_service_task_definition = true
@@ -95,7 +96,23 @@ module "pwm" {
     aws.core-network-services = aws.core-network-services
   }
 
-  log_error_pattern       = "ERROR"
+  log_error_pattern = "ERROR"
+
+  log_error_threshold_config = {
+    warning = {
+      threshold = 10
+      period    = 60
+    }
+    critical = {
+      threshold = 20
+      period    = 180
+    }
+  }
+  ecs_monitoring_anomaly_detection_thresholds = {
+    memory = 5
+    cpu    = 20
+  }
+
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_ancillary.arn_suffix
   enable_platform_backups = var.enable_platform_backups

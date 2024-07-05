@@ -89,3 +89,13 @@ module "g4s" {
 
   local_tags = local.tags
 }
+
+data "aws_caller_identity" "current_acct_id" {}
+
+output "account_id" {
+  value = data.aws_caller_identity.current.account_id
+}
+
+output "account_suffix" {
+  value = local.is-production ? "production" : "development"
+}

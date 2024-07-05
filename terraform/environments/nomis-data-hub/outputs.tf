@@ -8,6 +8,11 @@ output "efs_dns_names" {
   value       = { for key, value in module.baseline.efs : key => value.file_system.dns_name }
 }
 
+output "fsx_windows_dns_names" {
+  description = "FSX Windows DNS Names"
+  value       = { for key, value in module.baseline.fsx_windows : key => value.windows_file_system.dns_name }
+}
+
 output "route53_zone_ns_records" {
   description = "NS records of created zones"
   value       = { for key, value in module.baseline.route53_zones : key => value.name_servers }

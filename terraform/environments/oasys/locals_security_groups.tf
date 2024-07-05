@@ -36,7 +36,6 @@ locals {
     https_internal = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       "10.0.0.0/8",
-      # module.ip_addresses.azure_studio_hosting_cidrs.prod,
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
@@ -70,13 +69,14 @@ locals {
     ssh = module.ip_addresses.azure_fixngo_cidrs.prod
     https_internal = flatten([
       "10.0.0.0/8",
-      # module.ip_addresses.azure_studio_hosting_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
     https_external = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
+      module.ip_addresses.moj_cidr.vodafone_dia_networks,
+      module.ip_addresses.moj_cidr.palo_alto_primsa_access_corporate,
       module.ip_addresses.external_cidrs.cloud_platform,
       module.ip_addresses.azure_studio_hosting_public.prod,
       "35.177.125.252/32", "35.177.137.160/32",                                                     # trusted_appgw_external_client_ips infra_ip.j5_phones
@@ -120,7 +120,7 @@ locals {
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
-  baseline_security_groups = {
+  security_groups = {
     private = {
       description = "Security group for private subnet"
       ingress = {
@@ -220,10 +220,10 @@ locals {
           from_port   = 0
           to_port     = 8080
           protocol    = "tcp"
-          cidr_blocks = distinct(flatten([
+          cidr_blocks = flatten([
             local.security_group_cidrs.https_internal,
             local.security_group_cidrs.https_external,
-          ]))
+          ])
           security_groups = ["private_lb", "public_lb"]
         }
       }
@@ -256,14 +256,12 @@ locals {
           cidr_blocks = local.security_group_cidrs.icmp
         }
         ssh = {
-          description = "Allow ssh ingress"
-          from_port   = "22"
-          to_port     = "22"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.ssh
-          security_groups = [
-            # "bastion-linux",
-          ]
+          description     = "Allow ssh ingress"
+          from_port       = "22"
+          to_port         = "22"
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.ssh
+          security_groups = []
         }
         http8080 = {
           description = "Allow http 8080 ingress"
@@ -273,9 +271,7 @@ locals {
           cidr_blocks = local.security_group_cidrs.oracle_db
           security_groups = [
             "private_lb",
-            # "private-jumpserver",
             "private_web",
-            # "bastion-linux",
           ]
         }
         oracle1521 = {
@@ -288,7 +284,6 @@ locals {
             "private_lb",
             "bip",
             "private_web",
-            # "bastion-linux",
           ]
         }
         oracle3872 = {

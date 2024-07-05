@@ -25,6 +25,18 @@ locals {
   )
 }
 
+module "cloudwatch_dashboard" {
+  for_each = var.cloudwatch_dashboards
+
+  source = "../../modules/cloudwatch_dashboard"
+
+  dashboard_name = each.key
+  accountId      = lookup(each.value, "account_name", null) == null ? null : var.environment.account_ids[lookup(each.value, "account_name", null)]
+  periodOverride = lookup(each.value, "periodOverride", null)
+  start          = lookup(each.value, "start", null)
+  widget_groups  = lookup(each.value, "widget_groups", [])
+}
+
 resource "aws_cloudwatch_log_group" "this" {
   for_each = var.cloudwatch_log_groups
 
@@ -69,6 +81,9 @@ resource "aws_cloudwatch_metric_alarm" "this" {
 
   alarm_actions = [
     for item in each.value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+  ]
+  ok_actions = [
+    for item in each.value.ok_actions : try(aws_sns_topic.this[item].arn, item)
   ]
 
   alarm_description   = each.value.alarm_description

@@ -54,6 +54,36 @@ locals {
   }
 }
 
+resource "aws_ssm_association" "this" {
+  for_each = var.ssm_associations
+
+  apply_only_at_cron_interval = each.value.apply_only_at_cron_interval
+  association_name            = each.key
+  name                        = each.value.name
+  max_concurrency             = each.value.max_concurrency
+  max_errors                  = each.value.max_errors
+  schedule_expression         = each.value.schedule_expression
+
+  dynamic "output_location" {
+    for_each = each.value.output_location != null ? [each.value.output_location] : []
+    content {
+      s3_bucket_name = try(module.s3_bucket[output_location.value.s3_bucket_name].bucket.bucket, output_location.value.s3_bucket_name)
+      s3_key_prefix  = output_location.value.s3_key_prefix
+      s3_region      = var.environment.region
+    }
+  }
+
+  dynamic "targets" {
+    for_each = each.value.targets
+    content {
+      key = targets.value.key
+      values = [
+        for value in targets.value.values : try(module.ec2_instance[value].aws_instance.id, value)
+      ]
+    }
+  }
+}
+
 resource "aws_ssm_document" "this" {
   for_each = var.ssm_documents
 

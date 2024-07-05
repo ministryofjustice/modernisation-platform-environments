@@ -83,12 +83,6 @@ variable "environments_in_account" {
   default = []
 }
 
-variable "sns_topic_name" {
-  description = "SNS topic name"
-  type        = string
-  default     = "delius-core-alarms-topic"
-}
-
 variable "pagerduty_integration_key" {
   description = "Pager Duty Integration Key"
   type        = string
@@ -105,4 +99,10 @@ variable "enable_platform_backups" {
   description = "Enable or disable Mod Platform centralised backups"
   type        = bool
   default     = null
+}
+
+variable "db_suffix" {
+  description = "identifier to append to name e.g. dsd, boe"
+  type        = string
+  default     = "db"
 }

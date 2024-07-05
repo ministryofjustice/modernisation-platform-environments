@@ -2,7 +2,7 @@ locals {
   internal_lb_idle_timeout = 180
   internal_lb_http_port    = 80
   internal_lb_https_port   = 443
-  internal_lb_http_hosts   = ["portal-oim-internal.aws.dev.legalservices.gov.uk", "portal-oam-internal.aws.dev.legalservices.gov.uk", "portal-idm-console.aws.dev.legalservices.gov.uk"]
+  internal_lb_http_hosts   = [aws_route53_record.oim_internal.name, aws_route53_record.oam_internal.name, aws_route53_record.idm_console.name, aws_route53_record.ohs_internal.name]
 }
 
 ####################################
@@ -61,8 +61,8 @@ resource "aws_lb_listener" "https_internal" {
   load_balancer_arn = aws_lb.internal.arn
   port              = local.internal_lb_https_port
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate_validation.external_lb_certificate_validation.certificate_arn
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = aws_acm_certificate_validation.load_balancer.certificate_arn
 
   default_action {
     type             = "forward"
@@ -84,7 +84,7 @@ resource "aws_lb_listener_rule" "host_based_internal" {
 
   condition {
     host_header {
-      values = local.internal_lb_http_hosts
+      values = local.internal_lb_http_hosts # These are the URLs that accessed the LAA-Porta-AppOhsIn CLB in Landing Zone via Port 80, but we have merged this CLB with the Internal ALB instead, so this additional rule is required
     }
   }
 

@@ -8,6 +8,7 @@
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
       "db_backup_window": "03:00-06:00",
+      "db_ca_cert_identifier": "rds-ca-rsa2048-g1",
       "db_retention_period": "15",
       "db_maintenance_window": "mon:00:00-mon:03:00",
       "db_instance_class": "db.t3.xlarge",
@@ -24,7 +25,7 @@
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "rds:delius-jitbit-development-database-2024-03-01-06-19",
-      "lambda_log_retention_days": "1"
+      "lambda_log_retention_days": "30"
     },
     "development": {
       "migration_source_account_id": "377957503799",
@@ -34,6 +35,7 @@
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
       "db_backup_window": "03:00-06:00",
+      "db_ca_cert_identifier": "rds-ca-rsa2048-g1",
       "db_retention_period": "15",
       "db_maintenance_window": "mon:00:00-mon:03:00",
       "db_instance_class": "db.t3.xlarge",
@@ -50,7 +52,7 @@
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy",
-      "lambda_log_retention_days": "14"
+      "lambda_log_retention_days": "30"
     },
     "test": {
       "migration_source_account_id": "377957503799",
@@ -60,6 +62,7 @@
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
       "db_backup_window": "03:00-06:00",
+      "db_ca_cert_identifier": "rds-ca-rsa2048-g1",
       "db_retention_period": "15",
       "db_maintenance_window": "mon:00:00-mon:03:00",
       "db_instance_class": "db.t3.xlarge",
@@ -76,7 +79,7 @@
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "copied-jitbit-training-migration-mp",
-      "lambda_log_retention_days": "14"
+      "lambda_log_retention_days": "30"
     },
     "preproduction": {
       "migration_source_account_id": "377957503799",
@@ -86,6 +89,7 @@
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
       "db_backup_window": "03:00-06:00",
+      "db_ca_cert_identifier": "rds-ca-rsa2048-g1",
       "db_retention_period": "15",
       "db_maintenance_window": "mon:00:00-mon:03:00",
       "db_instance_class": "db.t3.xlarge",
@@ -102,7 +106,7 @@
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
       "db_snapshot_identifier": "jitbit-preproduction-migration-trial-mp-copy",
-      "lambda_log_retention_days": "14"
+      "lambda_log_retention_days": "30"
     },
     "production": {
       "migration_source_account_id": "097456858629",
@@ -112,6 +116,7 @@
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
       "db_backup_window": "03:00-06:00",
+      "db_ca_cert_identifier": "rds-ca-rsa2048-g1",
       "db_retention_period": "15",
       "db_maintenance_window": "mon:00:00-mon:03:00",
       "db_instance_class": "db.t3.xlarge",
@@ -127,7 +132,7 @@
       "db_deletion_protection": "true",
       "db_skip_final_snapshot": "false",
       "db_delete_automated_backups": "false",
-      "lambda_log_retention_days": "14"
+      "lambda_log_retention_days": "30"
     }
   }
 }

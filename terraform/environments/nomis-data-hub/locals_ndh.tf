@@ -8,6 +8,12 @@ locals {
   }
 
   ndh_app_a = {
+    cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
+    )
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
     })
@@ -20,15 +26,23 @@ locals {
     })
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
     tags = {
-      description         = "RHEL7.9 NDH App"
-      component           = "ndh"
-      server-type         = "ndh-app"
-      monitored           = false
-      instance-scheduling = "skip-scheduling"
+      description            = "RHEL7.9 NDH App"
+      component              = "ndh"
+      server-type            = "ndh-app"
+      os-type                = "Linux"
+      monitored              = false
+      instance-access-policy = "limited"
+      instance-scheduling    = "skip-scheduling"
     }
   }
 
   ndh_ems_a = {
+    cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
+    )
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name = "nomis_data_hub_rhel_7_9_ems_release_2023-05-02T00-00-34.669Z"
     })
@@ -41,11 +55,13 @@ locals {
     })
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
     tags = {
-      description         = "RHEL7.9 NDH ems"
-      component           = "ndh"
-      server-type         = "ndh-ems"
-      monitored           = false
-      instance-scheduling = "skip-scheduling"
+      description            = "RHEL7.9 NDH ems"
+      component              = "ndh"
+      server-type            = "ndh-ems"
+      os-type                = "Linux"
+      monitored              = false
+      instance-access-policy = "limited"
+      instance-scheduling    = "skip-scheduling"
     }
   }
 

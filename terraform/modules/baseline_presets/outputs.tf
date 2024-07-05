@@ -14,12 +14,29 @@ output "backup_plans" {
   }
 }
 
+output "cloudwatch_dashboard_widgets" {
+  description = "Map of common cloudwatch dashboard widgets grouped by namespace"
+  value       = local.cloudwatch_dashboard_widgets
+}
+
+output "cloudwatch_dashboard_widget_groups" {
+  description = "Map of common cloudwatch dashboard widget groups"
+  value       = local.cloudwatch_dashboard_widget_groups
+}
+
+output "cloudwatch_dashboards" {
+  description = "Map of common cloudwatch dashboards"
+  value = {
+    for key, value in local.cloudwatch_dashboards : key => value if contains(local.cloudwatch_dashboards_filter, key)
+  }
+}
+
 output "cloudwatch_log_groups" {
   description = "Map of log groups"
 
-  value = var.options.cloudwatch_log_groups != null ? {
-    for key, value in local.cloudwatch_log_groups : key => value if contains(var.options.cloudwatch_log_groups, key)
-  } : local.cloudwatch_log_groups
+  value = {
+    for key, value in local.cloudwatch_log_groups : key => value if contains(local.cloudwatch_log_groups_filter, key)
+  }
 }
 
 output "cloudwatch_metric_alarms" {
@@ -70,7 +87,9 @@ output "iam_roles" {
 output "iam_service_linked_roles" {
   description = "Map of common service linked roles to create"
 
-  value = local.iam_service_linked_roles
+  value = var.options.iam_service_linked_roles != null ? {
+    for key, value in local.iam_service_linked_roles : key => value if contains(var.options.iam_service_linked_roles, key)
+  } : local.iam_service_linked_roles
 }
 
 output "iam_policies" {
@@ -109,6 +128,11 @@ output "kms_grants" {
   }
 }
 
+output "oam_links" {
+  description = "Map of oam_links to create depending on options provided"
+  value       = local.oam_links
+}
+
 output "route53_resolver_rules" {
   description = "Map of route53 resolver rules depending on options provided"
   value       = local.route53_resolver_rules
@@ -117,6 +141,13 @@ output "route53_resolver_rules" {
 output "route53_resolvers" {
   description = "Map of route53 resolvers to create depending on options provided"
   value       = local.route53_resolvers
+}
+
+output "s3_buckets" {
+  description = "Map of requested s3_buckets"
+  value = {
+    for key, value in local.s3_buckets : key => value if contains(local.s3_buckets_filter, key)
+  }
 }
 
 output "s3_bucket_policies" {
@@ -131,11 +162,6 @@ output "s3_iam_policies" {
   value = local.requested_s3_iam_policies
 }
 
-output "s3_buckets" {
-  description = "Map of s3_buckets"
-  value       = local.s3_buckets
-}
-
 output "s3_lifecycle_rules" {
   description = "Map of s3 lifecycle rules that can be used for buckets"
   value       = local.s3_lifecycle_rules
@@ -145,6 +171,13 @@ output "secretsmanager_secrets" {
   description = "Map of common secretsmanager secrets to create"
   value = {
     for key, value in local.secretsmanager_secrets : key => value if contains(local.secretsmanager_secrets_filter, key)
+  }
+}
+
+output "ssm_associations" {
+  description = "Map of common ssm associations to create"
+  value = {
+    for key, value in local.ssm_associations : key => value if contains(local.ssm_associations_filter, key)
   }
 }
 

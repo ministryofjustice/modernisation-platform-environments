@@ -1,3 +1,11 @@
+# Microservices module
+
+This is a 'batteries-included' terraform module that creates an ECS Service (plus the associated resources such as target groups, ALB associations, dns etc).
+
+Optionally, resources such as RDS and elasticache can be deployed.
+
+In addition, this module deploys the baseline monitoring stack for all components and hooks alarms up to pagerduty.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -18,9 +26,9 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_container_definition"></a> [container\_definition](#module\_container\_definition) | git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container | v4.2.1 |
+| <a name="module_container_definition"></a> [container\_definition](#module\_container\_definition) | git::<https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container> | v4.3.0 |
 | <a name="module_ecs_policies"></a> [ecs\_policies](#module\_ecs\_policies) | ../ecs_policies | n/a |
-| <a name="module_ecs_service"></a> [ecs\_service](#module\_ecs\_service) | git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service | v4.2.1 |
+| <a name="module_ecs_service"></a> [ecs\_service](#module\_ecs\_service) | git::<https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service> | v4.3.0 |
 
 ## Resources
 
@@ -113,6 +121,7 @@
 | <a name="input_ecs_service_egress_security_group_ids"></a> [ecs\_service\_egress\_security\_group\_ids](#input\_ecs\_service\_egress\_security\_group\_ids) | Security group ids to allow egress from the ECS service | <pre>list(object({<br>    referenced_security_group_id = optional(string, null)<br>    cidr_ipv4                    = optional(string, null)<br>    port                         = optional(number, null)<br>    ip_protocol                  = string<br>  }))</pre> | `[]` | no |
 | <a name="input_ecs_service_ingress_security_group_ids"></a> [ecs\_service\_ingress\_security\_group\_ids](#input\_ecs\_service\_ingress\_security\_group\_ids) | Security group ids to allow ingress to the ECS service | <pre>list(object({<br>    referenced_security_group_id = optional(string, null)<br>    cidr_ipv4                    = optional(string, null)<br>    port                         = number<br>    ip_protocol                  = string<br>  }))</pre> | `[]` | no |
 | <a name="input_efs_volumes"></a> [efs\_volumes](#input\_efs\_volumes) | The EFS volumes to mount | `list(any)` | `[]` | no |
+| <a name="input_elasticache_apply_immediately"></a> [elasticache\_apply\_immediately](#input\_elasticache\_apply\_immediately) | Apply changes immediately | `bool` | `false` | no |
 | <a name="input_elasticache_endpoint_environment_variable"></a> [elasticache\_endpoint\_environment\_variable](#input\_elasticache\_endpoint\_environment\_variable) | Environment variable to store the elasticache endpoint | `string` | `""` | no |
 | <a name="input_elasticache_engine"></a> [elasticache\_engine](#input\_elasticache\_engine) | The Elasticache engine | `string` | `"redis"` | no |
 | <a name="input_elasticache_engine_version"></a> [elasticache\_engine\_version](#input\_elasticache\_engine\_version) | The Elasticache engine version | `string` | `"5.0.6"` | no |
@@ -125,6 +134,7 @@
 | <a name="input_elasticache_subnet_group_name"></a> [elasticache\_subnet\_group\_name](#input\_elasticache\_subnet\_group\_name) | The Elasticache subnet group name | `string` | `"default"` | no |
 | <a name="input_enable_platform_backups"></a> [enable\_platform\_backups](#input\_enable\_platform\_backups) | Enable or disable Mod Platform centralised backups | `bool` | `null` | no |
 | <a name="input_env_name"></a> [env\_name](#input\_env\_name) | Environment name short ie dev | `string` | n/a | yes |
+| <a name="input_extra_task_role_policies"></a> [extra\_task\_role\_policies](#input\_extra\_task\_role\_policies) | A map of data "aws\_iam\_policy\_document" objects, keyed by name, to attach to the task role | `map(any)` | `{}` | no |
 | <a name="input_force_new_deployment"></a> [force\_new\_deployment](#input\_force\_new\_deployment) | Force a new deployment | `bool` | `false` | no |
 | <a name="input_frontend_lb_arn_suffix"></a> [frontend\_lb\_arn\_suffix](#input\_frontend\_lb\_arn\_suffix) | Used by alarms | `string` | n/a | yes |
 | <a name="input_health_check_grace_period_seconds"></a> [health\_check\_grace\_period\_seconds](#input\_health\_check\_grace\_period\_seconds) | The amount of time, in seconds, that Amazon ECS waits before unhealthy instances are shut down. | `number` | `60` | no |
@@ -157,11 +167,12 @@
 | <a name="input_rds_monitoring_interval"></a> [rds\_monitoring\_interval](#input\_rds\_monitoring\_interval) | RDS monitoring interval | `number` | `60` | no |
 | <a name="input_rds_multi_az"></a> [rds\_multi\_az](#input\_rds\_multi\_az) | RDS multi az | `bool` | `false` | no |
 | <a name="input_rds_parameter_group_name"></a> [rds\_parameter\_group\_name](#input\_rds\_parameter\_group\_name) | RDS parameter group name | `string` | `null` | no |
-| <a name="input_rds_password_secret_variable"></a> [rds\_password\_secret\_variable](#input\_rds\_password\_secret\_variable) | Secret variable to store the rds secretsmanager arn | `string` | `""` | no |
+| <a name="input_rds_password_secret_variable"></a> [rds\_password\_secret\_variable](#input\_rds\_password\_secret\_variable) | Secret variable to store the rds secretsmanager arn password | `string` | `""` | no |
 | <a name="input_rds_performance_insights_enabled"></a> [rds\_performance\_insights\_enabled](#input\_rds\_performance\_insights\_enabled) | RDS performance insights enabled | `bool` | `false` | no |
 | <a name="input_rds_port"></a> [rds\_port](#input\_rds\_port) | RDS port | `number` | `null` | no |
 | <a name="input_rds_skip_final_snapshot"></a> [rds\_skip\_final\_snapshot](#input\_rds\_skip\_final\_snapshot) | RDS skip final snapshot | `bool` | `false` | no |
 | <a name="input_rds_storage_type"></a> [rds\_storage\_type](#input\_rds\_storage\_type) | RDS storage type | `string` | `"gp2"` | no |
+| <a name="input_rds_user_secret_variable"></a> [rds\_user\_secret\_variable](#input\_rds\_user\_secret\_variable) | Secret variable to store the rds secretsmanager arn username | `string` | `""` | no |
 | <a name="input_rds_username"></a> [rds\_username](#input\_rds\_username) | RDS database username | `string` | `null` | no |
 | <a name="input_redeploy_on_apply"></a> [redeploy\_on\_apply](#input\_redeploy\_on\_apply) | Redeploy the ecs service on apply | `bool` | `false` | no |
 | <a name="input_snapshot_identifier"></a> [snapshot\_identifier](#input\_snapshot\_identifier) | RDS snapshot identifier | `string` | `null` | no |
@@ -174,7 +185,12 @@
 
 | Name | Description |
 |------|-------------|
+| <a name="output_elasticache_endpoint"></a> [elasticache\_endpoint](#output\_elasticache\_endpoint) | n/a |
+| <a name="output_elasticache_port"></a> [elasticache\_port](#output\_elasticache\_port) | n/a |
+| <a name="output_rds_endpoint"></a> [rds\_endpoint](#output\_rds\_endpoint) | n/a |
 | <a name="output_rds_password_secret_arn"></a> [rds\_password\_secret\_arn](#output\_rds\_password\_secret\_arn) | n/a |
+| <a name="output_rds_port"></a> [rds\_port](#output\_rds\_port) | n/a |
 | <a name="output_service_security_group_id"></a> [service\_security\_group\_id](#output\_service\_security\_group\_id) | n/a |
 | <a name="output_target_group_arn"></a> [target\_group\_arn](#output\_target\_group\_arn) | n/a |
+| <a name="output_task_role_arn"></a> [task\_role\_arn](#output\_task\_role\_arn) | n/a |
 <!-- END_TF_DOCS -->

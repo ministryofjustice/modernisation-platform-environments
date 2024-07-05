@@ -1,12 +1,11 @@
 variable "region" {
+  type    = string
   default = "eu-west-2"
-
 }
 variable "tags" {
   type        = map(string)
   description = "Common tags to be used by all resources"
 }
-
 variable "pClusterName" {
   type    = string
   default = ""
@@ -14,30 +13,27 @@ variable "pClusterName" {
 variable "pAutoscalingGroupName" {
   type    = string
   default = ""
-
 }
 variable "pLoadBalancerName" {
   type    = string
   default = ""
-
 }
 variable "pTargetGroupName" {
   type    = string
   default = ""
-
 }
 variable "appnameenv" {
+  type    = string
   default = ""
-
 }
 variable "sns_topic_name" {
+  type    = string
   default = ""
-
 }
-
 variable "pagerduty_integration_key" {
+  type    = string
+  default = ""
 }
-
 variable "pECSCPUAlarmThreshold" {
   description = "ECS CPU Alarm Threshold"
   type        = number

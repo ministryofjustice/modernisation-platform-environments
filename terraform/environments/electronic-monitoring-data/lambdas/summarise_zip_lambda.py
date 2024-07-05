@@ -44,14 +44,15 @@ def handler(event, context):
 
     # Read each file's content and build directory structure
     for file_name in file_list:
-        parts = file_name.split("/")
-        current_dict = directory_structure
+        if not file_name.endswith("/"):
+            parts = file_name.split("/")
+            current_dict = directory_structure
 
-        # Traverse the directory structure and create dictionary entries
-        for part in parts[:-1]:
-            if part not in current_dict:
-                current_dict[part] = {}
-            current_dict = current_dict[part]
+            # Traverse the directory structure and create dictionary entries
+            for part in parts[:-1]:
+                if part not in current_dict:
+                    current_dict[part] = {}
+                current_dict = current_dict[part]
 
     logger.info(f"\n\nJSON directory structure:\n{directory_structure}")
 

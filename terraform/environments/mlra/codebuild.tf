@@ -1,6 +1,7 @@
-# TODO change the module name to codebuild when rebuilding
 
 module "mlra-selenium" {
+  #checkov:skip=CKV_AWS_316:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_314:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   count  = local.environment == "development" ? 1 : 0
   source = "./modules/codebuild"
 

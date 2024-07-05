@@ -14,7 +14,8 @@ resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_desti
     }
     enabled = true
     matching_event_types = [
-      "BOUNCE"
+      "BOUNCE",
+      "DELIVERY_DELAY"
     ]
   }
 }
@@ -34,6 +35,16 @@ resource "aws_lambda_function" "bounce_email_notification" {
   runtime          = "python3.12"
   handler          = "bounce_email_notification.handler"
   source_code_hash = data.archive_file.lambda_function_payload_bounce_email_notification.output_base64sha256
+
+  timeout = 6
+
+  environment {
+    variables = {
+      RATE_LIMIT     = 5
+      DYNAMODB_TABLE = aws_dynamodb_table.bounce_email_notification.name
+      FROM_ADDRESS   = "notifications@${aws_sesv2_email_identity.jitbit.email_identity}"
+    }
+  }
 
   lifecycle {
     replace_triggered_by = [aws_iam_role.lambda_bounce_email_notification]
@@ -72,6 +83,22 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
     ]
     resources = ["arn:aws:logs:*:*:*"]
   }
+
+  statement {
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:GetItem",
+      "dynamodb:Query"
+    ]
+    resources = [aws_dynamodb_table.bounce_email_notification.arn]
+  }
+
+  statement {
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = [data.aws_kms_key.general_shared.arn]
+  }
 }
 
 resource "aws_lambda_permission" "sns_bounce_email_notification" {
@@ -90,7 +117,52 @@ resource "aws_sns_topic_subscription" "lambda_bounce_email_notification" {
 
 resource "aws_cloudwatch_log_group" "bounce_email_notification" {
   name              = "/aws/lambda/bounce_email_notification"
-  retention_in_days = local.application_data.accounts[local.environment].lambda_log_retention_days
+  retention_in_days = 3
 
   tags = local.tags
+}
+
+
+resource "aws_dynamodb_table" "bounce_email_notification" {
+  name         = "bounce_email_notification"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "email_ticket_id"
+
+  server_side_encryption {
+    enabled     = true
+    kms_key_arn = data.aws_kms_key.general_shared.arn
+  }
+
+  ttl {
+    attribute_name = "expireAt"
+    enabled        = true
+  }
+
+  attribute {
+    name = "email_ticket_id"
+    type = "S"
+  }
+
+  tags = local.tags
+}
+
+resource "aws_dynamodb_resource_policy" "bounce_email_notification" {
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = aws_iam_role.lambda_bounce_email_notification.arn
+        },
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem"
+        ],
+        Resource = aws_dynamodb_table.bounce_email_notification.arn
+      }
+    ]
+  })
+  resource_arn = aws_dynamodb_table.bounce_email_notification.arn
 }

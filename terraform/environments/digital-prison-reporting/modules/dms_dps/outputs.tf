@@ -13,3 +13,7 @@ output "dms_replication_task_name" {
 output "dms_replication_task_arn" {
   value = var.enable_replication_task ? join("", aws_dms_replication_task.dms-replication.*.replication_task_arn) : ""
 }
+
+output "replication_task_id" {
+  value = var.enable_replication_task ? join("", aws_dms_replication_task.dms-replication.*.replication_task_id) : ""
+}

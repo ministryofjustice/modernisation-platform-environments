@@ -80,7 +80,7 @@ module "data_ingestion_pipeline" {
             "Arguments" : {
               "--dpr.file.transfer.source.bucket" : var.s3_raw_bucket_id,
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
-              "--dpr.file.transfer.retention.days" : "0",
+              "--dpr.file.transfer.retention.period.amount" : "0",
               "--dpr.file.transfer.delete.copied.files" : "true",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.allowed.s3.file.extensions" : ".parquet",

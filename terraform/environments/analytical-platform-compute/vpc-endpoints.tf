@@ -1,5 +1,6 @@
 module "vpc_endpoints" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "5.8.1"
@@ -100,6 +101,24 @@ module "vpc_endpoints" {
         { Name = format("%s-secretsmanager", module.vpc.name) }
       )
     },
+    aps = {
+      service             = "aps"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-aps", module.vpc.name) }
+      )
+    },
+    aps-workspaces = {
+      service             = "aps-workspaces"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-aps-workspaces", module.vpc.name) }
+      )
+    },
     /* Gateways */
     s3 = {
       service      = "s3"
@@ -111,9 +130,9 @@ module "vpc_endpoints" {
       ])
       tags = merge(
         local.tags,
-        { Name = format("%s-s3", local.application_name) }
+        { Name = format("%s-s3", module.vpc.name) }
       )
-    },
+    }
   }
 
   tags = local.tags

@@ -1,7 +1,66 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "edw_AppName": "EDW2",
+      "edw_environment": "dev",
+      "edw_region": "eu-west-2",
+      "edw_ec2_ami_id": "ami-01d4d23fbf3fcc925",
+      "edw_ec2_instance_type": "m4.xlarge",
+      "edw_ssh_key_name": "development-general",
+      "edw_OrahomeVolumeSize": "150",
+      "edw_OratempVolumeSize": "250",
+      "edw_root_volume_size": "60",
+      "edw_OradataVolumeSize": "1296",
+      "edw_SoftwareVolumeSize": "1000",
+      "edw_ArchiveVolumeSize": "200",
+      "edw_dns_extension": "aws.dev.legalservices.gov.uk",
+      "edw_bucket_name": "laa-oracle-software",
+      "edw_s3_backup_bucket": "laa-software-library",
+      "edw_sns_topic_arn": "arn:aws:sns:eu-west-2:902837325998:EDW5-Alerting-Topic-NonProd",
+      "edw_cis_ip": "10.221.60.123",
+      "edw_eric_ip": "10.221.60.125",
+      "edw_ccms_ip": "10.221.60.130",
+      "edw_backup_lambda_arn": "arn:aws:lambda:eu-west-2:411213865113:function:snapshotDBFunction",
+      "edw_sg_inbound_count": "1",
+      "edw_management_cidr": "10.200.0.0/20",
+      "edw_bastion_ssh_cidr": "10.202.0.0/20",
+      "mp_domain_name": "modernisation-platform.service.justice.gov.uk",
+      "lambda_function_inline_code_filename": "index.py",
+      "lambda_function_name": "edw-system-root-password-rotation",
+      "lambda_function_description": "Rotate AWS Secrets Manager Secret Value",
+      "lambda_function_handler": "index.lambda_handler",
+      "lambda_function_runtime": "python3.8",
+      "lambda_function_timeout": "300",
+      "secret_rotation_frequency_days": "28",
+      "secret_id_suffix_length": "3",
+      "edw_instance_descriptor": "Database",
+      "edw_logstream_errors_detected_threshold": "1",
+      "edw_logstream_errors_detected_periods": "3600",
+      "edw_logstream_errors_detected_evaluation_periods": "1",
+      "edw_log_metric_filter_namespace": "LogsMetricFilters",
+      "edw_log_metric_pmon_status": "db_PMON_status_alerts",
+      "edw_log_metrics_oracle_alerts": "oracle_alert_log_errors",
+      "edw_log_metrics_tbs_freespace": "db_tablespace_space_alerts",
+      "edw_log_metric_cdc_status": "db_CDC_status_alerts",
+      "edw_log_metric_cdc_status2": "db_CDC_Applystatus_alerts",
+      "edw_log_metric_name_rman_arch_backup": "rman_arch_backup_log_errors",
+      "edw_log_metric_name_rman_backup": "rman_backup_log_errors",
+      "edw_cpu_evaluation_period": "5",
+      "edw_cpu_alert_period": "60",
+      "edw_cpu_alert_threshold": "90",
+      "edw_mem_alert_evaluation_periods": "5",
+      "edw_mem_alert_period": "60",
+      "edw_mem_alert_threshold": "90",
+      "edw_diskspace_alert_evaluation_periods": "1",
+      "edw_diskspace_alert_period": "60",
+      "edw_diskspace_alert_threshold": "90",
+      "edw_dashboard_refresh_period": "60",
+      "edw_disk_path": "/oracle/dbf",
+      "edw_disk_device": "/dev/xvdf",
+      "edw_disk_fs_type": "ext4",
+      "database_ec2_name": "edw-db-instance",
+      "edw_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqJXcEXymhifpt3jSnLHVoPCwD07usEGhKCboMjMuSS2nFaSy+JDhsL/BKUQUgW88ozLzCp4XL0+jfpqzJqwrgVgfZI059w6QqLXyUF8HxQa0jolOWQZXq9+BZX6DnmPX84p40MZ38OrNiEoNuSqN1u3dqbRIageDSJuKAp39DjrQVoTPh1lchddKiucVMU0xK8Z1QQWHyoZTBYolC+hPNZ7lwT+Vq8CLywDUlBcZdbCKRMeUXD+kzg+nduCyB71gV4zlE4vD7x/RADvAfOINVQNSRQFY9QgnQylyylsRhzCGtXTPUC6Cnhmi49L/AyDd7Qh78ZEOOrs5HTJNsJmt84LuurD9dimtour2tlvDkZOurib/voKfrHxih1q5lgzn7BEZ42jO0H6UKtHv9hkkMOCfewnGHrkZ9ptgmHyR/pMWXbwiM/+osc1XLgEBJ6rFe+mtge4GzIx5ZApMGZV3LFe3ZoPGtnyORvjyI/jkOTco6gVIc87Wn0MkD5tFV9ME= fani.foteva@MJ004598",
+      "edw_pagerduty_integration_key_name": "laa_edw_nonprod_alarms"
     },
     "test": {
       "example_var": "test-data"
@@ -14,3 +73,5 @@
     }
   }
 }
+
+

@@ -20,6 +20,9 @@ module "acm_certificate" {
       alarm_actions = [
         for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
       ]
+      ok_actions = [
+        for item in value.ok_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
     })
   }
 

@@ -244,3 +244,35 @@ resource "aws_iam_role_policy_attachment" "access_to_lz_buckets_policy" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.access_to_lz_buckets.arn
 }
+
+# Allow EC2 operations.
+resource "aws_iam_policy" "ec2_operations_policy" {
+  name        = "ec2_operations-${local.environment}"
+  description = "Allows EC2 operations."
+
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Sid" : "EC2Operations",
+          "Effect" : "Allow",
+          "Action" : [
+            "ec2:Describe*",
+            "ec2:CreateSnapshot",
+            "ec2:CreateSnapshots",
+            "ec2:DeleteSnapshot",
+            "ec2:CreateTags",
+            "ec2:DeleteTags"
+          ],
+          "Resource" : "*"
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_operations_policy_att" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = aws_iam_policy.ec2_operations_policy.arn
+}

@@ -34,7 +34,7 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   service_access_role_arn = var.ep_service_access_role_arn
 
   # Extra settings:
-  add_column_name = true
+  # add_column_name = true
   # add_trailing_padding_character              = false
   bucket_folder = var.database_name
   # canned_acl_for_objects                      = "NONE"
@@ -44,18 +44,18 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   # cdc_min_file_size                           = 32000
   # cdc_path                                    = "cdc/path"
   # compression_type                            = "NONE"
-  csv_delimiter     = ","
-  csv_no_sup_value  = "false"
-  csv_null_value    = "null"
-  csv_row_delimiter = "\\n"
-  data_format       = "csv"
-  data_page_size    = 68000000
+  # csv_delimiter     = ","
+  # csv_no_sup_value  = "false"
+  # csv_null_value    = "null"
+  # csv_row_delimiter = "\\n"
+  data_format    = "parquet"
+  data_page_size = 2048000
   # date_partition_delimiter                    = "UNDERSCORE"
   # date_partition_enabled                      = false
   # date_partition_sequence                     = "yyyymmddhh"
   # date_partition_timezone                     = "Europe/London"
   # dict_page_size_limit                        = 1000000
-  # enable_statistics                           = true
+  enable_statistics = true
   # encoding_type                               = "plain"
   # encryption_mode                             = "SSE_S3"
   # expected_bucket_owner                       = data.aws_caller_identity.current.account_id
@@ -63,12 +63,12 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   # glue_catalog_generation                     = true
   # ignore_header_rows                          = 1
   # include_op_for_full_load                    = true
-  max_file_size = 64000
-  # parquet_timestamp_in_millisecond            = false
-  # parquet_version = "parquet-2-0"
+  max_file_size                    = 64000
+  parquet_timestamp_in_millisecond = true
+  parquet_version                  = "parquet-2-0"
   # preserve_transactions                       = false
   # rfc_4180                                    = false
-  # row_group_length                            = 11000
+  row_group_length = 20048
   # server_side_encryption_kms_key_id           = aws_kms_key.example.arn
   # timestamp_column_name                       = "_timestamp"
   # use_csv_no_sup_value                        = false
@@ -77,8 +77,11 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   tags = merge(
     var.local_tags,
     {
-      Resource_Type = "DMS Target Endpoint - S3",
+      Resource_Type = "DMS Target Endpoint - S3-Parquet",
     },
   )
 
 }
+
+# ==========================================================================
+

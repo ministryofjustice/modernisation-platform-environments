@@ -14,15 +14,12 @@ locals {
   }
 
   prod_validation = {
-    "${local.application_data.accounts[local.environment].acm_cert_domain_name}" = {
+    local.application_data.accounts[local.environment].acm_cert_domain_name = {
       account   = "core-network-services"
-      zone_name = "${local.application_data.accounts[local.environment].acm_cert_domain_name}"
+      zone_name = local.application_data.accounts[local.environment].acm_cert_domain_name
     }
   }
-
-
 }
-
 
 
 module "alb" {
@@ -58,7 +55,7 @@ module "alb" {
 
   listener_protocol = "HTTPS"
   listener_port     = 443
-  alb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01" # TODO This enforces TLSv1.2. For general, use ELBSecurityPolicy-2016-08 instead 
+  alb_ssl_policy    = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   production_zone_id   = data.aws_route53_zone.production-network-services.zone_id
   services_zone_id     = data.aws_route53_zone.network-services.zone_id

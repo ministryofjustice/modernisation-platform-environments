@@ -13,7 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.cdpt_chaps_ddos_alarm.arn]
   dimensions = {
-    ResourceArn = aws_lb.chaps_lb.arn
+    ResourceArn = module.lb_access_logs_enabled.load_balancer.arn
   }
 }
 

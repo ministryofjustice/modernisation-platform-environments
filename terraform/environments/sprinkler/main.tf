@@ -476,7 +476,7 @@ resource "aws_lb_listener" "external" {
   load_balancer_arn = aws_lb.external.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
@@ -633,7 +633,7 @@ resource "aws_lb_listener" "inner" {
   load_balancer_arn = aws_lb.inner.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate.inner.arn
 
   default_action {
@@ -814,12 +814,4 @@ resource "aws_cloudwatch_log_group" "app" {
       Name = var.networking[0].application
     },
   )
-}
-
-resource "aws_acm_certificate" "us_east_1_test" {
-  domain_name       = "test.modernisation-platform.service.justice.gov.uk"
-  validation_method = "DNS"
-  provider          = aws.us-east-1
-
-  tags = local.tags
 }

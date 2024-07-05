@@ -5,8 +5,7 @@
       "ec2amiid": "ami-0a5b0804d9efdeed0",
       "ec2instancetype": "t3.medium",
       "mp_vpc_cidr": "10.26.56.0/21",
-      "lz_shared_nonprod_mgmt_vpc_cidr": "10.200.0.0/20",
-      "lz_shared_prod_mgmt_vpc_cidr": "10.200.16.0/20",
+      "workspace_cidr": "10.200.0.0/20",
       "u01_orahome_size": "40",
       "u01_orahome_snapshot": "snap-0dbe4e9eb3ae8c8e2",
       "u02_oradata_size": "100",
@@ -16,7 +15,7 @@
       "u04_arch_size": "50",
       "u04_arch_snapshot": "snap-0bc63d7b569e9eb3b",
       "container_instance_type": "linux",
-      "ami_image_id": "ami-0a7fe1d4be64d0d0f",
+      "ami_image_id": "ami-0c1789b266d504ff3",
       "instance_type": "t3a.medium",
       "key_name": "",
       "ec2_desired_capacity": 1,
@@ -29,12 +28,31 @@
       "appscaling_max_capacity": 2,
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80,
+      "ec2_instance_warmup_period": 300,
+      "container_memory_allocation": 1000,
       "region": "eu-west-2",
       "docker_image_tag": "development",
-      "app_db_url": "db.apex.aws.dev.legalservices.gov.uk:1521:APEX",
       "app_debug_enabled": "false",
       "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
-      "server_port": 8080
+      "server_port": 8080,
+      "apex_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDvpItu0G1G3a5VxaPHxviFwAw87ai5D48kzyMLOu5rVRwp71x/Hhd49Gex2ffLmHxc3fS8pv6vxmNGpg2/33uqsFmiS6vK0K/1jtuiOdn4vUnlvF1a56zd5kGTtcJQ+IIQcJgDrUUgkCtojHlpLRHypA2qrXYO0hwGYgs20vowgJsfzhnFmzfxCeV4pP0XcEHJ9bvx9I8/Zz5bA9a7CEHeWHttYxi0Bg82JzgnLqvQyND5sNx8FGa5ks1UbDnxpx8hl5I1P93hFW3FcIMeg/1NZiqC9HwjAokSxLTlJx1pzjHmYiZFpNtNxvLH2W9CGzszXLuAlSwkeipHU560Iuim9muXqy1U7Y8Is292U8pwmcLI734B2HB/nhvAG99WUGTzprizS3n6VlVBBE4EfET6sRLscKHSx8frslHdP8Z7xKUNxUhvNrcCPN7u2Kacy0WL4Nd3Aa42VtjxZ72uWARay1BWUFBOMC9vgTSmFsl/14AjKadNhukPVVpIuDAdMZM= vincent.cheung@MJ004609",
+      "database_status_alarm_threshold": "1",
+      "database_cpu_alarm_threshold": "85",
+      "database_oracle_alerts_alarm_threshold": "1",
+      "database_pmon_status_alarm_threshold": "1",
+      "ecs_cpu_alarm_threshold": "75",
+      "ecs_memory_alarm_threshold": "75",
+      "asg_cpu_alarm_threshold": "85",
+      "asg_status_alarm_threshold": "1",
+      "alb_response_time_alarm_threshold": "10",
+      "alb_response_time_max_alarm_threshold": "60",
+      "alb_unhealthy_hosts_alarm_threshold": "0",
+      "alb_rejected_connections_alarm_threshold": "10",
+      "alb_target_5xx_alarm_threshold": "1",
+      "alb_elb_5xx_alarm_threshold": "10",
+      "alb_target_4xx_alarm_threshold": "10",
+      "alb_elb_4xx_alarm_threshold": "10",
+      "oas_lz_cidr": "10.202.4.85/32"
     },
     "test": {
       "example_var": "test-data"
@@ -43,7 +61,8 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "container_memory_allocation": 2000
     }
   }
 }

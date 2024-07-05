@@ -17,13 +17,10 @@ resource "aws_db_instance" "database" {
   db_subnet_group_name      = aws_db_subnet_group.db.id
   final_snapshot_identifier = "final-snapshot-${formatdate("YYYYMMDDhhmmss", timestamp())}"
   publicly_accessible       = false
+  ca_cert_identifier        = "rds-ca-rsa2048-g1"
   apply_immediately         = true
-}
 
-resource "aws_db_instance_role_association" "database" {
-  db_instance_identifier = aws_db_instance.database.identifier
-  feature_name           = "S3_INTEGRATION"
-  role_arn               = aws_iam_role.S3_db_backup_restore_access.arn
+
 }
 
 resource "aws_db_subnet_group" "db" {

@@ -20,12 +20,12 @@ data "aws_subnets" "shared-private" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
-  vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name                  = "${var.app_name}-cluster-scaling-group"
-  desired_capacity      = var.ec2_desired_capacity
-  max_size              = var.ec2_max_size
-  min_size              = var.ec2_min_size
-  protect_from_scale_in = true
+  vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
+  name                = "${var.app_name}-cluster-scaling-group"
+  desired_capacity    = var.ec2_desired_capacity
+  max_size            = var.ec2_max_size
+  min_size            = var.ec2_min_size
+  # protect_from_scale_in = true
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
@@ -209,44 +209,22 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Effect": "Allow",
             "Action": [
-                "ec2:DescribeTags",
-                "ec2:DescribeInstances",
                 "ecs:CreateCluster",
                 "ecs:DeregisterContainerInstance",
                 "ecs:DiscoverPollEndpoint",
                 "ecs:Poll",
                 "ecs:RegisterContainerInstance",
                 "ecs:StartTelemetrySession",
-                "ecs:UpdateContainerInstancesState",
                 "ecs:Submit*",
-                "ecs:TagResource",
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-                "ecr:*",
+                "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
-                "logs:CreateLogGroup",
                 "logs:DescribeLogStreams",
-                "s3:ListBucket",
-                "s3:*Object*",
-                "kms:Decrypt",
-                "kms:Encrypt",
-                "kms:GenerateDataKey",
-                "kms:ReEncrypt",
-                "kms:GenerateDataKey",
-                "kms:DescribeKey",
-                "xray:PutTraceSegments",
-                "xray:PutTelemetryRecords",
-                "xray:GetSamplingRules",
-                "xray:GetSamplingTargets",
-                "xray:GetSamplingStatisticSummaries",
-                "xray:*"
+                "ecr:*"
             ],
-            "Resource": "*"
+            "Resource": "*",
+            "Effect": "Allow"
         }
     ]
 }
@@ -256,11 +234,6 @@ EOF
 resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_role_policy_attachment" "CloudWatchAgentServerPolicy" {
-  role       = aws_iam_role.ec2_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
@@ -288,8 +261,8 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
   family             = "${var.app_name}-task-definition"
   count              = var.container_instance_type == "windows" ? 1 : 0
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn # grants the Amazon ECS container agents permission to make AWS API calls on your behalf
+  task_role_arn      = aws_iam_role.ecs_task_execution_role.arn # assumed by the containers running in the task, allowing your application code (on the container) to use other AWS services
   requires_compatibilities = [
     "EC2",
   ]
@@ -310,9 +283,9 @@ resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
 
 resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
   family             = "${var.app_name}-task-definition"
-  network_mode       = var.network_mode
+  # network_mode       = var.network_mode
   count              = var.container_instance_type == "linux" ? 1 : 0
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn # grants the Amazon ECS container agents permission to make AWS API calls on your behalf
   requires_compatibilities = [
     "EC2",
   ]
@@ -327,42 +300,6 @@ resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
     var.tags_common,
     {
       Name = "${var.app_name}-linux-task-definition"
-    }
-  )
-}
-
-resource "aws_ecs_service" "ecs_service" {
-  name            = "${var.app_name}-ecs-service"
-  cluster         = aws_ecs_cluster.ecs_cluster.id
-  task_definition = data.aws_ecs_task_definition.task_definition.id
-  desired_count   = var.app_count
-
-  capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.apex.name
-    weight            = 1
-  }
-
-  health_check_grace_period_seconds = 300
-
-  ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
-    type  = "spread"
-  }
-
-  load_balancer {
-    target_group_arn = var.lb_tg_arn
-    container_name   = var.app_name
-    container_port   = var.server_port
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
-  ]
-
-  tags = merge(
-    var.tags_common,
-    {
-      Name = "${var.app_name}-ecs-service"
     }
   )
 }
@@ -387,12 +324,12 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
-resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = "${var.app_name}-ecs-task-execution-s3-policy"
+resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = "${var.app_name}-ecs-task-execution-policy"
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-task-execution-s3-policy"
+      Name = "${var.app_name}-ecs-task-execution-policy"
     }
   )
   policy = <<EOF
@@ -402,24 +339,9 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam
     {
       "Effect": "Allow",
       "Action": [
-        "s3:ListBucket",
-        "s3:*Object*",
-        "kms:Decrypt",
-        "kms:Encrypt",
-        "kms:GenerateDataKey",
-        "kms:ReEncrypt",
-        "kms:GenerateDataKey",
-        "kms:DescribeKey",
-        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-        "elasticloadbalancing:DeregisterTargets",
-        "elasticloadbalancing:Describe*",
-        "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-        "elasticloadbalancing:RegisterTargets",
-        "ec2:Describe*",
-        "ec2:AuthorizeSecurityGroupIngress",
         "ssm:GetParameters"
       ],
-      "Resource": ["*"]
+      "Resource": ["${var.database_tad_password_arn}"]
     }
   ]
 }
@@ -443,31 +365,149 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
-resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
+# resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
+#   role       = aws_iam_role.ecs_task_execution_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+# }
+resource "aws_iam_role_policy_attachment" "ecs_task_execution" {
   role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-}
-resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
+  policy_arn = aws_iam_policy.ecs_task_execution_policy.arn
 }
 
-# Set up CloudWatch group and log stream and retain logs for 30 days
-resource "aws_cloudwatch_log_group" "cloudwatch_group" {
-  #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
-  name              = "${var.app_name}-ecs-log-group"
-  retention_in_days = 30
+resource "aws_ecs_service" "ecs_service" {
+  name            = "${var.app_name}-ecs-service"
+  cluster         = aws_ecs_cluster.ecs_cluster.id
+  task_definition = data.aws_ecs_task_definition.task_definition.id
+  desired_count   = var.app_count
+  iam_role        = aws_iam_role.ecs_service.arn # role that allows Amazon ECS to make calls to your load balancer on your behalf. DO NOT specify if the task definition network mode is awsvpc
+
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.apex.name
+    weight            = 1
+  }
+
+  health_check_grace_period_seconds = 300
+
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
+  }
+
+  load_balancer {
+    target_group_arn = var.lb_tg_arn
+    container_name   = var.app_name
+    container_port   = var.server_port
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group, aws_iam_role_policy_attachment.ecs_service
+  ]
+
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-log-group"
+      Name = "${var.app_name}-ecs-service"
     }
   )
 }
 
-resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
-  name           = "${var.app_name}-log-stream"
-  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+# ECS Service IAM role
+# Allows Amazon ECS to make calls to your load balancer on your behalf
+data "aws_iam_policy_document" "ecs_service" {
+  version = "2012-10-17"
+  statement {
+    sid    = ""
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "ecs.amazonaws.com",
+      ]
+    }
+  }
+}
+
+resource "aws_iam_policy" "ecs_service" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = "${var.app_name}-ecs-service-policy"
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-service-policy"
+    }
+  )
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+        "elasticloadbalancing:DeregisterTargets",
+        "elasticloadbalancing:Describe*",
+        "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+        "elasticloadbalancing:RegisterTargets",
+        "ec2:Describe*",
+        "ec2:AuthorizeSecurityGroupIngress"
+      ],
+      "Resource": ["*"]
+    }
+  ]
+}
+EOF
+}
+
+# ECS task execution role
+resource "aws_iam_role" "ecs_service" {
+  name               = "${var.app_name}-ecs-service-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_service.json
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-service-role"
+    }
+  )
+}
+
+# ECS task execution role policy attachment
+resource "aws_iam_role_policy_attachment" "ecs_service" {
+  role       = aws_iam_role.ecs_service.name
+  policy_arn = aws_iam_policy.ecs_service.arn
+}
+
+# Set up CloudWatch group and log stream and retain logs for 3 months
+resource "aws_cloudwatch_log_group" "cloudwatch_group" {
+  #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
+  name              = "${var.app_name}-ecs-container-logs"
+  retention_in_days = 90
+  kms_key_id        = var.log_group_kms_key
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-container-logs"
+    }
+  )
+}
+
+# resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
+#   name           = "${var.app_name}-log-stream"
+#   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+# }
+
+resource "aws_cloudwatch_log_group" "ec2" {
+  name              = "${var.app_name}-ecs-ec2-logs"
+  retention_in_days = 90
+  kms_key_id        = var.log_group_kms_key
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-ec2-logs"
+    }
+  )
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
@@ -488,7 +528,9 @@ resource "aws_appautoscaling_policy" "ecs_target_cpu" {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
-    target_value = var.ecs_scaling_cpu_threshold
+    target_value       = var.ecs_scaling_cpu_threshold
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
   }
 }
 
@@ -502,7 +544,9 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
     }
-    target_value = var.ecs_scaling_mem_threshold
+    target_value       = var.ecs_scaling_mem_threshold
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
   }
 }
 
@@ -516,9 +560,11 @@ resource "aws_ecs_capacity_provider" "apex" {
     managed_scaling {
       # maximum_scaling_step_size = 1000
       # minimum_scaling_step_size = 1
-      status          = "ENABLED"
-      target_capacity = var.ecs_target_capacity
+      status                 = "ENABLED"
+      target_capacity        = var.ecs_target_capacity
+      instance_warmup_period = var.ec2_instance_warmup_period
     }
+    managed_draining = "ENABLED"
   }
 }
 
@@ -527,3 +573,4 @@ resource "aws_ecs_cluster_capacity_providers" "apex" {
 
   capacity_providers = [aws_ecs_capacity_provider.apex.name]
 }
+

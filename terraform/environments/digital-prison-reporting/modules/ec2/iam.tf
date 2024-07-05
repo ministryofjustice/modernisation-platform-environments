@@ -58,27 +58,6 @@ data "aws_iam_policy_document" "kinesis-data-stream" {
   }
 }
 
-## Kines Data Stream CW and KMS Policy
-resource "aws_iam_policy" "kinesis-cw-kms-developer" {
-  name        = "${var.name}-cw-kms-developer"
-  description = "Kinesis Data Stream CW KMS Developer Policy"
-  path        = "/"
-
-  policy = data.aws_iam_policy_document.kinesis-cloudwatch-kms.json
-}
-
-data "aws_iam_policy_document" "kinesis-cloudwatch-kms" {
-  statement {
-    actions = [
-      "cloudwatch:PutMetricData",
-      "kms:*",
-    ]
-    resources = [
-      "*"
-    ]
-  }
-}
-
 ## DMS Policy
 resource "aws_iam_policy" "dms" {
   name        = "${var.name}-dms-service-access"
@@ -209,6 +188,39 @@ data "aws_iam_policy_document" "glue-access" {
   }
 }
 
+## EC2 Generic Role
+resource "aws_iam_policy" "generic" {
+  name        = "${var.name}-generic-policy"
+  description = "AWS Generic Policy for EC2 Agent"
+  path        = "/"
+
+  policy = data.aws_iam_policy_document.generic.json
+}
+
+data "aws_iam_policy_document" "generic" {
+  statement {
+    actions = [
+      "ec2:Describe*",
+      "ec2:Get*",
+      "ec2:List*",
+      "ec2:AssignPrivateIpAddresses",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "cloudwatch:PutMetricData",
+      "kms:*",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
 ## Dynamo Access Policy
 resource "aws_iam_policy" "dynamodb-access" {
   name        = "${var.name}-dynamodb-access"
@@ -255,6 +267,11 @@ data "aws_iam_policy_document" "dynamo-access" {
   }
 }
 
+resource "aws_iam_role_policy_attachment" "generic" {
+  role       = aws_iam_role.kinesis-agent-instance-role.name
+  policy_arn = aws_iam_policy.generic.arn
+}
+
 resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
   name = "${var.name}-profile"
   role = aws_iam_role.kinesis-agent-instance-role.name
@@ -275,10 +292,10 @@ resource "aws_iam_role_policy_attachment" "dynamo-access" {
   policy_arn = aws_iam_policy.dynamodb-access.arn
 }
 
-resource "aws_iam_role_policy_attachment" "cloudwatch-kms" {
-  role       = aws_iam_role.kinesis-agent-instance-role.name
-  policy_arn = aws_iam_policy.kinesis-cw-kms-developer.arn
-}
+#resource "aws_iam_role_policy_attachment" "cloudwatch-kms" {
+#  role       = aws_iam_role.kinesis-agent-instance-role.name
+#  policy_arn = aws_iam_policy.kinesis-cw-kms-developer.arn
+#}
 
 resource "aws_iam_role_policy_attachment" "dms" {
   role       = aws_iam_role.kinesis-agent-instance-role.name

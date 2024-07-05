@@ -1,0 +1,36 @@
+---
+schemaVersion: "2.2"
+description: SSM Document for updating configuration management on linux servers using ansible
+parameters:
+  branch:
+    type: String
+    description: Which branch of modernisation-platform-configuration-management to use
+    default: main
+  ansibleArgs:
+    type: String
+    description: Any additional parameters to pass to ansible
+    default: site.yml --tags ec2patch
+mainSteps:
+  - name: LinuxAnsibleConfigurationManagement
+    action: aws:runShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Linux
+    inputs:
+      runCommand:
+        - |
+          set -eo pipefail
+          run_ansible() {
+            tmpdir=/root/.ec2-configuration-management
+            branch="{{ branch }}"
+            ansibleArgs="{{ ansibleArgs }}"
+            sudo /bin/rm -rf $tmpdir 2>/dev/null || true
+            sudo mkdir $tmpdir 2>/dev/null || true
+            sudo curl -sS "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$branch/ansible/roles/ansible-script/files/ansible.sh" -o $tmpdir/ansible.sh
+            sudo chmod +x $tmpdir/ansible.sh
+            sudo ansible_dir=$tmpdir branch=$branch $tmpdir/ansible.sh $ansibleArgs
+          }
+          echo "Running ansible: check /var/log/messages on server or cloudwatch for logs"
+          run_ansible | logger -p local3.info -t ec2-configuration-management-ansible
+          echo "Great success: ansible completed without error"

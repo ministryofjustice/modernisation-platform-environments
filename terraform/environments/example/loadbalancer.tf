@@ -97,7 +97,7 @@ resource "aws_lb_listener" "external" {
   port              = local.application_data.accounts[local.environment].server_port
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol
   #checkov:skip=CKV_AWS_2: "protocol for lb set in application_variables"
-  ssl_policy = local.application_data.accounts[local.environment].lb_listener_protocol == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+  ssl_policy = local.application_data.accounts[local.environment].lb_listener_protocol == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
   #checkov:skip=CKV_AWS_103: "ssl_policy for lb set in application_variables"
 
   default_action {
@@ -182,7 +182,7 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
 #################################################################################
 ######################### S3 Bucket required for logs  ##########################
 #################################################################################
-module "s3-bucket-lb" { #tfsec:ignore:aws-s3-enable-versioning
+module "s3-bucket-lb" {                                                                                                           #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=568694e50e03630d99cb569eafa06a0b879a1239" #v7.1.0
 
   bucket_prefix      = "s3-bucket-example-lb"

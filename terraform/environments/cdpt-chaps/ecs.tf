@@ -3,6 +3,10 @@ data "aws_ecs_task_definition" "task_definition" {
   depends_on      = [aws_ecs_task_definition.chaps_task_definition]
 }
 
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized"
+}
+
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
 
@@ -204,7 +208,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   desired_capacity          = local.application_data.accounts[local.environment].ec2_desired_capacity
   max_size                  = local.application_data.accounts[local.environment].ec2_max_size
   min_size                  = local.application_data.accounts[local.environment].ec2_min_size
-  health_check_grace_period = 60
+  health_check_grace_period = 80
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
@@ -238,8 +242,7 @@ resource "aws_security_group" "cluster_ec2" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    cidr_blocks     = ["0.0.0.0/0"]
-    security_groups = [aws_security_group.chaps_lb_sc.id]
+    security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
   ingress {
@@ -251,12 +254,11 @@ resource "aws_security_group" "cluster_ec2" {
   }
 
   egress {
-    description     = "Cluster EC2 loadbalancer egress rule"
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-    security_groups = []
+    description = "Cluster EC2 loadbalancer egress rule"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = merge(
@@ -273,7 +275,7 @@ resource "aws_security_group" "cluster_ec2" {
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = local.application_data.accounts[local.environment].ami_image_id
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"] #local.application_data.accounts[local.environment].ami_image_id
   instance_type = local.application_data.accounts[local.environment].instance_type
   key_name      = "${local.application_name}-ec2"
   ebs_optimized = true
@@ -351,6 +353,11 @@ resource "aws_iam_role" "ec2_instance_role" {
     ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_policy_attachment" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role" "app_execution" {
@@ -465,7 +472,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.chaps_lb_sc.id]
+    security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
   egress {
@@ -527,4 +534,9 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
 resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
   name           = "${local.application_name}-log-stream"
   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+}
+
+output "ami_id" {
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  sensitive = true
 }

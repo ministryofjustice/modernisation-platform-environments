@@ -12,9 +12,6 @@ resource "aws_efs_file_system" "this" {
     { Name = var.name },
     var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
   )
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 # module for mount target
@@ -23,9 +20,6 @@ resource "aws_efs_mount_target" "this" {
   file_system_id  = aws_efs_file_system.this.id
   subnet_id       = each.value
   security_groups = [aws_security_group.default.id]
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 # module for efs access point
@@ -40,9 +34,6 @@ resource "aws_efs_access_point" "ldap" {
       Name = "${var.env_name}-${var.name}-efs-access-point"
     }
   )
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 # Security Group

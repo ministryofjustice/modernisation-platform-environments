@@ -16,7 +16,7 @@ module "oracle_db_shared" {
   platform_vars      = var.platform_vars
   env_name           = var.env_name
   tags               = local.tags
-  public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
+  public_keys        = local.db_public_key_data.keys[var.env_name]
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
@@ -25,7 +25,6 @@ module "oracle_db_shared" {
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
-
 }
 
 module "oracle_db_primary" {
@@ -56,7 +55,7 @@ module "oracle_db_primary" {
   subnet_id          = var.account_config.ordered_private_subnet_ids[count.index % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, count.index % 3, "a")}"
 
-  tags = local.tags
+  tags = merge(local.tags, { "Patch Group" = "oracle_db_patchgroup" })
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.db_config.ansible_user_data_config
@@ -67,6 +66,8 @@ module "oracle_db_primary" {
   ssh_keys_bucket_name = module.oracle_db_shared.ssh_keys_bucket_name
 
   instance_profile_policies = local.instance_policies
+
+  sns_topic_arn = aws_sns_topic.delius_core_alarms.arn
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -104,7 +105,7 @@ module "oracle_db_standby" {
   environment_config = var.environment_config
   subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_primary)) % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_primary)) % 3, "a")}"
-  tags               = local.tags
+  tags               = merge(local.tags, { "Patch Group" = "oracle_db_patchgroup" })
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.db_config.ansible_user_data_config
@@ -116,7 +117,31 @@ module "oracle_db_standby" {
 
   instance_profile_policies = local.instance_policies
 
+  sns_topic_arn = aws_sns_topic.delius_core_alarms.arn
+
   providers = {
     aws.core-vpc = aws.core-vpc
   }
+}
+
+# Allow Access To Delius Core Application Secret From MIS Primary EC2 Instance Role
+
+data "aws_iam_policy_document" "database_application_passwords" {
+  count = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
+  statement {
+    sid    = "MisAWSAccountToReadTheSecret"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.platform_vars.environment_management.account_ids[join("-", ["delius-mis", var.account_info.mp_environment])]}:role/instance-role-delius-mis-${var.env_name}-mis-db-1"]
+    }
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [module.oracle_db_shared.database_application_passwords_secret_arn]
+  }
+}
+
+resource "aws_secretsmanager_secret_policy" "database_application_passwords" {
+  count      = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
+  secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
+  policy     = data.aws_iam_policy_document.database_application_passwords[0].json
 }

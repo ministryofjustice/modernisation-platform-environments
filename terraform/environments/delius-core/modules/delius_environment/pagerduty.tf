@@ -1,13 +1,7 @@
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "delius_core_alarms" {
-  name = var.sns_topic_name
-
-  tags = merge(
-    var.tags,
-    {
-      Name = "${var.app_name}-${var.env_name}-sns-topic"
-    }
-  )
+  name = "delius-core-${var.env_name}-alarms-topic"
+  tags = var.tags
 }
 
 # link the sns topic to the service

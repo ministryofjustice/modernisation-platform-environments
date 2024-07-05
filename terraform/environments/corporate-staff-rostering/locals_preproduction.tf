@@ -1,29 +1,370 @@
-# csr-preproduction environment settings
 locals {
 
-  # cloudwatch monitoring config
-  preproduction_cloudwatch_monitoring_options = {}
-
-  # baseline config
-  preproduction_config = {
-
-    baseline_s3_buckets = {
-      csr-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-      }
+  baseline_presets_preproduction = {
+    options = {
     }
+  }
 
-    baseline_secretsmanager_secrets = {
-      "/oracle/database/PPIWFM" = {
-        secrets = {
-          passwords = { description = "database passwords" }
+  # please keep resources in alphabetical order
+  baseline_preproduction = {
+
+    ec2_instances = {
+      pp-csr-db-a = merge(local.defaults_database_ec2, {
+        config = merge(local.defaults_database_ec2.config, {
+          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
+          "/dev/sda1" = { label = "root", size = 30 }
+          "/dev/sdb"  = { label = "app", size = 100 } # /u01
+          "/dev/sdc"  = { label = "app", size = 100 } # /u02
+        })
+        ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
+          data  = { total_size = 1500 }
+          flash = { total_size = 100 }
+        })
+        instance = merge(local.defaults_database_ec2.instance, {
+        })
+        tags = merge(local.defaults_database_ec2.tags, {
+          pre-migration = "PPCDL00019"
+          description   = "PP CSR DB server"
+          server-type   = "csr-db"
+          oracle-sids   = "PPIWFM"
+        })
+      })
+
+      pp-csr-a-13-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-13-a"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
         }
-      }
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          pre-migration = "PPCAW00013"
+          description   = "Application Server Region 1"
+          ami           = "pp-csr-a-13-a"
+        })
+      })
+
+      pp-csr-a-14-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-14-b"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 56 }
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          pre-migration = "PPCAW00014"
+          description   = "Application Server Region 2"
+          ami           = "pp-csr-a-14-b"
+        })
+      })
+
+      pp-csr-a-17-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-17-a"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          pre-migration = "PPCAW00017"
+          description   = "Application Server Region 3"
+          ami           = "pp-csr-a-17-a"
+        })
+      })
+
+      pp-csr-a-18-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-18-b"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 128 }
+          "/dev/sdc"  = { type = "gp3", size = 56 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          pre-migration = "PPCAW00018"
+          description   = "Application Server Region 4"
+          ami           = "pp-csr-a-18-b"
+        })
+      })
+
+      pp-csr-a-2-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-2-b"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          pre-migration = "PPCAW00002"
+          description   = "Application Server Region 5"
+          ami           = "pp-csr-a-2-b"
+        })
+      })
+
+      pp-csr-a-3-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-3-a"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          pre-migration = "PPCAW00003"
+          description   = "Application Server Region 6"
+          ami           = "pp-csr-a-3-a"
+        })
+      })
+
+      pp-csr-a-15-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-15-a"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          pre-migration = "PPCAW00015"
+          description   = "Application Server Training A"
+          ami           = "pp-csr-a-15-a"
+        })
+      })
+
+      pp-csr-a-16-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-csr-a-16-b"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 128 }
+          "/dev/sdd"  = { type = "gp3", size = 128 }
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          pre-migration = "PPCAW00016"
+          description   = "Application Server Training B"
+          ami           = "pp-csr-a-16-b"
+        })
+      })
+
+      pp-csr-w-1-a = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "PPCWW00001"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
+        }
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
+          pre-migration = "PPCWW00001"
+          description   = "Web Server Region 1 and 2"
+          ami           = "PPCWW00001"
+        })
+      })
+
+      pp-csr-w-2-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-2-b"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 129 }
+          "/dev/sdc"  = { type = "gp3", size = 56 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
+        }
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
+          pre-migration = "PPCWW00002"
+          description   = "Web Server Region 1 and 2"
+          ami           = "pp-csr-w-2-b"
+        })
+      })
+
+      pp-csr-w-5-a = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "PPCWW00005"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+        }
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
+          pre-migration = "PPCWW00005"
+          description   = "Web Server Region 3 and 4"
+          ami           = "PPCWW00005"
+        })
+      })
+
+      pp-csr-w-6-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-6-b"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
+        }
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
+          pre-migration = "PPCWW00006"
+          description   = "Web Server Region 3 and 4"
+          ami           = "pp-csr-w-6-b"
+        })
+      })
+
+      pp-csr-w-7-a = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-8-b"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 200 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
+          pre-migration = "PPCWW00007"
+          description   = "Web Server Region 5 and 6"
+          ami           = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
+        })
+      })
+
+      pp-csr-w-8-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-8-b"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 200 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+        }
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
+          pre-migration = "PPCWW00008"
+          description   = "Web Server Region 5 and 6"
+          ami           = "pp-csr-w-8-b"
+        })
+      })
+
+      pp-csr-w-3-a = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-3-a"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 129 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 56 }
+        }
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
+          pre-migration = "PPCWW00003"
+          description   = "Web Server Training A and B"
+          ami           = "pp-csr-w-3-a"
+        })
+      })
+
+      pp-csr-w-4-b = merge(local.defaults_web_ec2, {
+        config = merge(local.defaults_web_ec2.config, {
+          ami_name          = "pp-csr-w-4-b"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb"  = { type = "gp3", size = 56 }
+          "/dev/sdc"  = { type = "gp3", size = 129 }
+          "/dev/sdd"  = { type = "gp3", size = 129 }
+        }
+        instance = merge(local.defaults_web_ec2.instance, {
+          instance_type = "m5.2xlarge"
+        })
+        tags = merge(local.defaults_web_ec2.tags, {
+          pre-migration = "PPCWW00004"
+          description   = "Web Server Training A and B"
+          ami           = "pp-csr-w-4-b"
+        })
+      })
     }
 
-
-    baseline_iam_policies = {
+    iam_policies = {
       Ec2PreprodDatabasePolicy = {
         description = "Permissions required for Preprod Database EC2s"
         statements = [
@@ -63,484 +404,10 @@ locals {
       }
     }
 
-    baseline_ec2_instances = {
-      pp-csr-db-a = merge(local.defaults_database_ec2, {
-        config = merge(local.defaults_database_ec2.config, {
-          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
-          availability_zone = "${local.region}a"
-          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
-            "Ec2PreprodDatabasePolicy",
-          ])
-        })
-        cloudwatch_metric_alarms = local.ec2_cloudwatch_metric_alarms.database # inc. ec2_instance_cwagent_collectd_oracle_db_backup alarms
-        instance = merge(local.defaults_database_ec2.instance, {
-          instance_type                = "r6i.xlarge"
-          metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-          disable_api_termination      = true
-          disable_api_stop             = true
-        })
-
-        ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
-          "/dev/sda1" = { label = "root", size = 30 }
-          "/dev/sdb"  = { label = "app", size = 100 } # /u01
-          "/dev/sdc"  = { label = "app", size = 100 } # /u02
-        })
-
-        ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
-          data = {
-            iops       = 3000
-            throughput = 125
-            total_size = 1500
-          }
-          flash = {
-            iops       = 3000
-            throughput = 125
-            total_size = 100
-          }
-        })
-
-        secretsmanager_secrets = module.baseline_presets.ec2_instance.secretsmanager_secrets.oracle_19c
-
-        tags = {
-          pre-migration = "PPCDL00019"
-          description   = "PP CSR DB server"
-          ami           = "base_ol_8_5"
-          os-type       = "Linux"
-          component     = "test"
-          server-type   = "csr-db"
-          oracle-sids   = "PPIWFM"
-        }
-      })
-
-      pp-csr-a-13-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-csr-a-13-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdd"  = { type = "gp3", size = 128 }
-          "/dev/sdc"  = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          pre-migration = "PPCAW00013"
-          description   = "Application Server Region 1"
-          os-type       = "Windows"
-          ami           = "pp-csr-a-13-a"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-a-14-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-csr-a-14-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 128 }
-          "/dev/sdc"  = { type = "gp3", size = 128 }
-          "/dev/sdd"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          pre-migration = "PPCAW00014"
-          description   = "Application Server Region 2"
-          os-type       = "Windows"
-          ami           = "pp-csr-a-14-b"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-a-17-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-csr-a-17-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-          "/dev/sdc"  = { type = "gp3", size = 128 }
-          "/dev/sdd"  = { type = "gp3", size = 128 }
-        }
-        tags = {
-          pre-migration = "PPCAW00017"
-          description   = "Application Server Region 3"
-          os-type       = "Windows"
-          ami           = "pp-csr-a-17-a"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-a-18-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-csr-a-18-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 128 }
-          "/dev/sdc"  = { type = "gp3", size = 56 }
-          "/dev/sdd"  = { type = "gp3", size = 128 }
-        }
-        tags = {
-          pre-migration = "PPCAW00018"
-          description   = "Application Server Region 4"
-          os-type       = "Windows"
-          ami           = "pp-csr-a-18-b"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-a-2-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-csr-a-2-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          pre-migration = "PPCAW00002"
-          description   = "Application Server Region 5"
-          os-type       = "Windows"
-          ami           = "pp-csr-a-2-b"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-a-3-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-csr-a-3-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          pre-migration = "PPCAW00003"
-          description   = "Application Server Region 6"
-          os-type       = "Windows"
-          ami           = "pp-csr-a-3-a"
-          component     = "app"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-a-15-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-csr-a-15-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-          "/dev/sdc"  = { type = "gp3", size = 128 }
-          "/dev/sdd"  = { type = "gp3", size = 128 }
-        }
-        tags = {
-          pre-migration = "PPCAW00015"
-          description   = "Application Server Training A"
-          os-type       = "Windows"
-          ami           = "pp-csr-a-15-a"
-          component     = "trainingA"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-a-16-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-csr-a-16-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-          "/dev/sdc"  = { type = "gp3", size = 128 }
-          "/dev/sdd"  = { type = "gp3", size = 128 }
-        }
-        tags = {
-          pre-migration = "PPCAW00016"
-          description   = "Application Server Training B"
-          os-type       = "Windows"
-          ami           = "pp-csr-a-16-b"
-          component     = "trainingB"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-w-1-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "PPCWW00001"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-          "/dev/sdc"  = { type = "gp3", size = 129 }
-          "/dev/sdd"  = { type = "gp3", size = 129 }
-        }
-        tags = {
-          pre-migration = "PPCWW00001"
-          description   = "Web Server Region 1 and 2"
-          os-type       = "Windows"
-          ami           = "PPCWW00001"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-w-2-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-csr-w-2-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 129 }
-          "/dev/sdc"  = { type = "gp3", size = 56 }
-          "/dev/sdd"  = { type = "gp3", size = 129 }
-        }
-        tags = {
-          pre-migration = "PPCWW00002"
-          description   = "Web Server Region 1 and 2"
-          os-type       = "Windows"
-          ami           = "pp-csr-w-2-b"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-w-5-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "PPCWW00005"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-          "/dev/sdc"  = { type = "gp3", size = 129 }
-        }
-        tags = {
-          pre-migration = "PPCWW00005"
-          description   = "Web Server Region 3 and 4"
-          os-type       = "Windows"
-          ami           = "PPCWW00005"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-w-6-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-csr-w-6-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-          "/dev/sdc"  = { type = "gp3", size = 129 }
-          "/dev/sdd"  = { type = "gp3", size = 129 }
-        }
-        tags = {
-          pre-migration = "PPCWW00006"
-          description   = "Web Server Region 3 and 4"
-          os-type       = "Windows"
-          ami           = "pp-csr-w-6-b"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-w-7-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-csr-w-8-b"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 200 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          pre-migration = "PPCWW00007"
-          description   = "Web Server Region 5 and 6"
-          os-type       = "Windows"
-          ami           = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-w-8-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-csr-w-8-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 200 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          pre-migration = "PPCWW00008"
-          description   = "Web Server Region 5 and 6"
-          os-type       = "Windows"
-          ami           = "pp-csr-w-8-b"
-          component     = "web"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-w-3-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-csr-w-3-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 129 }
-          "/dev/sdc"  = { type = "gp3", size = 129 }
-          "/dev/sdd"  = { type = "gp3", size = 56 }
-        }
-        tags = {
-          pre-migration = "PPCWW00003"
-          description   = "Web Server Training A and B"
-          os-type       = "Windows"
-          ami           = "pp-csr-w-3-a"
-          component     = "trainingab"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-
-      pp-csr-w-4-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
-          ami_name          = "pp-csr-w-4-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "m5.2xlarge"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb"  = { type = "gp3", size = 56 }
-          "/dev/sdc"  = { type = "gp3", size = 129 }
-          "/dev/sdd"  = { type = "gp3", size = 129 }
-        }
-        tags = {
-          pre-migration = "PPCWW00004"
-          description   = "Web Server Training A and B"
-          os-type       = "Windows"
-          ami           = "pp-csr-w-4-b"
-          component     = "trainingab"
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-      })
-    }
-
-
-    baseline_lbs = {
+    lbs = {
       r12 = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
@@ -664,7 +531,6 @@ locals {
         }
 
         listeners = {
-
           http = {
             port     = 80
             protocol = "TCP"
@@ -682,7 +548,6 @@ locals {
             }
           }
           http-7771 = {
-
             port     = 7771
             protocol = "TCP"
             default_action = {
@@ -710,7 +575,7 @@ locals {
       }
       r34 = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
@@ -878,7 +743,7 @@ locals {
       }
       r56 = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
@@ -1046,7 +911,7 @@ locals {
       }
       trainab = {
         internal_lb              = true
-        enable_delete_protection = false
+        enable_delete_protection = true
         load_balancer_type       = "network"
         force_destroy_bucket     = true
         subnets = [
@@ -1224,7 +1089,7 @@ locals {
       }
     }
 
-    baseline_route53_zones = {
+    route53_zones = {
       "pp.csr.service.justice.gov.uk" = {
         records = [
           # Set to IP of the Azure CSR PP DB in PPCDL00019
@@ -1244,8 +1109,13 @@ locals {
         ]
       }
     }
+
+    secretsmanager_secrets = {
+      "/oracle/database/PPIWFM" = {
+        secrets = {
+          passwords = { description = "database passwords" }
+        }
+      }
+    }
   }
 }
-
-
-

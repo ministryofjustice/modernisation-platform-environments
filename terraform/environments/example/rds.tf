@@ -24,26 +24,27 @@ resource "aws_db_instance" "example-rds" {
   username                   = local.application_data.accounts[local.environment].db_user
   password                   = aws_secretsmanager_secret_version.db_password.secret_string
   # tflint-ignore: aws_db_instance_default_parameter_group
-  parameter_group_name        = "default.mysql5.7"
-  skip_final_snapshot         = local.application_data.accounts[local.environment].skip_final_snapshot
-  allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
-  max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
-  maintenance_window          = local.application_data.accounts[local.environment].maintenance_window
-  allow_major_version_upgrade = local.application_data.accounts[local.environment].allow_major_version_upgrade
-  backup_window               = local.application_data.accounts[local.environment].backup_window
-  backup_retention_period     = local.application_data.accounts[local.environment].retention_period
+  parameter_group_name                = "default.mysql5.7"
+  skip_final_snapshot                 = local.application_data.accounts[local.environment].skip_final_snapshot
+  allocated_storage                   = local.application_data.accounts[local.environment].db_allocated_storage
+  max_allocated_storage               = local.application_data.accounts[local.environment].db_max_allocated_storage
+  maintenance_window                  = local.application_data.accounts[local.environment].maintenance_window
+  allow_major_version_upgrade         = local.application_data.accounts[local.environment].allow_major_version_upgrade
+  backup_window                       = local.application_data.accounts[local.environment].backup_window
+  backup_retention_period             = local.application_data.accounts[local.environment].retention_period
   iam_database_authentication_enabled = local.application_data.accounts[local.environment].db_iam_database_authentication_enabled
-  multi_az = local.application_data.accounts[local.environment].db_multi_az
-  monitoring_interval = local.application_data.accounts[local.environment].db_monitoring_interval
-  monitoring_role_arn = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? "" : aws_iam_role.rds_enhanced_monitoring[0].arn
-  storage_encrypted               = true
-  db_subnet_group_name = aws_db_subnet_group.example.name
-  vpc_security_group_ids = [aws_security_group.rds-example.id]
-  performance_insights_enabled    = local.application_data.accounts[local.environment].db_performance_insights_enabled
-  performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
-  enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
+  multi_az                            = local.application_data.accounts[local.environment].db_multi_az
+  monitoring_interval                 = local.application_data.accounts[local.environment].db_monitoring_interval
+  monitoring_role_arn                 = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? "" : aws_iam_role.rds_enhanced_monitoring[0].arn
+  storage_encrypted                   = true
+  db_subnet_group_name                = aws_db_subnet_group.example.name
+  vpc_security_group_ids              = [aws_security_group.rds-example.id]
+  performance_insights_enabled        = local.application_data.accounts[local.environment].db_performance_insights_enabled
+  performance_insights_kms_key_id     = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
+  enabled_cloudwatch_logs_exports     = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-example", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-example", local.application_name, local.environment)) },
+    { instance-scheduling = "skip-scheduling" } # This is now managed by the flexible shutdown & startup workflow.
   )
 }
 
@@ -56,7 +57,7 @@ resource "aws_db_subnet_group" "example" {
 
 resource "aws_security_group" "rds-example" {
   description = "RDS Security Group"
-  vpc_id = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {

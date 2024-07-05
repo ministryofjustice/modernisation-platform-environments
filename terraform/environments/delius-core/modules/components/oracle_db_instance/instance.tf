@@ -59,5 +59,8 @@ module "instance" {
     { database = local.database_tag },
     var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
   )
-  #  cloudwatch_metric_alarms = {}
+
+  cloudwatch_metric_alarms = merge(
+    local.cloudwatch_metric_alarms.ec2
+  )
 }

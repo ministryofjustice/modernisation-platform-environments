@@ -174,6 +174,11 @@ variable "ga_4_tag_id_secret_name2" {
   description = "Parameter store secret name containing the Google Analytics 4 Tag Id - version 2 updated value"
 }
 
+variable "gtm_id_secret_name" {
+  type        = string
+  description = "Parameter store secret name containing the Google Tag Manager Id"
+}
+
 variable "ecs_target_capacity" {
   type        = string
   description = "The target value for the CloudWatch metric used in the Amazon ECS-managed target tracking scaling policy. For example, a value of 100 will result in the Amazon EC2 instances in your Auto Scaling group being completely utilized."

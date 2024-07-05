@@ -8,8 +8,8 @@ resource "aws_route53_record" "external_sandbox" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.external_sandbox[0].dns_name
-    zone_id                = aws_lb.external_sandbox[0].zone_id
+    name                   = aws_lb.external.dns_name
+    zone_id                = aws_lb.external.zone_id
     evaluate_target_health = true
   }
 }

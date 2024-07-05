@@ -18,7 +18,12 @@ RESOURCES_TO_CHECK_FOR=(
   "aws_route_table"
   "aws_route_table_association"
   "aws_route",
-  "aws_iam_openid_connect_provider"
+  "aws_iam_openid_connect_provider",
+  "aws_cloudformation_stack",
+  "aws_cloudformation_stack_set",
+  "aws_cloudformation_stack_set_instance",
+  "aws_cloudformation_type",
+  "aws_ec2_transit_gateway_vpc_attachment"
 )
 
 resourcesFound=false

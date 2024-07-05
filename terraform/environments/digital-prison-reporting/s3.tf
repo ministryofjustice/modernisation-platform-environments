@@ -57,3 +57,23 @@ module "s3_domain_preview_bucket" {
     }
   )
 }
+
+# S3 Structured Historical, DPR2-717
+module "s3_structured_historical_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-structured-historical-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false
+  enable_lifecycle          = true
+  cloudtrail_access_policy  = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-structured-historical-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-717"
+    }
+  )
+}

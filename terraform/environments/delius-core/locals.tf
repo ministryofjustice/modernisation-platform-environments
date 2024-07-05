@@ -13,7 +13,7 @@ locals {
   delius_environments_per_account = {
     # account = [env1, env2]
     prod     = []
-    pre_prod = []
+    pre_prod = ["stage", "preprod"]
     test     = ["test"]
     dev      = ["dev"]
   }

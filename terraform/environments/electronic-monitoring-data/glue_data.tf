@@ -73,7 +73,26 @@ data "aws_iam_policy_document" "dms_dv_athena_iam_policy_document" {
       "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:workgroup/primary",
       "arn:aws:athena:eu-west-2:${local.modernisation_platform_account_id}:datacatalog/dms_data_validation/*",
       "arn:aws:athena:eu-west-2:800964199911:workgroup/primary",
-      "arn:aws:athena:eu-west-2:800964199911:datacatalog/dms_data_validation/*"
+      "arn:aws:athena:eu-west-2:800964199911:datacatalog/dms_data_validation/*",
+      "arn:aws:athena:eu-west-2:976799291502:workgroup/primary",
+      "arn:aws:athena:eu-west-2:976799291502:datacatalog/dms_data_validation/*"
     ]
+  }
+}
+
+data "aws_iam_policy_document" "glue_notebook_ec2_iam_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeVpcEndpoints",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcAttribute",
+      "ec2:DescribeRouteTables",
+      "ec2:DescribeSecurityGroups"
+    ]
+    resources = ["*"]
   }
 }

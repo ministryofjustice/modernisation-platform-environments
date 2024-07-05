@@ -142,6 +142,11 @@ variable "ecs_target_capacity" {
   description = "The target value for the CloudWatch metric used in the Amazon ECS-managed target tracking scaling policy. For example, a value of 100 will result in the Amazon EC2 instances in your Auto Scaling group being completely utilized."
 }
 
+variable "ec2_instance_warmup_period" {
+  type        = string
+  description = "Period of time, in seconds, after a newly launched Amazon EC2 instance can contribute to CloudWatch metrics for Auto Scaling group for the Capacity Provider."
+}
+
 variable "lb_tg_arn" {
   type        = string
   description = "Load balancer target group ARN used by ECS service"
@@ -150,4 +155,14 @@ variable "lb_tg_arn" {
 variable "server_port" {
   type        = string
   description = "The port the containers will be listening on"
+}
+
+variable "log_group_kms_key" {
+  type        = string
+  description = "The key ARN for CloudWatch Log Group encryption"
+}
+
+variable "database_tad_password_arn" {
+  type        = string
+  description = "The ARN of the APEX TAD database password"
 }

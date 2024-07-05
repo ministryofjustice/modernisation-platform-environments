@@ -69,6 +69,9 @@ env:
   ENVIRONMENT_MANAGEMENT: "${{ secrets.modernisation_platform_environments }}"
   GITHUB_TOKEN: "${{ secrets.pipeline_github_token }}"
 
+concurrency:
+  group: ${{ inputs.application }}-${{ inputs.environment }}
+
 jobs:
   plan:
     name: "plan"
@@ -92,11 +95,13 @@ jobs:
       - name: Get AWS Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Get Backend AWS Account Number
         run: |
           BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$BACKEND_NUMBER"
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
@@ -255,7 +260,8 @@ jobs:
               owner: owner,
               repo: repo,
               issue_number: context.payload.pull_request.number,
-              body: `@${context.actor} Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance`
+              body: `@${context.actor} Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance\n
+              Guidance on approving these PRs is available at https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/reviewing-mp-environments-prs.html#process-for-approving-prs`
             });
 
   apply:
@@ -271,11 +277,13 @@ jobs:
       - name: Get AWS Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Get Backend AWS Account Number
         run: |
           BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$BACKEND_NUMBER"
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials

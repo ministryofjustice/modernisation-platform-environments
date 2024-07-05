@@ -1,6 +1,7 @@
 locals {
 
   iam_policies_filter = distinct(flatten([
+    var.options.enable_offloc_sync ? ["OfflocSyncPolicy"] : [],
     var.options.enable_azure_sas_token ? ["SasTokenRotatorPolicy"] : [],
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_hmpps_domain ? ["HmppsDomainSecretsPolicy"] : [],
@@ -8,9 +9,10 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_delius_dba_secrets_access ? ["DeliusDbaSecretsPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
-    var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_s3_shared_bucket ? ["Ec2AccessSharedS3Policy"] : [],
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
+    var.options.enable_vmimport ? ["vmimportPolicy"] : [],
     var.options.iam_policies_filter,
     "EC2Default",
     "EC2Db",
@@ -34,10 +36,9 @@ locals {
     var.options.enable_business_unit_kms_cmks ? local.iam_policy_statements_ec2.business_unit_kms_cmk : [],
     var.options.enable_ec2_cloud_watch_agent ? local.iam_policy_statements_ec2.CloudWatchAgentServerReduced : [],
     var.options.enable_ec2_self_provision ? local.iam_policy_statements_ec2.Ec2SelfProvision : [],
-    var.options.enable_shared_s3 ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
+    var.options.enable_s3_shared_bucket ? local.iam_policy_statements_ec2.S3ReadSharedWrite : [],
     var.options.enable_ec2_reduced_ssm_policy ? local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? local.iam_policy_statements_ec2.OracleEnterpriseManagedServer : [],
-    var.options.iam_policy_statements_ec2_default
   ])
 
   oem_account_id = try(var.environment.account_ids["hmpps-oem-${var.environment.environment}"], "OemAccountNotFound")
@@ -55,7 +56,7 @@ locals {
       statements = flatten([
         local.iam_policy_statements_in_ec2_default,
         local.iam_policy_statements_ec2.OracleLicenseTracking,
-        var.options.db_backup_s3 ? local.iam_policy_statements_ec2.S3DbBackupRead : [],
+        var.options.enable_s3_db_backup_bucket ? local.iam_policy_statements_ec2.S3DbBackupRead : [],
       ])
     }
 
@@ -153,10 +154,94 @@ locals {
         },
       ]
     }
+    OfflocSyncPolicy = {
+      description = "Permissions required for Offloc Sync"
+      statements = [
+        {
+          sid    = "OfflocSync"
+          effect = "Allow"
+          actions = [
+            "ssm:GetParameter",
+            "ssm:PutParameter",
+          ]
+          resources = [
+            "arn:aws:ssm:${var.environment.region}:${var.environment.account_id}:parameter/*",
+          ]
+        },
+        {
+          sid    = "EncryptSecrets"
+          effect = "Allow"
+          actions = [
+            "kms:Encrypt",
+            "kms:Decrypt",
+          ]
+          resources = [
+            var.environment.kms_keys["general"].arn
+          ]
+        },
+        {
+          sid    = "AllowS3ReadWrite"
+          effect = "Allow"
+          actions = [
+            "s3:GetObject",
+            "s3:PutObject",
+            "s3:DeleteObject",
+            "s3:ListBucket",
+          ]
+          resources = [
+            "arn:aws:s3:::*",
+          ]
+        }
+      ]
+    }
 
     SSMManagedInstanceCoreReducedPolicy = {
       description = "AmazonSSMManagedInstanceCore minus GetParameters"
       statements  = local.iam_policy_statements_ec2.SSMManagedInstanceCoreReduced
     }
+
+    vmimportPolicy = {
+      description = "vm import permissions"
+      statements = [
+        {
+          effect = "Allow"
+          actions = [
+            "s3:GetBucketLocation",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:PutObject",
+            "s3:GetBucketAcl"
+          ],
+          resources = [
+            "arn:aws:s3:::*",
+            "arn:aws:s3:::*/*",
+            "arn:aws:s3:::*/*/*"
+          ]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "ec2:ModifySnapshotAttribute",
+            "ec2:CopySnapshot",
+            "ec2:RegisterImage",
+            "ec2:Describe*"
+          ],
+          resources = ["*"]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "kms:CreateGrant",
+            "kms:Decrypt",
+            "kms:DescribeKey",
+            "kms:Encrypt",
+            "kms:GenerateDataKey*",
+            "kms:ReEncrypt*"
+          ],
+          resources = ["*"]
+        }
+      ]
+    }
+
   }
 }

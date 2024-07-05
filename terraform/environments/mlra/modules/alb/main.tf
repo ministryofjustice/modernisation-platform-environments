@@ -1,4 +1,3 @@
-
 locals {
 
   loadbalancer_ingress_rules = {
@@ -120,8 +119,9 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 
 # Terraform module which creates S3 Bucket resources for Load Balancer Access Logs on AWS.
-
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 module "s3-bucket" {
+  #checkov:skip=CKV_TF_1:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   count  = var.existing_bucket_name == "" ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
@@ -282,10 +282,11 @@ resource "aws_security_group" "lb" {
   dynamic "egress" {
     for_each = local.loadbalancer_egress_rules
     content {
-      description     = lookup(egress.value, "description", null)
-      from_port       = lookup(egress.value, "from_port", null)
-      to_port         = lookup(egress.value, "to_port", null)
-      protocol        = lookup(egress.value, "protocol", null)
+      description = lookup(egress.value, "description", null)
+      from_port   = lookup(egress.value, "from_port", null)
+      to_port     = lookup(egress.value, "to_port", null)
+      protocol    = lookup(egress.value, "protocol", null)
+      #tfsec:ignore:AVD-AWS-0104:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
       cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
       security_groups = lookup(egress.value, "security_groups", null)
     }
@@ -293,14 +294,14 @@ resource "aws_security_group" "lb" {
 }
 
 ## Cloudfront
-
-
-resource "random_password" "cloudfront" {
+resource "random_password" "cloudfront" { # tflint-ignore: terraform_required_providers
   length  = 16
   special = false
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
+  #checkov:skip=CKV2_AWS_57:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_149:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
@@ -320,9 +321,14 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
   secret_id = data.aws_secretsmanager_secret.cloudfront.arn
 }
 
-# TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP? Yes for now
-
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-development in laa-dev
+  #checkov:skip=CKV_AWS_18:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_21:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_144:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_145:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_61:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_62:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
   # force_destroy = true # Enable to recreate bucket deleting everything inside
   tags = merge(
@@ -337,14 +343,18 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
   }
 }
 
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_ownership_controls" "cloudfront" {
+  #checkov:skip=CKV2_AWS_65:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.cloudfront.id
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
+  #checkov:skip=CKV2_AWS_67:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.cloudfront.id
   rule {
     apply_server_side_encryption_by_default {
@@ -357,6 +367,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
   }
 }
 
+#tfsec:ignore:AVD-AWS-0132:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_s3_bucket_public_access_block" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
 
@@ -370,7 +381,13 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   }
 }
 
+#tfsec:ignore:AVD-AWS-0013:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_cloudfront_distribution" "external" {
+  #checkov:skip=CKV2_AWS_32:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_46:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV2_AWS_47:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_305:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+  #checkov:skip=CKV_AWS_310:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   http_version = var.cloudfront_http_version
   origin {
     domain_name = aws_lb.loadbalancer.dns_name
@@ -501,6 +518,7 @@ resource "aws_waf_rule" "block" {
 }
 
 resource "aws_waf_web_acl" "waf_acl" {
+  #checkov:skip=CKV_AWS_176:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name        = "${upper(var.application_name)} Whitelisting Requesters"
   metric_name = "${upper(var.application_name)}WhitelistingRequesters"
   default_action {
@@ -529,19 +547,18 @@ resource "aws_waf_web_acl" "waf_acl" {
 
 # TODO This resource is required because otherwise Error: failed to read schema for module.alb.null_resource.always_run in registry.terraform.io/hashicorp/null: failed to instantiate provider
 # When the whole stack is recreated this can be removed
-resource "null_resource" "always_run" {
+resource "null_resource" "always_run" { # tflint-ignore: terraform_required_providers
 }
 
 
 
 resource "aws_lb_listener" "alb_listener" {
-
+  #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   load_balancer_arn = aws_lb.loadbalancer.arn
   port              = var.listener_port
-  #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
-  protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
-  ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
-  certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
+  protocol          = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
+  ssl_policy        = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
+  certificate_arn   = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
   default_action {
     type = "fixed-response"
@@ -647,20 +664,63 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 }
 
+resource "aws_athena_database" "cloudfront-access-logs" {
+  name   = "cloudfront_access_logs"
+  bucket = aws_s3_bucket.cloudfront.id
+  encryption_configuration {
+    encryption_option = "SSE_S3"
+  }
+}
+
+resource "aws_athena_named_query" "cloudfront_query" {
+  name     = "${var.application_name}-create-cloudfront-logs-table"
+  database = aws_athena_database.cloudfront-access-logs.name
+  query = templatefile(
+    "${path.module}/templates/create_cloudfront_logs_table.sql",
+    {
+      bucket     = aws_s3_bucket.cloudfront.id
+      account_id = var.account_number
+      region     = var.region
+    }
+  )
+}
+
+resource "aws_athena_workgroup" "cloudfront-logs" {
+  name = "${var.application_name}-cloudfront-logs"
+
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${aws_s3_bucket.cloudfront.id}/output/"
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+    }
+  }
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.application_name}-cloudfront-access-logs"
+    }
+  )
+
+}
+
 
 
 ####### Certificates, Cert Validations & Route53 #######
 
 
 ## External LB Cert
-
 resource "aws_acm_certificate" "external_lb" {
-
+  #checkov:skip=CKV_AWS_233:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   domain_name               = var.acm_cert_domain_name
   validation_method         = "DNS"
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
   tags                      = var.tags
-  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
     prevent_destroy = false
   }
@@ -743,14 +803,13 @@ resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
 
 ######## Cloudfront Cert
 
-
 resource "aws_acm_certificate" "cloudfront" {
+  #checkov:skip=CKV_AWS_233:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   domain_name               = var.acm_cert_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
   tags                      = var.tags
-  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
     prevent_destroy = false
   }

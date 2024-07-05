@@ -40,6 +40,7 @@ resource "aws_db_instance" "jitbit_sandbox" {
 
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.sqlserver-se-15.0"
+  ca_cert_identifier          = local.application_data.accounts["sandbox"].db_ca_cert_identifier
   deletion_protection         = local.application_data.accounts["sandbox"].db_deletion_protection
   delete_automated_backups    = local.application_data.accounts["sandbox"].db_delete_automated_backups
   skip_final_snapshot         = local.application_data.accounts["sandbox"].db_skip_final_snapshot

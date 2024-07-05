@@ -236,7 +236,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
       "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-04bbb6312b86648be",
       "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-00413756d2dfcf6d2",
       "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-080498c4c9d25e6bd",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-029d2b17679dab982"
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-029d2b17679dab982",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-70%-i-029d2b17679dab982",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-90%-i-029d2b17679dab982"
       ]
    }
  ]
@@ -250,13 +252,13 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_alarm_suppressio
   policy_arn = aws_iam_policy.iam_policy_for_lambda_alarm_suppression[0].arn
 }
 
-####################################################
-# IAM Role & Policy for Lambda Terminate CPU Process
-####################################################
+###########################################################
+# IAM Role & Policy for Cloudwatch - Lambda Functions - DEV
+###########################################################
 
-resource "aws_iam_role" "lambda_role_terminate_cpu_process" {
+resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_dev" {
   count              = local.is-development == true ? 1 : 0
-  name               = "PPUD_Lambda_Function_Role_Terminate_CPU_Process"
+  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Invoke_Lambda_Dev"
   assume_role_policy = <<EOF
 {
  "Version": "2012-10-17",
@@ -274,11 +276,11 @@ resource "aws_iam_role" "lambda_role_terminate_cpu_process" {
 EOF
 }
 
-resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process" {
+resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
   count       = local.is-development == true ? 1 : 0
-  name        = "aws_iam_policy_for_terraform_aws_lambda_role_terminate_cpu_process"
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_dev"
   path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role terminate cpu processes"
+  description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda development"
   policy      = <<EOF
 {
  "Version": "2012-10-17",
@@ -294,9 +296,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process" {
       ],
       "Resource": [
       "arn:aws:ssm:eu-west-2:075585660276:*",
-      "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:CPU-High-i-0b5c31ecda24ebc04",
-      "arn:aws:ec2:eu-west-2:075585660276:instance/i-0b5c31ecda24ebc04",
-      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
+      "arn:aws:cloudwatch:eu-west-2:075585660276:*",
+      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
+      "arn:aws:lambda:eu-west-2:075585660276:*",
+      "arn:aws:ec2:eu-west-2:075585660276:*"
       ]
    }
  ]
@@ -304,10 +307,132 @@ resource "aws_iam_policy" "iam_policy_for_lambda_terminate_cpu_process" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy_terminate_cpu_process_to_lambda_role_terminate_cpu_process" {
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev" {
   count      = local.is-development == true ? 1 : 0
-  role       = aws_iam_role.lambda_role_terminate_cpu_process[0].name
-  policy_arn = aws_iam_policy.iam_policy_for_lambda_terminate_cpu_process[0].arn
+  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_dev[0].arn
+}
+
+##########################################################
+# IAM Role & Policy for Lambda Terminate CPU Process - UAT
+##########################################################
+
+resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_uat" {
+  count              = local.is-preproduction == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Invoke_Lambda_UAT"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_uat"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda uat"
+  policy      = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+        "ssm:SendCommand",
+        "ssm:GetCommandInvocation",
+        "ec2:DescribeInstances",
+        "lambda:InvokeAsync",
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+      "arn:aws:ssm:eu-west-2:172753231260:*",
+      "arn:aws:cloudwatch:eu-west-2:172753231260:*",
+      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
+      "arn:aws:lambda:eu-west-2:172753231260:*",
+      "arn:aws:ec2:eu-west-2:172753231260:*"
+      ]
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat" {
+  count      = local.is-preproduction == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_uat[0].arn
+}
+
+###########################################################
+# IAM Role & Policy for Lambda Terminate CPU Process - PROD
+###########################################################
+
+resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Invoke_Lambda_PROD"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_prod"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda prod"
+  policy      = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+        "ssm:SendCommand",
+        "ssm:GetCommandInvocation",
+        "ec2:DescribeInstances",
+        "lambda:InvokeAsync",
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+      "arn:aws:ssm:eu-west-2:817985104434:*",
+      "arn:aws:cloudwatch:eu-west-2:817985104434:*",
+      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
+      "arn:aws:lambda:eu-west-2:817985104434:*",
+      "arn:aws:ec2:eu-west-2:817985104434:*"
+      ]
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_prod[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_prod[0].arn
 }
 
 ###################

@@ -1,11 +1,18 @@
-resource "aws_secretsmanager_secret" "delius_core_dba_passwords" {
+# Oracle Database DBA Secret
+
+resource "aws_secretsmanager_secret" "database_dba_passwords" {
   name        = local.dba_secret_name
   description = "DBA Users Credentials"
   kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
 }
 
-data "aws_iam_policy_document" "delius_core_dba_passwords" {
+moved {
+  from = aws_secretsmanager_secret.delius_core_dba_passwords
+  to   = aws_secretsmanager_secret.database_dba_passwords
+}
+
+data "aws_iam_policy_document" "database_dba_passwords" {
   statement {
     sid    = "OemAWSAccountToReadTheSecret"
     effect = "Allow"
@@ -18,34 +25,20 @@ data "aws_iam_policy_document" "delius_core_dba_passwords" {
   }
 }
 
-resource "aws_secretsmanager_secret_policy" "delius_core_dba_passwords" {
-  secret_arn = aws_secretsmanager_secret.delius_core_dba_passwords.arn
-  policy     = data.aws_iam_policy_document.delius_core_dba_passwords.json
+resource "aws_secretsmanager_secret_policy" "database_dba_passwords" {
+  secret_arn = aws_secretsmanager_secret.database_dba_passwords.arn
+  policy     = data.aws_iam_policy_document.database_dba_passwords.json
 }
 
-resource "aws_secretsmanager_secret_version" "delius_core_dba_passwords" {
-  secret_id     = aws_secretsmanager_secret.delius_core_dba_passwords.id
-  secret_string = "REPLACE"
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
-}
-
-resource "aws_secretsmanager_secret" "delius_core_application_passwords" {
+# Oracle Database Application Secret
+resource "aws_secretsmanager_secret" "database_application_passwords" {
   name        = local.application_secret_name
   description = "Application Users Credentials"
   kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
 }
 
-resource "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
-  secret_id     = aws_secretsmanager_secret.delius_core_application_passwords.id
-  secret_string = "REPLACE"
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
+moved {
+  from = aws_secretsmanager_secret.delius_core_application_passwords
+  to   = aws_secretsmanager_secret.database_application_passwords
 }

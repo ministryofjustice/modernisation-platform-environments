@@ -5,7 +5,19 @@ locals {
 
   application_secret_name = "${local.secret_prefix}-application-passwords"
 
+  dms_audit_endpoint_source_secret_name = "${local.secret_prefix}-dms-audit-endpoint-source"
+
+  dms_asm_endpoint_source_secret_name = "${local.secret_prefix}-dms-asm-endpoint-source"
+
+  dms_audit_endpoint_target_secret_name = "${local.secret_prefix}-dms-audit-endpoint-target"
+
   oem_account_id = var.platform_vars.environment_management.account_ids[join("-", ["hmpps-oem", var.account_info.mp_environment])]
+
+  mis_account_id = var.platform_vars.environment_management.account_ids[join("-", ["delius-mis", var.account_info.mp_environment])]
+
+  delius_account_id = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
+
+  has_mis_environment = lookup(var.environment_config, "has_mis_environment", false)
 
   oracle_statistics_map = {
     "dev" = {
@@ -16,14 +28,14 @@ locals {
       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
       "source_environment" = "dev"
     },
-    #     "stage" = {
-    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-    #       "target_environment" = "prod"
-    #     },
-    #     "preprod" = {
-    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-    #       "target_environment" = "prod"
-    #     },
+    "stage" = {
+      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      "target_environment" = "prod"
+    },
+    "preprod" = {
+      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      "target_environment" = "prod"
+    },
     #     "prod" = {
     #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
     #       "source_environment" = "preprod"
@@ -39,14 +51,14 @@ locals {
       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
       "source_environment" = "dev"
     },
-    #     "stage" = {
-    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-    #       "target_environment" = "prod"
-    #     },
-    #     "preprod" = {
-    #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-    #       "target_environment" = "prod"
-    #     },
+    "stage" = {
+      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      # "target_environment" = "prod"
+    },
+    "preprod" = {
+      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      # "target_environment" = "prod"
+    },
     #     "prod" = {
     #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
     #       "source_environment" = "preprod"
@@ -54,4 +66,5 @@ locals {
   }
 
   oracle_backup_bucket_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
+
 }

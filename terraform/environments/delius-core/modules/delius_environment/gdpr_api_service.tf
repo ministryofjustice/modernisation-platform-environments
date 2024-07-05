@@ -17,6 +17,8 @@ module "gdpr_api_service" {
     "SECURITY_OAUTH2_CLIENT_CLIENT-SECRET" : aws_ssm_parameter.delius_core_gdpr_api_client_secret.arn
   }
 
+  desired_count = 0
+
   container_secrets_env_specific = try(var.delius_microservice_configs.gdpr_api.container_secrets_env_specific, {})
 
   db_ingress_security_groups = []
@@ -46,7 +48,7 @@ module "gdpr_api_service" {
   rds_backup_retention_period = var.delius_microservice_configs.gdpr_api.rds_backup_retention_period
   rds_backup_window           = var.delius_microservice_configs.gdpr_api.rds_backup_window
   rds_deletion_protection     = var.delius_microservice_configs.gdpr_api.rds_deletion_protection
-  snapshot_identifier         = var.delius_microservice_configs.gdpr_api.snapshot_identifier
+  snapshot_identifier         = data.aws_ssm_parameter.gdpr_api_snapshot_identifier.value
   rds_skip_final_snapshot     = var.delius_microservice_configs.gdpr_api.rds_skip_final_snapshot
 
   container_vars_default = {
@@ -79,4 +81,21 @@ module "gdpr_api_service" {
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_frontend.arn_suffix
   enable_platform_backups = var.enable_platform_backups
+}
+
+#######################
+#   GDPR API Params   #
+#######################
+
+resource "aws_ssm_parameter" "gpdr_api_snapshot_identifier" {
+  name  = "/delius-core-${var.env_name}/gdpr-api/snapshot_id"
+  type  = "String"
+  value = "DEFAULT"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+data "aws_ssm_parameter" "gdpr_api_snapshot_identifier" {
+  name = aws_ssm_parameter.gpdr_api_snapshot_identifier.name
 }

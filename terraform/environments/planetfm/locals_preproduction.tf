@@ -1,23 +1,77 @@
 locals {
 
-  # cloudwatch monitoring config
-  preproduction_cloudwatch_monitoring_options = {}
+  baseline_presets_preproduction = {
+    options = {}
+  }
 
-  # baseline config
-  preproduction_config = {
-    baseline_ec2_instances = {
-      # database server
+  # please keep resources in alphabetical order
+  baseline_preproduction = {
+
+    acm_certificates = {
+      planetfm_wildcard_cert = {
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "modernisation-platform.service.justice.gov.uk"
+        external_validation_records_created = true
+        subject_alternate_names = [
+          "*.pp.planetfm.service.justice.gov.uk",
+          "pp-cafmwebx.az.justice.gov.uk",
+          "pp-cafmtx.az.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for planetfm preproduction domains"
+        }
+      }
+    }
+
+    ec2_instances = {
+      # app servers
+      pp-cafm-a-10-b = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-cafm-a-10-b"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          disable_api_stop        = true
+          disable_api_termination = true
+          instance_type           = "t3.large"
+          monitoring              = true
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          ami           = "pp-cafm-a-10-b"
+          description   = "RDS Session Host and CAFM App Server/PFME Licence Server"
+          pre-migration = "PPFAW0010"
+        })
+      })
+
+      pp-cafm-a-11-a = merge(local.defaults_app_ec2, {
+        config = merge(local.defaults_app_ec2.config, {
+          ami_name          = "pp-cafm-a-11-a"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+        }
+        instance = merge(local.defaults_app_ec2.instance, {
+          disable_api_stop        = true
+          disable_api_termination = true
+          instance_type           = "t3.large"
+          monitoring              = true
+        })
+        tags = merge(local.defaults_app_ec2.tags, {
+          ami           = "pp-cafm-a-11-a"
+          description   = "RDS session host and app server"
+          pre-migration = "PPFAW011"
+        })
+      })
+
+      # database servers
       pp-cafm-db-a = merge(local.defaults_database_ec2, {
         config = merge(local.defaults_database_ec2.config, {
           ami_name          = "pp-cafm-db-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_database_ec2.instance, {
-          instance_type = "r6i.xlarge"
-          # set these to false and apply before instance can be deleted
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
+          availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -28,56 +82,17 @@ locals {
           "/dev/sdf"  = { type = "gp3", size = 250 }
           "/dev/sdg"  = { type = "gp3", size = 200 }
         }
+        instance = merge(local.defaults_database_ec2.instance, {
+          disable_api_stop        = true
+          disable_api_termination = true
+          instance_type           = "r6i.xlarge"
+          monitoring              = true
+        })
         tags = merge(local.defaults_database_ec2.tags, {
-          pre-migration     = "PPFDW0030"
-          description       = "SQL Server"
           app-config-status = "pending"
           ami               = "pp-cafm-db-a"
-        })
-      })
-
-      # app servers
-      pp-cafm-a-10-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-cafm-a-10-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "t3.large"
-          # set these to false and apply before instance can be deleted
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-        }
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPFAW0010"
-          description   = "RDS Session Host and CAFM App Server/PFME Licence Server"
-          ami           = "pp-cafm-a-10-b"
-        })
-      })
-
-      pp-cafm-a-11-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
-          ami_name          = "pp-cafm-a-11-a"
-          availability_zone = "${local.region}a"
-        })
-        instance = merge(local.defaults_app_ec2.instance, {
-          instance_type = "t3.large"
-          # set these to false and apply before instance can be deleted
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-        }
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPFAW011"
-          description   = "RDS session host and app server"
-          ami           = "pp-cafm-a-11-a"
+          description       = "SQL Server"
+          pre-migration     = "PPFDW0030"
         })
       })
 
@@ -85,85 +100,85 @@ locals {
       pp-cafm-w-4-b = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-cafm-w-4-b"
-          availability_zone = "${local.region}b"
-        })
-        instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "t3.large"
-          # set these to false and apply before instance can be deleted
-          disable_api_termination = true
-          disable_api_stop        = true
-          monitoring              = true
+          availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
+        instance = merge(local.defaults_web_ec2.instance, {
+          disable_api_stop        = true
+          disable_api_termination = true
+          instance_type           = "t3.large"
+          monitoring              = true
+        })
         tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPFWW0004"
-          description   = "Web Portal Server"
           ami           = "pp-cafm-w-4-b"
+          description   = "Web Portal Server"
+          pre-migration = "PPFWW0004"
         })
       })
 
       pp-cafm-w-5-a = merge(local.defaults_web_ec2, {
         config = merge(local.defaults_web_ec2.config, {
           ami_name          = "pp-cafm-w-5-a"
-          availability_zone = "${local.region}a"
+          availability_zone = "eu-west-2a"
         })
         instance = merge(local.defaults_web_ec2.instance, {
-          instance_type = "t3.large"
-          # set these to false and apply before instance can be deleted
-          disable_api_termination = true
           disable_api_stop        = true
+          disable_api_termination = true
+          instance_type           = "t3.large"
           monitoring              = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPFWW0005"
-          description   = "Migrated server PPFWW0005 Web Portal Server"
           ami           = "pp-cafm-w-5-a"
+          description   = "Migrated server PPFWW0005 Web Portal Server"
+          pre-migration = "PPFWW0005"
         })
       })
     }
-    baseline_lbs = {
+
+    lbs = {
       private = {
-        internal_lb                      = true
+        enable_cross_zone_load_balancing = true
         enable_delete_protection         = false
-        load_balancer_type               = "application"
         idle_timeout                     = 3600
+        internal_lb                      = true
+        load_balancer_type               = "application"
         security_groups                  = ["loadbalancer"]
         subnets                          = module.environment.subnets["private"].ids
-        enable_cross_zone_load_balancing = true
 
         instance_target_groups = {
           web-45-80 = {
-            port     = 80
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              path                = "/"
-              healthy_threshold   = 3
-              unhealthy_threshold = 5
-              timeout             = 5
-              interval            = 30
-              matcher             = "200-399"
-              port                = 80
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
             attachments = [
               { ec2_instance_name = "pp-cafm-w-4-b" },
               { ec2_instance_name = "pp-cafm-w-5-a" },
             ]
+            health_check = {
+              enabled             = true
+              healthy_threshold   = 3
+              interval            = 30
+              matcher             = "200-399"
+              path                = "/"
+              port                = 80
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            port     = 80
+            protocol = "HTTP"
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
           }
         }
         listeners = {
           http = {
             port     = 80
             protocol = "HTTP"
+
             default_action = {
               type = "redirect"
               redirect = {
@@ -174,10 +189,11 @@ locals {
             }
           }
           https = {
+            certificate_names_or_arns = ["planetfm_wildcard_cert"]
             port                      = 443
             protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["planetfm_wildcard_cert"]
+            ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+
             default_action = {
               type = "fixed-response"
               fixed_response = {
@@ -186,6 +202,7 @@ locals {
                 status_code  = "501"
               }
             }
+
             rules = {
               web-45-80 = {
                 priority = 4580
@@ -207,7 +224,8 @@ locals {
         }
       }
     }
-    baseline_route53_zones = {
+
+    route53_zones = {
       "pp.planetfm.service.justice.gov.uk" = {
         records = [
           { name = "_658adffab7a58a4d5a86804a2b6eb2f7", type = "CNAME", ttl = 86400, records = ["_c649cb794d2fa2e1ac4d3f6fb4e1c8a7.mhbtsbpdnt.acm-validations.aws"] },
@@ -218,23 +236,8 @@ locals {
         ]
       }
     }
-    baseline_acm_certificates = {
-      planetfm_wildcard_cert = {
 
-        domain_name = module.environment.domains.public.modernisation_platform
-        subject_alternate_names = [
-          "*.pp.planetfm.service.justice.gov.uk",
-          "pp-cafmwebx.az.justice.gov.uk",
-          "pp-cafmtx.az.justice.gov.uk",
-        ]
-        external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        tags = {
-          description = "wildcard cert for planetfm ${local.environment} domains"
-        }
-      }
-    }
-    baseline_security_groups = {
+    security_groups = {
       cafm_app_fixngo = {
         description = "Allow fixngo cafm app connectivity"
         ingress = {
@@ -287,7 +290,6 @@ locals {
             protocol    = "TCP"
             cidr_blocks = ["10.40.50.64/26"]
           }
-
         }
         egress = {
           all = {

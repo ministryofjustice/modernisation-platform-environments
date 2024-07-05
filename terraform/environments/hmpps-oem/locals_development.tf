@@ -1,33 +1,22 @@
-# nomis-development environment settings
 locals {
 
-  # cloudwatch monitoring config
-  development_cloudwatch_monitoring_options = {
-    enable_cloudwatch_monitoring_account = false
-  }
+  baseline_presets_development = {
+    options = {
+      enable_ec2_delius_dba_secrets_access = true
 
-  # baseline presets config
-  development_baseline_presets_options = {
-    enable_ec2_delius_dba_secrets_access = true # additional permissions to access delius secrets
-
-    sns_topics = {
-      pagerduty_integrations = {
-        dba_pagerduty = "hmpps_shef_dba_non_prod"
-        dso_pagerduty = "nomis_nonprod_alarms"
+      sns_topics = {
+        pagerduty_integrations = {
+          dba_pagerduty = "hmpps_shef_dba_non_prod"
+          dso_pagerduty = "nomis_nonprod_alarms"
+        }
       }
     }
   }
 
-  # baseline config
-  development_config = {
+  # please keep resources in alphabetical order
+  baseline_development = {
 
-    baseline_secretsmanager_secrets = {
-      "/oracle/oem"                = local.oem_secretsmanager_secrets
-      "/oracle/database/EMREP"     = local.oem_secretsmanager_secrets
-      "/oracle/database/DEVRCVCAT" = local.oem_secretsmanager_secrets
-    }
-
-    baseline_ec2_autoscaling_groups = {
+    ec2_autoscaling_groups = {
       dev-base-ol85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_ol_8_5_*"
@@ -55,7 +44,7 @@ locals {
       }
     }
 
-    baseline_ec2_instances = {
+    ec2_instances = {
       dev-oem-a = merge(local.oem_ec2_default, {
         cloudwatch_metric_alarms = merge(
           local.oem_ec2_cloudwatch_metric_alarms.standard,
@@ -73,6 +62,12 @@ locals {
           oracle-sids = "EMREP DEVRCVCAT"
         })
       })
+    }
+
+    secretsmanager_secrets = {
+      "/oracle/oem"                = local.oem_secretsmanager_secrets
+      "/oracle/database/EMREP"     = local.oem_secretsmanager_secrets
+      "/oracle/database/DEVRCVCAT" = local.oem_secretsmanager_secrets
     }
   }
 }

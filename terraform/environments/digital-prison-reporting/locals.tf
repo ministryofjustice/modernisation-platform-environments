@@ -1,9 +1,13 @@
 #### This file can be used to store locals specific to the member account ####
 #### DPR Specific ####
 locals {
-  project = local.application_data.accounts[local.environment].project_short_id
+  project              = local.application_data.accounts[local.environment].project_short_id
+  analytics_project_id = "analytics"
 
   other_log_retention_in_days = local.application_data.accounts[local.environment].other_log_retention_in_days
+
+  # Kinesis Agent
+  kinesis_agent_autoscale = local.application_data.accounts[local.environment].kinesis_agent_autoscale
 
   # glue_db                       = local.application_data.accounts[local.environment].glue_db_name
   # glue_db_data_domain           = local.application_data.accounts[local.environment].glue_db_data_domain
@@ -49,6 +53,11 @@ locals {
   datamart_port     = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["port"]
   datamart_username = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["username"]
   datamart_password = jsondecode(data.aws_secretsmanager_secret_version.datamart.secret_string)["password"]
+
+  # Athena Federated Query
+  federated_query_lambda_memory_mb             = local.application_data.accounts[local.environment].athena_federated_query_lambda_memory_mb
+  federated_query_lambda_timeout_seconds       = local.application_data.accounts[local.environment].athena_federated_query_lambda_timeout_seconds
+  federated_query_lambda_concurrent_executions = local.application_data.accounts[local.environment].athena_federated_query_lambda_concurrent_executions
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
@@ -158,6 +167,7 @@ locals {
   # Common Policies
   kms_read_access_policy = "${local.project}_kms_read_policy"
   s3_read_access_policy  = "${local.project}_s3_read_policy"
+  s3_read_write_policy   = "${local.project}_s3_read_write_policy"
   apigateway_get_policy  = "${local.project}_apigateway_get_policy"
   invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
 
@@ -231,9 +241,8 @@ locals {
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
   # s3 transfer
-  scheduled_s3_file_transfer_retention_days = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_days
-  scheduled_s3_file_transfer_schedule       = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_schedule
-  enable_s3_file_transfer_trigger           = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
+  scheduled_s3_file_transfer_retention_period_amount = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_amount
+  scheduled_s3_file_transfer_retention_period_unit   = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_unit
 
   # step function notification lambda
   step_function_notification_lambda_handler = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
@@ -289,6 +298,10 @@ locals {
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 
+  # Setup Athena Workgroups 
+  setup_dpr_generic_athena_workgroup       = local.application_data.accounts[local.environment].dpr_generic_athena_workgroup
+  setup_analytics_generic_athena_workgroup = local.application_data.accounts[local.environment].analytics_generic_athena_workgroup
+
   # Sonatype Secrets
   setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
 
@@ -296,9 +309,21 @@ locals {
   nomis_secrets_placeholder = {
     db_name  = "nomis"
     password = "placeholder"
+    # We need to duplicate the username with 'user' and 'username' keys
     user     = "placeholder"
-    endpoint = "0.0.0.0"
+    username = "placeholder"
+    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
     port     = "1521"
+  }
+
+  # Bodmis Secrets PlaceHolder 
+  bodmis_secrets_placeholder = {
+    db_name  = "bodmis"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
+    port     = "1522"
   }
 
   # DPS Secrets PlaceHolder
@@ -311,12 +336,44 @@ locals {
     port     = "5432"
   }
 
+  # Operational DataStore Secrets PlaceHolder
+  operational_datastore_secrets_placeholder = {
+    username = "placeholder"
+    password = "placeholder"
+  }
+
   # biprws Secrets Placeholder
   enable_biprws_secrets = local.application_data.accounts[local.environment].biprws.enable
   biprws_secrets_placeholder = {
     busobj-converter = "placeholder"
     endpoint         = local.application_data.accounts[local.environment].biprws.endpoint
     endpoint_type    = local.application_data.accounts[local.environment].biprws.endpoint_type
+  }
+
+  # cp_k8s_secrets_placeholder
+  enable_cp_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_k8s_secrets
+  cp_k8s_secrets_placeholder = {
+    cloud_platform_k8s_token           = "placeholder"
+    cloud_platform_certificate_auth    = "placeholder"
+    cloud_platform_k8s_server          = "placeholder"
+    cloud_platform_k8s_cluster_name    = "placeholder"
+    cloud_platform_k8s_cluster_context = "placeholder"
+  }
+
+  # cp_bodmis_k8s_secrets_placeholder
+  enable_cp_bodmis_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_bodmis_k8s_secrets
+  cp_bodmis_k8s_secrets_placeholder = {
+    cloud_platform_k8s_token           = "placeholder"
+    cloud_platform_certificate_auth    = "placeholder"
+    cloud_platform_k8s_server          = "placeholder"
+    cloud_platform_k8s_cluster_name    = "placeholder"
+    cloud_platform_k8s_cluster_context = "placeholder"
+  }
+
+  # Analytics Platform, DBT Secrets 
+  enable_dbt_k8s_secrets = local.application_data.accounts[local.environment].enable_dbt_k8s_secrets
+  dbt_k8s_secrets_placeholder = {
+    oidc_cluster_identifier = "placeholder"
   }
 
   sonatype_secrets_placeholder = {

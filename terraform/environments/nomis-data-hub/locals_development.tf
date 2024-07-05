@@ -1,36 +1,19 @@
 locals {
-  development_config = {
-    baseline_efs = {
-      # dev_efs = {
-      #   access_points = {
-      #     root = {
-      #       posix_user = {
-      #         gid = 10003
-      #         uid = 10003
-      #       }
-      #       root_directory = {
-      #         path = "/"
-      #         creation_info = {
-      #           owner_gid   = 10003
-      #           owner_uid   = 10003
-      #           permissions = "0777"
-      #         }
-      #       }
-      #     }
-      #   }
-      #   backup_policy_status = "DISABLED"
-      #   file_system = {
-      #     availability_zone_name = "eu-west-2a"
-      #   }
-      #   mount_targets = [{
-      #     subnet_name        = "private"
-      #     availability_zones = ["eu-west-2a"]
-      #     security_groups    = ["private"]
-      #   }]
-      # }
-    }
 
-    baseline_ec2_autoscaling_groups = {
+  baseline_presets_development = {
+    options = {
+      sns_topics = {
+        pagerduty_integrations = {
+          dso_pagerduty = "nomis_data_hub_nonprod_alarms"
+        }
+      }
+    }
+  }
+
+  # please keep resources in alphabetical order
+  baseline_development = {
+
+    ec2_autoscaling_groups = {
       dev-base-rhel85 = {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0

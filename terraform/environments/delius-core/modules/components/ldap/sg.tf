@@ -29,7 +29,7 @@ resource "aws_security_group_rule" "ldap_nlb" {
   cidr_blocks       = [var.account_config.shared_vpc_cidr]
 }
 
-resource "aws_security_group_rule" "top_ldap_from_bastion" {
+resource "aws_security_group_rule" "to_ldap_from_bastion" {
   for_each                 = toset(["tcp", "udp"])
   description              = "Allow inbound traffic from bastion"
   type                     = "ingress"

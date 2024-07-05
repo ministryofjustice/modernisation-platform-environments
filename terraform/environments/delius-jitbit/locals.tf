@@ -34,10 +34,34 @@ locals {
 
   validation_record_fqdns = local.is-development ? [local.domain_name_main[0], local.domain_name_sub[0], local.domain_name_sub_sandbox[0]] : [local.domain_name_main[0], local.domain_name_sub[0]]
 
-  internal_security_group_cidrs = flatten([
+  internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-    module.ip_addresses.moj_cidrs.trusted_mojo_public
-  ])
+    module.ip_addresses.moj_cidrs.trusted_mojo_public,
+    module.ip_addresses.moj_cidr.ark_dc_external_internet,
+    module.ip_addresses.moj_cidr.vodafone_dia_networks,
+    module.ip_addresses.moj_cidr.palo_alto_primsa_access_corporate,
+    module.ip_addresses.moj_cidr.digital_prisons,
+    [
+      # Route53 Healthcheck Access Cidrs
+      # London Region not support yet, so metrics are not yet publised, can be enabled at later stage for Route53 endpoint monitor
+      "15.177.0.0/18",     # GLOBAL Region
+      "54.251.31.128/26",  # ap-southeast-1 Region
+      "54.255.254.192/26", # ap-southeast-1 Region
+      "176.34.159.192/26", # eu-west-1 Region
+      "54.228.16.0/26",    # eu-west-1 Region
+      "107.23.255.0/26",   # us-east-1 Region
+      "54.243.31.192/26"   # us-east-1 Region
+    ]
+  ]))
 
+  ipv6_cidr_blocks = [
+    # Route53 Healthcheck Access Cidrs IPv6
+    "2406:da18:7ff:f800::/53",  # ap-southeast-1 Region
+    "2406:da18:fff:f800::/53",  # ap-southeast-1 Region
+    "2a05:d018:fff:f800::/53",  # eu-west-1 Region
+    "2a05:d018:7ff:f800::/53",  # eu-west-1 Region
+    "2600:1f18:7fff:f800::/53", # us-east-1 Region
+    "2600:1f18:3fff:f800::/53", # us-east-1 Region
+  ]
 }

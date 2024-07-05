@@ -1,102 +1,65 @@
+# define configuration common to all environments here
+# define environment specific configuration in locals_development.tf, locals_test.tf etc.
+
 locals {
-  business_unit = var.networking[0].business-unit
-  region        = "eu-west-2"
-
-  environment_configs = {
-    development   = local.development_config
-    test          = local.test_config
-    preproduction = local.preproduction_config
-    production    = local.production_config
+  baseline_presets_environments_specific = {
+    development   = local.baseline_presets_development
+    test          = local.baseline_presets_test
+    preproduction = local.baseline_presets_preproduction
+    production    = local.baseline_presets_production
   }
-  baseline_environment_config = local.environment_configs[local.environment]
+  baseline_presets_environment_specific = local.baseline_presets_environments_specific[local.environment]
 
-  baseline_presets_options = {
-    enable_application_environment_wildcard_cert = false
-    enable_backup_plan_daily_and_weekly          = true
-    enable_business_unit_kms_cmks                = true
-    enable_hmpps_domain                          = true
-    enable_image_builder                         = true
-    enable_ec2_cloud_watch_agent                 = true
-    enable_ec2_self_provision                    = true
-    enable_oracle_secure_web                     = true
-    enable_ec2_put_parameter                     = false
-    enable_ec2_user_keypair                      = true
-    cloudwatch_metric_alarms_default_actions     = ["planetfm_pagerduty"]
-    cloudwatch_metric_alarms                     = {}
-    route53_resolver_rules = {
-      # outbound-data-and-private-subnets = ["azure-fixngo-domain"]  # already set by nomis account
-    }
-    iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-    iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-    s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    sns_topics = {
-      pagerduty_integrations = {
-        planetfm_pagerduty = "planetfm_alarms"
+  baseline_environments_specific = {
+    development   = local.baseline_development
+    test          = local.baseline_test
+    preproduction = local.baseline_preproduction
+    production    = local.baseline_production
+  }
+  baseline_environment_specific = local.baseline_environments_specific[local.environment]
+
+  baseline_presets_all_environments = {
+    options = {
+      cloudwatch_metric_alarms_default_actions = ["planetfm_pagerduty"]
+      # cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
+      # cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
+      # enable_backup_plan_daily_and_weekly = true
+      enable_business_unit_kms_cmks = true
+      enable_ec2_cloud_watch_agent  = true
+      enable_ec2_self_provision     = true
+      enable_ec2_user_keypair       = true
+      enable_hmpps_domain           = true
+      enable_image_builder          = true
+      enable_oracle_secure_web      = true
+      enable_s3_bucket              = true
+      enable_s3_software_bucket     = true
+      iam_policies_filter           = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+      iam_policies_ec2_default      = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+      s3_iam_policies               = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+
+      sns_topics = {
+        pagerduty_integrations = {
+          planetfm_pagerduty = "planetfm_alarms"
+        }
       }
     }
   }
 
-  baseline_acm_certificates = {}
-  baseline_cloudwatch_log_groups = merge(
-    local.ssm_doc_cloudwatch_log_groups, {}
-  )
-
-  baseline_ec2_autoscaling_groups = {}
-  baseline_ec2_instances          = {}
-  baseline_iam_policies = {
-    SSMPolicy = {
-      description = "Policy to allow ssm actions"
-      statements = [{
-        effect = "Allow"
-        actions = [
-          "ssm:SendCommand"
-        ]
-        resources = ["*"]
-      }]
+  baseline_all_environments = {
+    cloudwatch_log_groups = local.ssm_doc_cloudwatch_log_groups
+    iam_policies = {
+      SSMPolicy = {
+        description = "Policy to allow ssm actions"
+        statements = [{
+          effect = "Allow"
+          actions = [
+            "ssm:SendCommand"
+          ]
+          resources = ["*"]
+        }]
+      }
     }
+    resource_explorer = true
+    security_groups   = local.security_groups
   }
-  baseline_iam_roles                = {}
-  baseline_iam_service_linked_roles = {}
-  baseline_key_pairs                = {}
-  baseline_kms_grants               = {}
-  baseline_lbs                      = {}
-  baseline_route53_resolvers        = {}
-  baseline_route53_zones            = {}
-
-  baseline_s3_buckets = {
-    s3-bucket = {
-      iam_policies = module.baseline_presets.s3_iam_policies
-    }
-  }
-
-  baseline_secretsmanager_secrets = {}
-
-  baseline_security_groups = {
-    loadbalancer              = local.security_groups.loadbalancer
-    web                       = local.security_groups.web
-    app                       = local.security_groups.app
-    database                  = local.security_groups.database
-    domain                    = local.security_groups.domain
-    jumpserver                = local.security_groups.jumpserver
-    remotedesktop_sessionhost = local.security_groups.remotedesktop_sessionhost
-  }
-
-  baseline_sns_topics     = {}
-  baseline_ssm_parameters = {}
-
-  environment_cloudwatch_monitoring_options = {
-    development   = local.development_cloudwatch_monitoring_options
-    test          = local.test_cloudwatch_monitoring_options
-    preproduction = local.preproduction_cloudwatch_monitoring_options
-    production    = local.production_cloudwatch_monitoring_options
-  }
-
-  cloudwatch_local_environment_monitoring_options = local.environment_cloudwatch_monitoring_options[local.environment]
-
-  cloudwatch_monitoring_options = {
-    enable_cloudwatch_monitoring_account    = false
-    enable_cloudwatch_cross_account_sharing = false
-    # enable_cloudwatch_dashboard             = false
-  }
-
 }

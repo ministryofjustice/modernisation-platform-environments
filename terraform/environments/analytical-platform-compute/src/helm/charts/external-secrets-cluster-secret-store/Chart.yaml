@@ -1,0 +1,6 @@
+---
+apiVersion: v2
+name: external-secrets-cluster-secret-store
+description: A Helm chart to create a cluster secret store for external-secrets
+type: application
+version: 1.0.0

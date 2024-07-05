@@ -11,8 +11,19 @@ module "reload_pipeline" {
   definition = jsonencode(
     {
       "Comment" : "Reload Pipeline Step Function",
-      "StartAt" : "Stop Glue Streaming Job",
+      "StartAt" : "Stop DMS Replication Task",
       "States" : {
+        "Stop DMS Replication Task" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.stop_dms_task_job,
+            "Arguments" : {
+              "--dpr.dms.replication.task.id" : var.replication_task_id
+            }
+          },
+          "Next" : "Stop Glue Streaming Job"
+        },
         "Stop Glue Streaming Job" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
@@ -56,7 +67,7 @@ module "reload_pipeline" {
             "Arguments" : {
               "--dpr.file.transfer.source.bucket" : var.s3_curated_bucket_id,
               "--dpr.file.transfer.destination.bucket" : var.s3_temp_reload_bucket_id,
-              "--dpr.file.transfer.retention.days" : "0",
+              "--dpr.file.transfer.retention.period.amount" : "0",
               "--dpr.file.transfer.delete.copied.files" : "false",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
@@ -143,7 +154,7 @@ module "reload_pipeline" {
             "Arguments" : {
               "--dpr.file.transfer.source.bucket" : var.s3_raw_bucket_id,
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
-              "--dpr.file.transfer.retention.days" : "0",
+              "--dpr.file.transfer.retention.period.amount" : "0",
               "--dpr.file.transfer.delete.copied.files" : "true",
               "--dpr.allowed.s3.file.extensions" : ".parquet",
               "--dpr.config.key" : var.domain

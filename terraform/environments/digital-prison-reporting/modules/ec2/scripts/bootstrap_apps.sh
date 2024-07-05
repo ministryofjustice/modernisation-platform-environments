@@ -5,11 +5,16 @@ exec > /tmp/userdata.log 2>&1
 # ENV Variables, 
 namespace="dpr-nomis-port-forwarder"
 app="nomis-port-forwarder"
+bodmis_namespace="dpr-bodmis-port-forwarder"
+bodmis_app="bodmis-port-forwarder"
 local_port="1521"
+bodmis_local_port="1522"
 remote_port="1521"
 # Location of script that will be used to launch the domain builder jar.
-nomis_portforwarder_script="/usr/bin/nomis-port-forwarder.sh"
+nomis_portforwarder_script="/usr/bin/nomispf.sh"
+bodmis_portforwarder_script="/usr/bin/bodmispf.sh"
 kubeconfig="/home/ssm-user/.kube/config"
+bodmis_kubeconfig="/home/ssm-user/.kube/bodmis_config"
 
 # Setup Required Directories
 touch /tmp/hello-ec2
@@ -38,7 +43,7 @@ echo "assumeyes=1" >> /etc/yum.conf
 sudo yum -y update
 
 # Setup YUM install Kinesis Agent
-sudo yum -y install aws-kinesis-agent wget unzip
+sudo yum -y install aws-kinesis-agent wget unzip jq
 
 # Setup Oracle Client Tools
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-basic-21.8.0.0.0-1.x86_64.rpm
@@ -88,6 +93,24 @@ chmod -R 777 /opt/kinesis
 
 # Configure MP -> NOMIS Connectivity, for Development Env Workaround
 if [ ${environment} = "development" ]; then
+
+# Add Secondary IP
+# Get the Network Interface ID
+interface_id=`aws ec2 describe-network-interfaces --region eu-west-2  --filters Name=attachment.instance-id,Values=$(aws sts get-caller-identity --query UserId --output text | cut -d : -f 2) --query "NetworkInterfaces[0].NetworkInterfaceId" --output text`
+echo "___Interface ID: $interface_id"
+
+sleep 300
+# Add Secondary IP
+aws ec2 assign-private-ip-addresses --network-interface-id $interface_id --private-ip-addresses ${static_ip}
+
+# Get Secrets
+nomis_cp_k8s_server=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_server)
+nomis_cp_k8s_cert_auth=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_certificate_auth)
+nomis_cp_k8s_cluster_name=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_name)
+nomis_cp_k8s_cluster_context=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_context)
+nomis_cp_k8s_cluster_token=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_token)
+
+echo "SERVER_NAME....$nomis_cp_k8s_server"
 # Install KUBECTL Libs
 ## Download Libs
 curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.1/2023-04-19/bin/linux/amd64/kubectl
@@ -95,37 +118,46 @@ chmod +x ./kubectl
 cp ./kubectl /usr/bin/kubectl
 
 mkdir -p /home/ssm-user/.kube
+chown -R ssm-user:ssm-user /home/ssm-user/.kube
+chmod -R 755 /home/ssm-user/.kube
 
+# NOMIS
 ## Add Kubeconfig
 cat <<EOF > $kubeconfig
 apiVersion: v1
 clusters:
 - cluster:
-    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeE1EWXlPREUyTXprMU5sb1hEVE14TURZeU5qRTJNemsxTmxvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTDNZCk9jcWxuVUdZTGR6TFlZTFcyOHVVWk1QdGE3TWJTK09EbTh4RWNXNlRVMXoyeFovcUNwSUhRS0VGelk2SWJwVSsKaHB0Z2VrRnNKQllEc2pjRjhRSTNPSkFaMFVjMXpNaXo1TFE2ZU1pOENsbmRMYnk4NWRNLzliRGZ0T1dlMDVqcQpYSENmYW9RNWR0Y3NCbWplWFAzbm1ZZGRJcTBiRUZZMTJiQjkvOTRLRVJSdnp4U3oxNkg5VkJwdzA3UVArTFRTCnRKT2JjWWlzcEFSTXJUVTlZa1pVS1lJT2FUYnBqRHhHVGdMNm1EaWNSdHlQeU9admx0MUFSTFR3NUpBVG42WUYKaXNCMkt5cHA2Q05DNDVoaFVpU05vZE9vaUcxNVRpNU5WeWM5azQ4eTFqZWExZ0kzTnM0VGFpQXRxNEhPTHR3NQpML2RqMEFRTTJIalZlVG90TVJVQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFHUCs2RTZCMDVNSmxFZ04zcEJkRUxEa29yakEKMGJ0SmR2S1lEakkyWTE0cGtSMFlacXZjT2Zkd0tOM1VuL2FYblllT21xNFExdHRpMUZQRDR6MTE0TFU4VjBTcwo3Q080azE5NzNMVGxValRGTVZNNHZoZXlXc0JLRzJxZW10TGhkVjJGSDh1Y2lDZnVWd0hNb3lQTmJJdktCSVFOCnFIS08wclU0bElpSzVrcEdydXBZYWRIV3pLL0VMTlk5alZtelJxcXpGQ3lmVjJuWGZJK2xrbXFUOGN5Y0FWbS8KOExSQjhnK1dhTGxLQThydWMzYmZIWUJNZ2J1ZkpzYTVaU3lGd2dkNlNua0dta1c2KzBERklRUVAweEl5ajRaWgpFL1JxL0QyNE5zK2ZNc3lxWVRUQ21rRktUdTJENzJvQllUdmt5bnQ3Rjh3a0gwSWRiK1MxMXNxUVdCcz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-    server: https://DF366E49809688A3B16EEC29707D8C09.gr7.eu-west-2.eks.amazonaws.com
-  name: live.cloud-platform.service.justice.gov.uk
+    certificate-authority-data: $nomis_cp_k8s_cert_auth
+    server: $nomis_cp_k8s_server
+  name: $nomis_cp_k8s_cluster_name
 contexts:
 - context:
-    cluster: live.cloud-platform.service.justice.gov.uk
+    cluster: $nomis_cp_k8s_cluster_name
     namespace: dpr-nomis-port-forwarder
     user: nomis-port-forwarder-migrated
-  name: live.cloud-platform.service.justice.gov.uk
-current-context: live.cloud-platform.service.justice.gov.uk
+  name: $nomis_cp_k8s_cluster_name
+current-context: $nomis_cp_k8s_cluster_context
 kind: Config
 preferences: {}
 users:
 - name: nomis-port-forwarder-migrated
   user:
-    token: eyJhbGciOiJSUzI1NiIsImtpZCI6IlBiS0MzZGN6a1IwbFljNkNOd1dVODY2OXQzLW0tOWRKZ1dpNEdRTG9LOUkifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkcHItbm9taXMtcG9ydC1mb3J3YXJkZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoibm9taXMtcG9ydC1mb3J3YXJkZXItbWlncmF0ZWQtdG9rZW4tMDEtMDEtMjAwMCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJub21pcy1wb3J0LWZvcndhcmRlci1taWdyYXRlZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjdjOGIyMTllLTJmNGEtNDI4Yi1iYzdiLWU0N2IxNjkzZGZiZCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkcHItbm9taXMtcG9ydC1mb3J3YXJkZXI6bm9taXMtcG9ydC1mb3J3YXJkZXItbWlncmF0ZWQifQ.R0Y9kVzeTE-Bcd4twHNNWFffGvin1yayjtdeQSjNVmQBD42vazcEwbr8H3F5i2A5wW8j5Tk_IYzD7Zby26zyIiu_DF8DXe-bERQEHFa-A6pyygnGQPdWcDlZSklGAHBmUmQH5rKTqKDVfFW8gpP58h8zP3L518pBW6eGi-3GTeJH1pNL7sAVwAaKEmbHWqMScCir7G22MCFYwlVyUTarueFGLxR0fId4y2eHFCarlSBkKSS48ewC9WGCp2knJRZURwdZmlSGGO2mAT4Lqq06ZrIHwe_LUYc8hsWcVSGxqPwhdrHCmIcmhXKz6NMEwFpR6KNoRBBAHziCgurJQHzdKA
+    token: $nomis_cp_k8s_cluster_token
 EOF
 
-# Configure Kubernetes Cluster for CP
+# NOMIS
 ## Permission for Config
-chmod 666 $kubeconfig
+chmod 0755 $kubeconfig
 
+# NOMIS
 # Generate a Port forwarder script 
 sudo cat <<EOF > $nomis_portforwarder_script
 #!/bin/bash
+
+unset KUBE_CONFIG; unset KUBECONFIG
+
+export KUBE_CONFIG=$kubeconfig
+export KUBECONFIG=$kubeconfig
 
 ## Set Kube Config
 
@@ -138,15 +170,119 @@ kubectl get pods
 
 ## Port forward from CP to MP
 export POD=\$(kubectl get pod -n $namespace -l app=$app -o jsonpath="{.items[0].metadata.name}")
-kubectl port-forward pods/\$POD $remote_port:$local_port --address='0.0.0.0'
+kubectl port-forward pods/\$POD $local_port:$remote_port --address='0.0.0.0'
+EOF
+###
+
+# BODMIS PortForwarding
+# Get Secrets
+bodmis_cp_k8s_server=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_server)
+bodmis_cp_k8s_cert_auth=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_certificate_auth)
+bodmis_cp_k8s_cluster_name=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_name)
+bodmis_cp_k8s_cluster_context=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_cluster_context)
+bodmis_cp_k8s_cluster_token=$(aws secretsmanager get-secret-value --secret-id external/cloud_platform/bodmis_k8s_auth | jq --raw-output '.SecretString' | jq -r .cloud_platform_k8s_token)
+
+echo "SERVER_NAME....$bodmis_cp_k8s_server"
+## Add Kubeconfig
+cat <<EOF > $bodmis_kubeconfig
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: $bodmis_cp_k8s_cert_auth
+    server: $bodmis_cp_k8s_server
+  name: $bodmis_cp_k8s_cluster_name
+contexts:
+- context:
+    cluster: $bodmis_cp_k8s_cluster_name
+    namespace: dpr-bodmis-port-forwarder
+    user: bodmis-port-forwarder-migrated
+  name: $bodmis_cp_k8s_cluster_name
+current-context: $bodmis_cp_k8s_cluster_context
+kind: Config
+preferences: {}
+users:
+- name: bodmis-port-forwarder-migrated
+  user:
+    token: $bodmis_cp_k8s_cluster_token
 EOF
 
-## Add Permissions and Execute the Forwarder
-chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
-fi   
+###
+
+# Configure Kubernetes Cluster for CP
+## Permission for Config
+chmod 0755 $bodmis_kubeconfig
+
+# BODMIS
+# Generate a Port forwarder script 
+sudo cat <<EOF > $bodmis_portforwarder_script
+#!/bin/bash
+
+unset KUBE_CONFIG; unset KUBECONFIG
+
+export KUBE_CONFIG=$bodmis_kubeconfig
+export KUBECONFIG=$bodmis_kubeconfig
+
+## Set Kube Config
+
+kubectl config use-context live.cloud-platform.service.justice.gov.uk           
+kubectl config set-cluster live.cloud-platform.service.justice.gov.uk        
+kubectl config current-context
+
+## Verify Connectivity CP K8s Cluster,
+kubectl get pods
+
+## Port forward from CP to MP
+export POD=\$(kubectl get pod -n $bodmis_namespace -l app=$bodmis_app -o jsonpath="{.items[0].metadata.name}")
+kubectl port-forward pods/\$POD $bodmis_local_port:$remote_port --address='0.0.0.0'
+EOF
+
+## Add Permissions and Execute the Nomis and Bodmis Port Forwarders
+#chmod 0755 $nomis_portforwarder_script; su -c $nomis_portforwarder_script ssm-user
+#chmod 0755 $bodmis_portforwarder_script; su -c $bodmis_portforwarder_script ssm-user
+chmod 0755 $nomis_portforwarder_script; chmod 0755 $bodmis_portforwarder_script
+
+# Create a systemd service for Nomis PortForward
+cat <<EOL > /etc/systemd/system/nomispf.service
+[Unit]
+Description=NOMIS PortForward Service
+
+[Service]
+ExecStart=$nomis_portforwarder_script
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+# Create a systemd service for Bodmis PortForward
+cat <<EOL > /etc/systemd/system/bodmispf.service
+[Unit]
+Description=BODMIS PortForward Service
+
+[Service]
+ExecStart=$bodmis_portforwarder_script
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+
+fi
 
 # Start Stream at Start of the EC2 
-sudo chkconfig aws-kinesis-agent on
-sudo service aws-kinesis-agent start
+# sudo chkconfig aws-kinesis-agent on
+# sudo service aws-kinesis-agent start
+systemctl daemon-reload
+
+# NOMIS PF Service 
+sudo systemctl enable nomispf.service
+sudo systemctl start nomispf.service
+
+# BODMIS PF Service 
+sudo systemctl enable bodmispf.service
+sudo systemctl start bodmispf.service
+
+# AMAZON SSM SGENT
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent

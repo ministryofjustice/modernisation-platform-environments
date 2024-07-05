@@ -40,3 +40,9 @@ variable "environments_in_account" {
   type    = list(string)
   default = []
 }
+
+variable "pagerduty_integration_key" {
+  description = "Pager Duty Integration Key"
+  type        = string
+  default     = null
+}

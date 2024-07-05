@@ -1,33 +1,18 @@
 locals {
-  cloudfront_validation_records = {
-    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-      zone = lookup(
-        local.route53_zones,
-        dvo.domain_name,
-        lookup(
-          local.route53_zones,
-          replace(dvo.domain_name, "/^[^.]*./", ""),
-          lookup(
-            local.route53_zones,
-            replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
-            { provider = "external" }
-      )))
+  s3_origin_id   = "portalerrorpagebucketorigin"
+  cloudfront_url = local.environment == "production" ? "tbd.service.justice.gov.uk" : "mp-${local.application_name}.${data.aws_route53_zone.external.name}"
+  cloudfront_domain_types = { for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
     }
   }
-
-  validation_records_cloudfront = {
-    for key, value in local.cloudfront_validation_records : key => {
-      name   = value.name
-      record = value.record
-      type   = value.type
-    } if value.zone.provider == "external"
-  }
-
-  s3_origin_id = "portalerrorpagebucketorigin"
-
+  cloudfront_domain_name_main   = [for k, v in local.cloudfront_domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_name_sub    = [for k, v in local.cloudfront_domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_record_main = [for k, v in local.cloudfront_domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_record_sub  = [for k, v in local.cloudfront_domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_type_main   = [for k, v in local.cloudfront_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_type_sub    = [for k, v in local.cloudfront_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 }
 
 ### Cloudfront Secret Creation
@@ -340,26 +325,11 @@ resource "aws_cloudfront_distribution" "external" {
   tags = local.tags
 }
 
-
-##### Cloudfront Cert
-resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
-  count           = (length(local.validation_records_cloudfront) == 0 || local.external_validation_records_created) ? 1 : 0
-  provider        = aws.us-east-1
-  certificate_arn = aws_acm_certificate.cloudfront.arn
-  validation_record_fqdns = [
-    for key, value in local.validation_records_cloudfront : replace(value.name, "/\\.$/", "")
-  ]
-  depends_on = [
-    aws_route53_record.cloudfront_validation_core_network_services,
-    aws_route53_record.cloudfront_validation_core_vpc
-  ]
-}
-
 resource "aws_acm_certificate" "cloudfront" {
   domain_name               = local.application_data.accounts[local.environment].mp_domain_name
   validation_method         = "DNS"
   provider                  = aws.us-east-1
-  subject_alternative_names = local.environment == "production" ? null : ["mp-portal.${data.aws_route53_zone.external.name}"]
+  subject_alternative_names = local.environment == "production" ? null : [local.cloudfront_url]
   tags                      = local.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
@@ -367,41 +337,32 @@ resource "aws_acm_certificate" "cloudfront" {
   }
 }
 
-resource "aws_route53_record" "cloudfront_validation_core_network_services" {
+resource "aws_route53_record" "cloudfront_external_validation" {
   provider = aws.core-network-services
-  for_each = {
-    for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "core-network-services"
-  }
 
+  count           = local.environment == "production" ? 0 : 1
   allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
+  name            = local.cloudfront_domain_name_main[0]
+  records         = local.cloudfront_domain_record_main
   ttl             = 60
-  type            = each.value.type
-  # NOTE: value.zone is null indicates the validation zone could not be found
-  # Ensure route53_zones variable contains the given validation zone or
-  # explicitly provide the zone details in the validation variable.
-  zone_id = each.value.zone.zone_id
-
-  depends_on = [
-    aws_acm_certificate.cloudfront
-  ]
+  type            = local.cloudfront_domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
-resource "aws_route53_record" "cloudfront_validation_core_vpc" {
+resource "aws_route53_record" "cloudfront_external_validation_subdomain" {
   provider = aws.core-vpc
-  for_each = {
-    for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "core-vpc"
-  }
 
+  count           = local.environment == "production" ? 0 : 1
   allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
+  name            = local.cloudfront_domain_name_sub[0]
+  records         = local.cloudfront_domain_record_sub
   ttl             = 60
-  type            = each.value.type
-  zone_id         = each.value.zone.zone_id
+  type            = local.cloudfront_domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
 
-  depends_on = [
-    aws_acm_certificate.cloudfront
-  ]
+resource "aws_acm_certificate_validation" "cloudfront" {
+  provider                = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [local.cloudfront_domain_name_main[0], local.cloudfront_domain_name_sub[0]]
 }

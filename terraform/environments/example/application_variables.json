@@ -1,6 +1,7 @@
 {
   "accounts": {
     "development": {
+      "excluded_protections": ["e9e3fbe2-6b74-4624-84e0-8e3e7ba62806"],
       "app_name": "example",
       "launch_type": "EC2",
       "allow_major_version_upgrade": "false",

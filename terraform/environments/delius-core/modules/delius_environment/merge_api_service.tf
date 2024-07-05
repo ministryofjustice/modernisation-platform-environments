@@ -12,6 +12,8 @@ module "merge_api_service" {
   ]
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
 
+  desired_count = 0
+
   db_ingress_security_groups = []
   cluster_security_group_id  = aws_security_group.cluster.id
 
@@ -36,7 +38,7 @@ module "merge_api_service" {
   rds_username                = var.delius_microservice_configs.merge_api.rds_username
   rds_license_model           = var.delius_microservice_configs.merge_api.rds_license_model
   rds_deletion_protection     = var.delius_microservice_configs.merge_api.rds_deletion_protection
-  snapshot_identifier         = var.delius_microservice_configs.merge_api.snapshot_identifier
+  snapshot_identifier         = data.aws_ssm_parameter.merge_api_snapshot_identifier.value
   rds_skip_final_snapshot     = var.delius_microservice_configs.merge_api.rds_skip_final_snapshot
   maintenance_window          = var.delius_microservice_configs.merge_api.maintenance_window
   rds_backup_retention_period = var.delius_microservice_configs.merge_api.rds_backup_retention_period
@@ -78,4 +80,21 @@ module "merge_api_service" {
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_frontend.arn_suffix
   enable_platform_backups = var.enable_platform_backups
+}
+
+#######################
+#   Merge API Params  #
+#######################
+
+resource "aws_ssm_parameter" "merge_api_snapshot_identifier" {
+  name  = "/delius-core-${var.env_name}/merge-api/snapshot_id"
+  type  = "String"
+  value = "DEFAULT"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+data "aws_ssm_parameter" "merge_api_snapshot_identifier" {
+  name = aws_ssm_parameter.merge_api_snapshot_identifier.name
 }

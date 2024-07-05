@@ -1,9 +1,9 @@
 module "bastion_linux" {
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
 
-  count = var.bastion_linux != null ? 1 : 0
+  count = var.bastion_linux.public_key_data != null ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=6c4f0918a2db00ababbb40648b2ee57556ab90ab" # temp guid will be replaced with a release ref=v4.2.2? next week
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts

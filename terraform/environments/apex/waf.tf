@@ -15,7 +15,7 @@ resource "aws_waf_ipset" "wafmanualallowset" {
   name = "${upper(local.application_name)} Manual Allow Set"
 
   # Ranges from https://github.com/ministryofjustice/laa-apex/blob/master/aws/application/application_stack.template
-  # removed redundant ip addresses such as RedCentric access and AWS Holborn offices
+  # removed redundant ip addresses such as RedCentric access and AWS Holborn offices Wifi
 
   dynamic "ip_set_descriptors" {
     for_each = local.ip_set_list

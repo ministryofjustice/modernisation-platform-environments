@@ -8,20 +8,9 @@ resource "random_id" "rds_suffix" {
 
 resource "aws_security_group" "db" {
   count       = var.create_rds ? 1 : 0
-  name        = "${var.name}-${var.env_name}-database-security-group"
+  name        = "${var.name}-${var.env_name}-rds-security-group"
   description = "controls access to db"
   vpc_id      = var.account_config.shared_vpc_id
-
-  ingress {
-    protocol    = "tcp"
-    description = "Allow RDS traffic"
-    from_port   = var.rds_port
-    to_port     = var.rds_port
-    security_groups = concat(
-      [var.bastion_sg_id],
-      var.db_ingress_security_groups
-    )
-  }
 
   tags = merge(
     var.tags,
@@ -29,6 +18,41 @@ resource "aws_security_group" "db" {
       Name = "${var.name}-${var.env_name}-db_security_group"
     }
   )
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rds_from_custom" {
+  for_each = {
+    for sg in var.db_ingress_security_groups : sg => sg
+  }
+  security_group_id            = aws_security_group.db[0].id
+  from_port                    = var.rds_port
+  to_port                      = var.rds_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = each.value
+  description                  = "Allow RDS traffic from ${each.value}"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rds_from_bastion" {
+  count                        = var.create_rds ? 1 : 0
+  security_group_id            = aws_security_group.db[0].id
+  from_port                    = var.rds_port
+  to_port                      = var.rds_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = var.bastion_sg_id
+  description                  = "Allow RDS traffic from service"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rds_from_service" {
+  count                        = var.create_rds ? 1 : 0
+  security_group_id            = aws_security_group.db[0].id
+  from_port                    = var.rds_port
+  to_port                      = var.rds_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ecs_service.id
+  description                  = "Allow RDS traffic from service"
 }
 
 resource "aws_db_subnet_group" "this" {

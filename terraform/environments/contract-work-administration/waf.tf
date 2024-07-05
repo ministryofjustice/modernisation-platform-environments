@@ -304,7 +304,7 @@ resource "aws_wafv2_ip_set" "moj_whitelist" {
 #     #             }
 #     #         }
 #     #     }
-        
+
 #     #   } 
 #     # }
 #   }
@@ -324,9 +324,9 @@ resource "aws_wafv2_ip_set" "moj_whitelist" {
 resource "aws_cloudformation_stack" "wafv2" {
   name = "${local.application_name_short}-wafv2"
   parameters = {
-    pEnvironment = local.environment
-    pAppName = upper(local.application_name_short)
-    pIsProd = local.environment == "production" ? "true" : "false"
+    pEnvironment    = local.environment
+    pAppName        = upper(local.application_name_short)
+    pIsProd         = local.environment == "production" ? "true" : "false"
     pIPWhiteListArn = aws_wafv2_ip_set.moj_whitelist.arn
   }
   template_body = file("${path.module}/wafv2.template")
@@ -338,8 +338,8 @@ resource "aws_wafv2_web_acl_association" "cwa" {
 }
 
 resource "aws_cloudwatch_log_group" "wafv2" {
-  count = local.environment != "production" ? 1 : 0
-  name = "aws-waf-logs-${local.application_name_short}"
+  count             = local.environment != "production" ? 1 : 0
+  name              = "aws-waf-logs-${local.application_name_short}"
   retention_in_days = 7
   tags = merge(
     local.tags,
@@ -351,7 +351,7 @@ resource "aws_cloudwatch_log_group" "wafv2" {
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "non_prod" {
-  count = local.environment != "production" ? 1 : 0
+  count                   = local.environment != "production" ? 1 : 0
   log_destination_configs = [aws_cloudwatch_log_group.wafv2[0].arn]
   resource_arn            = aws_cloudformation_stack.wafv2.outputs["WAFv2ARN"]
 }

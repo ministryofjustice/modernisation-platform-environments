@@ -13,6 +13,11 @@ output "ecs_service" {
   value       = aws_ecs_service.ecs_service
 }
 
+output "ecs_cluster_name" {
+  description = "Name of the ECS cluster"
+  value       = aws_ecs_cluster.ecs_cluster.name
+}
+
 output "ecs_task_execution_role" {
   description = "Displays task definition role details"
   value       = aws_iam_role.ecs_task_execution_role

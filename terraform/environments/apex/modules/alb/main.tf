@@ -3,12 +3,11 @@ locals {
 
   loadbalancer_ingress_rules = {
     "lb_ingress" = {
-      description = "Loadbalancer ingress rule from CloudFront"
-      from_port   = var.security_group_ingress_from_port
-      to_port     = var.security_group_ingress_to_port
-      protocol    = var.security_group_ingress_protocol
-      # Uncomment below when CloudFront is setup
-      # prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+      description     = "Loadbalancer ingress rule from CloudFront"
+      from_port       = var.security_group_ingress_from_port
+      to_port         = var.security_group_ingress_to_port
+      protocol        = var.security_group_ingress_protocol
+      prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
     }
   }
 
@@ -114,9 +113,9 @@ data "aws_vpc" "shared" {
   }
 }
 
-# data "aws_ec2_managed_prefix_list" "cloudfront" {
-#   name = "com.amazonaws.global.cloudfront.origin-facing"
-# }
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
 
 
 
@@ -302,7 +301,7 @@ resource "random_password" "cloudfront" {
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
+  name        = "cloudfront-v1-secret-${var.application_name}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
 

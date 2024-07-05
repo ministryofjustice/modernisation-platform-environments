@@ -1,5 +1,5 @@
 module "container_definition" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v4.2.1"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v4.3.0"
   name                     = var.name
   image                    = var.container_image
   memory                   = var.container_memory
@@ -8,6 +8,8 @@ module "container_definition" {
   readonly_root_filesystem = false
 
   environment = local.calculated_container_vars_list
+
+  health_check = var.health_check
 
   secrets       = local.calculated_container_secrets_list
   port_mappings = var.container_port_config
@@ -23,15 +25,16 @@ module "container_definition" {
 }
 
 module "ecs_policies" {
-  source       = "../ecs_policies"
-  env_name     = var.env_name
-  service_name = var.name
-  tags         = var.tags
+  source                   = "../ecs_policies"
+  env_name                 = var.env_name
+  service_name             = var.name
+  tags                     = var.tags
+  extra_task_role_policies = var.extra_task_role_policies
 }
 
 module "ecs_service" {
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v4.2.1"
-  container_definitions = module.container_definition.json_encoded_list
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v4.3.0"
+  container_definitions = nonsensitive(module.container_definition.json_encoded_list)
   cluster_arn           = var.ecs_cluster_arn
   name                  = var.name
 
@@ -48,12 +51,12 @@ module "ecs_service" {
 
   health_check_grace_period_seconds = var.health_check_grace_period_seconds
 
-  service_load_balancers = concat([{
-    target_group_arn = aws_lb_target_group.frontend.arn
+  service_load_balancers = var.microservice_lb != null ? concat([{
+    target_group_arn = aws_lb_target_group.frontend[0].arn
     container_name   = var.name
     container_port   = var.container_port_config[0].containerPort
     }],
-  values(local.ecs_nlbs))
+  values(local.ecs_nlbs)) : values(local.ecs_nlbs)
 
   efs_volumes = var.efs_volumes
 

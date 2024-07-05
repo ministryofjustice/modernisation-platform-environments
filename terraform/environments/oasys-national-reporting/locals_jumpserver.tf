@@ -1,12 +1,10 @@
 locals {
   jumpserver_ec2 = {
-    autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default_with_warm_pool
-    autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-    # ami has unwanted ephemeral device, don't copy all the ebs_volumes
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                      = "base_windows_server_2012_r2_release_2024-*"
-      ami_owner                     = "374269020027"
-      availability_zone             = null
+      ami_name          = "base_windows_server_2012_r2_release_2024-*"
+      ami_owner         = "374269020027"
+      availability_zone = "eu-west-2a"
+      # ami has unwanted ephemeral device, don't copy all the ebs_volumes
       ebs_volumes_copy_all_from_ami = false
       user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
     })

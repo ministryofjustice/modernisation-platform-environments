@@ -20,6 +20,9 @@ resource "aws_security_group" "database_security_group" {
       Name = "${local.application_name}-database_security_group-security-group"
     }
   )
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_subnet_group" "jitbit" {
@@ -45,12 +48,15 @@ resource "aws_db_instance" "jitbit" {
   identifier     = "${local.application_name}-${local.environment}-database"
   username       = local.application_data.accounts[local.environment].db_user
 
+  apply_immediately = false
+
   manage_master_user_password = true
 
   snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
 
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.sqlserver-se-15.0"
+  ca_cert_identifier          = local.application_data.accounts[local.environment].db_ca_cert_identifier
   deletion_protection         = local.application_data.accounts[local.environment].db_deletion_protection
   delete_automated_backups    = local.application_data.accounts[local.environment].db_delete_automated_backups
   skip_final_snapshot         = local.skip_final_snapshot

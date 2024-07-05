@@ -48,7 +48,7 @@ locals {
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
-  baseline_security_groups = {
+  security_groups = {
     lb = {
       description = "Security group for public subnet"
       ingress = {
@@ -142,6 +142,13 @@ locals {
     bip = {
       description = "Security group for bip"
       ingress = {
+        all-from-web = {
+          description     = "Allow all ingress from web"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          security_groups = ["web"]
+        }
         all-within-subnet = {
           description = "Allow all ingress to self"
           from_port   = 0
@@ -149,26 +156,27 @@ locals {
           protocol    = -1
           self        = true
         }
-        http6400 = {
-          description     = "Allow http6400 ingress"
+        host-agent = {
+          description     = "Allow http1128 ingress"
+          from_port       = 1128
+          to_port         = 1128
+          protocol        = "tcp"
+          security_groups = ["web"]
+        }
+        subversion = {
+          description     = "Allow http3690 ingress"
+          from_port       = 3690
+          to_port         = 3690
+          protocol        = "tcp"
+          security_groups = ["web"]
+        }
+        cms-ingress = {
+          description     = "Allow http6400-http6500 ingress"
           from_port       = 6400
-          to_port         = 6400
+          to_port         = 6500
           protocol        = "tcp"
-          security_groups = ["web"]
-        }
-        http6411 = {
-          description     = "Allow http6411 ingress"
-          from_port       = 6411
-          to_port         = 6411
-          protocol        = "tcp"
-          security_groups = ["web"]
-        }
-        http6455 = {
-          description     = "Allow http6455 ingress"
-          from_port       = 6455
-          to_port         = 6455
-          protocol        = "tcp"
-          security_groups = ["web"]
+          security_groups = ["web", "private-jumpserver"]
+          cidr_blocks     = ["10.0.0.0/8"] # added for testing, remove later
         }
       }
       egress = {
@@ -191,6 +199,27 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+        }
+        subversion = {
+          description     = "Allow http3690 ingress"
+          from_port       = 3690
+          to_port         = 3690
+          protocol        = "tcp"
+          security_groups = []
+        }
+        http6450 = {
+          description     = "Allow http6450 ingress"
+          from_port       = 6450
+          to_port         = 6450
+          protocol        = "tcp"
+          security_groups = []
+        }
+        http6455 = {
+          description     = "Allow http6455 ingress"
+          from_port       = 6455
+          to_port         = 6455
+          protocol        = "tcp"
+          security_groups = []
         }
         http28080 = {
           description     = "Allow http28080 ingress"
@@ -234,6 +263,28 @@ locals {
           to_port     = "3872"
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.oracle_oem_agent
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+    private-jumpserver = {
+      description = "Security group for jumpservers"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
         }
       }
       egress = {

@@ -156,6 +156,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   statistic           = each.value.statistic
   threshold           = each.value.threshold
   alarm_actions       = each.value.alarm_actions
+  ok_actions          = each.value.ok_actions
   alarm_description   = each.value.alarm_description
   datapoints_to_alarm = each.value.datapoints_to_alarm
   treat_missing_data  = each.value.treat_missing_data

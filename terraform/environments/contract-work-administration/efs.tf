@@ -1,9 +1,9 @@
 resource "aws_efs_file_system" "cwa" {
 
   performance_mode = "maxIO"
-#   throughput_mode  = "Bursting"
-  encrypted        = "true"
-  kms_key_id       = aws_kms_key.efs.arn
+  #   throughput_mode  = "Bursting"
+  encrypted  = "true"
+  kms_key_id = aws_kms_key.efs.arn
 
   lifecycle_policy {
     transition_to_ia = "AFTER_90_DAYS"
@@ -25,12 +25,12 @@ resource "aws_efs_backup_policy" "cwa" {
 }
 
 resource "aws_kms_key" "efs" {
-  description             = "KMS key for encrypting EFS"
-#   deletion_window_in_days = 10
-  enable_key_rotation     = true
-  tags = local.tags
+  description = "KMS key for encrypting EFS"
+  #   deletion_window_in_days = 10
+  enable_key_rotation = true
+  tags                = local.tags
 }
-        
+
 resource "aws_kms_key_policy" "efs" {
   key_id = aws_kms_key.efs.id
   policy = jsonencode({
@@ -74,20 +74,20 @@ resource "aws_security_group" "efs" {
 
 resource "aws_vpc_security_group_egress_rule" "efs_outbound" {
   security_group_id = aws_security_group.efs.id
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  description = "EFS Rule inbound from local VPC"
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  description       = "EFS Rule inbound from local VPC"
+  from_port         = 2049
+  ip_protocol       = "tcp"
+  to_port           = 2049
 }
 
 resource "aws_vpc_security_group_ingress_rule" "efs_inbound" {
   security_group_id = aws_security_group.efs.id
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  description = "EFS Rule outbound to local VPC"
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  description       = "EFS Rule outbound to local VPC"
+  from_port         = 2049
+  ip_protocol       = "tcp"
+  to_port           = 2049
 }
 
 resource "aws_cloudwatch_metric_alarm" "efs_connection_repo_home" {
@@ -103,8 +103,8 @@ resource "aws_cloudwatch_metric_alarm" "efs_connection_repo_home" {
   period             = "60"
   statistic          = "Sum"
   threshold          = local.environment == "production" ? 4 : 3
-  # alarm_actions      = [aws_sns_topic.alerting_topic.arn]
-  # ok_actions         = [aws_sns_topic.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
   treat_missing_data = "breaching"
   tags = merge(
     local.tags,

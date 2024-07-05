@@ -21,7 +21,7 @@ locals {
 
   certificate_arn = aws_acm_certificate.external.arn
 
-  globalprotect_ips = module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_alpha
+  moj_ips = concat(module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public, module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal, module.ip_addresses.moj_cidrs.trusted_mojo_public)
   unilink_ips = [
     "194.75.210.216/29", # Unilink AOVPN
     "83.98.63.176/29",   # Unilink AOVPN
@@ -36,5 +36,10 @@ locals {
     "217.138.45.109/32", # Unilink AOVPN
     "217.138.45.110/32", # Unilink AOVPN
   ]
-  all_ingress_ips = concat(local.globalprotect_ips, local.unilink_ips)
+  all_ingress_ips = concat(local.moj_ips, local.unilink_ips)
+
+  secret_prefix           = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
+  application_secret_name = "${local.secret_prefix}-application-passwords"
+  mis_account_id          = var.platform_vars.environment_management.account_ids[join("-", ["delius-mis", var.account_info.mp_environment])]
+
 }

@@ -28,5 +28,6 @@ module "environment_dev" {
 
   nextcloud_config = local.nextcloud_config_dev
 
-  tags = local.tags
+  tags                      = local.tags
+  pagerduty_integration_key = local.pagerduty_integration_keys["delius_nextcloud_nonprod_alarms"]
 }

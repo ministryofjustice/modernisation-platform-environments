@@ -15,7 +15,7 @@ module "ec2_autoscaling_group" {
 
   for_each = var.ec2_autoscaling_groups
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=ac452c53dbfb30fa9eb94507f71068be22cee477" #v2.5.4
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=60ab25bd675cb64d4a67c5f5fd32a147fa0ece4a" # v2.5.5
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -82,6 +82,9 @@ module "ec2_autoscaling_group" {
     for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
       alarm_actions = [
         for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+      ok_actions = [
+        for item in value.ok_actions : try(aws_sns_topic.this[item].arn, item)
       ]
     })
   }

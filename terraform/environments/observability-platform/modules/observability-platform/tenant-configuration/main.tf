@@ -24,6 +24,18 @@ module "cloudwatch_source" {
   depends_on = [module.xray_source]
 }
 
+module "amazon_prometheus_query_source" {
+  for_each = {
+    for name, account in var.aws_accounts : name => account if account.amazon_prometheus_query_enabled
+  }
+
+  source = "../../grafana/amazon-prometheus-query-source"
+
+  name                           = each.key
+  account_id                     = var.environment_management.account_ids[each.key]
+  amazon_prometheus_workspace_id = each.value.amazon_prometheus_workspace_id
+}
+
 module "prometheus_push" {
   for_each = {
     for name, account in var.aws_accounts : name => account if account.prometheus_push_enabled
@@ -46,5 +58,9 @@ module "team" {
   identity_centre_team = var.identity_centre_team
   aws_accounts         = var.aws_accounts
 
-  depends_on = [module.xray_source, module.cloudwatch_source]
+  depends_on = [
+    module.xray_source,
+    module.cloudwatch_source,
+    module.amazon_prometheus_query_source
+  ]
 }

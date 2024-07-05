@@ -1,0 +1,37 @@
+---
+schemaVersion: "2.2"
+description: SSM Document for updating configuration management on windows servers using powershell
+parameters:
+  branch:
+    type: String
+    description: Which branch of modernisation-platform-configuration-management to use
+    default: main
+  powershellScript:
+    type: String
+    description: Powershell script to invoke from config management repo powershell/Scripts directory
+    default: Invoke-UserDataScript.ps1
+  powershellScriptArgs:
+    type: String
+    description: 'Any additional parameters to pass to powershell in hashtable format, e.g. @{"DomainNameFQDN" = "azure.noms.root"}'
+    default: '@{}'
+mainSteps:
+  - name: WindowsPowershellConfigurationManagement
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
+    inputs:
+      runCommand:
+        - |
+          # Run UserData powershell from modernisation-platform-configuration-management repo
+          $ErrorActionPreference = "Stop"
+          Write-Output "Downloading and running Run-GitScript.ps1"
+          Set-Location -Path ([System.IO.Path]::GetTempPath())
+          $GitBranch = "{{ branch }}"
+          $Script = "{{ powershellScript }}"
+          $ScriptArgs = {{ powershellScriptArgs }}
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
+          Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
+          . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch -ScriptArgs $ScriptArgs
+          Exit $LASTEXITCODE

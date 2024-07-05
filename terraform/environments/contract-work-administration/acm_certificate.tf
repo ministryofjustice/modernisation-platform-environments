@@ -1,18 +1,18 @@
 locals {
-    lbs_prod_domain = local.environment == "production" ? "tbd.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  lbs_prod_domain = local.environment == "production" ? "tbd.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
 
-    lbs_domain_types = { for dvo in aws_acm_certificate.load_balancer.domain_validation_options : dvo.domain_name => {
-        name   = dvo.resource_record_name
-        record = dvo.resource_record_value
-        type   = dvo.resource_record_type
-        }
+  lbs_domain_types = { for dvo in aws_acm_certificate.load_balancer.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
     }
-    lbs_domain_name_main   = [for k, v in local.lbs_domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
-    lbs_domain_name_sub    = [for k, v in local.lbs_domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
-    lbs_domain_record_main = [for k, v in local.lbs_domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
-    lbs_domain_record_sub  = [for k, v in local.lbs_domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
-    lbs_domain_type_main   = [for k, v in local.lbs_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
-    lbs_domain_type_sub    = [for k, v in local.lbs_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+  }
+  lbs_domain_name_main   = [for k, v in local.lbs_domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  lbs_domain_name_sub    = [for k, v in local.lbs_domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  lbs_domain_record_main = [for k, v in local.lbs_domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  lbs_domain_record_sub  = [for k, v in local.lbs_domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  lbs_domain_type_main   = [for k, v in local.lbs_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  lbs_domain_type_sub    = [for k, v in local.lbs_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
 }
 

@@ -13,16 +13,16 @@ locals {
 
   database_cloudwatch_metric_alarms = {
     standard = merge(
-      module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
     )
     db_connected = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
     )
     db_backup = merge(
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,
     )
   }
 
@@ -38,21 +38,11 @@ locals {
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     ebs_volumes = {
-      "/dev/sdb" = { type = "gp3", label = "app", size = 100 } # /u01
-      "/dev/sdc" = { type = "gp3", label = "app", size = 100 } # /u02
-      "/dev/sde" = { type = "gp3", label = "data" }            # DATA01
-      "/dev/sdf" = { type = "gp3", label = "data" }            # DATA02
-      "/dev/sdg" = { type = "gp3", label = "data" }            # DATA03
-      "/dev/sdh" = { type = "gp3", label = "data" }            # DATA04
-      "/dev/sdi" = { type = "gp3", label = "data" }            # DATA05
-      "/dev/sdj" = { type = "gp3", label = "flash" }           # FLASH01
-      "/dev/sdk" = { type = "gp3", label = "flash" }           # FLASH02
-      "/dev/sds" = { type = "gp3", label = "swap" }
-    }
-
-    ebs_volume_config = {
-      data  = { total_size = 500 }
-      flash = { total_size = 50 }
+      "/dev/sdb" = { type = "gp3", label = "app", size = 100 }   # /u01
+      "/dev/sdc" = { type = "gp3", label = "app", size = 500 }   # /u02
+      "/dev/sde" = { type = "gp3", label = "data", size = 500 }  # DATA01
+      "/dev/sdj" = { type = "gp3", label = "flash", size = 200 } # FLASH01
+      "/dev/sds" = { type = "gp3", label = "swap", size = 4 }
     }
 
     route53_records = module.baseline_presets.ec2_instance.route53_records.internal_and_external
@@ -71,12 +61,12 @@ locals {
 
   database_ec2_a = merge(local.database_ec2_default, {
     config = merge(local.database_ec2_default.config, {
-      availability_zone = "${local.region}a"
+      availability_zone = "eu-west-2a"
     })
   })
   database_ec2_b = merge(local.database_ec2_default, {
     config = merge(local.database_ec2_default.config, {
-      availability_zone = "${local.region}b"
+      availability_zone = "eu-west-2b"
     })
   })
 

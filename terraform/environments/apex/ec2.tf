@@ -1,25 +1,7 @@
-locals {
-  instance-userdata = <<EOF
-#!/bin/bash
-cd /tmp
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-sudo systemctl start amazon-ssm-agent
-sudo systemctl enable amazon-ssm-agent
-echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
-mount -a
-
-cd /etc
-mkdir cloudwatch_agent
-cd cloudwatch_agent
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
-rpm -U ./amazon-cloudwatch-agent.rpm
-echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/etc/cloudwatch_agent/cloudwatch_agent_config.json
-
-EOF
+resource "aws_key_pair" "apex" {
+  key_name   = "${local.application_name}-ssh-key"
+  public_key = local.application_data.accounts[local.environment].apex_ec2_key
 }
-
-
 
 
 resource "aws_instance" "apex_db_instance" {
@@ -28,11 +10,13 @@ resource "aws_instance" "apex_db_instance" {
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
-  vpc_security_group_ids      = [aws_security_group.ec2.id]
+  vpc_security_group_ids      = [aws_security_group.database.id]
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
-  user_data_base64            = base64encode(local.instance-userdata)
+  key_name                    = aws_key_pair.apex.key_name
+  user_data_base64            = base64encode(local.database-instance-userdata)
+  user_data_replace_on_change = true
 
 
   root_block_device {
@@ -48,7 +32,7 @@ resource "aws_instance" "apex_db_instance" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name} Database Server" },
+    { "Name" = local.database_ec2_name },
     { "instance-scheduling" = "skip-scheduling" },
     { "snapshot-with-daily-7-day-retention" = "yes" }
   )
@@ -59,64 +43,70 @@ data "local_file" "cloudwatch_agent" {
 }
 
 
-resource "aws_security_group" "ec2" {
-  name        = local.application_name
+resource "aws_security_group" "database" {
+  name        = "${local.application_name}-db-security-group"
   description = "APEX DB Server Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
-  # this ingress rule to be added after the ECS has been setup in MP
-  # ingress {
-  #   description = "database listener port access to ECS security group"
-  #   from_port   = 1521
-  #   to_port     = 1521
-  #   protocol    = "tcp"
-  #   security_groups = aws_security_group.<ECS_SG>.id #!Ref AppEcsSecurityGroup
-  # }
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-db-security-group" }
+  )
 
-  ingress {
-    description = "database listener port access to lz non prod mgmt cidr"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].lz_shared_nonprod_mgmt_vpc_cidr]
-  }
-  ingress {
-    description = "database listener port access to lz prod mgmt cidr"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].lz_shared_prod_mgmt_vpc_cidr]
-  }
-  ingress {
-    description = "database listener port access to MP development CIDR"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
-  }
-  ingress {
-    description = "inbound ssh access for Lambda"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].mp_vpc_cidr]
-  }
-
-  egress {
-    description = "Allow AWS SSM Session Manager"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    description = "outbound access"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
+
+resource "aws_vpc_security_group_ingress_rule" "db_ecs" {
+  security_group_id            = aws_security_group.database.id
+  description                  = "Allow ECS to access database instance"
+  referenced_security_group_id = module.apex-ecs.cluster_ec2_security_group_id
+  from_port                    = 1521
+  ip_protocol                  = "tcp"
+  to_port                      = 1521
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
+  security_group_id = aws_security_group.database.id
+  description       = "Allow MP VPC (OAS) to access database instance"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
+  security_group_id            = aws_security_group.database.id
+  description                  = "Allow Lambda SSH access for backup snapshots"
+  referenced_security_group_id = aws_security_group.backup_lambda.id
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
+  security_group_id = aws_security_group.database.id
+  description       = "Database listener port access to Workspaces"
+  cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
+}
+
+# This is a temp rule whilst OAS resides in LZ
+resource "aws_vpc_security_group_ingress_rule" "oas_lz" {
+  security_group_id = aws_security_group.database.id
+  description       = "Allow OAS in LZ to access APEX"
+  cidr_ipv4         = local.application_data.accounts[local.environment].oas_lz_cidr
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
+}
+
+resource "aws_vpc_security_group_egress_rule" "db_outbound" {
+  security_group_id = aws_security_group.database.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${local.application_name}-ec2-profile"
@@ -264,11 +254,61 @@ resource "aws_volume_attachment" "u04-arch" {
 
 resource "aws_route53_record" "apex-db" {
   provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.inner.zone_id
-  name     = "db.${local.application_name}.${data.aws_route53_zone.inner.name}"
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "db.${local.application_name}.${data.aws_route53_zone.external.name}"
   type     = "A"
   ttl      = 900
   records  = [aws_instance.apex_db_instance.private_ip]
+}
+
+resource "aws_cloudwatch_log_group" "database" {
+  name              = "${upper(local.application_name)}-EC2-database-alert"
+  retention_in_days = 0
+  # kms_key_id = aws_kms_key.cloudwatch_logs_key.arn # Not encrypted in LZ
+  tags = merge(
+    local.tags,
+    {
+      Name = "${upper(local.application_name)}-EC2-database-alert"
+    }
+  )
+}
+
+resource "aws_cloudwatch_log_metric_filter" "database" {
+  name           = "${upper(local.application_name)}-LogMetricOracleAlerts"
+  pattern        = "\"ORA-\""
+  log_group_name = aws_cloudwatch_log_group.database.name
+
+  metric_transformation {
+    name          = "${upper(local.application_name)}-LogMetricOracleAlerts"
+    namespace     = "LogsMetricFilters"
+    value         = "1"
+    default_value = 0
+  }
+}
+
+resource "aws_cloudwatch_log_group" "pmon_status" {
+  name              = "${upper(local.application_name)}-EC2-database-pmon-status"
+  retention_in_days = 0
+  # kms_key_id = aws_kms_key.cloudwatch_logs_key.arn # Not encrypted in LZ
+  tags = merge(
+    local.tags,
+    {
+      Name = "${upper(local.application_name)}-EC2-database-pmon-status"
+    }
+  )
+}
+
+resource "aws_cloudwatch_log_metric_filter" "pmon_status" {
+  name           = "${upper(local.application_name)}-LogMetricPMONStatus"
+  pattern        = "DOWN"
+  log_group_name = aws_cloudwatch_log_group.pmon_status.name
+
+  metric_transformation {
+    name          = "${upper(local.application_name)}-LogMetricPMONStatus"
+    namespace     = "LogsMetricFilters"
+    value         = "1"
+    default_value = 0
+  }
 }
 
 

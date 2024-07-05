@@ -10,7 +10,7 @@ module "nextcloud_service" {
 
   target_group_protocol_version = "HTTP1"
 
-  container_image = "nextcloud:latest"
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-nextcloud:latest"
   container_port_config = [
     {
       containerPort = "80"
@@ -18,17 +18,22 @@ module "nextcloud_service" {
     }
   ]
 
-  desired_count                      = 3
-  deployment_maximum_percent         = "200"
-  deployment_minimum_healthy_percent = "100"
+  desired_count                      = 1
+  deployment_maximum_percent         = "100"
+  deployment_minimum_healthy_percent = "0"
 
-  ecs_service_egress_security_group_ids = [
+  ecs_service_egress_security_group_ids = concat([
     for efs in module.nextcloud_efs : {
       ip_protocol                  = "tcp"
       port                         = 2049
       referenced_security_group_id = efs.sg_id
+    }], [
+    {
+      ip_protocol = "tcp"
+      port        = 389
+      cidr_ipv4   = var.account_info.cp_cidr
     }
-  ]
+  ])
 
   efs_volumes = [
     for efs in module.nextcloud_efs : {
@@ -46,9 +51,9 @@ module "nextcloud_service" {
       }]
     }
   ]
-  mount_points = [for efs in module.nextcloud_efs : {
-    sourceVolume  = efs.name
-    containerPath = "/var/www/${efs.name}"
+  mount_points = [for k, v in module.nextcloud_efs : {
+    sourceVolume  = v.name
+    containerPath = "/var/www/${k}"
     readOnly      = false
   }]
 
@@ -59,21 +64,30 @@ module "nextcloud_service" {
   alb_listener_rule_paths            = ["/"]
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
   microservice_lb                    = aws_alb.nextcloud
-  name                               = "nextcloud-poc"
+  name                               = "nextcloud"
+
+
+  container_cpu    = 2048
+  container_memory = 4096
+
+  extra_task_role_policies = {
+    "S3_BUCKET_CONFIG"   = data.aws_iam_policy_document.s3_bucket_config
+    "access_ldap_secret" = data.aws_iam_policy_document.access_ldap_secret
+  }
 
   create_rds               = true
   rds_engine               = "mariadb"
-  rds_engine_version       = "10.6"
+  rds_engine_version       = "10.5"
   rds_instance_class       = "db.t3.small"
   rds_allocated_storage    = 500
   rds_username             = "misnextcloud"
   rds_port                 = 3306
-  rds_parameter_group_name = "default.mariadb10.6"
+  rds_parameter_group_name = "default.mariadb10.5"
   rds_license_model        = "general-public-license"
-  snapshot_identifier      = "rds-090524-shared-key"
+  snapshot_identifier      = "nextcloud-rds-19062024"
 
-  rds_allow_major_version_upgrade = false
-  rds_apply_immediately           = false
+  rds_allow_major_version_upgrade = true
+  rds_apply_immediately           = true
 
   create_elasticache               = true
   elasticache_engine               = "redis"
@@ -81,31 +95,34 @@ module "nextcloud_service" {
   elasticache_node_type            = "cache.t3.small"
   elasticache_port                 = 6379
   elasticache_parameter_group_name = "default.redis6.x"
-  elasticache_subnet_group_name    = "nextcloud-elasticache-subnet-group"
 
-  db_ingress_security_groups = [aws_security_group.cluster.id]
+  db_ingress_security_groups = []
 
   rds_endpoint_environment_variable         = "MYSQL_HOST"
+  rds_password_secret_variable              = "MYSQL_PASSWORD"
+  rds_user_secret_variable                  = "MYSQL_USER"
   elasticache_endpoint_environment_variable = "REDIS_HOST"
 
   container_vars_default = {
     MYSQL_DATABASE            = "nextcloud"
-    MYSQL_USER                = "dbadmin"
-    MYSQL_PASSWORD            = "password"
-    REDIS_PORT                = "6379"
-    REDIS_PASSWORD            = "password"
+    REDIS_HOST_PORT           = "6379"
     NEXTCLOUD_ADMIN_USER      = "admin"
     NEXTCLOUD_TRUSTED_DOMAINS = aws_route53_record.nextcloud_external.fqdn
+    S3_BUCKET_CONFIG          = module.s3_bucket_config.bucket.id
+    LDAP_PASSWORD_SECRET_ARN  = "arn:aws:secretsmanager:eu-west-2:${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:secret:ldap-admin-password"
   }
+
   container_vars_env_specific = {}
 
   container_secrets_env_specific = {}
+
+
 
   container_secrets_default = {
     NEXTCLOUD_ADMIN_PASSWORD = aws_secretsmanager_secret.nextcloud_admin_password.arn
   }
 
-  log_error_pattern      = "FATAL"
+  log_error_pattern      = "ERROR"
   sns_topic_arn          = aws_sns_topic.nextcloud_alarms.arn
   frontend_lb_arn_suffix = aws_alb.nextcloud.arn_suffix
 
@@ -116,6 +133,8 @@ module "nextcloud_service" {
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
+
+  ignore_changes_service_task_definition = false
 
 }
 
@@ -131,4 +150,38 @@ resource "aws_secretsmanager_secret_version" "nextcloud_admin_password" {
 resource "random_password" "nextcloud_admin_password" {
   length  = 32
   special = true
+}
+
+
+data "aws_iam_policy_document" "s3_bucket_config" {
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject"
+    ]
+    resources = [module.s3_bucket_config.bucket.arn]
+  }
+}
+
+data "aws_iam_policy_document" "access_ldap_secret" {
+  statement {
+    sid = "AccessToSecretsManager"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:secretsmanager:eu-west-2:${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:secret:ldap-admin-password*"
+    ]
+  }
+  statement {
+    sid = "kmsAccess"
+    actions = [
+      "kms:Decrypt"
+    ]
+    effect = "Allow"
+    resources = [
+      var.account_config.kms_keys.general_shared
+    ]
+  }
 }

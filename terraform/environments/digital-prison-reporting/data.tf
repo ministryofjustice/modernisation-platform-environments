@@ -16,6 +16,19 @@ data "aws_secretsmanager_secret_version" "nomis" {
   depends_on = [aws_secretsmanager_secret.nomis]
 }
 
+# Source Bodmis Secrets
+data "aws_secretsmanager_secret" "bodmis" {
+  name = aws_secretsmanager_secret.bodmis.id
+
+  depends_on = [aws_secretsmanager_secret_version.bodmis]
+}
+
+data "aws_secretsmanager_secret_version" "bodmis" {
+  secret_id = data.aws_secretsmanager_secret.bodmis.id
+
+  depends_on = [aws_secretsmanager_secret.bodmis]
+}
+
 # Source DataMart Secrets
 data "aws_secretsmanager_secret" "datamart" {
   name = aws_secretsmanager_secret.redshift.id
@@ -27,6 +40,21 @@ data "aws_secretsmanager_secret_version" "datamart" {
   secret_id = data.aws_secretsmanager_secret.datamart.id
 
   depends_on = [aws_secretsmanager_secret.redshift]
+}
+
+# Operational DataStore Secrets for use in DataHub
+data "aws_secretsmanager_secret" "operational_datastore" {
+  count = (local.environment == "development" ? 1 : 0)
+  name  = aws_secretsmanager_secret.operational_datastore[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.operational_datastore[0]]
+}
+
+data "aws_secretsmanager_secret_version" "operational_datastore" {
+  count     = (local.environment == "development" ? 1 : 0)
+  secret_id = data.aws_secretsmanager_secret.operational_datastore[0].id
+
+  depends_on = [aws_secretsmanager_secret.operational_datastore[0]]
 }
 
 
@@ -67,4 +95,23 @@ data "aws_secretsmanager_secret" "pagerduty_integration" {
 data "aws_secretsmanager_secret_version" "pagerduty_integration" {
   count     = local.enable_pagerduty_alerts ? 1 : 0
   secret_id = data.aws_secretsmanager_secret.pagerduty_integration[0].id
+}
+
+# Source Analytics DBT Secrets
+data "aws_secretsmanager_secret" "dbt_secrets" {
+  name = aws_secretsmanager_secret.dbt_secrets[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.dbt_secrets]
+}
+
+data "aws_secretsmanager_secret_version" "dbt_secrets" {
+  secret_id = data.aws_secretsmanager_secret.dbt_secrets.id
+
+  depends_on = [aws_secretsmanager_secret.dbt_secrets]
+}
+
+
+# TLS Certificate for OIDC URL, DBT K8s Platform 
+data "tls_certificate" "dbt_analytics" {
+  url = "https://oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}"
 }

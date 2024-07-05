@@ -71,23 +71,20 @@ if __name__ == "__main__":
     # =================================================================================
 
     table_ddl_create = f'''
-    CREATE EXTERNAL TABLE `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
-    `run_datetime` timestamp, 
-    `full_table_name` string, 
+    CREATE EXTERNAL TABLE IF NOT EXISTS `{GLUE_CATALOG_DB_NAME}`.`{GLUE_CATALOG_TBL_NAME}`(
+    `run_datetime` timestamp,
     `json_row` string, 
-    `validation_msg` string)
+    `validation_msg` string,
+    `table_to_ap` string)
     PARTITIONED BY ( 
-        `database_name` string)
-    ROW FORMAT SERDE 
-        'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' 
-    STORED AS INPUTFORMAT 
-        'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat' 
-    OUTPUTFORMAT 
-        'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+        `database_name` string,
+        `full_table_name` string)
+    STORED AS PARQUET
     LOCATION
-        's3://dms-data-validation-20240509174326500600000002/dms_data_validation/glue_df_output/'
+        's3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/dms_data_validation/glue_df_output/'
     TBLPROPERTIES (
         'classification'='parquet', 
+        'parquet.compression'='SNAPPY',
         'partition_filtering.enabled'='true',
         'typeOfData'='file')
     '''.strip()

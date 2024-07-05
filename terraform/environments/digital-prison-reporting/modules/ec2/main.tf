@@ -5,6 +5,7 @@ data "template_file" "user_data" {
 
   vars = {
     environment = var.env
+    static_ip   = var.static_private_ip
   }
 }
 

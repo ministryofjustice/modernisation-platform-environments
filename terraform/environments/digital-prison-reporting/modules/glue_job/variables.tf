@@ -10,10 +10,12 @@ variable "arguments" {
 }
 
 variable "max_concurrent" {
+  type    = number
   default = 1
 }
 
 variable "dpu" {
+  type    = number
   default = 1
 }
 
@@ -36,6 +38,7 @@ variable "spark_event_logs" {
 }
 
 variable "bookmark" {
+  type        = string
   default     = "disabled"
   description = "It can be enabled, disabled or paused."
 }
@@ -167,6 +170,7 @@ variable "create_role" {
 #}
 
 variable "execution_class" {
+  type        = string
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
 }
@@ -328,11 +332,13 @@ variable "continuous_log_stream_prefix" {
 }
 
 variable "region" {
+  type        = string
   description = "Current AWS Region."
   default     = "eu-west-2"
 }
 
 variable "account" {
+  type        = string
   description = "AWS Account ID."
   default     = ""
 }
