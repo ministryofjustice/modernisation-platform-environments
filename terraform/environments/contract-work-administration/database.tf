@@ -58,6 +58,11 @@ sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
 sed -i '/development-general$/d' /root/.ssh/authorized_keys
 sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
+## Add custom metric script
+echo "Adding the custom metrics script for CloudWatch"
+echo '${data.local_file.database_custom_metrics.content}' > /var/db-cw-custom.json
+# This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+
 EOF
 
 }

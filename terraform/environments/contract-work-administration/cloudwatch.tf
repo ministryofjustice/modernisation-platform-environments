@@ -335,6 +335,92 @@ resource "aws_cloudwatch_metric_alarm" "database_oradata_read" {
   )
 }
 
+resource "aws_cloudwatch_metric_alarm" "database_oraredo_diskspace" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oraredo-diskspace"
+  alarm_description   = "EBS Oraredo Volume - Disk Space is Low"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oraredo"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oraredo_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = "5"
+  metric_name        = "disk_used_percent_oraredo"
+  namespace          = "CustomScript"
+  period             = "60"
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_diskspace_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oraredo-diskspace"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oradata_diskspace" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oradata-diskspace"
+  alarm_description   = "EBS Oradata Volume - Disk Space is Low"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oradata"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oradata_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = "5"
+  metric_name        = "disk_used_percent_oradata"
+  namespace          = "CustomScript"
+  period             = "60"
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_diskspace_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oradata-diskspace"
+    }
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "database_oratmp_diskspace" {
+
+  alarm_name          = "${local.application_name_short}-${local.environment}-database-oratmp-diskspace"
+  alarm_description   = "EBS Oratmp Volume - Disk Space is Low"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  dimensions = {
+    path = "/CWA/oratmp"
+    InstanceId = aws_instance.database.id
+    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    InstanceType = aws_instance.database.instance_type
+    device = "/dev/xvd${local.oratmp_device_name_letter}"
+    fstype = "ext4"
+  }
+  evaluation_periods = "5"
+  metric_name        = "disk_used_percent_oratmp"
+  namespace          = "CustomScript"
+  period             = "60"
+  statistic          = "Average"
+  threshold          = local.application_data.accounts[local.environment].database_diskspace_threshold
+  alarm_actions      = [aws_sns_topic.cwa.arn]
+  ok_actions         = [aws_sns_topic.cwa.arn]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-database-oratmp-diskspace"
+    }
+  )
+}
 
 # resource "aws_cloudwatch_metric_alarm" "" {
 
@@ -349,7 +435,7 @@ resource "aws_cloudwatch_metric_alarm" "database_oradata_read" {
 #   namespace          = ""
 #   period             = ""
 #   statistic          = ""
-#   threshold          = ""
+#   threshold          = local.application_data.accounts[local.environment].database_oradata_read_alarm_threshold
 #   alarm_actions      = [aws_sns_topic.cwa.arn]
 #   ok_actions         = [aws_sns_topic.cwa.arn]
 #   treat_missing_data = ""

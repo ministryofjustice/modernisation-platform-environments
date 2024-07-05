@@ -1,6 +1,7 @@
 #!/bin/bash
 
-### /var/cw-custom.sh for Concurrent Manager
+### /var/cw-custom.sh for Concurrent Manager - MP version
+
 #  INSTANCE INFO
 INSTANCE_META=http://169.254.169.254/latest/meta-data
 INSTANCE_ID=$(curl $INSTANCE_META/instance-id)
