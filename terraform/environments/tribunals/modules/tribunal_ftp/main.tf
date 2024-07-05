@@ -71,7 +71,6 @@ module "app_ecs_task" {
   is_ftp_app                   = var.is_ftp_app
   lb_tg_arn                    = var.target_group_arns["${local.module_name}"]
   sftp_lb_tg_arn               = var.target_group_arns_sftp["${local.module_name}"]
-  subnets_shared_public_ids    = var.subnets_shared_public_ids
   subnets_shared_private_ids   = var.subnets_shared_private_ids
   app_lb_sg_id                 = var.app_lb_sg_id
   vpc_shared_id                = var.vpc_shared_id
