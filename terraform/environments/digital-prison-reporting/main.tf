@@ -48,6 +48,7 @@ module "glue_reporting_hub_job" {
   account                      = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
   connections                  = local.glue_connection_names
+  additional_secret_arns       = [aws_secretsmanager_secret.operational_datastore.arn]
 
   tags = merge(
     local.all_tags,
@@ -116,6 +117,7 @@ module "glue_reporting_hub_batch_job" {
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
   connections                   = local.glue_connection_names
+  additional_secret_arns        = [aws_secretsmanager_secret.operational_datastore.arn]
 
   tags = merge(
     local.all_tags,
@@ -171,6 +173,7 @@ module "glue_reporting_hub_cdc_job" {
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
   connections                   = local.glue_connection_names
+  additional_secret_arns        = [aws_secretsmanager_secret.operational_datastore.arn]
 
   tags = merge(
     local.all_tags,
