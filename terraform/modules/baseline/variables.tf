@@ -832,6 +832,7 @@ variable "s3_buckets" {
   description = "map of s3 buckets to create where the map key is the bucket prefix.  See s3_bucket module for more variable details.  Use iam_policies to automatically create a iam policies for the bucket where the key is the name of the policy"
   type = map(object({
     acl                 = optional(string, "private")
+    ownership_controls  = optional(string, "BucketOwnerPreferred")
     versioning_enabled  = optional(bool, true)
     replication_enabled = optional(bool, false)
     replication_region  = optional(string)

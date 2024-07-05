@@ -63,35 +63,39 @@ locals {
 
   s3_buckets = {
     (local.s3_environment_specific.s3_bucket_name) = {
-      iam_policies   = local.requested_s3_iam_policies
-      lifecycle_rule = [local.s3_environment_specific.s3_lifecycle_rule]
+      iam_policies       = local.requested_s3_iam_policies
+      lifecycle_rule     = [local.s3_environment_specific.s3_lifecycle_rule]
+      ownership_controls = "BucketOwnerPreferred"
       tags = {
         backup = "false"
       }
     }
     (local.s3_environment_specific.db_backup_bucket_name) = {
-      bucket_policy_v2 = local.s3_environment_specific.db_backup_bucket_policy
-      custom_kms_key   = var.environment.kms_keys["general"].arn
-      iam_policies     = local.requested_s3_iam_policies
-      lifecycle_rule   = [local.s3_environment_specific.db_backup_lifecycle_rule]
+      bucket_policy_v2   = local.s3_environment_specific.db_backup_bucket_policy
+      custom_kms_key     = var.environment.kms_keys["general"].arn
+      iam_policies       = local.requested_s3_iam_policies
+      lifecycle_rule     = [local.s3_environment_specific.db_backup_lifecycle_rule]
+      ownership_controls = "BucketOwnerPreferred"
       tags = {
         backup = "false"
       }
     }
     (local.s3_environment_specific.shared_bucket_name) = {
-      bucket_policy_v2 = local.s3_environment_specific.shared_bucket_policy
-      custom_kms_key   = var.environment.kms_keys["general"].arn
-      iam_policies     = local.requested_s3_iam_policies
-      lifecycle_rule   = [local.s3_environment_specific.shared_lifecycle_rule]
+      bucket_policy_v2   = local.s3_environment_specific.shared_bucket_policy
+      custom_kms_key     = var.environment.kms_keys["general"].arn
+      iam_policies       = local.requested_s3_iam_policies
+      lifecycle_rule     = [local.s3_environment_specific.shared_lifecycle_rule]
+      ownership_controls = "BucketOwnerPreferred"
       tags = {
         backup = "false"
       }
     }
     (local.s3_environment_specific.software_bucket_name) = {
-      bucket_policy_v2 = local.s3_environment_specific.software_bucket_policy
-      custom_kms_key   = var.environment.kms_keys["general"].arn
-      iam_policies     = local.requested_s3_iam_policies
-      lifecycle_rule   = [local.s3_lifecycle_rules.software]
+      bucket_policy_v2   = local.s3_environment_specific.software_bucket_policy
+      custom_kms_key     = var.environment.kms_keys["general"].arn
+      iam_policies       = local.requested_s3_iam_policies
+      lifecycle_rule     = [local.s3_lifecycle_rules.software]
+      ownership_controls = "BucketOwnerPreferred"
       tags = {
         backup = "false"
       }
