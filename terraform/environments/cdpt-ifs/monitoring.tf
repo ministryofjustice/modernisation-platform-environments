@@ -8,7 +8,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   statistic           = "Sum"
   threshold           = "1"
   alarm_description   = "This metric monitors 5xx errors on the load balancer"
-  alarm_actions       = [aws_sns_topic.lb_alarm_topic.arn]
+  alarm_actions       = [aws_sns_topic.lb_5xx_alarm_topic.arn]
   dimensions = {
     LoadBalancer = "${local.application_name}-lb"
   }
@@ -16,7 +16,6 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
 
 resource "aws_sns_topic" "lb_5xx_alarm_topic" {
   name = "lb_5xx_alarm_topic"
-  kms_master_key_id = data.aws_kms_key.sns.id
 }
 
 # Pager duty integration
