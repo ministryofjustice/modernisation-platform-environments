@@ -42,6 +42,6 @@ module "pagerduty_core_alerts" {
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.lb_5xx_alarm_topic.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys["cloudwatch_lb_alert"]
+  pagerduty_integration_key = local.pagerduty_integration_keys["cdpt-ifs-alarms"]
 }
 
