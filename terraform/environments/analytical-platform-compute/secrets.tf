@@ -73,7 +73,7 @@ module "ui_azure_client_secret" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.1.2"
 
-  name        = "ui/azure"
+  name        = "ui/azure-client"
   description = "Azure client secret for Analytical Platform UI"
   kms_key_id  = module.common_secrets_manager_kms.key_arn
 
