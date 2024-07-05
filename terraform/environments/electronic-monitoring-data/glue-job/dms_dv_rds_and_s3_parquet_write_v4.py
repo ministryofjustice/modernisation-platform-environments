@@ -65,7 +65,6 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "jdbc_read_512mb_partitions",
                        "jdbc_read_1gb_partitions",
                        "jdbc_read_2gb_partitions",
-                       "jdbc_read_3gb_partitions",
                        "rds_read_rows_fetch_size"
                        ]
 
@@ -565,8 +564,6 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             int_partitions_evaluated = int(total_size_mb/1024)
         elif args.get("jdbc_read_2gb_partitions", "false") == "true":
             int_partitions_evaluated = int((total_size_mb/1024)/2)
-        elif args.get("jdbc_read_3gb_partitions", "false") == "true":
-            int_partitions_evaluated = int((total_size_mb/1024)/3)
         else:
             int_partitions_evaluated = total_files
 
@@ -662,8 +659,11 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         df_rds_temp_t3 = df_rds_temp_t3.repartition(jdbc_read_partitions_num, jdbc_partition_column)
         LOGGER.info(f"""{msg_prefix}: RDS-DF-Partitions = {df_rds_temp_t3.rdd.getNumPartitions()}""")
 
-        df_rds_temp_t3 = df_rds_temp_t3.persist(StorageLevel.MEMORY_AND_DISK)
-        LOGGER.info(f"""{msg_prefix}: >> .persist(StorageLevel.MEMORY_AND_DISK) << Completed.""")
+        # df_rds_temp_t3 = df_rds_temp_t3.persist(StorageLevel.MEMORY_AND_DISK)
+        # LOGGER.info(f"""{msg_prefix}: >> .persist(StorageLevel.MEMORY_AND_DISK) << Completed.""")
+
+        df_rds_temp_t3 = df_rds_temp_t3.cache()
+        LOGGER.info(f"""{msg_prefix}: >> Cached into memory << Completed.""")
 
 
         df_prq_temp = get_s3_parquet_df_v2(tbl_prq_s3_folder_path, df_rds_temp.schema)
@@ -678,8 +678,11 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         df_prq_temp_t1 = df_prq_temp_t1.repartition(jdbc_read_partitions_num, jdbc_partition_column)
         LOGGER.info(f"""{msg_prefix}: PRQ-DF-Partitions = {df_prq_temp_t1.rdd.getNumPartitions()}""")
 
-        df_prq_temp_t1 = df_prq_temp_t1.persist(StorageLevel.MEMORY_AND_DISK)
-        LOGGER.info(f"""{msg_prefix}: >> .persist(StorageLevel.MEMORY_AND_DISK) << Completed.""")
+        # df_prq_temp_t1 = df_prq_temp_t1.persist(StorageLevel.MEMORY_AND_DISK)
+        # LOGGER.info(f"""{msg_prefix}: >> .persist(StorageLevel.MEMORY_AND_DISK) << Completed.""")
+
+        df_prq_temp_t1 = df_prq_temp_t1.cache()
+        LOGGER.info(f"""{msg_prefix}: >> Cached into memory << Completed.""")
 
 
         validated_colmns_list = list()

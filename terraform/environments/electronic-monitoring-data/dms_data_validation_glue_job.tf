@@ -161,7 +161,6 @@ resource "aws_glue_job" "dms_dv_glue_job_v4" {
     "--jdbc_read_512mb_partitions"        = "false"
     "--jdbc_read_1gb_partitions"          = "true"
     "--jdbc_read_2gb_partitions"          = "false"
-    "--jdbc_read_3gb_partitions"          = "false"
     "--rds_read_rows_fetch_size"          = 100000
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
@@ -178,7 +177,7 @@ spark.sql.adaptive.enabled=true
 --conf spark.sql.adaptive.skewJoin.enabled=true 
 --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.shuffle.service.enabled=false
+--conf spark.shuffle.service.enabled=false 
 --conf spark.sql.files.maxPartitionBytes=1g
 EOF
 
