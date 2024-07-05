@@ -69,3 +69,12 @@ variable "sftp_lb_tg_arn" {
   type        = string
   description = "Network Load balancer target group ARN used by SFTP connections"
 }
+
+variable "subnets_shared_private_ids" {
+}
+
+variable "app_lb_sg_id" {
+}
+
+variable "vpc_shared_id" {
+}

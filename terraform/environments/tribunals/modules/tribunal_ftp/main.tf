@@ -55,22 +55,26 @@ resource "aws_ecr_repository" "app-ecr-repo" {
 ####################### ECS Task #########################################
 
 module "app_ecs_task" {
-  source                    = "../ecs_task"
-  app_name                  = local.app
-  task_definition_volume    = var.task_definition_volume
-  container_definition      = local.app_container_definition
-  tags_common               = var.tags
-  appscaling_min_capacity   = var.appscaling_min_capacity
-  appscaling_max_capacity   = var.appscaling_max_capacity
-  ecs_scaling_cpu_threshold = var.ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold = var.ecs_scaling_mem_threshold
-  app_count                 = var.app_count
-  server_port               = var.server_port
-  cluster_id                = var.cluster_id
-  cluster_name              = var.cluster_name
-  is_ftp_app                = var.is_ftp_app
-  lb_tg_arn                 = var.target_group_arns["${local.module_name}"]
-  sftp_lb_tg_arn            = var.target_group_arns_sftp["${local.module_name}"]
+  source                       = "../ecs_task"
+  app_name                     = local.app
+  task_definition_volume       = var.task_definition_volume
+  container_definition         = local.app_container_definition
+  tags_common                  = var.tags
+  appscaling_min_capacity      = var.appscaling_min_capacity
+  appscaling_max_capacity      = var.appscaling_max_capacity
+  ecs_scaling_cpu_threshold    = var.ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold    = var.ecs_scaling_mem_threshold
+  app_count                    = var.app_count
+  server_port                  = var.server_port
+  cluster_id                   = var.cluster_id
+  cluster_name                 = var.cluster_name
+  is_ftp_app                   = var.is_ftp_app
+  lb_tg_arn                    = var.target_group_arns["${local.module_name}"]
+  sftp_lb_tg_arn               = var.target_group_arns_sftp["${local.module_name}"]
+  subnets_shared_public_ids    = var.subnets_shared_public_ids
+  subnets_shared_private_ids   = var.subnets_shared_private_ids
+  app_lb_sg_id                 = var.app_lb_sg_id
+  vpc_shared_id                = var.vpc_shared_id
 }
 
 ####################### Load Balancer #########################################
