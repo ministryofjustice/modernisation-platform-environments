@@ -45,11 +45,11 @@ resource "aws_s3_object" "dms_dv_glue_job_s3_object_v2" {
   etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v2.py")
 }
 
-resource "aws_s3_object" "dms_dv_glue_job_s3_object_v4" {
+resource "aws_s3_object" "dms_dv_glue_job_s3_object_v4a" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-  key    = "dms_dv_rds_and_s3_parquet_write_v4.py"
-  source = "glue-job/dms_dv_rds_and_s3_parquet_write_v4.py"
-  etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v4.py")
+  key    = "dms_dv_rds_and_s3_parquet_write_v4a.py"
+  source = "glue-job/dms_dv_rds_and_s3_parquet_write_v4a.py"
+  etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v4a.py")
 }
 
 resource "aws_s3_object" "dms_dv_glue_job_s3_object_v4b" {
@@ -147,8 +147,8 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
 # "--spark-ui-event-logs-path"          = "false"
 # "--spark-event-logs-path"             = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
 
-resource "aws_glue_job" "dms_dv_glue_job_v4" {
-  name              = "dms-dv-glue-job-v4"
+resource "aws_glue_job" "dms_dv_glue_job_v4a" {
+  name              = "dms-dv-glue-job-v4a"
   description       = "DMS Data Validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
   glue_version      = "4.0"
@@ -164,10 +164,9 @@ resource "aws_glue_job" "dms_dv_glue_job_v4" {
     "--rds_db_tbl_pkeys_col_list"         = ""
     "--rds_df_trim_str_col_list"          = ""
     "--rds_df_trim_micro_sec_ts_col_list" = ""
-    "--jdbc_read_256mb_partitions"        = "false"
+    "--jdbc_read_256mb_partitions"        = "true"
     "--jdbc_read_512mb_partitions"        = "false"
-    "--jdbc_read_1gb_partitions"          = "true"
-    "--jdbc_read_2gb_partitions"          = "false"
+    "--jdbc_read_1gb_partitions"          = "false"
     "--rds_read_rows_fetch_size"          = 100000
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
@@ -185,7 +184,6 @@ spark.sql.adaptive.enabled=true
 --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
 --conf spark.shuffle.service.enabled=false 
---conf spark.sql.files.maxPartitionBytes=1g
 EOF
 
   }
@@ -193,7 +191,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_parquet_write_v4.py"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_parquet_write_v4a.py"
   }
 
   tags = merge(
