@@ -38,7 +38,7 @@ locals {
 # link the sns topic to the service
 module "pagerduty_core_alerts" {
   depends_on = [
-    aws_sns_topic.lb-5xx-errors
+    aws_sns_topic.lb_5xx_alarm_topic
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.lb_5xx_alarm_topic.name]
