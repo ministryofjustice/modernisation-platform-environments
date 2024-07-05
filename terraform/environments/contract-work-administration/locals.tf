@@ -19,4 +19,5 @@ locals {
   oratmp_device_name_letter = "h"
   oraredo_device_name_letter = "i"
   share_device_name_letter = "k"
+  
 }
