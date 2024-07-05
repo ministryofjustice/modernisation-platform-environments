@@ -696,7 +696,18 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                                                                    rds_db_name, 
                                                                                    rds_tbl_name)).cache()
             
-            df_rds_prq_file_subtract_temp = df_rds_temp_t3.subtract(df_prq_file_temp_t1)
+            df_rds_temp_t4 = df_rds_temp_t3.join(df_prq_file_temp_t1, 
+                                                 rds_db_tbl_pkeys_col_list, 
+                                                 how='leftsemi')
+            
+            df_prq_file_temp_t1_count = df_prq_file_temp_t1.count()
+            df_rds_temp_t4_count = df_rds_temp_t4.count()
+            if df_prq_file_temp_t1_count != df_rds_temp_t4_count:
+                fail_msg = f"""df_rds_temp_t4({df_rds_temp_t4_count}) - leftsemi join - df_prq_file_temp_t1({df_prq_file_temp_t1_count})"""
+                LOGGER.error(f"""{fail_msg}: Row count MISMATCHED!""")
+                sys.exit(1)
+
+            df_rds_prq_file_subtract_temp = df_rds_temp_t4.subtract(df_prq_file_temp_t1)
             df_rds_prq_file_subtract_temp_count = df_rds_prq_file_subtract_temp.count()
 
             if df_rds_prq_file_subtract_temp_count == 0:
