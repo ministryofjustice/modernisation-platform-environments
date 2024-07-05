@@ -64,6 +64,7 @@ sed -i '/testimage$/d' /root/.ssh/authorized_keys
 echo "Adding the custom metrics script for CloudWatch"
 rm /var/cw-custom.sh
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.backup_lambda.id}/app-cw-custom.sh /var/cw-custom.sh
+chmod +x cw-custom.sh
 #  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
 
 EOF
@@ -97,7 +98,7 @@ resource "aws_instance" "app1" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.app_userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   metadata_options {
     http_tokens                 = "optional"
   }
