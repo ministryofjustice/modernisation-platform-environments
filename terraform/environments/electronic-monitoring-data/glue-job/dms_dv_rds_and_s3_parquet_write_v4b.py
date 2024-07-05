@@ -737,7 +737,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
                 LOGGER.info(f"""Using Dataframe-'select' column(s) list: {temp_select_list}""")
 
-                df_subtract_select_cols = df_rds_temp_t3.select(*temp_select_list)\
+                df_subtract_select_cols = df_rds_temp_t4.select(*temp_select_list)\
                                             .subtract(df_prq_file_temp_t1.select(*temp_select_list))
         
                 df_subtract_select_cols_count = df_subtract_select_cols.count()
