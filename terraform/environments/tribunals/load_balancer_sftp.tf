@@ -67,9 +67,9 @@ resource "aws_lb_target_group" "tribunals_target_group_sftp" {
   }
 }
 
-# resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment_sftp" {
-#   for_each         = aws_lb_target_group.tribunals_target_group_sftp
-#   target_group_arn = each.value.arn
-#   target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
-#   port             = each.value.port
-# }
+resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment_sftp" {
+  for_each         = aws_lb_target_group.tribunals_target_group_sftp
+  target_group_arn = each.value.arn
+  target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
+  port             = each.value.port
+}
