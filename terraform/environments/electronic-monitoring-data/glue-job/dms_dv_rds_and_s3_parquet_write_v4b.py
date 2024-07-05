@@ -809,10 +809,12 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             # df_temp_row.show(truncate=False)
             LOGGER.warn(f"Not all table columns validated - 1b")
         else:
+            additional_val_msg_1 = f"""{trim_str_msg}\n{trim_ts_ms_msg}""".strip()
+            additional_val_msg_2 = f"""\n{additional_val_msg_1}""" if additional_val_msg_1 != '' else ''
             df_temp_row = spark.sql(f"""select 
                                         current_timestamp() as run_datetime, 
                                         '' as json_row,
-                                        "{rds_tbl_name} - Validated.\n{trim_str_msg}\n{trim_ts_ms_msg}" as validation_msg,
+                                        "{rds_tbl_name} - Validated.{additional_val_msg_2}" as validation_msg,
                                         '{rds_db_name}' as database_name,
                                         '{db_sch_tbl}' as full_table_name,
                                         'False' as table_to_ap
