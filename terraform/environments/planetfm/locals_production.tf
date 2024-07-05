@@ -274,7 +274,7 @@ locals {
 
     lbs = {
       private = {
-        access_logs_lifecycle_rule       = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+        # access_logs_lifecycle_rule       = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
         enable_cross_zone_load_balancing = true
         enable_delete_protection         = false
         idle_timeout                     = 3600
