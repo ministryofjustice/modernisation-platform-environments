@@ -49,7 +49,7 @@ module "glue_reporting_hub_job" {
   account                      = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
   connections                  = local.glue_connection_names
-  additional_secret_arns       = glue_datahub_job_extra_dev_secrets
+  additional_secret_arns       = local.glue_datahub_job_extra_dev_secrets
 
   tags = merge(
     local.all_tags,
@@ -118,7 +118,7 @@ module "glue_reporting_hub_batch_job" {
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
   connections                   = local.glue_connection_names
-  additional_secret_arns        = glue_datahub_job_extra_dev_secrets
+  additional_secret_arns        = local.glue_datahub_job_extra_dev_secrets
 
   tags = merge(
     local.all_tags,
@@ -174,7 +174,7 @@ module "glue_reporting_hub_cdc_job" {
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
   connections                   = local.glue_connection_names
-  additional_secret_arns        = glue_datahub_job_extra_dev_secrets
+  additional_secret_arns        = local.glue_datahub_job_extra_dev_secrets
 
   tags = merge(
     local.all_tags,
