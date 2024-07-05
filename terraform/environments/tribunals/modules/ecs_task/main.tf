@@ -141,11 +141,11 @@ resource "aws_ecs_service" "ecs_service" {
     type  = "spread"
   }
 
-  network_configuration {
-    subnets          = var.subnets_shared_private_ids
-    security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = false
-  }
+  # network_configuration {
+  #   subnets          = var.subnets_shared_private_ids
+  #   security_groups  = [aws_security_group.ecs_service.id]
+  #   assign_public_ip = false
+  # }
 
   load_balancer {
     target_group_arn = var.lb_tg_arn
