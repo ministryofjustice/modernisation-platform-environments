@@ -794,38 +794,34 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         df_rds_temp_t3.unpersist(True)
         # -------------------------------------------------------
 
-        if global_validated_colmns_list:
-            #LOGGER.info(f"""validated_colmns_list = {validated_colmns_list}""")
+        # total_non_primary_key_columns = len(df_rds_columns_list) - len(rds_db_tbl_pkeys_col_list)
+        
+        if len(global_validated_colmns_list) != 0:
+            # depupe list --> list(dict.fromkeys(validated_colmn_msg_list)))
+            df_temp_row = spark.sql(f"""select 
+                                        current_timestamp() as run_datetime, 
+                                        '' as json_row,
+                                        "{' ; '.join(global_validated_colmns_list)} - Specified Columns Validated." as validation_msg,
+                                        '{rds_db_name}' as database_name,
+                                        '{db_sch_tbl}' as full_table_name,
+                                        'False' as table_to_ap
+                                    """.strip())
+            # df_temp_row.show(truncate=False)
+            LOGGER.warn(f"Not all table columns validated - 1b")
+        else:
+            df_temp_row = spark.sql(f"""select 
+                                        current_timestamp() as run_datetime, 
+                                        '' as json_row,
+                                        "{rds_tbl_name} - Validated.\n{trim_str_msg}\n{trim_ts_ms_msg}" as validation_msg,
+                                        '{rds_db_name}' as database_name,
+                                        '{db_sch_tbl}' as full_table_name,
+                                        'False' as table_to_ap
+                                    """.strip())
+            
+            LOGGER.info(f"{rds_tbl_name}: Validation Successful - 1")
+        # -------------------------------------------------------
 
-            total_non_primary_key_columns = len(df_rds_columns_list) - len(rds_db_tbl_pkeys_col_list)
-            # -------------------------------------------------------
-
-            if total_non_primary_key_columns == len(global_validated_colmns_list):
-                df_temp_row = spark.sql(f"""select 
-                                            current_timestamp() as run_datetime, 
-                                            '' as json_row,
-                                            "{rds_tbl_name} - Validated.\n{trim_str_msg}\n{trim_ts_ms_msg}" as validation_msg,
-                                            '{rds_db_name}' as database_name,
-                                            '{db_sch_tbl}' as full_table_name,
-                                            'False' as table_to_ap
-                                        """.strip())
-                
-                LOGGER.info(f"{rds_tbl_name}: Validation Successful - 1")
-            else:
-                # depupe list --> list(dict.fromkeys(validated_colmn_msg_list)))
-                df_temp_row = spark.sql(f"""select 
-                                            current_timestamp() as run_datetime, 
-                                            '' as json_row,
-                                            "{' ; '.join(global_validated_colmns_list)} - Specified Columns Validated." as validation_msg,
-                                            '{rds_db_name}' as database_name,
-                                            '{db_sch_tbl}' as full_table_name,
-                                            'False' as table_to_ap
-                                        """.strip())
-                # df_temp_row.show(truncate=False)
-                LOGGER.warn(f"Not all table columns validated - 1b")
-            # -------------------------------------------------------
-
-            df_dv_output = df_dv_output.union(df_temp_row)
+        df_dv_output = df_dv_output.union(df_temp_row)
         # -------------------------------------------------------
 
     else:
