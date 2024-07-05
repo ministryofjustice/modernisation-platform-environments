@@ -12,6 +12,7 @@ locals {
     "--dpr.operational.data.store.glue.connection.name" = aws_glue_connection.glue_operational_datastore_connection[0].name
     "--dpr.operational.data.store.loading.schema.name"  = "loading"
   } : {})
+  glue_datahub_job_extra_dev_secrets = (local.environment == "development" ? [aws_secretsmanager_secret.operational_datastore[0].arn] : [])
 }
 
 resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
@@ -48,7 +49,7 @@ module "glue_reporting_hub_job" {
   account                      = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
   connections                  = local.glue_connection_names
-  additional_secret_arns       = [aws_secretsmanager_secret.operational_datastore[0].arn]
+  additional_secret_arns       = glue_datahub_job_extra_dev_secrets
 
   tags = merge(
     local.all_tags,
@@ -117,7 +118,7 @@ module "glue_reporting_hub_batch_job" {
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
   connections                   = local.glue_connection_names
-  additional_secret_arns        = [aws_secretsmanager_secret.operational_datastore[0].arn]
+  additional_secret_arns        = glue_datahub_job_extra_dev_secrets
 
   tags = merge(
     local.all_tags,
@@ -173,7 +174,7 @@ module "glue_reporting_hub_cdc_job" {
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
   connections                   = local.glue_connection_names
-  additional_secret_arns        = [aws_secretsmanager_secret.operational_datastore[0].arn]
+  additional_secret_arns        = glue_datahub_job_extra_dev_secrets
 
   tags = merge(
     local.all_tags,
