@@ -144,7 +144,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret"
     ]
-    resources = merge(additional_secret_arns, [
+    resources = merge(var.additional_secret_arns, [
       "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*"
     ])
   }
