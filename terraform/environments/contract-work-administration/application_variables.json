@@ -35,7 +35,6 @@
       "share_snapshot_id": "snap-0e4f93177b88c076f",
       "app_snapshot_id": "snap-0713966f6fbd5d43c",
       "concurrent_manager_snapshot_id": "snap-012a415b26337ede1"
-
     },
     "test": {
       "example_var": "test-data"

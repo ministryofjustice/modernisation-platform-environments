@@ -85,7 +85,7 @@ resource "aws_instance" "database" {
   user_data_base64            = base64encode(local.db_userdata)
   user_data_replace_on_change = true
   metadata_options {
-    http_tokens                 = "optional"
+    http_tokens = "optional"
   }
 
   tags = merge(

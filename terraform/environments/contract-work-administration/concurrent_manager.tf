@@ -81,7 +81,7 @@ resource "aws_instance" "concurrent_manager" {
   user_data_base64            = base64encode(local.cm_userdata)
   user_data_replace_on_change = true
   metadata_options {
-    http_tokens                 = "optional"
+    http_tokens = "optional"
   }
 
   tags = merge(

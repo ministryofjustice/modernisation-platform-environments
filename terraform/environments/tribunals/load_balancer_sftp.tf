@@ -24,7 +24,7 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-//Will need ingress rules for all 10 sftp ports:
+  //Will need ingress rules for all 10 sftp ports:
   dynamic "ingress" {
     for_each = var.sftp_services
     content {
