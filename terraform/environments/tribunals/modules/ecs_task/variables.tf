@@ -55,9 +55,6 @@ variable "server_port" {
   description = "The port the containers will be listening on"
 }
 
-variable "lb_listener" {
-}
-
 variable "cluster_id" {
 }
 

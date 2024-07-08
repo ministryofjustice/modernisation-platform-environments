@@ -2,6 +2,10 @@ variable "app_name" {
   description = "Name of the application"
 }
 
+variable "module_name" {
+  description = "Name of the module"
+}
+
 variable "app_url" {
 }
 
@@ -36,6 +40,9 @@ variable "app_source_db_user" {
 }
 
 variable "app_source_db_password" {
+}
+
+variable "app_load_balancer" {
 }
 
 variable "environment" {
@@ -98,4 +105,18 @@ variable "is_ftp_app" {
 }
 
 variable "waf_arn" {
+}
+
+variable "target_group_attachment_port" {
+  description = "The port of the target group"
+}
+
+variable "target_group_arns" {
+  description = "Map of target group ARNs"
+  type        = map(string)
+}
+
+variable "target_group_arns_sftp" {
+  description = "Map of target group ARNs for sftp"
+  type        = map(string)
 }

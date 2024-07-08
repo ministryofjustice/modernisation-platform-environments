@@ -6,6 +6,17 @@ Import-Module ECSTools
 
 Initialize-ECSAgent –Cluster ${cluster_name} -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]' -EnableTaskENI
 
+# Install SSM Agent 
+$SSM_AGENT_MSI = "https://s3.amazonaws.com/amazon-ssm-us-west-2/latest/windows_amd64/AmazonSSMAgentSetup.msi"
+Invoke-WebRequest -Uri $SSM_AGENT_MSI -OutFile "C:\\SSMAgent.msi"
+Start-Process -FilePath "msiexec.exe" -ArgumentList "/i C:\\SSMAgent.msi /quiet" -Wait
+
+# Start SSM Agent service
+Start-Service AmazonSSMAgent
+
+# Set SSM to start automatically 
+Set-Service -Name AmazonSSMAgent -StartupType Automatic
+
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 </powershell>

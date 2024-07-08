@@ -26,3 +26,10 @@ variable "is_ftp_app" {
 
 variable "waf_arn" {
 }
+
+variable "target_group_attachment_port" {
+  description = "The port of the target group"
+}
+
+variable "app_load_balancer" {
+}

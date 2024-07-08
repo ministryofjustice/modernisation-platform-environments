@@ -97,6 +97,12 @@ variable "python_version" {
   }
 }
 
+variable "additional_secret_arns" {
+  type        = list(string)
+  default     = []
+  description = "(Optional) The list of additional secrets this job needs access to."
+}
+
 variable "connections" {
   type        = list(string)
   default     = []

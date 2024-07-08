@@ -3,47 +3,67 @@ locals {
 #!/bin/bash
 
 ### Temp install of AWS CLI - removed once actual AMI is used
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo yum install -y unzip
-unzip awscliv2.zip
-sudo ./aws/install
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# sudo yum install -y unzip
+# unzip awscliv2.zip
+# sudo ./aws/install
 ##############
 
-### Temp command to use V2 of metadata to get userdata - removed once actual AMI is used
-TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
-PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
+echo "Setting host name"
+hostname ${local.database_hostname}
+echo "${local.database_hostname}" > /etc/hostname
+sed -i '/^HOSTNAME/d' /etc/sysconfig/network
+echo "HOSTNAME=${local.database_hostname}" >> /etc/sysconfig/network
+
+### Command to use IMDSv2 instance to get userdata
+# TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`	
+# PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)	
 ##############
 
-hostnamectl set-hostname ${local.database_hostname}
-
-#PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+echo "Getting IP Addresses for /etc/hosts"
+PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 APP1_IP=""
 CM_IP=""
 
 while [ -z "$APP1_IP" ] || [ -z "$CM_IP" ]
 do
   sleep 5
-  APP1_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values="${local.appserver1_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
-  CM_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values="${local.cm_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
+  APP1_IP=$(/usr/local/bin/aws ec2 describe-instances --filter Name=tag:Name,Values="${local.appserver1_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
+  CM_IP=$(/usr/local/bin/aws ec2 describe-instances --filter Name=tag:Name,Values="${local.cm_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
 done
 
-sudo sed -i '/cwa-db$/d' /etc/hosts
-sudo sed -i '/cwa-app1$/d' /etc/hosts
-sudo sed -i '/cwa-app2$/d' /etc/hosts
-sudo bash -c "echo '$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}' >> /etc/hosts"
-sudo bash -c "echo '$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}' >> /etc/hosts"
-sudo bash -c "echo '$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}' >> /etc/hosts"
+echo "Updating /etc/hosts"
+sed -i '/cwa-db$/d' /etc/hosts
+sed -i '/cwa-app1$/d' /etc/hosts
+sed -i '/cwa-app2$/d' /etc/hosts
+echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
+echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
+echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
 ## Mounting to EFS - uncomment when AMI has been applied
-# echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# mount -a
-# mount_status=$?
-# while [[ $mount_status != 0 ]]
-# do
-#   sleep 10
-#   mount -a
-#   mount_status=$?
-# done
+echo "Updating /etc/fstab"
+sed -i '/^fs-/d' /etc/fstab
+sed -i '/^s3fs/d' /etc/fstab
+echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
+
+## Update the send mail url
+echo "Updating the send mail config"
+sed -i 's/aws.dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+sed -i 's/dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+
+## Remove SSH key allowed
+echo "Removing old SSH key"
+sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
+sed -i '/development-general$/d' /root/.ssh/authorized_keys
+sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 EOF
 
@@ -64,6 +84,9 @@ resource "aws_instance" "database" {
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
   user_data_replace_on_change = true
+  metadata_options {
+    http_tokens = "optional"
+  }
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
@@ -274,7 +297,7 @@ resource "aws_ebs_volume" "oradata" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -298,7 +321,7 @@ resource "aws_ebs_volume" "oracle" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oracle_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oracle_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -322,7 +345,7 @@ resource "aws_ebs_volume" "oraarch" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oraarch_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -346,7 +369,7 @@ resource "aws_ebs_volume" "oratmp" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oratmp_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oratmp_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -370,7 +393,7 @@ resource "aws_ebs_volume" "oraredo" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -394,7 +417,7 @@ resource "aws_ebs_volume" "share" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].share_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].share_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]

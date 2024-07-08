@@ -91,7 +91,7 @@ resource "aws_lb_listener" "maat_internal_lb_https_listener" {
   load_balancer_arn = aws_lb.maat_internal_lb.arn
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = local.ext_lb_listener_protocol == "HTTPS" ? aws_acm_certificate_validation.load_balancers.certificate_arn : null
 
   default_action {

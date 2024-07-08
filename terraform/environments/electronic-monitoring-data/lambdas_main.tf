@@ -219,21 +219,21 @@ module "query_output_to_list" {
 # ------------------------------------------------------
 
 module "update_log_table" {
-    source = "./modules/lambdas"
-    function_name = "update_log_table"
-    is_image = true
-    role_name = aws_iam_role.update_log_table.name
-    role_arn = aws_iam_role.update_log_table.arn
-    memory_size = 1024
-    timeout = 900
-    env_account_id = local.env_account_id
-    ecr_repo_name = module.ecr_lambdas_repo.repository_name
-    ecr_repo_url = module.ecr_lambdas_repo.repository_url
-    environment_variables = {
-      S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
-      DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
-      TABLE_NAME = "glue_df_output"
-      }
+  source                  = "./modules/lambdas"
+  function_name           = "update_log_table"
+  is_image                = true
+  role_name               = aws_iam_role.update_log_table.name
+  role_arn                = aws_iam_role.update_log_table.arn
+  memory_size             = 1024
+  timeout                 = 899
+  env_account_id          = local.env_account_id
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+    DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    TABLE_NAME    = "glue_df_output"
+  }
 }
 
 #-----------------------------------------------------------------------------------
@@ -277,8 +277,8 @@ module "load_json_table" {
     memory_size = 1024
     timeout = 900
     env_account_id = local.env_account_id
-    ecr_repo_name = module.ecr_lambdas_repo.repository_name
-    ecr_repo_url = module.ecr_lambdas_repo.repository_url
+    core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+    production_dev          = local.is-production ? "prod" : "dev"
     environment_variables = {
       DLT_PROJECT_DIR: "/tmp"
       DLT_DATA_DIR: "/tmp"
@@ -289,3 +289,26 @@ module "load_json_table" {
       }
 }
 
+
+# ------------------------------------------------------
+# Unzip single file in zip store
+# ------------------------------------------------------
+
+module "unzip_unstructured_files" {
+  source                  = "./modules/lambdas"
+  function_name           = "unzip_unstructured_files"
+  is_image                = true
+  role_name               = aws_iam_role.unzip_unstructured_files.name
+  role_arn                = aws_iam_role.unzip_unstructured_files.arn
+  memory_size             = 1024
+  timeout                 = 900
+  env_account_id          = local.env_account_id
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    UNSTRUCTURED_BUCKET_NAME = module.unzipped-s3-data-store.bucket.id
+    DATA_STORE_BUCKET_NAME   = aws_s3_bucket.data_store.id
+  }
+  security_group_ids = [aws_security_group.lambda_db_security_group.id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
+}

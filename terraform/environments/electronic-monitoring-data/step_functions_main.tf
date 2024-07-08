@@ -125,12 +125,12 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
               "GetTableFileNames" : {
                 "Type" : "Task",
                 "Resource" : "${module.get_file_keys_for_table.lambda_function_arn}",
-                "ResultPath" : "$.result",
+                "ResultPath" : "$.fileKeys",
                 "Next" : "LoopThroughFileKeys"
               },
               "LoopThroughFileKeys" : {
                 "Type" : "Map",
-                "ItemsPath" : "$.result",
+                "ItemsPath" : "$.fileKeys",
                 "MaxConcurrency" : 4,
                 "Iterator" : {
                   "StartAt" : "SendTableToAp",
@@ -138,18 +138,18 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
                     "SendTableToAp" : {
                       "Type" : "Task",
                       "Resource" : "${module.send_table_to_ap.lambda_function_arn}",
-                      "ResultPath" : "$.db_info",
+                      "ResultPath" : "$.dbInfo",
                       "End" : true
-                      }
+                    }
                   }
                 }
                 "Next" : "UpdateLogTable"
               },
-              "UpdateLogTable": {
-                "Type": "Task",
-                "Resource": "${module.update_log_table.lambda_function_arn}",
-                "ResultPath": "$.final_result",
-                "End": true
+              "UpdateLogTable" : {
+                "Type" : "Task",
+                "Resource" : "${module.update_log_table.lambda_function_arn}",
+                "ResultPath" : "$.updateLogResult",
+                "End" : true
               }
             },
           }

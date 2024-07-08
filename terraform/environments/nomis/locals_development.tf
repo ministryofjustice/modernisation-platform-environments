@@ -351,6 +351,7 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
+
         instance_target_groups = {
           dev-nomis-web-a-http-7777 = merge(local.ec2_autoscaling_groups.web.lb_target_groups.http-7777, {
             attachments = [

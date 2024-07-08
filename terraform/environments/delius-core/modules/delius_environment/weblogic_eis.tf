@@ -52,6 +52,7 @@ module "weblogic_eis" {
 
   container_secrets_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_secrets_env_specific, {})
 
+  desired_count = 0
 
   container_port_config = [
     {

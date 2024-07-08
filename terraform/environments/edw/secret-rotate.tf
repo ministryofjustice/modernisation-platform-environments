@@ -1,5 +1,5 @@
 # ##################################
-# ### AWS SECRETS MANAGER SECRETS ###
+# ### AWS SECRETS MANAGER SECRETS ####
 # ##################################
 
 

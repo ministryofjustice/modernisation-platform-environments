@@ -22,6 +22,14 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
   }
 
   egress {
+    description = "Allow connections to Oracle, BODMIS"
+    from_port   = 1522
+    to_port     = 1522
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
     description = "Allow connections to Secrets Manager"
     from_port   = 443
     to_port     = 443
