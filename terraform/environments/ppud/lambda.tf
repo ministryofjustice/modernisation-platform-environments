@@ -144,8 +144,8 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_disable_cpu_alarm" {
 resource "aws_cloudwatch_event_rule" "enable_cpu_alarm" {
   count               = local.is-production == true ? 1 : 0
   name                = "enable_cpu_alarm"
-  description         = "Runs Weekly every Monday at 00:00 am"
-  schedule_expression = "cron(0 23 ? * SUN *)" # Time Zone is in UTC
+  description         = "Runs Weekly every Monday at 05:00 am"
+  schedule_expression = "cron(0 5 ? * MON *)" # Time Zone is in UTC
   # schedule_expression = "cron(0 0 ? * MON *)" # Time Zone is in UTC
 }
 
