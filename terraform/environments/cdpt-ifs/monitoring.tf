@@ -12,6 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   dimensions = {
     LoadBalancer = "${local.application_name}-lb"
   }
+  treat_missing_data  = "notBreaching"
 }
 
 resource "aws_sns_topic" "lb_5xx_alarm_topic" {
