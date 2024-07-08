@@ -73,9 +73,4 @@ module "environment_preprod" {
   pagerduty_integration_key = local.pagerduty_integration_key
 
   dms_config = local.dms_config_preprod
-
-  dms_audit_source_endpoint = local.dms_audit_source_endpoint_preprod
-  dms_audit_target_endpoint = local.dms_audit_target_endpoint_preprod
-  dms_user_source_endpoint = local.dms_user_source_endpoint_preprod
-  dms_user_target_endpoint = local.dms_user_target_endpoint_preprod
 }
