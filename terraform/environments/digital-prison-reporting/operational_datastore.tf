@@ -93,7 +93,7 @@ module "aurora_operational_db" {
     },
     {
       name         = "shared_preload_libraries"
-      value        = "pg_stat_statements, pg_cron"
+      value        = "pg_stat_statements,pg_cron"
       apply_method = "pending-reboot"
     }
   ]
