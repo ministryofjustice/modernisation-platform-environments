@@ -12,7 +12,7 @@ locals {
     "--dpr.operational.data.store.glue.connection.name" = aws_glue_connection.glue_operational_datastore_connection[0].name
     "--dpr.operational.data.store.loading.schema.name"  = "loading"
   } : {})
-  glue_datahub_job_extra_dev_secrets = (local.environment == "development" ? [aws_secretsmanager_secret.operational_datastore[0].arn] : [])
+  glue_datahub_job_extra_dev_secrets = [aws_secretsmanager_secret.operational_db_secret.arn]
 }
 
 resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
