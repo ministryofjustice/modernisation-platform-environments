@@ -44,7 +44,6 @@ module "appeals" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
@@ -86,7 +85,6 @@ module "ahmlr" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
   waf_arn                      = local.waf_arn
@@ -128,7 +126,6 @@ module "care_standards" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
   waf_arn                      = local.waf_arn
@@ -170,7 +167,6 @@ module "cicap" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "CaseFiles"
   waf_arn                      = local.waf_arn
@@ -212,7 +208,6 @@ module "employment_appeals" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Public/Upload"
   waf_arn                      = local.waf_arn
@@ -254,7 +249,6 @@ module "finance_and_tax" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
@@ -296,7 +290,6 @@ module "immigration_services" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
@@ -338,7 +331,6 @@ module "information_tribunal" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "DBFiles"
   waf_arn                      = local.waf_arn
@@ -380,7 +372,6 @@ module "lands_tribunal" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn
@@ -422,7 +413,6 @@ module "transport" {
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
   vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  subnets_shared_private_ids   = data.aws_subnets.shared-private.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   waf_arn                      = local.waf_arn

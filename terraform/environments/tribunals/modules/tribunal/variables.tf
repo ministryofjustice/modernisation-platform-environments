@@ -91,9 +91,6 @@ variable "cluster_name" {
 variable "subnets_shared_public_ids" {
 }
 
-variable "subnets_shared_private_ids" {
-}
-
 variable "aws_acm_certificate_external" {
 }
 
