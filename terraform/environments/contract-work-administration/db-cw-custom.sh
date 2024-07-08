@@ -77,7 +77,7 @@ WRITE_OPS_ORACLE=$(iostat -k | grep "$ORACLE" | awk '{print $4}')
 WRITE_OPS_NFSSHARE=$(iostat -k | grep "$NFSSHARE" | awk '{print $4}')
 WRITE_OPS_ROOT=$(iostat -k | grep "$ROOT" | awk '{print $4}')
 
-SWAP_USED=$(swapon -s | grep "/dev/mapper/VolGroup00-LogVol01" |  awk '{print $3}')
+SWAP_USED=$(cat /proc/swaps | grep "/dev/mapper/VolGroup00-LogVol01" |  awk '{print $3}')
 
 #  SEND MEMORY USAGE
 /usr/local/bin/aws cloudwatch put-metric-data                                               \

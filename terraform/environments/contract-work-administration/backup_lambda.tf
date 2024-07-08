@@ -99,10 +99,10 @@ resource "aws_iam_role_policy_attachment" "backup_lambda" {
 ##################################
 
 resource "aws_s3_bucket" "backup_lambda" {
-  bucket = "${local.application_name_short}-${local.environment}-backup-lambda"
+  bucket = "${local.application_name_short}-${local.environment}-scripts"
   tags = merge(
     local.tags,
-    { Name = "${local.application_name_short}-${local.environment}-backup-lambda" }
+    { Name = "${local.application_name_short}-${local.environment}-scripts" }
   )
 }
 
