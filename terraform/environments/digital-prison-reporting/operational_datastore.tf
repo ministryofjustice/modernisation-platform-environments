@@ -117,7 +117,7 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
     # This will be replaced by the details for the real Operational Data Store
     JDBC_CONNECTION_URL    = local.operational_db_jdbc_connection_string
     JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
-    SECRET_ID              = data.aws_secretsmanager_secret.operational_datastore[0].name
+    SECRET_ID              = data.aws_secretsmanager_secret.operational_db_secret.name
   }
 
   physical_connection_requirements {
