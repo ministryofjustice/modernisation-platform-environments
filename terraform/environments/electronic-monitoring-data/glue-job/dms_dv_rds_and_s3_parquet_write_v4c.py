@@ -696,10 +696,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             loop_count += 1
 
             jdbc_partition_col_lowerbound = jdbc_partition_col_upperbound+1
-            print(f"""{loop_count}-jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
+            LOGGER.info(f"""{loop_count}-jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
 
             jdbc_partition_col_upperbound = jdbc_partition_col_lowerbound + rds_rows_per_batch
-            print(f"""{loop_count}-jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
+            LOGGER.info(f"""{loop_count}-jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
             df_rds_temp = (get_df_read_rds_db_tbl_int_pkey(rds_db_name, rds_tbl_name, 
                                                            jdbc_partition_column,
@@ -767,10 +767,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                     loop_count += 1
 
                     jdbc_partition_col_lowerbound = jdbc_partition_col_upperbound+1
-                    print(f"""jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
+                    LOGGER.info(f"""jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
 
                     jdbc_partition_col_upperbound = pkey_max_value
-                    print(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
+                    LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
                     df_rds_temp = (get_df_read_rds_db_tbl_int_pkey(rds_db_name, rds_tbl_name, 
                                                                 jdbc_partition_column,
@@ -833,8 +833,9 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                     
                     current_processed_rows += df_rds_temp.count()
         
-        print(f"""Total RDS fetch batch count: {loop_count}""")
-        print(f"""total_rds_processed_rows: {current_processed_rows}""")
+        LOGGER.info(f"""Total RDS fetch batch count: {loop_count}""")
+        LOGGER.info(f"""Rows processed in all RDS batch fetches: {current_processed_rows}""")
+        LOGGER.info(f"""total_row_differences = {total_row_differences}""")
 
         if total_row_differences == 0 and (current_processed_rows == df_rds_count):
             df_temp_row = spark.sql(f"""select 
@@ -847,6 +848,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                     """.strip())
                 
             LOGGER.info(f"{rds_tbl_name}: Validation Successful - 1")
+            df_dv_output = df_dv_output.union(df_temp_row)
 
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
