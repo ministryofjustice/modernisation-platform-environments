@@ -172,17 +172,16 @@ locals {
   dms_config_test = {
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.1"
-  }
-
-  # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
-  # Please ensure any changes made here are consistent with Ansible variables.
-  dms_audit_source_endpoint_test = {}
-  dms_audit_target_endpoint_test = {
-    write_database  = "TSTNDA"
-  }
-  dms_user_source_endpoint_test = {
-     read_host       = "primarydb"
-    read_database   = "TSTNDA"
-  }
-  dms_user_target_endpoint_test = {}
+     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
+    # Please ensure any changes made here are consistent with Ansible variables.
+    audit_source_endpoint = {}
+    audit_target_endpoint  = {
+       write_database  = "TSTNDA"
+    }
+    user_source_endpoint = {
+        read_host       = "primarydb"
+       read_database   = "TSTNDA"
+    }
+    user_target_endpoint = {}
+}
 }
