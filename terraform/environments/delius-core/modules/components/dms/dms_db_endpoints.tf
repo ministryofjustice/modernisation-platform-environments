@@ -7,7 +7,7 @@
 resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
    count                           = var.dms_config.audit_source_endpoint.read_database == null ? 0 : 1
    database_name                   = var.dms_config.audit_source_endpoint.read_database
-   endpoint_id                     = "audit-data-from-${var.dms_audit_source_endpoint.read_database}"
+   endpoint_id                     = "audit-data-from-${var.dms_config.audit_source_endpoint.read_database}"
    endpoint_type                   = "source"
    engine_name                     = "oracle"
    secrets_manager_access_role_arn = "arn:aws:iam::${local.delius_account_id}:role/DMSSecretsManagerAccessRole"
