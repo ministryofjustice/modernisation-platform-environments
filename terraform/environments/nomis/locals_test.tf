@@ -482,7 +482,7 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
-        
+
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["nomis_wildcard_cert"]
