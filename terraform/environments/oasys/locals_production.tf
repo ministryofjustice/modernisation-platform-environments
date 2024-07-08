@@ -387,16 +387,17 @@ locals {
 
     lbs = {
       public = {
-        access_logs              = true
-        enable_delete_protection = false
-        existing_target_groups   = {}
-        force_destroy_bucket     = true
-        idle_timeout             = 3600 # 60 is default
-        internal_lb              = false
-        s3_versioning            = false
-        security_groups          = ["public_lb"]
-        subnets                  = module.environment.subnets["public"].ids
-        tags                     = local.tags
+        access_logs                = true
+        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+        enable_delete_protection   = false
+        existing_target_groups     = {}
+        force_destroy_bucket       = true
+        idle_timeout               = 3600 # 60 is default
+        internal_lb                = false
+        s3_versioning              = false
+        security_groups            = ["public_lb"]
+        subnets                    = module.environment.subnets["public"].ids
+        tags                       = local.tags
 
         listeners = {
           https = {
