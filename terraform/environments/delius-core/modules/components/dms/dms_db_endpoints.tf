@@ -12,7 +12,7 @@ resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
    engine_name                     = "oracle"
    secrets_manager_access_role_arn = "arn:aws:iam::${local.delius_account_id}:role/DMSSecretsManagerAccessRole"
    secrets_manager_arn             = aws_secretsmanager_secret.dms_audit_source_endpoint_db.arn
-   extra_connection_attributes     = "ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${var.oracle_db_server_names[var.dms_audit_source_endpoint.read_host]}/+ASM;asm_user=delius_audit_dms_pool;UseBFile=true;UseLogminerReader=false;"
+   extra_connection_attributes     = "ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host]}/+ASM;asm_user=delius_audit_dms_pool;UseBFile=true;UseLogminerReader=false;"
 }
 
 # In repository environments the dms_user_source_endpoint.read_database must be defined
