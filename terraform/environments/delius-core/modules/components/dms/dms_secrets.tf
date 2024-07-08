@@ -75,7 +75,7 @@ resource "aws_secretsmanager_secret_policy" "dms_user_source_endpoint_db" {
 }
 
 resource "aws_secretsmanager_secret_version" "dms_user_source_endpoint_db" {
-  count = var.dms_user_source_endpoint.read_host == null ? 0 : 1
+  count = var.dms_config.user_source_endpoint.read_host == null ? 0 : 1
   secret_id = aws_secretsmanager_secret.dms_user_source_endpoint_db.id
   secret_string = jsonencode({
     username = "delius_audit_dms_pool"
