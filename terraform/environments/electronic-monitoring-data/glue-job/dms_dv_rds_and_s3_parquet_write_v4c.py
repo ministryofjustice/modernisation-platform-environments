@@ -57,7 +57,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "parquet_output_bucket_name",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
-                       "dataframe_repartition_number"
+                       "dataframe_repartition_number",
                        "rds_sqlserver_db",
                        "rds_sqlserver_db_schema",
                        "rds_sqlserver_db_table",
