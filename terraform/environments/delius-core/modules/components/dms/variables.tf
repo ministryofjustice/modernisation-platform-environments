@@ -64,28 +64,4 @@ variable "platform_vars" {
   })
 }
 
-variable "dms_audit_source_endpoint" {
-type = object({
-    read_host              = optional(string)
-    read_database          = optional(string)
-    })
-}
-
-variable "dms_audit_target_endpoint" {
-type = object({
-    write_database          = optional(string)
-    })
-}
-
-variable "dms_user_source_endpoint" {
-type = object({
-    read_host             = optional(string)
-    read_database         = optional(string)
-  })
-}
-
-variable "dms_user_target_endpoint" {
-type = object({
-    write_database         = optional(string)
-  })
 }
