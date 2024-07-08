@@ -614,7 +614,7 @@ variable "lbs" {
     })), [
       {
       enabled = "Enabled"
-      id      = "main"
+      id      = "loadbalancer_three_months"
       prefix  = ""
       tags = {
         rule      = "log"
@@ -622,15 +622,11 @@ variable "lbs" {
       }
 
       transition = [
-        { days = 90, storage_class = "STANDARD_IA" },
-        { days = 365, storage_class = "GLACIER" }
+        { days = 31, storage_class = "STANDARD_IA" }
       ]
-      expiration = { days = 730 }
-      noncurrent_version_transition = [
-        { days = 90, storage_class = "STANDARD_IA" },
-        { days = 365, storage_class = "GLACIER" }
-      ]
-      noncurrent_version_expiration = { days = 730 }
+      expiration = { days = 90 }
+      noncurrent_version_transition = []
+      noncurrent_version_expiration = { days = 7 }
     }])
     load_balancer_type               = optional(string, "application")
     security_groups                  = list(string)
