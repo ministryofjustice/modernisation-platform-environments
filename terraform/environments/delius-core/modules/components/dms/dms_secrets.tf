@@ -25,7 +25,7 @@ resource "aws_secretsmanager_secret_policy" "dms_audit_source_endpoint_db" {
 }
 
 data "aws_secretsmanager_secret" "delius_core_application_passwords" {
-  arn = var.delius_core_application_passwords_arn
+  arn = var.database_application_passwords_secret_arn
 }
 
 data "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
@@ -39,7 +39,7 @@ resource "aws_secretsmanager_secret_version" "dms_audit_source_endpoint_db" {
     username = "delius_audit_dms_pool"
     password = jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"]
     port = "1521"
-    host = var.oracle_db_server_names[var.dms_audit_source_endpoint.read_host]
+    host = var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host]
   })
 }
 
@@ -75,12 +75,12 @@ resource "aws_secretsmanager_secret_policy" "dms_user_source_endpoint_db" {
 }
 
 resource "aws_secretsmanager_secret_version" "dms_user_source_endpoint_db" {
-  count = var.dms_config.user_source_endpoint.read_host == null ? 0 : 1
+  count = try(var.dms_config.user_source_endpoint.read_host, null) == null ? 0 : 1
   secret_id = aws_secretsmanager_secret.dms_user_source_endpoint_db.id
   secret_string = jsonencode({
     username = "delius_audit_dms_pool"
     password = jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"]
     port = "1521"
-    host = var.oracle_db_server_names[var.dms_user_source_endpoint.read_host]
+    host = var.oracle_db_server_names[var.dms_config.user_source_endpoint.read_host]
   })
 }

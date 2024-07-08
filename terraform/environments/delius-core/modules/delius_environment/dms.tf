@@ -7,12 +7,8 @@ module "dms" {
   platform_vars               = var.platform_vars
   dms_config                  = var.dms_config
 
-  delius_core_application_passwords_arn = module.oracle_db_shared.delius_core_application_passwords_arn
+  database_application_passwords_secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
   oracle_db_server_names                = local.oracle_db_server_names
-  dms_audit_source_endpoint             = var.dms_audit_source_endpoint
-  dms_audit_target_endpoint             = var.dms_audit_target_endpoint
-  dms_user_source_endpoint              = var.dms_user_source_endpoint
-  dms_user_target_endpoint              = var.dms_user_target_endpoint
 
   providers = {
     aws                       = aws

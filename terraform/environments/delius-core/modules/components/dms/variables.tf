@@ -34,10 +34,7 @@ variable "engine_version" {
 }
 
 variable "dms_config" {
-  type = object({
-    replication_instance_class = string
-    engine_version             = string
-  })
+  type = any
 }
 
 variable "db_suffix" {
@@ -46,7 +43,7 @@ variable "db_suffix" {
   default     = "db"
 }
 
-variable "delius_core_application_passwords_arn" {
+variable "database_application_passwords_secret_arn" {
   type = any
 }
 
@@ -62,6 +59,4 @@ variable "platform_vars" {
   type = object({
     environment_management = any
   })
-}
-
 }

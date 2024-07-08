@@ -18,7 +18,7 @@ resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
 # In repository environments the dms_user_source_endpoint.read_database must be defined
 # The endpoint for user (USER_) is the Delius database.
 resource "aws_dms_endpoint" "dms_user_source_endpoint_db" {
-   count                           = var.dms_config.user_source_endpoint.read_database == null ? 0 : 1
+   count                           = try(var.dms_config.user_source_endpoint.read_database, null) == null ? 0 : 1
    database_name                   = var.dms_config.user_source_endpoint.read_database
    endpoint_id                     = "user-data-from-${var.dms_config.user_source_endpoint.read_database}"
    endpoint_type                   = "source"
