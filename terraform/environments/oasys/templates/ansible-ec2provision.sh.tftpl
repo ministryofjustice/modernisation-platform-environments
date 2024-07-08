@@ -122,7 +122,7 @@ run_ansible() {
   cd $ansible_dir/${ansible_repo}/${ansible_repo_basedir}
   $python -m pip install -r requirements.txt
   ansible-galaxy role install -r $requirements_yml
-  ansible-galaxy collection install -r $requirements_yml
+  ansible-galaxy collection install -r $requirements_yml || true
 
   # run ansible (comma after localhost deliberate)
   echo "# Execute ansible site.yml ${ansible_args} $ansible_group_vars ..."
