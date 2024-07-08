@@ -483,7 +483,7 @@ locals {
     lbs = {
       private = merge(local.lbs.private, {
         
-        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_three_months]
+        # access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_three_months]
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["nomis_wildcard_cert"]
