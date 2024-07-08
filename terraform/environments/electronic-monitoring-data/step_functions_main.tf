@@ -137,11 +137,9 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
                   "States" : {
                     "SendTableToAp" : {
                       "Type" : "Task",
-                      "ResultSelector": {
-                        "dbInfo.$": "$"
-                      },
                       "Resource" : "${module.send_table_to_ap.lambda_function_arn}",
-                      "ResultPath" : "$",
+                      "InputPath": "$",
+                      "ResultPath": "$.dbInfo",
                       "End" : true
                     }
                   }
