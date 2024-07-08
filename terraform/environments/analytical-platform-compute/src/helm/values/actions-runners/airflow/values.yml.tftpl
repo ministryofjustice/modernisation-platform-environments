@@ -1,0 +1,13 @@
+---
+replicaCount: ${replicaCount}
+
+github:
+  organisation: ${github_organisation}
+  repository: ${github_repository}
+  token: ${github_token}
+  runner:
+    labels: ${github_runner_labels}
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}

@@ -78,9 +78,9 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Copy Data to Temp-Reload Bucket"
+          "Next" : "Copy Curated Data to Temp-Reload Bucket"
         },
-        "Copy Data to Temp-Reload Bucket" : {
+        "Copy Curated Data to Temp-Reload Bucket" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
@@ -105,9 +105,9 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Truncate Data"
+          "Next" : "Empty Structured and Curated Data"
         },
-        "Truncate Data" : {
+        "Empty Structured and Curated Data" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
@@ -184,9 +184,9 @@ module "replay_pipeline" {
               "--dpr.orchestration.wait.interval.seconds" : "60"
             }
           },
-          "Next" : "Truncate Raw Data"
+          "Next" : "Empty Raw Data"
         },
-        "Truncate Raw Data" : {
+        "Empty Raw Data" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {

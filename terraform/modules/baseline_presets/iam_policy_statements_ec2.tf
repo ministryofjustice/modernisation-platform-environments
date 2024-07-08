@@ -108,8 +108,7 @@ locals {
         sid    = "S3ReadSharedWrite"
         effect = "Allow"
         actions = [
-          "s3:GetObject",
-          "s3:GetObjectTagging", # required for aws cp if restoring grom Glacier
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -136,8 +135,7 @@ locals {
         sid    = "S3ReadShared"
         effect = "Allow"
         actions = [
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
         ]
         resources = [
@@ -158,8 +156,7 @@ locals {
         sid    = "S3ReadSharedWriteLimited"
         effect = "Allow"
         actions = [
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -182,8 +179,7 @@ locals {
         sid    = "S3ReadSharedWriteDelete"
         effect = "Allow"
         actions = [
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -341,8 +337,7 @@ locals {
         sid    = "S3DbBackupRead"
         effect = "Allow"
         actions = [
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
         ]
         resources = flatten([

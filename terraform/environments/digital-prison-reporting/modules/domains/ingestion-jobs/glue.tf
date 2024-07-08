@@ -25,6 +25,7 @@ module "glue_reporting_hub_cdc_job" {
   account                       = var.account_id
   log_group_retention_in_days   = var.glue_log_group_retention_in_days
   connections                   = var.glue_cdc_job_connections
+  additional_secret_arns        = var.glue_cdc_job_additional_secret_arns
 
   arguments = var.glue_cdc_arguments
 
@@ -63,6 +64,7 @@ module "glue_reporting_hub_batch_job" {
   account                       = var.account_id
   log_group_retention_in_days   = var.glue_log_group_retention_in_days
   connections                   = var.glue_batch_job_connections
+  additional_secret_arns        = var.glue_batch_job_additional_secret_arns
 
   arguments = var.glue_batch_arguments
 

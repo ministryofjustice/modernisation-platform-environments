@@ -68,7 +68,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "60.3.0"
+  version    = "61.1.0"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -183,7 +183,7 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.15.0"
+  version    = "v1.15.1"
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   values = [
     templatefile(
@@ -276,4 +276,20 @@ resource "helm_release" "external_secrets_cluster_secret_store" {
   namespace = kubernetes_namespace.external_secrets.metadata[0].name
 
   depends_on = [helm_release.external_secrets]
+}
+
+/* KEDA */
+resource "helm_release" "keda" {
+  /* https://artifacthub.io/packages/helm/kedacore/keda */
+  name       = "keda"
+  repository = "https://kedacore.github.io/charts"
+  chart      = "keda"
+  version    = "2.14.2"
+  namespace  = kubernetes_namespace.keda.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/keda/values.yml.tftpl",
+      {}
+    )
+  ]
 }

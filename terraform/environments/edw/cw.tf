@@ -538,7 +538,7 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
 EOF
 }
 
-############# CLOUDFORMATION STACK #############
+# ############# CLOUDFORMATION STACK #############
 
 # resource "aws_cloudformation_stack" "edw-cloudwatch-stack" {
 #   name          = "${local.application_name}-cloudwatch-stack"
@@ -557,4 +557,39 @@ EOF
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "edw_alerting_topic" {
   name = "${local.application_name}-SNS-topic"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-edw-alerting-topic"
+    }
+  )
+}
+
+# Pager duty integration
+
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "edw_pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+data "aws_secretsmanager_secret_version" "edw_pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.edw_pagerduty_integration_keys.id
+}
+
+# Add a local to get the keys
+locals {
+  edw_pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.edw_pagerduty_integration_keys.secret_string)
+  edw_pagerduty_integration_key_name = local.application_data.accounts[local.environment].edw_pagerduty_integration_key_name
+}
+
+# link the sns topic to the service
+
+module "edw_pagerduty_core_alerts" {
+  depends_on = [
+    aws_sns_topic.edw_alerting_topic
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.edw_alerting_topic.name]
+  pagerduty_integration_key = local.edw_pagerduty_integration_keys[local.edw_pagerduty_integration_key_name]
 }

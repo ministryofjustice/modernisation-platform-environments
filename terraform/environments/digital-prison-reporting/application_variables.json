@@ -570,7 +570,7 @@
       },
       "setup_cw_insights": false,
       "enable_cp_k8s_secrets": false,
-      "enable_cp_bodmis_k8s_secrets": false,      
+      "enable_cp_bodmis_k8s_secrets": false,
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true
@@ -755,13 +755,13 @@
         }
       },
       "biprws": {
-        "enable": false,
+        "enable": true,
         "endpoint": "placeholder",
         "endpoint_type": "load_balancer"
       },
       "setup_cw_insights": false,
       "enable_cp_k8s_secrets": false,
-      "enable_cp_bodmis_k8s_secrets": false,      
+      "enable_cp_bodmis_k8s_secrets": false,
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true

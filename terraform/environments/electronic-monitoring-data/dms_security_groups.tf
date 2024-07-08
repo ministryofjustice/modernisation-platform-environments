@@ -31,6 +31,16 @@ resource "aws_vpc_security_group_ingress_rule" "dms_to_rds_sg_rule" {
   description                  = "DMS Terraform"
 }
 
+resource "aws_security_group_rule" "allow_glue_athena" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.dms_ri_security_group.id
+  source_security_group_id = aws_security_group.dms_ri_security_group.id
+  description              = "Allow inbound traffic from DMS replication instance to Glue and Athena endpoints"
+}
+
 # ---------------------------------------------------------------------------
 
 resource "aws_security_group" "glue_rds_conn_security_group" {

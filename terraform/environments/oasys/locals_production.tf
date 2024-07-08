@@ -2,6 +2,7 @@ locals {
 
   baseline_presets_production = {
     options = {
+      db_backup_lifecycle_rule = "rman_backup_one_month"
       sns_topics = {
         pagerduty_integrations = {
           dso_pagerduty               = "oasys_alarms"

@@ -39,6 +39,7 @@ module "s3_bucket" {
 
   bucket_prefix              = each.key
   acl                        = each.value.acl
+  ownership_controls         = each.value.ownership_controls
   versioning_enabled         = each.value.versioning_enabled
   replication_enabled        = each.value.replication_enabled
   replication_region         = coalesce(each.value.replication_region, var.environment.region)

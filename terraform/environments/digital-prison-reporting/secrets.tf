@@ -24,6 +24,30 @@ resource "aws_secretsmanager_secret_version" "nomis" {
   }
 }
 
+# Nomis Source Secrets
+resource "aws_secretsmanager_secret" "bodmis" {
+  name = "external/${local.project}-bodmis-source-secret"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-bodmis-source-secret"
+      Resource_Type = "Secrets"
+      Jira          = "DPR2-721"
+    }
+  )
+}
+
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "bodmis" {
+  secret_id     = aws_secretsmanager_secret.bodmis.id
+  secret_string = jsonencode(local.bodmis_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
 # DPS Source Secrets
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "dps" {

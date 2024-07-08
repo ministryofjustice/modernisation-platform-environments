@@ -1,6 +1,13 @@
-data "aws_ecs_task_definition" "task_definition" {
+data "aws_ecs_task_definition" "task_definitions" {
   task_definition = aws_ecs_task_definition.ifs_task_definition.family
-  depends_on      = [aws_ecs_task_definition.ifs_task_definition]
+}
+
+data "aws_ecs_task_definition" "latest_task_definition" {
+  task_definition = "${aws_ecs_task_definition.ifs_task_definition.family}:${data.aws_ecs_task_definition.task_definitions.revision}"
+}
+
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized"
 }
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
@@ -258,7 +265,7 @@ resource "aws_iam_role_policy" "app_execution" {
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = local.application_data.accounts[local.environment].ami_image_id
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"] #local.application_data.accounts[local.environment].ami_image_id
   instance_type = local.application_data.accounts[local.environment].instance_type
   key_name      = "${local.application_name}-ec2"
   ebs_optimized = true
@@ -356,20 +363,30 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  depends_on                        = [aws_lb_listener.https_listener]
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.ifs_task_definition.arn
+  task_definition                   = data.aws_ecs_task_definition.latest_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
+  force_new_deployment              = true
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.ifs.name
     weight            = 1
   }
 
+  depends_on = [
+    aws_lb_listener.https_listener,
+    aws_ecs_task_definition.ifs_task_definition
+  ]
+
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
+  }
+
+  ordered_placement_strategy {
+    field = "cpu"
+    type  = "binpack"
   }
 
   load_balancer {
@@ -462,7 +479,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.ifs_lb_sc.id]
+    security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
   egress {
@@ -529,4 +546,9 @@ resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
 resource "aws_iam_role_policy_attachment" "bastion_managed" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   role       = aws_iam_role.ec2_instance_role.name
+}
+
+output "ami_id" {
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  sensitive = true
 }

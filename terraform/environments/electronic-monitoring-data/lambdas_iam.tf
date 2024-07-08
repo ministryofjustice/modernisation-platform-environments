@@ -432,8 +432,8 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
     ]
     resources = [
       "${aws_s3_bucket.data_store.arn}/*",
-       aws_s3_bucket.data_store.arn
-     ]
+      aws_s3_bucket.data_store.arn
+    ]
   }
 }
 
@@ -464,4 +464,59 @@ resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zi
   function_name = module.output_file_structure_as_json_from_zip.lambda_function_arn
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.data_store.arn
+}
+
+# ------------------------------------------
+# unzip_unstructured_files
+# ------------------------------------------
+
+resource "aws_iam_role" "unzip_unstructured_files" {
+  name               = "unzip_unstructured_files"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.unzip_unstructured_files.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_lambda_vpc_access_execution" {
+  role       = aws_iam_role.unzip_unstructured_files.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+data "aws_iam_policy_document" "get_put_zip_s3_files" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      aws_s3_bucket.data_store.arn,
+      "${aws_s3_bucket.data_store.arn}/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      module.unzipped-s3-data-store.bucket.arn,
+      "${module.unzipped-s3-data-store.bucket.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "get_put_zip_s3_files" {
+  name   = "get_put_zip_s3_files"
+  policy = data.aws_iam_policy_document.get_put_zip_s3_files.json
+}
+resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_get_put_zip_s3_files" {
+  role       = aws_iam_role.unzip_unstructured_files.name
+  policy_arn = aws_iam_policy.get_put_zip_s3_files.arn
 }

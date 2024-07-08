@@ -1,8 +1,8 @@
 locals {
 
   lb_maintenance_message_preproduction = {
-    maintenance_title   = "Prison-NOMIS Maintenance Window"
-    maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
+    maintenance_title   = "Prison-NOMIS Environment Not Started"
+    maintenance_message = "Lsast weblogic is rarely used so is started on demand. Preprod is available during working hours. Please see <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> or contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel for more information"
   }
 
   baseline_presets_preproduction = {
@@ -46,7 +46,7 @@ locals {
       # ACTIVE (blue deployment)
       lsast-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0 # started on demand
         })
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -96,19 +96,23 @@ locals {
 
       # NOT-ACTIVE (green deployment)
       preprod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
           max_size         = 0
+
+          initial_lifecycle_hooks = {
+            "ready-hook" = {
+              default_result       = "ABANDON"
+              heartbeat_timeout    = 7200
+              lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+            }
+          }
 
           # instance_refresh = {
           #   strategy               = "Rolling"
           #   min_healthy_percentage = 50
           # }
         })
-        # autoscaling_schedules = {
-        #   scale_up   = { recurrence = "0 7 * * Mon-Fri" }
-        #   scale_down = { recurrence = "0 18 * * Mon-Fri", desired_capacity = 1 }
-        # }
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
@@ -118,8 +122,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            # Comment in instance refresh above if changing branch + want automated instance refresh
-            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -403,7 +406,7 @@ locals {
             # weblogic servers can alter priorities to enable maintenance message
             rules = {
               lsast-nomis-web-a-http-7777 = {
-                priority = 100
+                priority = 1150 # reduce by 1000 to make active
                 actions = [{
                   type              = "forward"
                   target_group_name = "lsast-nomis-web-a-http-7777"
@@ -462,8 +465,8 @@ locals {
                   host_header = {
                     values = [
                       "maintenance.preproduction.nomis.service.justice.gov.uk",
-                      "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
-                      "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
+                      "c.pp-nomis.az.justice.gov.uk",
+                      "c.lsast-nomis.az.justice.gov.uk",
                       "c.preproduction.nomis.service.justice.gov.uk",
                       "c-lsast.preproduction.nomis.service.justice.gov.uk",
                     ]
