@@ -13,8 +13,8 @@ resource "aws_secretsmanager_secret" "resource_rds_secret" {
   recovery_window_in_days = 0
 }
 
-# resource "aws_secretsmanager_secret_version" "resource_rds_secret_current" {
-#   secret_id     = aws_secretsmanager_secret.resource_rds_secret.id
+resource "aws_secretsmanager_secret_version" "resource_rds_secret_current" {
+  secret_id     = aws_secretsmanager_secret.resource_rds_secret.id
 #   secret_string = <<EOF
 # {
 #   "username": "${aws_db_instance.rdsdb.username}",
@@ -26,7 +26,7 @@ resource "aws_secretsmanager_secret" "resource_rds_secret" {
 #   "database_name": "master"
 # }
 # EOF
-# }
+}
 
 data "aws_secretsmanager_secret" "data_rds_secret" {
   depends_on = [aws_secretsmanager_secret_version.resource_rds_secret_current]
