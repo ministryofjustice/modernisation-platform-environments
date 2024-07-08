@@ -611,7 +611,7 @@ variable "lbs" {
       noncurrent_version_expiration = optional(object({
         days = optional(number)
       }))  
-    })), [])
+    })), [module.baseline_presets.s3_lifecycle_rules.default])
     load_balancer_type               = optional(string, "application")
     security_groups                  = list(string)
     subnets                          = list(string)
