@@ -94,9 +94,6 @@ variable "subnets_shared_public_ids" {
 variable "subnets_shared_private_ids" {
 }
 
-variable "app_lb_sg_id" {
-}
-
 variable "aws_acm_certificate_external" {
 }
 

@@ -141,12 +141,6 @@ resource "aws_ecs_service" "ecs_service" {
     type  = "spread"
   }
 
-  # network_configuration {
-  #   subnets          = var.subnets_shared_private_ids
-  #   security_groups  = [aws_security_group.ecs_service.id]
-  #   assign_public_ip = false
-  # }
-
   load_balancer {
     target_group_arn = var.lb_tg_arn
     container_name   = "${var.app_name}-container"
@@ -164,27 +158,6 @@ resource "aws_ecs_service" "ecs_service" {
     }
   )
 }
-
-# resource "aws_security_group" "ecs_service" {
-#   name_prefix = "ecs-service-sg-"
-#   vpc_id      = var.vpc_shared_id
-
-#   ingress {
-#     from_port       = 80
-#     to_port         = 80
-#     protocol        = "tcp"
-#     description     = "Allow traffic on port 80 from load balancer"
-#     security_groups = [var.app_lb_sg_id]
-#   }
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-
 
 // SFTP service
 resource "aws_ecs_service" "ecs_service_sftp" {
