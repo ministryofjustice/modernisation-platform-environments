@@ -35,7 +35,6 @@ locals {
       enable_ec2_cloud_watch_agent        = true
       enable_ec2_self_provision           = true
       enable_ec2_user_keypair             = true
-      enable_offloc_sync                  = true
       enable_s3_bucket                    = true
       enable_s3_software_bucket           = true
       iam_policies_filter                 = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
