@@ -24,10 +24,10 @@
 #   }
 # }
 
-resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = "dbsubnetgroup"
-  subnet_ids = data.aws_subnets.shared-private.ids
-}
+# resource "aws_db_subnet_group" "db_subnet_group" {
+#   name       = "dbsubnetgroup"
+#   subnet_ids = data.aws_subnets.shared-private.ids
+# }
 
 resource "aws_security_group" "sqlserver_db_sc" {
   name        = "sqlserver_security_group"

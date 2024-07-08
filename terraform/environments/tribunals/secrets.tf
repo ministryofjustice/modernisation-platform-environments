@@ -26,6 +26,13 @@ resource "aws_secretsmanager_secret_version" "resource_rds_secret_current" {
 #   "database_name": "master"
 # }
 # EOF
+
+  secret_string = <<EOF
+{
+  "test": "test
+}
+EOF
+
 }
 
 data "aws_secretsmanager_secret" "data_rds_secret" {
