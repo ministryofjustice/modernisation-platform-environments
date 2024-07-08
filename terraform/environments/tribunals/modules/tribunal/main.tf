@@ -15,9 +15,6 @@ locals {
   app_source_db_user           = var.app_source_db_user
   app_source_db_password       = var.app_source_db_password
   documents_location           = var.documents_location
-  app_user_data = base64encode(templatefile("user_data.sh", {
-    cluster_name = "${local.app}_app_cluster"
-  }))
   app_container_definition = jsonencode([{
     command : [
       "New-Item -Path C:\\inetpub\\wwwroot\\index.html -Type file -Value '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p>'; C:\\ServiceMonitor.exe w3svc"
