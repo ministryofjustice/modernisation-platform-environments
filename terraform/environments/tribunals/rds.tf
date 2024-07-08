@@ -16,7 +16,7 @@ resource "aws_db_instance" "rdsdb" {
   publicly_accessible = false
 
   multi_az               = false
-  db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
+  db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.sqlserver_db_sc.id]
 
   tags = {
@@ -24,7 +24,7 @@ resource "aws_db_instance" "rdsdb" {
   }
 }
 
-resource "aws_db_subnet_group" "dbsubnetgroup" {
+resource "aws_db_subnet_group" "db_subnet_group" {
   name       = "dbsubnetgroup"
   subnet_ids = data.aws_subnets.shared-private.ids
 }
