@@ -196,7 +196,11 @@ locals {
           oasys-national-reporting-environment = "t2"
         })
       })
-      t2-onr-client-a = local.jumpserver_ec2
+      t2-onr-client-a = merge(local.jumpserver_ec2, {
+        config = merge(local.jumpserver_ec2.config, {
+          ami_name = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
+        })
+      })
     }
 
     iam_policies = {
