@@ -729,7 +729,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             df_prq_filtered_t3_count = df_prq_filtered_t3.count()
 
             if df_rds_temp_t4_count == df_prq_filtered_t3_count:
-                df_rds_prq_diff = df_rds_temp_t4.exceptAll(df_prq_filtered_t3)
+                df_rds_prq_diff = df_rds_temp_t4.subtract(df_prq_filtered_t3)
                 df_rds_prq_diff_count = df_rds_prq_diff.count()
 
                 if df_rds_prq_diff_count == 0:
@@ -800,7 +800,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                     df_prq_filtered_t3_count = df_prq_filtered_t3.count()
 
                     if df_rds_temp_t4_count == df_prq_filtered_t3_count:
-                        df_rds_prq_diff = df_rds_temp_t4.exceptAll(df_prq_filtered_t3)
+                        df_rds_prq_diff = df_rds_temp_t4.subtract(df_prq_filtered_t3)
                         df_rds_prq_diff_count = df_rds_prq_diff.count()
 
                         if df_rds_prq_diff_count == 0:
