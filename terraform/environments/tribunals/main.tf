@@ -1,5 +1,6 @@
 locals {
-  rds_url            = aws_db_instance.rdsdb.address
+  # rds_url            = aws_db_instance.rdsdb.address
+  rds_url            = "test"
   app_load_balancer  = aws_lb.tribunals_lb
   rds_user           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
   rds_port           = "1433"
