@@ -57,7 +57,7 @@ sed -i '/testimage$/d' /root/.ssh/authorized_keys
 echo "Adding the custom metrics script for CloudWatch"
 rm /var/cw-custom.sh
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.backup_lambda.id}/db-cw-custom.sh /var/cw-custom.sh
-chmod +x cw-custom.sh
+chmod 700 /var/cw-custom.sh
 # This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
 
 EOF
