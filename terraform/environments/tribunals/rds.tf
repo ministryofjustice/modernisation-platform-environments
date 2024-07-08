@@ -13,7 +13,7 @@ resource "aws_db_instance" "rdsdb" {
   skip_final_snapshot = true
 
   license_model       = "license-included"
-  publicly_accessible = true
+  publicly_accessible = false
 
   multi_az               = false
   db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
