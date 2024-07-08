@@ -153,8 +153,8 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
     ]
     effect = "Allow"
     resources = [
-      aws_secretsmanager_secret.delius_core_dba_passwords.arn,
-      aws_secretsmanager_secret.delius_core_application_passwords.arn,
+      aws_secretsmanager_secret.database_dba_passwords.arn,
+      aws_secretsmanager_secret.database_application_passwords.arn,
     ]
   }
 }
@@ -225,59 +225,59 @@ resource "aws_iam_policy" "instance_ssm" {
 }
 
 # new IAM role OEM setup to allow ec2s to access secrets manager and kms keys
-resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
-  name = "EC2OracleEnterpriseManagementSecretsRole-${var.db_suffix}"
+# resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
+#   name = "EC2OracleEnterpriseManagementSecretsRole-${var.env_name}-${var.db_suffix}"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "*"
-      },
-      "Action": "sts:AssumeRole",
-      "Condition": {
-        "ForAnyValue:ArnLike": {
-          "aws:PrincipalArn": "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-*"
-        }
-      }
-    }
-  ]
-}
-EOF
-}
+#   assume_role_policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Principal": {
+#         "AWS": "*"
+#       },
+#       "Action": "sts:AssumeRole",
+#       "Condition": {
+#         "ForAnyValue:ArnLike": {
+#           "aws:PrincipalArn": "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-*"
+#         }
+#       }
+#     }
+#   ]
+# }
+# EOF
+# }
 
-resource "aws_iam_role_policy_attachment" "allow_kms_keys_access" {
-  role       = aws_iam_role.EC2OracleEnterpriseManagementSecretsRole.name
-  policy_arn = aws_iam_policy.business_unit_kms_key_access.arn
-}
+# resource "aws_iam_role_policy_attachment" "allow_kms_keys_access" {
+#   role       = aws_iam_role.EC2OracleEnterpriseManagementSecretsRole.name
+#   policy_arn = aws_iam_policy.business_unit_kms_key_access.arn
+# }
 
-data "aws_iam_policy_document" "OracleEnterpriseManagementSecretsPolicyDocument" {
-  statement {
-    sid    = "OracleEnterpriseManagementSecretsPolicyDocument"
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue"
-    ]
-    resources = [
-      "arn:aws:secretsmanager:*:*:secret:/oracle/database/EMREP/shared-*",
-      "arn:aws:secretsmanager:*:*:secret:/oracle/database/*RCVCAT/shared-*",
-      "arn:aws:secretsmanager:*:*:secret:/oracle/oem/shared-*"
-    ]
-  }
-}
+# data "aws_iam_policy_document" "OracleEnterpriseManagementSecretsPolicyDocument" {
+#   statement {
+#     sid    = "OracleEnterpriseManagementSecretsPolicyDocument"
+#     effect = "Allow"
+#     actions = [
+#       "secretsmanager:GetSecretValue"
+#     ]
+#     resources = [
+#       "arn:aws:secretsmanager:*:*:secret:/oracle/database/EMREP/shared-*",
+#       "arn:aws:secretsmanager:*:*:secret:/oracle/database/*RCVCAT/shared-*",
+#       "arn:aws:secretsmanager:*:*:secret:/oracle/oem/shared-*"
+#     ]
+#   }
+# }
 
-resource "aws_iam_policy" "OracleEnterpriseManagementSecretsPolicy" {
-  name   = "OracleEnterpriseManagementSecretsPolicy-${var.db_suffix}"
-  policy = data.aws_iam_policy_document.OracleEnterpriseManagementSecretsPolicyDocument.json
-}
+# resource "aws_iam_policy" "OracleEnterpriseManagementSecretsPolicy" {
+#   name   = "OracleEnterpriseManagementSecretsPolicy-${var.env_name}-${var.db_suffix}"
+#   policy = data.aws_iam_policy_document.OracleEnterpriseManagementSecretsPolicyDocument.json
+# }
 
-resource "aws_iam_role_policy_attachment" "OracleEnterpriseManagementSecretsPolicy" {
-  role       = aws_iam_role.EC2OracleEnterpriseManagementSecretsRole.name
-  policy_arn = aws_iam_policy.OracleEnterpriseManagementSecretsPolicy.arn
-}
+# resource "aws_iam_role_policy_attachment" "OracleEnterpriseManagementSecretsPolicy" {
+#   role       = aws_iam_role.EC2OracleEnterpriseManagementSecretsRole.name
+#   policy_arn = aws_iam_policy.OracleEnterpriseManagementSecretsPolicy.arn
+# }
 
 
 

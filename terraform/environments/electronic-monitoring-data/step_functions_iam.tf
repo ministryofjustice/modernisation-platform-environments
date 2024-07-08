@@ -173,8 +173,8 @@ data "aws_iam_policy_document" "send_database_to_ap_athena_queries" {
     ]
 
     resources = [
-      "arn:aws:s3:::em-athena-result-output",
-      "arn:aws:s3:::em-athena-result-output/*",
+      module.athena-s3-bucket.bucket.arn,
+      "${module.athena-s3-bucket.bucket.arn}/*",
       "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
       aws_s3_bucket.dms_dv_parquet_s3_bucket.arn
     ]
@@ -207,7 +207,7 @@ data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
       "${module.send_table_to_ap.lambda_function_arn}:*",
       "${module.get_file_keys_for_table.lambda_function_arn}:*",
       "${module.query_output_to_list.lambda_function_arn}:*",
-      "${aws_lambda_function.update_log_table.arn}:*"
+      "${module.update_log_table.lambda_function_arn}:*"
     ]
   }
   statement {
@@ -221,7 +221,7 @@ data "aws_iam_policy_document" "send_tables_to_ap_lambda_invoke_policy" {
       module.send_table_to_ap.lambda_function_arn,
       module.get_file_keys_for_table.lambda_function_arn,
       module.query_output_to_list.lambda_function_arn,
-      aws_lambda_function.update_log_table.arn
+      module.update_log_table.lambda_function_arn
     ]
   }
 }

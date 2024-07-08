@@ -35,5 +35,7 @@ module "environment_dev" {
   boe_db_config = local.boe_db_config_dev
   mis_db_config = local.mis_db_config_dev
 
+  pagerduty_integration_key = local.pagerduty_integration_key
+
   tags = local.tags
 }

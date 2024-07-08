@@ -143,6 +143,13 @@ output "route53_resolvers" {
   value       = local.route53_resolvers
 }
 
+output "s3_buckets" {
+  description = "Map of requested s3_buckets"
+  value = {
+    for key, value in local.s3_buckets : key => value if contains(local.s3_buckets_filter, key)
+  }
+}
+
 output "s3_bucket_policies" {
   description = "Map of common bucket policies to use on s3_buckets"
 
@@ -153,11 +160,6 @@ output "s3_iam_policies" {
   description = "Map of common iam_policies that can be used to give access to s3_buckets"
 
   value = local.requested_s3_iam_policies
-}
-
-output "s3_buckets" {
-  description = "Map of s3_buckets"
-  value       = local.s3_buckets
 }
 
 output "s3_lifecycle_rules" {

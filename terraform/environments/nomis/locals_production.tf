@@ -86,8 +86,8 @@ locals {
       # ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
-          desired_capacity = 8
-          max_size         = 8
+          desired_capacity = 5
+          max_size         = 6
 
           # instance_refresh = {
           #   strategy               = "Rolling"
@@ -119,6 +119,12 @@ locals {
       })
 
       prod-nomis-client-a = merge(local.ec2_autoscaling_groups.client, {
+        tags = merge(local.ec2_autoscaling_groups.client.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
+      # BEING USED FOR TESTING
+      prod-nomis-client-b = merge(local.ec2_autoscaling_groups.client, {
         tags = merge(local.ec2_autoscaling_groups.client.tags, {
           domain-name = "azure.hmpp.root"
         })
@@ -168,8 +174,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+          data  = { total_size = 4000, iops = 9000, throughput = 250 }
+          flash = { total_size = 1000, iops = 3000, throughput = 250 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -200,8 +206,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+          data  = { total_size = 4000, iops = 9000, throughput = 250 }
+          flash = { total_size = 1000, iops = 3000, throughput = 125 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -233,8 +239,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 6000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+          data  = { total_size = 6000, iops = 9000, throughput = 250 }
+          flash = { total_size = 1000, iops = 3000, throughput = 250 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -267,8 +273,10 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 6000, iops = 12000, throughput = 750 }
-          flash = { total_size = 1000, iops = 5000, throughput = 500 }
+          data  = { total_size = 6000, iops = 3000, throughput = 125 }
+          flash = { total_size = 1000, iops = 3000, throughput = 125 }
+          # data  = { total_size = 6000, iops = 9000, throughput = 250 } # replace above with this on failover
+          # flash = { total_size = 1000, iops = 3000, throughput = 250 } # replace above with this on failover
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -450,21 +458,17 @@ locals {
 
     s3_buckets = {
       nomis-audit-archives = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
         ]
-        iam_policies = module.baseline_presets.s3_iam_policies
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
         lifecycle_rule = [
           module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
         ]
-      }
-      nomis-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
+        tags = {
+          backup = "false"
+        }
       }
     }
 

@@ -10,22 +10,5 @@ locals {
     route53_zones = {
       "test.csr.service.justice.gov.uk" = {}
     }
-
-    s3_buckets = {
-      # use this bucket for storing artefacts for use across all accounts
-      csr-software = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-
-      csr-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-      }
-    }
   }
 }

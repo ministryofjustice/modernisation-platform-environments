@@ -9,6 +9,7 @@ locals {
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     var.options.enable_observability_platform_monitoring ? ["observability-platform"] : [],
     try(length(var.options.cloudwatch_metric_oam_links), 0) != 0 ? ["CloudWatch-CrossAccountSharingRole"] : [],
+    var.options.enable_vmimport ? ["vmimport"] : [],
   ]))
 
   iam_roles = {
@@ -157,6 +158,27 @@ locals {
       }]
       policy_attachments = [
         "OfflocSyncPolicy",
+      ]
+    }
+
+    vmimport = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type        = "Service"
+          identifiers = ["vmie.amazonaws.com"]
+        }
+        conditions = [{
+          test     = "StringEquals"
+          variable = "sts:Externalid"
+          values = [
+            "vmimport",
+          ]
+        }]
+      }]
+      policy_attachments = [
+        "vmimportPolicy",
       ]
     }
   }

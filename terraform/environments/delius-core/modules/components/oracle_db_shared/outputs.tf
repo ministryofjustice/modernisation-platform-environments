@@ -26,6 +26,6 @@ output "instance_policies" {
   }
 }
 
-output "delius_core_application_passwords_arn" {
-   value = aws_secretsmanager_secret.delius_core_application_passwords.arn
+output "database_application_passwords_secret_arn" {
+  value = aws_secretsmanager_secret.database_application_passwords.arn
 }

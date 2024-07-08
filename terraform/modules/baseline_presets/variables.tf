@@ -1,4 +1,4 @@
- # tflint-ignore: terraform_typed_variables
+# tflint-ignore: terraform_typed_variables
 variable "environment" {
   # Not defining 'type' as it is defined in the output of the environment module
   description = "Standard environmental data resources from the environment module"
@@ -20,6 +20,8 @@ variable "options" {
     cloudwatch_metric_alarms_default_actions     = optional(list(string))          # default alarm_action to apply to cloudwatch metrics returned by this module
     cloudwatch_metric_oam_links_ssm_parameters   = optional(list(string))          # list of account names to send cloudwatch metrics to, creates placeholder SSM param for each
     cloudwatch_metric_oam_links                  = optional(list(string))          # list of account names to send cloudwatch metrics to, creates oam link for each
+    db_backup_bucket_name                        = optional(string)                # override default backup bucket name
+    db_backup_more_permissions                   = optional(bool, false)           # allow cross-account delete access for db-backup S3 buckets
     enable_application_environment_wildcard_cert = optional(bool, false)           # create ACM cert with mod platform business unit
     enable_azure_sas_token                       = optional(bool, false)           # create /azure SSM parameter and pipeline role
     enable_offloc_sync                           = optional(bool, false)           # create role for offloc pipeline
@@ -35,15 +37,19 @@ variable "options" {
     enable_ec2_session_manager_cloudwatch_logs   = optional(bool, false)           # create SSM doc and log group for session manager logs
     enable_ec2_ssm_agent_update                  = optional(bool, false)           # create SSM association for auto-update of SSM agent. update-ssm-agent tag needs to be set on EC2s also
     enable_ec2_user_keypair                      = optional(bool, false)           # create secret and key-pair for ec2-user
-    enable_shared_s3                             = optional(bool, false)           # create devtest and preprodprod S3 bucket
     enable_observability_platform_monitoring     = optional(bool, false)           # create role for observability platform monitroing
-    db_backup_s3                                 = optional(bool, false)           # create db-backup S3 buckets
-    db_backup_more_permissions                   = optional(bool, false)           # additional permissions for db-backup S3 buckets
+    enable_s3_bucket                             = optional(bool, false)           # create s3-bucket S3 bucket for general use
+    enable_s3_db_backup_bucket                   = optional(bool, false)           # create db-backup S3 buckets
+    enable_s3_shared_bucket                      = optional(bool, false)           # create devtest and preprodprod S3 bucket for sharing between accounts
+    enable_s3_software_bucket                    = optional(bool, false)           # create software S3 bucket in test account for image builder/configuration-management
+    enable_vmimport                              = optional(bool, false)           # create role for vm imports
     route53_resolver_rules                       = optional(map(list(string)), {}) # create route53 resolver rules; list of map keys to filter local.route53_resolver_rules_all
     iam_policies_filter                          = optional(list(string), [])      # any policies to add from local.iam_policies which haven't been added automatically by the enable options
     iam_policies_ec2_default                     = optional(list(string), [])      # any policies to add to the default EC2 policy which haven't been added automatically the above enable_ec2 options
     iam_service_linked_roles                     = optional(list(string))          # create iam service linked roles; list of map keys to filter local.iam_service_linked_roles; default is to create all
+    s3_bucket_name                               = optional(string)                # override default general purpose bucket name
     s3_iam_policies                              = optional(list(string))          # create default iam policies for bucket access, list of map keys to filter local.s3_iam_policies
+    software_bucket_name                         = optional(string)                # override default software/artefacts bucket name
 
     sns_topics = optional(object({
       pagerduty_integrations = optional(map(string), {}) # create sns topics where map key is name and value is modernisation platform pagerduty_integration_keys

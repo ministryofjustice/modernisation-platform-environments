@@ -29,7 +29,6 @@ locals {
         "ec2_instance_oracle_db_with_backup",
         "ec2_instance_textfile_monitoring",
       ]
-      db_backup_s3                                = true
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
       enable_image_builder                        = true
@@ -38,7 +37,10 @@ locals {
       enable_ec2_self_provision                   = true
       enable_ec2_oracle_enterprise_managed_server = true
       enable_ec2_user_keypair                     = true
-      enable_shared_s3                            = true
+      enable_s3_db_backup_bucket                  = true
+      enable_s3_bucket                            = true
+      enable_s3_shared_bucket                     = true
+      enable_s3_software_bucket                   = true
       iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
@@ -151,12 +153,6 @@ locals {
           "oasys-national-reporting-${local.environment}",
           "planetfm-${local.environment}",
         ]
-      }
-    }
-
-    s3_buckets = {
-      s3-bucket = {
-        iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
 

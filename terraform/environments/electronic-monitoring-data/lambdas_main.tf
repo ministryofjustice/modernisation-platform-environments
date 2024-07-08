@@ -1,8 +1,11 @@
 locals {
   lambda_path = "lambdas"
-  env_name = local.is-production? "prod": "dev"
+  env_name    = local.is-production ? "prod" : "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
+
+  output_fs_json_lambda = "output_file_structure_as_json_from_zip"
 }
+
 # ------------------------------------------------------
 # Get Metadata from RDS Function
 # ------------------------------------------------------
@@ -188,48 +191,76 @@ module "send_table_to_ap" {
 
 
 data "archive_file" "query_output_to_list" {
-    type = "zip"
-    source_file = "${local.lambda_path}/query_output_to_list.py"
-    output_path = "${local.lambda_path}/query_output_to_list.zip"
+  type        = "zip"
+  source_file = "${local.lambda_path}/query_output_to_list.py"
+  output_path = "${local.lambda_path}/query_output_to_list.zip"
 }
 
 module "query_output_to_list" {
-    source              = "./modules/lambdas"
-    filename = "${local.lambda_path}/query_output_to_list.zip"
-    function_name = "query_output_to_list"
-    role_arn = aws_iam_role.query_output_to_list.arn
-    role_name = aws_iam_role.query_output_to_list.name
-    handler = "query_output_to_list.handler"
-    source_code_hash = data.archive_file.query_output_to_list.output_base64sha256
-    layers = null
-    timeout = 900
-    memory_size = 1024
-    runtime = "python3.11"
-    security_group_ids = null
-    subnet_ids = null
-    env_account_id = local.env_account_id
-    environment_variables = null
+  source                = "./modules/lambdas"
+  filename              = "${local.lambda_path}/query_output_to_list.zip"
+  function_name         = "query_output_to_list"
+  role_arn              = aws_iam_role.query_output_to_list.arn
+  role_name             = aws_iam_role.query_output_to_list.name
+  handler               = "query_output_to_list.handler"
+  source_code_hash      = data.archive_file.query_output_to_list.output_base64sha256
+  layers                = null
+  timeout               = 900
+  memory_size           = 1024
+  runtime               = "python3.11"
+  security_group_ids    = null
+  subnet_ids            = null
+  env_account_id        = local.env_account_id
+  environment_variables = null
 }
 
 # ------------------------------------------------------
 # Update log table
 # ------------------------------------------------------
 
-
-resource "aws_lambda_function" "update_log_table" {
+module "update_log_table" {
+    source = "./modules/lambdas"
     function_name = "update_log_table"
-    role = aws_iam_role.update_log_table.arn
+    is_image = true
+    role_name = aws_iam_role.update_log_table.name
+    role_arn = aws_iam_role.update_log_table.arn
     memory_size = 1024
     timeout = 900
-    package_type  = "Image"
-    image_uri = "${module.ecr_lambda_repo.repository_url}:${local.env_name}"
-    architectures = ["arm64"]
-    environment {
-      variables = {
+    env_account_id = local.env_account_id
+    ecr_repo_name = module.ecr_lambdas_repo.repository_name
+    ecr_repo_url = module.ecr_lambdas_repo.repository_url
+    environment_variables = {
       S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
       DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
       TABLE_NAME = "glue_df_output"
       }
-    }
+}
+
+#-----------------------------------------------------------------------------------
+# S3 lambda function to perform zip file structure extraction into json for Athena
+#-----------------------------------------------------------------------------------
+
+data "archive_file" "output_file_structure_as_json_from_zip" {
+  type        = "zip"
+  source_file = "${local.lambda_path}/${local.output_fs_json_lambda}.py"
+  output_path = "${local.lambda_path}/${local.output_fs_json_lambda}.zip"
+}
+
+module "output_file_structure_as_json_from_zip" {
+  source                = "./modules/lambdas"
+  filename              = "${local.lambda_path}/${local.output_fs_json_lambda}.zip"
+  function_name         = local.output_fs_json_lambda
+  role_arn              = aws_iam_role.output_fs_json_lambda.arn
+  role_name             = aws_iam_role.output_fs_json_lambda.name
+  handler               = "${local.output_fs_json_lambda}.handler"
+  source_code_hash      = data.archive_file.output_file_structure_as_json_from_zip.output_base64sha256
+  layers                = ["arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2:67"]
+  timeout               = 900
+  memory_size           = 1024
+  runtime               = "python3.12"
+  security_group_ids    = [aws_security_group.lambda_db_security_group.id]
+  subnet_ids            = data.aws_subnets.shared-public.ids
+  env_account_id        = local.env_account_id
+  environment_variables = null
 }
 

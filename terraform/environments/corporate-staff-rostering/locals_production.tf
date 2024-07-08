@@ -895,16 +895,6 @@ locals {
       }
     }
 
-    s3_buckets = {
-      csr-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy,
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-    }
-
     secretsmanager_secrets = {
       "/oracle/database/PIWFM" = {
         secrets = {

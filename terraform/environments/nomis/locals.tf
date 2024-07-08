@@ -33,6 +33,7 @@ locals {
       cloudwatch_metric_alarms_default_actions    = ["dso_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters  = ["hmpps-oem-${local.environment}"]
       cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
+      db_backup_bucket_name                       = "nomis-db-backup-bucket"
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
       enable_ec2_cloud_watch_agent                = true
@@ -41,26 +42,22 @@ locals {
       enable_ec2_session_manager_cloudwatch_logs  = true
       enable_ec2_ssm_agent_update                 = true
       enable_ec2_user_keypair                     = true
+      enable_s3_bucket                            = true
+      enable_s3_db_backup_bucket                  = true
+      enable_s3_software_bucket                   = true
       enable_image_builder                        = true
       enable_hmpps_domain                         = true # Syscon users are collaborators so need domain creds to access nomis-client EC2s
       iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-      route53_resolver_rules = {
-        outbound-data-and-private-subnets = ["azure-fixngo-domain"]
-      }
-      s3_iam_policies = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+      route53_resolver_rules                      = { outbound-data-and-private-subnets = ["azure-fixngo-domain"] }
+      s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+      software_bucket_name                        = "ec2-image-builder-nomis"
     }
   }
 
   baseline_all_environments = {
     options = {
       enable_resource_explorer = true
-    }
-
-    s3_buckets = {
-      s3-bucket = {
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
     }
 
     security_groups = local.security_groups

@@ -122,7 +122,7 @@ module "nextcloud_service" {
     NEXTCLOUD_ADMIN_PASSWORD = aws_secretsmanager_secret.nextcloud_admin_password.arn
   }
 
-  log_error_pattern      = "FATAL"
+  log_error_pattern      = "ERROR"
   sns_topic_arn          = aws_sns_topic.nextcloud_alarms.arn
   frontend_lb_arn_suffix = aws_alb.nextcloud.arn_suffix
 

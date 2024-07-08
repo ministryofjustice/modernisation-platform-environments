@@ -269,8 +269,8 @@ locals {
       pp-ncr-client-a = merge(local.jumpserver_ec2_default, {
         # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.jumpserver_ec2_default.config, {
-          ami_name = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
-          availability_zone             = "eu-west-2a"
+          ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.jumpserver_ec2_default.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
@@ -480,13 +480,6 @@ locals {
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "private" }, # preproduction.reporting.nomis.service.justice.gov.uk
         ]
-      }
-    }
-
-    s3_buckets = {
-      ncr-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
       }
     }
 

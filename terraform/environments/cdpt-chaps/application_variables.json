@@ -13,7 +13,7 @@
       "ec2_desired_capacity": 1,
       "ec2_max_size": 2,
       "ec2_min_size": 1,
-      "ami_image_id": "ami-0cf98f96c2bae561e",
+      "ami_image_id": "ami-0e2606e2f0acb32c4",
       "instance_type": "t3.large",
       "container_port": 80,
       "client_id": "aa335a21-40a9-45a0-b0ef-16d65584b024"
@@ -31,7 +31,7 @@
       "ec2_desired_capacity": 2,
       "ec2_max_size": 3,
       "ec2_min_size": 2,
-      "ami_image_id": "ami-0cf98f96c2bae561e",
+      "ami_image_id": "ami-0e2606e2f0acb32c4",
       "instance_type": "t3.large",
       "container_port": 80,
       "client_id": "2e2cc8ad-7b64-41b9-93a1-c16b9a00b34f"
@@ -49,7 +49,7 @@
       "ec2_desired_capacity": 2,
       "ec2_max_size": 3,
       "ec2_min_size": 2,
-      "ami_image_id": "ami-0cf98f96c2bae561e",
+      "ami_image_id": "ami-0e2606e2f0acb32c4",
       "instance_type": "t3.large",
       "container_port": 80,
       "client_id": "0a5da4a0-a108-4ca5-a45c-440b72b323e6"

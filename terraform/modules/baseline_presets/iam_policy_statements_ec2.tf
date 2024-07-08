@@ -114,13 +114,9 @@ locals {
           "s3:PutObject",
           "s3:PutObjectAcl",
         ]
-        resources = concat(var.environment.environment == "production" || var.environment.environment == "preproduction" ? [
-          "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*/*",
-          "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*"
-          ] : [
-          "arn:aws:s3:::devtest-${var.environment.application_name}-*/*",
-          "arn:aws:s3:::devtest-${var.environment.application_name}-*"
-          ], [
+        resources = [
+          "arn:aws:s3:::${local.s3_environment_specific.shared_bucket_name}*/*",
+          "arn:aws:s3:::${local.s3_environment_specific.shared_bucket_name}*",
           "arn:aws:s3:::ec2-image-builder-*/*",
           "arn:aws:s3:::ec2-image-builder-*",
           "arn:aws:s3:::*-software*/*",
@@ -129,7 +125,7 @@ locals {
           "arn:aws:s3:::mod-platform-image-artefact-bucket*",
           "arn:aws:s3:::modernisation-platform-software*/*",
           "arn:aws:s3:::modernisation-platform-software*"
-        ])
+        ]
       }
     ]
 
@@ -351,20 +347,20 @@ locals {
         ]
         resources = flatten([
           var.environment.environment == "production" ? [
-            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*/*",
-            "arn:aws:s3:::prod-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::prod-${var.environment.application_name}-db-backup-bucket-*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.preproduction.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.preproduction.db_backup_bucket_name}*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.production.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.production.db_backup_bucket_name}*/*",
           ] : [],
           var.environment.environment == "preproduction" ? [
-            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::preprod-${var.environment.application_name}-db-backup-bucket-*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.preproduction.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.preproduction.db_backup_bucket_name}*/*",
           ] : [],
           contains(["development", "test"], var.environment.environment) ? [
-            "arn:aws:s3:::dev-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::dev-${var.environment.application_name}-db-backup-bucket-*/*",
-            "arn:aws:s3:::devtest-${var.environment.application_name}-db-backup-bucket-*",
-            "arn:aws:s3:::devtest-${var.environment.application_name}-db-backup-bucket-*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.development.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.development.db_backup_bucket_name}*/*",
+            "arn:aws:s3:::${local.s3_environments_specific.test.db_backup_bucket_name}*",
+            "arn:aws:s3:::${local.s3_environments_specific.test.db_backup_bucket_name}*/*",
           ] : [],
         ])
       }

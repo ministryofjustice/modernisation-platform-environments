@@ -643,12 +643,6 @@ locals {
       }
     }
 
-    s3_buckets = {
-      oasys-production = {
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-    }
-
     secretsmanager_secrets = {
       "/oracle/bip/production" = local.secretsmanager_secrets_bip
       "/oracle/bip/trn"        = local.secretsmanager_secrets_bip

@@ -473,12 +473,6 @@ locals {
       }
     }
 
-    s3_buckets = {
-      oasys-test = {
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-    }
-
     secretsmanager_secrets = {
       "/oracle/bip/t1" = local.secretsmanager_secrets_bip
       "/oracle/bip/t2" = local.secretsmanager_secrets_bip

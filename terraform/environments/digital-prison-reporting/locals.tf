@@ -2,6 +2,7 @@
 #### DPR Specific ####
 locals {
   project = local.application_data.accounts[local.environment].project_short_id
+  analytics_project_id = "analytics"
 
   other_log_retention_in_days = local.application_data.accounts[local.environment].other_log_retention_in_days
 
@@ -242,8 +243,6 @@ locals {
   # s3 transfer
   scheduled_s3_file_transfer_retention_period_amount = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_amount
   scheduled_s3_file_transfer_retention_period_unit   = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_unit
-  scheduled_s3_file_transfer_schedule                = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_schedule
-  enable_s3_file_transfer_trigger                    = local.application_data.accounts[local.environment].enable_s3_file_transfer_trigger
 
   # step function notification lambda
   step_function_notification_lambda_handler = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
@@ -299,6 +298,10 @@ locals {
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 
+  # Setup Athena Workgroups 
+  setup_dpr_generic_athena_workgroup = local.application_data.accounts[local.environment].dpr_generic_athena_workgroup
+  setup_analytics_generic_athena_workgroup = local.application_data.accounts[local.environment].analytics_generic_athena_workgroup
+
   # Sonatype Secrets
   setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
 
@@ -323,6 +326,12 @@ locals {
     port     = "5432"
   }
 
+  # Operational DataStore Secrets PlaceHolder
+  operational_datastore_secrets_placeholder = {
+    username = "placeholder"
+    password = "placeholder"
+  }
+
   # biprws Secrets Placeholder
   enable_biprws_secrets = local.application_data.accounts[local.environment].biprws.enable
   biprws_secrets_placeholder = {
@@ -334,6 +343,16 @@ locals {
   # cp_k8s_secrets_placeholder
   enable_cp_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_k8s_secrets
   cp_k8s_secrets_placeholder = {
+    cloud_platform_k8s_token           = "placeholder"
+    cloud_platform_certificate_auth    = "placeholder"
+    cloud_platform_k8s_server          = "placeholder"
+    cloud_platform_k8s_cluster_name    = "placeholder"
+    cloud_platform_k8s_cluster_context = "placeholder"
+  }
+
+  # cp_bodmis_k8s_secrets_placeholder
+  enable_cp_bodmis_k8s_secrets = local.application_data.accounts[local.environment].enable_cp_bodmis_k8s_secrets
+  cp_bodmis_k8s_secrets_placeholder = {
     cloud_platform_k8s_token           = "placeholder"
     cloud_platform_certificate_auth    = "placeholder"
     cloud_platform_k8s_server          = "placeholder"

@@ -71,8 +71,8 @@ locals {
       # ACTIVE (blue deployment)
       preprod-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 2
-          max_size         = 2
+          desired_capacity = 1
+          max_size         = 1
         })
         cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -517,20 +517,6 @@ locals {
           { name = "c", type = "A", lbs_map_key = "private" },
           { name = "c-lsast", type = "A", lbs_map_key = "private" },
         ]
-      }
-    }
-
-    s3_buckets = {
-      nomis-audit-archives = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
-        lifecycle_rule = [
-          module.baseline_presets.s3_lifecycle_rules.ninety_day_standard_ia_ten_year_expiry
-        ]
-      }
-      nomis-db-backup-bucket = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        iam_policies   = module.baseline_presets.s3_iam_policies
       }
     }
 

@@ -31,6 +31,8 @@ locals {
       enable_hmpps_domain           = true
       enable_image_builder          = true
       enable_oracle_secure_web      = true
+      enable_s3_bucket              = true
+      enable_s3_software_bucket     = true
       iam_policies_filter           = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       iam_policies_ec2_default      = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       s3_iam_policies               = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
@@ -58,11 +60,6 @@ locals {
       }
     }
     resource_explorer = true
-    s3_buckets = {
-      s3-bucket = {
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
-    }
-    security_groups = local.security_groups
+    security_groups   = local.security_groups
   }
 }

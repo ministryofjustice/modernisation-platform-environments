@@ -72,3 +72,8 @@ variable "environments_in_account" {
   default = []
 }
 
+variable "pagerduty_integration_key" {
+  description = "PagerDuty integration key"
+  type        = string
+  default     = null
+}

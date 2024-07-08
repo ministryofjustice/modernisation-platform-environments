@@ -1,9 +1,12 @@
 module "dms_task" {
   source = "./modules/dms"
 
-  for_each = toset(local.is-production? [
+  for_each = toset(local.is-production ? [
     "g4s_cap_dw",
-    "g4s_emsys_mvp"
+    "g4s_emsys_mvp",
+    "capita_alcohol_monitoring",
+    "g4s_atrium",
+    "civica_orca"
   ] : ["test"])
 
   database_name = each.key
