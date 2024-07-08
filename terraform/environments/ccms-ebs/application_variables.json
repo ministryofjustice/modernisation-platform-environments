@@ -93,12 +93,12 @@
       "instance_role_ftp": "ftp",
       "instance_role_mailrelay": "mailrelay",
       "instance_role_webgate": "webgate",
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 731,
+      "s3_lifecycle_days_expiration_noncurrent": 731,
+      "s3_lifecycle_days_transition_current_glacier": 366,
+      "s3_lifecycle_days_transition_current_standard": 91,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 366,
+      "s3_lifecycle_days_transition_noncurrent_standard": 91
     },
     "test": {
       "short_env": "tst",
