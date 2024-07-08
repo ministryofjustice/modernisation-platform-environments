@@ -242,15 +242,15 @@ module "output_file_structure_as_json_from_zip" {
   source                = "./modules/lambdas"
   function_name         = "extract_metadata_from_atrium_unstructured"
   is_image              = true
-  role_arn              = aws_iam_role.extract_metadata_from_atrium_unstructured.arn
   role_name             = aws_iam_role.extract_metadata_from_atrium_unstructured.name
-  ecr_repo_name         = module.ecr_lambdas_repo.repository_name
-  ecr_repo_url          = module.ecr_lambdas_repo.repository_url
+  role_arn              = aws_iam_role.extract_metadata_from_atrium_unstructured.arn
   memory_size           = 1024
   timeout               = 900
+  env_account_id        = local.env_account_id
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev = local.is-production ? "prod" : "dev"
   security_group_ids    = [aws_security_group.lambda_db_security_group.id]
   subnet_ids            = data.aws_subnets.shared-public.ids
-  env_account_id        = local.env_account_id
   environment_variables = null
 }
 
