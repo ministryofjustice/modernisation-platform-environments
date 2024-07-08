@@ -611,7 +611,27 @@ variable "lbs" {
       noncurrent_version_expiration = optional(object({
         days = optional(number)
       }))  
-    })), [module.baseline_presets.s3_lifecycle_rules.default])
+    })), [
+      {
+      enabled = "Enabled"
+      id      = "main"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        { days = 90, storage_class = "STANDARD_IA" },
+        { days = 365, storage_class = "GLACIER" }
+      ]
+      expiration = { days = 730 }
+      noncurrent_version_transition = [
+        { days = 90, storage_class = "STANDARD_IA" },
+        { days = 365, storage_class = "GLACIER" }
+      ]
+      noncurrent_version_expiration = { days = 730 }
+    }])
     load_balancer_type               = optional(string, "application")
     security_groups                  = list(string)
     subnets                          = list(string)
