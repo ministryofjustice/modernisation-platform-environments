@@ -62,7 +62,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_schema",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
-                       "rds_upperbound_factor"
+                       "rds_upperbound_factor",
                        "rds_read_rows_fetch_size"
                        ]
 
