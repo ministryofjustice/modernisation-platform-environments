@@ -179,7 +179,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
   network_interfaces {
     device_index                = 0
     security_groups             = [aws_security_group.cluster_ec2.id]
-    subnet_id                   = data.aws_subnet.public_subnets_a.id
+    subnet_id                   = data.aws_subnet.private_subnets_a.id
     delete_on_termination       = true
     associate_public_ip_address = false
   }
@@ -198,7 +198,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
 
 # # Finally, create the Auto scaling group for the launch template
 resource "aws_autoscaling_group" "tribunals-all-asg" {
-  vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
+  vpc_zone_identifier = [data.aws_subnet.private_subnets_a.id]
   desired_capacity    = 1
   max_size            = 1
   min_size            = 1
