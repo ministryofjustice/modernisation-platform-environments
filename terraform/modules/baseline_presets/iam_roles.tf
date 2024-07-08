@@ -1,8 +1,6 @@
 locals {
 
   iam_roles_filter = distinct(flatten([
-    var.options.enable_offloc_sync ? ["OfflocSyncRole"] : [],
-    var.options.enable_azure_sas_token ? ["SasTokenRotatorRole"] : [],
     var.options.enable_hmpps_domain ? ["EC2HmppsDomainSecretsRole"] : [],
     var.options.enable_ec2_delius_dba_secrets_access ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
@@ -106,58 +104,6 @@ locals {
       }]
       policy_attachments = [
         "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
-      ]
-    }
-
-    SasTokenRotatorRole = {
-      assume_role_policy = [{
-        effect  = "Allow"
-        actions = ["sts:AssumeRoleWithWebIdentity"]
-        principals = {
-          type        = "Federated"
-          identifiers = ["arn:aws:iam::${var.environment.account_id}:oidc-provider/token.actions.githubusercontent.com"]
-        }
-        conditions = [
-          {
-            test     = "StringEquals"
-            values   = ["sts.amazonaws.com"]
-            variable = "token.actions.githubusercontent.com:aud"
-          },
-          {
-            test     = "StringLike"
-            values   = ["repo:ministryofjustice/dso-modernisation-platform-automation:*"] # ["repo:ministryofjustice/dso-modernisation-platform-automation:ref:refs/heads/main"]
-            variable = "token.actions.githubusercontent.com:sub"
-          },
-        ]
-      }]
-      policy_attachments = [
-        "SasTokenRotatorPolicy",
-      ]
-    }
-
-    OfflocSyncRole = {
-      assume_role_policy = [{
-        effect  = "Allow"
-        actions = ["sts:AssumeRoleWithWebIdentity"]
-        principals = {
-          type        = "Federated"
-          identifiers = ["arn:aws:iam::${var.environment.account_id}:oidc-provider/token.actions.githubusercontent.com"]
-        }
-        conditions = [
-          {
-            test     = "StringEquals"
-            values   = ["sts.amazonaws.com"]
-            variable = "token.actions.githubusercontent.com:aud"
-          },
-          {
-            test     = "StringLike"
-            values   = ["repo:ministryofjustice/ansible-monorepo:*"]
-            variable = "token.actions.githubusercontent.com:sub"
-          },
-        ]
-      }]
-      policy_attachments = [
-        "OfflocSyncPolicy",
       ]
     }
 

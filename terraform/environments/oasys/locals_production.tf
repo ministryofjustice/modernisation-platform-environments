@@ -65,6 +65,26 @@ locals {
         })
       })
 
+      pd-oasys-web-b = merge(local.webserver, {
+        autoscaling_group = merge(local.webserver.autoscaling_group, {
+          desired_capacity = 1
+          max_size         = 1
+        })
+        config = merge(local.webserver.config, {
+          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
+            "Ec2ProdWebPolicy",
+          ])
+        })
+        instance = merge(local.webserver.instance, {
+          instance_type = "t3.large"
+        })
+        tags = merge(local.webserver.tags, {
+          oasys-environment  = "production"
+          oracle-db-hostname = "db.oasys.hmpps-production.modernisation-platform.internal"
+          oracle-db-sid      = "PDOASYS"
+        })
+      })
+
       ptc-oasys-web-a = merge(local.webserver, {
         config = merge(local.webserver.config, {
           iam_resource_names_prefix = "ec2-web-ptc"
@@ -433,6 +453,22 @@ locals {
                   }
                 ]
               }
+              pd-web-b-http-8080 = {
+                priority = 101
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-oasys-web-b-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "b.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
               ptc-web-http-8080 = {
                 priority = 200
                 actions = [{
@@ -517,6 +553,22 @@ locals {
                         "oasys-ukwest.oasys.az.justice.gov.uk",
                         # "oasys.az.justice.gov.uk",
                         "p-oasys.az.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              pd-web-b-http-8080 = {
+                priority = 101
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-oasys-web-b-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
