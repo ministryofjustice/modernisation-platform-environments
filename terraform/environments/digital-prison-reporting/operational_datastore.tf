@@ -14,7 +14,8 @@ locals {
     }
   )
 
-  operational_db_credentials = jsondecode(data.aws_secretsmanager_secret_version.operational_db_secret_version.secret_string)
+  operational_db_credentials            = jsondecode(data.aws_secretsmanager_secret_version.operational_db_secret_version.secret_string)
+  operational_db_jdbc_connection_string = "jdbc:postgresql://dpr2-834-instance-1.cja8lnnvvipo.eu-west-2.rds.amazonaws.com:5432/postgres"
 }
 
 ################################################################################
@@ -111,7 +112,7 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
 
   connection_properties = {
     # This will be replaced by the details for the real Operational Data Store
-    JDBC_CONNECTION_URL    = "jdbc:postgresql://dpr2-834-instance-1.cja8lnnvvipo.eu-west-2.rds.amazonaws.com:5432/postgres"
+    JDBC_CONNECTION_URL    = local.operational_db_jdbc_connection_string
     JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
     SECRET_ID              = data.aws_secretsmanager_secret.operational_datastore[0].name
   }
