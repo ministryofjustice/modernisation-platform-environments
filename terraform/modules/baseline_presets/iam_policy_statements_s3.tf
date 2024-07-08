@@ -9,8 +9,7 @@ locals {
         sid    = "S3ReadWriteCoreSharedServicesProduction"
         effect = "Allow"
         actions = [
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:PutObject",
           "s3:PutObjectAcl",
           "s3:PutObjectTagging",
@@ -30,9 +29,7 @@ locals {
         sid    = "S3ReadAllEnvironments"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket"
         ]
         principals = {
@@ -50,9 +47,7 @@ locals {
         sid    = "S3ReadOnlyPreprod"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket"
         ]
         principals = {
@@ -69,9 +64,7 @@ locals {
         sid    = "S3WritePreprod"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -93,9 +86,7 @@ locals {
         sid    = "S3ReadWriteAllEnvironments"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -116,9 +107,7 @@ locals {
         sid    = "S3ReadProdPreprod"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
         ]
         principals = {
@@ -135,9 +124,7 @@ locals {
         sid    = "S3ReadWriteProdPreprod"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -158,9 +145,7 @@ locals {
         sid    = "S3ReadWriteDeleteAllEnvironments"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -182,9 +167,7 @@ locals {
         sid    = "S3ReadDevTest"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
         ]
         principals = {
@@ -201,9 +184,7 @@ locals {
         sid    = "S3ReadWriteDeleteDevTest"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -225,9 +206,7 @@ locals {
         sid    = "S3ReadDev"
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket"
         ]
         principals = {
@@ -243,9 +222,7 @@ locals {
       {
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
         ]
       }
@@ -254,9 +231,7 @@ locals {
       {
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -269,9 +244,7 @@ locals {
       {
         effect = "Allow"
         actions = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:GetObjectTagging",
+          "s3:Get*",
           "s3:ListBucket",
           "s3:PutObject",
           "s3:PutObjectAcl",

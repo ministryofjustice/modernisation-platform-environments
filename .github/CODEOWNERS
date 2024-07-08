@@ -12,7 +12,7 @@
 /terraform/environments/cica-copilot @ministryofjustice/cica-copilot-llm-maintainers @ministryofjustice/modernisation-platform
 /terraform/environments/cica-data-extraction @ministryofjustice/cica-extract-tool-admins @ministryofjustice/modernisation-platform
 /terraform/environments/cica-tariff @ministryofjustice/cica-mp-tariff @ministryofjustice/modernisation-platform
-/terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
+/terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform

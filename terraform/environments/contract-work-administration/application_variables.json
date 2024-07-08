@@ -43,8 +43,6 @@
       "database_diskspace_threshold": "95",
       "database_read_write_ops_threshold": "1100000",
       "database_oradata_queue_length_threshold": "3"
-
-
     },
     "test": {
       "example_var": "test-data"

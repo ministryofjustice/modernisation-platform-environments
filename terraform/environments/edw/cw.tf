@@ -3,46 +3,46 @@
 ##### EC2 Log Group
 
 resource "aws_cloudwatch_log_group" "EC2LogGoup" {
-  name                 = "${local.application_name}-EC2"
-  retention_in_days    = 180
+  name              = "${local.application_name}-EC2"
+  retention_in_days = 180
 }
 
 ##### EC2 Cloudwatch Log Groups
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupCfnInit" {
-  name                 = "${local.application_name}-CfnInit"
-  retention_in_days    = 180
+  name              = "${local.application_name}-CfnInit"
+  retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupOracleAlerts" {
-  name                 = "${local.application_name}-OracleAlerts"
-  retention_in_days    = 180
+  name              = "${local.application_name}-OracleAlerts"
+  retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupRman" {
-  name                 = "${local.application_name}-RMan"
-  retention_in_days    = 180
+  name              = "${local.application_name}-RMan"
+  retention_in_days = 180
 
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupRmanArch" {
-  name                 = "${local.application_name}-RManArch"
-  retention_in_days    = 180
+  name              = "${local.application_name}-RManArch"
+  retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupTBSFreespace" {
-  name                 = "${local.application_name}-TBSFreespace"
-  retention_in_days    = 180
+  name              = "${local.application_name}-TBSFreespace"
+  retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupPMONstatus" {
-  name                 = "${local.application_name}-PMONstatus"
-  retention_in_days    = 180
+  name              = "${local.application_name}-PMONstatus"
+  retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupCDCstatus" {
-  name                 = "${local.application_name}-CDCstatus"
-  retention_in_days    = 180
+  name              = "${local.application_name}-CDCstatus"
+  retention_in_days = 180
 }
 
 
@@ -119,8 +119,8 @@ resource "aws_cloudwatch_metric_alarm" "EDWEc2MemoryOverThreshold" {
   treat_missing_data  = "breaching"
 
   dimensions = {
-    ImageId     = aws_instance.edw_db_instance.ami
-    InstanceId  = aws_instance.edw_db_instance.id
+    ImageId      = aws_instance.edw_db_instance.ami
+    InstanceId   = aws_instance.edw_db_instance.id
     InstanceType = aws_instance.edw_db_instance.instance_type
   }
 
@@ -141,12 +141,12 @@ resource "aws_cloudwatch_metric_alarm" "EDWEbsDiskSpaceUsedOverThreshold" {
   treat_missing_data  = "breaching"
 
   dimensions = {
-    path     = local.application_data.accounts[local.environment].edw_disk_path
-    InstanceId = aws_instance.edw_db_instance.id
-    ImageId = aws_instance.edw_db_instance.ami
+    path         = local.application_data.accounts[local.environment].edw_disk_path
+    InstanceId   = aws_instance.edw_db_instance.id
+    ImageId      = aws_instance.edw_db_instance.ami
     InstanceType = aws_instance.edw_db_instance.instance_type
-    device = local.application_data.accounts[local.environment].edw_disk_device
-    fstype = local.application_data.accounts[local.environment].edw_disk_fs_type
+    device       = local.application_data.accounts[local.environment].edw_disk_device
+    fstype       = local.application_data.accounts[local.environment].edw_disk_fs_type
   }
 
   alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
@@ -184,14 +184,14 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmOracleAlerts" {
   evaluation_periods  = local.application_data.accounts[local.environment].edw_logstream_errors_detected_evaluation_periods
   treat_missing_data  = "notBreaching"
 
-  alarm_actions       = [aws_sns_topic.edw_alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.edw_alerting_topic.arn]
+  alarm_actions = [aws_sns_topic.edw_alerting_topic.arn]
+  ok_actions    = [aws_sns_topic.edw_alerting_topic.arn]
 }
 
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterOracleAlerts" {
   name           = "EDWLogsMetricFilterOracleAlerts"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupOracleAlerts.name
-  pattern = "\"ORA-\""
+  pattern        = "\"ORA-\""
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metrics_oracle_alerts}"
@@ -219,7 +219,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmTBSFreespace" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterTBSFreespace" {
   name           = "EDWLogsMetricFilterTBSFreespace"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupTBSFreespace.name
-  pattern = "ALERT"
+  pattern        = "ALERT"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metrics_tbs_freespace}"
@@ -247,7 +247,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmPMONstatus" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterPMONstatus" {
   name           = "EDWLogsMetricFilterPMONstatus"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupPMONstatus.name
-  pattern = "DOWN"
+  pattern        = "DOWN"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_pmon_status}"
@@ -275,7 +275,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus" {
   name           = "EDWLogsMetricFilterCDCstatus"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupCDCstatus.name
-  pattern =  "[APPLY_NAME, STATUS=\"DISABLED\"]"
+  pattern        = "[APPLY_NAME, STATUS=\"DISABLED\"]"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status}"
@@ -303,7 +303,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmCDCstatus2" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterCDCstatus2" {
   name           = "EDWLogsMetricFilterCDCstatus2"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupCDCstatus.name
-  pattern = "[SOURCE_NAME ,SOURCE_ENABLED=\"N\"]"
+  pattern        = "[SOURCE_NAME ,SOURCE_ENABLED=\"N\"]"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_cdc_status2}"
@@ -331,7 +331,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanBackup" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanBackup" {
   name           = "EDWLogsMetricFilterRmanBackup"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupRman.name
-  pattern = "?ERRORs ?Errors ?errors ?ERROR ?Error ?error"
+  pattern        = "?ERRORs ?Errors ?errors ?ERROR ?Error ?error"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_name_rman_backup}"
@@ -359,7 +359,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWLogStreamErrorsAlarmRmanArchBackup" {
 resource "aws_cloudwatch_log_metric_filter" "EDWLogsMetricFilterRmanArchBackup" {
   name           = "EDWLogsMetricFilterRmanArchBackup"
   log_group_name = aws_cloudwatch_log_group.EDWLogGroupRmanArch.name
-  pattern = "?FAILURE ?Failure ?failure"
+  pattern        = "?FAILURE ?Failure ?failure"
 
   metric_transformation {
     name      = "${local.application_name}_${local.application_data.accounts[local.environment].edw_log_metric_name_rman_arch_backup}"
@@ -543,7 +543,7 @@ EOF
 # resource "aws_cloudformation_stack" "edw-cloudwatch-stack" {
 #   name          = "${local.application_name}-cloudwatch-stack"
 #   capabilities = ["CAPABILITY_IAM"]
-  
+
 #   tags = merge(
 #     local.tags,
 #     {

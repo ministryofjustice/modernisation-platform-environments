@@ -1,7 +1,7 @@
 
 ####### EC2 Role #######
 resource "aws_iam_role" "edw_ec2_role" {
-  name               = "${local.application_name}-ec2-role"
+  name = "${local.application_name}-ec2-role"
   assume_role_policy = jsonencode({
     Statement = [{
       Effect    = "Allow"
@@ -54,7 +54,7 @@ resource "aws_iam_role" "edw_ec2_role" {
     {
       Name = "${local.application_name}-db-instance-role"
     }
-  )  
+  )
 }
 
 
@@ -70,7 +70,7 @@ resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
     {
       Name = "${local.application_name}-db-instance-profile"
     }
-  )  
+  )
 }
 
 ####### DB Instance #######
@@ -87,17 +87,17 @@ resource "aws_instance" "edw_db_instance" {
   iam_instance_profile   = aws_iam_instance_profile.edw_ec2_instance_profile.id
   key_name               = aws_key_pair.edw_ec2_key.key_name
   subnet_id              = data.aws_subnet.private_subnets_a.id
-  vpc_security_group_ids  = [aws_security_group.edw_db_security_group.id]
+  vpc_security_group_ids = [aws_security_group.edw_db_security_group.id]
   user_data = base64encode(templatefile("edw-ec2-user-data.sh", {
-    edw_app_name = local.application_data.accounts[local.environment].edw_AppName
-    edw_dns_extension = local.application_data.accounts[local.environment].edw_dns_extension
-    edw_environment  = local.application_data.accounts[local.environment].edw_environment
-    edw_region = local.application_data.accounts[local.environment].edw_region
-    edw_ec2_role = aws_iam_role.edw_ec2_role.name
+    edw_app_name         = local.application_data.accounts[local.environment].edw_AppName
+    edw_dns_extension    = local.application_data.accounts[local.environment].edw_dns_extension
+    edw_environment      = local.application_data.accounts[local.environment].edw_environment
+    edw_region           = local.application_data.accounts[local.environment].edw_region
+    edw_ec2_role         = aws_iam_role.edw_ec2_role.name
     edw_s3_backup_bucket = local.application_data.accounts[local.environment].edw_s3_backup_bucket
-    edw_cis_ip = local.application_data.accounts[local.environment].edw_cis_ip
-    edw_eric_ip = local.application_data.accounts[local.environment].edw_eric_ip
-    edw_ccms_ip = local.application_data.accounts[local.environment].edw_ccms_ip
+    edw_cis_ip           = local.application_data.accounts[local.environment].edw_cis_ip
+    edw_eric_ip          = local.application_data.accounts[local.environment].edw_eric_ip
+    edw_ccms_ip          = local.application_data.accounts[local.environment].edw_ccms_ip
   }))
 
 
@@ -204,7 +204,7 @@ resource "aws_ebs_volume" "ArchiveVolume" {
   type              = "gp3"
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraarch"
+    Name                                               = "${local.application_data.accounts[local.environment].edw_AppName}-oraarch"
     "dlm:snapshot-with:volume-hourly-35-day-retention" = "yes"
   }
 }
@@ -291,9 +291,9 @@ resource "aws_security_group" "edw_db_security_group" {
 
 resource "aws_route53_record" "edw_internal_dns_record" {
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.application_name}.${data.aws_route53_zone.external.name}"
-  type    = "A"
-  ttl     = 900
-  records = [aws_instance.edw_db_instance.private_ip]
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name}.${data.aws_route53_zone.external.name}"
+  type     = "A"
+  ttl      = 900
+  records  = [aws_instance.edw_db_instance.private_ip]
 }
