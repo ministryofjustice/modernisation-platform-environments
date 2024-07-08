@@ -60,6 +60,10 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
       noncurrent_version_expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
       }
+
+      abort_incomplete_multipart_upload_days = {
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+      }
     }
   ]
 
@@ -153,6 +157,10 @@ module "s3-bucket-logging" {
       noncurrent_version_expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
       }
+
+      abort_incomplete_multipart_upload_days = {
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+      }
     }
   ]
 
@@ -242,6 +250,10 @@ module "s3-bucket-dbbackup" {
 
       noncurrent_version_expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+      }
+
+      abort_incomplete_multipart_upload_days = {
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
       }
     }
   ]
