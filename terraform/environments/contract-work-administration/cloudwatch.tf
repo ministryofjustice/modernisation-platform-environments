@@ -337,7 +337,7 @@ resource "aws_cloudwatch_metric_alarm" "database_rx_packet_dropped" {
 resource "aws_cloudwatch_metric_alarm" "database_tx_packet_errors" {
 
   alarm_name          = "${local.application_name_short}-${local.environment}-database-tx-packet-errors"
-  alarm_description   = "Number of errors tx Packets Over Threshold"
+  alarm_description   = "Number of TX Packet Errors Over Threshold"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
     InstanceId = aws_instance.database.id
@@ -950,7 +950,7 @@ resource "aws_cloudwatch_metric_alarm" "app1_f60srvm_process" {
   threshold          = 0
   alarm_actions      = [aws_sns_topic.cwa.arn]
   ok_actions         = [aws_sns_topic.cwa.arn]
-  treat_missing_data = "missing"
+  treat_missing_data = "breaching"
   tags = merge(
     local.tags,
     {
@@ -962,7 +962,7 @@ resource "aws_cloudwatch_metric_alarm" "app1_f60srvm_process" {
 resource "aws_cloudwatch_metric_alarm" "app1_cwa_process" {
 
   alarm_name          = "${local.application_name_short}-${local.environment}-app1-cwa-process"
-  alarm_description   = ""
+  alarm_description   = "APPS_CWA Process has stopped"
   comparison_operator = "GreaterThanThreshold"
   dimensions = {
     InstanceId = aws_instance.app1.id
@@ -975,7 +975,7 @@ resource "aws_cloudwatch_metric_alarm" "app1_cwa_process" {
   threshold          = 0
   alarm_actions      = [aws_sns_topic.cwa.arn]
   ok_actions         = [aws_sns_topic.cwa.arn]
-  treat_missing_data = "missing"
+  treat_missing_data = "breaching"
   tags = merge(
     local.tags,
     {
@@ -987,7 +987,7 @@ resource "aws_cloudwatch_metric_alarm" "app1_cwa_process" {
 resource "aws_cloudwatch_metric_alarm" "app1_apache_process" {
 
   alarm_name          = "${local.application_name_short}-${local.environment}-app1-apache-process"
-  alarm_description   = ""
+  alarm_description   = "Apache Process has stopped"
   comparison_operator = "GreaterThanThreshold"
   dimensions = {
     InstanceId = aws_instance.app1.id
@@ -1000,7 +1000,7 @@ resource "aws_cloudwatch_metric_alarm" "app1_apache_process" {
   threshold          = 0
   alarm_actions      = [aws_sns_topic.cwa.arn]
   ok_actions         = [aws_sns_topic.cwa.arn]
-  treat_missing_data = "missing"
+  treat_missing_data = "breaching"
   tags = merge(
     local.tags,
     {
@@ -1025,7 +1025,7 @@ resource "aws_cloudwatch_metric_alarm" "app2_f60srvm_process" {
   threshold          = 0
   alarm_actions      = [aws_sns_topic.cwa.arn]
   ok_actions         = [aws_sns_topic.cwa.arn]
-  treat_missing_data = "missing"
+  treat_missing_data = "breaching"
   tags = merge(
     local.tags,
     {
@@ -1037,7 +1037,7 @@ resource "aws_cloudwatch_metric_alarm" "app2_f60srvm_process" {
 resource "aws_cloudwatch_metric_alarm" "app2_cwa_process" {
   count               = contains(["development", "testing"], local.environment) ? 0 : 1
   alarm_name          = "${local.application_name_short}-${local.environment}-app2-cwa-process"
-  alarm_description   = ""
+  alarm_description   = "APPS_CWA Process has stopped"
   comparison_operator = "GreaterThanThreshold"
   dimensions = {
     InstanceId = aws_instance.app2[0].id
@@ -1050,7 +1050,7 @@ resource "aws_cloudwatch_metric_alarm" "app2_cwa_process" {
   threshold          = 0
   alarm_actions      = [aws_sns_topic.cwa.arn]
   ok_actions         = [aws_sns_topic.cwa.arn]
-  treat_missing_data = "missing"
+  treat_missing_data = "breaching"
   tags = merge(
     local.tags,
     {
@@ -1062,7 +1062,7 @@ resource "aws_cloudwatch_metric_alarm" "app2_cwa_process" {
 resource "aws_cloudwatch_metric_alarm" "app2_apache_process" {
   count               = contains(["development", "testing"], local.environment) ? 0 : 1
   alarm_name          = "${local.application_name_short}-${local.environment}-app2-apache-process"
-  alarm_description   = ""
+  alarm_description   = "Apache Process has stopped"
   comparison_operator = "GreaterThanThreshold"
   dimensions = {
     InstanceId = aws_instance.app2[0].id
@@ -1075,7 +1075,7 @@ resource "aws_cloudwatch_metric_alarm" "app2_apache_process" {
   threshold          = 0
   alarm_actions      = [aws_sns_topic.cwa.arn]
   ok_actions         = [aws_sns_topic.cwa.arn]
-  treat_missing_data = "missing"
+  treat_missing_data = "breaching"
   tags = merge(
     local.tags,
     {
@@ -1133,12 +1133,37 @@ data "template_file" "dashboard_no_ha" {
     dashboard_refresh_period    = 60
     database_instance_id        = aws_instance.database.id
     database_cpu_alarm          = aws_cloudwatch_metric_alarm.database_cpu.arn
+    database_memory_alarm       = aws_cloudwatch_metric_alarm.database_ec2_memory.arn
+    database_oradata_diskspace_alarm  = aws_cloudwatch_metric_alarm.database_oradata_diskspace.arn
+    database_oraarch_diskspace_alarm  = aws_cloudwatch_metric_alarm.database_oraarch_diskspace.arn
+    database_oratmp_diskspace_alarm   = aws_cloudwatch_metric_alarm.database_oratmp_diskspace.arn
+    database_oraredo_diskspace_alarm = aws_cloudwatch_metric_alarm.database_oraredo_diskspace.arn
+    database_oracle_diskspace_alarm = aws_cloudwatch_metric_alarm.database_oracle_diskspace.arn
+    database_root_diskspace_alarm = aws_cloudwatch_metric_alarm.database_root_diskspace.arn
+    database_rx_packet_dropped_alarm = aws_cloudwatch_metric_alarm.database_rx_packet_dropped.arn
+    database_tx_packet_dropped_alarm = aws_cloudwatch_metric_alarm.database_tx_packet_dropped.arn
+    database_rx_packet_errors_alarm = aws_cloudwatch_metric_alarm.database_rx_packet_errors.arn
+    database_tx_packet_errors_alarm = aws_cloudwatch_metric_alarm.database_tx_packet_errors.arn
+    database_oradata_read_alarm = aws_cloudwatch_metric_alarm.database_oradata_read.arn
+    database_oraarch_read_alarm = aws_cloudwatch_metric_alarm.database_oraarch_read.arn
+    database_oratmp_read_alarm = aws_cloudwatch_metric_alarm.database_oratmp_read.arn
+    database_oraredo_read_alarm = aws_cloudwatch_metric_alarm.database_oraredo_read.arn
+    database_oracle_read_alarm = aws_cloudwatch_metric_alarm.database_oracle_read.arn
+    database_root_read_alarm = aws_cloudwatch_metric_alarm.database_root_read.arn
+    database_oradata_writes_alarm = aws_cloudwatch_metric_alarm.database_oradata_writes.arn
+    database_oraarch_writes_alarm  = aws_cloudwatch_metric_alarm.database_oraarch_writes.arn
+    database_oratmp_writes_alarm   = aws_cloudwatch_metric_alarm.database_oratmp_writes.arn
+    database_oraredo_writes_alarm = aws_cloudwatch_metric_alarm.database_oraredo_writes.arn
+    database_oracle_writes_alarm = aws_cloudwatch_metric_alarm.database_oracle_writes.arn
+    database_root_writes_alarm = aws_cloudwatch_metric_alarm.database_root_writes.arn
     database_status_check_alarm = aws_cloudwatch_metric_alarm.database_ec2_status_check.arn
     cm_status_check_alarm       = aws_cloudwatch_metric_alarm.cm_ec2_status_check.arn
     app1_status_check_alarm     = aws_cloudwatch_metric_alarm.app1_ec2_status_check.arn
     elb_request_count_alarm     = aws_cloudwatch_metric_alarm.elb_request_count.arn
     efs_data_read_alarm         = aws_cloudwatch_metric_alarm.efs_data_read.arn
     efs_data_write_alarm        = aws_cloudwatch_metric_alarm.efs_data_write.arn
+    database_ec2_swap_alarm     = aws_cloudwatch_metric_alarm.database_ec2_swap.arn
+
   }
 }
 
