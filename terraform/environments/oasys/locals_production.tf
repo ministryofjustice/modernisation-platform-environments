@@ -607,8 +607,8 @@ locals {
                         "practice.oasys.az.justice.gov.uk",
                         "practice.p-oasys.az.justice.gov.uk",
                         "practice-ukwest.oasys.az.justice.gov.uk",
-                        "practice.a-int.oasys.az.justice.gov.uk",
-                        "practice.b-int.oasys.az.justice.gov.uk",
+                        # "practice.a-int.oasys.az.justice.gov.uk",
+                        # "practice.b-int.oasys.az.justice.gov.uk",
                       ]
                     }
                   }
@@ -629,8 +629,8 @@ locals {
                         "training.oasys.az.justice.gov.uk",
                         "training.p-oasys.az.justice.gov.uk",
                         "training-ukwest.oasys.az.justice.gov.uk",
-                        "training.a-int.oasys.service.justice.gov.uk",
-                        "training.b-int.oasys.service.justice.gov.uk",
+                        # "training.a-int.oasys.service.justice.gov.uk",
+                        # "training.b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
