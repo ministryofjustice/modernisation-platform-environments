@@ -75,14 +75,19 @@ resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
 
 ####### DB Instance #######
 
+resource "aws_key_pair" "edw_ec2_key" {
+  key_name   = "${local.application_name}-ssh-key"
+  public_key = local.application_data.accounts[local.environment].edw_ec2_key
+}
+
 resource "aws_instance" "edw_db_instance" {
-  ami                  = local.application_data.accounts[local.environment].edw_ec2_ami_id
-  instance_type        = local.application_data.accounts[local.environment].edw_ec2_instance_type
-  iam_instance_profile = aws_iam_instance_profile.edw_ec2_instance_profile.id
-  # ADD AFTER BASTION
-  # key_name               = local.application_data.accounts[local.environment].edw_ssh_key_name
-  subnet_id       = data.aws_subnet.private_subnets_a.id
-  security_groups = [aws_security_group.edw_db_security_group.id]
+  ami                    = local.application_data.accounts[local.environment].edw_ec2_ami_id
+  availability_zone      = "eu-west-2a"
+  instance_type          = local.application_data.accounts[local.environment].edw_ec2_instance_type
+  iam_instance_profile   = aws_iam_instance_profile.edw_ec2_instance_profile.id
+  key_name               = aws_key_pair.edw_ec2_key.key_name
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.edw_db_security_group.id]
   user_data = base64encode(templatefile("edw-ec2-user-data.sh", {
     edw_app_name         = local.application_data.accounts[local.environment].edw_AppName
     edw_dns_extension    = local.application_data.accounts[local.environment].edw_dns_extension
@@ -117,7 +122,7 @@ resource "aws_instance" "edw_db_instance" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-edw-db-instance"
+      Name = "${local.application_data.accounts[local.environment].database_ec2_name}"
     }
   )
 }
@@ -282,12 +287,13 @@ resource "aws_security_group" "edw_db_security_group" {
   }
 }
 
-####### DB DNS #######
+###### DB DNS #######
 
-# resource "aws_route53_record" "edw_internal_dns_record" {
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "${local.application_name}.${data.aws_route53_zone.external.name}"
-#   type    = "A"
-#   ttl     = 900
-#   records = [aws_instance.edw_db_instance.private_ip]
-# }
+resource "aws_route53_record" "edw_internal_dns_record" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name}.${data.aws_route53_zone.external.name}"
+  type     = "A"
+  ttl      = 900
+  records  = [aws_instance.edw_db_instance.private_ip]
+}

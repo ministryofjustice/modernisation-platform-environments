@@ -26,6 +26,10 @@ data "aws_lb_target_group" "target_group" {
   }
 }
 
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized"
+}
+
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   desired_capacity    = var.ec2_desired_capacity
@@ -99,8 +103,9 @@ resource "aws_security_group" "cluster_ec2" {
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template" {
-  name_prefix   = "${var.app_name}-ec2-launch-template"
-  image_id      = var.ami_image_id
+  name_prefix = "${var.app_name}-ec2-launch-template"
+  #image_id      = var.ami_image_id
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type = var.instance_type
   key_name      = var.key_name
   ebs_optimized = true
@@ -227,6 +232,13 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.ec2_instance_policy.arn
 }
+
+# Attach policy to allow SSM agent to be exposed (SSM agent is intalled on Windows Server ECS Optimised AMIs)
+resource "aws_iam_role_policy_attachment" "ecs_ssm_policy_attachment" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 //ECS cluster
 
 resource "aws_ecs_cluster" "ecs_cluster" {

@@ -1,5 +1,5 @@
 output "target_group_arn" {
-  value = aws_lb_target_group.frontend.arn
+  value = try(aws_lb_target_group.frontend[0].arn, null)
 }
 
 output "service_security_group_id" {

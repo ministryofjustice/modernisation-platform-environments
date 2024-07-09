@@ -161,3 +161,8 @@ variable "log_group_kms_key" {
   type        = string
   description = "The key ARN for CloudWatch Log Group encryption"
 }
+
+variable "database_tad_password_arn" {
+  type        = string
+  description = "The ARN of the APEX TAD database password"
+}

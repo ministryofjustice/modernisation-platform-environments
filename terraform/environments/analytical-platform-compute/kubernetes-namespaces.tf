@@ -16,6 +16,12 @@ resource "kubernetes_namespace" "cluster_autoscaler" {
   }
 }
 
+resource "kubernetes_namespace" "karpenter" {
+  metadata {
+    name = "karpenter"
+  }
+}
+
 resource "kubernetes_namespace" "external_dns" {
   metadata {
     name = "external-dns"
@@ -37,6 +43,12 @@ resource "kubernetes_namespace" "ingress_nginx" {
 resource "kubernetes_namespace" "external_secrets" {
   metadata {
     name = "external-secrets"
+  }
+}
+
+resource "kubernetes_namespace" "keda" {
+  metadata {
+    name = "keda"
   }
 }
 
@@ -68,6 +80,16 @@ resource "kubernetes_namespace" "mlflow" {
     labels = {
       "pod-security.kubernetes.io/enforce"                          = "restricted"
       "compute.analytical-platform.service.justice.gov.uk/workload" = "mlflow"
+    }
+  }
+}
+
+resource "kubernetes_namespace" "ui" {
+  metadata {
+    name = "ui"
+    labels = {
+      "pod-security.kubernetes.io/enforce"                          = "restricted"
+      "compute.analytical-platform.service.justice.gov.uk/workload" = "ui"
     }
   }
 }

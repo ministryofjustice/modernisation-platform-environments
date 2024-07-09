@@ -28,13 +28,14 @@ locals {
       # cloudwatch_metric_alarms_default_actions   = ["dso_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
       # cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
+      enable_azure_sas_token              = true
       enable_backup_plan_daily_and_weekly = true
       enable_business_unit_kms_cmks       = true
+      enable_hmpps_domain                 = true # for copycde script
       enable_image_builder                = true
       enable_ec2_cloud_watch_agent        = true
       enable_ec2_self_provision           = true
       enable_ec2_user_keypair             = true
-      enable_offloc_sync                  = true
       enable_s3_bucket                    = true
       enable_s3_software_bucket           = true
       iam_policies_filter                 = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]

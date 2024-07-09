@@ -72,7 +72,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -85,9 +85,17 @@ locals {
 
       # ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 5
           max_size         = 6
+
+          initial_lifecycle_hooks = {
+            "ready-hook" = {
+              default_result       = "ABANDON"
+              heartbeat_timeout    = 7200
+              lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+            }
+          }
 
           # instance_refresh = {
           #   strategy               = "Rolling"
@@ -123,8 +131,12 @@ locals {
           domain-name = "azure.hmpp.root"
         })
       })
-      # BEING USED FOR TESTING
+      # Being used for testing, capacity defaults to 0 
       prod-nomis-client-b = merge(local.ec2_autoscaling_groups.client, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.client.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 0
+        })
         tags = merge(local.ec2_autoscaling_groups.client.tags, {
           domain-name = "azure.hmpp.root"
         })
@@ -331,6 +343,7 @@ locals {
     lbs = {
       private = merge(local.lbs.private, {
 
+        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["nomis_wildcard_cert"]
@@ -433,7 +446,7 @@ locals {
           { name = "pndh-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "por", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "por-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "por-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "por-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "ptrdat", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "ptrdat-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "ptrdat-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
@@ -445,7 +458,7 @@ locals {
           { name = "pmis-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "pnomisapiro", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "pnomisapiro-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "pnomisapiro-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pnomisapiro-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "maintenance", type = "A", lbs_map_key = "private" },

@@ -2,6 +2,7 @@ locals {
 
   baseline_presets_production = {
     options = {
+      db_backup_lifecycle_rule = "rman_backup_one_month"
     }
   }
 
@@ -23,7 +24,7 @@ locals {
           "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
         ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
-          data  = { total_size = 1500 }
+          data  = { total_size = 1500, iops = 6000 }
           flash = { total_size = 500 }
         })
         instance = merge(local.defaults_database_ec2.instance, {

@@ -12,6 +12,8 @@ module "merge_api_service" {
   ]
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
 
+  desired_count = 0
+
   db_ingress_security_groups = []
   cluster_security_group_id  = aws_security_group.cluster.id
 

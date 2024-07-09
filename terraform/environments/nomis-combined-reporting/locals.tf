@@ -21,7 +21,6 @@ locals {
   baseline_presets_all_environments = {
     options = {
       db_backup_bucket_name                       = "ncr-db-backup-bucket"
-      enable_azure_sas_token                      = true
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
       enable_image_builder                        = true

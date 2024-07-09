@@ -60,7 +60,7 @@ locals {
         }
       }
       autoscaling_schedules = {
-        "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
+        "scale_up"   = { recurrence = "0 6 * * Mon-Fri" }
         "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
       }
       config = {
@@ -104,10 +104,16 @@ locals {
 
     web = {
       autoscaling_group = {
-        desired_capacity    = 1
-        max_size            = 1
-        force_delete        = true
-        vpc_zone_identifier = module.environment.subnets["private"].ids
+        desired_capacity          = 1
+        max_size                  = 1
+        force_delete              = true
+        vpc_zone_identifier       = module.environment.subnets["private"].ids
+        wait_for_capacity_timeout = 0
+
+        warm_pool = {
+          min_size          = 0
+          reuse_on_scale_in = true
+        }
       }
       config   = local.ec2_instances.web.config
       instance = local.ec2_instances.web.instance

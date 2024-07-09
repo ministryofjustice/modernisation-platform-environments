@@ -549,7 +549,8 @@ data "aws_iam_policy_document" "redshift_dataapi" {
     actions = [
       "redshift-data:GetStatementResult",
       "redshift-data:DescribeStatement",
-      "redshift-data:ListStatements"
+      "redshift-data:ListStatements",
+      "redshift-data:CancelStatement"
     ]
     resources = [
       "*"

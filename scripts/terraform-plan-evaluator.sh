@@ -22,7 +22,12 @@ RESOURCES_TO_CHECK_FOR=(
   "aws_cloudformation_stack",
   "aws_cloudformation_stack_set",
   "aws_cloudformation_stack_set_instance",
-  "aws_cloudformation_type"
+  "aws_cloudformation_type",
+  "aws_ec2_transit_gateway_vpc_attachment",
+  "aws_lakeformation_permissions",
+  "aws_ram_resource_share",
+  "aws_ram_principal_association",
+  "aws_ram_resource_association"
 )
 
 resourcesFound=false

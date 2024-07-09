@@ -1,16 +1,16 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "vpc_cidr": "10.0.0.0/16"
     },
     "test": {
-      "example_var": "test-data"
+      "vpc_cidr": "10.0.0.0/16"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "vpc_cidr": "10.0.0.0/16"
     },
     "production": {
-      "example_var": "production-data"
+      "vpc_cidr": "10.0.0.0/16"
     }
   }
 }

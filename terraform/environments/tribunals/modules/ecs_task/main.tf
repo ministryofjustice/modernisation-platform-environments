@@ -48,11 +48,11 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = "${var.app_name}-ecs-task-execution-s3-policy"
+  name = "${var.app_name}-ecs-task-execution-s3-policy-2"
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-task-execution-s3-policy"
+      Name = "${var.app_name}-ecs-task-execution-s3-policy-2"
     }
   )
   policy = <<EOF
@@ -63,12 +63,13 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam
       "Effect": "Allow",
       "Action": [
         "s3:ListBucket",
-        "s3:*Object*",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
         "kms:Decrypt",
         "kms:Encrypt",
         "kms:GenerateDataKey",
         "kms:ReEncrypt",
-        "kms:GenerateDataKey",
         "kms:DescribeKey",
         "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
         "elasticloadbalancing:DeregisterTargets",
@@ -147,7 +148,7 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   depends_on = [
-    var.lb_listener, aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
+    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
   ]
 
   tags = merge(
@@ -188,7 +189,7 @@ resource "aws_ecs_service" "ecs_service_sftp" {
   }
 
   depends_on = [
-    var.lb_listener, aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
+    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
   ]
 
   tags = merge(

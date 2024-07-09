@@ -2,6 +2,7 @@ locals {
 
   baseline_presets_production = {
     options = {
+      db_backup_lifecycle_rule = "rman_backup_one_month"
       sns_topics = {
         pagerduty_integrations = {
           dso_pagerduty               = "oasys_alarms"
@@ -56,6 +57,26 @@ locals {
           instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
             "Ec2ProdWebPolicy",
           ])
+        })
+        tags = merge(local.webserver.tags, {
+          oasys-environment  = "production"
+          oracle-db-hostname = "db.oasys.hmpps-production.modernisation-platform.internal"
+          oracle-db-sid      = "PDOASYS"
+        })
+      })
+
+      pd-oasys-web-b = merge(local.webserver, {
+        autoscaling_group = merge(local.webserver.autoscaling_group, {
+          desired_capacity = 1
+          max_size         = 1
+        })
+        config = merge(local.webserver.config, {
+          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
+            "Ec2ProdWebPolicy",
+          ])
+        })
+        instance = merge(local.webserver.instance, {
+          instance_type = "t3.large"
         })
         tags = merge(local.webserver.tags, {
           oasys-environment  = "production"
@@ -386,16 +407,17 @@ locals {
 
     lbs = {
       public = {
-        access_logs              = true
-        enable_delete_protection = false
-        existing_target_groups   = {}
-        force_destroy_bucket     = true
-        idle_timeout             = 3600 # 60 is default
-        internal_lb              = false
-        s3_versioning            = false
-        security_groups          = ["public_lb"]
-        subnets                  = module.environment.subnets["public"].ids
-        tags                     = local.tags
+        access_logs                = true
+        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+        enable_delete_protection   = false
+        existing_target_groups     = {}
+        force_destroy_bucket       = true
+        idle_timeout               = 3600 # 60 is default
+        internal_lb                = false
+        s3_versioning              = false
+        security_groups            = ["public_lb"]
+        subnets                    = module.environment.subnets["public"].ids
+        tags                       = local.tags
 
         listeners = {
           https = {
@@ -426,6 +448,22 @@ locals {
                         "oasys.service.justice.gov.uk",
                         "bridge-oasys.az.justice.gov.uk",
                         "www.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              pd-web-b-http-8080 = {
+                priority = 101
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-oasys-web-b-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -515,6 +553,22 @@ locals {
                         "oasys-ukwest.oasys.az.justice.gov.uk",
                         # "oasys.az.justice.gov.uk",
                         "p-oasys.az.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              pd-web-b-http-8080 = {
+                priority = 101
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-oasys-web-b-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
