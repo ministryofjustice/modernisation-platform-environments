@@ -88,8 +88,8 @@ locals {
           }
           scripts = [
             "install-ssm-agent.sh.tftpl",
-            "ansible-ec2provision.sh.tftpl",
-            "post-ec2provision2.sh.tftpl"
+            "ansible-ec2provision2.sh.tftpl",
+            "post-ec2provision.sh.tftpl"
           ]
         }
         tags = merge(local.webserver.tags, {
