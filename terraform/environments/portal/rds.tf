@@ -31,7 +31,7 @@ locals {
   iadb_storage_type               = "gp2"
   appstream_cidr                  = "10.200.32.0/19"
   cidr_ire_workspace              = "10.200.96.0/19"
-  workspaces_cidr                 = "10.200.16.0/20"
+  workspaces_cidr                 = contains(["development", "testing"], local.environment) ? "10.200.0.0/20" : "10.200.16.0/20"
   cp_vpc_cidr                     = "172.20.0.0/20"
   lzprd-vpc                       = "10.205.0.0/20"
 
@@ -273,15 +273,6 @@ resource "aws_security_group" "igdb" {
   }
 
   ingress {
-    description = "Ireland Shared Services Inbound - Workspaces etc"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.cidr_ire_workspace]
-
-  }
-
-  ingress {
     description = "SharedServices Inbound - Workspaces etc"
     from_port   = 1521
     to_port     = 1521
@@ -370,15 +361,6 @@ resource "aws_security_group" "iadb" {
     to_port     = 1521
     protocol    = "tcp"
     cidr_blocks = [local.appstream_cidr]
-
-  }
-
-  ingress {
-    description = "Ireland Shared Services Inbound - Workspaces etc"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.cidr_ire_workspace]
 
   }
 
