@@ -78,6 +78,20 @@ locals {
         instance = merge(local.webserver.instance, {
           instance_type = "t3.large"
         })
+        user_data_cloud_init = {
+          args = {
+            lifecycle_hook_name  = "ready-hook"
+            branch               = "main"
+            ansible_repo         = "modernisation-platform-configuration-management"
+            ansible_repo_basedir = "ansible"
+            ansible_args         = ""
+          }
+          scripts = [
+            "install-ssm-agent.sh.tftpl",
+            "ansible-ec2provision2.sh.tftpl",
+            "post-ec2provision.sh.tftpl"
+          ]
+        }
         tags = merge(local.webserver.tags, {
           oasys-environment  = "production"
           oracle-db-hostname = "db.oasys.hmpps-production.modernisation-platform.internal"
@@ -482,6 +496,8 @@ locals {
                         "ptc.oasys.service.justice.gov.uk",
                         "practice.bridge-oasys.az.justice.gov.uk",
                         "practice.oasys.service.justice.gov.uk",
+                        "practice.a.oasys.service.justice.gov.uk",
+                        "practice.b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -500,6 +516,8 @@ locals {
                         "trn.oasys.service.justice.gov.uk",
                         "training.bridge-oasys.az.justice.gov.uk",
                         "training.oasys.service.justice.gov.uk",
+                        "training.a.oasys.service.justice.gov.uk",
+                        "training.b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -589,6 +607,8 @@ locals {
                         "practice.oasys.az.justice.gov.uk",
                         "practice.p-oasys.az.justice.gov.uk",
                         "practice-ukwest.oasys.az.justice.gov.uk",
+                        "practice.a-int.oasys.az.justice.gov.uk",
+                        "practice.b-int.oasys.az.justice.gov.uk",
                       ]
                     }
                   }
@@ -609,6 +629,8 @@ locals {
                         "training.oasys.az.justice.gov.uk",
                         "training.p-oasys.az.justice.gov.uk",
                         "training-ukwest.oasys.az.justice.gov.uk",
+                        "training.a-int.oasys.service.justice.gov.uk",
+                        "training.b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -636,15 +658,23 @@ locals {
           { name = "a", type = "A", lbs_map_key = "public" },
           { name = "b", type = "A", lbs_map_key = "public" },
           { name = "practice", type = "A", lbs_map_key = "public" },
+          { name = "practice.a", type = "A", lbs_map_key = "public" },
+          { name = "practice.b", type = "A", lbs_map_key = "public" },
           { name = "ptc", type = "A", lbs_map_key = "public" },
           { name = "training", type = "A", lbs_map_key = "public" },
+          { name = "training.a", type = "A", lbs_map_key = "public" },
+          { name = "training.b", type = "A", lbs_map_key = "public" },
           { name = "trn", type = "A", lbs_map_key = "public" },
           { name = "int", type = "A", lbs_map_key = "private" },
           { name = "a-int", type = "A", lbs_map_key = "private" },
           { name = "b-int", type = "A", lbs_map_key = "private" },
           { name = "practice.int", type = "A", lbs_map_key = "private" },
+          { name = "practice.a-int", type = "A", lbs_map_key = "private" },
+          { name = "practice.b-int", type = "A", lbs_map_key = "private" },
           { name = "ptc-int", type = "A", lbs_map_key = "private" },
           { name = "training.int", type = "A", lbs_map_key = "private" },
+          { name = "training.a-int", type = "A", lbs_map_key = "private" },
+          { name = "training.b-int", type = "A", lbs_map_key = "private" },
           { name = "trn-int", type = "A", lbs_map_key = "private" },
         ]
         records = [
