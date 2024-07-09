@@ -8,7 +8,8 @@ module "dms_task" {
     "g4s_atrium",
     "civica_orca",
     "g4s_subject_history",
-    "g4s_telephony"
+    "g4s_telephony",
+    "g4s_atv"
   ] : ["test"])
 
   database_name = each.key
