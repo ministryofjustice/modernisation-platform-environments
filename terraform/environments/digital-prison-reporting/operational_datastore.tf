@@ -15,7 +15,8 @@ locals {
   )
 
   operational_db_credentials            = jsondecode(data.aws_secretsmanager_secret_version.operational_db_secret_version.secret_string)
-  operational_db_jdbc_connection_string = "jdbc:postgresql://dpr2-834-instance-1.cja8lnnvvipo.eu-west-2.rds.amazonaws.com:5432/postgres"
+  operational_db_port                   = 5432
+  operational_db_jdbc_connection_string = "jdbc:postgresql://dpr2-834-instance-1.cja8lnnvvipo.eu-west-2.rds.amazonaws.com:${local.operational_db_port}/postgres"
 }
 
 ################################################################################
@@ -150,4 +151,18 @@ resource "aws_security_group" "glue_operational_datastore_connection_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all traffic out from this Security Group"
   }
+}
+
+# This SG should be attached to the Operational DataSTore to allow the transfer component lambda to run migrations
+resource "aws_security_group" "allow_lambda_ingress_to_operational_datastore" {
+  count = local.enable_generic_lambda_sg ? 1 : 0
+
+  name        = "${local.project}-operational-datastore-allow-lambda-ingress_sg"
+  description = "Security group to allow ingress to Operational Datastore from transfer component lambda"
+  vpc_id      = data.aws_vpc.shared.id
+
+  from_port         = local.operational_db_port
+  to_port           = local.operational_db_port
+  protocol          = "TCP"
+  security_group_id = aws_security_group.lambda_generic[0].id
 }
