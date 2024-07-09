@@ -161,8 +161,10 @@ resource "aws_security_group" "allow_lambda_ingress_to_operational_datastore" {
   description = "Security group to allow ingress to Operational Datastore from transfer component lambda"
   vpc_id      = data.aws_vpc.shared.id
 
-  from_port         = local.operational_db_port
-  to_port           = local.operational_db_port
-  ip_protocol       = "TCP"
-  security_group_id = aws_security_group.lambda_generic[0].id
+  ingress {
+    from_port         = local.operational_db_port
+    to_port           = local.operational_db_port
+    protocol          = "tcp"
+    security_groups   = [aws_security_group.lambda_generic[0].id]
+  }
 }
