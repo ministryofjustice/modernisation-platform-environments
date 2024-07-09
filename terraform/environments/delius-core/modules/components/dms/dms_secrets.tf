@@ -51,7 +51,7 @@ resource "aws_secretsmanager_secret_version" "dms_audit_source_endpoint_db" {
 # Database Write Access
 resource "aws_secretsmanager_secret" "dms_user_source_endpoint_db" {
   name        = local.dms_user_source_endpoint_secret_name
-  description = "DMS Database Endpoint for Writing Audited Interaction Replication Data"
+  description = "DMS Database Endpoint for Writing Audited User Data"
   kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
 }

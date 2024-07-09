@@ -60,3 +60,7 @@ variable "platform_vars" {
     environment_management = any
   })
 }
+
+variable "business_unit_kms_key_access_arn" {
+  type = any
+}
