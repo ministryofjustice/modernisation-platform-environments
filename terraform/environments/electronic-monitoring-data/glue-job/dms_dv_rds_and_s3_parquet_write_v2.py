@@ -456,7 +456,7 @@ def process_dv_for_table(rds_db_name,
             
             if RECORDED_PKEYS_LIST.get(rds_tbl_name, None) is None:
                 LOGGER.warn(f"""No READ-partition columns given !""")
-                df_rds_temp = get_rds_dataframe(rds_tbl_name, rds_tbl_name)
+                df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
 
             else:
 
