@@ -163,6 +163,6 @@ resource "aws_security_group" "allow_lambda_ingress_to_operational_datastore" {
 
   from_port         = local.operational_db_port
   to_port           = local.operational_db_port
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   security_group_id = aws_security_group.lambda_generic[0].id
 }
