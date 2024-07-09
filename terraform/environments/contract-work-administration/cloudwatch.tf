@@ -1093,7 +1093,7 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
     InstanceId = aws_instance.database.id
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
-  metric_name        = "swap_used"
+  metric_name        = "swap_used_percentage"
   namespace          = "CustomScript"
   period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Average"

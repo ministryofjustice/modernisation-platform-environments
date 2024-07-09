@@ -26,7 +26,7 @@
       "elb_target_response_time_alarm_threshold": "1",
       "elb_request_count_alarm_threshold": "1000",
       "status_check_alarm_threshold": "1",
-      "database_ec2_swap_alarm_threshold": "50000000",
+      "database_ec2_swap_alarm_threshold": "50",
       "oradata_snapshot_id": "snap-0a14498e1aabc04f5",
       "oracle_snapshot_id": "snap-06a2c2f2d5416ecdd",
       "oraarch_snapshot_id": "snap-0c0c14e6fe5572f9b",

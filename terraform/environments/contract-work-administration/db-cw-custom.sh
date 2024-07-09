@@ -77,7 +77,11 @@ WRITE_OPS_ORACLE=$(iostat -k | grep "$ORACLE" | awk '{print $4}')
 WRITE_OPS_NFSSHARE=$(iostat -k | grep "$NFSSHARE" | awk '{print $4}')
 WRITE_OPS_ROOT=$(iostat -k | grep "$ROOT" | awk '{print $4}')
 
-SWAP_USED=$(cat /proc/swaps | grep "/dev/mapper/VolGroup00-LogVol01" |  awk '{print $3}')
+SWAP_FREE=$(cat /proc/meminfo | grep "SwapFree" | awk '{print $2}')
+SWAP_TOTAL=$(cat /proc/meminfo | grep "SwapTotal" | awk '{print $2}')
+SWAP_USED=$(echo "$SWAP_TOTAL - $SWAP_FREE" | bc )
+SWAP_USED_PERCENTAGE=$(echo "scale=5;($SWAP_USED/$SWAP_TOTAL)*100" | bc )
+
 
 #  SEND MEMORY USAGE
 /usr/local/bin/aws cloudwatch put-metric-data                                               \
@@ -280,10 +284,10 @@ SWAP_USED=$(cat /proc/swaps | grep "/dev/mapper/VolGroup00-LogVol01" |  awk '{pr
 
 #  SEND SWAP USED
 /usr/local/bin/aws cloudwatch put-metric-data                                                                       \
---metric-name swap_used                                                                                           \
+--metric-name swap_used_percentage                                                                                         \
 --namespace "$CLOUDWATCH_NAMESPACE"                                                                                 \
 --dimensions  InstanceId="$INSTANCE_ID" \
---value "$SWAP_USED"                                                                                                \
+--value "$SWAP_USED_PERCENTAGE"                                                                                                \
 --unit Count
 
 exit 0
