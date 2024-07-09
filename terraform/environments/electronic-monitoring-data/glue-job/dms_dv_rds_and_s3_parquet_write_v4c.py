@@ -627,7 +627,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         msg_prefix = f"""df_prq_read_t2-{rds_tbl_name}"""
         LOGGER.info(f"""{msg_prefix}: PARQUET-DF-Partitions = {df_prq_read_t2.rdd.getNumPartitions()}""")
         
-        df_prq_read_t2.cache()
+        df_prq_read_t2 = df_prq_read_t2.cache()
         LOGGER.info(f"""{msg_prefix} Dataframe Cached into memory.""")
 
         # -------------------------------------------------------
@@ -664,10 +664,16 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
             additional_msg = trim_str_msg+trim_ts_ms_msg if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
 
+
             msg_prefix = f"""df_rds_temp_t3-{rds_tbl_name}"""
-            LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
-            df_rds_temp_t4 = df_rds_temp_t3.repartition(given_df_repartition_num, 
-                                                        jdbc_partition_column)
+            if loop_count%20 == 0:
+                LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
+                df_rds_temp_t4 = df_rds_temp_t3.repartition(given_df_repartition_num-10, 
+                                                            jdbc_partition_column)
+            else:
+                LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
+                df_rds_temp_t4 = df_rds_temp_t3.repartition(given_df_repartition_num, 
+                                                            jdbc_partition_column)
             
             msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
             LOGGER.info(f"""{loop_count}-{msg_prefix}: RDS-DF-Partitions = {df_rds_temp_t4.rdd.getNumPartitions()}""")
@@ -687,7 +693,15 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 if df_rds_prq_diff_count == 0:
                     df_prq_read_t2.unpersist()
                     df_prq_read_t2 = df_prq_read_t2.where(f"""not {df_filter_exp}""")
-                    df_prq_read_t2.cache()
+
+                    if loop_count%20 == 0:
+                        msg_prefix = f"""df_prq_read_t2-{rds_tbl_name}"""
+                        LOGGER.info(f"""{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
+                        df_prq_read_t2 = df_prq_read_t2.repartition(given_df_repartition_num-10, 
+                                                                    jdbc_partition_column)
+                    # --------------------------------------------------------------------
+
+                    df_prq_read_t2 = df_prq_read_t2.cache()
                 else:
                     LOGGER.warn(f"""{loop_count}-df_rds_prq_diff_count ({df_rds_prq_diff_count}): Row differences found.""")
                     total_row_differences += df_rds_prq_diff_count
@@ -712,7 +726,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 LOGGER.error(f"""df_rds_temp_t4_count ({df_rds_temp_t4_count}) != df_prq_filtered_t3_count ({df_prq_filtered_t3_count})""")
                 sys.exit(1)
             
-            current_processed_rows += df_rds_temp.count()
+            current_processed_rows += df_rds_temp_t4_count
             
         else:
             if jdbc_partition_col_upperbound <= pkey_max_value:
@@ -735,7 +749,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
                     msg_prefix = f"""df_rds_temp_t3-{rds_tbl_name}"""
                     LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
-                    df_rds_temp_t4 = df_rds_temp_t3.repartition(given_df_repartition_num, 
+                    df_rds_temp_t4 = df_rds_temp_t3.repartition(int(given_df_repartition_num/2), 
                                                                 jdbc_partition_column)
                     
                     msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
@@ -746,25 +760,22 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                     # -------------------------------------------------------------------------------------------
 
                     df_filter_exp = f"""{jdbc_partition_column} between {jdbc_partition_col_lowerbound} and {jdbc_partition_col_upperbound}"""
-                    df_prq_filtered_t3 = df_prq_read_t2.where(df_filter_exp)
+                    df_prq_filtered_t3 = df_prq_read_t2.where(df_filter_exp).coalesce(int(given_df_repartition_num/2))
                     df_prq_filtered_t3_count = df_prq_filtered_t3.count()
 
                     if df_rds_temp_t4_count == df_prq_filtered_t3_count:
                         df_rds_prq_diff = df_rds_temp_t4.subtract(df_prq_filtered_t3)
                         df_rds_prq_diff_count = df_rds_prq_diff.count()
 
-                        if df_rds_prq_diff_count == 0:
-                            df_prq_read_t2.unpersist()
-                            df_prq_read_t2 = df_prq_read_t2.where(f"""not {df_filter_exp}""")
-                            df_prq_read_t2.cache()
-                        else:
+                        if df_rds_prq_diff_count != 0:
+                            
                             LOGGER.warn(f"""{loop_count}-df_rds_prq_diff_count ({df_rds_prq_diff_count}): Row differences found.""")
                             total_row_differences += df_rds_prq_diff_count
 
                             df_subtract_temp = (df_rds_prq_diff
                                 .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp_t4.columns])))
                                 .selectExpr("json_row")
-                                .limit(1))
+                                .limit(5))
 
                             subtract_validation_msg = f"""'{rds_tbl_name}' - {df_rds_prq_diff_count}"""
                             df_subtract_temp = df_subtract_temp.selectExpr(
@@ -781,7 +792,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                         LOGGER.error(f"""df_rds_temp_t4_count ({df_rds_temp_t4_count}) != df_prq_filtered_t3_count ({df_prq_filtered_t3_count})""")
                         sys.exit(1)
                     
-                    current_processed_rows += df_rds_temp.count()
+                    current_processed_rows += df_rds_temp_t4_count
         
         LOGGER.info(f"""Total RDS fetch batch count: {loop_count}""")
         LOGGER.info(f"""Rows processed in all RDS batch fetches: {current_processed_rows}""")
