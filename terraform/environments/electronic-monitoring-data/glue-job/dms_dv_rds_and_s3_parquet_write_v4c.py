@@ -62,8 +62,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_schema",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
-                       "rds_upperbound_factor",
-                       "rds_read_rows_fetch_size"
+                       "rds_upperbound_factor"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -270,45 +269,6 @@ def get_rds_df_between_pkey_ids(in_rds_db_name, in_table_name,
                 .load())
 
 
-def get_df_read_rds_db_tbl_int_pkey(in_rds_db_name, in_table_name,
-                                    jdbc_partition_column, 
-                                    jdbc_partition_col_lowerbound,
-                                    jdbc_partition_col_upperbound, 
-                                    jdbc_read_partitions_num,
-                                    jdbc_rows_fetch_size
-                                    ) -> DataFrame:
-    given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
-    
-    numPartitions = jdbc_read_partitions_num
-    # Note: numPartitions is normally equal to number of executors defined.
-    # The maximum number of partitions that can be used for parallelism in table reading and writing. 
-    # This also determines the maximum number of concurrent JDBC connections. 
-
-    fetchSize = jdbc_rows_fetch_size
-    # The JDBC fetch size, which determines how many rows to fetch per round trip. 
-    # This can help performance on JDBC drivers which default to low fetch size (e.g. Oracle with 10 rows).
-    # Too Small: => frequent round trips to database
-    # Too Large: => Consume a lot of memory
-
-    query_str = f"""
-    SELECT *
-    FROM {given_rds_sqlserver_db_schema}.[{in_table_name}]
-    """.strip()
-
-    return (spark.read.format("jdbc")
-                .option("url", get_rds_db_jdbc_url(in_rds_db_name))
-                .option("driver", RDS_DB_INSTANCE_DRIVER)
-                .option("user", RDS_DB_INSTANCE_USER)
-                .option("password", RDS_DB_INSTANCE_PWD)
-                .option("dbtable", f"""({query_str}) as t""")
-                .option("partitionColumn", jdbc_partition_column)
-                .option("lowerBound", jdbc_partition_col_lowerbound)
-                .option("upperBound", jdbc_partition_col_upperbound)
-                .option("numPartitions", numPartitions)
-                .option("fetchSize", fetchSize)
-                .load())
-
-
 def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name) -> DataFrame:
     given_rds_sqlserver_db_schema = args["rds_sqlserver_db_schema"]
 
@@ -511,7 +471,7 @@ def apply_rds_transforms(df_rds_temp: DataFrame,
 
         trim_msg_prefix = f"""Given -> rds_df_trim_str_col_list = {rds_df_trim_str_col_list}"""
         LOGGER.warn(f"""{trim_msg_prefix}, {type(rds_df_trim_str_col_list)}""")
-        trim_str_msg = f"""; [str column(s) - extra spaces trimmed]"""
+        trim_str_msg = f""" [str column(s) - extra spaces trimmed]"""
 
         df_rds_temp_t1 = df_rds_temp.transform(rds_df_trim_str_columns, 
                                                 rds_df_trim_str_col_list)
@@ -675,12 +635,6 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         rds_rows_per_batch = int(df_rds_count/int(args['rds_upperbound_factor']))
         LOGGER.info(f"""rds_rows_per_batch = {rds_rows_per_batch}""")
 
-        rds_read_rows_fetch_size = int(args["rds_read_rows_fetch_size"])
-        jdbc_rows_fetch_size = rds_rows_per_batch \
-                                if rds_rows_per_batch > rds_read_rows_fetch_size \
-                                    else rds_read_rows_fetch_size
-        LOGGER.info(f"""jdbc_rows_fetch_size = {jdbc_rows_fetch_size}""")
-
 
         LOGGER.info(f"""pkey_max_value = {pkey_max_value}""")
 
@@ -701,12 +655,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             jdbc_partition_col_upperbound = jdbc_partition_col_lowerbound + rds_rows_per_batch
             LOGGER.info(f"""{loop_count}-jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
-            df_rds_temp = (get_df_read_rds_db_tbl_int_pkey(rds_db_name, rds_tbl_name, 
-                                                           jdbc_partition_column,
-                                                           jdbc_partition_col_lowerbound,
-                                                           jdbc_partition_col_upperbound,
-                                                           given_df_repartition_num,
-                                                           jdbc_rows_fetch_size))
+            df_rds_temp = (get_rds_df_between_pkey_ids(rds_db_name, rds_tbl_name, 
+                                                       jdbc_partition_column,
+                                                       jdbc_partition_col_lowerbound,
+                                                       jdbc_partition_col_upperbound))
             LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
 
             df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
@@ -772,12 +724,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                     jdbc_partition_col_upperbound = pkey_max_value
                     LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
-                    df_rds_temp = (get_df_read_rds_db_tbl_int_pkey(rds_db_name, rds_tbl_name, 
+                    df_rds_temp = (get_rds_df_between_pkey_ids(rds_db_name, rds_tbl_name, 
                                                                 jdbc_partition_column,
                                                                 jdbc_partition_col_lowerbound,
-                                                                jdbc_partition_col_upperbound,
-                                                                given_df_repartition_num,
-                                                                jdbc_rows_fetch_size))
+                                                                jdbc_partition_col_upperbound))
                     LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
 
                     df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
