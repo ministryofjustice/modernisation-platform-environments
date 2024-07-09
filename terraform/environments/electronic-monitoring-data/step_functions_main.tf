@@ -132,6 +132,7 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
                 "Type" : "Map",
                 "ItemsPath" : "$.fileKeys",
                 "MaxConcurrency" : 4,
+                "OutputPath": "$[0].dbInfo",
                 "Iterator" : {
                   "StartAt" : "SendTableToAp",
                   "States" : {
@@ -148,9 +149,7 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
               },
               "UpdateLogTable" : {
                 "Type" : "Task",
-                "InputPath": "$[0].dbInfo",
                 "Resource" : "${module.update_log_table.lambda_function_arn}",
-                "ResultPath" : "$.updateLogResult",
                 "End" : true
               }
             },
