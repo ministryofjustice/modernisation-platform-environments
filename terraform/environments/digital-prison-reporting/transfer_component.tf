@@ -78,7 +78,7 @@ module "transfer_comp_operational_datastore_Lambda" {
     "DB_PASSWORD"          = jsondecode(data.aws_secretsmanager_secret_version.operational_datastore[0].secret_string).password
     "GIT_FOLDERS"          = "migrations/development/operationaldatastore/sql" # Comma Seperated
     "GIT_REPOSITORY"       = "https://github.com/ministryofjustice/digital-prison-reporting-transfer-component"
-    "FLYWAY_METHOD"        = "check"
+    "FLYWAY_METHOD"        = "migrate"
   }
 
   vpc_settings = {
