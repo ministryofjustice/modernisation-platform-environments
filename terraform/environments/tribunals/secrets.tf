@@ -15,24 +15,17 @@ resource "aws_secretsmanager_secret" "resource_rds_secret" {
 
 resource "aws_secretsmanager_secret_version" "resource_rds_secret_current" {
   secret_id     = aws_secretsmanager_secret.resource_rds_secret.id
-#   secret_string = <<EOF
-# {
-#   "username": "${aws_db_instance.rdsdb.username}",
-#   "password": "${aws_db_instance.rdsdb.password}",
-#   "engine": "${aws_db_instance.rdsdb.engine}",
-#   "host": "${aws_db_instance.rdsdb.address}",
-#   "port": ${aws_db_instance.rdsdb.port},
-#   "dbClusterIdentifier": "${aws_db_instance.rdsdb.ca_cert_identifier}",
-#   "database_name": "master"
-# }
-# EOF
-
   secret_string = <<EOF
 {
-  "test": "test
+  "username": "${aws_db_instance.rdsdb.username}",
+  "password": "${aws_db_instance.rdsdb.password}",
+  "engine": "${aws_db_instance.rdsdb.engine}",
+  "host": "${aws_db_instance.rdsdb.address}",
+  "port": ${aws_db_instance.rdsdb.port},
+  "dbClusterIdentifier": "${aws_db_instance.rdsdb.ca_cert_identifier}",
+  "database_name": "master"
 }
 EOF
-
 }
 
 data "aws_secretsmanager_secret" "data_rds_secret" {
