@@ -153,7 +153,7 @@ resource "aws_security_group" "glue_operational_datastore_connection_sg" {
   }
 }
 
-# This SG should be attached to the Operational DataSTore to allow the transfer component lambda to run migrations
+# This SG should be attached to the Operational DataStore to allow the transfer component lambda to run migrations
 resource "aws_security_group" "allow_lambda_ingress_to_operational_datastore" {
   count = local.enable_generic_lambda_sg ? 1 : 0
 
