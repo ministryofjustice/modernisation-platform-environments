@@ -114,27 +114,27 @@ resource "random_password" "app_new_password" {
   special = false
 }
 
-resource "null_resource" "app_setup_db" {
+# resource "null_resource" "app_setup_db" {
 
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
 
-    environment = {
-      DB_URL        = local.app_rds_url
-      USER_NAME     = local.app_rds_user
-      PASSWORD      = local.app_rds_password
-      NEW_DB_NAME   = local.app_db_name
-      NEW_USER_NAME = local.app_db_login_name
-      NEW_PASSWORD  = random_password.app_new_password.result
-      APP_FOLDER    = local.sql_migration_path
-    }
-  }
+#     environment = {
+#       DB_URL        = local.app_rds_url
+#       USER_NAME     = local.app_rds_user
+#       PASSWORD      = local.app_rds_password
+#       NEW_DB_NAME   = local.app_db_name
+#       NEW_USER_NAME = local.app_db_login_name
+#       NEW_PASSWORD  = random_password.app_new_password.result
+#       APP_FOLDER    = local.sql_migration_path
+#     }
+#   }
 
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+# }
 
 resource "aws_secretsmanager_secret" "app_db_credentials" {
   name                    = "${local.app}-credentials-db-2"
