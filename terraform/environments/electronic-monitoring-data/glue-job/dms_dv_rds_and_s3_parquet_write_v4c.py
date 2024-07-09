@@ -471,7 +471,7 @@ def apply_rds_transforms(df_rds_temp: DataFrame,
 
         trim_msg_prefix = f"""Given -> rds_df_trim_str_col_list = {rds_df_trim_str_col_list}"""
         LOGGER.warn(f"""{trim_msg_prefix}, {type(rds_df_trim_str_col_list)}""")
-        trim_str_msg = f"""; [str column(s) - extra spaces trimmed]"""
+        trim_str_msg = f""" [str column(s) - extra spaces trimmed]"""
 
         df_rds_temp_t1 = df_rds_temp.transform(rds_df_trim_str_columns, 
                                                 rds_df_trim_str_col_list)
