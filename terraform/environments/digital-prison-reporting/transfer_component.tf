@@ -73,12 +73,13 @@ module "transfer_comp_operational_datastore_Lambda" {
 
   env_vars = {
     # Connection string and creds will be replaced by the details for the real Operational Data Store
-    "DB_CONNECTION_STRING" = local.operational_db_jdbc_connection_string
-    "DB_USERNAME"          = jsondecode(data.aws_secretsmanager_secret_version.operational_datastore[0].secret_string).username
-    "DB_PASSWORD"          = jsondecode(data.aws_secretsmanager_secret_version.operational_datastore[0].secret_string).password
-    "GIT_FOLDERS"          = "migrations/development/operationaldatastore/sql" # Comma Seperated
-    "GIT_REPOSITORY"       = "https://github.com/ministryofjustice/digital-prison-reporting-transfer-component"
-    "FLYWAY_METHOD"        = "migrate"
+    "DB_CONNECTION_STRING"       = local.operational_db_jdbc_connection_string
+    "DB_USERNAME"                = jsondecode(data.aws_secretsmanager_secret_version.operational_datastore[0].secret_string).username
+    "DB_PASSWORD"                = jsondecode(data.aws_secretsmanager_secret_version.operational_datastore[0].secret_string).password
+    "GIT_FOLDERS"                = "migrations/development/operationaldatastore/sql" # Comma Seperated
+    "GIT_REPOSITORY"             = "https://github.com/ministryofjustice/digital-prison-reporting-transfer-component"
+    "FLYWAY_METHOD"              = "migrate"
+    "FLYWAY_BASELINE_ON_MIGRATE" = "true"
   }
 
   vpc_settings = {
