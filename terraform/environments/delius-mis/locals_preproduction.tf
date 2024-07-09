@@ -297,8 +297,15 @@ locals {
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
-      "/dev/sde" = { label = "data" }            # DATA
-      "/dev/sdf" = { label = "flash" }           # FLASH
+      "/dev/sde1" = { label = "data" }           # DATA
+      "/dev/sde2" = { label = "data" }           # DATA
+      "/dev/sde3" = { label = "data" }           # DATA
+      "/dev/sde4" = { label = "data" }           # DATA
+      "/dev/sde5" = { label = "data" }           # DATA
+      "/dev/sdf1" = { label = "flash" }          # FLASH
+      "/dev/sdf2" = { label = "flash" }          # FLASH
+      "/dev/sdf3" = { label = "flash" }          # FLASH
+      "/dev/sdf4" = { label = "flash" }          # FLASH
       "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {
@@ -311,13 +318,13 @@ locals {
         iops       = 5000
         throughput = 500
         type       = "gp3"
-        total_size = 5000
+        total_size = 1000
       }
       flash = {
         iops       = 3000
         throughput = 500
         type       = "gp3"
-        total_size = 4000
+        total_size = 1000
       }
     }
     ansible_user_data_config = {
