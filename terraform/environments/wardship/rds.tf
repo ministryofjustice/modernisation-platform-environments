@@ -15,6 +15,7 @@ resource "aws_db_instance" "wardship_db" {
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade = true
   ca_cert_identifier          = "rds-ca-rsa2048-g1"
+  apply_immediately           = true
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
