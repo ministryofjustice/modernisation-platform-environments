@@ -345,6 +345,12 @@ locals {
     password = "placeholder"
   }
 
+  # Transfer Component RDS Role Secrets PlaceHolder
+  operational_datastore_secrets_placeholder = {
+    username = "placeholder"
+    password = "placeholder"
+  }
+
   # biprws Secrets Placeholder
   enable_biprws_secrets = local.application_data.accounts[local.environment].biprws.enable
   biprws_secrets_placeholder = {

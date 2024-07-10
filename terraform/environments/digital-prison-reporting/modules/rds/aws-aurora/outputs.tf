@@ -98,6 +98,17 @@ output "additional_cluster_endpoints" {
 }
 
 ################################################################################
+# All Endpoint(s)
+################################################################################
+
+output "rds_cluster_endpoints" {
+  description = "RDS Cluster Endpoints"
+  value = {
+    for k, ep in aws_rds_cluster_endpoint.this : k => ep.endpoint
+  }
+}
+
+################################################################################
 # Cluster IAM Roles
 ################################################################################
 

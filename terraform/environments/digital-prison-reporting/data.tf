@@ -124,3 +124,12 @@ data "aws_secretsmanager_secret" "operational_db_secret" {
 data "aws_secretsmanager_secret_version" "operational_db_secret_version" {
   secret_id = data.aws_secretsmanager_secret.operational_db_secret.id
 }
+
+# AWS Secrets Manager for Transfer Component Role Credentials
+data "aws_secretsmanager_secret" "transfer_component_role_secret" {
+  name = aws_secretsmanager_secret.transfer_component_role_secret.name
+}
+
+data "aws_secretsmanager_secret_version" "transfer_component_role_secret_version" {
+  secret_id = data.aws_secretsmanager_secret.transfer_component_role_secret.id
+}

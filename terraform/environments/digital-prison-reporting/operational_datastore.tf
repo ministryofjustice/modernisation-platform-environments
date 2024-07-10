@@ -17,6 +17,7 @@ locals {
   )
 
   operational_db_credentials = jsondecode(data.aws_secretsmanager_secret_version.operational_db_secret_version.secret_string)
+  transfer_component_role_credentials = jsondecode(data.aws_secretsmanager_secret_version.transfer_component_role_secret_version.secret_string)
 }
 
 ################################################################################
@@ -106,6 +107,20 @@ module "aurora" {
   db_cluster_activity_stream_mode       = "async"
 
   tags = local.operational_db_tags
+}
+
+module "transfer_component_role" {
+  source = "source = "./modules/rds/setup-rds-user/"
+
+  setup_additional_users = true
+  host                   = module.aurora.rds_cluster_endpoints["static"]
+  port                   = 5432
+  database               = "postgres"
+  db_username            = local.operational_db_credentials.username
+  db_master_password     = local.operational_db_credentials.password
+  db_password            = local.transfer_component_role_credentials.password
+  rds_role_name          = local.transfer_component_role_credentials.username
+  read_write_role        = true
 }
 
 resource "aws_glue_connection" "glue_operational_datastore_connection" {

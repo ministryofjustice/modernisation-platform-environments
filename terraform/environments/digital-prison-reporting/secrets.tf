@@ -353,3 +353,28 @@ resource "aws_secretsmanager_secret_version" "operational_db_secret_version" {
     password = random_password.operational_db_password.result
   })
 }
+
+# AWS Secrets Manager for Transfer Component Role Credentials
+
+resource "random_password" "transfer_component_role_password" {
+  length  = 16
+  special = false
+}
+
+resource "aws_secretsmanager_secret" "transfer_component_role_secret" {
+  name = "${local.project}-rds-transfer-component-role-secret"
+  description = "Secret for transfer-component-role username and password"
+
+  tags = {
+    Name = "${local.project}-rds-transfer-component-role-secret"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "transfer_component_role_secret_version" {
+  secret_id = aws_secretsmanager_secret.transfer_component_role_secret.id
+
+  secret_string = jsonencode({
+    username = "transfer-component-role"
+    password = random_password.transfer_component_role_password.result
+  })
+}
