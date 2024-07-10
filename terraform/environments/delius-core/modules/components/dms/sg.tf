@@ -26,4 +26,7 @@ resource "aws_vpc_security_group_egress_rule" "dms_db_conn" {
   to_port                      = 1521
   ip_protocol                  = "tcp"
   cidr_ipv4                    = var.account_config.shared_vpc_cidr
+  tags = merge(var.tags,
+    { Name = "oracle-out" }
+  )
 }
