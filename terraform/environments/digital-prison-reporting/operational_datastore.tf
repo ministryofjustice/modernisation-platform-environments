@@ -21,10 +21,10 @@ locals {
 }
 
 ################################################################################
-# RDS Aurora Cluster
+# Operationa DB - RDS Aurora Cluster
 ################################################################################
 
-module "aurora" {
+module "aurora_operational_db" {
   source = "./modules/rds/aws-aurora/"
 
   name                        = "${local.name}-cluster"
@@ -113,7 +113,7 @@ module "transfer_component_role" {
   source = "source = "./modules/rds/setup-rds-user/"
 
   setup_additional_users = true
-  host                   = module.aurora.rds_cluster_endpoints["static"]
+  host                   = module.aurora_operational_db.rds_cluster_endpoints["static"]
   port                   = 5432
   database               = "postgres"
   db_username            = local.operational_db_credentials.username
