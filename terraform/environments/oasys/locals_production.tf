@@ -613,8 +613,8 @@ locals {
                         "practice.oasys.az.justice.gov.uk",
                         "practice.p-oasys.az.justice.gov.uk",
                         # "practice-ukwest.oasys.az.justice.gov.uk",
-                        "practice.a-int.oasys.az.justice.gov.uk",
-                        "practice.b-int.oasys.az.justice.gov.uk",
+                        "practice.a-int.oasys.service.justice.gov.uk",
+                        "practice.b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
