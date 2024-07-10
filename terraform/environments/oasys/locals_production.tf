@@ -549,8 +549,8 @@ locals {
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
             alarm_target_group_names = [
-              "pd-oasys-web-a-pv-http-8080",
-              # "pd-oasys-web-b-pv-http-8080",
+              # "pd-oasys-web-a-pv-http-8080",
+              "pd-oasys-web-b-pv-http-8080",
             ]
 
             default_action = {
