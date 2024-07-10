@@ -1,64 +1,20 @@
-resource "aws_ecs_cluster" "dagster_cluster" {
-  name = "dagster-cluster"
+module "dagster_test" {
+    source = "datarootsio/ecs-dagster/aws"
+
+    resource_prefix = "test-dlt"
+    resource_suffix = "env"
+
+    vpc_id             = data.aws_vpc.shared.id
+    public_subnet_ids  = [
+      data.aws_subnet_ids.public_subnets_a.id,
+      data.aws_subnet_ids.public_subnets_b.id,
+      data.aws_subnet_ids.public_subnets_a.id
+      ]
+
+    rds_password = data.aws_secretsmanager_random_password.test.random_password
 }
 
-resource "aws_ecs_task_definition" "dagster_task" {
-  family                   = "dagster-task"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  memory                   = "512"
-  cpu                      = "256"
-  execution_role_arn       = aws_iam_role.dagster_role.arn
-  task_role_arn            = aws_iam_role.dagster_role.arn
-
-  container_definitions = jsonencode([{
-    name  = "dagster"
-    image = "dagster/dagster:latest"
-    essential = true
-
-    portMappings = [{
-      containerPort = 3000
-      hostPort      = 3000
-    }]
-  }])
-}
-
-resource "aws_ecs_service" "dagster_service" {
-  name            = "dagster-service"
-  cluster         = aws_ecs_cluster.dagster_cluster.id
-  task_definition = aws_ecs_task_definition.dagster_task.arn
-  desired_count   = 1
-
-  network_configuration {
-    subnets          = data.aws_subnets.shared-private.ids
-    security_groups  = [aws_security_group.dagster_sg.id]
-    assign_public_ip = true
-  }
-}
-
-resource "aws_security_group" "dagster_ri_security_group" {
-  name        = "dagster_ri_security_group"
-  description = "Secuity Group having relevant acess for dagster"
-  vpc_id      = data.aws_vpc.shared.id
-
-}
-
-resource "aws_security_group" "dagster_sg" {
-  name        = "dagster_sg"
-  description = "Allow HTTP inbound traffic"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    referenced_security_group_id = aws_security_group.dagster_ri_security_group.id
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    referenced_security_group_id = aws_security_group.dagster_ri_security_group.id
-  }
+data "aws_secretsmanager_random_password" "test" {
+  password_length = 50
+  exclude_numbers = true
 }
