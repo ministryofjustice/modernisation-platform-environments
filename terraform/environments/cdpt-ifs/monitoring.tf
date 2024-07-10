@@ -20,7 +20,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   dimensions = {
     ResourceArn = module.lb_access_logs_enabled.load_balancer_arn
   }
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
 }
 
 # Pager duty integration
