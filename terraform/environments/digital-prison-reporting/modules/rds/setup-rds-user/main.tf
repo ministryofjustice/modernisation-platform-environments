@@ -4,7 +4,6 @@ locals {
 }
 
 provider "postgresql" {
-  count           = local.setup_user ? 1 : 0
   host            = var.host
   port            = var.port
   database        = var.database
