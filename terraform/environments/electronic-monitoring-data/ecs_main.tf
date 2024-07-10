@@ -1,28 +1,88 @@
-provider "dagster" {}
+module "eks" {
+  source          = "terraform-aws-modules/eks/aws"
+  version         = "17.24.0"
+  cluster_name    = "dagster-test"
+  cluster_version = "1.20"
+  subnets         = module.vpc.private_subnets
+  tags = {
+    name = "dagster"
+  }
+  vpc_id = data.aws_vpc.shared.id
 
-resource "dagster_deployment" "this" {
-  name              = "test-deploy"
-  settings_document = data.dagster_configuration_document.this.json
+  workers_group_defaults = {
+    root_volume_type = "gp2"
+  }
+
+  worker_groups = [
+    {
+      name                          = "worker-group-1"
+      instance_type                 = "t2.small"
+      additional_userdata           = "echo nothing"
+      additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
+      asg_desired_capacity          = 2
+    },
+    {
+      name                          = "worker-group-2"
+      instance_type                 = "t2.medium"
+      additional_userdata           = "echo nothing"
+      additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
+      asg_desired_capacity          = 1
+    },
+  ]
 }
 
-data "dagster_configuration_document" "this" {
-  yaml_body = <<YAML
-run_queue:
-  max_concurrent_runs: 30
-  tag_concurrency_limits: []
-run_monitoring:
-  start_timeout_seconds: 1200
-  cancel_timeout_seconds: 1400
-  free_slots_after_run_end_seconds: 300
-run_retries:
-  max_retries: 0
-  retry_on_asset_or_op_failure: true
-sso_default_role: VIEWER
-non_isolated_runs:
-  max_concurrent_non_isolated_runs: 1
-auto_materialize:
-  run_tags: {}
-  respect_materialization_data_versions: false
-  use_sensors: false
-YAML
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_id
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_id
+}
+
+
+resource "aws_security_group" "worker_group_mgmt_one" {
+  name_prefix = "worker_group_mgmt_one"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "10.0.0.0/8",
+    ]
+  }
+}
+
+resource "aws_security_group" "worker_group_mgmt_two" {
+  name_prefix = "worker_group_mgmt_two"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "192.168.0.0/16",
+    ]
+  }
+}
+
+resource "aws_security_group" "all_worker_mgmt" {
+  name_prefix = "all_worker_management"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "10.0.0.0/8",
+      "172.16.0.0/12",
+      "192.168.0.0/16",
+    ]
+  }
 }
