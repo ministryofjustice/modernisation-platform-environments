@@ -44,14 +44,6 @@
         "Id": "VALIDATOR_EXT"
       },
       {
-        "Severity": "LOGGER_SEVERITY_DETAILED_DEBUG",
-        "Id": "VALIDATOR_SOURCE"
-      },
-      {
-        "Severity": "LOGGER_SEVERITY_DETAILED_DEBUG",
-        "Id": "VALIDATOR_TARGET"
-      },
-      {
         "Severity": "LOGGER_SEVERITY_DEFAULT",
         "Id": "TARGET_APPLY"
       },
