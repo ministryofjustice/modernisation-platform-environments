@@ -3,7 +3,7 @@ module "eks" {
   version         = "17.24.0"
   cluster_name    = "dagster-test"
   cluster_version = "1.20"
-  subnets         = data.aws_subnet.private_subnets_a
+  subnets         = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   tags = {
     name = "dagster"
   }
