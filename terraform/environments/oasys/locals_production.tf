@@ -67,8 +67,8 @@ locals {
 
       pd-oasys-web-b = merge(local.webserver, {
         autoscaling_group = merge(local.webserver.autoscaling_group, {
-          desired_capacity = 1
-          max_size         = 1
+          desired_capacity = 4
+          max_size         = 4
         })
         config = merge(local.webserver.config, {
           instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
