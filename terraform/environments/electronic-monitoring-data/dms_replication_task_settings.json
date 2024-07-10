@@ -37,10 +37,6 @@
       },
       {
         "Severity": "LOGGER_SEVERITY_DETAILED_DEBUG",
-        "Id": "VALIDATOR"
-      },
-      {
-        "Severity": "LOGGER_SEVERITY_DETAILED_DEBUG",
         "Id": "VALIDATOR_EXT"
       },
       {
