@@ -24,11 +24,12 @@ locals {
 module "aurora" {
   source = "./modules/rds/aws-aurora/"
 
-  name            = "${local.name}-cluster"
-  engine          = "aurora-postgresql"
-  engine_version  = "16.2"
-  master_username = local.operational_db_credentials.username
-  master_password = local.operational_db_credentials.password
+  name                        = "${local.name}-cluster"
+  engine                      = "aurora-postgresql"
+  engine_version              = "16.2"
+  manage_master_user_password = false
+  master_username             = local.operational_db_credentials.username
+  master_password             = local.operational_db_credentials.password
   instances = {
     1 = {
       identifier     = local.name
