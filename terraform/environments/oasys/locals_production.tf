@@ -458,7 +458,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pd-oasys-web-a-pb-http-8080"
+                  target_group_name = "pd-oasys-web-b-pb-http-8080"
                 }]
                 conditions = [
                   {
@@ -568,7 +568,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pd-oasys-web-a-pv-http-8080"
+                  target_group_name = "pd-oasys-web-b-pv-http-8080"
                 }]
                 conditions = [
                   {
