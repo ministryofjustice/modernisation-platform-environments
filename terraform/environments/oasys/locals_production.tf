@@ -78,6 +78,20 @@ locals {
         instance = merge(local.webserver.instance, {
           instance_type = "t3.large"
         })
+        user_data_cloud_init = {
+          args = {
+            lifecycle_hook_name  = "ready-hook"
+            branch               = "main"
+            ansible_repo         = "modernisation-platform-configuration-management"
+            ansible_repo_basedir = "ansible"
+            ansible_args         = ""
+          }
+          scripts = [
+            "install-ssm-agent.sh.tftpl",
+            "ansible-ec2provision2.sh.tftpl",
+            "post-ec2provision.sh.tftpl"
+          ]
+        }
         tags = merge(local.webserver.tags, {
           oasys-environment  = "production"
           oracle-db-hostname = "db.oasys.hmpps-production.modernisation-platform.internal"
@@ -425,13 +439,18 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+            alarm_target_group_names = [
+              "pd-oasys-web-a-pb-http-8080",
+              # "pd-oasys-web-b-pb-http-8080",
+            ]
 
             default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Use www.oasys.service.justice.gov.uk, or for practice ptc.oasys.service.justice.gov.uk, or for training trn.oasys.service.justice.gov.uk"
-                status_code  = "200"
+              type = "redirect"
+              redirect = {
+                host        = "oasys.service.justice.gov.uk"
+                port        = "443"
+                protocol    = "HTTPS"
+                status_code = "HTTP_302"
               }
             }
             rules = {
@@ -444,7 +463,7 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = [
+                      values = [ # max of 5
                         "oasys.service.justice.gov.uk",
                         "bridge-oasys.az.justice.gov.uk",
                         "www.oasys.service.justice.gov.uk",
@@ -462,7 +481,7 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = [
+                      values = [# max of 5
                         "b.oasys.service.justice.gov.uk",
                       ]
                     }
@@ -478,10 +497,11 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = [
-                        "ptc.oasys.service.justice.gov.uk",
+                      values = [ # max of 5
                         "practice.bridge-oasys.az.justice.gov.uk",
                         "practice.oasys.service.justice.gov.uk",
+                        "practice.a.oasys.service.justice.gov.uk",
+                        "practice.b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -496,10 +516,11 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = [
-                        "trn.oasys.service.justice.gov.uk",
+                      values = [ # max of 5
                         "training.bridge-oasys.az.justice.gov.uk",
                         "training.oasys.service.justice.gov.uk",
+                        "training.a.oasys.service.justice.gov.uk",
+                        "training.b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -527,6 +548,10 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+            alarm_target_group_names = [
+              "pd-oasys-web-a-pv-http-8080",
+              # "pd-oasys-web-b-pv-http-8080",
+            ]
 
             default_action = {
               type = "redirect"
@@ -548,7 +573,7 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = [
+                      values = [ # max of 5
                         "int.oasys.service.justice.gov.uk",
                         "oasys-ukwest.oasys.az.justice.gov.uk",
                         # "oasys.az.justice.gov.uk",
@@ -567,7 +592,7 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = [
+                      values = [ # max of 5
                         "b-int.oasys.service.justice.gov.uk",
                       ]
                     }
@@ -583,12 +608,13 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = [
-                        "ptc-int.oasys.service.justice.gov.uk",
+                      values = [ # max of 5
                         "practice.int.oasys.service.justice.gov.uk",
                         "practice.oasys.az.justice.gov.uk",
                         "practice.p-oasys.az.justice.gov.uk",
-                        "practice-ukwest.oasys.az.justice.gov.uk",
+                        # "practice-ukwest.oasys.az.justice.gov.uk",
+                        "practice.a-int.oasys.az.justice.gov.uk",
+                        "practice.b-int.oasys.az.justice.gov.uk",
                       ]
                     }
                   }
@@ -603,12 +629,13 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = [
-                        "trn-int.oasys.service.justice.gov.uk",
+                      values = [ # max of 5
                         "training.int.oasys.service.justice.gov.uk",
                         "training.oasys.az.justice.gov.uk",
                         "training.p-oasys.az.justice.gov.uk",
-                        "training-ukwest.oasys.az.justice.gov.uk",
+                        # "training-ukwest.oasys.az.justice.gov.uk",
+                        "training.a-int.oasys.service.justice.gov.uk",
+                        "training.b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -636,16 +663,24 @@ locals {
           { name = "a", type = "A", lbs_map_key = "public" },
           { name = "b", type = "A", lbs_map_key = "public" },
           { name = "practice", type = "A", lbs_map_key = "public" },
-          { name = "ptc", type = "A", lbs_map_key = "public" },
+          { name = "practice.a", type = "A", lbs_map_key = "public" },
+          { name = "practice.b", type = "A", lbs_map_key = "public" },
+          # { name = "ptc", type = "A", lbs_map_key = "public" },
           { name = "training", type = "A", lbs_map_key = "public" },
-          { name = "trn", type = "A", lbs_map_key = "public" },
+          { name = "training.a", type = "A", lbs_map_key = "public" },
+          { name = "training.b", type = "A", lbs_map_key = "public" },
+          # { name = "trn", type = "A", lbs_map_key = "public" },
           { name = "int", type = "A", lbs_map_key = "private" },
           { name = "a-int", type = "A", lbs_map_key = "private" },
           { name = "b-int", type = "A", lbs_map_key = "private" },
           { name = "practice.int", type = "A", lbs_map_key = "private" },
-          { name = "ptc-int", type = "A", lbs_map_key = "private" },
+          { name = "practice.a-int", type = "A", lbs_map_key = "private" },
+          { name = "practice.b-int", type = "A", lbs_map_key = "private" },
+          # { name = "ptc-int", type = "A", lbs_map_key = "private" },
           { name = "training.int", type = "A", lbs_map_key = "private" },
-          { name = "trn-int", type = "A", lbs_map_key = "private" },
+          { name = "training.a-int", type = "A", lbs_map_key = "private" },
+          { name = "training.b-int", type = "A", lbs_map_key = "private" },
+          # { name = "trn-int", type = "A", lbs_map_key = "private" },
         ]
         records = [
           { name = "reporting", type = "NS", ttl = "86400", records = ["ns-1953.awsdns-52.co.uk", "ns-1415.awsdns-48.org", "ns-637.awsdns-15.net", "ns-454.awsdns-56.com"] },
