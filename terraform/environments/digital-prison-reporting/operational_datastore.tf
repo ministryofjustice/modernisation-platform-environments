@@ -114,7 +114,7 @@ module "aurora_operational_db" {
 ################################################################################
 
 module "transfer_component_role" {
-  source = "source = "./modules/rds/setup-rds-user/"
+  source = "./modules/rds/setup-rds-user/"
 
   setup_additional_users = true
   host                   = module.aurora_operational_db.rds_cluster_endpoints["static"]
