@@ -36,6 +36,13 @@ resource "aws_ecs_service" "dagster_service" {
   }
 }
 
+resource "aws_security_group" "dagster_ri_security_group" {
+  name        = "dagster_ri_security_group"
+  description = "Secuity Group having relevant acess for dagster"
+  vpc_id      = data.aws_vpc.shared.id
+
+}
+
 resource "aws_security_group" "dagster_sg" {
   name        = "dagster_sg"
   description = "Allow HTTP inbound traffic"
@@ -45,13 +52,13 @@ resource "aws_security_group" "dagster_sg" {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    referenced_security_group_id = aws_security_group.dagster_ri_security_group.id
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    referenced_security_group_id = aws_security_group.dagster_ri_security_group.id
   }
 }
