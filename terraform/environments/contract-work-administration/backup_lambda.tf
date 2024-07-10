@@ -98,16 +98,16 @@ resource "aws_iam_role_policy_attachment" "backup_lambda" {
 ### S3 for Backup Lambda
 ##################################
 
-resource "aws_s3_bucket" "backup_lambda" {
-  bucket = "${local.application_name_short}-${local.environment}-backup-lambda"
+resource "aws_s3_bucket" "scripts" {
+  bucket = "${local.application_name_short}-${local.environment}-scripts"
   tags = merge(
     local.tags,
-    { Name = "${local.application_name_short}-${local.environment}-backup-lambda" }
+    { Name = "${local.application_name_short}-${local.environment}-scripts" }
   )
 }
 
 resource "aws_s3_object" "provision_files" {
-  bucket       = aws_s3_bucket.backup_lambda.id
+  bucket       = aws_s3_bucket.scripts.id
   for_each     = fileset("./zipfiles/", "**")
   key          = each.value
   source       = "./zipfiles/${each.value}"
@@ -122,14 +122,14 @@ resource "time_sleep" "wait_for_provision_files" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "backup_lambda" {
-  bucket = aws_s3_bucket.backup_lambda.id
+  bucket = aws_s3_bucket.scripts.id
   rule {
     object_ownership = "ObjectWriter"
   }
 }
 
 resource "aws_s3_bucket_acl" "backup_lambda" {
-  bucket = aws_s3_bucket.backup_lambda.id
+  bucket = aws_s3_bucket.scripts.id
   acl    = "private"
   depends_on = [
     aws_s3_bucket_ownership_controls.backup_lambda
@@ -137,7 +137,7 @@ resource "aws_s3_bucket_acl" "backup_lambda" {
 }
 
 resource "aws_s3_bucket_public_access_block" "backup_lambda" {
-  bucket                  = aws_s3_bucket.backup_lambda.bucket
+  bucket                  = aws_s3_bucket.scripts.bucket
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -145,7 +145,7 @@ resource "aws_s3_bucket_public_access_block" "backup_lambda" {
 }
 
 resource "aws_s3_bucket_versioning" "backup_lambda" {
-  bucket = aws_s3_bucket.backup_lambda.id
+  bucket = aws_s3_bucket.scripts.id
   versioning_configuration {
     status = "Enabled"
   }
@@ -204,7 +204,7 @@ resource "aws_lambda_layer_version" "backup_lambda" {
   layer_name       = "SSHNodeJSLayer"
   description      = "A layer to add ssh libs to lambda"
   license_info     = "Apache-2.0"
-  s3_bucket        = aws_s3_bucket.backup_lambda.id
+  s3_bucket        = aws_s3_bucket.scripts.id
   s3_key           = "nodejs.zip"
   source_code_hash = filebase64sha256("zipfiles/nodejs.zip")
 
@@ -221,7 +221,7 @@ resource "aws_lambda_function" "create_db_snapshots" {
   source_code_hash = data.archive_file.create_db_snapshots.output_base64sha256
   runtime          = "nodejs18.x"
   layers           = [aws_lambda_layer_version.backup_lambda.arn]
-  s3_bucket        = aws_s3_bucket.backup_lambda.id
+  s3_bucket        = aws_s3_bucket.scripts.id
   s3_key           = "${local.create_db_snapshots_script_prefix}.zip"
   memory_size      = 128
   timeout          = 900
@@ -250,7 +250,7 @@ resource "aws_lambda_function" "delete_db_snapshots" {
   handler          = "deletesnapshots.lambda_handler"
   source_code_hash = data.archive_file.delete_db_snapshots.output_base64sha256
   runtime          = "python3.8"
-  s3_bucket        = aws_s3_bucket.backup_lambda.id
+  s3_bucket        = aws_s3_bucket.scripts.id
   s3_key           = "${local.delete_db_snapshots_script_prefix}.zip"
   memory_size      = 3000
   timeout          = 900
@@ -275,7 +275,7 @@ resource "aws_lambda_function" "connect_db" {
   source_code_hash = data.archive_file.connect_db.output_base64sha256
   runtime          = "nodejs18.x"
   layers           = [aws_lambda_layer_version.backup_lambda.arn]
-  s3_bucket        = aws_s3_bucket.backup_lambda.id
+  s3_bucket        = aws_s3_bucket.scripts.id
   s3_key           = "${local.db_connect_script_prefix}.zip"
   memory_size      = 128
   timeout          = 900

@@ -415,13 +415,13 @@ resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
 # output_file_structure_as_json_from_zip
 # ------------------------------------------
 
-resource "aws_iam_role" "output_fs_json_lambda" {
-  name                = "output_fs_json_lambda"
+resource "aws_iam_role" "extract_metadata_from_atrium_unstructured" {
+  name                = "extract_metadata_from_atrium_unstructured"
   assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
 
-data "aws_iam_policy_document" "output_fs_json_lambda_s3_policy_document" {
+data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_policy_document" {
   statement {
     sid    = "S3PermissionsForUnzippingLambda"
     effect = "Allow"
@@ -437,24 +437,24 @@ data "aws_iam_policy_document" "output_fs_json_lambda_s3_policy_document" {
   }
 }
 
-resource "aws_iam_policy" "output_fs_json_lambda_s3_policy" {
-  name        = "output-fs-json-lambda-s3-policy"
-  description = "Policy for Lambda to use S3 for ${local.output_fs_json_lambda}"
-  policy      = data.aws_iam_policy_document.output_fs_json_lambda_s3_policy_document.json
+resource "aws_iam_policy" "extract_metadata_from_atrium_unstructured_s3_policy" {
+  name        = "extract-metadata-from-atrium-unstructured-lambda-s3-policy"
+  description = "Policy for Lambda to use S3 for extract_metadata_from_atrium_unstructured"
+  policy      = data.aws_iam_policy_document.extract_metadata_from_atrium_unstructured_s3_policy_document.json
 }
 
-resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_s3_policy_attachment" {
-  role       = aws_iam_role.output_fs_json_lambda.name
-  policy_arn = aws_iam_policy.output_fs_json_lambda_s3_policy.arn
+resource "aws_iam_role_policy_attachment" "extract_metadata_from_atrium_unstructured_s3_policy_attachment" {
+  role       = aws_iam_role.extract_metadata_from_atrium_unstructured.name
+  policy_arn = aws_iam_policy.extract_metadata_from_atrium_unstructured_s3_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_vpc_access_execution" {
-  role       = aws_iam_role.output_fs_json_lambda.name
+resource "aws_iam_role_policy_attachment" "extract_metadata_from_atrium_unstructured_vpc_access_execution" {
+  role       = aws_iam_role.extract_metadata_from_atrium_unstructured.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "output_fs_json_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.output_fs_json_lambda.name
+resource "aws_iam_role_policy_attachment" "extract_metadata_from_atrium_unstructured_sqs_queue_access_execution" {
+  role       = aws_iam_role.extract_metadata_from_atrium_unstructured.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
@@ -464,4 +464,59 @@ resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zi
   function_name = module.output_file_structure_as_json_from_zip.lambda_function_arn
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.data_store.arn
+}
+
+# ------------------------------------------
+# unzip_unstructured_files
+# ------------------------------------------
+
+resource "aws_iam_role" "unzip_unstructured_files" {
+  name               = "unzip_unstructured_files"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.unzip_unstructured_files.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_lambda_vpc_access_execution" {
+  role       = aws_iam_role.unzip_unstructured_files.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+data "aws_iam_policy_document" "get_put_zip_s3_files" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      aws_s3_bucket.data_store.arn,
+      "${aws_s3_bucket.data_store.arn}/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      module.unzipped-s3-data-store.bucket.arn,
+      "${module.unzipped-s3-data-store.bucket.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "get_put_zip_s3_files" {
+  name   = "get_put_zip_s3_files"
+  policy = data.aws_iam_policy_document.get_put_zip_s3_files.json
+}
+resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_get_put_zip_s3_files" {
+  role       = aws_iam_role.unzip_unstructured_files.name
+  policy_arn = aws_iam_policy.get_put_zip_s3_files.arn
 }

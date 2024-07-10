@@ -69,6 +69,9 @@ locals {
 
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
+
+      /* UI */
+      ui_hostname = "development.analytical-platform.service.justice.gov.uk"
     }
     test = {
       /* VPC */
@@ -117,6 +120,9 @@ locals {
 
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
+
+      /* UI */
+      ui_hostname = "test.analytical-platform.service.justice.gov.uk"
     }
     production = {
       /* VPC */
@@ -164,6 +170,9 @@ locals {
 
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
+
+      /* UI */
+      ui_hostname = "analytical-platform.service.justice.gov.uk"
     }
   }
 }

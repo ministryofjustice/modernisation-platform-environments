@@ -231,6 +231,7 @@ locals {
   # Transfer Component
   enable_transfercomp_lambda         = local.application_data.accounts[local.environment].enable_transfer_component_lambda
   lambda_transfercomp_name           = "${local.project}-transfer-component"
+  lambda_transfercomp_ods_name       = "${local.project}-transfer-component-operational-datastore"
   lambda_transfercomp_runtime        = "java11"
   lambda_transfercomp_tracing        = "Active"
   lambda_transfercomp_handler        = "com.geekoosh.flyway.FlywayHandler"

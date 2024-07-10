@@ -592,6 +592,42 @@ variable "lbs" {
     idle_timeout                     = optional(string)
     internal_lb                      = optional(bool, false)
     access_logs                      = optional(bool, true)
+    access_logs_lifecycle_rule       = optional(list(object({
+      id = optional(string)
+      enabled = optional(string)
+      prefix = optional(string)
+      tags = optional(map(string), {})
+      transition = optional(list(object({
+        days = optional(number)
+        storage_class = optional(string)
+      })))
+      expiration = optional(object({
+        days = optional(number)
+      }))
+      noncurrent_version_transition = optional(list(object({
+        days = optional(number)
+        storage_class = optional(string)
+      })))
+      noncurrent_version_expiration = optional(object({
+        days = optional(number)
+      }))  
+    })), [
+      {
+      enabled = "Enabled"
+      id      = "loadbalancer_three_months"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        { days = 31, storage_class = "STANDARD_IA" }
+      ]
+      expiration = { days = 90 }
+      noncurrent_version_transition = []
+      noncurrent_version_expiration = { days = 7 }
+    }])
     load_balancer_type               = optional(string, "application")
     security_groups                  = list(string)
     subnets                          = list(string)
@@ -832,6 +868,7 @@ variable "s3_buckets" {
   description = "map of s3 buckets to create where the map key is the bucket prefix.  See s3_bucket module for more variable details.  Use iam_policies to automatically create a iam policies for the bucket where the key is the name of the policy"
   type = map(object({
     acl                 = optional(string, "private")
+    ownership_controls  = optional(string, "BucketOwnerPreferred")
     versioning_enabled  = optional(bool, true)
     replication_enabled = optional(bool, false)
     replication_region  = optional(string)

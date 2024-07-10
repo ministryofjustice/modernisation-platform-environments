@@ -53,3 +53,48 @@ resource "aws_backup_selection" "cwa" {
     }
   }
 }
+
+data "aws_iam_policy_document" "cwa_vault" {
+  statement {
+    sid = "Allow local account basic permissions to the vault"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
+    }
+
+    actions = [
+      "backup:DescribeBackupVault",
+      "backup:PutBackupVaultAccessPolicy",
+      "backup:DeleteBackupVaultAccessPolicy",
+      "backup:GetBackupVaultAccessPolicy",
+      "backup:StartBackupJob",
+      "backup:GetBackupVaultNotifications",
+      "backup:PutBackupVaultNotifications",
+      "backup:StartRestoreJob"
+    ]
+
+    resources = [aws_backup_vault.cwa.arn]
+  }
+  statement {
+    sid = "Allow copying of recovery points from Landing Zone"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::411213865113:root"]
+    }
+
+    actions = [
+      "backup:CopyIntoBackupVault"
+    ]
+
+    resources = [aws_backup_vault.cwa.arn]
+  }
+}
+
+resource "aws_backup_vault_policy" "cwa" {
+  backup_vault_name = aws_backup_vault.cwa.name
+  policy            = data.aws_iam_policy_document.cwa_vault.json
+}

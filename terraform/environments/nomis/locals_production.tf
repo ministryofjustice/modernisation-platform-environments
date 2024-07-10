@@ -72,7 +72,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -343,6 +343,7 @@ locals {
     lbs = {
       private = merge(local.lbs.private, {
 
+        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["nomis_wildcard_cert"]
