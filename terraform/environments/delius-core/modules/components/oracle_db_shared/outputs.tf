@@ -29,3 +29,7 @@ output "instance_policies" {
 output "database_application_passwords_secret_arn" {
   value = aws_secretsmanager_secret.database_application_passwords.arn
 }
+
+output "db_ec2_sg_id" {
+  value = aws_security_group.db_ec2.id
+}
