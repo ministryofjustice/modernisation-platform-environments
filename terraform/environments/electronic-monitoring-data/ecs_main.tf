@@ -5,7 +5,7 @@ module "dagster_test" {
     resource_suffix = "env"
 
     vpc             = data.aws_vpc.shared.id
-    public_subnet_ids  = [
+    public_subnet  = [
       data.aws_subnet_ids.public_subnets_a.id,
       data.aws_subnet_ids.public_subnets_b.id,
       data.aws_subnet_ids.public_subnets_a.id
