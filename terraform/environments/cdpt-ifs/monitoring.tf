@@ -6,6 +6,10 @@ resource "aws_sns_topic" "lb_5xx_alarm_topic" {
   name = "lb_5xx_alarm_topic"
 }
 
+locals{
+  lb_short_arn = join("/", slice(split("/", module.lb_access_logs_enabled.load_balancer_arn), 1, 4))
+}
+
 resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   alarm_name          = "lb-5xx-errors"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -18,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   alarm_description   = "This metric monitors 5xx errors on the targets behind the load balancer"
   alarm_actions       = [aws_sns_topic.lb_5xx_alarm_topic.arn]
   dimensions = {
-    LoadBalancer = "app/cdpt-ifs-lb/57f7ca8467869532"
+    LoadBalancer = local.lb_short_arn
   }
   treat_missing_data  = "notBreaching"
 }
@@ -50,3 +54,6 @@ module "pagerduty_core_alerts" {
   pagerduty_integration_key = local.pagerduty_integration_keys["cdpt-ifs-alarms"]
 }
 
+output "lb_short_arn" {
+  value = local.lb_short_arn
+}
