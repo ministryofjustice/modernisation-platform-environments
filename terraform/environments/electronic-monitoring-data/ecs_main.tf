@@ -30,7 +30,7 @@ resource "aws_ecs_service" "dagster_service" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-private
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.dagster_sg.id]
     assign_public_ip = true
   }
