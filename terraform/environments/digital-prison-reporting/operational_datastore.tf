@@ -116,7 +116,7 @@ module "aurora_operational_db" {
 module "transfer_component_role" {
   source = "./modules/rds/rds-pgres-role/"
 
-  setup_additional_users = true
+  setup_additional_users = false
   host                   = module.aurora_operational_db.rds_cluster_endpoints["static"]
   port                   = 5432
   database               = "postgres"
