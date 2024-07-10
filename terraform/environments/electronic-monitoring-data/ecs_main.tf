@@ -1,5 +1,5 @@
 module "dagster_test" {
-    source = "github.com/datarootsio/ecs-dagster/aws"
+    source = "github.com/datarootsio/terraform-aws-ecs-dagster"
 
     resource_prefix = "test-dlt"
     resource_suffix = "env"
