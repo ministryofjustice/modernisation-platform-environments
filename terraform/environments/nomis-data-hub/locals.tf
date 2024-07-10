@@ -45,6 +45,26 @@ locals {
   }
 
   baseline_all_environments = {
+    s3_buckets = {
+      offloc-upload = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        iam_policies   = module.baseline_presets.s3_iam_policies
+        lifecycle_rule = [{
+          enabled                       = "Enabled"
+          id                            = "offloc"
+          prefix                        = ""
+          tags                          = { rule = "log", autoclean = "true" }
+          transition                    = []
+          expiration                    = { days = 30 }
+          noncurrent_version_transition = []
+          noncurrent_version_expiration = { days = 7 }
+        }]
+        tags = {
+          backup = "false"
+        }
+      }
+    }
+
     security_groups = local.security_groups
   }
 }
