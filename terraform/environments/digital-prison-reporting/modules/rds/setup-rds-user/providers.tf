@@ -1,8 +1,8 @@
 terraform {
   required_providers {
     postgresql = {
-      source  = "hashicorp/postgresql"
-      version = "~> 1.0"
+      source  = "cyrilgdn/postgresql"
+      version = "~> 1.12"
     }
   }
 }
