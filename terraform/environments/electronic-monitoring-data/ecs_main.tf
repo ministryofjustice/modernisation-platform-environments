@@ -1,3 +1,5 @@
+provider "dagster" {}
+
 resource "dagster_deployment" "this" {
   name              = "test-deploy"
   settings_document = data.dagster_configuration_document.this.json
