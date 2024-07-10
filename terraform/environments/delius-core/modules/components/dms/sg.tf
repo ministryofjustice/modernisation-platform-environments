@@ -18,3 +18,12 @@ resource "aws_vpc_security_group_egress_rule" "dms_instance_https_out" {
     { Name = "https-out" }
   )
 }
+
+resource "aws_vpc_security_group_egress_rule" "dms_db_conn" {
+  security_group_id            = aws_security_group.dms.id
+  description                  = "Allow communication between DMS and delius db instances"
+  from_port                    = 1521
+  to_port                      = 1521
+  ip_protocol                  = "tcp"
+  cidr_ipv4                    = var.account_config.shared_vpc_cidr
+}
