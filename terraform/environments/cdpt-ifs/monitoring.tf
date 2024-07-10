@@ -18,7 +18,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   alarm_description   = "This metric monitors 5xx errors on the targets behind the load balancer"
   alarm_actions       = [aws_sns_topic.lb_5xx_alarm_topic.arn]
   dimensions = {
-    ResourceArn = module.lb_access_logs_enabled.load_balancer_arn
+    LoadBalancer = "app/cdpt-ifs-lb/57f7ca8467869532"
   }
   treat_missing_data  = "notBreaching"
 }
