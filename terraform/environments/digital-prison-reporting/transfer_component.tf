@@ -1,5 +1,9 @@
 # Domain Builder Flyway Lambda
 
+locals {
+  transfer_component_migrations_repo = "https://github.com/ministryofjustice/digital-prison-reporting-transfer-component"
+}
+
 module "transfer_comp_lambda_layer" {
   source = "./modules/lambdas/layer"
 
@@ -34,7 +38,7 @@ module "transfer_comp_Lambda" {
     "DB_PASSWORD"          = local.datamart_password
     "FLYWAY_METHOD"        = "check"
     "GIT_FOLDERS"          = "migrations/development/redshift/sql" # Comma Seperated
-    "GIT_REPOSITORY"       = "https://github.com/ministryofjustice/digital-prison-reporting-transfer-component"
+    "GIT_REPOSITORY"       = local.transfer_component_migrations_repo
   }
 
   vpc_settings = {
@@ -77,7 +81,7 @@ module "transfer_comp_operational_datastore_Lambda" {
     "DB_USERNAME"                = jsondecode(data.aws_secretsmanager_secret_version.operational_datastore[0].secret_string).username
     "DB_PASSWORD"                = jsondecode(data.aws_secretsmanager_secret_version.operational_datastore[0].secret_string).password
     "GIT_FOLDERS"                = "migrations/development/operationaldatastore/sql" # Comma Seperated
-    "GIT_REPOSITORY"             = "https://github.com/ministryofjustice/digital-prison-reporting-transfer-component"
+    "GIT_REPOSITORY"             = local.transfer_component_migrations_repo
     "FLYWAY_METHOD"              = "check"
     "FLYWAY_BASELINE_ON_MIGRATE" = "true"
   }
