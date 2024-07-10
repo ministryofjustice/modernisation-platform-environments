@@ -1,5 +1,5 @@
 module "dagster_test" {
-    source = "datarootsio/ecs-dagster/aws"
+    source = "github.com/datarootsio/ecs-dagster/aws"
 
     resource_prefix = "test-dlt"
     resource_suffix = "env"
