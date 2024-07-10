@@ -109,6 +109,10 @@ module "aurora_operational_db" {
   tags = local.operational_db_tags
 }
 
+################################################################################
+# Operationa DB - Transfer Component Role/User
+################################################################################
+
 module "transfer_component_role" {
   source = "source = "./modules/rds/setup-rds-user/"
 
