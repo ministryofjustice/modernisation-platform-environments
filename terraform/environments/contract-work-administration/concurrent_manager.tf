@@ -2,13 +2,6 @@ locals {
   cm_userdata = <<EOF
 #!/bin/bash
 
-### Temp install of AWS CLI - removed once actual AMI is used
-# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-# sudo yum install -y unzip
-# unzip awscliv2.zip
-# sudo ./aws/install
-##############
-
 echo "Setting host name"
 hostname ${local.cm_hostname}
 echo "${local.cm_hostname}" > /etc/hostname
@@ -61,8 +54,28 @@ sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
 sed -i '/development-general$/d' /root/.ssh/authorized_keys
 sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
+## Add custom metric script
+echo "Adding the custom metrics script for CloudWatch"
+rm /var/cw-custom.sh
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/cm-cw-custom.sh /var/cw-custom.sh
+chmod 700 /var/cw-custom.sh
+#  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+
 EOF
 
+}
+
+### Load custom metric script into an S3 bucket
+resource "aws_s3_object" "cm_custom_script" {
+    bucket = aws_s3_bucket.scripts.id
+    key    = "cm-cw-custom.sh"
+    source = "./cm-cw-custom.sh"
+    source_hash  = filemd5("./cm-cw-custom.sh")
+}
+
+resource "time_sleep" "wait_cm_custom_script" {
+  create_duration = "1m"
+  depends_on      = [aws_s3_object.cm_custom_script]
 }
 
 ######################################
@@ -79,7 +92,7 @@ resource "aws_instance" "concurrent_manager" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.cm_userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   metadata_options {
     http_tokens = "optional"
   }

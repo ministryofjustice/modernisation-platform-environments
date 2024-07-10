@@ -36,7 +36,7 @@
         "Id": "REST_SERVER"
       },
       {
-        "Severity": "LOGGER_SEVERITY_DEFAULT",
+        "Severity": "LOGGER_SEVERITY_DETAILED_DEBUG",
         "Id": "VALIDATOR_EXT"
       },
       {

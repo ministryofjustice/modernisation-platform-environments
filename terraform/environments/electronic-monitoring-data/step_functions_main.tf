@@ -132,16 +132,15 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
                 "Type" : "Map",
                 "ItemsPath" : "$.fileKeys",
                 "MaxConcurrency" : 4,
+                "OutputPath": "$[0].dbInfo",
                 "Iterator" : {
                   "StartAt" : "SendTableToAp",
                   "States" : {
                     "SendTableToAp" : {
                       "Type" : "Task",
                       "Resource" : "${module.send_table_to_ap.lambda_function_arn}",
-                      "ResultSelector": {
-                        "dbInfo.$": "$.dbInfo"
-                      },
-                      "ResultPath": "$",
+                      "InputPath": "$",
+                      "ResultPath": "$.dbInfo",
                       "End" : true
                     }
                   }
@@ -151,7 +150,6 @@ resource "aws_sfn_state_machine" "send_database_to_ap" {
               "UpdateLogTable" : {
                 "Type" : "Task",
                 "Resource" : "${module.update_log_table.lambda_function_arn}",
-                "ResultPath" : "$.updateLogResult",
                 "End" : true
               }
             },
