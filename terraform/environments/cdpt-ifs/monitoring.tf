@@ -12,7 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   evaluation_periods  = "1"
   metric_name         = "HTTPCode_Target_5XX_Count"
   namespace           = "AWS/ApplicationELB"
-  period              = "60"
+  period              = "300"
   statistic           = "Sum"
   threshold           = "1"
   alarm_description   = "This metric monitors 5xx errors on the targets behind the load balancer"
