@@ -32,6 +32,8 @@ data "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
   secret_id = data.aws_secretsmanager_secret.delius_core_application_passwords.id
 }
 
+# We must provide the inner zone domain to the host as the DMS instance will not append this automatically
+# for address resolution
 resource "aws_secretsmanager_secret_version" "dms_audit_source_endpoint_db" {
   count = var.dms_config.audit_source_endpoint.read_host == null ? 0 : 1
   secret_id = aws_secretsmanager_secret.dms_audit_source_endpoint_db.id
@@ -39,7 +41,7 @@ resource "aws_secretsmanager_secret_version" "dms_audit_source_endpoint_db" {
     username = "delius_audit_dms_pool"
     password = jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"]
     port = "1521"
-    host = var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host]
+    host = join(".",[var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host],var.account_config.route53_inner_zone_info])
   })
 }
 
