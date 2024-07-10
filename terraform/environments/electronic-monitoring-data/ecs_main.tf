@@ -6,9 +6,9 @@ module "dagster_test" {
 
     vpc             = data.aws_vpc.shared.id
     public_subnet  = [
-      data.aws_subnet_ids.public_subnets_a.id,
-      data.aws_subnet_ids.public_subnets_b.id,
-      data.aws_subnet_ids.public_subnets_a.id
+      data.aws_subnet.public_subnets_a.id,
+      data.aws_subnet.public_subnets_b.id,
+      data.aws_subnet.public_subnets_c.id
       ]
 
     rds_password = data.aws_secretsmanager_random_password.test.random_password
