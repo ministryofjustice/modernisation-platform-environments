@@ -27,7 +27,7 @@ resource "aws_iam_policy" "dagster_policy" {
         "s3:PutObject"
       ]
       Effect   = "Allow"
-      Resource = [module.dagster-bucket.bucket_arn, "${module.dagster-bucket.bucket_arn}/*"]
+      Resource = [module.dagster-bucket.bucket.arn, "${module.dagster-bucket.bucket.arn}/*"]
     }]
   })
 }
