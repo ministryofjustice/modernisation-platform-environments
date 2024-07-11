@@ -2,10 +2,6 @@ data "aws_lb" "cdpt-chaps-lb" {
   name = "cdpt-chaps-lb"
 }
 
-resource "aws_sns_topic" "lb_5xx_alarm_topic" {
-  name = "lb_5xx_alarm_topic"
-}
-
 locals{
   lb_short_arn = join("/", slice(split("/", module.lb_access_logs_enabled.load_balancer_arn), 1, 4))
 }
