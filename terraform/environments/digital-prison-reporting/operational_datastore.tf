@@ -113,19 +113,19 @@ module "aurora_operational_db" {
 # Operationa DB - Transfer Component Role/User
 ################################################################################
 
-module "transfer_component_role" {
-  source = "./modules/rds/rds-pgres-role/"
-
-  setup_additional_users = false
-  host                   = module.aurora_operational_db.rds_cluster_endpoints["static"]
-  port                   = 5432
-  database               = "postgres"
-  db_username            = local.operational_db_credentials.username
-  db_master_password     = local.operational_db_credentials.password
-  db_password            = local.transfer_component_role_credentials.password
-  rds_role_name          = local.transfer_component_role_credentials.username
-  read_write_role        = true
-}
+#module "transfer_component_role" {
+#  source = "./modules/rds/rds-pgres-role/"
+#
+#  setup_additional_users = false
+#  host                   = module.aurora_operational_db.rds_cluster_endpoints["static"]
+#  port                   = 5432
+#  database               = "postgres"
+#  db_username            = local.operational_db_credentials.username
+#  db_master_password     = local.operational_db_credentials.password
+#  db_password            = local.transfer_component_role_credentials.password
+#  rds_role_name          = local.transfer_component_role_credentials.username
+#  read_write_role        = true
+#}
 
 resource "aws_glue_connection" "glue_operational_datastore_connection" {
   count           = (local.environment == "development" ? 1 : 0)
