@@ -547,8 +547,3 @@ resource "aws_iam_role_policy_attachment" "bastion_managed" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   role       = aws_iam_role.ec2_instance_role.name
 }
-
-output "ami_id" {
-  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-  sensitive = true
-}
