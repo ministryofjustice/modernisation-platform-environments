@@ -184,7 +184,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v4a" {
     "--conf"                              = <<EOF
 spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.sql.shuffle.partitions=2001
+--conf spark.sql.shuffle.partitions=2001 
 --conf spark.sql.files.maxPartitionBytes=128m 
 EOF
 
