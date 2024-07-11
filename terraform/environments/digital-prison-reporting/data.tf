@@ -115,3 +115,21 @@ data "aws_secretsmanager_secret_version" "dbt_secrets" {
 data "tls_certificate" "dbt_analytics" {
   url = "https://oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}"
 }
+
+# AWS Secrets Manager for Operational DB Credentials
+data "aws_secretsmanager_secret" "operational_db_secret" {
+  name = aws_secretsmanager_secret.operational_db_secret.name
+}
+
+data "aws_secretsmanager_secret_version" "operational_db_secret_version" {
+  secret_id = data.aws_secretsmanager_secret.operational_db_secret.id
+}
+
+# AWS Secrets Manager for Transfer Component Role Credentials
+data "aws_secretsmanager_secret" "transfer_component_role_secret" {
+  name = aws_secretsmanager_secret.transfer_component_role_secret.name
+}
+
+data "aws_secretsmanager_secret_version" "transfer_component_role_secret_version" {
+  secret_id = data.aws_secretsmanager_secret.transfer_component_role_secret.id
+}
