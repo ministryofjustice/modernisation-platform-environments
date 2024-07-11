@@ -59,7 +59,9 @@ module "test-2c" {
 module "development" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   # This is an internal module so commit hashes are not needed
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v3.0.0"
+#   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v3.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=DSOS-2870/ssm-patch-module-refactor"
+
   count  = local.is-development == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
@@ -69,7 +71,7 @@ module "development" {
   application_name = local.application_name
   approval_days    = "0"
   patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
-  operating_system = "REDHAT_ENTERPRISE_LINUX"
+  operating_system = "WINDOWS"
 
   tags = merge(
     local.tags,
