@@ -1,5 +1,4 @@
 locals {
-  glue_connection_names                 = (local.environment == "development" ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : [])
   operational_db_port                   = 5432
   operational_db_default_database       = "operational_db"
   operational_db_jdbc_connection_string = "jdbc:postgresql://${module.aurora_operational_db.rds_cluster_endpoints["static"]}:${local.operational_db_port}/${local.operational_db_default_database}"
@@ -110,7 +109,6 @@ module "aurora_operational_db" {
 }
 
 resource "aws_glue_connection" "glue_operational_datastore_connection" {
-  count           = (local.environment == "development" ? 1 : 0)
   name            = "${local.project}-operational-datastore-connection"
   connection_type = "JDBC"
 
@@ -123,13 +121,12 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
 
   physical_connection_requirements {
     availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
-    security_group_id_list = [aws_security_group.glue_operational_datastore_connection_sg[0].id]
+    security_group_id_list = [aws_security_group.glue_operational_datastore_connection_sg.id]
     subnet_id              = data.aws_subnet.private_subnets_a.id
   }
 }
 
 resource "aws_security_group" "glue_operational_datastore_connection_sg" {
-  count       = (local.environment == "development" ? 1 : 0)
   name        = "${local.project}-operational-datastore-connection_sg"
   description = "Security group to allow glue access to Operational Datastore via JDBC Connection"
   vpc_id      = data.aws_vpc.shared.id
