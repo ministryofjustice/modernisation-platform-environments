@@ -46,6 +46,7 @@ module "test-2c" {
   severity            = ["Critical","Important"]
   product             = ["RedhatEnterpriseLinux8.5"]
 
+
   tags = merge(
     local.tags,
     {
