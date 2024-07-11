@@ -131,20 +131,10 @@ jobs:
             --force \
             --no-dry-run
       - name: Slack failure notification
-        uses: slackapi/slack-github-action@53b162f7f5bedbf55515caebaee839322b18fb28 # v1.26.0
+        uses: slackapi/slack-github-action@70cd7be8e40a46e8b0eced40b0de447bdb42f68e # v1.26.0
         with:
           payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": ":no_entry: *Failed GitHub Action* :no_entry:\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>\n*Job:* ${{ github.job }}\n*Repo:* ${{ github.repository }}\n*Failed Environment:* ${{ matrix.nuke_accts }}"
-                  }
-                }
-              ]
-            }
+            {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
@@ -199,7 +189,6 @@ jobs:
           AWS_NUKE_VERSION: v2.19.0
       - name: Nuke Plan (Dry Run)
         run: |
-          exit 1
           aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
           $(echo "export AWS_ACCESS_KEY_ID=$(echo $(cat creds) | sed -n 's/.*"AccessKeyId": "\([^"]*\)".*/\1/p')")
           $(echo "export AWS_SECRET_ACCESS_KEY=$(echo $(cat creds) | sed -n 's/.*"SecretAccessKey": "\([^"]*\)".*/\1/p')")
