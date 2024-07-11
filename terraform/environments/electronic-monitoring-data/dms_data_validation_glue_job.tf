@@ -127,8 +127,8 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
     spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
-    --conf spark.sql.parquet.aggregatePushdown=true
-    --conf spark.sql.files.maxPartitionBytes=128m
+    --conf spark.sql.parquet.aggregatePushdown=true 
+    --conf spark.sql.files.maxPartitionBytes=128m 
     EOF
   }
 
@@ -182,12 +182,10 @@ resource "aws_glue_job" "dms_dv_glue_job_v4a" {
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-spark.sql.adaptive.enabled=true 
---conf spark.sql.adaptive.coalescePartitions.enabled=true 
---conf spark.sql.adaptive.skewJoin.enabled=true 
---conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.shuffle.service.enabled=false 
+--conf spark.sql.shuffle.partitions=2001
+--conf spark.sql.files.maxPartitionBytes=128m 
 EOF
 
   }
@@ -238,12 +236,10 @@ resource "aws_glue_job" "dms_dv_glue_job_v4b" {
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-spark.sql.adaptive.enabled=true 
---conf spark.sql.adaptive.coalescePartitions.enabled=true 
---conf spark.sql.adaptive.skewJoin.enabled=true 
---conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.shuffle.service.enabled=false 
+--conf spark.sql.shuffle.partitions=2001 
+--conf spark.sql.files.maxPartitionBytes=128m 
 EOF
 
   }
@@ -293,12 +289,10 @@ resource "aws_glue_job" "dms_dv_glue_job_v4c" {
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-spark.sql.adaptive.enabled=true 
---conf spark.sql.adaptive.coalescePartitions.enabled=true 
---conf spark.sql.adaptive.skewJoin.enabled=true 
---conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.shuffle.service.enabled=false 
+--conf spark.sql.shuffle.partitions=2001 
+--conf spark.sql.files.maxPartitionBytes=128m 
 EOF
 
   }
