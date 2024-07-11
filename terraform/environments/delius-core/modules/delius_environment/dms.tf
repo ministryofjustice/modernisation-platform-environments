@@ -9,7 +9,6 @@ module "dms" {
 
   database_application_passwords_secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
   oracle_db_server_names                = local.oracle_db_server_names
-  business_unit_kms_key_access_arn      = var.db_config.instance_policies.business_unit_kms_key_access.arn
   db_ec2_sg_id                          = module.oracle_db_shared.db_ec2_sg_id
 
   providers = {
