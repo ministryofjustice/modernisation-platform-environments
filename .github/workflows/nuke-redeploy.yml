@@ -89,5 +89,26 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development} "assume_role={role_arn=\"arn:aws:iam::${{ env.BACKEND_NUMBER }}:role/modernisation-account-terraform-state-member-access\"}"
           terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
           bash scripts/terraform-apply.sh terraform/environments/${ACCOUNT_NAME%-development}
+
+      - name: Slack failure notification
+        uses: slackapi/slack-github-action@53b162f7f5bedbf55515caebaee839322b18fb28 # v1.26.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":no_entry: *Failed GitHub Action* :no_entry:\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>\n*Job:* ${{ github.job }}\n*Repo:* ${{ github.repository }}\n*Failed Environment:* ${{ matrix.nuke_accts }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        if: ${{ failure() }}
+
     env:
       ACCOUNT_NAME: ${{ matrix.nuke_accts }}
