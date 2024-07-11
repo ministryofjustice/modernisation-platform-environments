@@ -441,6 +441,7 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].lb
             alarm_target_group_names = [
               "pd-oasys-web-${local.web_live_side}-pb-http-8080",
             ]
@@ -549,6 +550,7 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].lb
             alarm_target_group_names = [
               "pd-oasys-web-${local.web_live_side}-pv-http-8080",
             ]
