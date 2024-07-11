@@ -42,22 +42,6 @@ data "aws_secretsmanager_secret_version" "datamart" {
   depends_on = [aws_secretsmanager_secret.redshift]
 }
 
-# Operational DataStore Secrets for use in DataHub
-data "aws_secretsmanager_secret" "operational_datastore" {
-  count = (local.environment == "development" ? 1 : 0)
-  name  = aws_secretsmanager_secret.operational_datastore[0].id
-
-  depends_on = [aws_secretsmanager_secret_version.operational_datastore[0]]
-}
-
-data "aws_secretsmanager_secret_version" "operational_datastore" {
-  count     = (local.environment == "development" ? 1 : 0)
-  secret_id = data.aws_secretsmanager_secret.operational_datastore[0].id
-
-  depends_on = [aws_secretsmanager_secret.operational_datastore[0]]
-}
-
-
 # AWS _IAM_ Policy
 data "aws_iam_policy" "rds_full_access" {
   arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"

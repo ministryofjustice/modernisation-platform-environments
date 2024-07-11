@@ -1,7 +1,8 @@
 locals {
   glue_connection_names                 = (local.environment == "development" ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : [])
   operational_db_port                   = 5432
-  operational_db_jdbc_connection_string = "jdbc:postgresql://dpr2-834-instance-1.cja8lnnvvipo.eu-west-2.rds.amazonaws.com:${local.operational_db_port}/postgres"
+  operational_db_default_database       = "operational_db"
+  operational_db_jdbc_connection_string = "jdbc:postgresql://${module.aurora_operational_db.rds_cluster_endpoints["static"]}:${local.operational_db_port}/${local.operational_db_default_database}"
 
   name   = "${local.project}-operational-db"
 
