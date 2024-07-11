@@ -12,7 +12,7 @@ module "test-2a" {
   approval_days        = "0"
   patch_schedule       = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
   operating_system     = "WINDOWS"
-  suffix               = "-2a"
+  suffix               = "-win"
   patch_tag            = "eu-west-2a"
   patch_classification = ["SecurityUpdates", "CriticalUpdates"]
   severity            = ["Critical","Important"]
@@ -40,8 +40,8 @@ module "test-2c" {
   approval_days        = "0"
   patch_schedule       = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
   operating_system     = "REDHAT_ENTERPRISE_LINUX"
-  suffix               = "-2c"
-  patch_tag            = "eu-west-2c"
+  suffix               = "-red"
+  patch_tag           = "eu-west-2c"
   patch_classification = ["Security", "Bugfix"]
   severity            = ["Critical","Important"]
   product             = ["RedhatEnterpriseLinux8.5"]
