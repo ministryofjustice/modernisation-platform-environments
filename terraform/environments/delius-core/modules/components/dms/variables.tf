@@ -61,10 +61,6 @@ variable "platform_vars" {
   })
 }
 
-variable "business_unit_kms_key_access_arn" {
-  type = any
-}
-
 variable "db_ec2_sg_id" {
   description = "Security group id of the database EC2 hosts"
   type        = string

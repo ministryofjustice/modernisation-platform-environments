@@ -9,8 +9,11 @@
 # As of date of writing, the AWS_DMS_ENDPOINT resource does not support using Secrets Manager for
 # ASM connectivity as Oracle-specific attributes are not available.
 # A replacement resource, aws_dms_oracle_endpoint, is in development and the following should be replaced
-# once that becomes available.   In the meantime we must specify ASM connectivity configuration within the
-# extra connection attributes.
+# once that becomes available.
+# In the meantime we cannot use Secrets for holding connection details since we have no place where we
+# can define the ASM password.
+# We are therefore restricted to using inline definition of endpoints.  NB: We assume the delius_audit_dms_pool
+# password is the same for both the DB and ASM instances.
 # Reference:  https://github.com/hashicorp/terraform-provider-aws/issues/23506
 resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
    count                           = try(var.dms_config.audit_source_endpoint.read_database, null) == null ? 0 : 1
