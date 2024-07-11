@@ -69,6 +69,7 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
 
 
 resource "aws_iam_role" "dms_clients_may_list_buckets" {
+  count = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
   name = "DMSListBuckets"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
