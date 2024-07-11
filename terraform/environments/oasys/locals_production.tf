@@ -1,5 +1,7 @@
 locals {
 
+  web_live_side = "b"
+
   baseline_presets_production = {
     options = {
       db_backup_lifecycle_rule = "rman_backup_one_month"
@@ -50,8 +52,8 @@ locals {
     ec2_autoscaling_groups = {
       pd-oasys-web-a = merge(local.webserver, {
         autoscaling_group = merge(local.webserver.autoscaling_group, {
-          desired_capacity = 4
-          max_size         = 4
+          desired_capacity = 0
+          max_size         = 0
         })
         config = merge(local.webserver.config, {
           instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
@@ -440,8 +442,7 @@ locals {
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
             alarm_target_group_names = [
-              "pd-oasys-web-a-pb-http-8080",
-              # "pd-oasys-web-b-pb-http-8080",
+              "pd-oasys-web-${local.web_live_side}-pb-http-8080",
             ]
 
             default_action = {
@@ -458,7 +459,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pd-oasys-web-b-pb-http-8080"
+                  target_group_name = "pd-oasys-web-${local.web_live_side}-pb-http-8080"
                 }]
                 conditions = [
                   {
@@ -549,8 +550,7 @@ locals {
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
             alarm_target_group_names = [
-              # "pd-oasys-web-a-pv-http-8080",
-              "pd-oasys-web-b-pv-http-8080",
+              "pd-oasys-web-${local.web_live_side}-pv-http-8080",
             ]
 
             default_action = {
@@ -568,7 +568,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pd-oasys-web-b-pv-http-8080"
+                  target_group_name = "pd-oasys-web-${local.web_live_side}-pv-http-8080"
                 }]
                 conditions = [
                   {
