@@ -121,50 +121,32 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
 
   physical_connection_requirements {
     availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
-    security_group_id_list = [aws_security_group.glue_operational_datastore_connection_sg.id]
+    security_group_id_list = []
+#     security_group_id_list = [aws_security_group.glue_operational_datastore_connection_sg.id]
     subnet_id              = data.aws_subnet.private_subnets_a.id
   }
 }
 
-resource "aws_security_group" "glue_operational_datastore_connection_sg" {
-  name        = "${local.project}-operational-datastore-connection_sg"
-  description = "Security group to allow glue access to Operational Datastore via JDBC Connection"
-  vpc_id      = data.aws_vpc.shared.id
-
-  # This SG is attached to the Glue connection and should also be attached to the Operational Datastore RDS
-  # See https://docs.aws.amazon.com/glue/latest/dg/setup-vpc-for-glue-access.html
-
-  # A self-referencing inbound rule for all TCP ports to enable AWS Glue to communicate between its components
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "TCP"
-    self        = true
-    description = "Security Group can Ingress to itself on all ports - required for Glue to communicate with itself"
-  }
-
-  # Allow all traffic out
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all traffic out from this Security Group"
-  }
-}
-
-# This SG should be attached to the Operational DataStore to allow the transfer component lambda to run migrations
-resource "aws_security_group" "allow_lambda_ingress_to_operational_datastore" {
-  count = local.environment == "development" && local.enable_generic_lambda_sg ? 1 : 0
-
-  name        = "${local.project}-operational-datastore-allow-lambda-ingress_sg"
-  description = "Security group to allow ingress to Operational Datastore from transfer component lambda"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port = local.operational_db_port
-    to_port   = local.operational_db_port
-    protocol  = "tcp"
-    security_groups = [aws_security_group.lambda_generic[0].id]
-  }
-}
+# resource "aws_security_group" "glue_operational_datastore_connection_sg" {
+#   name        = "${local.project}-operational-datastore-connection_sg"
+#   description = "Security group to allow glue access to Operational Datastore via JDBC Connection"
+#   vpc_id      = data.aws_vpc.shared.id
+#
+#   # A self-referencing inbound rule for all TCP ports to enable AWS Glue to communicate between its components
+#   ingress {
+#     from_port   = 0
+#     to_port     = 65535
+#     protocol    = "TCP"
+#     self        = true
+#     description = "Security Group can Ingress to itself on all ports - required for Glue to communicate with itself"
+#   }
+#
+#   # Allow all traffic out
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#     description = "Allow all traffic out from this Security Group"
+#   }
+# }
