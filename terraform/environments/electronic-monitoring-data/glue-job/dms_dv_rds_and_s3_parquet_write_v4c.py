@@ -680,7 +680,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         while (jdbc_partition_col_upperbound+rds_rows_per_batch) <= pkey_max_value:
             loop_count += 1
 
-            jdbc_partition_col_lowerbound = jdbc_partition_col_upperbound+1
+            jdbc_partition_col_lowerbound = 0 if jdbc_partition_col_upperbound == 0 \
+                                                else jdbc_partition_col_upperbound+1
             LOGGER.info(f"""{loop_count}-jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
 
             jdbc_partition_col_upperbound = jdbc_partition_col_lowerbound + rds_rows_per_batch
