@@ -18,8 +18,6 @@ from pyspark.storagelevel import StorageLevel
 # ===============================================================================
 
 sc = SparkContext()
-# sc._jsc.hadoopConfiguration().set("spark.executor.memory", "9g")
-# sc._jsc.hadoopConfiguration().set("spark.executor.cores", "3")
 sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.enabled", "true")
 sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "3g")
 sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.enabled", "true")
