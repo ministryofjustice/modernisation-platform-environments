@@ -29,245 +29,83 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   role       = aws_iam_role.dms-vpc-role.name
 }
 
-# resource "aws_iam_role" "dms-remote-s3-endpoint" {
+# resource "aws_iam_role" "dms_remote_s3_endpoint_writer" {
 #   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
-#   name               = "dms-cloudwatch-logs-role"
+#   name               = "dms-remote-s3-endpoint-role"
 # }
 
-# data "aws_iam_policy_document" "dms-remote-s3-endpoint-access" {
-#   count = lookup(local.oracle_statistics_map[var.env_name], "source_id", null) != null ? 1 : 0
-#   statement {
-#     sid    = "allowAccessToListOracleStatistics${title(local.oracle_statistics_map[var.env_name]["source_environment"])}Bucket"
-#     effect = "Allow"
-#     actions = [
-#       "s3:ListBucket"
-#     ]
-#     resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-statistics-backup-data"]
-#   }
-
-#   statement {
-#     sid    = "allowAccessToOracleStatistics${title(local.oracle_statistics_map[var.env_name]["source_environment"])}BucketObjects"
-#     effect = "Allow"
-#     actions = [
-#       "s3:PutObjectAcl",
-#       "s3:PutObject",
-#       "s3:GetObjectTagging",
-#       "s3:GetObject"
-#     ]
-#     resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-statistics-backup-data/*"]
-#   }
-# }
-
-# data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
-#   count = lookup(local.oracle_statistics_map[var.env_name], "source_id", null) != null ? 1 : 0
-#   statement {
-#     sid    = "allowAccessToOracleDb${title(local.oracle_statistics_map[var.env_name]["source_environment"])}Bucket"
-#     effect = "Allow"
-#     actions = [
-#       "s3:*"
-#     ]
-#     resources = [
-#       "arn:aws:s3:::${local.oracle_backup_bucket_prefix}",
-#       "arn:aws:s3:::${local.oracle_backup_bucket_prefix}/*"
-#     ]
-#   }
-# }
-
-# data "aws_iam_policy_document" "combined" {
-#   source_policy_documents = compact([
-#     try(data.aws_iam_policy_document.oracledb_backup_bucket_access.json, null),
-#     try(data.aws_iam_policy_document.oracle_remote_statistics_bucket_access[0].json, null),
-#     try(data.aws_iam_policy_document.oracledb_remote_backup_bucket_access[0].json, null)
-#   ])
-# }
-
-# resource "aws_iam_policy" "oracledb_backup_bucket_access" {
-
-#   name        = "${var.env_name}-oracle-${var.db_suffix}-backup-bucket-access"
-#   description = "Allow access to Oracle DB Backup Bucket"
-#   policy      = data.aws_iam_policy_document.combined.json
-# }
-
-# resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
-
-#   bucket = "${local.oracle_backup_bucket_prefix}-inventory"
-#   tags = merge(
-#     var.tags,
-#     {
-#       "Name" = "${local.oracle_backup_bucket_prefix}-inventory"
-#     },
-#     {
-#       "Purpose" = "Inventory of Oracle DB Backup Pieces"
-#     },
-#   )
-# }
-
-
-# resource "aws_s3_bucket_versioning" "s3_bucket_oracledb_backups_inventory" {
-
-#   bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
-#   versioning_configuration {
-#     status = "Suspended"
-#   }
-# }
-
-
-# data "aws_caller_identity" "current" {
-# }
-
-# resource "aws_s3_bucket_public_access_block" "oracledb_backups_inventory" {
-
-#   bucket                  = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
-#   block_public_acls       = true # Block public access to buckets and objects granted through *new* access control lists (ACLs)
-#   ignore_public_acls      = true # Block public access to buckets and objects granted through any access control lists (ACLs)
-#   block_public_policy     = true # Block public access to buckets and objects granted through new public bucket or access point policies
-#   restrict_public_buckets = true # Block public and cross-account access to buckets and objects through any public bucket or access point policies
-# }
-
-# data "aws_iam_policy_document" "oracledb_backups_inventory" {
+# data "aws_iam_policy_document" "dms_remote_s3_endpoint_writer" {
+#   count      = try(var.dms_config.audit_target_endpoint.read_database.write_environment, null) == null ? 0 : 1
 #   version = "2012-10-17"
 
 #   statement {
-#     sid       = "InventoryPolicy"
+#     sid       = "DMSS3EndpointPolicy"
 #     effect    = "Allow"
 #     actions   = ["s3:PutObject"]
-#     resources = ["${aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn}/*"]
-
-#     condition {
-#       test     = "StringEquals"
-#       variable = "aws:SourceAccount"
-#       values   = ["${var.account_info.id}"]
-#     }
-
-#     condition {
-#       test     = "StringEquals"
-#       variable = "s3:x-amz-acl"
-#       values   = ["bucket-owner-full-control"]
-#     }
-
-#     condition {
-#       test     = "ArnLike"
-#       variable = "aws:SourceArn"
-#       values   = ["${module.s3_bucket_oracledb_backups.bucket.arn}"]
-#     }
+#     resources = [var.dms_config.audit_target_endpoint.read_database.write_environment]
 
 #     principals {
 #       type        = "Service"
-#       identifiers = ["s3.amazonaws.com"]
+#       identifiers = ["dms.amazonaws.com"]
 #     }
 #   }
 # }
 
+# resource "aws_iam_role_policy" "dms_remote_s3_endpoint_writer_policy" {
+#   name        = "dms-remote-s3-endpoint-writer-policy"
+#   description = "Allow writing of DMS replication data to s3 bucket in another account"
 
-# resource "aws_s3_bucket_policy" "oracledb_backups_inventory_policy" {
-
-#   bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
-#   policy = data.aws_iam_policy_document.oracledb_backups_inventory.json
+#   policy      = data.aws_iam_policy_document.dms_remote_s3_endpoint_writer
 # }
 
-# resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
-
-#   bucket = module.s3_bucket_oracledb_backups.bucket.id
-#   name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backup-pieces"
-
-#   included_object_versions = "Current"
-
-#   optional_fields = ["Size", "LastModifiedDate"]
-
-#   schedule {
-#     frequency = "Daily"
-#   }
-
-#   destination {
-#     bucket {
-#       format     = "CSV"
-#       bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn
-#     }
-#   }
+# resource "aws_iam_policy_attachment" "dms_remote_s3_endpoint_writer_policy_attachment" {
+#   role       = aws_iam_role.dms_remote_s3_endpoint_writer.name
+#   policy_arn = aws_iam_role_policy.dms_remote_s3_endpoint_writer_policy.arn
 # }
 
-# # Bucket for storing Oracle Statistics Backup Dump Files
+# locals {
+#    client_ids = 
+# }
 
-# data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
-#   count   = (lookup(local.oracle_statistics_map[var.env_name], "target_account_id", null) != null) && var.deploy_oracle_stats ? 1 : 0
-#   version = "2012-10-17"
 
-#   statement {
-#     sid       = "OracleStatisticsListPolicy"
-#     effect    = "Allow"
-#     actions   = ["s3:ListBucket"]
-#     resources = ["${module.s3_bucket_oracle_statistics[0].bucket.arn}"]
+resource "aws_iam_role" "dms_clients_may_list_buckets" {
+  name = "DMSListBuckets"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      for principal in var.dms_config.client_account_arns:
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = principal
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
 
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
-#     }
-#   }
+# resource "aws_iam_role_policy" "assume_role_policy" {
+#   provider = aws.target
 
-#   statement {
-#     sid    = "OracleStatisticsObjectPolicy"
-#     effect = "Allow"
-#     actions = [
-#       "s3:PutObjectAcl",
-#       "s3:PutObject",
-#       "s3:GetObjectTagging",
-#       "s3:GetObject"
+#   name   = "AssumeRolePolicy"
+#   role   = aws_iam_role.assume_role.id
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         Effect = "Allow",
+#         Action = [
+#           "s3:ListAllMyBuckets",
+#           "s3:ListBucket"
+#         ],
+#         Resource = "*"
+#       }
 #     ]
-#     resources = ["${module.s3_bucket_oracle_statistics[0].bucket.arn}/*"]
-
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
-#     }
-#   }
+#   })
 # }
 
-
-# module "s3_bucket_oracle_statistics" {
-#   count = var.deploy_oracle_stats ? 1 : 0
-
-#   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
-#   bucket_name         = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-statistics-backup-data"
-#   versioning_enabled  = false
-#   ownership_controls  = "BucketOwnerEnforced"
-#   replication_enabled = false
-#   custom_kms_key      = var.account_config.kms_keys.general_shared
-#   bucket_policy = try([data.aws_iam_policy_document.s3_bucket_oracle_statistics[0].json], [
-#     "{}"
-#   ])
-#   providers = {
-#     aws.bucket-replication = aws.bucket-replication
-#   }
-
-#   lifecycle_rule = [
-#     {
-#       id      = "main"
-#       enabled = "Enabled"
-#       prefix  = ""
-
-#       tags = {
-#         rule      = "log"
-#         autoclean = "true"
-#       }
-
-#       transition = [
-#         {
-#           days          = 90
-#           storage_class = "STANDARD_IA"
-#         }
-#       ]
-
-#       expiration = {
-#         days = 365
-#       }
-#     }
-#   ]
-
-#   tags = var.tags
+# output "role_arn" {
+#   value = aws_iam_role.assume_role.arn
 # }
-
-
-
-
-
 

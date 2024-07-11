@@ -179,7 +179,9 @@ locals {
         read_host              = "standbydb2"
         read_database          = "DMDNDAS2"
     }
-    audit_target_endpoint = {}
+    audit_target_endpoint = {
+        write_environment      = "test"
+    }
     user_source_endpoint = {}
     user_target_endpoint = {
          write_database         = "DMDNDA"

@@ -36,7 +36,7 @@ module "environment_stage" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = local.dms_config_stage
+  dms_config = merge(local.dms_config_stage,{client_account_arns = local.dms_client_account_arns})
 }
 
 module "environment_preprod" {
@@ -72,5 +72,5 @@ module "environment_preprod" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = local.dms_config_preprod
+  dms_config = merge(local.dms_config_preprod,{client_account_arns = local.dms_client_account_arns})
 }

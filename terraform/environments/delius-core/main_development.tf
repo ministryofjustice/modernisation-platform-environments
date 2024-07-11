@@ -35,5 +35,6 @@ module "environment_dev" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = local.dms_config_dev
+  dms_config = merge(local.dms_config_dev,{client_account_arns = local.dms_client_account_arns})
+ 
 }
