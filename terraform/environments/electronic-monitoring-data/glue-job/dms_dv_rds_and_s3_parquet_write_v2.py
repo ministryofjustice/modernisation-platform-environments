@@ -65,7 +65,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 OPTIONAL_INPUTS = [
     "rds_select_db_tbls",
     "rds_exclude_db_tbls",
-    "rds_db_tbl_pkeys_col_list"
+    "rds_db_tbl_pkeys_col_list",
     "rds_df_trim_micro_sec_ts_col_list",
     "rds_read_rows_fetch_size"
 ]
