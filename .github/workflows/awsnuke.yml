@@ -234,7 +234,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": ":no_entry: *Failed GitHub Action* :no_entry:\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>\n*Job:* ${{ github.job }}\n*Repo:* ${{ github.repository }}\n*Failed Environment:* ${{ matrix.nuke_accts }}"
+                    "text": ":no_entry: *Failed GitHub Action* :no_entry:\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>\n*Job:* ${{ github.job }}\n*Repo:* ${{ github.repository }}\n*Failed Environment:* ${{ env.ACCOUNT_NAME }}"
                   }
                 }
               ]
