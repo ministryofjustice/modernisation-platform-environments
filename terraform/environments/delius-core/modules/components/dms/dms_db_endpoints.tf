@@ -18,11 +18,11 @@ resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
    endpoint_id                     = "audit-data-from-${var.dms_config.audit_source_endpoint.read_database}"
    endpoint_type                   = "source"
    engine_name                     = "oracle"
-   username                        = "delius_audit_dms_pool"
-   password                        = join(",",[jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"],jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"])
+   username                        = local.dms_audit_username
+   password                        = join(",",[jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username],jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username]])
    server_name                     = join(".",[var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])
    port                            = local.oracle_port
-   extra_connection_attributes     = "ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".",[var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])}:${local.oracle_port}/+ASM;asm_user=delius_audit_dms_pool;UseBFile=true;UseLogminerReader=false;"
+   extra_connection_attributes     = "ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".",[var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])}:${local.oracle_port}/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
 }
 
 # In repository environments the dms_user_source_endpoint.read_database must be defined
@@ -33,8 +33,8 @@ resource "aws_dms_endpoint" "dms_user_source_endpoint_db" {
    endpoint_id                     = "user-data-from-${var.dms_config.user_source_endpoint.read_database}"
    endpoint_type                   = "source"
    engine_name                     = "oracle"
-   username                        = "delius_audit_dms_pool"
-   password                        = join(",",[jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"],jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)["delius_audit_dms_pool"])
+   username                        = local.dms_audit_username
+   password                        = join(",",[jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username],jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username]])
    server_name                     = join(".",[var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])
-   extra_connection_attributes     = "ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".",[var.oracle_db_server_names[var.dms_config.user_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])}:1521/+ASM;asm_user=delius_audit_dms_pool;UseBFile=true;UseLogminerReader=false;"
+   extra_connection_attributes     = "ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".",[var.oracle_db_server_names[var.dms_config.user_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])}:1521/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
 }
