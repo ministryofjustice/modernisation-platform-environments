@@ -1,3 +1,35 @@
+data "aws_lb" "cdpt-chaps-lb" {
+  name = "cdpt-chaps-lb"
+}
+
+resource "aws_sns_topic" "lb_5xx_alarm_topic" {
+  name = "lb_5xx_alarm_topic"
+}
+
+locals{
+  lb_short_arn = join("/", slice(split("/", module.lb_access_logs_enabled.load_balancer_arn), 1, 4))
+}
+
+# LoadBalancer Alarm
+
+resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
+  alarm_name          = "lb-5xx-errors"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "HTTPCode_ELB_5XX_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = "300"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "This metric monitors 5xx errors on the load balancer"
+  alarm_actions       = [aws_sns_topic.cdpt_chaps_ddos_alarm.arn]
+  dimensions = {
+    LoadBalancer = local.lb_short_arn
+  }
+  treat_missing_data  = "notBreaching"
+}
+
+
 # DDoS Alarm
 
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
@@ -16,6 +48,8 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
     ResourceArn = module.lb_access_logs_enabled.load_balancer.arn
   }
 }
+
+
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "cdpt_chaps_ddos_alarm" {
