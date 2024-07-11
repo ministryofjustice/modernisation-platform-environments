@@ -15,6 +15,14 @@
 # We are therefore restricted to using inline definition of endpoints.  NB: We assume the delius_audit_dms_pool
 # password is the same for both the DB and ASM instances.
 # Reference:  https://github.com/hashicorp/terraform-provider-aws/issues/23506
+data "aws_secretsmanager_secret" "delius_core_application_passwords" {
+  arn = var.database_application_passwords_secret_arn
+}
+
+data "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
+  secret_id = data.aws_secretsmanager_secret.delius_core_application_passwords.id
+}
+
 resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
    count                           = try(var.dms_config.audit_source_endpoint.read_database, null) == null ? 0 : 1
    database_name                   = var.dms_config.audit_source_endpoint.read_database
