@@ -527,7 +527,27 @@ resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_get_put_zip_
 
 resource "aws_iam_role" "load_json_into_athena" {
   name               = "load_json_into_athena"
-  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  
+  assume_role_policy  = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "athena.amazonaws.com"
+        }
+      }
+    ]
+  })
+
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
 
