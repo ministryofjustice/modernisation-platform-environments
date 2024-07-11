@@ -7,7 +7,7 @@ locals {
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_critical_threshold" {
   alarm_name          = "${var.name}-${var.env_name}-ecs-cpu-critical-threshold"
   alarm_description   = "Triggers alarm if ECS CPU crosses a critical threshold"
-  namespace           = "AWS/ECS"
+  namespace           = "AWS/ApplicationELB"
   metric_name         = "CPUUtilization"
   statistic           = "Average"
   period              = "60"
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_critical_threshold" {
 resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_critical_threshold" {
   alarm_name          = "${var.name}-${var.env_name}-ecs-memory-critical-threshold"
   alarm_description   = "Triggers alarm if ECS memory crosses a critical threshold"
-  namespace           = "AWS/ECS"
+  namespace           = "AWS/ApplicationELB"
   metric_name         = "MemoryUtilization"
   statistic           = "Average"
   period              = "60"
@@ -63,7 +63,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
     id          = "m1"
     return_data = true
     metric {
-      namespace   = "AWS/ECS"
+      namespace   = "AWS/ApplicationELB"
       metric_name = "CPUUtilization"
       dimensions = {
         ServiceName = var.name
@@ -99,7 +99,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_threshold" {
     id          = "m1"
     return_data = true
     metric {
-      namespace   = "AWS/ECS"
+      namespace   = "AWS/ApplicationELB"
       metric_name = "MemoryUtilization"
       dimensions = {
         ServiceName = var.name
