@@ -110,6 +110,23 @@ locals {
         })
       })
 
+      dev-donotuse-client-b = merge(local.ec2_autoscaling_groups.client, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.client.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 0
+          warm_pool        = {}
+        })
+        tags = merge(local.ec2_autoscaling_groups.client.tags, {
+          domain-name            = "azure.noms.root"
+          Install-WindowsFeature = "RDS-RD-SERVER -IncludeManagementTools,RDS-Web-Access"
+        })
+        config = merge(local.ec2_autoscaling_groups.client.config, {
+          user_data_raw = base64encode(templatefile("../../modules/baseline-presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "nomis/DSOS-2888/add-rds-role-option"
+          }))
+        })
+      })
+
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
       })
     }
