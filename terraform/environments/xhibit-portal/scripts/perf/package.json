@@ -10,6 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^3.2.3",
-    "tedious": "^14.3.0"
+    "tedious": "^18.2.3"
   }
 }
