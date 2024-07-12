@@ -31,7 +31,7 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
 
 resource "aws_iam_role" "dms_clients_may_list_buckets" {
   count = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
-  name = "DMSListBuckets"
+  name = "dms-list-buckets-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -45,4 +45,46 @@ resource "aws_iam_role" "dms_clients_may_list_buckets" {
       }
     ]
   })
+}
+
+data "aws_iam_policy_document" "dms_s3_buckets_policy" {
+  statement {
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "arn:aws:s3:::*",
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["${var.env_name}-dms-destination-bucket*"]
+    }
+  }
+
+ statement {
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.env_name}-dms-destination-bucket*",
+      "arn:aws:s3:::${var.env_name}-dms-destination-bucket*/*"
+    ]
+  }
+
+}
+
+resource "aws_iam_policy" "dms_s3_buckets_policy" {
+  name        = "dms_s3_buckets_policy"
+  description = "Policy to allow listing and writing S3 buckets with DMS destination prefix"
+  policy      = data.aws_iam_policy_document.dms_s3_buckets_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "dms_s3_buckets_policy_attachment" {
+  role       = aws_iam_role.dms_s3_buckets_role.name
+  policy_arn = aws_iam_policy.dms_s3_buckets_policy.arn
 }
