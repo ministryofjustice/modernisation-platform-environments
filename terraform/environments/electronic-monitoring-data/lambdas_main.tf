@@ -276,3 +276,31 @@ module "unzip_unstructured_files" {
   security_group_ids = [aws_security_group.lambda_db_security_group.id]
   subnet_ids         = data.aws_subnets.shared-public.ids
 }
+
+#-----------------------------------------------------------------------------------
+# Load json data from S3 to Athena
+#-----------------------------------------------------------------------------------
+
+module "load_json_into_athena" {
+    source = "./modules/lambdas"
+    function_name = "load_json_into_athena"
+    is_image = true
+    role_name = aws_iam_role.load_json_into_athena.name
+    role_arn = aws_iam_role.load_json_into_athena.arn
+    memory_size = 10000
+    timeout = 900
+    env_account_id = local.env_account_id
+    core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+    production_dev          = local.is-production ? "prod" : "dev"
+    environment_variables = {
+      DLT_PROJECT_DIR: "/tmp"
+      DLT_DATA_DIR: "/tmp"
+      DLT_PIPELINE_DIR: "/tmp"
+      BUCKET_URL                               = "s3://${aws_s3_bucket.data_store.id}/g4s/dev_access/2024-02-16"
+      QUERY_RESULT_BUCKET                      = "s3://${module.athena-s3-bucket.bucket.id}/output"
+      STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${module.athena-s3-bucket.bucket.id}/output"
+      ATHENA_WORK_GROUP                        = aws_athena_workgroup.default.id
+      DATASET_NAME                             = "atrium_unstructured"
+      SCHEMA_PATH                              = "s3://${module.metadata-s3-bucket.bucket.id}/dlt_schemas"
+      }
+}
