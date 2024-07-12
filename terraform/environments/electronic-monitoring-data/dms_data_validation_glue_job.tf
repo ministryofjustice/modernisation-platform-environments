@@ -130,10 +130,11 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-    spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
-    --conf spark.sql.parquet.aggregatePushdown=true 
-    --conf spark.sql.files.maxPartitionBytes=128m 
-    EOF
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.parquet.aggregatePushdown=true 
+--conf spark.sql.files.maxPartitionBytes=128m 
+EOF
+
   }
 
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
