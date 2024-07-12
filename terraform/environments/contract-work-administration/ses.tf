@@ -1,5 +1,33 @@
 resource "aws_sesv2_email_identity" "cwa" {
   email_identity         = data.aws_route53_zone.external.name
+  dkim_signing_attributes {
+    next_signing_key_length    = "RSA_1024_BIT"
+  }
+  tags = local.tags
+}
+
+resource "aws_sesv2_email_identity_policy" "cwa" {
+  email_identity = aws_sesv2_email_identity.cwa.email_identity
+  policy_name    = "ssvc-ses-permission-${local.environment}"
+
+  policy = <<EOF
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      },
+      "Action": [
+        "ses:SendEmail",
+        "ses:SendRawEmail"
+      ],
+      "Resource": "arn:aws:ses:eu-west-1:${data.aws_caller_identity.current.account_id}:identity/${data.aws_route53_zone.external.name}"
+    }
+  ]
+}
+EOF
 }
 
 resource "aws_route53_record" "ses_dkim" {
