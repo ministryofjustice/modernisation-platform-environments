@@ -200,6 +200,10 @@ locals {
       })
 
       test-nomis-client-a = merge(local.ec2_autoscaling_groups.client, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.client.autoscaling_group, {
+          desired_capacity = 3 # until we get some RD Licences
+          max_size         = 3
+        })
         tags = merge(local.ec2_autoscaling_groups.client.tags, {
           domain-name = "azure.noms.root"
         })
