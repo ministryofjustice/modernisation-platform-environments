@@ -6,16 +6,17 @@ echo "Installing tools required"
 apt-get update
 apt-get -y install python-pip
 apt-get -y install unzip
+pip install --upgrade pip
 pip install ansible
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
-pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+# pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 . ~/.nvm/nvm.sh
 nvm install node
-export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
 
+# export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
 # export LOGS="Postfix-EC2"
 # export APPNAME="${local.application_name_short}"
 export ENV="${local.application_data.accounts[local.environment].env_short}"
@@ -35,7 +36,7 @@ export SESANS=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-v
 mkdir -p /run/cfn-init # Path to store cfn-init scripts
 
 echo "Running Ansible Pull"
-ansible-pull -U https://$SESANS@github.com/ministryofjustice/laa-aws-postfix-smtp aws/app/ansible/adhoc.yml -i aws/app/ansible/inventory/$ENV --limit=smtp --extra-vars "smtp_user_name=$SESU smtp_user_pass=$SESP" -d /root/ansible
+ansible-pull -U https://$SESANS@github.com/ministryofjustice/laa-aws-postfix-smtp aws/app/ansible/adhoc.yml -C TBC -i aws/app/ansible/inventory/$ENV --limit=smtp --extra-vars "smtp_user_name=$SESU smtp_user_pass=$SESP" -d /root/ansible
 
 EOF
 }
@@ -51,7 +52,7 @@ resource "aws_instance" "smtp" {
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.smtp.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.cwa.id
+  iam_instance_profile        = aws_iam_instance_profile.smtp.id
 #   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.smtp_userdata)
   user_data_replace_on_change = true
@@ -123,4 +124,31 @@ resource "aws_secretsmanager_secret" "smtp_sesrsap" {
 resource "aws_secretsmanager_secret" "smtp_sesrsa" {
   name        = "postfix/app/SESRSA"
   description = ""
+}
+
+### SMTP IAM User
+
+resource "aws_iam_user" "smtp" {
+  name = "smtp-${local.application_data.accounts[local.environment].env_short}"
+  tags = {
+    local.tags
+  }
+}
+
+resource "aws_iam_access_key" "smtp" {
+  user = aws_iam_user.smtp.name
+}
+
+data "aws_iam_policy_document" "smtp_user" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendRawEmail"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_user_policy" "smtp_user" {
+  name   = "AmazonSesSendingAccess"
+  user   = aws_iam_user.smtp.name
+  policy = data.aws_iam_policy_document.smtp_user.json
 }
