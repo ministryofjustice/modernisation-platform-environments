@@ -55,7 +55,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "parquet_output_bucket_name",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
-                       "dataframe_repartition_number",
+                       "parquet_df_repartition_num",
+                       "rds_df_repartition_num",
                        "parallel_jdbc_conn_num",
                        "rds_sqlserver_db",
                        "rds_sqlserver_db_schema",
@@ -648,11 +649,11 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                                                           rds_db_name, 
                                                                           rds_tbl_name))
 
-        given_df_repartition_num = int(args['dataframe_repartition_number'])
+        parquet_df_repartition_num = int(args['parquet_df_repartition_num'])
 
         msg_prefix = f"""df_prq_read_t1-{rds_tbl_name}"""
         LOGGER.info(f"""{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
-        df_prq_read_t2 = df_prq_read_t1.repartition(given_df_repartition_num, 
+        df_prq_read_t2 = df_prq_read_t1.repartition(parquet_df_repartition_num, 
                                                     jdbc_partition_column)
         
         msg_prefix = f"""df_prq_read_t2-{rds_tbl_name}"""
@@ -670,6 +671,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
         LOGGER.info(f"""pkey_max_value = {pkey_max_value}""")
 
         # -------------------------------------------------------
+
+        rds_df_repartition_num = int(args['rds_df_repartition_num'])
 
         current_processed_rows = 0
         jdbc_partition_col_upperbound = 0
@@ -702,17 +705,17 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
             additional_msg = trim_str_msg+trim_ts_ms_msg if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
 
-            # if loop_count%20 == 0:
-            #     given_df_repartition_num = given_df_repartition_num - 10
-
-            msg_prefix = f"""df_rds_temp_t3-{rds_tbl_name}"""
-            LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
-            df_rds_temp_t4 = df_rds_temp_t3.repartition(given_df_repartition_num, 
-                                                        jdbc_partition_column)
+            if rds_df_repartition_num != 0:
+                msg_prefix = f"""df_rds_temp_t3-{rds_tbl_name}"""
+                LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
+                df_rds_temp_t4 = df_rds_temp_t3.repartition(rds_df_repartition_num, 
+                                                            jdbc_partition_column)
             
-            msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
-            LOGGER.info(f"""{loop_count}-{msg_prefix}: RDS-DF-Partitions = {df_rds_temp_t4.rdd.getNumPartitions()}""")
-
+                msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
+                LOGGER.info(f"""{loop_count}-{msg_prefix}: RDS-DF-Partitions = {df_rds_temp_t4.rdd.getNumPartitions()}""")
+            else:
+                df_rds_temp_t4 = df_rds_temp_t3.alias("df_rds_temp_t4")
+                
             df_rds_temp_t4_count = df_rds_temp_t4.count()
 
             # -------------------------------------------------------------------------------------------
@@ -735,8 +738,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                     df_prq_read_t2 = df_prq_read_t2.where(f"""not {df_filter_exp}""")
                     
                     if loop_count%10 == 0:
-                        LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({given_df_repartition_num}) on {jdbc_partition_column} <<""")
-                        df_prq_read_t2 = df_prq_read_t2.repartition(given_df_repartition_num, 
+                        LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({parquet_df_repartition_num}) on {jdbc_partition_column} <<""")
+                        df_prq_read_t2 = df_prq_read_t2.repartition(parquet_df_repartition_num, 
                                                                     jdbc_partition_column)
                     # --------------------------------------------------------------------
 
@@ -796,19 +799,22 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                     df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
                     additional_msg = trim_str_msg+trim_ts_ms_msg if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
 
-                    msg_prefix = f"""df_rds_temp_t3-{rds_tbl_name}"""
-                    LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
-                    df_rds_temp_t4 = df_rds_temp_t3.repartition(int(given_df_repartition_num/2), 
-                                                                jdbc_partition_column)
+                    if rds_df_repartition_num != 0:
+                        msg_prefix = f"""df_rds_temp_t3-{rds_tbl_name}"""
+                        LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
+                        df_rds_temp_t4 = df_rds_temp_t3.repartition(int(rds_df_repartition_num/2), 
+                                                                    jdbc_partition_column)
                     
-                    msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
-                    LOGGER.info(f"""{loop_count}-{msg_prefix}: RDS-DF-Partitions = {df_rds_temp_t4.rdd.getNumPartitions()}""")
+                        msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
+                        LOGGER.info(f"""{loop_count}-{msg_prefix}: RDS-DF-Partitions = {df_rds_temp_t4.rdd.getNumPartitions()}""")
+                    else:
+                        df_rds_temp_t4 = df_rds_temp_t3.alias("df_rds_temp_t4")
 
                     df_rds_temp_t4_count = df_rds_temp_t4.count()
 
 
                     df_filter_exp = f"""{jdbc_partition_column} between {jdbc_partition_col_lowerbound} and {jdbc_partition_col_upperbound}"""
-                    df_prq_filtered_t3 = df_prq_read_t2.where(df_filter_exp).coalesce(int(given_df_repartition_num/2))
+                    df_prq_filtered_t3 = df_prq_read_t2.where(df_filter_exp).coalesce(int(parquet_df_repartition_num/2))
                     df_prq_filtered_t3_count = df_prq_filtered_t3.count()
 
                     if df_rds_temp_t4_count == df_prq_filtered_t3_count:
