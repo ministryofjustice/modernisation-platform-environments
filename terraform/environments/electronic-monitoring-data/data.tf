@@ -22,14 +22,3 @@ data "aws_iam_policy_document" "lambda_assume_role" {
   }
 }
 
-data "aws_iam_policy_document" "athena_assume_role" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["athena.amazonaws.com"]
-    }
-    actions = ["sts:AssumeRole"]
-  }
-}
-
