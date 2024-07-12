@@ -12,8 +12,10 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 ./aws/install
 # pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+
+echo "Installing node using nvm"
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-. ~/.nvm/nvm.sh
+. /.nvm/nvm.sh
 nvm install node
 
 # export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
@@ -33,10 +35,10 @@ echo "Getting secrets from Secrets Manager"
 export SESP=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD --query SecretString --output text`
 export SESU=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/APP_DATA_MIGRATION_SMTP_USER --query SecretString --output text`
 export SESANS=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/SESANS --query SecretString --output text`
-mkdir -p /run/cfn-init # Path to store cfn-init scripts
+# mkdir -p /run/cfn-init # Path to store cfn-init scripts
 
 echo "Running Ansible Pull"
-ansible-pull -U https://$SESANS@github.com/ministryofjustice/laa-aws-postfix-smtp aws/app/ansible/adhoc.yml -C TBC -i aws/app/ansible/inventory/$ENV --limit=smtp --extra-vars "smtp_user_name=$SESU smtp_user_pass=$SESP" -d /root/ansible
+ansible-pull -U https://$SESANS@github.com/ministryofjustice/laa-aws-postfix-smtp aws/app/ansible/adhoc.yml -C modernisation-platform -i aws/app/ansible/inventory/$ENV --limit=smtp --extra-vars "smtp_user_name=${aws_iam_access_key.smtp.ses_smtp_password_v4} smtp_user_pass=${aws_iam_access_key.smtp.ses_smtp_password_v4}" -d /root/ansible | tail -n +3
 
 EOF
 }
@@ -104,26 +106,46 @@ resource "aws_vpc_security_group_ingress_rule" "smtp_vpc" {
 resource "aws_secretsmanager_secret" "smtp_user" {
   name        = "postfix/app/APP_DATA_MIGRATION_SMTP_USER"
   description = "IAM user access key for SMTP"
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/APP_DATA_MIGRATION_SMTP_USER" }
+  )
 }
 
 resource "aws_secretsmanager_secret" "smtp_password" {
   name        = "postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD"
   description = "IAM user access secret for SMTP"
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD" }
+  )
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesans" {
   name        = "postfix/app/SESANS"
   description = "Secret to pull from Ansible code from https://github.com/ministryofjustice/laa-aws-postfix-smtp"
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/SESANS" }
+  )
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesrsap" {
   name        = "postfix/app/SESRSAP"
   description = ""
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/SESRSAP" }
+  )
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesrsa" {
   name        = "postfix/app/SESRSA"
   description = ""
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/SESRSA" }
+  )
 }
 
 ### SMTP IAM User
