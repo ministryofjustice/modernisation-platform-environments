@@ -88,5 +88,5 @@ resource "aws_iam_policy" "dms_s3_buckets_policy" {
 resource "aws_iam_role_policy_attachment" "dms_s3_buckets_policy_attachment" {
   count      = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
   role       = aws_iam_role.dms_client_bucket_role[0].name
-  policy_arn = aws_iam_policy.dms_s3_buckets_policy.arn
+  policy_arn = aws_iam_policy.dms_s3_buckets_policy[0].arn
 }
