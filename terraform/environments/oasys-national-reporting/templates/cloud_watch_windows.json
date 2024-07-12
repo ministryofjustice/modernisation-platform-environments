@@ -74,7 +74,35 @@
           "Requests Queued",
           "Application Restarts"
         ]
-      }
+      },
+      "procstat": [
+        {
+          "exe": "ssm-agent",
+          "measurement": [
+            "cpu_time_system",
+            "cpu_time_user",
+            "memory_rss",
+            "num_threads",
+            "pid_count",
+            "pid",
+            "read_bytes",
+            "write_bytes"
+          ]
+        },                
+        {
+          "exe": "amazon-cloudwatch-agent",
+          "measurement": [
+            "cpu_time_system",
+            "cpu_time_user",
+            "memory_rss",
+            "num_threads",
+            "pid_count",
+            "pid",
+            "read_bytes",    
+            "write_bytes"
+          ]
+        }        
+      ]
     },
     "append_dimensions": {
       "ImageId": "${aws:ImageId}",
