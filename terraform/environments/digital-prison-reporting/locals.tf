@@ -19,7 +19,7 @@ locals {
   env                     = local.environment
   s3_kms_arn              = aws_kms_key.s3.arn
   operational_db_kms_arn  = aws_kms_key.operational_db.arn
-  operational_db_kms_id  = aws_kms_key.operational_db.key_id
+  operational_db_kms_id   = aws_kms_key.operational_db.key_id
   kinesis_kms_arn         = aws_kms_key.kinesis-kms-key.arn
   kinesis_kms_id          = data.aws_kms_key.kinesis_kms_key.key_id
   create_bucket           = local.application_data.accounts[local.environment].setup_buckets
