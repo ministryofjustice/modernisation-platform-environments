@@ -1,0 +1,106 @@
+resource "aws_sesv2_email_identity" "cwa" {
+  email_identity         = data.aws_route53_zone.external.zone_id
+}
+
+resource "aws_route53_record" "ses_dkim" {
+  provider = aws.core-vpc
+  count    = 3
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${aws_sesv2_email_identity.cwa.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${data.aws_route53_zone.external.zone_id}"
+  type     = "CNAME"
+  ttl      = "600"
+  records  = ["${aws_sesv2_email_identity.cwa.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"]
+}
+
+
+resource "aws_route53_record" "ses_dmarc" {
+  count    = contains(["development"], local.environment) ? 0 : 1
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "_dmarc.${data.aws_route53_zone.external.zone_id}"
+  type     = "TXT"
+  ttl      = "600"
+  records  = ["v=DMARC1;p=none;sp=none;fo=1;rua=mailto:dmarc-rua@dmarc.service.gov.uk,mailto:dmarc-rua@digital.justice.gov.uk;ruf=mailto:dmarc-ruf@dmarc.service.gov.uk,mailto:dmarc-ruf@digital.justice.gov.uk"]
+}
+
+### SMTP IAM User
+
+resource "aws_iam_user" "smtp" {
+  name = "smtp-${local.application_data.accounts[local.environment].env_short}"
+  tags = local.tags
+}
+
+resource "aws_iam_access_key" "smtp" {
+  user = aws_iam_user.smtp.name
+}
+
+data "aws_iam_policy_document" "smtp_user" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendRawEmail"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_user_policy" "smtp_user" {
+  name   = "AmazonSesSendingAccess"
+  user   = aws_iam_user.smtp.name
+  policy = data.aws_iam_policy_document.smtp_user.json
+}
+
+### SMTP Secrets Creation
+
+resource "aws_secretsmanager_secret" "smtp_user" {
+  name        = "postfix/app/APP_DATA_MIGRATION_SMTP_USER"
+  description = "IAM user access key for SMTP"
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/APP_DATA_MIGRATION_SMTP_USER" }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "smtp_user" {
+  secret_id     = aws_secretsmanager_secret.smtp_user.id
+  secret_string = aws_iam_access_key.smtp.id
+}
+
+resource "aws_secretsmanager_secret" "smtp_password" {
+  name        = "postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD"
+  description = "IAM user access secret for SMTP"
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD" }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "smtp_password" {
+  secret_id     = aws_secretsmanager_secret.smtp_password.id
+  secret_string = aws_iam_access_key.smtp.ses_smtp_password_v4
+}
+
+resource "aws_secretsmanager_secret" "smtp_sesans" {
+  name        = "postfix/app/SESANS"
+  description = "Secret to pull from Ansible code from https://github.com/ministryofjustice/laa-aws-postfix-smtp"
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/SESANS" }
+  )
+}
+
+resource "aws_secretsmanager_secret" "smtp_sesrsap" {
+  name        = "postfix/app/SESRSAP"
+  description = ""
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/SESRSAP" }
+  )
+}
+
+resource "aws_secretsmanager_secret" "smtp_sesrsa" {
+  name        = "postfix/app/SESRSA"
+  description = ""
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/SESRSA" }
+  )
+}
