@@ -24,6 +24,7 @@ locals {
         "ec2",
         "ec2_linux",
         "ec2_instance_linux",
+        # "ec2_instance_textfile_monitoring", # TODO ADD
       ]
       # cloudwatch_metric_alarms_default_actions   = ["dso_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
@@ -31,16 +32,18 @@ locals {
       enable_azure_sas_token              = true
       enable_backup_plan_daily_and_weekly = true
       enable_business_unit_kms_cmks       = true
-      enable_hmpps_domain                 = true # for copycde script
-      enable_image_builder                = true
       enable_ec2_cloud_watch_agent        = true
       enable_ec2_self_provision           = true
-      enable_ec2_user_keypair             = true
-      enable_s3_bucket                    = true
-      enable_s3_software_bucket           = true
-      iam_policies_filter                 = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-      iam_policies_ec2_default            = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-      s3_iam_policies                     = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+      # enable_ec2_session_manager_cloudwatch_logs = true
+      # enable_ec2_ssm_agent_update                = true
+      enable_ec2_user_keypair   = true
+      enable_hmpps_domain       = true # for copycde script
+      enable_image_builder      = true
+      enable_s3_bucket          = true
+      enable_s3_software_bucket = true
+      iam_policies_filter       = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+      iam_policies_ec2_default  = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+      s3_iam_policies           = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }
 

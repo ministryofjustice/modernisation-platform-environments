@@ -6,6 +6,7 @@ locals {
         "ec2_linux",
         "ec2_instance_linux",
         "ec2_instance_filesystems",
+        # "ec2_instance_textfile_monitoring", # TODO ADD
       ]
       sns_topics = {
         pagerduty_integrations = {
@@ -19,64 +20,67 @@ locals {
   baseline_production = {
 
     ec2_instances = {
-      dr-ndh-app-b = merge(local.ndh_app_a, {
+      dr-ndh-app-b = merge(local.ec2_instances.ndh_app, {
         cloudwatch_metric_alarms = merge(
-          local.ndh_app_a.cloudwatch_metric_alarms,
+          local.ec2_instances.ndh_app.cloudwatch_metric_alarms,
           module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_filesystems_check
         )
-        config = merge(local.ndh_app_a.config, {
+        config = merge(local.ec2_instances.ndh_app.config, {
           availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_instances.ndh_app.config.instance_profile_policies, [
             "Ec2pdPolicy",
           ])
         })
-        tags = merge(local.ndh_app_a.tags, {
+        tags = merge(local.ec2_instances.ndh_app.tags, {
           nomis-data-hub-environment = "dr"
         })
       })
 
-      dr-ndh-ems-b = merge(local.ndh_ems_a, {
-        config = merge(local.ndh_ems_a.config, {
+      dr-ndh-ems-b = merge(local.ec2_instances.ndh_ems, {
+        config = merge(local.ec2_instances.ndh_ems.config, {
           availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_instances.ndh_ems.config.instance_profile_policies, [
             "Ec2pdPolicy",
           ])
         })
-        tags = merge(local.ndh_ems_a.tags, {
+        tags = merge(local.ec2_instances.ndh_ems.tags, {
           nomis-data-hub-environment = "dr"
         })
       })
 
-      pd-ndh-app-a = merge(local.ndh_app_a, {
+      pd-ndh-app-a = merge(local.ec2_instances.ndh_app, {
         cloudwatch_metric_alarms = merge(
-          local.ndh_app_a.cloudwatch_metric_alarms,
+          local.ec2_instances.ndh_app.cloudwatch_metric_alarms,
           module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_filesystems_check
         )
-        config = merge(local.ndh_app_a.config, {
+        config = merge(local.ec2_instances.ndh_app.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_instances.ndh_app.config.instance_profile_policies, [
             "Ec2pdPolicy",
           ])
         })
-        tags = merge(local.ndh_app_a.tags, {
+        tags = merge(local.ec2_instances.ndh_app.tags, {
           nomis-data-hub-environment = "pd"
         })
       })
 
-      pd-ndh-ems-a = merge(local.ndh_ems_a, {
-        config = merge(local.ndh_ems_a.config, {
+      pd-ndh-ems-a = merge(local.ec2_instances.ndh_ems, {
+        config = merge(local.ec2_instances.ndh_ems.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_instances.ndh_ems.config.instance_profile_policies, [
             "Ec2pdPolicy",
           ])
         })
-        tags = merge(local.ndh_ems_a.tags, {
+        tags = merge(local.ec2_instances.ndh_ems.tags, {
           nomis-data-hub-environment = "pd"
         })
       })
 
-      production-management-server-2022 = merge(local.management_server_2022, {
-        tags = merge(local.management_server_2022.tags, {
+      production-management-server-2022 = merge(local.ec2_instances.ndh_mgmt, {
+        config = merge(local.ec2_instances.ndh_mgmt.config, {
+          availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.ec2_instances.ndh_mgmt.tags, {
           nomis-data-hub-environment = "production"
         })
       })
@@ -106,10 +110,8 @@ locals {
         records = [
           { name = "preproduction", records = ["ns-1418.awsdns-49.org", "ns-230.awsdns-28.com", "ns-693.awsdns-22.net", "ns-1786.awsdns-31.co.uk"], type = "NS", ttl = "86400" },
           { name = "test", records = ["ns-498.awsdns-62.com", "ns-881.awsdns-46.net", "ns-1294.awsdns-33.org", "ns-1610.awsdns-09.co.uk"], type = "NS", ttl = "86400" },
-          #{ name = "pd-app", type = "A", ttl = 300, records = ["10.40.3.196"] }, #azure
           { name = "pd-app", type = "A", ttl = 300, records = ["10.27.8.136"] }, #aws pd
           #{ name = "pd-app", type = "A", ttl = 300, records = ["10.27.9.33"] }, #aws dr
-          #{ name = "pd-ems", type = "A", ttl = 300, records = ["10.40.3.198"] }, #azure
           { name = "pd-ems", type = "A", ttl = 300, records = ["10.27.8.120"] }, #aws pd
           #{ name = "pd-ems", type = "A", ttl = 300, records = ["10.27.9.228"] }, #aws dr
         ]
@@ -117,8 +119,8 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/ndh/pd" = local.ndh_secretsmanager_secrets
-      "/ndh/dr" = local.ndh_secretsmanager_secrets
+      "/ndh/pd" = local.secretsmanager_secrets.ndh
+      "/ndh/dr" = local.secretsmanager_secrets.ndh
     }
   }
 }
