@@ -121,9 +121,10 @@ locals {
           Install-WindowsFeature = "RDS-RD-SERVER -IncludeManagementTools,RDS-Web-Access"
         })
         config = merge(local.ec2_autoscaling_groups.client.config, {
-          user_data_raw = base64encode(templatefile("../../modules/baseline-presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+          user_data_raw = base64encode(templatefile("../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
             branch = "nomis/DSOS-2888/add-rds-role-option"
-          }))
+          }
+        ))
         })
       })
 
