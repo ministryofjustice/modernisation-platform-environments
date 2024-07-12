@@ -272,13 +272,14 @@ resource "aws_glue_job" "dms_dv_glue_job_v4c" {
     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
     "--dataframe_repartition_number"      = 180
+    "--parallel_jdbc_conn_num"            = 45
     "--rds_sqlserver_db"                  = ""
     "--rds_sqlserver_db_schema"           = ""
     "--rds_sqlserver_db_table"            = ""
     "--rds_db_tbl_pkeys_col_list"         = ""
     "--rds_df_trim_str_col_list"          = ""
     "--rds_df_trim_micro_sec_ts_col_list" = ""
-    "--rds_upperbound_factor"             = 100
+    "--rds_upperbound_factor"             = 45
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
