@@ -117,7 +117,7 @@ locals {
         })
         tags = merge(local.ec2_autoscaling_groups.client.tags, {
           domain-name            = "azure.noms.root"
-          Install-WindowsFeature = "RDS-RD-SERVER"
+          Install-WindowsFeature = "RDS-RD-SERVER:RDS-WEB-ACCESS"
         })
         config = merge(local.ec2_autoscaling_groups.client.config, {
           user_data_raw = base64encode(templatefile("../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
