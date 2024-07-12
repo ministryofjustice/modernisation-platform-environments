@@ -12,11 +12,17 @@ resource "aws_instance" "tariff_app" {
   ami                         = data.aws_ami.shared_ami.id
   associate_public_ip_address = false
   ebs_optimized               = true
-  ##iam_instance_profile        = aws_iam_instance_profile.tariff_ec2_instance_profile.name
+  iam_instance_profile        = aws_iam_instance_profile.tariff_instance_profile.name
   instance_type               = "m5.2xlarge"
   key_name                    = aws_key_pair.key_pair_app.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
+  user_data = <<EOF
+            #!/bin/bash
+            yum update -y
+            yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+            systemctl status amazon-ssm-agent
+            EOF
   user_data_replace_on_change = true
   vpc_security_group_ids = [aws_security_group.tariff_app_security_group.id]
 
