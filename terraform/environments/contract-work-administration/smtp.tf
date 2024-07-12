@@ -130,9 +130,7 @@ resource "aws_secretsmanager_secret" "smtp_sesrsa" {
 
 resource "aws_iam_user" "smtp" {
   name = "smtp-${local.application_data.accounts[local.environment].env_short}"
-  tags = {
-    local.tags
-  }
+  tags = local.tags
 }
 
 resource "aws_iam_access_key" "smtp" {
