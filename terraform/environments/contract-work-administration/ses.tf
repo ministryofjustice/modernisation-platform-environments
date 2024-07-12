@@ -1,12 +1,12 @@
 resource "aws_sesv2_email_identity" "cwa" {
-  email_identity         = data.aws_route53_zone.external.zone_id
+  email_identity         = data.aws_route53_zone.external.name
 }
 
 resource "aws_route53_record" "ses_dkim" {
   provider = aws.core-vpc
   count    = 3
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${aws_sesv2_email_identity.cwa.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${data.aws_route53_zone.external.zone_id}"
+  name     = "${aws_sesv2_email_identity.cwa.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${data.aws_route53_zone.external.name}"
   type     = "CNAME"
   ttl      = "600"
   records  = ["${aws_sesv2_email_identity.cwa.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"]
@@ -17,7 +17,7 @@ resource "aws_route53_record" "ses_dmarc" {
   count    = contains(["development"], local.environment) ? 0 : 1
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "_dmarc.${data.aws_route53_zone.external.zone_id}"
+  name     = "_dmarc.${data.aws_route53_zone.external.name}"
   type     = "TXT"
   ttl      = "600"
   records  = ["v=DMARC1;p=none;sp=none;fo=1;rua=mailto:dmarc-rua@dmarc.service.gov.uk,mailto:dmarc-rua@digital.justice.gov.uk;ruf=mailto:dmarc-ruf@dmarc.service.gov.uk,mailto:dmarc-ruf@digital.justice.gov.uk"]
