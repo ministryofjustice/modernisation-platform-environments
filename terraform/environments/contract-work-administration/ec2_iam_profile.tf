@@ -187,3 +187,8 @@ resource "aws_iam_role_policy_attachment" "smtp" {
   role       = aws_iam_role.smtp.name
   policy_arn = aws_iam_policy.smtp.arn
 }
+
+resource "aws_iam_role_policy_attachment" "smtp_ssm" {
+  role       = aws_iam_role.smtp.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
