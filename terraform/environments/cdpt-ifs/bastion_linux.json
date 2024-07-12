@@ -1,13 +1,16 @@
 {
   "keys": {
     "development": {
-      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk"
+      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk",
+      "fshafaatmoj": "ssh-ed25519 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUxOQAAACBL7yJWa+B+hyn4d+OiDmUwpu/S8r/pgMQ+VB2Foh5qRgAAAKgwsFrDMLBawwAAAAtzc2gtZWQyNTUxOQAAACBL7yJWa+B+hyn4d+OiDmUwpu/S8r/pgMQ+VB2Foh5qRgAAAECgQ7cw6whA4tOyi20Yl1gkOo9jjWYtCqoJtP0LAPyt9EvvIlZr4H6HKfh346IOZTCm79Lyv+mAxD5UHYWiHmpGAAAAJGZhd2F6LnNoYWZhYXRAZGlnaXRhbC5qdXN0aWNlLmdvdi51awE= fawaz.shafaat@digital.justice.gov.uk"
     },
     "preproduction": {
-      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk"
+      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk",
+      "fshafaatmoj": "ssh-ed25519 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUxOQAAACBL7yJWa+B+hyn4d+OiDmUwpu/S8r/pgMQ+VB2Foh5qRgAAAKgwsFrDMLBawwAAAAtzc2gtZWQyNTUxOQAAACBL7yJWa+B+hyn4d+OiDmUwpu/S8r/pgMQ+VB2Foh5qRgAAAECgQ7cw6whA4tOyi20Yl1gkOo9jjWYtCqoJtP0LAPyt9EvvIlZr4H6HKfh346IOZTCm79Lyv+mAxD5UHYWiHmpGAAAAJGZhd2F6LnNoYWZhYXRAZGlnaXRhbC5qdXN0aWNlLmdvdi51awE= fawaz.shafaat@digital.justice.gov.uk"
     },
     "production": {
-      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk"
+      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk",
+      "fshafaatmoj": "ssh-ed25519 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUxOQAAACBL7yJWa+B+hyn4d+OiDmUwpu/S8r/pgMQ+VB2Foh5qRgAAAKgwsFrDMLBawwAAAAtzc2gtZWQyNTUxOQAAACBL7yJWa+B+hyn4d+OiDmUwpu/S8r/pgMQ+VB2Foh5qRgAAAECgQ7cw6whA4tOyi20Yl1gkOo9jjWYtCqoJtP0LAPyt9EvvIlZr4H6HKfh346IOZTCm79Lyv+mAxD5UHYWiHmpGAAAAJGZhd2F6LnNoYWZhYXRAZGlnaXRhbC5qdXN0aWNlLmdvdi51awE= fawaz.shafaat@digital.justice.gov.uk"
     }
   }
 }
