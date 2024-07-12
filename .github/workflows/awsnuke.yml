@@ -102,7 +102,7 @@ jobs:
           chmod +x $HOME/bin/aws-nuke
           echo "END: Install AWS Nuke"
         env:
-          AWS_NUKE_VERSION: v2.19.0
+          AWS_NUKE_VERSION: v2.25.0
       - name: Nuke Plan (Dry Run)
         run: |
           aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
@@ -186,7 +186,7 @@ jobs:
           chmod +x $HOME/bin/aws-nuke
           echo "END: Install AWS Nuke"
         env:
-          AWS_NUKE_VERSION: v2.19.0
+          AWS_NUKE_VERSION: v2.25.0
       - name: Nuke Plan (Dry Run)
         run: |
           aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
