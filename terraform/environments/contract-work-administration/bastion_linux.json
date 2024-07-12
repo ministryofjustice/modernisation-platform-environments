@@ -2,7 +2,8 @@
   "keys": {
     "development": {
       "vincent": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDuFHvGG5DBE8ukfCFhLYw8RdJnk3sr4Xv9bOwkuW9Hzob4uiyR93C/+Kp/QUd3aokYPW8SueylrBOGvF/NtipTmXkjW0jNP/7t2bZDp1ZbZaORm4jAtPnISXPQ01zNxHUthlkKxMY+YUownKRi3kTAbwRyUZsbfvYYLXxhC19dCrwBbqwFHnuX5SNfDMc/jVyCH/sxjMoYL+CbV7D8EEGIOJqNF0ocyADWSsyfA2G9OL8bM5kdoCWWZkweA6eByqhqDeXtxkxJmDvLopF/7MyqRYoIh1kzYMBHUf3f0iSnOsmT0EhT3Sj4UNv8h3FDfzyJx/A7Qm+M9lS9Mfh2RenX+YHlqZeUfC+981+2q7wbKkctWAfzdgaFsd6xD2XcUPsX3P2rzmBozRc8nYqZ36JdCe4gTPe+aBmhipsXMJU/qdoqOSiJpi8YhiJ9P6/XKRn12ksZVQ4YnMvp6H0nHM0wJIacbyocHzYBOFDlaJYiiQJDegOXDKrz+C2m6Vk4Xns= vincent.cheung@MJ004609",
-      "saanchi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMAY8Vb7XTq4gpyAO1s7HsNpwlteXkuTTa+UpRQtaHW1 saanchi.dubey@L0517"
+      "saanchi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMAY8Vb7XTq4gpyAO1s7HsNpwlteXkuTTa+UpRQtaHW1 saanchi.dubey@L0517",
+      "vladimir": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILbQQtjGI4F8ShGceeIowUzsCcmuwpITIo6K74lo3WP5 vladimirs.kovalovs@L0854"
     },
     "preproduction": {},
     "production": {}
