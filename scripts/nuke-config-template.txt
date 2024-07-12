@@ -108,6 +108,8 @@ presets:
       SSMParameter:
         - property: tag:component
           value: "delegate-access"
+        - property: tag:component
+          value: "member-bootstrap"
       ConfigServiceConfigRule:
         - type: glob
           value: "securityhub-*"
