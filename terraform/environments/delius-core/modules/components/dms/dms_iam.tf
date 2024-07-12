@@ -79,12 +79,14 @@ data "aws_iam_policy_document" "dms_s3_buckets_policy" {
 }
 
 resource "aws_iam_policy" "dms_s3_buckets_policy" {
+  count       = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
   name        = "dms_s3_buckets_policy"
   description = "Policy to allow listing and writing S3 buckets with DMS destination prefix"
   policy      = data.aws_iam_policy_document.dms_s3_buckets_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "dms_s3_buckets_policy_attachment" {
-  role       = aws_iam_role.dms_client_bucket_role.name
+  count      = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
+  role       = aws_iam_role.dms_client_bucket_role[0].name
   policy_arn = aws_iam_policy.dms_s3_buckets_policy.arn
 }
