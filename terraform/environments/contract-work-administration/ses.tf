@@ -23,7 +23,7 @@ resource "aws_sesv2_email_identity_policy" "cwa" {
         "ses:SendEmail",
         "ses:SendRawEmail"
       ],
-      "Resource": "arn:aws:ses:eu-west-1:${data.aws_caller_identity.current.account_id}:identity/${data.aws_route53_zone.external.name}"
+      "Resource": "arn:aws:ses:eu-west-2:${data.aws_caller_identity.current.account_id}:identity/${data.aws_route53_zone.external.name}"
     }
   ]
 }
