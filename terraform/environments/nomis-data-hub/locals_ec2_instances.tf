@@ -106,7 +106,10 @@ locals {
     }
 
     ndh_mgmt = {
-      # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+      cloudwatch_metric_alarms = merge(
+        module.baseline_presets.cloudwatch_metric_alarms.ec2,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+      )
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2023-*"
         ebs_volumes_copy_all_from_ami = false

@@ -75,6 +75,19 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
         ]
       }
+      "nomis-data-hub-${local.environment}" = {
+        account_name   = "nomis-data-hub-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_filesystems,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
+        ]
+      }
       "corporate-staff-rostering-${local.environment}" = {
         account_name   = "corporate-staff-rostering-${local.environment}"
         periodOverride = "auto"
