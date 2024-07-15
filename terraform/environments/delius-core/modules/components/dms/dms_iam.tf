@@ -150,7 +150,7 @@ resource "aws_iam_role_policy_attachment" "dms_s3_assume_bucket_role_in_resposit
 }
 
 resource "aws_iam_role_policy_attachment" "dms_s3_assume_bucket_role_in_respository_attachment_for_debug" {
-  count       = local.delius_account_id ==  326912278139 ? 1 : 0
+  count       = local.account_id == "326912278139" ? 1 : 0
   role       = "AWSReservedSSO_modernisation-platform-developer_4d411ef0fd3a5613"
   policy_arn = aws_iam_policy.dms_s3_assume_bucket_role_in_respository[0].arn
 }
