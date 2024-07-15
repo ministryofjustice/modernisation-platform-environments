@@ -27,7 +27,7 @@ resource "random_password" "app_new_password" {
 
 resource "aws_lambda_function" "app_setup_db" {
   for_each      = var.web_app_services
-  filename      = "lambda.zip"
+  filename      = "lambda_function/deployment_package.zip"
   function_name = "${each.value.name_prefix}-setup-db"
   role          = aws_iam_role.lambda_role.arn
   handler       = "index.handler"
@@ -45,15 +45,6 @@ resource "aws_lambda_function" "app_setup_db" {
       APP_FOLDER    = each.value.sql_migration_path
     }
   }
-
-  layers = [aws_lambda_layer_version.pyodbc_layer.arn]
-
-}
-
-resource "aws_lambda_layer_version" "pyodbc_layer" {
-  filename            = "lambda_layer.zip"
-  layer_name          = "pyodbc_layer"
-  compatible_runtimes = ["python3.8"]
 }
 
 # resource "null_resource" "app_setup_db" {
