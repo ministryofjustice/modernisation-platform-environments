@@ -114,32 +114,15 @@ resource "random_password" "app_new_password" {
   special = false
 }
 
-resource "aws_iam_role" "lambda_role" {
-  name = "lambda_tribunals_db_setup_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action = "sts:AssumeRole",
-        Effect = "Allow",
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
 resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
-  role       = aws_iam_role.lambda_role.name
+  role       = var.db_role_name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_lambda_function" "app_setup_db" {
   filename         = "lambda.zip"
   function_name    = "app_setup_db"
-  role             = aws_iam_role.lambda_role.arn
+  role             = var.db_role_arn
   handler          = "index.handler"
   runtime          = "python3.8"
   timeout          = 300
