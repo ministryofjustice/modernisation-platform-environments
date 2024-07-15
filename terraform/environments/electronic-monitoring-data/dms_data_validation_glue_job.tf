@@ -163,7 +163,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v4d" {
     "--rds_sqlserver_db_schema"           = ""
     "--rds_sqlserver_db_table"            = ""
     "--rds_db_tbl_pkeys_col_list"         = ""
-    "--rds_df_trim_str_col_list"          = ""
+    "--rds_df_trim_str_columns"           = "false"
     "--rds_df_trim_micro_sec_ts_col_list" = ""
     "--rds_upperbound_factor"             = 8
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id

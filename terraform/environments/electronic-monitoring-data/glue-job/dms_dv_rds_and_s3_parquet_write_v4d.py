@@ -63,11 +63,11 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_schema",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
-                       "rds_upperbound_factor"
+                       "rds_upperbound_factor",
+                       "rds_df_trim_str_columns"
                        ]
 
 OPTIONAL_INPUTS = [
-    "rds_df_trim_str_col_list",
     "rds_df_trim_micro_sec_ts_col_list"
 ]
 
@@ -322,7 +322,14 @@ def get_rds_tbl_col_attributes(in_rds_db_name, in_tbl_name) -> DataFrame:
             )
 
 
-def rds_df_trim_str_columns(in_rds_df: DataFrame, 
+def rds_df_trim_str_columns(in_rds_df: DataFrame) -> DataFrame:
+    return (in_rds_df.select(
+            *[F.trim(F.col(c[0])).alias(c[0]) if c[1] == 'string' else F.col(c[0])
+              for c in in_rds_df.dtypes])
+            )
+
+
+def rds_df_trim_str_columns_v2(in_rds_df: DataFrame, 
                             in_rds_df_trim_str_col_list) -> DataFrame:
     string_dtype_columns = [c[0] for c in in_rds_df.dtypes 
                             if c[1] == 'string']
@@ -495,18 +502,14 @@ def apply_rds_transforms(df_rds_temp: DataFrame,
     trim_str_msg = ""
 
     t1_rds_str_col_trimmed = False
-    if args.get('rds_df_trim_str_col_list', None) is not None:
+    if args.get("rds_df_trim_str_columns", "false") == "true":
 
-        rds_df_trim_str_col_str = args['rds_df_trim_str_col_list']
-        rds_df_trim_str_col_list = [f"""{column.strip().strip("'").strip('"')}""" 
-                                    for column in rds_df_trim_str_col_str.split(",")]
+        LOGGER.info(f"""Given -> rds_df_trim_str_columns = 'true'""")
+        LOGGER.warn(f""">> Stripping string column spaces <<""")
 
-        trim_msg_prefix = f"""Given -> rds_df_trim_str_col_list = {rds_df_trim_str_col_list}"""
-        LOGGER.warn(f"""{trim_msg_prefix}, {type(rds_df_trim_str_col_list)}""")
+        df_rds_temp_t1 = df_rds_temp.transform(rds_df_trim_str_columns)
+
         trim_str_msg = f""" [str column(s) - extra spaces trimmed]"""
-
-        df_rds_temp_t1 = df_rds_temp.transform(rds_df_trim_str_columns, 
-                                                rds_df_trim_str_col_list)
         t1_rds_str_col_trimmed = True
     # -------------------------------------------------------
 
@@ -723,7 +726,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
             # rds_rows_filtered_from_prq_df = df_prq_read_t2.alias("L")\
             #                         .join(df_rds_temp_t4.alias("R"), on=jdbc_partition_column, how='left')\
-            #                         .where(" and ".join([f"L.{column} != R.{column}" 
+            #                         .where(" or ".join([f"L.{column} != R.{column}" 
             #                                              for column in df_rds_temp_t4.columns
             #                                              if column != jdbc_partition_column]))\
             #                         .select("L.*")
@@ -793,7 +796,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
                 # rds_rows_filtered_from_prq_df = df_prq_read_t2.alias("L")\
                 #                         .join(df_rds_temp_t4.alias("R"), on=jdbc_partition_column, how='left')\
-                #                         .where(" and ".join([f"L.{column} != R.{column}" 
+                #                         .where(" or ".join([f"L.{column} != R.{column}" 
                 #                                              for column in df_rds_temp_t4.columns
                 #                                              if column != jdbc_partition_column]))\
                 #                         .select("L.*")

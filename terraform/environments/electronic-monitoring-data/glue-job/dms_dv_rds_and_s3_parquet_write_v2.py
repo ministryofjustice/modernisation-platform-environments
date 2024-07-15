@@ -532,8 +532,8 @@ def process_dv_for_table(rds_db_name,
         trim_str_msg = ""
         t2_rds_str_col_trimmed = False
         if args.get("rds_df_trim_str_columns", "false") == "true":
-            msg_prefix = f"""Given -> rds_df_trim_str_columns = 'true'"""
-            LOGGER.info(f"""{msg_prefix}. Stripping string column spaces.""")
+            LOGGER.info(f"""Given -> rds_df_trim_str_columns = 'true'""")
+            LOGGER.warn(f""">> Stripping string column spaces <<""")
 
             df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_str_columns)
 
