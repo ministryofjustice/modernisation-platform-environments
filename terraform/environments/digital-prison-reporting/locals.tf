@@ -301,14 +301,14 @@ locals {
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 
-  # Setup Athena Workgroups 
+  # Setup Athena Workgroups
   setup_dpr_generic_athena_workgroup       = local.application_data.accounts[local.environment].dpr_generic_athena_workgroup
   setup_analytics_generic_athena_workgroup = local.application_data.accounts[local.environment].analytics_generic_athena_workgroup
 
   # Sonatype Secrets
   setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
 
-  # Nomis Secrets PlaceHolder 
+  # Nomis Secrets PlaceHolder
   nomis_secrets_placeholder = {
     db_name  = "nomis"
     password = "placeholder"
@@ -319,7 +319,7 @@ locals {
     port     = "1521"
   }
 
-  # Bodmis Secrets PlaceHolder 
+  # Bodmis Secrets PlaceHolder
   bodmis_secrets_placeholder = {
     db_name  = "bodmis"
     password = "placeholder"
@@ -373,7 +373,7 @@ locals {
     cloud_platform_k8s_cluster_context = "placeholder"
   }
 
-  # Analytics Platform, DBT Secrets 
+  # Analytics Platform, DBT Secrets
   enable_dbt_k8s_secrets = local.application_data.accounts[local.environment].enable_dbt_k8s_secrets
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder"
@@ -393,6 +393,9 @@ locals {
     port                = "5439"
     username            = module.datamart.redshift_master_user
   }
+
+  analytical_platform_sharing = can(local.application_data.accounts[local.environment].analycal_platform_share.target_account_id)
+
 
   all_tags = merge(
     local.tags,

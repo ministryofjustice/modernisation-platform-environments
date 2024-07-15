@@ -41,6 +41,26 @@ data "aws_iam_policy_document" "glue-policy-data" {
       type        = "AWS"
     }
   }
+  statement {
+    # Required for cross-account sharing via LakeFormation if producer has existing Glue policy
+    # ref: https://docs.aws.amazon.com/lake-formation/latest/dg/hybrid-cross-account.html
+    effect = "Allow"
+
+    actions = [
+      "glue:ShareResource"
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ram.amazonaws.com"]
+    }
+
+    resources = [
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/*/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
+    ]
+  }
 }
 
 # Resuse for all S3 read Only
@@ -412,7 +432,7 @@ resource "aws_iam_role_policy" "dmsvpcpolicy" {
 EOF
 }
 
-### Iam User Role for AWS Redshift Spectrum, 
+### Iam User Role for AWS Redshift Spectrum,
 resource "aws_iam_role" "redshift-spectrum-role" {
   name = "${local.project}-redshift-spectrum-role"
 
@@ -713,4 +733,86 @@ resource "aws_iam_policy" "glue_catalog_readonly" {
   name        = "${local.project}-glue-catalog-readonly"
   description = "Glue Catalog Readonly Policy"
   policy      = data.aws_iam_policy_document.glue_catalog_readonly.json
+}
+
+# Analytical Platform Share Policy & Role
+
+data "aws_iam_policy_document" "analytical_platform_share_policy" {
+  for_each = local.analytical_platform_share
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:RegisterResource",
+      "lakeformation:DeregisterResource",
+      "lakeformation:ListPermissions"
+    ]
+    resources = [
+      "arn:aws:lakeformation:${local.current_account_region}:${local.current_account_id}:catalog:${local.current_account_id}"
+    ]
+  }
+
+  statement {
+    effect  = "Allow"
+    actions = ["iam:PutRolePolicy"]
+    resources = [
+      "arn:aws:iam::${local.current_account_id}:role/*/AWSServiceRoleForLakeFormationDataAccess"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ram:CreateResourceShare",
+      "ram:DeleteResourceShare"
+    ]
+    resources = [
+      "arn:aws:ram:${local.current_account_region}:${local.current_account_id}:resource-share/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetPartition"
+    ]
+    resources = concat(
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/${local.analytical_platform_share.glue_database}",
+      formatlist("arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/${local.analytical_platform_share.glue_database}/%s", [local.analytical_platform_share.glue_tables]),
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
+    )
+  }
+}
+
+resource "aws_iam_role" "analytical_platform_share_role" {
+  for_each = local.analytical_platform_share
+
+  name = "analytical-platform-share-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${each.value.target_account_id}:root"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
+  for_each = local.analytical_platform_share
+
+  name   = "analytical-platform-share-policy"
+  role   = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy = data.aws_iam_policy_document.analytical_platform_share_policy[each.key].json
 }
