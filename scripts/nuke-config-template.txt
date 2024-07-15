@@ -101,15 +101,11 @@ presets:
       EC2VPC:
         - property: tag:component
           value: "secure-baselines"
-      ElasticacheCacheParameterGroup:
-        - property: GroupName
-          type: glob
-          value: "default.*"
       KMSKey:
         - property: tag:component
           value: "secure-baselines"
       OSPackage:
-        - property: Packagename
+        - property: PackageName
           type: regex
           value: "^(opensearch-)?analysis-.+$"
       S3Bucket:
