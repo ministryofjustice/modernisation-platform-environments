@@ -25,30 +25,30 @@ resource "random_password" "app_new_password" {
   special = false
 }
 
-resource "aws_lambda_function" "app_setup_db" {
-  for_each      = var.web_app_services
-  filename      = "lambda.zip"
-  function_name = "${each.value.name_prefix}-setup-db"
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "index.handler"
-  runtime       = "python3.8"
-  timeout       = 300
+# resource "aws_lambda_function" "app_setup_db" {
+#   for_each      = var.web_app_services
+#   filename      = "lambda.zip"
+#   function_name = "${each.value.name_prefix}-setup-db"
+#   role          = aws_iam_role.lambda_role.arn
+#   handler       = "index.handler"
+#   runtime       = "python3.8"
+#   timeout       = 300
 
-  environment {
-    variables = {
-      DB_URL        = aws_db_instance.rdsdb.address
-      USER_NAME     = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-      PASSWORD      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-      NEW_DB_NAME   = each.value.app_db_name
-      NEW_USER_NAME = each.value.app_db_login_name
-      NEW_PASSWORD  = random_password.app_new_password.result
-      APP_FOLDER    = each.value.sql_migration_path
-    }
-  }
+#   environment {
+#     variables = {
+#       DB_URL        = aws_db_instance.rdsdb.address
+#       USER_NAME     = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+#       PASSWORD      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+#       NEW_DB_NAME   = each.value.app_db_name
+#       NEW_USER_NAME = each.value.app_db_login_name
+#       NEW_PASSWORD  = random_password.app_new_password.result
+#       APP_FOLDER    = each.value.sql_migration_path
+#     }
+#   }
 
-  layers = [aws_lambda_layer_version.pyodbc_layer.arn]
+#   layers = [aws_lambda_layer_version.pyodbc_layer.arn]
 
-}
+# }
 
 resource "aws_lambda_layer_version" "pyodbc_layer" {
   filename            = "lambda_layer.zip"
