@@ -128,7 +128,7 @@ locals {
           Install-WindowsFeature = "RDS-RD-SERVER"
         })
         config = merge(local.ec2_autoscaling_groups.client.config, {
-          user_data_raw = base64encode(templatefile("user-data-pwsh-test.yaml.tftpl", {
+          user_data_raw = base64encode(templatefile("templates/user-data-pwsh-test.yaml.tftpl", {
             branch = "nomis/DSOS-2888/add-run-command-option"
           }
         ))
