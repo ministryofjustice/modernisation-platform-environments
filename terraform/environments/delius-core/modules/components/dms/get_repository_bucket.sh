@@ -5,7 +5,9 @@ BUCKET_PREFIX=$1
 BUCKET_ACCOUNT_ID=$2
 
 
-echo "{\"bucket_name\": \"$BUCKET_PREFIX\"}"
+WHOAMI=$(aws sts get-caller-identity | jq -r '.Arn')
+
+echo "{\"bucket_name\": \"$WHOAMI\"}"
 exit 0
 
 for BUCKET in $(aws s3api list-buckets --query "Buckets[].Name" --output text); do
