@@ -19,14 +19,13 @@ locals {
         availability_zone             = "eu-west-2a"
         ebs_volumes_copy_all_from_ami = true
         iam_resource_names_prefix     = "ec2-database"
-        ssm_parameters_prefix         = "ec2/" # TODO: remove
         secretsmanager_secrets_prefix = "ec2/"
         subnet_name                   = "data"
 
         instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "Ec2OracleEnterpriseManagerPolicy",
           "EC2Db",
-          # "SSMManagedInstanceCoreReducedPolicy", # replace with arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
@@ -87,8 +86,8 @@ locals {
       }
 
       tags = {
-        ami                  = "hmpps_ol_8_5_oracledb_19c" # not including as hardening role seems to cause an issue
-        backup               = "false"                     # opt out of mod platform default backup plan
+        ami                  = "hmpps_ol_8_5_oracledb_19c"
+        backup               = "false" # opt out of mod platform default backup plan
         component            = "data"
         instance-scheduling  = "skip-scheduling"
         licence-requirements = "Oracle Enterprise Management"
@@ -96,7 +95,7 @@ locals {
         os-type              = "Linux"
         os-version           = "OL 8.5"
         server-type          = "hmpps-oem"
-        # update-ssm-agent = "patchgroup1" # TODO add
+        update-ssm-agent     = "patchgroup1"
       }
     }
   }
