@@ -56,6 +56,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
                        "parquet_df_repartition_num",
+                       "parquet_df_repartition_frequency",
                        "rds_df_repartition_num",
                        "parallel_jdbc_conn_num",
                        "rds_sqlserver_db",
@@ -674,188 +675,162 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
         rds_df_repartition_num = int(args['rds_df_repartition_num'])
 
-        current_processed_rows = 0
+        rds_rows_read_count = 0
+        total_rds_rows_fetched = 0
+        cumulative_prq_rows_processed = 0
         jdbc_partition_col_upperbound = 0
-        total_row_differences = 0
         additional_msg = ''
 
         loop_count = 0
         while (jdbc_partition_col_upperbound+rds_rows_per_batch) <= pkey_max_value:
             loop_count += 1
 
+            # EVALUATE LOWER & UPPER BOUND VALUES OF PARTITION / PRIMARY KEY COLUMN
             jdbc_partition_col_lowerbound = 0 if jdbc_partition_col_upperbound == 0 \
                                                 else jdbc_partition_col_upperbound+1
             LOGGER.info(f"""{loop_count}-jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
 
             jdbc_partition_col_upperbound = jdbc_partition_col_lowerbound + rds_rows_per_batch
             LOGGER.info(f"""{loop_count}-jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
-
-            # df_rds_temp = get_rds_df_between_pkey_ids(rds_db_name, rds_tbl_name, 
-            #                                           jdbc_partition_column,
-            #                                           jdbc_partition_col_lowerbound,
-            #                                           jdbc_partition_col_upperbound)
             
+            # READ - RDS - BATCH ROWS: START
             df_rds_temp = get_df_read_rds_db_tbl_int_pkey(rds_db_name, rds_tbl_name, 
                                                           jdbc_partition_column,
                                                           jdbc_partition_col_lowerbound,
                                                           jdbc_partition_col_upperbound)
-            
             LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+            # READ - RDS - BATCH ROWS: END
 
+            if rds_df_repartition_num != 0:
+                msg_prefix = f"""df_rds_temp-{rds_tbl_name}"""
+                LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({rds_df_repartition_num}) on {jdbc_partition_column} <<""")
+                df_rds_temp = df_rds_temp.repartition(rds_df_repartition_num, jdbc_partition_column)
+            # -----------------------------------------------------------------
+
+            # TRANSFORM & CACHE - RDS - BATCH ROWS: START
             df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
             additional_msg = trim_str_msg+trim_ts_ms_msg if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
 
-            if rds_df_repartition_num != 0:
-                msg_prefix = f"""df_rds_temp_t3-{rds_tbl_name}"""
-                LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
-                df_rds_temp_t4 = df_rds_temp_t3.repartition(rds_df_repartition_num, 
-                                                            jdbc_partition_column)
+            msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
+            df_rds_temp_t4 = df_rds_temp_t3.cache()
+            LOGGER.info(f"""{loop_count}-{msg_prefix} - Caching the transformed RDS-DB dataframe.".""")
+            # TRANSFORM & CACHE - RDS - BATCH ROWS: END
+
+            # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
             
-                msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
-                LOGGER.info(f"""{loop_count}-{msg_prefix}: RDS-DF-Partitions = {df_rds_temp_t4.rdd.getNumPartitions()}""")
-            else:
-                df_rds_temp_t4 = df_rds_temp_t3.alias("df_rds_temp_t4")
-                
-            df_rds_temp_t4_count = df_rds_temp_t4.count()
+            rds_rows_filtered_from_prq_df = df_prq_read_t2.alias("L")\
+                                                .join(df_rds_temp_t4.alias("R"), on=df_rds_temp_t4.columns, how='leftanti')
 
-            # -------------------------------------------------------------------------------------------
+            # rds_rows_filtered_from_prq_df = df_prq_read_t2.alias("L")\
+            #                         .join(df_rds_temp_t4.alias("R"), on=jdbc_partition_column, how='leftanti')\
+            #                         .where(" and ".join([f"L.{column} = R.{column}" 
+            #                                              for column in df_rds_temp_t4.columns
+            #                                              if column != jdbc_partition_column]))
+            # --------------------------------------------------------------------
 
-            df_filter_exp = f"""{jdbc_partition_column} between {jdbc_partition_col_lowerbound} and {jdbc_partition_col_upperbound}"""
-            df_prq_filtered_t3 = df_prq_read_t2.where(df_filter_exp)
-            df_prq_filtered_t3_count = df_prq_filtered_t3.count()
+            if loop_count%int(args['parquet_df_repartition_frequency']) == 0:
+                msg_prefix = f"""rds_rows_filtered_from_prq_df-{rds_tbl_name}"""
+                LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({parquet_df_repartition_num}) on {jdbc_partition_column} <<""")
+                rds_rows_filtered_from_prq_df = rds_rows_filtered_from_prq_df.repartition(parquet_df_repartition_num, jdbc_partition_column)
 
-            if df_rds_temp_t4_count == df_prq_filtered_t3_count:
-                LOGGER.info(f"""{loop_count}-df_rds_temp_t4_count == df_prq_filtered_t3_count: {df_rds_temp_t4_count}""")
-                df_rds_prq_diff = df_rds_temp_t4.subtract(df_prq_filtered_t3)
-                df_rds_prq_diff_count = df_rds_prq_diff.count()
+            # df_prq_rds_diff_count = rds_rows_filtered_from_prq_df.count()
 
-                if df_rds_prq_diff_count == 0:
-                    msg_prefix = f"""df_prq_read_t2-{rds_tbl_name}"""
+            msg_prefix = f"""df_prq_read_t2-{rds_tbl_name}"""
+            df_prq_read_t2.unpersist()
+            LOGGER.info(f"""{loop_count}-{msg_prefix} - Unperisted.""")
 
-                    df_prq_read_t2.unpersist()
-                    LOGGER.info(f"""{loop_count}-{msg_prefix} - Unperisted.""")
+            df_prq_read_t2 = rds_rows_filtered_from_prq_df.cache()
+            LOGGER.info(f"""{loop_count}-{msg_prefix} - Caching the filtered parquet dataframe.""")
+            # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - END
 
-                    df_prq_read_t2 = df_prq_read_t2.where(f"""not {df_filter_exp}""")
-                    
-                    if loop_count%10 == 0:
-                        LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({parquet_df_repartition_num}) on {jdbc_partition_column} <<""")
-                        df_prq_read_t2 = df_prq_read_t2.repartition(parquet_df_repartition_num, 
-                                                                    jdbc_partition_column)
-                    # --------------------------------------------------------------------
+            # ACTION
+            rds_rows_read_count = df_rds_temp_t4.count()
+            LOGGER.info(f"""{loop_count}-RDS rows fetched = {rds_rows_read_count}""")
+            total_rds_rows_fetched += rds_rows_read_count
 
-                    df_prq_read_t2 = df_prq_read_t2.cache()
-                    LOGGER.info(f"""{loop_count}-{msg_prefix} Cached filtered dataframe.""")
-                else:
+            # ACTION
+            cumulative_prq_rows_processed = df_rds_count - df_prq_read_t2.count()
+            LOGGER.info(f"""{loop_count}-cumulative_prq_rows_processed = {cumulative_prq_rows_processed}""")
 
-                    LOGGER.warn(f"""{loop_count}-df_rds_prq_diff_count ({df_rds_prq_diff_count}): Row differences found.""")
-                    total_row_differences += df_rds_prq_diff_count
-
-                    df_subtract_temp = (df_rds_prq_diff
-                           .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp_t4.columns])))
-                           .selectExpr("json_row")
-                           .limit(1))
-
-                    subtract_validation_msg = f"""'{rds_tbl_name}' - {df_rds_prq_diff_count}"""
-                    df_subtract_temp = df_subtract_temp.selectExpr(
-                                            "current_timestamp as run_datetime",
-                                            "json_row",
-                                            f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
-                                            f"""'{rds_db_name}' as database_name""",
-                                            f"""'{db_sch_tbl}' as full_table_name""",
-                                            """'False' as table_to_ap"""
-                                        )
-                    LOGGER.warn(f"{loop_count}-Validation Failed - 2")
-                    df_dv_output = df_dv_output.union(df_subtract_temp)
-                # -----------------------------------------------------
-            else:
-                LOGGER.error(f"""df_rds_temp_t4_count ({df_rds_temp_t4_count}) != df_prq_filtered_t3_count ({df_prq_filtered_t3_count})""")
-                sys.exit(1)
-            # -------------
-
-            current_processed_rows += df_rds_temp_t4_count
-            
+            df_rds_temp_t4.unpersist(True)
         else:
             if jdbc_partition_col_upperbound <= pkey_max_value:
-                    loop_count += 1
+                loop_count += 1
 
-                    jdbc_partition_col_lowerbound = jdbc_partition_col_upperbound+1
-                    LOGGER.info(f"""{loop_count}-jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
+                # EVALUATE LOWER & UPPER BOUND VALUES OF PARTITION / PRIMARY KEY COLUMN
+                jdbc_partition_col_lowerbound = jdbc_partition_col_upperbound+1
+                LOGGER.info(f"""{loop_count}-jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
 
-                    jdbc_partition_col_upperbound = pkey_max_value
-                    LOGGER.info(f"""{loop_count}-jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
+                jdbc_partition_col_upperbound = pkey_max_value
+                LOGGER.info(f"""{loop_count}-jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
-                    # df_rds_temp = get_rds_df_between_pkey_ids(rds_db_name, rds_tbl_name, 
-                    #                                           jdbc_partition_column,
-                    #                                           jdbc_partition_col_lowerbound,
-                    #                                           jdbc_partition_col_upperbound)
-
-                    df_rds_temp = get_df_read_rds_db_tbl_int_pkey(rds_db_name, rds_tbl_name, 
-                                                                  jdbc_partition_column,
-                                                                  jdbc_partition_col_lowerbound,
-                                                                  jdbc_partition_col_upperbound)
-            
-                    LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
-
-                    df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
-                    additional_msg = trim_str_msg+trim_ts_ms_msg if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
-
-                    if rds_df_repartition_num != 0:
-                        msg_prefix = f"""df_rds_temp_t3-{rds_tbl_name}"""
-                        LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING on {jdbc_partition_column} <<""")
-                        df_rds_temp_t4 = df_rds_temp_t3.repartition(int(rds_df_repartition_num/2), 
-                                                                    jdbc_partition_column)
-                    
-                        msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
-                        LOGGER.info(f"""{loop_count}-{msg_prefix}: RDS-DF-Partitions = {df_rds_temp_t4.rdd.getNumPartitions()}""")
-                    else:
-                        df_rds_temp_t4 = df_rds_temp_t3.alias("df_rds_temp_t4")
-
-                    df_rds_temp_t4_count = df_rds_temp_t4.count()
-
-
-                    df_filter_exp = f"""{jdbc_partition_column} between {jdbc_partition_col_lowerbound} and {jdbc_partition_col_upperbound}"""
-                    df_prq_filtered_t3 = df_prq_read_t2.where(df_filter_exp).coalesce(int(parquet_df_repartition_num/2))
-                    df_prq_filtered_t3_count = df_prq_filtered_t3.count()
-
-                    if df_rds_temp_t4_count == df_prq_filtered_t3_count:
-                        LOGGER.info(f"""{loop_count}-df_rds_temp_t4_count == df_prq_filtered_t3_count: {df_rds_temp_t4_count}""")
-                        df_rds_prq_diff = df_rds_temp_t4.subtract(df_prq_filtered_t3)
-                        df_rds_prq_diff_count = df_rds_prq_diff.count()
-
-                        if df_rds_prq_diff_count != 0:
-                            
-                            LOGGER.warn(f"""{loop_count}-df_rds_prq_diff_count ({df_rds_prq_diff_count}): Row differences found.""")
-                            total_row_differences += df_rds_prq_diff_count
-
-                            df_subtract_temp = (df_rds_prq_diff
-                                .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp_t4.columns])))
-                                .selectExpr("json_row")
-                                .limit(5))
-
-                            subtract_validation_msg = f"""'{rds_tbl_name}' - {df_rds_prq_diff_count}"""
-                            df_subtract_temp = df_subtract_temp.selectExpr(
-                                                    "current_timestamp as run_datetime",
-                                                    "json_row",
-                                                    f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
-                                                    f"""'{rds_db_name}' as database_name""",
-                                                    f"""'{db_sch_tbl}' as full_table_name""",
-                                                    """'False' as table_to_ap"""
-                                                )
-                            LOGGER.warn(f"{loop_count}-Validation Failed - 2")
-                            df_dv_output = df_dv_output.union(df_subtract_temp)
-                        # -----------------------------------------------------
-                    else:
-                        LOGGER.error(f"""{loop_count}-df_rds_temp_t4_count ({df_rds_temp_t4_count}) != df_prq_filtered_t3_count ({df_prq_filtered_t3_count})""")
-                        sys.exit(1)
-                    # ---------------------------------------------------------
-
-                    current_processed_rows += df_rds_temp_t4_count
+                # READ - RDS - BATCH ROWS: START
+                df_rds_temp = get_df_read_rds_db_tbl_int_pkey(rds_db_name, rds_tbl_name, 
+                                                                jdbc_partition_column,
+                                                                jdbc_partition_col_lowerbound,
+                                                                jdbc_partition_col_upperbound)
         
-        LOGGER.info(f"""Total RDS fetch batch count: {loop_count}""")
-        LOGGER.info(f"""Rows processed in all RDS batch fetches: {current_processed_rows}""")
-        LOGGER.info(f"""total_row_differences = {total_row_differences}""")
+                LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+                # READ - RDS - BATCH ROWS: END
 
-        if total_row_differences == 0 and (current_processed_rows == df_rds_count):
+                if rds_df_repartition_num != 0:
+                    msg_prefix = f"""df_rds_temp-{rds_tbl_name}"""
+                    LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({rds_df_repartition_num}) on {jdbc_partition_column} <<""")
+                    df_rds_temp = df_rds_temp.repartition(rds_df_repartition_num, jdbc_partition_column)
+                # -----------------------------------------------------------------
+
+                # TRANSFORM & CACHE - RDS - BATCH ROWS: START
+                df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
+                additional_msg = trim_str_msg+trim_ts_ms_msg if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
+
+                msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
+                df_rds_temp_t4 = df_rds_temp_t3.cache()
+                LOGGER.info(f"""{loop_count}-{msg_prefix} - Caching the transformed RDS-DB dataframe.".""")
+                # TRANSFORM & CACHE - RDS - BATCH ROWS: END
+
+                # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
+
+                rds_rows_filtered_from_prq_df = df_prq_read_t2.alias("L")\
+                                    .join(df_rds_temp_t4.alias("R"), on=df_rds_temp_t4.columns, how='leftanti')
+
+                # rds_rows_filtered_from_prq_df = df_prq_read_t2.alias("L")\
+                #                         .join(df_rds_temp_t4.alias("R"), on=jdbc_partition_column, how='leftanti')\
+                #                         .where(" and ".join([f"L.{column} = R.{column}" 
+                #                                             for column in df_rds_temp_t4.columns
+                #                                             if column != jdbc_partition_column]))
+
+                if loop_count%int(args['parquet_df_repartition_frequency']) == 0:
+                    msg_prefix = f"""rds_rows_filtered_from_prq_df-{rds_tbl_name}"""
+                    LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({int(parquet_df_repartition_num/2)}) on {jdbc_partition_column} <<""")
+                    rds_rows_filtered_from_prq_df = rds_rows_filtered_from_prq_df.repartition(int(parquet_df_repartition_num/2), jdbc_partition_column)
+
+                msg_prefix = f"""df_prq_read_t2-{rds_tbl_name}"""
+                df_prq_read_t2.unpersist()
+                LOGGER.info(f"""{loop_count}-{msg_prefix} - Unperisted.""")
+
+                df_prq_read_t2 = rds_rows_filtered_from_prq_df.cache()
+                LOGGER.info(f"""{loop_count}-{msg_prefix} - Caching the filtered parquet dataframe.""")
+                # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
+
+                # ACTION
+                rds_rows_read_count = df_rds_temp_t4.count()
+                LOGGER.info(f"""{loop_count}-RDS rows fetched = {rds_rows_read_count}""")
+                total_rds_rows_fetched += rds_rows_read_count
+
+                # ACTION
+                cumulative_prq_rows_processed = df_rds_count - df_prq_read_t2.count()
+                LOGGER.info(f"""{loop_count}-cumulative_prq_rows_processed = {cumulative_prq_rows_processed}""")
+
+                df_rds_temp_t4.unpersist(True)
+
+        LOGGER.info(f"""Total RDS fetch batch count: {loop_count}""")
+        LOGGER.info(f"""Total rows processed: {cumulative_prq_rows_processed}""")
+
+        total_row_differences = df_prq_read_t2.count()
+        LOGGER.info(f"""total_row_differences = {total_row_differences}""")
+        df_prq_read_t2.unpersist()
+
+        if total_row_differences == 0 and (total_rds_rows_fetched == cumulative_prq_rows_processed):
             df_temp_row = spark.sql(f"""select 
                                         current_timestamp() as run_datetime, 
                                         '' as json_row,
@@ -867,6 +842,27 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 
             LOGGER.info(f"{rds_tbl_name}: Validation Successful - 1")
             df_dv_output = df_dv_output.union(df_temp_row)
+        else:
+
+            LOGGER.warn(f"""{loop_count}-df_rds_prq_diff_count ({total_row_differences}): Row differences found.""")
+
+            df_subtract_temp = (df_prq_read_t2
+                                    .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp_t4.columns])))
+                                    .selectExpr("json_row")
+                                    .limit(100))
+
+            subtract_validation_msg = f"""'{rds_tbl_name}' - {total_row_differences}"""
+            df_subtract_temp = df_subtract_temp.selectExpr(
+                                    "current_timestamp as run_datetime",
+                                    "json_row",
+                                    f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
+                                    f"""'{rds_db_name}' as database_name""",
+                                    f"""'{db_sch_tbl}' as full_table_name""",
+                                    """'False' as table_to_ap"""
+                                )
+            LOGGER.warn(f"{loop_count}-Validation Failed - 2")
+            df_dv_output = df_dv_output.union(df_subtract_temp)
+        # -----------------------------------------------------
 
     else:
         df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
