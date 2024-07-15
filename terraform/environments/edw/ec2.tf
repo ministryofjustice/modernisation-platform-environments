@@ -76,7 +76,7 @@ resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
 ####### DB Instance #######
 
 resource "aws_key_pair" "edw_ec2_key" {
-  key_name   = "${local.application_name}-ssh-key"
+  key_name   = "${local.application_name}-ssh-key-new"
   public_key = local.application_data.accounts[local.environment].edw_ec2_key
 }
 
