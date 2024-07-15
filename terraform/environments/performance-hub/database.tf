@@ -27,7 +27,7 @@ resource "aws_db_instance" "database" {
   final_snapshot_identifier           = "final-snapshot"
   kms_key_id                          = aws_kms_key.rds.arn
   deletion_protection                 = false
-  option_group_name                   = aws_db_option_group.db_option_group.nßame
+  option_group_name                   = aws_db_option_group.db_option_group.name
   db_subnet_group_name                = aws_db_subnet_group.db.id
   enabled_cloudwatch_logs_exports     = ["error"]
   ca_cert_identifier                  = "rds-ca-rsa2048-g1"
