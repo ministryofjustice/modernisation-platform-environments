@@ -29,10 +29,9 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   role       = aws_iam_role.dms-vpc-role.name
 }
 
-# Allow client accounts to assume this role in the this account when it is the repository
-resource "aws_iam_role" "dms_client_bucket_role" {
-  count = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
-  name = "dms-client-buckets-role"
+resource "aws_iam_role" "dms_client_s3_list_role" {
+ count = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
+  name = "dms-client-s3-list-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -48,10 +47,30 @@ resource "aws_iam_role" "dms_client_bucket_role" {
   })
 }
 
-data "aws_iam_policy_document" "dms_s3_buckets_policy" {
+resource "aws_iam_role" "dms_client_s3_put_role" {
+ count = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
+  name = "dms-client-s3-put-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      for principal in var.dms_config.client_account_arns:
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = principal
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+
+data "aws_iam_policy_document" "dms_client_s3_list_policy_data" {
   statement {
     actions = [
       "s3:ListBucket",
+      "s3:GetBucketAcl"
     ]
 
     resources = [
@@ -64,10 +83,24 @@ data "aws_iam_policy_document" "dms_s3_buckets_policy" {
       values   = ["${var.env_name}-dms-destination-bucket*"]
     }
   }
+}
 
+resource "aws_iam_policy" "dms_client_s3_list_policy" {
+  count       = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
+  name        = "dms-client-s3-list-policy"
+  description = "Policy to allow audit clients listing S3 buckets with DMS destination prefix"
+  policy      = data.aws_iam_policy_document.dms_client_s3_list_policy_data.json
+}
+
+resource "aws_iam_role_policy_attachment" "dms_client_s3_list_policy_attachment" {
+  count      = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
+  role       = aws_iam_role.dms_client_s3_list_role[0].name
+  policy_arn = aws_iam_policy.dms_client_s3_list_policy[0].arn
+}
+
+data "aws_iam_policy_document" "dms_client_s3_put_policy_data"  {
  statement {
     actions = [
-      "s3:GetBucketAcl",
       "s3:PutObject",
       "s3:PutObjectAcl",
     ]
@@ -77,21 +110,21 @@ data "aws_iam_policy_document" "dms_s3_buckets_policy" {
       "arn:aws:s3:::${local.dms_s3_local_bucket_prefix}*/*"
     ]
   }
-
 }
 
-resource "aws_iam_policy" "dms_s3_buckets_policy" {
+resource "aws_iam_policy" "dms_client_s3_put_policy" {
   count       = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
-  name        = "dms_s3_buckets_policy"
-  description = "Policy to allow listing and writing S3 buckets with DMS destination prefix"
-  policy      = data.aws_iam_policy_document.dms_s3_buckets_policy.json
+  name        = "dms-client-s3-put-policy"
+  description = "Policy to allow audit clients putting data to S3 buckets with DMS destination prefix"
+  policy      = data.aws_iam_policy_document.dms_client_s3_put_policy_data.json
 }
 
-resource "aws_iam_role_policy_attachment" "dms_s3_buckets_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "dms_client_s3_put_policy_attachment" {
   count      = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
-  role       = aws_iam_role.dms_client_bucket_role[0].name
-  policy_arn = aws_iam_policy.dms_s3_buckets_policy[0].arn
+  role       = aws_iam_role.dms_client_s3_put_role[0].name
+  policy_arn = aws_iam_policy.dms_client_s3_put_policy[0].arn
 }
+
 
 resource "aws_iam_policy" "dms_s3_audit_target_policy" {
   count       = local.dms_s3_repository_bucket.prefix == null ? 0 : 1
@@ -104,7 +137,6 @@ resource "aws_iam_policy" "dms_s3_audit_target_policy" {
       {
         Effect = "Allow"
         Action = [
-          "s3:ListBucket",
           "s3:GetObject",
           "s3:PutObject"
         ]
@@ -123,12 +155,12 @@ resource "aws_iam_role_policy_attachment" "dms_s3_audit_target_policy_attachment
   policy_arn = aws_iam_policy.dms_s3_audit_target_policy[0].arn
 }
 
-
-# and allow this account to assume the role in the respective repository account when it is the cient
-resource "aws_iam_policy" "dms_s3_assume_bucket_role_in_respository" {
-   count       = local.dms_s3_repository_bucket.account_id == null ? 0 : 1
-   name        = "dms-s3-assume-bucket-role-in-repository"
-   description = "Policy to allow DMS to assume the dms-client-bucket-role in the repository account"
+# Policy to allow terraform to list the buckets in the repository account when it
+# is being run in the client account by assuming the List Buckets role in the repository account
+resource "aws_iam_policy" "terraform_assume_dms_client_s3_list_role_policy" {
+  count       = local.dms_s3_repository_bucket.prefix == null ? 0 : 1
+  name        = "terraform-list-s3-buckets"
+  description = "Policy to allow Terraform access to role for listing s3 buckets in an audit repository account"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -136,21 +168,15 @@ resource "aws_iam_policy" "dms_s3_assume_bucket_role_in_respository" {
       {
         Effect = "Allow"
         Action = "sts:AssumeRole"
-        Resource =  "arn:aws:iam::${local.dms_s3_repository_bucket.account_id}:role/dms-client-buckets-role",
+        Resource = "arn:aws:iam::${local.dms_s3_repository_bucket.account_id}:role/dms-client-s3-list-role"
       }
     ]
   })
 }
 
-
-resource "aws_iam_role_policy_attachment" "dms_s3_assume_bucket_role_in_respository_attachment" {
-  count       = local.dms_s3_repository_bucket.account_id == null ? 0 : 1
-  role       = aws_iam_role.dms-vpc-role.name
-  policy_arn = aws_iam_policy.dms_s3_assume_bucket_role_in_respository[0].arn
-}
-
-resource "aws_iam_role_policy_attachment" "dms_s3_assume_bucket_role_in_respository_attachment_for_debug" {
-  count       = local.account_id == "326912278139" ? 1 : 0
-  role       = "AWSReservedSSO_modernisation-platform-developer_4d411ef0fd3a5613"
-  policy_arn = aws_iam_policy.dms_s3_assume_bucket_role_in_respository[0].arn
+# Attach this policy to the github-actions role since this is the one used to run the Terraform
+resource "aws_iam_role_policy_attachment" "terraform_assume_dms_client_s3_list_role_policy_attachment" {
+  count      = local.dms_s3_repository_bucket.prefix == null ? 0 : 1
+  role       = "github-actions"
+  policy_arn = aws_iam_policy.terraform_assume_dms_client_s3_list_role_policy[0].arn
 }
