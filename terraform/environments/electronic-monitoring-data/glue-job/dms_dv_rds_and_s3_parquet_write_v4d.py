@@ -615,7 +615,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             
             df_dv_output = df_dv_output.union(df_temp_row)
 
-            LOGGER.warn(f"Validation Failed - 3")
+            LOGGER.warn(f"{rds_tbl_name}: Validation Failed - 3")
             LOGGER.info(final_validation_msg)
             return df_dv_output
         else:
@@ -677,7 +677,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
         rds_rows_read_count = 0
         total_rds_rows_fetched = 0
-        cumulative_prq_rows_processed = 0
+        cumulative_matched_rows = 0
         jdbc_partition_col_upperbound = 0
         additional_msg = ''
 
@@ -747,8 +747,8 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             total_rds_rows_fetched += rds_rows_read_count
 
             # ACTION
-            cumulative_prq_rows_processed = df_rds_count - df_prq_read_t2.count()
-            LOGGER.info(f"""{loop_count}-cumulative_prq_rows_processed = {cumulative_prq_rows_processed}""")
+            cumulative_matched_rows = df_rds_count - df_prq_read_t2.count()
+            LOGGER.info(f"""{loop_count}-cumulative_matched_rows = {cumulative_matched_rows}""")
 
             df_rds_temp_t4.unpersist(True)
         else:
@@ -818,20 +818,18 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                 total_rds_rows_fetched += rds_rows_read_count
 
                 # ACTION
-                cumulative_prq_rows_processed = df_rds_count - df_prq_read_t2.count()
-                LOGGER.info(f"""{loop_count}-cumulative_prq_rows_processed = {cumulative_prq_rows_processed}""")
+                cumulative_matched_rows = df_rds_count - df_prq_read_t2.count()
+                LOGGER.info(f"""{loop_count}-cumulative_matched_rows = {cumulative_matched_rows}""")
 
                 df_rds_temp_t4.unpersist(True)
 
         LOGGER.info(f"""Total RDS fetch batch count: {loop_count}""")
-        LOGGER.info(f"""Total rows processed: {cumulative_prq_rows_processed}""")
 
         # ACTION
         total_row_differences = df_prq_read_t2.count()
-        LOGGER.info(f"""total_row_differences = {total_row_differences}""")
         df_prq_read_t2.unpersist()
 
-        if total_row_differences == 0 and (total_rds_rows_fetched == cumulative_prq_rows_processed):
+        if total_row_differences == 0 and (total_rds_rows_fetched == cumulative_matched_rows):
             df_temp_row = spark.sql(f"""select 
                                         current_timestamp() as run_datetime, 
                                         '' as json_row,
@@ -845,7 +843,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             df_dv_output = df_dv_output.union(df_temp_row)
         else:
 
-            LOGGER.warn(f"""{loop_count}-df_rds_prq_diff_count ({total_row_differences}): Row differences found.""")
+            LOGGER.warn(f"""Parquet-RDS Subtract Report: ({total_row_differences}): Row differences found!""")
 
             df_subtract_temp = (df_prq_read_t2
                                     .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp_t4.columns])))
@@ -861,7 +859,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                     f"""'{db_sch_tbl}' as full_table_name""",
                                     """'False' as table_to_ap"""
                                 )
-            LOGGER.warn(f"{loop_count}-Validation Failed - 2")
+            LOGGER.warn(f"{rds_tbl_name}: Validation Failed - 2")
             df_dv_output = df_dv_output.union(df_subtract_temp)
         # -----------------------------------------------------
 
@@ -876,7 +874,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                     '{db_sch_tbl}' as full_table_name,
                                     'False' as table_to_ap
                                 """.strip())
-        LOGGER.warn(f"Validation not applicable - 4")
+        LOGGER.warn(f"{rds_tbl_name}: Validation not applicable - 4")
         df_dv_output = df_dv_output.union(df_temp_row)
     # -------------------------------------------------------
 
