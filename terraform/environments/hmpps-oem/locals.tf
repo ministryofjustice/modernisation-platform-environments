@@ -28,22 +28,26 @@ locals {
         "ec2_instance_linux",
         "ec2_instance_oracle_db_with_backup",
         "ec2_instance_textfile_monitoring",
+        # "ec2_windows",
       ]
+      # cloudwatch_metric_alarms_default_actions = ["dso_pagerduty"] # disabled to prevent duplication on cross-account alarms
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
-      enable_image_builder                        = true
       enable_ec2_cloud_watch_agent                = true
-      enable_ec2_reduced_ssm_policy               = true
-      enable_ec2_self_provision                   = true
       enable_ec2_oracle_enterprise_managed_server = true
-      enable_ec2_user_keypair                     = true
-      enable_s3_db_backup_bucket                  = true
-      enable_s3_bucket                            = true
-      enable_s3_shared_bucket                     = true
-      enable_s3_software_bucket                   = true
-      iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-      iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-      s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+      enable_ec2_reduced_ssm_policy               = true # remove
+      enable_ec2_self_provision                   = true
+      # enable_ec2_session_manager_cloudwatch_logs  = true # TODO
+      enable_ec2_ssm_agent_update = true
+      enable_ec2_user_keypair     = true
+      enable_image_builder        = true
+      enable_s3_bucket            = true
+      enable_s3_db_backup_bucket  = true
+      enable_s3_shared_bucket     = true
+      enable_s3_software_bucket   = true
+      iam_policies_filter         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+      iam_policies_ec2_default    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+      s3_iam_policies             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }
 
