@@ -48,11 +48,12 @@ resource "aws_lambda_function" "app_setup_db" {
 }
 
 resource "null_resource" "app_setup_db" {
+  for_each = aws_lambda_function.app_setup_db
 
   provisioner "local-exec" {
     command = <<-EOT
       aws lambda invoke \
-        --function-name ${aws_lambda_function.app_setup_db.function_name} \
+        --function-name ${each.function_name} \
         --payload '{}' \
         response.json
     EOT
