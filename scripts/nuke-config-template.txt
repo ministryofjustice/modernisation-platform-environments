@@ -102,7 +102,8 @@ presets:
         - property: tag:component
           value: "secure-baselines"
       ElasticacheCacheParameterGroup:
-        - type: glob
+        - property: GroupName
+          type: glob
           value: "default.*"
       KMSKey:
         - property: tag:component
