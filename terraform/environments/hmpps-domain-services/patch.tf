@@ -12,9 +12,9 @@ module "test-2a" {
   approval_days        = "0"
   patch_schedule       = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
   operating_system     = "WINDOWS"
-  suffix               = "-win"
+  suffix                = "-win"
   patch_tag            = "eu-west-2a"
-  patch_classification = ["SecurityUpdates", "CriticalUpdates"]
+  patch_classification  = ["SecurityUpdates", "CriticalUpdates"]
   severity             = ["Critical", "Important"]
   product              = ["WindowsServer2022"]
 
