@@ -115,7 +115,7 @@ resource "random_password" "app_new_password" {
 }
 
 resource "aws_iam_role" "lambda_role" {
-  name = "lambda_db_setup_role"
+  name = "lambda_tribunals_db_setup_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
