@@ -43,7 +43,7 @@ module "test-2c" {
   operating_system     = "REDHAT_ENTERPRISE_LINUX"
   suffix               = "-red"
   patch_tag            = "eu-west-2c"
-  patch_classification  = ["Security", "Bugfix"]
+  patch_classification = ["Security", "Bugfix"]
   severity             = ["Critical", "Important"]
   product              = ["RedhatEnterpriseLinux8.5"]
 
@@ -65,14 +65,14 @@ module "development" {
     aws.bucket-replication = aws
   }
 
-  account_number        = local.environment_management.account_ids[terraform.workspace]
-  application_name      = local.application_name
-  approval_days         = "0"
-  patch_schedule        = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
-  operating_system      = "REDHAT_ENTERPRISE_LINUX"
-  patch_classification   = ["Security", "Bugfix"]
-  severity              = ["Critical", "Important"]
-  product               = ["RedhatEnterpriseLinux8.5"]
+  account_number       = local.environment_management.account_ids[terraform.workspace]
+  application_name     = local.application_name
+  approval_days        = "0"
+  patch_schedule       = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
+  operating_system     = "REDHAT_ENTERPRISE_LINUX"
+  patch_classification = ["Security", "Bugfix"]
+  severity             = ["Critical", "Important"]
+  product              = ["RedhatEnterpriseLinux8.5"]
 
   tags = merge(
     local.tags,
