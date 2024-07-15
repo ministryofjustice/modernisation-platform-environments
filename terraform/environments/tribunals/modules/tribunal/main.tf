@@ -109,11 +109,6 @@ module "app_dms" {
 
 ############################################################################
 
-resource "random_password" "app_new_password" {
-  length  = 16
-  special = false
-}
-
 resource "aws_secretsmanager_secret" "app_db_credentials" {
   name                    = "${local.app}-credentials-db-2"
   recovery_window_in_days = 0
@@ -124,7 +119,7 @@ resource "aws_secretsmanager_secret_version" "app_db_credentials_version" {
   secret_string = <<EOF
 {
   "username": "${local.app_db_login_name}",
-  "password": "${random_password.app_new_password.result}",
+  "password": "${var.new_db_password}",
   "host": "${local.app_rds_url}",
   "database_name": "${local.app_db_name}"
 }

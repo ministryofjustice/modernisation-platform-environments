@@ -20,6 +20,11 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "random_password" "app_new_password" {
+  length  = 16
+  special = false
+}
+
 resource "aws_lambda_function" "app_setup_db" {
   for_each         = var.web_app_services
   filename         = "lambda.zip"
@@ -36,7 +41,7 @@ resource "aws_lambda_function" "app_setup_db" {
       PASSWORD      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
       NEW_DB_NAME   = each.value.app_db_name
       NEW_USER_NAME = each.value.app_db_login_name
-      NEW_PASSWORD  = jsondecode(data.aws_secretsmanager_secret_version.app_db_credentials_version.secret_string)["password"]
+      NEW_PASSWORD  = random_password.app_new_password.result
       APP_FOLDER    = each.value.sql_migration_path
     }
   }

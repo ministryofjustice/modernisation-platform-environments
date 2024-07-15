@@ -8,6 +8,7 @@ locals {
   source_db_user     = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   source_db_password = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
   waf_arn            = aws_wafv2_web_acl.tribunals_web_acl.arn
+  new_db_password    = random_password.app_new_password.result
 }
 
 module "appeals" {
@@ -50,6 +51,7 @@ module "appeals" {
   target_group_attachment_port = var.services["appeals"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "ahmlr" {
@@ -91,6 +93,7 @@ module "ahmlr" {
   target_group_attachment_port = var.services["ahmlr"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "care_standards" {
@@ -132,6 +135,7 @@ module "care_standards" {
   target_group_attachment_port = var.services["care_standards"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "cicap" {
@@ -173,6 +177,7 @@ module "cicap" {
   target_group_attachment_port = var.services["cicap"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "employment_appeals" {
@@ -214,6 +219,7 @@ module "employment_appeals" {
   target_group_attachment_port = var.services["employment_appeals"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "finance_and_tax" {
@@ -255,6 +261,7 @@ module "finance_and_tax" {
   target_group_attachment_port = var.services["finance_and_tax"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "immigration_services" {
@@ -296,6 +303,7 @@ module "immigration_services" {
   target_group_attachment_port = var.services["immigration_services"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "information_tribunal" {
@@ -337,6 +345,7 @@ module "information_tribunal" {
   target_group_attachment_port = var.services["information_tribunal"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "lands_tribunal" {
@@ -378,6 +387,7 @@ module "lands_tribunal" {
   target_group_attachment_port = var.services["lands_tribunal"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "transport" {
@@ -419,6 +429,7 @@ module "transport" {
   target_group_attachment_port = var.services["transport"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = local.new_db_password
 }
 
 module "charity_tribunal_decisions" {
