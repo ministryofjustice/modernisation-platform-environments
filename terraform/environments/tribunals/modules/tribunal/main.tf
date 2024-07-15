@@ -114,13 +114,38 @@ resource "random_password" "app_new_password" {
   special = false
 }
 
-resource "null_resource" "app_setup_db" {
+resource "aws_iam_role" "lambda_role" {
+  name = "lambda_role"
 
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
 
-    environment = {
+resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_lambda_function" "app_setup_db" {
+  filename         = "lambda.zip"
+  function_name    = "app_setup_db"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "index.handler"
+  runtime          = "python3.8"
+  timeout          = 300
+
+  environment {
+    variables = {
       DB_URL        = local.app_rds_url
       USER_NAME     = local.app_rds_user
       PASSWORD      = local.app_rds_password
@@ -129,6 +154,18 @@ resource "null_resource" "app_setup_db" {
       NEW_PASSWORD  = random_password.app_new_password.result
       APP_FOLDER    = local.sql_migration_path
     }
+  }
+}
+
+resource "null_resource" "app_setup_db" {
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      aws lambda invoke \
+        --function-name ${aws_lambda_function.app_setup_db.function_name} \
+        --payload '{}' \
+        response.json
+    EOT
   }
 
   triggers = {
