@@ -120,11 +120,3 @@ variable "target_group_arns_sftp" {
   description = "Map of target group ARNs for sftp"
   type        = map(string)
 }
-
-variable "db_role_name" {
-  description = "Lambda role name"
-}
-
-variable "db_role_arn" {
-  description = "Lambda role arn"
-}

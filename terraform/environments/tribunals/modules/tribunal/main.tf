@@ -114,48 +114,6 @@ resource "random_password" "app_new_password" {
   special = false
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
-  role       = var.db_role_name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
-resource "aws_lambda_function" "app_setup_db" {
-  filename         = "lambda.zip"
-  function_name    = "app_setup_db"
-  role             = var.db_role_arn
-  handler          = "index.handler"
-  runtime          = "python3.8"
-  timeout          = 300
-
-  environment {
-    variables = {
-      DB_URL        = local.app_rds_url
-      USER_NAME     = local.app_rds_user
-      PASSWORD      = local.app_rds_password
-      NEW_DB_NAME   = local.app_db_name
-      NEW_USER_NAME = local.app_db_login_name
-      NEW_PASSWORD  = random_password.app_new_password.result
-      APP_FOLDER    = local.sql_migration_path
-    }
-  }
-}
-
-resource "null_resource" "app_setup_db" {
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      aws lambda invoke \
-        --function-name ${aws_lambda_function.app_setup_db.function_name} \
-        --payload '{}' \
-        response.json
-    EOT
-  }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
-
 resource "aws_secretsmanager_secret" "app_db_credentials" {
   name                    = "${local.app}-credentials-db-2"
   recovery_window_in_days = 0
