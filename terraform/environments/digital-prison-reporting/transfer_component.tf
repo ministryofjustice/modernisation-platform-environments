@@ -60,7 +60,6 @@ module "transfer_comp_Lambda" {
 
 module "transfer_comp_operational_datastore_Lambda" {
   source = "./modules/lambdas/generic"
-  count  = local.environment == "development" ? 1 : 0
 
   enable_lambda  = local.enable_transfercomp_lambda
   name           = local.lambda_transfercomp_ods_name
