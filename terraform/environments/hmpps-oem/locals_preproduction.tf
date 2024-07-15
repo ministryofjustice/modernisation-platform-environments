@@ -16,20 +16,19 @@ locals {
 
     ec2_instances = {
 
-      preprod-oem-a = merge(local.oem_ec2_default, {
-        cloudwatch_metric_alarms = merge(
-          local.oem_ec2_cloudwatch_metric_alarms.standard,
-          local.oem_ec2_cloudwatch_metric_alarms.backup,
-        )
-        config = merge(local.oem_ec2_default.config, {
+      preprod-oem-a = merge(local.ec2_instances.oem, {
+        config = merge(local.ec2_instances.oem.config, {
           availability_zone = "eu-west-2a"
         })
-        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+        instance = merge(local.ec2_instances.oem.instance, {
+          disable_api_termination = true
+        })
+        user_data_cloud_init = merge(local.ec2_instances.oem.user_data_cloud_init, {
+          args = merge(local.ec2_instances.oem.user_data_cloud_init.args, {
             branch = "main"
           })
         })
-        tags = merge(local.oem_ec2_default.tags, {
+        tags = merge(local.ec2_instances.oem.tags, {
           oracle-sids = "EMREP PPRCVCAT"
         })
       })
@@ -44,9 +43,9 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/oracle/oem"               = local.oem_secretsmanager_secrets
-      "/oracle/database/EMREP"    = local.oem_secretsmanager_secrets
-      "/oracle/database/PPRCVCAT" = local.oem_secretsmanager_secrets
+      "/oracle/oem"               = local.secretsmanager_secrets.oem
+      "/oracle/database/EMREP"    = local.secretsmanager_secrets.oem
+      "/oracle/database/PPRCVCAT" = local.secretsmanager_secrets.oem
     }
   }
 }
