@@ -30,6 +30,8 @@ resource "aws_db_instance" "database" {
   option_group_name                   = aws_db_option_group.db_option_group.name
   db_subnet_group_name                = aws_db_subnet_group.db.id
   enabled_cloudwatch_logs_exports     = ["error"]
+  ca_cert_identifier                  = "rds-ca-rsa2048-g1"
+  apply_immediately = true
 
   # timeouts {
   #   create = "40m"
