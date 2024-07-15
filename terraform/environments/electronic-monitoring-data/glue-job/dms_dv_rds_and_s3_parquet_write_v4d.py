@@ -56,15 +56,15 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
                        "parquet_df_repartition_num",
-                       "parquet_df_repartition_frequency",
-                       "rds_df_repartition_num",
                        "parallel_jdbc_conn_num",
                        "rds_sqlserver_db",
                        "rds_sqlserver_db_schema",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
                        "rds_upperbound_factor",
-                       "rds_df_trim_str_columns"
+                       "rds_df_repartition_num",
+                       "rds_df_trim_str_columns",
+                       "prq_leftanti_join_rds"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -691,10 +691,12 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             # EVALUATE LOWER & UPPER BOUND VALUES OF PARTITION / PRIMARY KEY COLUMN
             jdbc_partition_col_lowerbound = 0 if jdbc_partition_col_upperbound == 0 \
                                                 else jdbc_partition_col_upperbound+1
-            LOGGER.info(f"""{loop_count}-jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
+            msg_prefix = f"""jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}"""
+            LOGGER.info(f"""{loop_count}-{msg_prefix}""")
 
             jdbc_partition_col_upperbound = jdbc_partition_col_lowerbound + rds_rows_per_batch
-            LOGGER.info(f"""{loop_count}-jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
+            msg_prefix = f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}"""
+            LOGGER.info(f"""{loop_count}-{msg_prefix}""")
             
 
             # READ & REPARTITION - RDS - BATCH ROWS: START
@@ -702,51 +704,47 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
                                                           jdbc_partition_column,
                                                           jdbc_partition_col_lowerbound,
                                                           jdbc_partition_col_upperbound)
-            LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+            msg_prefix = f"""READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}"""
+            LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: {msg_prefix}""")
 
             if rds_df_repartition_num != 0:
-                msg_prefix = f"""df_rds_temp-{rds_tbl_name}"""
-                LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({rds_df_repartition_num}) on {jdbc_partition_column} <<""")
                 df_rds_temp = df_rds_temp.repartition(rds_df_repartition_num, jdbc_partition_column)
             # -------------------------------------------
             # READ & REPARTITION - RDS - BATCH ROWS: END
 
 
             # TRANSFORM & CACHE - RDS - BATCH ROWS: START
-            df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
-            additional_msg = trim_str_msg+trim_ts_ms_msg if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
+            df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, 
+                                                                                rds_db_name, 
+                                                                                rds_tbl_name)
+            additional_msg = trim_str_msg+trim_ts_ms_msg \
+                                if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
 
-            msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
             df_rds_temp_t4 = df_rds_temp_t3.cache()
-            LOGGER.info(f"""{loop_count}-{msg_prefix} - Caching the transformed RDS-DB dataframe.".""")
             # TRANSFORM & CACHE - RDS - BATCH ROWS: END
 
 
             # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
-            df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
-                                        .join(df_rds_temp_t4.alias("R"), 
-                                              on=df_rds_temp_t4.columns, 
-                                              how='leftanti')
+            if args['prq_leftanti_join_rds'] == 'true':
+                df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
+                                            .join(df_rds_temp_t4.alias("R"), 
+                                                  on=df_rds_temp_t4.columns, 
+                                                  how='leftanti')
+            else:
+                df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
+                                            .join(df_rds_temp_t4.alias("R"), 
+                                                  on=jdbc_partition_column, how='left')\
+                                            .where(" or ".join([f"L.{column} != R.{column}" 
+                                                                for column in df_rds_temp_t4.columns
+                                                                if column != jdbc_partition_column]))\
+                                            .select("L.*")
+            # --------------------------------------------
 
-            # df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
-            #                         .join(df_rds_temp_t4.alias("R"), on=jdbc_partition_column, how='left')\
-            #                         .where(" or ".join([f"L.{column} != R.{column}" 
-            #                                              for column in df_rds_temp_t4.columns
-            #                                              if column != jdbc_partition_column]))\
-            #                         .select("L.*")
-
-            if loop_count%int(args['parquet_df_repartition_frequency']) == 0:
-                msg_prefix = f"""df_prq_read_t2_filtered-{rds_tbl_name}"""
-                LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({parquet_df_repartition_num}) on {jdbc_partition_column} <<""")
-                df_prq_read_t2_filtered = df_prq_read_t2_filtered.repartition(parquet_df_repartition_num, jdbc_partition_column)
-            # -----------------------------------------------
-
-            msg_prefix = f"""df_prq_read_t2-{rds_tbl_name}"""
             df_prq_read_t2.unpersist()
-            LOGGER.info(f"""{loop_count}-{msg_prefix} - Unperisted.""")
 
+            df_prq_read_t2_filtered = df_prq_read_t2_filtered.repartition(parquet_df_repartition_num, 
+                                                                          jdbc_partition_column)
             df_prq_read_t2 = df_prq_read_t2_filtered.cache()
-            LOGGER.info(f"""{loop_count}-{msg_prefix} - Caching the filtered parquet dataframe.""")
             # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - END
 
             # ACTION
@@ -759,67 +757,66 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
             LOGGER.info(f"""{loop_count}-cumulative_matched_rows = {cumulative_matched_rows}""")
 
             df_rds_temp_t4.unpersist(True)
+        
+        # WHILE-ELSE - final leftover rows processed in this block.
         else:
             if jdbc_partition_col_upperbound < pkey_max_value:
                 loop_count += 1
 
                 # EVALUATE LOWER & UPPER BOUND VALUES OF PARTITION / PRIMARY KEY COLUMN
                 jdbc_partition_col_lowerbound = jdbc_partition_col_upperbound+1
-                LOGGER.info(f"""{loop_count}-jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
+                msg_prefix = f"""jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}"""
+                LOGGER.info(f"""{loop_count}-{msg_prefix}""")
 
                 jdbc_partition_col_upperbound = pkey_max_value
-                LOGGER.info(f"""{loop_count}-jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
+                msg_prefix = f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}"""
+                LOGGER.info(f"""{loop_count}-{msg_prefix}""")
 
                 # READ - RDS - BATCH ROWS: START
                 df_rds_temp = get_df_read_rds_db_tbl_int_pkey(rds_db_name, rds_tbl_name, 
                                                                 jdbc_partition_column,
                                                                 jdbc_partition_col_lowerbound,
                                                                 jdbc_partition_col_upperbound)
-        
-                LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}""")
+                
+                msg_prefix = f"""READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}"""
+                LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: {msg_prefix}""")
                 # READ - RDS - BATCH ROWS: END
 
                 if rds_df_repartition_num != 0:
-                    msg_prefix = f"""df_rds_temp-{rds_tbl_name}"""
-                    LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({rds_df_repartition_num}) on {jdbc_partition_column} <<""")
                     df_rds_temp = df_rds_temp.repartition(rds_df_repartition_num, jdbc_partition_column)
                 # -------------------------------------------
 
                 # TRANSFORM & CACHE - RDS - BATCH ROWS: START
-                df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, rds_db_name, rds_tbl_name)
-                additional_msg = trim_str_msg+trim_ts_ms_msg if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
+                df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, 
+                                                                                    rds_db_name, 
+                                                                                    rds_tbl_name)
+                additional_msg = trim_str_msg+trim_ts_ms_msg \
+                                    if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
 
-                msg_prefix = f"""df_rds_temp_t4-{rds_tbl_name}"""
                 df_rds_temp_t4 = df_rds_temp_t3.cache()
-                LOGGER.info(f"""{loop_count}-{msg_prefix} - Caching the transformed RDS-DB dataframe.".""")
                 # TRANSFORM & CACHE - RDS - BATCH ROWS: END
 
                 # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
+                if args['prq_leftanti_join_rds'] == 'true':
+                    df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
+                                                .join(df_rds_temp_t4.alias("R"), 
+                                                      on=df_rds_temp_t4.columns, 
+                                                      how='leftanti')
+                else:
+                    df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
+                                                .join(df_rds_temp_t4.alias("R"), 
+                                                      on=jdbc_partition_column, how='left')\
+                                                .where(" or ".join([f"L.{column} != R.{column}" 
+                                                                    for column in df_rds_temp_t4.columns
+                                                                    if column != jdbc_partition_column]))\
+                                                .select("L.*")
+                # --------------------------------------------
 
-                df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
-                                            .join(df_rds_temp_t4.alias("R"), 
-                                                  on=df_rds_temp_t4.columns, 
-                                                  how='leftanti')
-
-                # df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
-                #                         .join(df_rds_temp_t4.alias("R"), on=jdbc_partition_column, how='left')\
-                #                         .where(" or ".join([f"L.{column} != R.{column}" 
-                #                                              for column in df_rds_temp_t4.columns
-                #                                              if column != jdbc_partition_column]))\
-                #                         .select("L.*")
-
-                if loop_count%int(args['parquet_df_repartition_frequency']) == 0:
-                    msg_prefix = f"""df_prq_read_t2_filtered-{rds_tbl_name}"""
-                    LOGGER.info(f"""{loop_count}-{msg_prefix}: >> RE-PARTITIONING-({int(parquet_df_repartition_num/2)}) on {jdbc_partition_column} <<""")
-                    df_prq_read_t2_filtered = df_prq_read_t2_filtered.repartition(int(parquet_df_repartition_num/2), jdbc_partition_column)
-                # ----------------------------------------------
-
-                msg_prefix = f"""df_prq_read_t2-{rds_tbl_name}"""
                 df_prq_read_t2.unpersist()
-                LOGGER.info(f"""{loop_count}-{msg_prefix} - Unperisted.""")
 
+                df_prq_read_t2_filtered = df_prq_read_t2_filtered.repartition(int(parquet_df_repartition_num/2), 
+                                                                              jdbc_partition_column)
                 df_prq_read_t2 = df_prq_read_t2_filtered.cache()
-                LOGGER.info(f"""{loop_count}-{msg_prefix} - Caching the filtered parquet dataframe.""")
                 # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
 
                 # ACTION
@@ -833,7 +830,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
                 df_rds_temp_t4.unpersist(True)
 
-        LOGGER.info(f"""Total RDS fetch batch count: {loop_count}""")
+        LOGGER.info(f"""RDS-SQLServer-JDBC READ {rds_tbl_name}: Total batch iterations = {loop_count}""")
 
         # ACTION
         total_row_differences = df_prq_read_t2.count()
