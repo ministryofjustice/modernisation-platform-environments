@@ -59,7 +59,7 @@
       "edw_disk_device": "/dev/xvdf",
       "edw_disk_fs_type": "ext4",
       "database_ec2_name": "edw-db-instance",
-      "edw_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqJXcEXymhifpt3jSnLHVoPCwD07usEGhKCboMjMuSS2nFaSy+JDhsL/BKUQUgW88ozLzCp4XL0+jfpqzJqwrgVgfZI059w6QqLXyUF8HxQa0jolOWQZXq9+BZX6DnmPX84p40MZ38OrNiEoNuSqN1u3dqbRIageDSJuKAp39DjrQVoTPh1lchddKiucVMU0xK8Z1QQWHyoZTBYolC+hPNZ7lwT+Vq8CLywDUlBcZdbCKRMeUXD+kzg+nduCyB71gV4zlE4vD7x/RADvAfOINVQNSRQFY9QgnQylyylsRhzCGtXTPUC6Cnhmi49L/AyDd7Qh78ZEOOrs5HTJNsJmt84LuurD9dimtour2tlvDkZOurib/voKfrHxih1q5lgzn7BEZ42jO0H6UKtHv9hkkMOCfewnGHrkZ9ptgmHyR/pMWXbwiM/+osc1XLgEBJ6rFe+mtge4GzIx5ZApMGZV3LFe3ZoPGtnyORvjyI/jkOTco6gVIc87Wn0MkD5tFV9ME= fani.foteva@MJ004598",
+      "edw_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCTLaLYlRp9nXnprXkvSd9pxHxJq4KrZENz0PQ4fy8xe93x54TRfqzMEJdG4tl9Yb5Uv0HEmvi9kMSKZ8uorM67v9oFI5/xtnFoxO9M/cDLXbUmIQ5QFP6+BlDAPWPTV8hh9jAhY1VhkFJTGF0vMBCxdqfIwKH4l6wTciP/lrPYqp4uKddicg0T9mfk6y1EvaZhVTgpMdtj374xC+t57JN6TEuYxwcxsdUA4tB9y4B51LE9WEG7w1up8SeTduCAyGNpUu0lKVnLgpkcrJ3hD/pavUzdAmFESYmMjJkvtKHIuEaAVlxaWQDhHFAJ0BdMlJV4jAARaqgtqgLpsjp3NPnM4FOu3wXRY6+gw3cwDyg7TFlwksnayCHG3ZrSs3fF2cVGF/VQ9L0QZyayPNxnh1g+B7Nnuly3eXLOwD0KQ8XtNDvAX0kV7e2QGiDO0//n+LQHqDMFMTvVWo5g2Ct2HjP97Wf+QgYZ2wbAxb/JSnlHMxbrjeAo0DejscoYzp9f3AM= fani.foteva@MJ004598",
       "edw_pagerduty_integration_key_name": "laa_edw_nonprod_alarms",
       "oradata_snapshot_id": "snap-08e331d215e456fec",
       "orahome_snapshot_id": "snap-076f7b759f1cbfa2b",
