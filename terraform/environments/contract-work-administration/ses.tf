@@ -141,20 +141,20 @@ resource "aws_secretsmanager_secret" "smtp_sesrsa" {
 
 ## TODO Create Kinesis Data Firehose and IAM role for Production, then enable below to set event destination
 
-# resource "aws_sesv2_configuration_set" "cwa" {
-#   count    = contains(["production"], local.environment) ? 0 : 1
-#   configuration_set_name = "${local.environment}-configuration-set"
+resource "aws_sesv2_configuration_set" "cwa" {
+  count    = contains(["production"], local.environment) ? 1 : 0
+  configuration_set_name = "${local.environment}-configuration-set"
 
-#   delivery_options {
-#     tls_policy = "OPTIONAL"
-#   }
+  delivery_options {
+    tls_policy = "OPTIONAL"
+  }
 
-#   reputation_options {
-#     reputation_metrics_enabled = true
-#   }
+  reputation_options {
+    reputation_metrics_enabled = true
+  }
 
-#   tags = local.tags
-# }
+  tags = local.tags
+}
 
 # resource "aws_sesv2_configuration_set_event_destination" "cwa" {
 #   configuration_set_name = aws_sesv2_configuration_set.cwa.configuration_set_name
