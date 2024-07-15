@@ -755,7 +755,7 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
             df_rds_temp_t4.unpersist(True)
         else:
-            if jdbc_partition_col_upperbound <= pkey_max_value:
+            if jdbc_partition_col_upperbound < pkey_max_value:
                 loop_count += 1
 
                 # EVALUATE LOWER & UPPER BOUND VALUES OF PARTITION / PRIMARY KEY COLUMN
