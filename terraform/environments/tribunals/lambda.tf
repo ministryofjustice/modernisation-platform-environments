@@ -53,7 +53,7 @@ resource "null_resource" "app_setup_db" {
   provisioner "local-exec" {
     command = <<-EOT
       aws lambda invoke \
-        --function-name ${each.function_name} \
+        --function-name ${each.value.function_name} \
         --payload '{}' \
         response.json
     EOT
