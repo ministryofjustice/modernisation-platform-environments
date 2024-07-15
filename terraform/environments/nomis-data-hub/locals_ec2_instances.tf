@@ -8,7 +8,7 @@ locals {
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
-        # module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring, # TODO ADD
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring,
       )
       config = {
         ami_name                  = "nomis_data_hub_rhel_7_9_app_release_2023-05-02T00-00-47.783Z"
@@ -19,15 +19,14 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
-        ssm_parameters_prefix = "ec2/" # TODO REMOVE
-        subnet_name           = "private"
+        subnet_name = "private"
       }
       instance = {
-        disable_api_termination      = false # TODO set to TRUE
+        disable_api_termination      = false
         instance_type                = "t3.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = false # TODO change to true
+        monitoring                   = true
         vpc_security_group_ids       = ["ndh_app"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -45,13 +44,13 @@ locals {
         ]
       }
       tags = {
+        backup                 = "false"
         description            = "RHEL7.9 NDH App"
-        component              = "ndh"
         instance-access-policy = "limited"
         instance-scheduling    = "skip-scheduling"
-        monitored              = false # TODO remove
         os-type                = "Linux"
         server-type            = "ndh-app"
+        update-ssm-agent       = "patchgroup1"
       }
     }
 
@@ -71,15 +70,14 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
-        ssm_parameters_prefix = "ec2/" # TODO REMOVE
-        subnet_name           = "private"
+        subnet_name = "private"
       }
       instance = {
         disable_api_termination      = false
         instance_type                = "t3.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = false # TODO change to true
+        monitoring                   = true
         vpc_security_group_ids       = ["ndh_ems"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -97,13 +95,13 @@ locals {
         ]
       }
       tags = {
+        backup                 = "false"
         description            = "RHEL7.9 NDH ems"
-        component              = "ndh"
-        server-type            = "ndh-ems"
-        os-type                = "Linux"
-        monitored              = false
         instance-access-policy = "limited"
         instance-scheduling    = "skip-scheduling"
+        server-type            = "ndh-ems"
+        os-type                = "Linux"
+        update-ssm-agent       = "patchgroup1"
       }
     }
 
@@ -119,9 +117,12 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
-        subnet_name           = "private"
-        ssm_parameters_prefix = "ec2/" # TODO REMOVE
-        user_data_raw         = base64encode(file("./templates/ndh-user-data.yaml"))
+        subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
@@ -138,10 +139,11 @@ locals {
         }
       }
       tags = {
-        description = "Windows Server 2022 Management server for NDH"
-        os-type     = "Windows"
-        component   = "managementserver"
-        server-type = "ndh-management-server"
+        backup           = "false"
+        description      = "Windows Server 2022 Management server for NDH"
+        os-type          = "Windows"
+        server-type      = "NdhMgmt"
+        update-ssm-agent = "patchgroup1"
       }
     }
   }
