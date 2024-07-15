@@ -21,6 +21,9 @@ locals {
             "Ec2t1Policy",
           ])
         })
+        instance = merge(local.ec2_instances.ndh_app.instance, {
+          disable_api_termination = true
+        })
         tags = merge(local.ec2_instances.ndh_app.tags, {
           nomis-data-hub-environment = "t1"
         })
@@ -34,6 +37,9 @@ locals {
             "Ec2t1Policy",
           ])
         })
+        instance = merge(local.ec2_instances.ndh_ems.instance, {
+          disable_api_termination = true
+        })
         tags = merge(local.ec2_instances.ndh_ems.tags, {
           nomis-data-hub-environment = "t1"
         })
@@ -45,6 +51,9 @@ locals {
           instance_profile_policies = concat(local.ec2_instances.ndh_app.config.instance_profile_policies, [
             "Ec2t2Policy",
           ])
+        })
+        instance = merge(local.ec2_instances.ndh_app.instance, {
+          disable_api_termination = true
         })
         tags = merge(local.ec2_instances.ndh_app.tags, {
           nomis-data-hub-environment = "t2"
@@ -59,6 +68,9 @@ locals {
             "Ec2t2Policy",
           ])
         })
+        instance = merge(local.ec2_instances.ndh_ems.instance, {
+          disable_api_termination = true
+        })
         tags = merge(local.ec2_instances.ndh_ems.tags, {
           nomis-data-hub-environment = "t2"
         })
@@ -66,7 +78,11 @@ locals {
 
       test-management-server-2022 = merge(local.ec2_instances.ndh_mgmt, {
         config = merge(local.ec2_instances.ndh_mgmt.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
           availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.ndh_mgmt.instance, {
+          disable_api_termination = true
         })
         tags = merge(local.ec2_instances.ndh_mgmt.tags, {
           nomis-data-hub-environment = "test"
