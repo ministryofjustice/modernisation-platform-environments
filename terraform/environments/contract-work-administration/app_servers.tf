@@ -66,10 +66,10 @@ EOF
 
 ### Load custom metric script into an S3 bucket
 resource "aws_s3_object" "app_custom_script" {
-    bucket = aws_s3_bucket.scripts.id
-    key    = "app-cw-custom.sh"
-    source = "./app-cw-custom.sh"
-    source_hash  = filemd5("./app-cw-custom.sh")
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "app-cw-custom.sh"
+  source      = "./app-cw-custom.sh"
+  source_hash = filemd5("./app-cw-custom.sh")
 }
 
 resource "time_sleep" "wait_app_custom_script" {

@@ -176,15 +176,15 @@ locals {
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
     # Please ensure any changes made here are consistent with Ansible variables.
     audit_source_endpoint = {
-        read_host              = "standbydb2"
-        read_database          = "DMDNDAS2"
+      read_host     = "standbydb2"
+      read_database = "DMDNDAS2"
     }
     audit_target_endpoint = {
-        write_environment      = "test"
+      write_environment = "test"
     }
     user_source_endpoint = {}
     user_target_endpoint = {
-         write_database         = "DMDNDA"
+      write_database = "DMDNDA"
     }
   }
 }

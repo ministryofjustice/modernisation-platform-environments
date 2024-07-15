@@ -2,7 +2,7 @@ data "aws_lb" "cdpt-chaps-lb" {
   name = "cdpt-chaps-lb"
 }
 
-locals{
+locals {
   lb_short_arn = join("/", slice(split("/", module.lb_access_logs_enabled.load_balancer_arn), 1, 4))
 }
 
@@ -22,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   dimensions = {
     LoadBalancer = local.lb_short_arn
   }
-  treat_missing_data  = "notBreaching"
+  treat_missing_data = "notBreaching"
 }
 
 
