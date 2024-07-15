@@ -41,9 +41,9 @@ module "test-2c" {
   approval_days        = "0"
   patch_schedule       = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
   operating_system     = "REDHAT_ENTERPRISE_LINUX"
-  suffix                = "-red"
+  suffix               = "-red"
   patch_tag            = "eu-west-2c"
-  patch_classification  = ["Security", "Bugfix"]
+  patch_classification = ["Security", "Bugfix"]
   severity             = ["Critical", "Important"]
   product              = ["RedhatEnterpriseLinux8.5"]
 
