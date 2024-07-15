@@ -723,9 +723,9 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
             # rds_rows_filtered_from_prq_df = df_prq_read_t2.alias("L")\
             #                         .join(df_rds_temp_t4.alias("R"), on=jdbc_partition_column, how='left')\
-            #                         .where(" or ".join([f"L.{column} != R.{column}" 
+            #                         .where(" and ".join([f"L.{column} != R.{column}" 
             #                                              for column in df_rds_temp_t4.columns
-            #                                              if column != jdbc_partition_column]))
+            #                                              if column != jdbc_partition_column]))\
             #                         .select("L.*")
 
             if loop_count%int(args['parquet_df_repartition_frequency']) == 0:
@@ -793,11 +793,10 @@ def process_dv_for_table(rds_db_name, db_sch_tbl, total_files, total_size_mb) ->
 
                 # rds_rows_filtered_from_prq_df = df_prq_read_t2.alias("L")\
                 #                         .join(df_rds_temp_t4.alias("R"), on=jdbc_partition_column, how='left')\
-                #                         .where(" or ".join([f"L.{column} != R.{column}" 
+                #                         .where(" and ".join([f"L.{column} != R.{column}" 
                 #                                              for column in df_rds_temp_t4.columns
-                #                                              if column != jdbc_partition_column]))
+                #                                              if column != jdbc_partition_column]))\
                 #                         .select("L.*")
-                # --------------------------------------------------------------------
 
                 if loop_count%int(args['parquet_df_repartition_frequency']) == 0:
                     msg_prefix = f"""rds_rows_filtered_from_prq_df-{rds_tbl_name}"""
