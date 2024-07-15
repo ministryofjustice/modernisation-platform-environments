@@ -24,43 +24,42 @@ locals {
     }
 
     ec2_instances = {
+
       # app servers
-      pp-cafm-a-10-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-cafm-a-10-b = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-cafm-a-10-b"
           availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
-        instance = merge(local.defaults_app_ec2.instance, {
-          disable_api_stop        = true
+        instance = merge(local.ec2_instances.app.instance, {
+          disable_api_stop        = true # TODO: remove
           disable_api_termination = true
           instance_type           = "t3.large"
-          monitoring              = true
         })
-        tags = merge(local.defaults_app_ec2.tags, {
+        tags = merge(local.ec2_instances.app.tags, {
           ami           = "pp-cafm-a-10-b"
           description   = "RDS Session Host and CAFM App Server/PFME Licence Server"
           pre-migration = "PPFAW0010"
         })
       })
 
-      pp-cafm-a-11-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-cafm-a-11-a = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-cafm-a-11-a"
           availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.ec2_instances.app.instance, {
           disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.large"
-          monitoring              = true
         })
-        tags = merge(local.defaults_app_ec2.tags, {
+        tags = merge(local.ec2_instances.app.tags, {
           ami           = "pp-cafm-a-11-a"
           description   = "RDS session host and app server"
           pre-migration = "PPFAW011"
@@ -68,8 +67,8 @@ locals {
       })
 
       # database servers
-      pp-cafm-db-a = merge(local.defaults_database_ec2, {
-        config = merge(local.defaults_database_ec2.config, {
+      pp-cafm-db-a = merge(local.ec2_instances.db, {
+        config = merge(local.ec2_instances.db.config, {
           ami_name          = "pp-cafm-db-a"
           availability_zone = "eu-west-2a"
         })
@@ -82,13 +81,12 @@ locals {
           "/dev/sdf"  = { type = "gp3", size = 250 }
           "/dev/sdg"  = { type = "gp3", size = 200 }
         }
-        instance = merge(local.defaults_database_ec2.instance, {
+        instance = merge(local.ec2_instances.db.instance, {
           disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "r6i.xlarge"
-          monitoring              = true
         })
-        tags = merge(local.defaults_database_ec2.tags, {
+        tags = merge(local.ec2_instances.db.tags, {
           app-config-status = "pending"
           ami               = "pp-cafm-db-a"
           description       = "SQL Server"
@@ -97,33 +95,32 @@ locals {
       })
 
       # web servers
-      pp-cafm-w-4-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-cafm-w-4-b = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-cafm-w-4-b"
           availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.large"
-          monitoring              = true
         })
-        tags = merge(local.defaults_web_ec2.tags, {
+        tags = merge(local.ec2_instances.web.tags, {
           ami           = "pp-cafm-w-4-b"
           description   = "Web Portal Server"
           pre-migration = "PPFWW0004"
         })
       })
 
-      pp-cafm-w-5-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-cafm-w-5-a = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-cafm-w-5-a"
           availability_zone = "eu-west-2a"
         })
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.large"
@@ -132,7 +129,7 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
-        tags = merge(local.defaults_web_ec2.tags, {
+        tags = merge(local.ec2_instances.web.tags, {
           ami           = "pp-cafm-w-5-a"
           description   = "Migrated server PPFWW0005 Web Portal Server"
           pre-migration = "PPFWW0005"
@@ -141,68 +138,17 @@ locals {
     }
 
     lbs = {
-      private = {
-        enable_cross_zone_load_balancing = true
-        enable_delete_protection         = false
-        idle_timeout                     = 3600
-        internal_lb                      = true
-        load_balancer_type               = "application"
-        security_groups                  = ["loadbalancer"]
-        subnets                          = module.environment.subnets["private"].ids
-
+      private = merge(local.lbs.private, {
         instance_target_groups = {
-          web-45-80 = {
+          web-45-80 = merge(local.lbs.private.instance_target_groups.web-80, {
             attachments = [
               { ec2_instance_name = "pp-cafm-w-4-b" },
               { ec2_instance_name = "pp-cafm-w-5-a" },
             ]
-            health_check = {
-              enabled             = true
-              healthy_threshold   = 3
-              interval            = 30
-              matcher             = "200-399"
-              path                = "/"
-              port                = 80
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            port     = 80
-            protocol = "HTTP"
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-          }
+          })
         }
-        listeners = {
-          http = {
-            port     = 80
-            protocol = "HTTP"
-
-            default_action = {
-              type = "redirect"
-              redirect = {
-                port        = 443
-                protocol    = "HTTPS"
-                status_code = "HTTP_301"
-              }
-            }
-          }
-          https = {
-            certificate_names_or_arns = ["planetfm_wildcard_cert"]
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-
+        listeners = merge(local.lbs.private.listeners, {
+          https = merge(local.lbs.private.listeners.https, {
             rules = {
               web-45-80 = {
                 priority = 4580
@@ -220,9 +166,9 @@ locals {
                 }]
               }
             }
-          }
-        }
-      }
+          })
+        })
+      })
     }
 
     route53_zones = {
@@ -238,7 +184,7 @@ locals {
     }
 
     security_groups = {
-      cafm_app_fixngo = {
+      cafm_app_fixngo = { # TODO REMOVE
         description = "Allow fixngo cafm app connectivity"
         ingress = {
           all-from-self = {
