@@ -16,15 +16,6 @@ locals {
   # please keep resources in alphabetical order
   baseline_test = {
 
-    # TODO -- remove as these don't have any effect
-    cloudwatch_metric_alarms = merge(
-      module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-    )
-
     ec2_autoscaling_groups = {
       test-oem = merge(local.ec2_instances.oem, {
         autoscaling_group = {
