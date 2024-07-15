@@ -94,16 +94,16 @@ tasks:
           Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
           . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch
           $ScriptExitCode = $LASTEXITCODE
-          $ScriptExitCodeFilePath = "([System::IO::Path]::GetTempPath())\Run-GitScriptExitCode.txt"
+          $ScriptExitCodeFilePath = "C:\Windows\Temp\Run-GitScriptExitCode.txt"
           New-Item -Path $ScriptExitCodeFilePath -ItemType File -Force
           Add-Content -Path $ScriptExitCodeFilePath -Value $ScriptExitCode
-          exit $ScriptExitCode
       - frequency: always
         type: powershell
         runAs: admin
         content: |-
           # Run ready hook after all other tasks, on every boot. This covers the initial one as well as instances that were in the warm pool.
           $ErrorActionPreference = "Stop"
+          $ScriptExitCodeFilePath = "C:\Windows\Temp\Run-GitScriptExitCode.txt"
           function Main {
             # Get token
             $token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds" = "21600"} -Method PUT -Uri "http://169.254.169.254/latest/api/token"
@@ -116,7 +116,7 @@ tasks:
             # Run complete-lifecycle-action using AWS CLI
             aws autoscaling complete-lifecycle-action --lifecycle-hook-name "$${name}-ready-hook" --auto-scaling-group-name $name --lifecycle-action-result ABANDON --instance-id $instanceId --region $region
           }
-          $exitState = Get-Content -Path "([System::IO::Path]::GetTempPath())\Run-GitScriptExitCode.txt"
+          $exitState = Get-Content -Path $ScriptExitCodeFilePath
           Write-Output "post user data ready hook start" | Out-File -Append -FilePath C:\Windows\Temp\user-data.log
           if ($exitState -eq 0) {
             try {
