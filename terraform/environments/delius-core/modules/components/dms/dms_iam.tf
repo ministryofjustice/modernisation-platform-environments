@@ -29,6 +29,7 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   role       = aws_iam_role.dms-vpc-role.name
 }
 
+# Allow client accounts to assume this role in the this account when it is the repository
 resource "aws_iam_role" "dms_client_bucket_role" {
   count = length(var.dms_config.client_account_arns) > 0 ? 1 : 0
   name = "dms-client-buckets-role"
@@ -117,7 +118,26 @@ resource "aws_iam_policy" "dms_s3_audit_target_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "dms_s3_audit_target_policy_attachment" {
-  count       = local.dms_s3_repository_bucket.prefix == null ? 0 : 1
+  count      = local.dms_s3_repository_bucket.prefix == null ? 0 : 1
   role       = aws_iam_role.dms-vpc-role.name
   policy_arn = aws_iam_policy.dms_s3_audit_target_policy[0].arn
+}
+
+
+# and allow this account to assume the role in the respective repository account when it is the cient
+resource "aws_iam_policy" "dms_s3_assume_bucket_role_in_respository" {
+   count       = local.dms_s3_repository_bucket.account_id == null ? 0 : 1
+   name        = "dms-s3-assume-bucket-role-in-repository"
+   description = "Policy to allow DMS to assume the dms-client-bucket-role in the repository account"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Resource =  "arn:aws:iam::${local.dms_s3_repository_bucket.account_id}:role/dms-client-buckets-role",
+      }
+    ]
+  })
 }
