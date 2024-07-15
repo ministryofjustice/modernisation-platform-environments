@@ -69,40 +69,46 @@ $accounts_str
 presets:
   common:
     filters:
+      AccessAnalyzer:
+        - property: tag:component
+          value: "secure-baselines"
       AWSBackupPlan:
         - property: tag:component
           value: "secure-baselines"
       AWSBackupVault:
         - property: tag:component
           value: "secure-baselines"
-      EC2RouteTable:
-        - property: tag:component
-          value: "secure-baselines"
-      EC2VPC:
-        - property: tag:component
-          value: "secure-baselines"
-      EC2NetworkACL:
-        - property: tag:component
-          value: "secure-baselines"
-      KMSKey:
-        - property: tag:component
-          value: "secure-baselines"
-      S3Bucket:
+      ConfigServiceConfigRule:
+        - type: glob
+          value: "securityhub-*"
+        - type: glob
+          value: "FMManagedShieldConfigRule*"
+      EC2DHCPOption:
         - property: tag:component
           value: "secure-baselines"
       EC2InternetGatewayAttachment:
         - property: tag:vpc:component
           value: "secure-baselines"
-      AccessAnalyzer:
+      EC2NetworkACL:
         - property: tag:component
           value: "secure-baselines"
-      SNSTopic:
+      EC2RouteTable:
         - property: tag:component
           value: "secure-baselines"
       EC2SecurityGroup:
         - property: tag:component
           value: "secure-baselines"
-      EC2DHCPOption:
+      EC2VPC:
+        - property: tag:component
+          value: "secure-baselines"
+      KMSKey:
+        - property: tag:component
+          value: "secure-baselines"
+      OSPackage:
+        - property: PackageName
+          type: regex
+          value: "^(opensearch-)?analysis-.+$"
+      S3Bucket:
         - property: tag:component
           value: "secure-baselines"
       SSMParameter:
@@ -110,8 +116,6 @@ presets:
           value: "delegate-access"
         - property: tag:component
           value: "member-bootstrap"
-      ConfigServiceConfigRule:
-        - type: glob
-          value: "securityhub-*"
-        - type: glob
-          value: "FMManagedShieldConfigRule*"
+      SNSTopic:
+        - property: tag:component
+          value: "secure-baselines"
