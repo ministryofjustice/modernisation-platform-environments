@@ -1,5 +1,6 @@
 resource "aws_sesv2_email_identity" "cwa" {
-  email_identity         = data.aws_route53_zone.external.name
+  email_identity         = local.environment == "production" ? "tbc" : data.aws_route53_zone.external.name
+  configuration_set_name = local.environment == "production" ? aws_sesv2_configuration_set.cwa.configuration_set_name : null
   dkim_signing_attributes {
     next_signing_key_length    = "RSA_1024_BIT"
   }
@@ -132,3 +133,40 @@ resource "aws_secretsmanager_secret" "smtp_sesrsa" {
     { "Name" = "postfix/app/SESRSA" }
   )
 }
+
+
+###################################
+## Production set up
+###################################
+
+## TODO Create Kinesis Data Firehose and IAM role for Production, then enable below to set event destination
+
+# resource "aws_sesv2_configuration_set" "cwa" {
+#   count    = contains(["production"], local.environment) ? 0 : 1
+#   configuration_set_name = "${local.environment}-configuration-set"
+
+#   delivery_options {
+#     tls_policy = "OPTIONAL"
+#   }
+
+#   reputation_options {
+#     reputation_metrics_enabled = true
+#   }
+
+#   tags = local.tags
+# }
+
+# resource "aws_sesv2_configuration_set_event_destination" "cwa" {
+#   configuration_set_name = aws_sesv2_configuration_set.cwa.configuration_set_name
+#   event_destination_name = "ses-reputation-events-firehose"
+
+#   event_destination {
+#     kinesis_firehose_destination {
+#       delivery_stream_arn = aws_kinesis_firehose_delivery_stream.example.arn
+#       iam_role_arn        = aws_iam_role.example.arn
+#     }
+
+#     enabled              = true
+#     matching_event_types = ["SEND", TBC]
+#   }
+# }
