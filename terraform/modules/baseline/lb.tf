@@ -128,7 +128,7 @@ module "lb" {
   enable_cross_zone_load_balancing = each.value.enable_cross_zone_load_balancing
   dns_record_client_routing_policy = each.value.dns_record_client_routing_policy
   s3_versioning                    = each.value.s3_versioning
-  access_logs_lifecycle_rule                   = each.value.access_logs_lifecycle_rule
+  access_logs_lifecycle_rule       = each.value.access_logs_lifecycle_rule
 
   existing_bucket_name = try(module.s3_bucket[each.value.existing_bucket_name].bucket.id, each.value.existing_bucket_name)
 

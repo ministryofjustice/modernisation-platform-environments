@@ -56,7 +56,7 @@ resource "aws_backup_selection" "cwa" {
 
 data "aws_iam_policy_document" "cwa_vault" {
   statement {
-    sid = "Allow local account basic permissions to the vault"
+    sid    = "Allow local account basic permissions to the vault"
     effect = "Allow"
 
     principals {
@@ -78,7 +78,7 @@ data "aws_iam_policy_document" "cwa_vault" {
     resources = [aws_backup_vault.cwa.arn]
   }
   statement {
-    sid = "Allow copying of recovery points from Landing Zone"
+    sid    = "Allow copying of recovery points from Landing Zone"
     effect = "Allow"
 
     principals {

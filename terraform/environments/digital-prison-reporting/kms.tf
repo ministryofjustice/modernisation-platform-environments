@@ -141,3 +141,19 @@ resource "aws_kms_alias" "rds-kms-alias" {
   name          = "alias/${local.project}-rds-kms"
   target_key_id = aws_kms_key.rds.arn
 }
+
+# RDS Database Key
+resource "aws_kms_key" "operational_db" {
+  description         = "Encryption key for Operational DB"
+  enable_key_rotation = true
+  key_usage           = "ENCRYPT_DECRYPT"
+  is_enabled          = true
+
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.project}-operational-db-key"
+    }
+  )
+}

@@ -6,7 +6,7 @@ resource "aws_sns_topic" "lb_5xx_alarm_topic" {
   name = "lb_5xx_alarm_topic"
 }
 
-locals{
+locals {
   lb_short_arn = join("/", slice(split("/", module.lb_access_logs_enabled.load_balancer_arn), 1, 4))
 }
 
@@ -14,17 +14,17 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   alarm_name          = "lb-5xx-errors"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
-  metric_name         = "HTTPCode_Target_5XX_Count"
+  metric_name         = "HTTPCode_ELB_5XX_Count"
   namespace           = "AWS/ApplicationELB"
   period              = "300"
   statistic           = "Sum"
   threshold           = "1"
-  alarm_description   = "This metric monitors 5xx errors on the targets behind the load balancer"
+  alarm_description   = "This metric monitors 5xx errors on the load balancer"
   alarm_actions       = [aws_sns_topic.lb_5xx_alarm_topic.arn]
   dimensions = {
     LoadBalancer = local.lb_short_arn
   }
-  treat_missing_data  = "notBreaching"
+  treat_missing_data = "notBreaching"
 }
 
 # Pager duty integration

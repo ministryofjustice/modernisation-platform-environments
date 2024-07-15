@@ -520,3 +520,101 @@ resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_get_put_zip_
   role       = aws_iam_role.unzip_unstructured_files.name
   policy_arn = aws_iam_policy.get_put_zip_s3_files.arn
 }
+
+# ------------------------------------------
+# load table from json to athena
+# ------------------------------------------
+
+resource "aws_iam_role" "load_json_into_athena" {
+  name = "load_json_into_athena"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "athena.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+data "aws_iam_policy_document" "load_json_into_athena_s3_policy_document" {
+  statement {
+    sid    = "S3PermissionsForLoadingJsonIntoAthena"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${aws_s3_bucket.data_store.arn}/*",
+      aws_s3_bucket.data_store.arn,
+      "${module.athena-s3-bucket.bucket.arn}/*",
+      module.athena-s3-bucket.bucket.arn,
+      module.metadata-s3-bucket.bucket.arn,
+      "${module.metadata-s3-bucket.bucket.arn}/*",
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadingJsonIntoAthena"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "GluePermissionsForLoadingJsonIntoAthena"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "load_json_into_athena" {
+  name        = "load-json-into-athena-s3-policy"
+  description = "Policy for Lambda to use S3 for lambda"
+  policy      = data.aws_iam_policy_document.load_json_into_athena_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_json_into_athena_s3_policy_policy_attachment" {
+  role       = aws_iam_role.load_json_into_athena.name
+  policy_arn = aws_iam_policy.load_json_into_athena.arn
+}
+
+resource "aws_iam_role_policy_attachment" "load_json_into_athena_vpc_access_execution" {
+  role       = aws_iam_role.load_json_into_athena.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "load_json_into_athena_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.load_json_into_athena.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}

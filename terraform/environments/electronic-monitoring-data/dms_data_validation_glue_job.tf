@@ -92,6 +92,10 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
   retention_in_days = 14
 }
 
+resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group_v2" {
+  name              = "dms-dv-glue-job-v2"
+  retention_in_days = 14
+}
 # -------------------------------------------------------------------
 
 resource "aws_glue_job" "dms_dv_glue_job_v2" {
@@ -120,19 +124,17 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
     "--glue_catalog_tbl_name"             = "glue_df_output"
-    "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
+    "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group_v2.name}"
     "--enable-continuous-cloudwatch-log"  = "true"
     "--enable-continuous-log-filter"      = "true"
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-    spark.sql.adaptive.enabled=true 
-    --conf spark.sql.adaptive.coalescePartitions.enabled=true 
-    --conf spark.sql.adaptive.skewJoin.enabled=true 
-    --conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
-    --conf spark.sql.parquet.aggregatePushdown=true
-    --conf spark.sql.files.maxPartitionBytes=128m
-    EOF
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.parquet.aggregatePushdown=true 
+--conf spark.sql.files.maxPartitionBytes=128m 
+EOF
+
   }
 
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
@@ -185,12 +187,10 @@ resource "aws_glue_job" "dms_dv_glue_job_v4a" {
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-spark.sql.adaptive.enabled=true 
---conf spark.sql.adaptive.coalescePartitions.enabled=true 
---conf spark.sql.adaptive.skewJoin.enabled=true 
---conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.shuffle.service.enabled=false 
+--conf spark.sql.shuffle.partitions=2001 
+--conf spark.sql.files.maxPartitionBytes=128m 
 EOF
 
   }
@@ -241,12 +241,10 @@ resource "aws_glue_job" "dms_dv_glue_job_v4b" {
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-spark.sql.adaptive.enabled=true 
---conf spark.sql.adaptive.coalescePartitions.enabled=true 
---conf spark.sql.adaptive.skewJoin.enabled=true 
---conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.shuffle.service.enabled=false 
+--conf spark.sql.shuffle.partitions=2001 
+--conf spark.sql.files.maxPartitionBytes=128m 
 EOF
 
   }
@@ -278,14 +276,16 @@ resource "aws_glue_job" "dms_dv_glue_job_v4c" {
     "--script_bucket_name"                = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
-    "--dataframe_repartition_number"      = 180
+    "--parquet_df_repartition_num"        = 180
+    "--rds_df_repartition_num"            = 0
+    "--parallel_jdbc_conn_num"            = 45
     "--rds_sqlserver_db"                  = ""
     "--rds_sqlserver_db_schema"           = ""
     "--rds_sqlserver_db_table"            = ""
     "--rds_db_tbl_pkeys_col_list"         = ""
     "--rds_df_trim_str_col_list"          = ""
     "--rds_df_trim_micro_sec_ts_col_list" = ""
-    "--rds_upperbound_factor"             = 100
+    "--rds_upperbound_factor"             = 45
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
@@ -296,12 +296,10 @@ resource "aws_glue_job" "dms_dv_glue_job_v4c" {
     "--enable-metrics"                    = "true"
     "--enable-auto-scaling"               = "true"
     "--conf"                              = <<EOF
-spark.sql.adaptive.enabled=true 
---conf spark.sql.adaptive.coalescePartitions.enabled=true 
---conf spark.sql.adaptive.skewJoin.enabled=true 
---conf spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.shuffle.service.enabled=false 
+--conf spark.sql.shuffle.partitions=2001 
+--conf spark.sql.files.maxPartitionBytes=128m 
 EOF
 
   }

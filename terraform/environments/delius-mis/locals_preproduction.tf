@@ -297,8 +297,15 @@ locals {
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
-      "/dev/sde" = { label = "data" }            # DATA
-      "/dev/sdf" = { label = "flash" }           # FLASH
+      "/dev/sdf" = { label = "data" }           # DATA
+      "/dev/sdg" = { label = "data" }           # DATA
+      "/dev/sdh" = { label = "data" }           # DATA
+      "/dev/sdi" = { label = "data" }           # DATA
+      "/dev/sdj" = { label = "data" }           # DATA
+      "/dev/sdk" = { label = "flash" }          # FLASH
+      "/dev/sdl" = { label = "flash" }          # FLASH
+      "/dev/sdm" = { label = "flash" }          # FLASH
+      "/dev/sdn" = { label = "flash" }          # FLASH
       "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {

@@ -28,17 +28,20 @@ locals {
         "ec2_instance_linux",
         "ec2_instance_oracle_db_with_backup",
         "ec2_instance_textfile_monitoring",
+        "ec2_windows",
       ]
+      # cloudwatch_metric_alarms_default_actions = ["dso_pagerduty"] # disabled to prevent duplication on cross-account alarms
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
-      enable_image_builder                        = true
       enable_ec2_cloud_watch_agent                = true
-      enable_ec2_reduced_ssm_policy               = true
-      enable_ec2_self_provision                   = true
       enable_ec2_oracle_enterprise_managed_server = true
+      enable_ec2_self_provision                   = true
+      enable_ec2_session_manager_cloudwatch_logs  = true
+      enable_ec2_ssm_agent_update                 = true
       enable_ec2_user_keypair                     = true
-      enable_s3_db_backup_bucket                  = true
+      enable_image_builder                        = true
       enable_s3_bucket                            = true
+      enable_s3_db_backup_bucket                  = true
       enable_s3_shared_bucket                     = true
       enable_s3_software_bucket                   = true
       iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
@@ -73,6 +76,19 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
+        ]
+      }
+      "nomis-data-hub-${local.environment}" = {
+        account_name   = "nomis-data-hub-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_filesystems,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
         ]
       }
       "corporate-staff-rostering-${local.environment}" = {
@@ -156,19 +172,6 @@ locals {
       }
     }
 
-    security_groups = {
-      data-oem = local.security_groups.data_oem
-    }
-
-    ssm_parameters = {
-      "/ansible" = {
-        parameters = {
-          ssm_bucket = {
-            description          = "Ansible S3 bucket"
-            value_s3_bucket_name = "s3-bucket"
-          }
-        }
-      }
-    }
+    security_groups = local.security_groups
   }
 }

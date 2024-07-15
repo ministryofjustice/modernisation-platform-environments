@@ -61,73 +61,71 @@ locals {
       apply_only_at_cron_interval = true
       name                        = "AWS-UpdateSSMAgent"
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-ssm-agent-patchgroup1
-      targets = [{
-        key    = "tag:update-ssm-agent"
-        values = ["patchgroup1"]
-      }]
+      targets = [
+        { key = "tag:update-ssm-agent", values = ["patchgroup1"] },
+      ]
     }
     AWS-UpdateSSMAgent-patchgroup2 = {
       apply_only_at_cron_interval = true
       name                        = "AWS-UpdateSSMAgent"
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-ssm-agent-patchgroup2
-      targets = [{
-        key    = "tag:update-ssm-agent"
-        values = ["patchgroup2"]
-      }]
+      targets = [
+        { key = "tag:update-ssm-agent", values = ["patchgroup2"] },
+      ]
     }
     ec2-configuration-management-windows-daily = {
       apply_only_at_cron_interval = true
       name                        = "ec2-configuration-management-windows"
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-daily
-      targets = [{
-        key    = "tag:update-configuration-management"
-        values = ["daily"]
-      }]
+      targets = [
+        { key = "tag:update-configuration-management", values = ["daily"] },
+        { key = "tag:os-type", values = ["Windows"] },
+      ]
     }
     ec2-configuration-management-windows-patchgroup1 = {
       apply_only_at_cron_interval = true
       name                        = "ec2-configuration-management-windows"
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-patchgroup1
-      targets = [{
-        key    = "tag:update-configuration-management"
-        values = ["patchgroup1"]
-      }]
+      targets = [
+        { key = "tag:update-configuration-management", values = ["patchgroup1"] },
+        { key = "tag:os-type", values = ["Windows"] },
+      ]
     }
     ec2-configuration-management-windows-patchgroup2 = {
       apply_only_at_cron_interval = true
       name                        = "ec2-configuration-management-windows"
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-patchgroup2
-      targets = [{
-        key    = "tag:update-configuration-management"
-        values = ["patchgroup2"]
-      }]
+      targets = [
+        { key = "tag:update-configuration-management", values = ["patchgroup2"] },
+        { key = "tag:os-type", values = ["Windows"] },
+      ]
     }
     ec2-configuration-management-linux-daily = {
       apply_only_at_cron_interval = true
       name                        = "ec2-configuration-management-linux"
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-daily
-      targets = [{
-        key    = "tag:update-configuration-management"
-        values = ["daily"]
-      }]
+      targets = [
+        { key = "tag:update-configuration-management", values = ["daily"] },
+        { key = "tag:os-type", values = ["Linux"] },
+      ]
     }
     ec2-configuration-management-linux-patchgroup1 = {
       apply_only_at_cron_interval = true
       name                        = "ec2-configuration-management-linux"
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-patchgroup1
-      targets = [{
-        key    = "tag:update-configuration-management"
-        values = ["patchgroup1"]
-      }]
+      targets = [
+        { key = "tag:update-configuration-management", values = ["patchgroup1"] },
+        { key = "tag:os-type", values = ["Linux"] },
+      ]
     }
     ec2-configuration-management-linux-patchgroup2 = {
       apply_only_at_cron_interval = true
       name                        = "ec2-configuration-management-linux"
       schedule_expression         = local.ssm_schedule_expressions[var.environment.environment].update-configuration-management-patchgroup2
-      targets = [{
-        key    = "tag:update-configuration-management"
-        values = ["patchgroup2"]
-      }]
+      targets = [
+        { key = "tag:update-configuration-management", values = ["patchgroup2"] },
+        { key = "tag:os-type", values = ["Linux"] },
+      ]
     }
   }
 
