@@ -43,7 +43,7 @@ module "test-2c" {
   operating_system     = "REDHAT_ENTERPRISE_LINUX"
   suffix               = "-red"
   patch_tag            = "eu-west-2c"
-  patch_classification = ["Security", "Bugfix"]
+  patch_classification= ["Security", "Bugfix"]
   severity             = ["Critical", "Important"]
   product              = ["RedhatEnterpriseLinux8.5"]
 
