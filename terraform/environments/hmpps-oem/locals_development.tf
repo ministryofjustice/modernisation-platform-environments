@@ -28,12 +28,11 @@ locals {
           ami_name                  = "base_ol_8_5*"
           iam_resource_names_prefix = "ec2-instance"
           instance_profile_policies = [
-            # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
             "EC2Default",
             "EC2S3BucketWriteAndDeleteAccessPolicy",
             "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
           ]
-          ssm_parameters_prefix = "ec2/" # TODO: remove
           subnet_name           = "private"
         }
         instance = {
@@ -56,27 +55,18 @@ locals {
           ]
         }
         tags = {
-          ami = "base_ol_8_5"
-          # backup           = "false"
-          description = "For testing our base OL8.5 base image"
-          component   = "test"
-          os-type     = "Linux"
-          server-type = "base-ol-8-5" # TODO 
-          # update-ssm-agent = "patchgroup1"
+          backup           = "false"
+          description      = "For testing our base OL8.5 base image"
+          component        = "test"
+          os-type          = "Linux"
+          server-type      = "base-ol85"
+          update-ssm-agent = "patchgroup1"
         }
       }
     }
 
     ec2_instances = {
       dev-oem-a = merge(local.ec2_instances.oem, {
-        cloudwatch_metric_alarms = merge(
-          module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2,
-          module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux,
-          module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
-          module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
-          module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_connected,
-          # module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,  # TODO - enable
-        )
         config = merge(local.ec2_instances.oem.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-12-07T12-10-49.620Z"
           availability_zone = "eu-west-2a"
