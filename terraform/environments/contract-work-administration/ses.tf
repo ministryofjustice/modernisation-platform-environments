@@ -1,6 +1,6 @@
 resource "aws_sesv2_email_identity" "cwa" {
   email_identity         = local.environment == "production" ? "tbc" : data.aws_route53_zone.external.name
-  configuration_set_name = local.environment == "production" ? aws_sesv2_configuration_set[0].cwa.configuration_set_name : null
+  configuration_set_name = local.environment == "production" ? aws_sesv2_configuration_set.cwa[0].configuration_set_name : null
   dkim_signing_attributes {
     next_signing_key_length    = "RSA_1024_BIT"
   }
