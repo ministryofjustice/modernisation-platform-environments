@@ -41,9 +41,9 @@ module "test-2c" {
   approval_days        = "0"
   patch_schedule       = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
   operating_system     = "REDHAT_ENTERPRISE_LINUX"
-  suffix               = "-red"
+  suffix                = "-red"
   patch_tag            = "eu-west-2c"
-  patch_classification = ["Security", "Bugfix"]
+  patch_classification  = ["Security", "Bugfix"]
   severity             = ["Critical", "Important"]
   product              = ["RedhatEnterpriseLinux8.5"]
 
@@ -59,17 +59,20 @@ module "test-2c" {
 module "development" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   # This is an internal module so commit hashes are not needed
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v3.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=ssm-patch-module-refactor"
   count  = local.is-development == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
   }
 
-  account_number   = local.environment_management.account_ids[terraform.workspace]
-  application_name = local.application_name
-  approval_days    = "0"
-  patch_schedule   = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
-  operating_system = "REDHAT_ENTERPRISE_LINUX"
+  account_number        = local.environment_management.account_ids[terraform.workspace]
+  application_name      = local.application_name
+  approval_days         = "0"
+  patch_schedule        = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
+  operating_system      = "REDHAT_ENTERPRISE_LINUX"
+  patch_classification   = ["Security", "Bugfix"]
+  severity              = ["Critical", "Important"]
+  product               = ["RedhatEnterpriseLinux8.5"]
 
   tags = merge(
     local.tags,
