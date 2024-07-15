@@ -72,7 +72,7 @@ locals {
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
         ssm_parameters_prefix = "ec2/" # TODO REMOVE
-        subnet_name = "private"
+        subnet_name           = "private"
       }
       instance = {
         disable_api_termination      = false
@@ -119,9 +119,9 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
-        subnet_name   = "private"
+        subnet_name           = "private"
         ssm_parameters_prefix = "ec2/" # TODO REMOVE
-        user_data_raw = base64encode(file("./templates/ndh-user-data.yaml"))
+        user_data_raw         = base64encode(file("./templates/ndh-user-data.yaml"))
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }

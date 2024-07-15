@@ -18,7 +18,7 @@ resource "aws_vpc_security_group_egress_rule" "dms_db_conn_out" {
     { Name = "oracle-out" }
   )
 }
-  
+
 resource "aws_vpc_security_group_ingress_rule" "dms_db_conn_in" {
   security_group_id            = aws_security_group.dms.id
   description                  = "Allow incoming communication between delius db instances and DMS"

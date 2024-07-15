@@ -129,7 +129,7 @@ resource "aws_cloudwatch_metric_alarm" "elb_unhealthy_hosts_count" {
   alarm_description   = "CWA ELB Healthy Hosts less than Threshold"
   comparison_operator = "GreaterThanThreshold"
   dimensions = {
-    TargetGroup = aws_lb_target_group.external.arn_suffix
+    TargetGroup  = aws_lb_target_group.external.arn_suffix
     LoadBalancer = aws_lb.external.arn_suffix
   }
   evaluation_periods = 1
@@ -260,8 +260,8 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_memory" {
   alarm_description   = "Average EC2 memory usage exceeds the predefined threshold"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    InstanceId = aws_instance.database.id
-    ImageId = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
+    ImageId      = aws_instance.database.ami
     InstanceType = aws_instance.database.instance_type
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
@@ -286,10 +286,10 @@ resource "aws_cloudwatch_metric_alarm" "database_rx_packet_errors" {
   alarm_description   = "Number of RX Packet Errors Over Threshold"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    InstanceId = aws_instance.database.id
-    ImageId = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
+    ImageId      = aws_instance.database.ami
     InstanceType = aws_instance.database.instance_type
-    interface = local.ec2_network_interface
+    interface    = local.ec2_network_interface
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "net_err_in"
@@ -313,10 +313,10 @@ resource "aws_cloudwatch_metric_alarm" "database_rx_packet_dropped" {
   alarm_description   = "Number of Dropped RX Packets Over Threshold"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    InstanceId = aws_instance.database.id
-    ImageId = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
+    ImageId      = aws_instance.database.ami
     InstanceType = aws_instance.database.instance_type
-    interface = local.ec2_network_interface
+    interface    = local.ec2_network_interface
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "net_drop_in"
@@ -340,10 +340,10 @@ resource "aws_cloudwatch_metric_alarm" "database_tx_packet_errors" {
   alarm_description   = "Number of TX Packet Errors Over Threshold"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    InstanceId = aws_instance.database.id
-    ImageId = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
+    ImageId      = aws_instance.database.ami
     InstanceType = aws_instance.database.instance_type
-    interface = local.ec2_network_interface
+    interface    = local.ec2_network_interface
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "net_err_out"
@@ -367,10 +367,10 @@ resource "aws_cloudwatch_metric_alarm" "database_tx_packet_dropped" {
   alarm_description   = "Number of Dropped tx Packets Over Threshold"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    InstanceId = aws_instance.database.id
-    ImageId = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
+    ImageId      = aws_instance.database.ami
     InstanceType = aws_instance.database.instance_type
-    interface = local.ec2_network_interface
+    interface    = local.ec2_network_interface
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "net_drop_out"
@@ -394,12 +394,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oradata_read" {
   alarm_description   = "EBS Oradata Volume - Reads too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oradata"
-    ImageId = aws_instance.database.ami
-    InstanceId = aws_instance.database.id
+    path         = "/CWA/oradata"
+    ImageId      = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oradata_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oradata_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_reads_oradata"
@@ -423,12 +423,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oraredo_read" {
   alarm_description   = "EBS oraredo Volume - Reads too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oraredo"
-    ImageId = aws_instance.database.ami
-    InstanceId = aws_instance.database.id
+    path         = "/CWA/oraredo"
+    ImageId      = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oraredo_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oraredo_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_reads_oraredo"
@@ -452,12 +452,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oraarch_read" {
   alarm_description   = "EBS oraarch Volume - Reads too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oraarch"
-    ImageId = aws_instance.database.ami
-    InstanceId = aws_instance.database.id
+    path         = "/CWA/oraarch"
+    ImageId      = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oraarch_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oraarch_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_reads_oraarch"
@@ -481,12 +481,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oratmp_read" {
   alarm_description   = "EBS oratmp Volume - Reads too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oratmp"
-    ImageId = aws_instance.database.ami
-    InstanceId = aws_instance.database.id
+    path         = "/CWA/oratmp"
+    ImageId      = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oratmp_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oratmp_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_reads_oratmp"
@@ -510,12 +510,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oracle_read" {
   alarm_description   = "EBS oracle Volume - Reads too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oracle"
-    ImageId = aws_instance.database.ami
-    InstanceId = aws_instance.database.id
+    path         = "/CWA/oracle"
+    ImageId      = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oracle_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oracle_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_reads_oracle"
@@ -539,12 +539,12 @@ resource "aws_cloudwatch_metric_alarm" "database_root_read" {
   alarm_description   = "EBS root Volume - Reads too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/"
-    ImageId = aws_instance.database.ami
-    InstanceId = aws_instance.database.id
+    path         = "/"
+    ImageId      = aws_instance.database.ami
+    InstanceId   = aws_instance.database.id
     InstanceType = aws_instance.database.instance_type
-    device = local.root_device_name
-    fstype = "ext4"
+    device       = local.root_device_name
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_reads_root"
@@ -568,12 +568,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oraredo_diskspace" {
   alarm_description   = "EBS Oraredo Volume - Disk Space is Low"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oraredo"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oraredo"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oraredo_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oraredo_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "disk_used_percent_oraredo"
@@ -597,12 +597,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oradata_diskspace" {
   alarm_description   = "EBS Oradata Volume - Disk Space is Low"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oradata"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oradata"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oradata_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oradata_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "disk_used_percent_oradata"
@@ -626,12 +626,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oratmp_diskspace" {
   alarm_description   = "EBS Oratmp Volume - Disk Space is Low"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oratmp"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oratmp"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oratmp_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oratmp_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "disk_used_percent_oratmp"
@@ -655,12 +655,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oraarch_diskspace" {
   alarm_description   = "EBS oraarch Volume - Disk Space is Low"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oraarch"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oraarch"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oraarch_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oraarch_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "disk_used_percent_oraarch"
@@ -684,12 +684,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oracle_diskspace" {
   alarm_description   = "EBS oracle Volume - Disk Space is Low"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oracle"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oracle"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oracle_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oracle_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "disk_used_percent_oracle"
@@ -713,12 +713,12 @@ resource "aws_cloudwatch_metric_alarm" "database_root_diskspace" {
   alarm_description   = "EBS root Volume - Disk Space is Low"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = local.root_device_name
-    fstype = "ext4"
+    device       = local.root_device_name
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "disk_used_percent_root"
@@ -742,12 +742,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oraarch_writes" {
   alarm_description   = "EBS Oraarch Volume - Writes too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oraarch"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oraarch"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oraarch_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oraarch_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_writes_oraarch"
@@ -771,12 +771,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oratmp_writes" {
   alarm_description   = "EBS oratmp Volume - Writes too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oratmp"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oratmp"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oratmp_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oratmp_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_writes_oratmp"
@@ -800,12 +800,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oradata_writes" {
   alarm_description   = "EBS oradata Volume - Writes too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oradata"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oradata"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oradata_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oradata_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_writes_oradata"
@@ -829,12 +829,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oraredo_writes" {
   alarm_description   = "EBS oraredo Volume - Writes too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oraredo"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oraredo"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oraredo_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oraredo_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_writes_oraredo"
@@ -858,12 +858,12 @@ resource "aws_cloudwatch_metric_alarm" "database_oracle_writes" {
   alarm_description   = "EBS oracle Volume - Writes too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/CWA/oracle"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/CWA/oracle"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = "/dev/xvd${local.oracle_device_name_letter}"
-    fstype = "ext4"
+    device       = "/dev/xvd${local.oracle_device_name_letter}"
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_writes_oracle"
@@ -887,12 +887,12 @@ resource "aws_cloudwatch_metric_alarm" "database_root_writes" {
   alarm_description   = "EBS root Volume - Writes too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   dimensions = {
-    path = "/"
-    InstanceId = aws_instance.database.id
-    ImageId = local.application_data.accounts[local.environment].db_ami_id
+    path         = "/"
+    InstanceId   = aws_instance.database.id
+    ImageId      = local.application_data.accounts[local.environment].db_ami_id
     InstanceType = aws_instance.database.instance_type
-    device = local.root_device_name
-    fstype = "ext4"
+    device       = local.root_device_name
+    fstype       = "ext4"
   }
   evaluation_periods = local.application_data.accounts[local.environment].alert_eval_period
   metric_name        = "volume_writes_root"
@@ -1010,7 +1010,7 @@ resource "aws_cloudwatch_metric_alarm" "app1_apache_process" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "app2_f60srvm_process" {
-  count = contains(["development", "testing"], local.environment) ? 0 : 1
+  count               = contains(["development", "testing"], local.environment) ? 0 : 1
   alarm_name          = "${local.application_name_short}-${local.environment}-app2-f60srvm-process"
   alarm_description   = ""
   comparison_operator = "GreaterThanThreshold"
@@ -1129,40 +1129,40 @@ data "template_file" "dashboard_no_ha" {
 
   # TODO Update the local variables to reference the correct alarms once they are created
   vars = {
-    aws_region                  = "eu-west-2"
-    dashboard_refresh_period    = 60
-    database_instance_id        = aws_instance.database.id
-    database_cpu_alarm          = aws_cloudwatch_metric_alarm.database_cpu.arn
-    database_memory_alarm       = aws_cloudwatch_metric_alarm.database_ec2_memory.arn
-    database_oradata_diskspace_alarm  = aws_cloudwatch_metric_alarm.database_oradata_diskspace.arn
-    database_oraarch_diskspace_alarm  = aws_cloudwatch_metric_alarm.database_oraarch_diskspace.arn
-    database_oratmp_diskspace_alarm   = aws_cloudwatch_metric_alarm.database_oratmp_diskspace.arn
+    aws_region                       = "eu-west-2"
+    dashboard_refresh_period         = 60
+    database_instance_id             = aws_instance.database.id
+    database_cpu_alarm               = aws_cloudwatch_metric_alarm.database_cpu.arn
+    database_memory_alarm            = aws_cloudwatch_metric_alarm.database_ec2_memory.arn
+    database_oradata_diskspace_alarm = aws_cloudwatch_metric_alarm.database_oradata_diskspace.arn
+    database_oraarch_diskspace_alarm = aws_cloudwatch_metric_alarm.database_oraarch_diskspace.arn
+    database_oratmp_diskspace_alarm  = aws_cloudwatch_metric_alarm.database_oratmp_diskspace.arn
     database_oraredo_diskspace_alarm = aws_cloudwatch_metric_alarm.database_oraredo_diskspace.arn
-    database_oracle_diskspace_alarm = aws_cloudwatch_metric_alarm.database_oracle_diskspace.arn
-    database_root_diskspace_alarm = aws_cloudwatch_metric_alarm.database_root_diskspace.arn
+    database_oracle_diskspace_alarm  = aws_cloudwatch_metric_alarm.database_oracle_diskspace.arn
+    database_root_diskspace_alarm    = aws_cloudwatch_metric_alarm.database_root_diskspace.arn
     database_rx_packet_dropped_alarm = aws_cloudwatch_metric_alarm.database_rx_packet_dropped.arn
     database_tx_packet_dropped_alarm = aws_cloudwatch_metric_alarm.database_tx_packet_dropped.arn
-    database_rx_packet_errors_alarm = aws_cloudwatch_metric_alarm.database_rx_packet_errors.arn
-    database_tx_packet_errors_alarm = aws_cloudwatch_metric_alarm.database_tx_packet_errors.arn
-    database_oradata_read_alarm = aws_cloudwatch_metric_alarm.database_oradata_read.arn
-    database_oraarch_read_alarm = aws_cloudwatch_metric_alarm.database_oraarch_read.arn
-    database_oratmp_read_alarm = aws_cloudwatch_metric_alarm.database_oratmp_read.arn
-    database_oraredo_read_alarm = aws_cloudwatch_metric_alarm.database_oraredo_read.arn
-    database_oracle_read_alarm = aws_cloudwatch_metric_alarm.database_oracle_read.arn
-    database_root_read_alarm = aws_cloudwatch_metric_alarm.database_root_read.arn
-    database_oradata_writes_alarm = aws_cloudwatch_metric_alarm.database_oradata_writes.arn
-    database_oraarch_writes_alarm  = aws_cloudwatch_metric_alarm.database_oraarch_writes.arn
-    database_oratmp_writes_alarm   = aws_cloudwatch_metric_alarm.database_oratmp_writes.arn
-    database_oraredo_writes_alarm = aws_cloudwatch_metric_alarm.database_oraredo_writes.arn
-    database_oracle_writes_alarm = aws_cloudwatch_metric_alarm.database_oracle_writes.arn
-    database_root_writes_alarm = aws_cloudwatch_metric_alarm.database_root_writes.arn
-    database_status_check_alarm = aws_cloudwatch_metric_alarm.database_ec2_status_check.arn
-    cm_status_check_alarm       = aws_cloudwatch_metric_alarm.cm_ec2_status_check.arn
-    app1_status_check_alarm     = aws_cloudwatch_metric_alarm.app1_ec2_status_check.arn
-    elb_request_count_alarm     = aws_cloudwatch_metric_alarm.elb_request_count.arn
-    efs_data_read_alarm         = aws_cloudwatch_metric_alarm.efs_data_read.arn
-    efs_data_write_alarm        = aws_cloudwatch_metric_alarm.efs_data_write.arn
-    database_ec2_swap_alarm     = aws_cloudwatch_metric_alarm.database_ec2_swap.arn
+    database_rx_packet_errors_alarm  = aws_cloudwatch_metric_alarm.database_rx_packet_errors.arn
+    database_tx_packet_errors_alarm  = aws_cloudwatch_metric_alarm.database_tx_packet_errors.arn
+    database_oradata_read_alarm      = aws_cloudwatch_metric_alarm.database_oradata_read.arn
+    database_oraarch_read_alarm      = aws_cloudwatch_metric_alarm.database_oraarch_read.arn
+    database_oratmp_read_alarm       = aws_cloudwatch_metric_alarm.database_oratmp_read.arn
+    database_oraredo_read_alarm      = aws_cloudwatch_metric_alarm.database_oraredo_read.arn
+    database_oracle_read_alarm       = aws_cloudwatch_metric_alarm.database_oracle_read.arn
+    database_root_read_alarm         = aws_cloudwatch_metric_alarm.database_root_read.arn
+    database_oradata_writes_alarm    = aws_cloudwatch_metric_alarm.database_oradata_writes.arn
+    database_oraarch_writes_alarm    = aws_cloudwatch_metric_alarm.database_oraarch_writes.arn
+    database_oratmp_writes_alarm     = aws_cloudwatch_metric_alarm.database_oratmp_writes.arn
+    database_oraredo_writes_alarm    = aws_cloudwatch_metric_alarm.database_oraredo_writes.arn
+    database_oracle_writes_alarm     = aws_cloudwatch_metric_alarm.database_oracle_writes.arn
+    database_root_writes_alarm       = aws_cloudwatch_metric_alarm.database_root_writes.arn
+    database_status_check_alarm      = aws_cloudwatch_metric_alarm.database_ec2_status_check.arn
+    cm_status_check_alarm            = aws_cloudwatch_metric_alarm.cm_ec2_status_check.arn
+    app1_status_check_alarm          = aws_cloudwatch_metric_alarm.app1_ec2_status_check.arn
+    elb_request_count_alarm          = aws_cloudwatch_metric_alarm.elb_request_count.arn
+    efs_data_read_alarm              = aws_cloudwatch_metric_alarm.efs_data_read.arn
+    efs_data_write_alarm             = aws_cloudwatch_metric_alarm.efs_data_write.arn
+    database_ec2_swap_alarm          = aws_cloudwatch_metric_alarm.database_ec2_swap.arn
 
   }
 }

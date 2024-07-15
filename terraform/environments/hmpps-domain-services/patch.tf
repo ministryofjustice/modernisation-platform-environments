@@ -7,16 +7,16 @@ module "test-2a" {
     aws.bucket-replication = aws
   }
 
-  account_number      = local.environment_management.account_ids[terraform.workspace]
-  application_name    = local.application_name
-  approval_days       = "0"
-  patch_schedule      = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
-  operating_system    = "WINDOWS"
+  account_number       = local.environment_management.account_ids[terraform.workspace]
+  application_name     = local.application_name
+  approval_days        = "0"
+  patch_schedule       = "cron(0 21 ? * TUE#2 *)" # 2nd Tues @ 9pm
+  operating_system     = "WINDOWS"
   suffix               = "-win"
-  patch_tag           = "eu-west-2a"
+  patch_tag            = "eu-west-2a"
   patch_classification = ["SecurityUpdates", "CriticalUpdates"]
-  severity            = ["Critical","Important"]
-  product             = ["WindowsServer2022"]
+  severity             = ["Critical", "Important"]
+  product              = ["WindowsServer2022"]
 
 
   tags = merge(
@@ -36,16 +36,16 @@ module "test-2c" {
     aws.bucket-replication = aws
   }
 
-  account_number      = local.environment_management.account_ids[terraform.workspace]
-  application_name    = local.application_name
-  approval_days       = "0"
-  patch_schedule      = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
-  operating_system    = "REDHAT_ENTERPRISE_LINUX"
+  account_number       = local.environment_management.account_ids[terraform.workspace]
+  application_name     = local.application_name
+  approval_days        = "0"
+  patch_schedule       = "cron(0 21 ? * WED#2 *)" # 2nd Weds @ 9pm
+  operating_system     = "REDHAT_ENTERPRISE_LINUX"
   suffix               = "-red"
-  patch_tag           = "eu-west-2c"
+  patch_tag            = "eu-west-2c"
   patch_classification = ["Security", "Bugfix"]
-  severity            = ["Critical","Important"]
-  product             = ["RedhatEnterpriseLinux8.5"]
+  severity             = ["Critical", "Important"]
+  product              = ["RedhatEnterpriseLinux8.5"]
 
 
   tags = merge(

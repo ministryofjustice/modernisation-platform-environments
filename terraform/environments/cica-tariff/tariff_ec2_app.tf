@@ -17,13 +17,13 @@ resource "aws_instance" "tariff_app" {
   key_name                    = aws_key_pair.key_pair_app.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  user_data = <<EOF
+  user_data                   = <<EOF
             #!/bin/bash
             yum update -y
             yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
             systemctl status amazon-ssm-agent
             EOF
-  vpc_security_group_ids = [aws_security_group.tariff_app_security_group.id]
+  vpc_security_group_ids      = [aws_security_group.tariff_app_security_group.id]
 
   root_block_device {
     delete_on_termination = true
