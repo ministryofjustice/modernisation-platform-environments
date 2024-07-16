@@ -26,12 +26,6 @@ locals {
     windows-cloudwatch-agent-config = {
       content = file("./ssm-documents/windows-cloudwatch-agent-config.yaml")
     }
-    windows-domain-join = {
-      content = file("./ssm-documents/windows-domain-join.yaml")
-    }
-    windows-domain-leave = {
-      content = file("./ssm-documents/windows-domain-leave.yaml")
-    }
     # windows-psreadline-fix = {
     #   content = file("./ssm-documents/windows-psreadline-fix.yaml")
     # }

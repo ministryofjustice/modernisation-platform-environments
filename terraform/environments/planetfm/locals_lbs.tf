@@ -5,12 +5,12 @@ locals {
     private = {
       enable_cross_zone_load_balancing = true
       enable_delete_protection         = false
-      # force_destroy_bucket     = true # TODO
-      idle_timeout       = 3600
-      load_balancer_type = "application"
-      internal_lb        = true
-      security_groups    = ["loadbalancer"]
-      subnets            = module.environment.subnets["private"].ids
+      force_destroy_bucket             = true
+      idle_timeout                     = 3600
+      load_balancer_type               = "application"
+      internal_lb                      = true
+      security_groups                  = ["loadbalancer"]
+      subnets                          = module.environment.subnets["private"].ids
 
       instance_target_groups = {
         web-80 = {
@@ -48,7 +48,7 @@ locals {
           }
         }
         https = {
-          # module.baseline_presets.cloudwatch_metric_alarms.lb # TODO
+          cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
           certificate_names_or_arns = ["planetfm_wildcard_cert"]
           port                      = 443
           protocol                  = "HTTPS"
