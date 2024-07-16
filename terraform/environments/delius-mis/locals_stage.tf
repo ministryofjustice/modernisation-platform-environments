@@ -338,18 +338,18 @@ locals {
     }
 
     ebs_volumes = {
-      "/dev/sdb"  = { label = "app", size = 200 } # /u01
-      "/dev/sdc"  = { label = "app", size = 100 } # /u02
-      "/dev/sde1" = { label = "data" }            # DATA
-      "/dev/sde2" = { label = "data" }            # DATA
-      "/dev/sde3" = { label = "data" }            # DATA
-      "/dev/sde4" = { label = "data" }            # DATA
-      "/dev/sde5" = { label = "data" }            # DATA
-      "/dev/sdf1" = { label = "flash" }           # FLASH
-      "/dev/sdf2" = { label = "flash" }           # FLASH
-      "/dev/sdf3" = { label = "flash" }           # FLASH
-      "/dev/sdf4" = { label = "flash" }           # FLASH
-      "/dev/sds"  = { label = "swap" }
+      "/dev/sdb" = { label = "app", size = 200 } # /u01
+      "/dev/sdc" = { label = "app", size = 100 } # /u02
+      "/dev/sdf" = { label = "data" }           # DATA
+      "/dev/sdg" = { label = "data" }           # DATA
+      "/dev/sdh" = { label = "data" }           # DATA
+      "/dev/sdi" = { label = "data" }           # DATA
+      "/dev/sdj" = { label = "data" }           # DATA
+      "/dev/sdk" = { label = "flash" }          # FLASH
+      "/dev/sdl" = { label = "flash" }          # FLASH
+      "/dev/sdm" = { label = "flash" }          # FLASH
+      "/dev/sdn" = { label = "flash" }          # FLASH
+      "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {
       app = {
