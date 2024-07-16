@@ -97,4 +97,7 @@ tasks:
           $ScriptExitCodeFilePath = $([System.IO.Path]::GetTempPath()) + "Run-GitScriptExitCode.txt"
           New-Item -Path $ScriptExitCodeFilePath -ItemType File
           Add-Content -Path $ScriptExitCodeFilePath -Value $ScriptExitCode
+          $StateFilePath = $([System.IO.Path]::GetTempPath()) + "Run-GitScriptState.json"
+          New-Item -Path $StateFilePath -ItemType File
+          Get-Content -Path C:\ProgramData\Amazon\EC2Launch\state\state.json | Add-Content -Path $StateFilePath
           Exit $ScriptExitCode
