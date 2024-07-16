@@ -2,6 +2,10 @@
 # See common settings in locals.tf and environment specific settings in
 # locals_development.tf, locals_test.tf etc.
 
+resource "aws_ec2_serial_console_access" "default" {
+  enabled = true
+}
+
 module "ip_addresses" {
   source = "../../modules/ip_addresses"
 }
