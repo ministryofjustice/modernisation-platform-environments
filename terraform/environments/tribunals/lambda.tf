@@ -33,6 +33,7 @@ resource "aws_lambda_function" "app_setup_db" {
   handler       = "index.handler"
   runtime       = "python3.12"
   timeout       = 300
+  architectures = ["arm64"]
 
   environment {
     variables = {
