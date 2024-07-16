@@ -373,101 +373,101 @@ resource "aws_instance" "edw_db_instance" {
 
 ####### DB Volumes #######
 
-# resource "aws_ebs_volume" "orahomeVolume" {
-#   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
-#   size              = local.application_data.accounts[local.environment].edw_OrahomeVolumeSize
-#   encrypted         = true
-#   type              = "gp3"
-#     kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].orahome_snapshot_id # This is used for when data is being migrated
+resource "aws_ebs_volume" "orahomeVolume" {
+  availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
+  size              = local.application_data.accounts[local.environment].edw_OrahomeVolumeSize
+  encrypted         = true
+  type              = "gp3"
+    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].orahome_snapshot_id # This is used for when data is being migrated
 
-#   tags = {
-#     Name = "${local.application_data.accounts[local.environment].edw_AppName}-orahome"
-#   }
-# }
+  tags = {
+    Name = "${local.application_data.accounts[local.environment].edw_AppName}-orahome"
+  }
+}
 
-# resource "aws_volume_attachment" "orahomeVolume-attachment" {
-#   device_name = "/dev/sdi"
-#   volume_id   = aws_ebs_volume.orahomeVolume.id
-#   instance_id = aws_instance.edw_db_instance.id
-# }
+resource "aws_volume_attachment" "orahomeVolume-attachment" {
+  device_name = "/dev/sdi"
+  volume_id   = aws_ebs_volume.orahomeVolume.id
+  instance_id = aws_instance.edw_db_instance.id
+}
 
-# resource "aws_ebs_volume" "oratempVolume" {
-#   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
-#   size              = local.application_data.accounts[local.environment].edw_OratempVolumeSize
-#   encrypted         = true
-#   type              = "gp3"
-#     kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
+resource "aws_ebs_volume" "oratempVolume" {
+  availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
+  size              = local.application_data.accounts[local.environment].edw_OratempVolumeSize
+  encrypted         = true
+  type              = "gp3"
+    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
 
-#   tags = {
-#     Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraredo"
-#   }
-# }
+  tags = {
+    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraredo"
+  }
+}
 
-# resource "aws_volume_attachment" "oratempVolume-attachment" {
-#   device_name = "/dev/sdj"
-#   volume_id   = aws_ebs_volume.oratempVolume.id
-#   instance_id = aws_instance.edw_db_instance.id
-# }
+resource "aws_volume_attachment" "oratempVolume-attachment" {
+  device_name = "/dev/sdj"
+  volume_id   = aws_ebs_volume.oratempVolume.id
+  instance_id = aws_instance.edw_db_instance.id
+}
 
-# resource "aws_ebs_volume" "oradataVolume" {
-#   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
-#   size              = local.application_data.accounts[local.environment].edw_OradataVolumeSize
-#   encrypted         = true
-#   type              = "gp3"
-#     kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
+resource "aws_ebs_volume" "oradataVolume" {
+  availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
+  size              = local.application_data.accounts[local.environment].edw_OradataVolumeSize
+  encrypted         = true
+  type              = "gp3"
+    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
 
-#   tags = {
-#     Name = "${local.application_data.accounts[local.environment].edw_AppName}-oradata"
-#   }
-# }
+  tags = {
+    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oradata"
+  }
+}
 
-# resource "aws_volume_attachment" "oradataVolume-attachment" {
-#   device_name = "/dev/sdf"
-#   volume_id   = aws_ebs_volume.oradataVolume.id
-#   instance_id = aws_instance.edw_db_instance.id
-# }
+resource "aws_volume_attachment" "oradataVolume-attachment" {
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.oradataVolume.id
+  instance_id = aws_instance.edw_db_instance.id
+}
 
-# resource "aws_ebs_volume" "softwareVolume" {
-#   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
-#   size              = local.application_data.accounts[local.environment].edw_SoftwareVolumeSize
-#   encrypted         = true
-#   type              = "gp3"
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].software_snapshot_id # This is used for when data is being migrated
+resource "aws_ebs_volume" "softwareVolume" {
+  availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
+  size              = local.application_data.accounts[local.environment].edw_SoftwareVolumeSize
+  encrypted         = true
+  type              = "gp3"
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].software_snapshot_id # This is used for when data is being migrated
 
-#   tags = {
-#     Name = "${local.application_data.accounts[local.environment].edw_AppName}-software"
-#   }
-# }
+  tags = {
+    Name = "${local.application_data.accounts[local.environment].edw_AppName}-software"
+  }
+}
 
-# resource "aws_volume_attachment" "softwareVolume-attachment" {
-#   device_name = "/dev/sdg"
-#   volume_id   = aws_ebs_volume.softwareVolume.id
-#   instance_id = aws_instance.edw_db_instance.id
-# }
+resource "aws_volume_attachment" "softwareVolume-attachment" {
+  device_name = "/dev/sdg"
+  volume_id   = aws_ebs_volume.softwareVolume.id
+  instance_id = aws_instance.edw_db_instance.id
+}
 
-# resource "aws_ebs_volume" "ArchiveVolume" {
-#   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
-#   size              = local.application_data.accounts[local.environment].edw_ArchiveVolumeSize
-#   encrypted         = true
-#   type              = "gp3"
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].oraarch_snapshot_id # This is used for when data is being migrated
+resource "aws_ebs_volume" "ArchiveVolume" {
+  availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
+  size              = local.application_data.accounts[local.environment].edw_ArchiveVolumeSize
+  encrypted         = true
+  type              = "gp3"
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oraarch_snapshot_id # This is used for when data is being migrated
 
-#   tags = {
-#     Name                                               = "${local.application_data.accounts[local.environment].edw_AppName}-oraarch"
-#     "dlm:snapshot-with:volume-hourly-35-day-retention" = "yes"
-#   }
-# }
+  tags = {
+    Name                                               = "${local.application_data.accounts[local.environment].edw_AppName}-oraarch"
+    "dlm:snapshot-with:volume-hourly-35-day-retention" = "yes"
+  }
+}
 
-# resource "aws_volume_attachment" "ArchiveVolume-attachment" {
-#   device_name = "/dev/sdh"
-#   volume_id   = aws_ebs_volume.ArchiveVolume.id
-#   instance_id = aws_instance.edw_db_instance.id
-# }
+resource "aws_volume_attachment" "ArchiveVolume-attachment" {
+  device_name = "/dev/sdh"
+  volume_id   = aws_ebs_volume.ArchiveVolume.id
+  instance_id = aws_instance.edw_db_instance.id
+}
 
 
 ####### DB Security Groups #######
