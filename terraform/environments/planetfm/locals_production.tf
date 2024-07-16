@@ -291,6 +291,10 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
+            alarm_target_group_names = [
+              "web-3637-80",
+            ]
+
             rules = {
               web-3637-80 = {
                 priority = 3637
