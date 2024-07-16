@@ -155,6 +155,11 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "oam_sinks", {}),
   )
 
+  options = merge(
+    lookup(local.baseline_all_environments, "options", {}),
+    lookup(local.baseline_environment_specific, "options", {}),
+  )
+
   route53_resolvers = merge(
     module.baseline_presets.route53_resolvers,
     lookup(local.baseline_all_environments, "route53_resolvers", {}),
@@ -188,6 +193,20 @@ module "baseline" {
     lookup(local.baseline_all_environments, "sns_topics", {}),
     lookup(local.baseline_environment_specific, "sns_topics", {}),
   )
+
+  # TODO
+  #ssm_associations = merge(
+  #  module.baseline_presets.ssm_associations,
+  #  lookup(local.baseline_all_environments, "ssm_associations", {}),
+  #  lookup(local.baseline_environment_specific, "ssm_associations", {}),
+  #)
+
+  # TODO
+  #ssm_documents = merge(
+  #  module.baseline_presets.ssm_documents,
+  #  lookup(local.baseline_all_environments, "ssm_documents", {}),
+  #  lookup(local.baseline_environment_specific, "ssm_documents", {}),
+  #)
 
   ssm_parameters = merge(
     module.baseline_presets.ssm_parameters,
