@@ -31,7 +31,11 @@ resource "aws_db_instance" "database" {
   db_subnet_group_name                = aws_db_subnet_group.db.id
   enabled_cloudwatch_logs_exports     = ["error"]
   ca_cert_identifier                  = "rds-ca-rsa2048-g1"
-  apply_immediately = true
+  # BE VERY CAREFUL with apply_immediately = true. Useful if you want to see the results, but can cause a reboot
+  # of RDS meaning the connected app will fail.
+  # When apply_immediately=false, RDS changes are applied during the next maintenance_window
+  # For future reference, updating ca_cert_identifier with apply_immediately=true was fine.
+  apply_immediately                   = false
 
   # timeouts {
   #   create = "40m"
