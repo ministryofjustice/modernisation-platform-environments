@@ -34,7 +34,6 @@ resource "aws_db_instance" "database" {
   # BE VERY CAREFUL with apply_immediately = true. Useful if you want to see the results, but can cause a reboot
   # of RDS meaning the connected app will fail.
   # When apply_immediately=false, RDS changes are applied during the next maintenance_window
-  # For future reference, updating ca_cert_identifier with apply_immediately=true was fine.
   apply_immediately                   = false
 
   # timeouts {
