@@ -12,7 +12,6 @@ locals {
     }
   }
 
-
   # please keep resources in alphabetical order
   baseline_development = {
 
