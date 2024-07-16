@@ -118,12 +118,14 @@ tasks:
             aws autoscaling complete-lifecycle-action --lifecycle-hook-name "$${name}-ready-hook" --auto-scaling-group-name $name --lifecycle-action-result ABANDON --instance-id $instanceId --region $region
           }
           $exitState = Get-Content -Path $ScriptExitCodeFilePath
-          Write-Output "post user data ready hook start" | Out-File -Append -FilePath C:\Windows\Temp\user-data.log
-          if ($exitState -eq 0) {
+          $UserDataLogFilePath = $([System.IO.Path]::GetTempPath()) + "user-data.log"
+
+          Write-Output "post user data ready hook start" | Out-File -Append -FilePath $UserDataLogFilePath
+          if ($exitState -eq 3010) {
             try {
-              Main 2>&1 | Out-File -Append -FilePath C:\Windows\Temp\user-data.log
+              Main 2>&1 | Out-File -Append -FilePath $UserDataLogFilePath
             } catch {
-              $_ | Out-File -Append -FilePath C:\Windows\Temp\user-data.log
+              $_ | Out-File -Append -FilePath $UserDataLogFilePath
             }
           }
-          Write-Output "post user data ready hook end" | Out-File -Append -FilePath C:\Windows\Temp\user-data.log
+          Write-Output "post user data ready hook end" | Out-File -Append -FilePath $UserDataLogFilePath
