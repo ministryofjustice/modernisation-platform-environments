@@ -35,14 +35,14 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         instance = merge(local.ec2_instances.app.instance, {
-          disable_api_stop        = true # TODO: remove
           disable_api_termination = true
           instance_type           = "t3.large"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          ami           = "pp-cafm-a-10-b"
-          description   = "RDS Session Host and CAFM App Server/PFME Licence Server"
-          pre-migration = "PPFAW0010"
+          ami                 = "pp-cafm-a-10-b"
+          description         = "RDS Session Host and CAFM App Server/PFME Licence Server"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPFAW0010"
         })
       })
 
@@ -55,14 +55,14 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         instance = merge(local.ec2_instances.app.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.large"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          ami           = "pp-cafm-a-11-a"
-          description   = "RDS session host and app server"
-          pre-migration = "PPFAW011"
+          ami                 = "pp-cafm-a-11-a"
+          description         = "RDS session host and app server"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPFAW011"
         })
       })
 
@@ -82,15 +82,15 @@ locals {
           "/dev/sdg"  = { type = "gp3", size = 200 }
         }
         instance = merge(local.ec2_instances.db.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "r6i.xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          app-config-status = "pending"
-          ami               = "pp-cafm-db-a"
-          description       = "SQL Server"
-          pre-migration     = "PPFDW0030"
+          ami                 = "pp-cafm-db-a"
+          app-config-status   = "pending"
+          description         = "SQL Server"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPFDW0030"
         })
       })
 
@@ -104,14 +104,14 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         instance = merge(local.ec2_instances.web.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.large"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          ami           = "pp-cafm-w-4-b"
-          description   = "Web Portal Server"
-          pre-migration = "PPFWW0004"
+          ami                 = "pp-cafm-w-4-b"
+          description         = "Web Portal Server"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPFWW0004"
         })
       })
 
@@ -121,18 +121,17 @@ locals {
           availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_instances.web.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.large"
-          monitoring              = true
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         tags = merge(local.ec2_instances.web.tags, {
-          ami           = "pp-cafm-w-5-a"
-          description   = "Migrated server PPFWW0005 Web Portal Server"
-          pre-migration = "PPFWW0005"
+          ami                 = "pp-cafm-w-5-a"
+          description         = "Migrated server PPFWW0005 Web Portal Server"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPFWW0005"
         })
       })
     }

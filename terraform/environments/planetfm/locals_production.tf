@@ -28,6 +28,10 @@ locals {
     ec2_instances = {
       # app servers 
       pd-cafm-a-10-b = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-10-b"
           availability_zone = "eu-west-2b"
@@ -37,18 +41,22 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = {
-          ami           = "pd-cafm-a-10-b"
-          description   = "RDS Session Host and CAFM App Server/PFME Licence Server"
-          pre-migration = "PDFAW0010"
+          ami              = "pd-cafm-a-10-b"
+          description      = "RDS Session Host and CAFM App Server/PFME Licence Server"
+          pre-migration    = "PDFAW0010"
+          update-ssm-agent = "patchgroup2"
         }
       })
 
       pd-cafm-a-11-a = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+        )
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-11-a"
           availability_zone = "eu-west-2a"
@@ -58,18 +66,22 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = {
-          pre-migration = "PDFWA0011"
-          description   = "RDS session host and app server"
-          ami           = "pd-cafm-a-11-a"
+          ami              = "pd-cafm-a-11-a"
+          description      = "RDS session host and app server"
+          pre-migration    = "PDFWA0011"
+          update-ssm-agent = "patchgroup1"
         }
       })
 
       pd-cafm-a-12-b = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-12-b"
           availability_zone = "eu-west-2b"
@@ -79,18 +91,22 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = {
-          ami           = "pd-cafm-a-12-b"
-          description   = "RDS session host and app Server"
-          pre-migration = "PDFAW0012"
+          ami              = "pd-cafm-a-12-b"
+          description      = "RDS session host and app Server"
+          pre-migration    = "PDFAW0012"
+          update-ssm-agent = "patchgroup2"
         }
       })
 
       pd-cafm-a-13-a = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-13-a"
           availability_zone = "eu-west-2a"
@@ -100,19 +116,23 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 28 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = {
-          ami           = "pd-cafm-a-13-a"
-          description   = "RDS session host and App Server"
-          pre-migration = "PDFAW0013"
+          ami              = "pd-cafm-a-13-a"
+          description      = "RDS session host and App Server"
+          pre-migration    = "PDFAW0013"
+          update-ssm-agent = "patchgroup1"
         }
       })
 
       # database servers
       pd-cafm-db-a = merge(local.ec2_instances.db, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.db.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         config = merge(local.ec2_instances.db.config, {
           ami_name          = "pd-cafm-db-a"
           availability_zone = "eu-west-2a"
@@ -129,7 +149,6 @@ locals {
           "/dev/sdi"  = { type = "gp3", size = 250 } # U: drive
         }
         instance = merge(local.ec2_instances.db.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "r6i.4xlarge"
         })
@@ -138,10 +157,15 @@ locals {
           ami               = "pd-cafm-db-a"
           description       = "SQL Server"
           pre-migration     = "PDFDW0030"
+          update-ssm-agent  = "patchgroup1"
         })
       })
 
       pd-cafm-db-b = merge(local.ec2_instances.db, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.db.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         config = merge(local.ec2_instances.db.config, {
           ami_name          = "pd-cafm-db-b"
           availability_zone = "eu-west-2b"
@@ -158,7 +182,6 @@ locals {
           "/dev/sdi"  = { type = "gp3", size = 250 } # U: drive
         }
         instance = merge(local.ec2_instances.db.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "r6i.4xlarge"
         })
@@ -167,11 +190,16 @@ locals {
           ami               = "pd-cafm-db-b"
           description       = "SQL resilient Server"
           pre-migration     = "PDFDW0031"
+          update-ssm-agent  = "patchgroup2"
         })
       })
 
       # web servers
       pd-cafm-w-36-b = merge(local.ec2_instances.web, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.web.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-36-b"
           availability_zone = "eu-west-2b"
@@ -181,18 +209,22 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 28 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = {
-          ami           = "pd-cafm-w-36-b"
-          description   = "CAFM Asset Management"
-          pre-migration = "PDFWW00036"
+          ami              = "pd-cafm-w-36-b"
+          description      = "CAFM Asset Management"
+          pre-migration    = "PDFWW00036"
+          update-ssm-agent = "patchgroup2"
         }
       })
 
       pd-cafm-w-37-a = merge(local.ec2_instances.web, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.web.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-37-a"
           availability_zone = "eu-west-2a"
@@ -202,18 +234,22 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 28 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = {
-          pre-migration = "PFWW00037"
-          description   = "CAFM Assessment Management"
-          ami           = "pd-cafm-w-37-a"
+          pre-migration    = "PFWW00037"
+          description      = "CAFM Assessment Management"
+          ami              = "pd-cafm-w-37-a"
+          update-ssm-agent = "patchgroup1"
         }
       })
 
       pd-cafm-w-38-b = merge(local.ec2_instances.web, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.web.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-38-b"
           availability_zone = "eu-west-2b"
@@ -223,14 +259,14 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 100 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          disable_api_stop        = true
           disable_api_termination = true
           instance_type           = "t3.large"
         })
         tags = {
-          ami           = "pd-cafm-w-38-b"
-          description   = "CAFM Web Training"
-          pre-migration = "PDFWW3QCP660001"
+          ami              = "pd-cafm-w-38-b"
+          description      = "CAFM Web Training"
+          pre-migration    = "PDFWW3QCP660001"
+          update-ssm-agent = "patchgroup2"
         }
       })
     }
