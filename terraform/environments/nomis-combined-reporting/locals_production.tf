@@ -201,6 +201,27 @@ locals {
         })
       })
 
+      pd-ncr-processing-4-a = merge(local.bip_ec2_default, {
+        # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.bip_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "m6i.4xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "Prod SAP BI Platform installation and configurations"
+          instance-scheduling                  = "skip-scheduling"
+          node                                 = "3"
+          nomis-combined-reporting-environment = "pd"
+          type                                 = "processing"
+        })
+      })
+
       pd-ncr-web-1-a = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
