@@ -46,6 +46,32 @@ resource "aws_lambda_function" "app_setup_db" {
       APP_FOLDER    = each.value.sql_migration_path
     }
   }
+
+  vpc_config {
+    subnet_ids         = data.aws_subnets.shared-private.ids
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+}
+
+resource "aws_security_group" "lambda_sg" {
+  name   = "lambda_sg"
+  vpc_id = data.aws_vpc.shared.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group_rule" "allow_lambda_access_to_rds" {
+  type                     = "ingress"
+  from_port                = 1433
+  to_port                  = 1433
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.sqlserver_db_sc.id
+  source_security_group_id = aws_security_group.lambda_sg.id
 }
 
 # resource "null_resource" "app_setup_db" {
