@@ -115,17 +115,21 @@ tasks:
             $name = (aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Name" --output text).Split("`t")[-1]
 
             # Run complete-lifecycle-action using AWS CLI
-            aws autoscaling complete-lifecycle-action --lifecycle-hook-name "$${name}-ready-hook" --auto-scaling-group-name $name --lifecycle-action-result ABANDON --instance-id $instanceId --region $region
+            aws autoscaling complete-lifecycle-action --lifecycle-hook-name "$${name}-ready-hook" --auto-scaling-group-name $name --lifecycle-action-result CONTINUE --instance-id $instanceId --region $region
           }
           $exitState = Get-Content -Path $ScriptExitCodeFilePath
           $UserDataLogFilePath = $([System.IO.Path]::GetTempPath()) + "user-data.log"
+          Add-Content -Path $UserDataLogFilePath -Value "$(Get-Date) Exit state: $exitState"
+          $SuccessFilePath = ([System.IO.Path]::GetTempPath()) + "UserDataSuccess.txt"
 
           Write-Output "post user data ready hook start" | Out-File -Append -FilePath $UserDataLogFilePath
-          if ($exitState -eq 3010) {
+          if (Test-Path $SuccessFilePath) {
             try {
               Main 2>&1 | Out-File -Append -FilePath $UserDataLogFilePath
             } catch {
               $_ | Out-File -Append -FilePath $UserDataLogFilePath
             }
+          } else {
+            Write-Output "$(Get-Date) UserDataSuccess.txt not found, skipping ready hook" | Out-File -Append -FilePath $UserDataLogFilePath
           }
           Write-Output "post user data ready hook end" | Out-File -Append -FilePath $UserDataLogFilePath
