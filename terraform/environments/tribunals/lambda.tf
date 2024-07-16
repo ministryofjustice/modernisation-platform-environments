@@ -27,7 +27,7 @@ resource "random_password" "app_new_password" {
 
 resource "aws_lambda_function" "app_setup_db" {
   for_each      = var.web_app_services
-  filename      = "lambda_function/deployment_package.zip"
+  filename      = "lambda_function/my-deployment-package.zip"
   function_name = "${each.value.name_prefix}-setup-db"
   role          = aws_iam_role.lambda_role.arn
   handler       = "index.handler"
