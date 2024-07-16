@@ -102,6 +102,16 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
         ]
       }
+      "planetfm-${local.environment}" = {
+        account_name   = "planetfm-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
+        ]
+      }
     }
     iam_policies = {
       Ec2OracleEnterpriseManagerPolicy = {
