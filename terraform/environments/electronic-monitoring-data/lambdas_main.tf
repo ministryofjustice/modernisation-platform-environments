@@ -304,3 +304,23 @@ module "load_json_into_athena" {
     SCHEMA_PATH                              = "s3://${module.metadata-s3-bucket.bucket.id}/dlt_schemas"
   }
 }
+
+#-----------------------------------------------------------------------------------
+# S3 lambda function to perform zip file structure extraction into parquet for Athena
+#-----------------------------------------------------------------------------------
+
+module "extract_zip_to_parquet" {
+  source                  = "./modules/lambdas"
+  function_name           = "extract_zip_to_parquet"
+  is_image                = true
+  role_name               = aws_iam_role.extract_zip_to_parquet.name
+  role_arn                = aws_iam_role.extract_zip_to_parquet.arn
+  memory_size             = 1024
+  timeout                 = 900
+  env_account_id          = local.env_account_id
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  security_group_ids      = [aws_security_group.lambda_db_security_group.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
+  environment_variables   = null
+}

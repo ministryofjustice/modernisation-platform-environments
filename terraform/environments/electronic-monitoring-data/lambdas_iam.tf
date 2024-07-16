@@ -618,3 +618,58 @@ resource "aws_iam_role_policy_attachment" "load_json_into_athena_lambda_sqs_queu
   role       = aws_iam_role.load_json_into_athena.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
+
+# ------------------------------------------
+# extract_zip_to_parquet
+# ------------------------------------------
+
+resource "aws_iam_role" "extract_zip_to_parquet" {
+  name                = "extract_zip_to_parquet"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+}
+
+data "aws_iam_policy_document" "extract_zip_to_parquet_s3_policy_document" {
+  statement {
+    sid    = "S3PermissionsForUnzippingLambda"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${aws_s3_bucket.data_store.arn}/*",
+      aws_s3_bucket.data_store.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "extract_zip_to_parquet_s3_policy" {
+  name        = "extract-metadata-from-atrium-unstructured-lambda-s3-policy"
+  description = "Policy for Lambda to use S3 for extract_zip_to_parquet"
+  policy      = data.aws_iam_policy_document.extract_zip_to_parquet_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "extract_zip_to_parquet_s3_policy_attachment" {
+  role       = aws_iam_role.extract_zip_to_parquet.name
+  policy_arn = aws_iam_policy.extract_zip_to_parquet_s3_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "extract_zip_to_parquet_vpc_access_execution" {
+  role       = aws_iam_role.extract_zip_to_parquet.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "extract_zip_to_parquet_sqs_queue_access_execution" {
+  role       = aws_iam_role.extract_zip_to_parquet.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+resource "aws_lambda_permission" "s3_allow_extract_zip_to_parquet" {
+  statement_id  = "AllowOutputFileStructureAsJsonFromZipExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = module.extract_zip_to_parquet.lambda_function_arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.data_store.arn
+}
