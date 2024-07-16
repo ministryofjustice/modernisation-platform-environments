@@ -646,7 +646,7 @@ data "aws_iam_policy_document" "extract_zip_to_parquet_s3_policy_document" {
 }
 
 resource "aws_iam_policy" "extract_zip_to_parquet_s3_policy" {
-  name        = "extract-metadata-from-atrium-unstructured-lambda-s3-policy"
+  name        = "extract-zip-to-parquet-lambda-s3-policy"
   description = "Policy for Lambda to use S3 for extract_zip_to_parquet"
   policy      = data.aws_iam_policy_document.extract_zip_to_parquet_s3_policy_document.json
 }
