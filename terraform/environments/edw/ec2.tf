@@ -98,7 +98,6 @@ resource "aws_instance" "edw_db_instance" {
     edw_cis_ip           = local.application_data.accounts[local.environment].edw_cis_ip
     edw_eric_ip          = local.application_data.accounts[local.environment].edw_eric_ip
     edw_ccms_ip          = local.application_data.accounts[local.environment].edw_ccms_ip
-    edw_instance_id      = aws_instance.edw_db_instance.instance_id
   }))
 
 
