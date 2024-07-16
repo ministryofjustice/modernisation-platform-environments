@@ -30,11 +30,47 @@ resource "aws_instance" "tariff_app" {
     encrypted             = true
     volume_size           = 20
   }
+  ebs_block_device {
+    device_name = "xvde"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 100
+    snapshot_id = local.snapshot_id_xvde
+
+  }
+ ebs_block_device {
+    device_name = "xvdf"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 100
+    snapshot_id = local.snapshot_id_xvdf
+  }
+  ebs_block_device {
+    device_name = "xvdg"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 100
+    snapshot_id           = local.snapshot_id_xvdg
+  }
+    
+  ebs_block_device {
+    device_name = "xvdh"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 16
+    snapshot_id = local.snapshot_id_xvdh
+  }
+  ebs_block_device {
+    device_name = "xvdi"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 30
+    snapshot_id = local.snapshot_id_xvdi
+  }
 
   volume_tags = merge(tomap({
     "Name"                 = "${local.application_name}-app-root",
     "volume-attach-host"   = "app",
-    "volume-attach-device" = "/dev/sda1",
     "volume-mount-path"    = "/"
   }), local.tags)
 
