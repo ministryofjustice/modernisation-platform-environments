@@ -138,6 +138,7 @@ EOF
   )
 
 }
+# Note: Make sure 'max_table_size_mb' and 'spark.sql.files.maxPartitionBytes' values are the same.
 
 # "--enable-spark-ui"                   = "false"
 # "--spark-ui-event-logs-path"          = "false"
