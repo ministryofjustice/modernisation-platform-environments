@@ -394,7 +394,9 @@ locals {
     username            = module.datamart.redshift_master_user
   }
 
-  analytical_platform_sharing = can(local.application_data.accounts[local.environment].analycal_platform_share.target_account_id)
+  analytical_platform_share = can(local.application_data.accounts[local.environment].analytical_platform_share) ? {
+    "analytical_platform_share" = local.application_data.accounts[local.environment].analytical_platform_share
+  } : {}
 
 
   all_tags = merge(

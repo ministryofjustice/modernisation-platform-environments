@@ -783,9 +783,9 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "glue:GetPartition"
     ]
     resources = concat(
-      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/${local.analytical_platform_share.glue_database}",
-      formatlist("arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/${local.analytical_platform_share.glue_database}/%s", [local.analytical_platform_share.glue_tables]),
-      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
+      ["arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/${local.analytical_platform_share.glue_database}"],
+      formatlist("arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/${local.analytical_platform_share.glue_database}/%s", local.analytical_platform_share.glue_tables),
+      ["arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"]
     )
   }
 }
