@@ -2,7 +2,7 @@ module "s3_bucket_dms_destination" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
-  bucket_prefix      = "${var.env_name}-dms-destination-bucket"
+  bucket_name      = "${var.account_info.application_name}-${var.env_name}-dms-destination-bucket"
   versioning_enabled = true
 
   providers = {
