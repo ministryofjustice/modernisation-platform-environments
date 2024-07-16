@@ -20,7 +20,7 @@ resource "aws_db_instance" "database" {
   storage_encrypted                   = true
   iam_database_authentication_enabled = false
   vpc_security_group_ids              = [aws_security_group.db.id]
-  snapshot_identifier                 = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].db_snapshot_identifier)
+  #snapshot_identifier                 = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].db_snapshot_identifier)
   backup_retention_period             = 30
   maintenance_window                  = "Mon:00:00-Mon:03:00"
   backup_window                       = "03:00-06:00"
