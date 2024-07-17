@@ -507,7 +507,7 @@ resource "aws_volume_attachment" "ArchiveVolume-attachment" {
 ####### DB Security Groups #######
 
 resource "aws_security_group" "edw_db_security_group" {
-  name        = "${local.application_name} Security Group"
+  name        = "${local.application_name}-Security Group"
   description = "Security Group for DB EC2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -540,6 +540,14 @@ resource "aws_security_group" "edw_db_security_group" {
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].edw_bastion_ssh_cidr]
     description = "SSH access"
+  }
+
+  ingress {
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = ["10.26.56.0/21"]
+    description = "-"
   }
 
   ingress {
