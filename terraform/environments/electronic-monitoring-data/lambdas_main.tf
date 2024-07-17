@@ -310,13 +310,16 @@ module "load_json_into_athena" {
 #-----------------------------------------------------------------------------------
 
 module "extract_zip_to_parquet" {
-  source                  = "./modules/lambdas"
-  function_name           = "extract_zip_to_parquet"
-  is_image                = true
-  role_name               = aws_iam_role.extract_zip_to_parquet.name
-  role_arn                = aws_iam_role.extract_zip_to_parquet.arn
-  memory_size             = 1024
-  timeout                 = 900
+  source        = "./modules/lambdas"
+  function_name = "extract_zip_to_parquet"
+  is_image      = true
+  role_name     = aws_iam_role.extract_zip_to_parquet.name
+  role_arn      = aws_iam_role.extract_zip_to_parquet.arn
+  memory_size   = 1024
+  timeout       = 900
+  layers = [
+    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python311:12"
+  ]
   env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
