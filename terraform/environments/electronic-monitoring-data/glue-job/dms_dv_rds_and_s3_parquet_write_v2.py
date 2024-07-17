@@ -67,7 +67,8 @@ OPTIONAL_INPUTS = [
     "rds_exclude_db_tbls",
     "rds_db_tbl_pkeys_col_list",
     "rds_df_trim_micro_sec_ts_col_list",
-    "rds_read_rows_fetch_size"
+    "rds_read_rows_fetch_size",
+    "parquet_tbl_folder_if_different"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -443,10 +444,17 @@ def process_dv_for_table(rds_db_name,
 
     df_dv_output = spark.sql(sql_select_str).repartition(3)
 
-    tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
-
+    parquet_tbl_folder_if_different = args.get('parquet_tbl_folder_if_different', '')
+    if parquet_tbl_folder_if_different != '':
+        tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, 
+                                                          parquet_tbl_folder_if_different)
+        LOGGER.info(f"""Using a different parquet folder: {parquet_tbl_folder_if_different}""")
+    else:
+        tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
     # -------------------------------------------------------
 
+    LOGGER.info(f"""tbl_prq_s3_folder_path: {tbl_prq_s3_folder_path}""")
+    
     pkey_partion_read_used = False
     if tbl_prq_s3_folder_path is not None:
         
