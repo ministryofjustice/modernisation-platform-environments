@@ -31,7 +31,7 @@ locals {
 
     ec2_instances = {
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-cms-a = merge(local.bip_ec2_default, {
         #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -53,7 +53,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-cms-b = merge(local.bip_ec2_default, {
         #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -115,7 +115,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-client-a = merge(local.jumpserver_ec2_default, {
         # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.jumpserver_ec2_default.config, {
@@ -135,7 +135,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-etl-1-a = merge(local.etl_ec2_default, {
         # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.etl_ec2_default.config, {
@@ -155,7 +155,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-etl-2-b = merge(local.etl_ec2_default, {
         # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.etl_ec2_default.config, {
@@ -175,7 +175,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-processing-1-a = merge(local.bip_ec2_default, {
         # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -197,7 +197,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-processing-2-b = merge(local.bip_ec2_default, {
         # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -219,7 +219,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-processing-3-c = merge(local.bip_ec2_default, {
         # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -241,7 +241,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-processing-4-a = merge(local.bip_ec2_default, {
         # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -263,7 +263,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-web-1-a = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -283,7 +283,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-web-2-b = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -303,7 +303,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-web-3-c = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -323,7 +323,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-web-4-a = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -343,7 +343,7 @@ locals {
         })
       })
 
-      # Comment out ahead of deployment
+      # Comment out till needed for deployment
       pd-ncr-web-admin-a = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -364,7 +364,7 @@ locals {
       })
     }
 
-    # Comment out ahead of deployment
+    # Comment out till needed for deployment
     efs = {
       pd-ncr-sap-share = {
         access_points = {
@@ -554,8 +554,8 @@ locals {
     secretsmanager_secrets = {
       "/ec2/ncr-bip/pd"           = local.bip_secretsmanager_secrets
       "/ec2/ncr-web/pd"           = local.web_secretsmanager_secrets
-      "/oracle/database/PDBIPSYS" = local.database_secretsmanager_secrets
-      "/oracle/database/PDBIPAUD" = local.database_secretsmanager_secrets
+      "/oracle/database/PDBIPSYS" = local.database_secretsmanager_secrets # Azure Live System DB
+      "/oracle/database/PDBIPAUD" = local.database_secretsmanager_secrets # Azure Live Audit DB
       "/oracle/database/PDBISYS"  = local.database_secretsmanager_secrets
       "/oracle/database/PDBIAUD"  = local.database_secretsmanager_secrets
     }
