@@ -119,6 +119,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--num_of_repartitions"               = 0
     "--read_partition_size_mb"            = 128
     "--max_table_size_mb"                 = 4000
+    "--parquet_tbl_folder_if_different"   = ""
     "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
