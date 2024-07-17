@@ -251,80 +251,114 @@ EOF
 
 }
 
+####### IAM role #######
 
-
-####### EC2 Role #######
 resource "aws_iam_role" "edw_ec2_role" {
-  name = "${local.application_name}-ec2-role"
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Effect    = "Allow"
-      Principal = { Service = ["ec2.amazonaws.com"] }
-      Action    = ["sts:AssumeRole"]
-    }]
-  })
-
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-  ]
-
-  path = "/"
-
-  inline_policy {
-    name = "${local.application_name}-ec2-policy"
-    policy = jsonencode({
-      Statement = [
-        {
-          Effect   = "Allow"
-          Action   = ["s3:ListBucket"]
-          Resource = ["arn:aws:s3:::laa-software-library", "arn:aws:s3:::laa-software-library/*"]
-        },
-        {
-          Effect   = "Allow"
-          Action   = ["s3:GetObject"]
-          Resource = ["arn:aws:s3:::laa-software-library/*"]
-        },
-        {
-          Effect   = "Allow"
-          Action   = ["secretsmanager:GetSecretValue"]
-          Resource = ["arn:aws:secretsmanager:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}/app/*"]
-        },
-        {
-          Effect   = "Allow"
-          Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:DescribeLogStreams", "logs:PutRetentionPolicy", "logs:PutLogEvents", "ec2:DescribeInstances"]
-          Resource = ["*"]
-        },
-        {
-          Effect   = "Allow"
-          Action   = ["ec2:CreateTags"]
-          Resource = ["*"]
-        },
-      ]
-    })
-  }
-
+  name = "${local.application_name}-ec2-instance-role"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]    
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-db-instance-role"
+      Name = "${local.application_name}-ec2-instance-role"
     }
   )
+  path               = "/"
+  assume_role_policy = <<EOF
+{
+
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
+
+####### DB Policy #######
+
+resource "aws_iam_policy" "edw_ec2_role_policy" {
+  name = "${local.application_name}-ec2-policy"
+  path               = "/" 
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-policy"
+    }
+  )
+  policy = <<EOF
+{
+    "Version" : "2012-10-17",
+      "Statement": [
+        {
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::laa-software-library",
+                "arn:aws:s3:::laa-software-library/*"
+            ],
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::laa-software-library/*"
+            ],
+            "Effect": "Allow"
+        }, 
+        {
+            "Action": [
+                "secretsmanager:GetSecretValue"
+            ],
+            "Resource": [
+                "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}/app/*"
+            ],
+            "Effect": "Allow"
+        },  
+        {
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutRetentionPolicy",
+                "logs:PutLogEvents",
+                "ec2:DescribeInstances"
+            ],
+            "Resource": [*],
+            "Effect": "Allow"
+        }, 
+        {
+            "Action": [
+                "ec2:CreateTags"
+            ],
+            "Resource": [*],
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
 }
 
 
-####### DB Instance Profile #######
+####### DB Policy attachments #######
 
-resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
-  name = "${local.application_name}-S3-${local.application_data.accounts[local.environment].edw_bucket_name}-edw-RW-ec2-profile"
-  path = "/"
-  role = aws_iam_role.edw_ec2_role.name
+resource "aws_iam_role_policy_attachment" "edw_cw_agent_policy_attachment" {
+  role       = aws_iam_role.edw_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-db-instance-profile"
-    }
-  )
+resource "aws_iam_role_policy_attachment" "edw_ec2_policy_attachments" {
+  role       = aws_iam_role.edw_ec2_role.name
+  policy_arn = aws_iam_policy.edw_ec2_role_policy.arn
 }
 
 ####### DB Instance #######
