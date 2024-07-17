@@ -34,9 +34,9 @@ def lambda_handler(event, context):
 
     # Executing SQL commands
     commands = [
-        f"CREATE LOGIN {new_user_name} WITH PASSWORD = '{new_password}'",
-        f"CREATE USER {new_user_name} FOR LOGIN {new_user_name}",
-        f"USE {new_db_name}; EXEC sp_addrolemember N'db_owner', N'{new_user_name}'"
+        f"CREATE LOGIN [{new_user_name}] WITH PASSWORD = '{new_password}'",
+        f"CREATE USER [{new_user_name}] FOR LOGIN [{new_user_name}]",
+        f"USE [{new_db_name}]; EXEC sp_addrolemember N'db_owner', N'{new_user_name}'"
     ]
 
     for command in commands:

@@ -39,7 +39,7 @@ resource "aws_security_group" "sqlserver_db_sc" {
     to_port     = 1433
     protocol    = "tcp"
     description = "Allows Mateusz to access RDS"
-    cidr_blocks = ["82.1.119.170/32"]
+    cidr_blocks = ["109.158.54.26/32"]
   }
   ingress {
     from_port   = 1433
