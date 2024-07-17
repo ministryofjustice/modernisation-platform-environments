@@ -34,20 +34,16 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO
-        ssm_parameters_prefix         = "ec2/" # TODO
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       instance = {
-        disable_api_stop             = false # TODO
         disable_api_termination      = true
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         monitoring                   = true
         tags = {
-          backup-plan         = "daily-and-weekly"
-          instance-scheduling = "skip-scheduling" # TODO
+          backup-plan = "daily-and-weekly"
         }
         vpc_security_group_ids = ["domain", "app", "jumpserver"]
       }
@@ -100,9 +96,7 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/" # TODO
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       ebs_volumes = {
         "/dev/sdb" = { label = "app" }   # /u01
@@ -121,14 +115,12 @@ locals {
         flash = { iops = 3000, throughput = 125 }
       }
       instance = {
-        disable_api_stop             = false # TODO
         disable_api_termination      = true
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
         tags = {
-          backup-plan         = "daily-and-weekly"
-          instance-scheduling = "skip-scheduling" # TODO
+          backup-plan = "daily-and-weekly"
         }
         vpc_security_group_ids = ["database"]
       }
@@ -142,18 +134,14 @@ locals {
           recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
         }
       }
-      # TODO
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
         }
-        scripts = [
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       tags = {
@@ -190,20 +178,16 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO
-        ssm_parameters_prefix         = "ec2/" # TODO
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       instance = {
-        disable_api_stop             = false # TODO
         disable_api_termination      = true
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         monitoring                   = true
         tags = {
-          backup-plan         = "daily-and-weekly"
-          instance-scheduling = "skip-scheduling" # TODO
+          backup-plan = "daily-and-weekly"
         }
         vpc_security_group_ids = ["domain", "web", "jumpserver"]
       }
