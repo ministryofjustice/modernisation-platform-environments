@@ -526,9 +526,9 @@ resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_get_put_zip_
 # ------------------------------------------
 
 resource "aws_iam_role" "load_json_into_athena" {
-  name               = "load_json_into_athena"
-  
-  assume_role_policy  = jsonencode({
+  name = "load_json_into_athena"
+
+  assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
@@ -563,15 +563,15 @@ data "aws_iam_policy_document" "load_json_into_athena_s3_policy_document" {
     ]
     resources = [
       "${aws_s3_bucket.data_store.arn}/*",
-       aws_s3_bucket.data_store.arn,
-       "${module.athena-s3-bucket.bucket.arn}/*",
-       module.athena-s3-bucket.bucket.arn,
-       module.metadata-s3-bucket.bucket.arn,
-       "${module.metadata-s3-bucket.bucket.arn}/*",
-     ]
+      aws_s3_bucket.data_store.arn,
+      "${module.athena-s3-bucket.bucket.arn}/*",
+      module.athena-s3-bucket.bucket.arn,
+      module.metadata-s3-bucket.bucket.arn,
+      "${module.metadata-s3-bucket.bucket.arn}/*",
+    ]
   }
   statement {
-    sid   = "AthenaPermissionsForLoadingJsonIntoAthena"
+    sid    = "AthenaPermissionsForLoadingJsonIntoAthena"
     effect = "Allow"
     actions = [
       "athena:StartQueryExecution",
@@ -582,7 +582,7 @@ data "aws_iam_policy_document" "load_json_into_athena_s3_policy_document" {
     resources = ["*"]
   }
   statement {
-    sid  = "GluePermissionsForLoadingJsonIntoAthena"
+    sid    = "GluePermissionsForLoadingJsonIntoAthena"
     effect = "Allow"
     actions = [
       "glue:GetTable",
@@ -617,4 +617,12 @@ resource "aws_iam_role_policy_attachment" "load_json_into_athena_vpc_access_exec
 resource "aws_iam_role_policy_attachment" "load_json_into_athena_lambda_sqs_queue_access_execution" {
   role       = aws_iam_role.load_json_into_athena.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+resource "aws_lambda_permission" "s3_load_json_into_athena" {
+  statement_id  = "AllowLoadJsonIntoAthenaLamabdaExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = module.load_json_into_athena.lambda_function_arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.data_store.arn
 }
