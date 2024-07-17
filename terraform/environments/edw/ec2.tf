@@ -281,6 +281,20 @@ resource "aws_iam_role" "edw_ec2_role" {
 EOF
 }
 
+####### DB Instance Profile #######
+
+resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
+  name = "${local.application_name}-S3-${local.application_data.accounts[local.environment].edw_bucket_name}-edw-RW-ec2-profile"
+  path = "/"
+  role = aws_iam_role.edw_ec2_role.name
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-instance-profile"
+    }
+  )
+}
+
 ####### DB Policy #######
 
 resource "aws_iam_policy" "edw_ec2_role_policy" {
