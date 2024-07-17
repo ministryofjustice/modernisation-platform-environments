@@ -73,7 +73,9 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 OPTIONAL_INPUTS = [
     "date_partition_column_name",
     "other_partitionby_columns",
-    "validation_sample_fraction"
+    "validation_sample_fraction_float",
+    "validation_sample_df_repartition",
+    "rename_migrated_prq_tbl_folder"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -310,13 +312,16 @@ def check_s3_folder_path_if_exists(in_bucket_name, in_folder_path):
         exists = True
     return exists
 
+# ==================================================================
+
 
 def write_rds_df_to_s3_parquet(df_rds_read: DataFrame, 
                                partition_by_cols,
-                               s3_table_folder_path):
+                               table_folder_path):
 
     # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_cap_dw/dbo/F_History/
 
+    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
 
     if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path):
 
@@ -343,8 +348,8 @@ def write_rds_df_to_s3_parquet(df_rds_read: DataFrame,
 def compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                 df_rds_read: DataFrame, 
                                 jdbc_partition_column,
-                                s3_table_folder_path, 
-                                validation_sample_fraction,
+                                table_folder_path, 
+                                validation_sample_fraction_float,
                                 rds_db_name,
                                 rds_tbl_name) -> DataFrame:
     
@@ -358,14 +363,21 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     
     df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
 
+    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
     df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path).cache()
                                 
-    df_parquet_read_sample = df_parquet_read.sample(validation_sample_fraction)
+    df_parquet_read_sample = df_parquet_read.sample(validation_sample_fraction_float)
 
     df_parquet_read_sample_t1 = df_parquet_read_sample.selectExpr(
                                         *get_nvl_select_list(rds_jdbc_conn_obj, 
                                                              df_rds_read))
     
+    validation_sample_df_repartition = int(args['validation_sample_df_repartition'])
+    if validation_sample_df_repartition != 0:
+        df_parquet_read_sample_t1 = df_parquet_read_sample_t1.repartition(validation_sample_df_repartition, 
+                                                                          jdbc_partition_column)
+    # --------
+
     df_rds_read_sample = df_rds_read.join(df_parquet_read_sample, 
                                           on=jdbc_partition_column, 
                                           how = 'leftsemi')
@@ -373,6 +385,10 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     df_rds_read_sample_t1 = df_rds_read_sample.selectExpr(
                                         *get_nvl_select_list(rds_jdbc_conn_obj, 
                                                              df_rds_read))
+    if validation_sample_df_repartition != 0:
+        df_rds_read_sample_t1 = df_rds_read_sample_t1.repartition(validation_sample_df_repartition, 
+                                                                  jdbc_partition_column)
+    # --------
     
     df_prq_leftanti_rds = df_parquet_read_sample_t1.alias("L")\
                                         .join(df_rds_read_sample_t1.alias("R"), 
@@ -597,29 +613,33 @@ if __name__ == "__main__":
         df_rds_read = df_rds_read.repartition(jdbc_read_partitions_num, *partition_by_cols).cache()
     else:
         df_rds_read = df_rds_read.cache()
+    # -----------------------------------
 
-
-    table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}"""
-    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
+    rename_output_table_folder = args.get('rename_migrated_prq_tbl_folder', '')
+    if rename_output_table_folder == '':
+        table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}"""
+    else:
+        table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rename_output_table_folder}"""
+    # ---------------------------------------
 
 
     write_rds_df_to_s3_parquet(df_rds_read, 
                                partition_by_cols,
-                               s3_table_folder_path)
+                               table_folder_path)
 
     total_files, total_size = get_s3_folder_info(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path)
     msg_part_1 = f"""total_files={total_files}"""
     msg_part_2 = f"""total_size_mb={total_size/1024/1024}"""
     LOGGER.info(f"""{rds_sqlserver_db_table} written: msg_part_1, msg_part_2""")
 
-    validation_sample_fraction = float(args.get('validation_sample_fraction', 0))
-    if validation_sample_fraction != 0:
+    validation_sample_fraction_float = float(args.get('validation_sample_fraction_float', 0))
+    if validation_sample_fraction_float != 0:
         LOGGER.info(f"""Validating sample rows from the migrated data.""")
         df_dv_output = compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                                    df_rds_read,
                                                    jdbc_partition_column,
-                                                   s3_table_folder_path,
-                                                   validation_sample_fraction,
+                                                   table_folder_path,
+                                                   validation_sample_fraction_float,
                                                    rds_db_name,
                                                    rds_sqlserver_db_table)
 

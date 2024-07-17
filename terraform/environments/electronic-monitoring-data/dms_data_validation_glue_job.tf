@@ -90,6 +90,11 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group_v2" {
   name              = "dms-dv-glue-job-v2"
   retention_in_days = 14
 }
+
+resource "aws_cloudwatch_log_group" "rds_to_s3_parquet_migration" {
+  name              = "rds_to_s3_parquet_migration"
+  retention_in_days = 14
+}
 # -------------------------------------------------------------------
 
 resource "aws_glue_job" "dms_dv_glue_job_v2" {
@@ -227,10 +232,12 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--rds_table_total_rows"              = ""
     "--date_partition_column_name"        = ""
     "--other_partitionby_columns"         = ""
-    "--validation_sample_fraction"        = 0
+    "--validation_sample_fraction_float"  = 0
+    "--validation_sample_df_repartition"  = 0
     "--jdbc_read_256mb_partitions"        = "false"
     "--jdbc_read_512mb_partitions"        = "false"
     "--jdbc_read_1gb_partitions"          = "true"
+    "--rename_migrated_prq_tbl_folder"    = ""
     "--rds_to_parquet_output_s3_bucket"   = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--dv_parquet_output_s3_bucket"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
