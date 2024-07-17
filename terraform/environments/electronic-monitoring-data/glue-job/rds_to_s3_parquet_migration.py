@@ -544,6 +544,10 @@ if __name__ == "__main__":
         jdbc_read_partitions_num = int(rds_table_total_size_mb/1024)
     else:
         jdbc_read_partitions_num = 1
+
+    jdbc_read_partitions_num = 1 if jdbc_read_partitions_num == 0 \
+                                    else jdbc_read_partitions_num
+
     LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
 
     rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df()
