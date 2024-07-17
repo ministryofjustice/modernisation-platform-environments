@@ -29,10 +29,11 @@ locals {
         instance = merge(local.ec2_instances.db.instance, {
         })
         tags = merge(local.ec2_instances.db.tags, {
-          pre-migration = "PPCDL00019"
-          description   = "PP CSR DB server"
-          server-type   = "csr-db"
-          oracle-sids   = "PPIWFM"
+          description         = "PP CSR DB server"
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PPIWFM"
+          pre-migration       = "PPCDL00019"
+          server-type         = "csr-db"
         })
       })
 
@@ -51,9 +52,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PPCAW00013"
-          description   = "Application Server Region 1"
-          ami           = "pp-csr-a-13-a"
+          ami                 = "pp-csr-a-13-a"
+          description         = "Application Server Region 1"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00013"
         })
       })
 
@@ -72,9 +74,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PPCAW00014"
-          description   = "Application Server Region 2"
-          ami           = "pp-csr-a-14-b"
+          ami                 = "pp-csr-a-14-b"
+          description         = "Application Server Region 2"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00014"
         })
       })
 
@@ -93,9 +96,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PPCAW00017"
-          description   = "Application Server Region 3"
-          ami           = "pp-csr-a-17-a"
+          ami                 = "pp-csr-a-17-a"
+          description         = "Application Server Region 3"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00017"
         })
       })
 
@@ -114,9 +118,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PPCAW00018"
-          description   = "Application Server Region 4"
-          ami           = "pp-csr-a-18-b"
+          ami                 = "pp-csr-a-18-b"
+          description         = "Application Server Region 4"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00018"
         })
       })
 
@@ -133,9 +138,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PPCAW00002"
-          description   = "Application Server Region 5"
-          ami           = "pp-csr-a-2-b"
+          ami                 = "pp-csr-a-2-b"
+          description         = "Application Server Region 5"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00002"
         })
       })
 
@@ -152,9 +158,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PPCAW00003"
-          description   = "Application Server Region 6"
-          ami           = "pp-csr-a-3-a"
+          ami                 = "pp-csr-a-3-a"
+          description         = "Application Server Region 6"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00003"
         })
       })
 
@@ -173,9 +180,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PPCAW00015"
-          description   = "Application Server Training A"
-          ami           = "pp-csr-a-15-a"
+          ami                 = "pp-csr-a-15-a"
+          description         = "Application Server Training A"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00015"
         })
       })
 
@@ -194,9 +202,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PPCAW00016"
-          description   = "Application Server Training B"
-          ami           = "pp-csr-a-16-b"
+          ami                 = "pp-csr-a-16-b"
+          description         = "Application Server Training B"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00016"
         })
       })
 
@@ -215,9 +224,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PPCWW00001"
-          description   = "Web Server Region 1 and 2"
-          ami           = "PPCWW00001"
+          ami                 = "PPCWW00001"
+          description         = "Web Server Region 1 and 2"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00001"
         })
       })
 
@@ -236,9 +246,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PPCWW00002"
-          description   = "Web Server Region 1 and 2"
-          ami           = "pp-csr-w-2-b"
+          ami                 = "pp-csr-w-2-b"
+          description         = "Web Server Region 1 and 2"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00002"
         })
       })
 
@@ -256,9 +267,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PPCWW00005"
-          description   = "Web Server Region 3 and 4"
-          ami           = "PPCWW00005"
+          ami                 = "PPCWW00005"
+          description         = "Web Server Region 3 and 4"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00005"
         })
       })
 
@@ -277,9 +289,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PPCWW00006"
-          description   = "Web Server Region 3 and 4"
-          ami           = "pp-csr-w-6-b"
+          ami                 = "pp-csr-w-6-b"
+          description         = "Web Server Region 3 and 4"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00006"
         })
       })
 
@@ -296,9 +309,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PPCWW00007"
-          description   = "Web Server Region 5 and 6"
-          ami           = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
+          ami                 = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
+          description         = "Web Server Region 5 and 6"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00007"
         })
       })
 
@@ -315,9 +329,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PPCWW00008"
-          description   = "Web Server Region 5 and 6"
-          ami           = "pp-csr-w-8-b"
+          ami                 = "pp-csr-w-8-b"
+          description         = "Web Server Region 5 and 6"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00008"
         })
       })
 
@@ -336,9 +351,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PPCWW00003"
-          description   = "Web Server Training A and B"
-          ami           = "pp-csr-w-3-a"
+          ami                 = "pp-csr-w-3-a"
+          description         = "Web Server Training A and B"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00003"
         })
       })
 
@@ -357,9 +373,10 @@ locals {
           instance_type = "m5.2xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PPCWW00004"
-          description   = "Web Server Training A and B"
-          ami           = "pp-csr-w-4-b"
+          ami                 = "pp-csr-w-4-b"
+          description         = "Web Server Training A and B"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00004"
         })
       })
     }

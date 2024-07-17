@@ -30,9 +30,9 @@ locals {
         instance = merge(local.ec2_instances.db.instance, {
         })
         tags = merge(local.ec2_instances.db.tags, {
-          pre-migration = "PDCDL00013"
-          description   = "PD CSR Oracle primary DB server"
           ami           = "base_ol_8_5"
+          description   = "PD CSR Oracle primary DB server"
+          pre-migration = "PDCDL00013"
         })
       })
 
@@ -56,10 +56,9 @@ locals {
         instance = merge(local.ec2_instances.db.instance, {
         })
         tags = merge(local.ec2_instances.db.tags, {
-          pre-migration = "PDCDL00014"
-          description   = "PD CSR Oracle secondary DB server"
           ami           = "base_ol_8_5"
-          backup        = "false" # opt out of mod platform default backup plan
+          description   = "PD CSR Oracle secondary DB server"
+          pre-migration = "PDCDL00014"
         })
       })
 
@@ -78,9 +77,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PDCAW00007"
-          description   = "Application Server Region 1"
           ami           = "pd-csr-a-7-a"
+          description   = "Application Server Region 1"
+          pre-migration = "PDCAW00007"
         })
       })
 
@@ -99,9 +98,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PDCAW00008"
-          description   = "Application Server Region 2"
           ami           = "pd-csr-a-8-b"
+          description   = "Application Server Region 2"
+          pre-migration = "PDCAW00008"
         })
       })
 
@@ -120,9 +119,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PDCAW00009"
-          description   = "Application Server Region 3"
           ami           = "pd-csr-a-9-a"
+          description   = "Application Server Region 3"
+          pre-migration = "PDCAW00009"
         })
       })
 
@@ -141,9 +140,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PDCAW00010"
-          description   = "Application Server Region 4"
           ami           = "pd-csr-a-10-b"
+          description   = "Application Server Region 4"
+          pre-migration = "PDCAW00010"
         })
       })
 
@@ -162,9 +161,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PDCAW00011"
-          description   = "Application Server Region 5"
           ami           = "pd-csr-a-11-a"
+          description   = "Application Server Region 5"
+          pre-migration = "PDCAW00011"
         })
       })
 
@@ -182,9 +181,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          pre-migration = "PDCAW00012"
-          description   = "Application Server Region 6"
           ami           = "pd-csr-a-12-b"
+          description   = "Application Server Region 6"
+          pre-migration = "PDCAW00012"
         })
       })
 
@@ -203,9 +202,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PDCWW00001"
-          description   = "Web Server Region 1 and 2"
           ami           = "pd-csr-w-1-a"
+          description   = "Web Server Region 1 and 2"
+          pre-migration = "PDCWW00001"
         })
       })
 
@@ -224,9 +223,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PDCWW00002"
-          description   = "Web Server Region 1 and 2"
           ami           = "pd-csr-w-2-b"
+          description   = "Web Server Region 1 and 2"
+          pre-migration = "PDCWW00002"
         })
       })
 
@@ -245,9 +244,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PDCWW00003"
-          description   = "Web Server Region 3 and 4"
           ami           = "pd-csr-w-3-a"
+          description   = "Web Server Region 3 and 4"
+          pre-migration = "PDCWW00003"
         })
       })
 
@@ -266,9 +265,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PDCWW00004"
-          description   = "Web Server Region 3 and 4"
           ami           = "pd-csr-w-4-b"
+          description   = "Web Server Region 3 and 4"
+          pre-migration = "PDCWW00004"
         })
       })
 
@@ -287,9 +286,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PDCWW00005"
-          description   = "Web Server Region 5 and 6"
           ami           = "pd-csr-w-5-a"
+          description   = "Web Server Region 5 and 6"
+          pre-migration = "PDCWW00005"
         })
       })
 
@@ -308,9 +307,9 @@ locals {
           instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
-          pre-migration = "PDCWW00006"
-          description   = "Web Server Region 5 and 6"
           ami           = "pd-csr-w-6-b"
+          description   = "Web Server Region 5 and 6"
+          pre-migration = "PDCWW00006"
         })
       })
     }
