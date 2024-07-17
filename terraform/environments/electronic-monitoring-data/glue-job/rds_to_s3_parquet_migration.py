@@ -389,7 +389,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
         df_rds_read_sample_t1 = df_rds_read_sample_t1.repartition(validation_sample_df_repartition, 
                                                                   jdbc_partition_column)
     # --------
-    
+
     df_prq_leftanti_rds = df_parquet_read_sample_t1.alias("L")\
                                         .join(df_rds_read_sample_t1.alias("R"), 
                                               on=df_rds_read.columns, 
@@ -403,7 +403,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
         df_temp_row = spark.sql(f"""select 
                                     current_timestamp() as run_datetime, 
                                     '' as json_row,
-                                    "{rds_tbl_name} - Validated." as validation_msg,
+                                    "{rds_tbl_name} - Sample Rows Validated." as validation_msg,
                                     '{rds_db_name}' as database_name,
                                     '{db_sch_tbl}' as full_table_name,
                                     'False' as table_to_ap
@@ -428,7 +428,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
         df_subtract_temp = df_subtract_temp.selectExpr(
                                 "current_timestamp as run_datetime",
                                 "json_row",
-                                f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
+                                f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Sample Row Count!" as validation_msg""",
                                 f"""'{rds_db_name}' as database_name""",
                                 f"""'{db_sch_tbl}' as full_table_name""",
                                 """'False' as table_to_ap"""
