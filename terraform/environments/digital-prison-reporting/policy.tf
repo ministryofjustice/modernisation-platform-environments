@@ -41,6 +41,7 @@ data "aws_iam_policy_document" "glue-policy-data" {
       type        = "AWS"
     }
   }
+
   statement {
     # Required for cross-account sharing via LakeFormation if producer has existing Glue policy
     # ref: https://docs.aws.amazon.com/lake-formation/latest/dg/hybrid-cross-account.html
@@ -54,7 +55,6 @@ data "aws_iam_policy_document" "glue-policy-data" {
       type        = "Service"
       identifiers = ["ram.amazonaws.com"]
     }
-
     resources = [
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/*/*",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/*",
@@ -795,7 +795,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
 
-  name = "analytical-platform-share-role"
+  name = "${each.value.target_account_name}-share-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -814,7 +814,7 @@ resource "aws_iam_role" "analytical_platform_share_role" {
 resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
   for_each = local.analytical_platform_share
 
-  name   = "analytical-platform-share-policy"
+  name   = "${each.value.target_account_name}-share-policy"
   role   = aws_iam_role.analytical_platform_share_role[each.key].name
   policy = data.aws_iam_policy_document.analytical_platform_share_policy[each.key].json
 }
