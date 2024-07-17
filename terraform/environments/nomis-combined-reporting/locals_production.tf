@@ -12,104 +12,26 @@ locals {
     }
   }
 
-  acm_certificates = {
-    nomis_combined_reporting_wildcard_cert = {
-      cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
-      domain_name              = "modernisation-platform.service.justice.gov.uk"
-      subject_alternate_names = [
-        "reporting.nomis.service.justice.gov.uk",
-        "*.reporting.nomis.service.justice.gov.uk",
-      ]
-      tags = {
-        description = "Wildcard certificate for the preproduction environment"
-      }
-    }
-  }
-
-  efs = {
-    pd-ncr-sap-share = {
-      access_points = {
-        root = {
-          posix_user = {
-            gid = 1201 # binstall
-            uid = 1201 # bobj
-          }
-          root_directory = {
-            path = "/"
-            creation_info = {
-              owner_gid   = 1201 # binstall
-              owner_uid   = 1201 # bobj
-              permissions = "0777"
-            }
-          }
-        }
-      }
-      file_system = {
-        availability_zone_name = "eu-west-2a"
-        lifecycle_policy = {
-          transition_to_ia = "AFTER_30_DAYS"
-        }
-      }
-      mount_targets = [{
-        subnet_name        = "private"
-        availability_zones = ["eu-west-2a"]
-        security_groups    = ["bip"]
-      }]
-      tags = {
-        backup = "false"
-      }
-    }
-  }
-
   # please keep resources in alphabetical order
   baseline_production = {
 
-    iam_policies = {
-      Ec2PDDatabasePolicy = {
-        description = "Permissions required for PROD Database EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
-            ]
-          }
+    acm_certificates = {
+      nomis_combined_reporting_wildcard_cert = {
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name              = "modernisation-platform.service.justice.gov.uk"
+        subject_alternate_names = [
+          "reporting.nomis.service.justice.gov.uk",
+          "*.reporting.nomis.service.justice.gov.uk",
         ]
-      }
-      Ec2PDReportingPolicy = {
-        description = "Permissions required for PD reporting EC2s"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/pd/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/pd/*",
-            ]
-          }
-        ]
+        tags = {
+          description = "Wildcard certificate for the production environment"
+        }
       }
     }
 
     ec2_instances = {
 
+      # Comment out ahead of deployment
       pd-ncr-cms-a = merge(local.bip_ec2_default, {
         #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -131,6 +53,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-cms-b = merge(local.bip_ec2_default, {
         #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -192,6 +115,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-client-a = merge(local.jumpserver_ec2_default, {
         # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.jumpserver_ec2_default.config, {
@@ -211,6 +135,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-etl-1-a = merge(local.etl_ec2_default, {
         # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.etl_ec2_default.config, {
@@ -230,6 +155,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-etl-2-b = merge(local.etl_ec2_default, {
         # cloudwatch_metric_alarms = local.etl_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.etl_ec2_default.config, {
@@ -249,6 +175,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-processing-1-a = merge(local.bip_ec2_default, {
         # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -270,6 +197,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-processing-2-b = merge(local.bip_ec2_default, {
         # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -291,6 +219,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-processing-3-c = merge(local.bip_ec2_default, {
         # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -312,6 +241,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-processing-4-a = merge(local.bip_ec2_default, {
         # cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.bip_ec2_default.config, {
@@ -333,6 +263,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-web-1-a = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -352,6 +283,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-web-2-b = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -371,6 +303,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-web-3-c = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -390,6 +323,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-web-4-a = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -409,6 +343,7 @@ locals {
         })
       })
 
+      # Comment out ahead of deployment
       pd-ncr-web-admin-a = merge(local.web_ec2_default, {
         # cloudwatch_metric_alarms = local.web_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.web_ec2_default.config, {
@@ -427,6 +362,86 @@ locals {
           nomis-combined-reporting-environment = "pd"
         })
       })
+    }
+
+    # Comment out ahead of deployment
+    efs = {
+      pd-ncr-sap-share = {
+        access_points = {
+          root = {
+            posix_user = {
+              gid = 1201 # binstall
+              uid = 1201 # bobj
+            }
+            root_directory = {
+              path = "/"
+              creation_info = {
+                owner_gid   = 1201 # binstall
+                owner_uid   = 1201 # bobj
+                permissions = "0777"
+              }
+            }
+          }
+        }
+        file_system = {
+          availability_zone_name = "eu-west-2a"
+          lifecycle_policy = {
+            transition_to_ia = "AFTER_30_DAYS"
+          }
+        }
+        mount_targets = [{
+          subnet_name        = "private"
+          availability_zones = ["eu-west-2a"]
+          security_groups    = ["bip"]
+        }]
+        tags = {
+          backup = "false"
+        }
+      }
+    }
+
+    iam_policies = {
+      Ec2PDDatabasePolicy = {
+        description = "Permissions required for PROD Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ssm:GetParameter",
+            ]
+            resources = [
+              "arn:aws:ssm:*:*:parameter/azure/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
+            ]
+          }
+        ]
+      }
+      Ec2PDReportingPolicy = {
+        description = "Permissions required for PD reporting EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/pd/*",
+            ]
+          }
+        ]
+      }
     }
 
     # lbs = {
