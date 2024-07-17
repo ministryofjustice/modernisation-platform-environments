@@ -20,6 +20,30 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_iam_policy" "lambda_vpc_policy" {
+  name        = "lambda_vpc_policy"
+  description = "Policy to allow Lambda to create network interfaces in VPC"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DeleteNetworkInterface"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_vpc_policy_attachment" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_vpc_policy.arn
+}
+
 resource "random_password" "app_new_password" {
   length  = 16
   special = false
@@ -57,21 +81,19 @@ resource "aws_security_group" "lambda_sg" {
   name   = "lambda_sg"
   vpc_id = data.aws_vpc.shared.id
 
+  ingress {
+    protocol        = "tcp"
+    from_port       = 1433
+    to_port         = 1433
+    security_groups = [aws_security_group.sqlserver_db_sc.id]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-resource "aws_security_group_rule" "allow_lambda_access_to_rds" {
-  type                     = "ingress"
-  from_port                = 1433
-  to_port                  = 1433
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.sqlserver_db_sc.id
-  source_security_group_id = aws_security_group.lambda_sg.id
 }
 
 # resource "null_resource" "app_setup_db" {
