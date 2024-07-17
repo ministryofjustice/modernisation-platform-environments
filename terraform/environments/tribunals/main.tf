@@ -1,9 +1,12 @@
 locals {
-  rds_url            = aws_db_instance.rdsdb.address
+  # rds_url            = aws_db_instance.rdsdb.address
+  rds_url            = "test"
   app_load_balancer  = aws_lb.tribunals_lb
-  rds_user           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+  # rds_user           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+  rds_user           = "test"
   rds_port           = "1433"
-  rds_password       = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+  # rds_password       = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+  rds_password       = "test"
   source_db_url      = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
   source_db_user     = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   source_db_password = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
