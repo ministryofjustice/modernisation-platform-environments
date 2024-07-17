@@ -208,7 +208,7 @@ locals {
           description                          = "Prod SAP BI Platform installation and configurations"
           instance-scheduling                  = "skip-scheduling"
           node                                 = "3"
-          nomis-combined-reporting-environment = "pp"
+          nomis-combined-reporting-environment = "pd"
           type                                 = "processing"
         })
       })
