@@ -64,7 +64,7 @@ locals {
       }
     })
 
-    cloudwatch_log_metric_filters = local.application_log_metric_filters
+    cloudwatch_log_metric_filters = local.cloudwatch_app_log_metric_filters
 
     iam_policies = {
       CSRWebServerPolicy = {
@@ -81,13 +81,6 @@ locals {
       }
     }
 
-    security_groups = {
-      domain        = local.security_groups.domain
-      web           = local.security_groups.web
-      app           = local.security_groups.app
-      load-balancer = local.security_groups.load-balancer
-      database      = local.security_groups.database
-      jumpserver    = local.security_groups.jumpserver
-    }
+    security_groups = local.security_groups
   }
 }

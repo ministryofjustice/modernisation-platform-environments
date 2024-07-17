@@ -6,7 +6,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
-        local.application_log_metric_alarms.app, {
+        local.cloudwatch_app_log_metric_alarms.app, {
           instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
             threshold           = "0"
             evaluation_periods  = "5"
@@ -169,7 +169,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
-        local.application_log_metric_alarms.web, {
+        local.cloudwatch_app_log_metric_alarms.web, {
           instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
             threshold           = "0"
             evaluation_periods  = "5"
