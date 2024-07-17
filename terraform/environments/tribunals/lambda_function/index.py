@@ -18,11 +18,11 @@ def lambda_handler(event, context):
 
     # Establishing initial connection (CREATE DATABASE statement not allowed within multi-statement transaction)
     conn = pyodbc.connect(
-        f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={db_url};UID={user_name};PWD={password}"
+        f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={db_url};UID={user_name};PWD={password}",
+        autocommit=True
     )
     cursor = conn.cursor()
     cursor.execute(f"CREATE DATABASE {new_db_name}")
-    conn.commit()
     cursor.close()
     conn.close()
 
