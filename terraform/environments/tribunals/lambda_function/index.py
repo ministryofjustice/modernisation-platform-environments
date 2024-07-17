@@ -21,10 +21,11 @@ def lambda_handler(event, context):
         f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={db_url};UID={user_name};PWD={password}"
     )
     cursor = conn.cursor()
+    cursor.execute(f"CREATE DATABASE {new_db_name}")
+    conn.commit()
 
     # Executing SQL commands
     commands = [
-        f"CREATE DATABASE {new_db_name}",
         f"CREATE LOGIN {new_user_name} WITH PASSWORD = '{new_password}'",
         f"CREATE USER {new_user_name} FOR LOGIN {new_user_name}",
         f"USE {new_db_name}; EXEC sp_addrolemember N'db_owner', N'{new_user_name}'"
@@ -35,7 +36,7 @@ def lambda_handler(event, context):
         conn.commit()
 
     # Executing SQL script from file
-    script_path = f"./modules/{app_folder}/sp_migration.sql"
+    script_path = f"/{app_folder}/sp_migration.sql"
     with open(script_path, 'r') as file:
         script = file.read()
         for statement in script.split(';'):
