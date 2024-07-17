@@ -67,7 +67,10 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
                        "rds_table_total_size_mb",
-                       "rds_table_total_rows"
+                       "rds_table_total_rows",
+                       "year_partition",
+                       "month_partition",
+                       "day_partition"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -349,9 +352,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                 df_rds_read: DataFrame, 
                                 jdbc_partition_column,
                                 table_folder_path, 
-                                validation_sample_fraction_float,
-                                rds_db_name,
-                                rds_tbl_name) -> DataFrame:
+                                validation_sample_fraction_float) -> DataFrame:
     
     df_dv_output_schema = T.StructType(
         [T.StructField("run_datetime", T.TimestampType(), True),
@@ -367,12 +368,16 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     LOGGER.info(f"""Parquet Source being used for comparison: {s3_table_folder_path}""")
 
     df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path).cache()
-                                
-    df_parquet_read_sample = df_parquet_read.sample(validation_sample_fraction_float)
+
+    df_compare_columns_list = [col for col in df_parquet_read.columns 
+                                if col not in ['year', 'month', 'day']]
+    
+    df_parquet_read_sample = df_parquet_read.sample(validation_sample_fraction_float)\
+                                .select(*df_compare_columns_list)
 
     df_parquet_read_sample_t1 = df_parquet_read_sample.selectExpr(
                                         *get_nvl_select_list(rds_jdbc_conn_obj, 
-                                                             df_rds_read))
+                                                             df_parquet_read_sample))
     
     validation_sample_df_repartition = int(args['validation_sample_df_repartition'])
     if validation_sample_df_repartition != 0:
@@ -382,11 +387,12 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
 
     df_rds_read_sample = df_rds_read.join(df_parquet_read_sample, 
                                           on=jdbc_partition_column, 
-                                          how = 'leftsemi')
+                                          how = 'leftsemi')\
+                                    .select(*df_compare_columns_list)
 
     df_rds_read_sample_t1 = df_rds_read_sample.selectExpr(
                                         *get_nvl_select_list(rds_jdbc_conn_obj, 
-                                                             df_rds_read))
+                                                             df_rds_read_sample))
     if validation_sample_df_repartition != 0:
         df_rds_read_sample_t1 = df_rds_read_sample_t1.repartition(validation_sample_df_repartition, 
                                                                   jdbc_partition_column)
@@ -394,7 +400,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
 
     df_prq_leftanti_rds = df_parquet_read_sample_t1.alias("L")\
                                         .join(df_rds_read_sample_t1.alias("R"), 
-                                              on=df_rds_read.columns, 
+                                              on=df_parquet_read_sample_t1.columns, 
                                               how='leftanti')    
     
     df_prq_read_filtered_count = df_prq_leftanti_rds.count()
@@ -405,13 +411,13 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
         df_temp_row = spark.sql(f"""select 
                                     current_timestamp() as run_datetime, 
                                     '' as json_row,
-                                    "{rds_tbl_name} - Sample Rows Validated." as validation_msg,
-                                    '{rds_db_name}' as database_name,
+                                    "{rds_jdbc_conn_obj.rds_db_table_name} - Sample Rows Validated." as validation_msg,
+                                    '{rds_jdbc_conn_obj.rds_db_name}' as database_name,
                                     '{db_sch_tbl}' as full_table_name,
                                     'False' as table_to_ap
                                 """.strip())
             
-        LOGGER.info(f"{rds_tbl_name}: Validation Successful - 1")
+        LOGGER.info(f"{rds_jdbc_conn_obj.rds_db_table_name}: Validation Successful - 1")
         df_dv_output = df_dv_output.union(df_temp_row)
     else:
         msg_part_1 = f"""df_rds_read_count = {df_rds_read.count()}"""
@@ -426,16 +432,16 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                 .selectExpr("json_row")
                                 .limit(100))
 
-        subtract_validation_msg = f"""'{rds_tbl_name}' - {df_prq_read_filtered_count}"""
+        subtract_validation_msg = f"""'{rds_jdbc_conn_obj.rds_db_table_name}' - {df_prq_read_filtered_count}"""
         df_subtract_temp = df_subtract_temp.selectExpr(
                                 "current_timestamp as run_datetime",
                                 "json_row",
                                 f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Sample Row Count!" as validation_msg""",
-                                f"""'{rds_db_name}' as database_name""",
+                                f"""'{rds_jdbc_conn_obj.rds_db_name}' as database_name""",
                                 f"""'{db_sch_tbl}' as full_table_name""",
                                 """'False' as table_to_ap"""
                             )
-        LOGGER.warn(f"{rds_tbl_name}: Validation Failed - 2")
+        LOGGER.warn(f"{rds_jdbc_conn_obj.rds_db_table_name}: Validation Failed - 2")
         df_dv_output = df_dv_output.union(df_subtract_temp)
     # -----------------------------------------------------
 
@@ -538,11 +544,11 @@ if __name__ == "__main__":
     # -------------------------------------------------------
 
     if args.get("jdbc_read_256mb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(args['rds_table_total_size_mb']/256)
+        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/256)
     elif args.get("jdbc_read_512mb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(args['rds_table_total_size_mb']/512)
+        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb']/512))
     elif args.get("jdbc_read_1gb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(args['rds_table_total_size_mb']/1024)
+        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb']/1024))
     else:
         jdbc_read_partitions_num = 1
 
@@ -598,13 +604,19 @@ if __name__ == "__main__":
         given_date_column = args['date_partition_column_name']
         LOGGER.info(f"""given_date_column = {given_date_column}""")
 
-        df_rds_read = (df_rds_read
-                        .withColumn("year", F.year(given_date_column))
-                        .withColumn("month", F.month(given_date_column))
-                        .withColumn("day", F.dayofmonth(given_date_column))
-                        )
+        if args['year_partition'] == 'true':
+            df_rds_read = df_rds_read.withColumn("year", F.year(given_date_column))
+            partition_by_cols.append("year")
+
+        if args['month_partition'] == 'true':
+            df_rds_read = df_rds_read.withColumn("month", F.month(given_date_column))
+            partition_by_cols.append("month")
+
+        if args['day_partition'] == 'true':
+            df_rds_read = df_rds_read.withColumn("day", F.dayofmonth(given_date_column))
+            partition_by_cols.append("day")
+
         #df_rds_read = df_rds_read.repartition("year", "month", "day")
-        partition_by_cols.extend(["year", "month", "day"])
     # ----------------------------------------------------
 
     if args.get('other_partitionby_columns', None) is not None:
@@ -645,9 +657,7 @@ if __name__ == "__main__":
                                                    df_rds_read,
                                                    jdbc_partition_column,
                                                    table_folder_path,
-                                                   validation_sample_fraction_float,
-                                                   rds_db_name,
-                                                   rds_sqlserver_db_table)
+                                                   validation_sample_fraction_float)
 
         df_rds_read.unpersist(True)
 
