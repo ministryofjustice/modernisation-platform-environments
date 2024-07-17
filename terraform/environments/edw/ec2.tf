@@ -347,14 +347,14 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
                 "logs:PutLogEvents",
                 "ec2:DescribeInstances"
             ],
-            "Resource": [*],
+            "Resource": ["*"],
             "Effect": "Allow"
         }, 
         {
             "Action": [
                 "ec2:CreateTags"
             ],
-            "Resource": [*],
+            "Resource": ["*"],
             "Effect": "Allow"
         }
     ]
