@@ -116,7 +116,7 @@ locals {
           ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
+            "Ec2PDReportingPolicy",
           ])
         })
         instance = merge(local.bip_ec2_default.instance, {
@@ -137,7 +137,7 @@ locals {
           ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
+            "Ec2PDReportingPolicy",
           ])
         })
         instance = merge(local.bip_ec2_default.instance, {
