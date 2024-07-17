@@ -543,14 +543,6 @@ resource "aws_security_group" "edw_db_security_group" {
   }
 
   ingress {
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = ["10.26.56.0/21"]
-    description = "-"
-  }
-
-  ingress {
     from_port   = 1158
     to_port     = 1158
     protocol    = "tcp"
