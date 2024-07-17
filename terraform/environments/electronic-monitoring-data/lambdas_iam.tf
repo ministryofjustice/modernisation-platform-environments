@@ -636,7 +636,8 @@ data "aws_iam_policy_document" "extract_zip_to_parquet_s3_policy_document" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
     ]
     resources = [
       "${aws_s3_bucket.data_store.arn}/*",
@@ -667,7 +668,7 @@ resource "aws_iam_role_policy_attachment" "extract_zip_to_parquet_sqs_queue_acce
 }
 
 resource "aws_lambda_permission" "s3_allow_extract_zip_to_parquet" {
-  statement_id  = "AllowOutputFileStructureAsJsonFromZipExecutionFromS3Bucket"
+  statement_id  = "AllowExtractZipToParquetExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
   function_name = module.extract_zip_to_parquet.lambda_function_arn
   principal     = "s3.amazonaws.com"
