@@ -568,7 +568,7 @@ if __name__ == "__main__":
     df_rds_read = (rds_jdbc_conn_obj.get_df_read_rds_db_tbl_int_pkey(
                                             jdbc_partition_column,
                                             jdbc_partition_col_upperbound,
-                                            jdbc_read_partitions_num)).cache()
+                                            jdbc_read_partitions_num))
     LOGGER.info(f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
 
     partition_by_cols = list()
@@ -593,8 +593,12 @@ if __name__ == "__main__":
         partition_by_cols.extend(other_partitionby_columns)
     # ----------------------------------------------------
 
+    df_rds_read = df_rds_read.repartition(jdbc_read_partitions_num, *partition_by_cols).cache()
+
+
     table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}"""
     s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
+
 
     write_rds_df_to_s3_parquet(df_rds_read, 
                                partition_by_cols,
@@ -617,6 +621,7 @@ if __name__ == "__main__":
                                                    rds_sqlserver_db_table)
 
         df_rds_read.unpersist(True)
+
 
         write_to_s3_parquet(df_dv_output, rds_db_name, db_sch_tbl)
     # ------------------------------------------------------------
