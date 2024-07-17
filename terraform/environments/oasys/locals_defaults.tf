@@ -317,7 +317,7 @@ locals {
       ])
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
-      instance_type = "r6i.4xlarge"
+      instance_type = "r7i.4xlarge"
       tags = {
         backup-plan = "daily-and-weekly"
       }

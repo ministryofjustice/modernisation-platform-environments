@@ -31,7 +31,7 @@ locals {
           "/dev/sdb" = { label = "app", size = 300 }
         }
         instance = merge(local.audit_vault.instance, {
-          instance_type = "r6i.xlarge"
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.audit_vault.tags, {
           instance-scheduling = "skip-scheduling"
