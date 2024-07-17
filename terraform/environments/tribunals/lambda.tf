@@ -55,7 +55,7 @@ resource "aws_lambda_function" "app_setup_db" {
   function_name = "${each.value.name_prefix}-setup-db"
   role          = aws_iam_role.lambda_role.arn
   handler       = "index.handler"
-  runtime       = "python3.6"
+  runtime       = "python3.9"
   timeout       = 300
   architectures = ["x86_64"]
 
