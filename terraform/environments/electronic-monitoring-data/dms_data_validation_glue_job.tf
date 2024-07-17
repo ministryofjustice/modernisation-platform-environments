@@ -227,7 +227,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--rds_table_total_rows"              = ""
     "--date_partition_column_name"        = ""
     "--other_partitionby_columns"         = ""
-    "--validation_sample_fraction"        = ""
+    "--validation_sample_fraction"        = 0
     "--jdbc_read_256mb_partitions"        = "false"
     "--jdbc_read_512mb_partitions"        = "false"
     "--jdbc_read_1gb_partitions"          = "true"
@@ -244,7 +244,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
 spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
 --conf spark.sql.parquet.aggregatePushdown=true 
 --conf spark.sql.shuffle.partitions=2001 
---conf spark.sql.files.maxPartitionBytes=1g 
+--conf spark.sql.files.maxPartitionBytes=256m 
 EOF
 
   }

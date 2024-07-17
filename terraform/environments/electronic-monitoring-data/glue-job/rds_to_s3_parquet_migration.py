@@ -593,7 +593,10 @@ if __name__ == "__main__":
         partition_by_cols.extend(other_partitionby_columns)
     # ----------------------------------------------------
 
-    df_rds_read = df_rds_read.repartition(jdbc_read_partitions_num, *partition_by_cols).cache()
+    if partition_by_cols:
+        df_rds_read = df_rds_read.repartition(jdbc_read_partitions_num, *partition_by_cols).cache()
+    else:
+        df_rds_read = df_rds_read.cache()
 
 
     table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}"""
