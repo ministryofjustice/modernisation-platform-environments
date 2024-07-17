@@ -12,6 +12,55 @@ locals {
     }
   }
 
+  acm_certificates = {
+    nomis_combined_reporting_wildcard_cert = {
+      cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+      domain_name              = "modernisation-platform.service.justice.gov.uk"
+      subject_alternate_names = [
+        "reporting.nomis.service.justice.gov.uk",
+        "*.reporting.nomis.service.justice.gov.uk",
+      ]
+      tags = {
+        description = "Wildcard certificate for the preproduction environment"
+      }
+    }
+  }
+
+  efs = {
+    pd-ncr-sap-share = {
+      access_points = {
+        root = {
+          posix_user = {
+            gid = 1201 # binstall
+            uid = 1201 # bobj
+          }
+          root_directory = {
+            path = "/"
+            creation_info = {
+              owner_gid   = 1201 # binstall
+              owner_uid   = 1201 # bobj
+              permissions = "0777"
+            }
+          }
+        }
+      }
+      file_system = {
+        availability_zone_name = "eu-west-2a"
+        lifecycle_policy = {
+          transition_to_ia = "AFTER_30_DAYS"
+        }
+      }
+      mount_targets = [{
+        subnet_name        = "private"
+        availability_zones = ["eu-west-2a"]
+        security_groups    = ["bip"]
+      }]
+      tags = {
+        backup = "false"
+      }
+    }
+  }
+
   # please keep resources in alphabetical order
   baseline_production = {
 
@@ -60,6 +109,49 @@ locals {
     }
 
     ec2_instances = {
+
+      pd-ncr-cms-a = merge(local.bip_ec2_default, {
+        #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.bip_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "m6i.xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "Prod SAP BI Platform CMS installation and configurations"
+          instance-scheduling                  = "skip-scheduling"
+          node                                 = "1"
+          nomis-combined-reporting-environment = "pd"
+          type                                 = "management"
+        })
+      })
+
+      pd-ncr-cms-b = merge(local.bip_ec2_default, {
+        #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.bip_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "m6i.xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "Prod SAP BI Platform CMS installation and configurations"
+          instance-scheduling                  = "skip-scheduling"
+          node                                 = "2"
+          nomis-combined-reporting-environment = "pd"
+          type                                 = "management"
+        })
+      })
+
       pd-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
           local.database_cloudwatch_metric_alarms.standard,
@@ -97,6 +189,25 @@ locals {
           nomis-combined-reporting-environment = "pd"
           oracle-sids                          = ""
           instance-scheduling                  = "skip-scheduling"
+        })
+      })
+
+      pd-ncr-client-a = merge(local.jumpserver_ec2_default, {
+        # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.jumpserver_ec2_default.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.jumpserver_ec2_default.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        instance = merge(local.jumpserver_ec2_default.instance, {
+          instance_type = "t3.large",
+        })
+        tags = merge(local.jumpserver_ec2_default.tags, {
+          description                          = "Prod Jumpserver and Client Tools"
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
         })
       })
 
@@ -174,7 +285,7 @@ locals {
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "Prod SAP BI Platform installation and configurations"
           instance-scheduling                  = "skip-scheduling"
-          node                                 = "3"
+          node                                 = "4"
           nomis-combined-reporting-environment = "pd"
           type                                 = "processing"
         })
@@ -195,7 +306,7 @@ locals {
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "Prod SAP BI Platform installation and configurations"
           instance-scheduling                  = "skip-scheduling"
-          node                                 = "3"
+          node                                 = "5"
           nomis-combined-reporting-environment = "pd"
           type                                 = "processing"
         })
@@ -216,7 +327,7 @@ locals {
         tags = merge(local.bip_ec2_default.tags, {
           description                          = "Prod SAP BI Platform installation and configurations"
           instance-scheduling                  = "skip-scheduling"
-          node                                 = "3"
+          node                                 = "6"
           nomis-combined-reporting-environment = "pd"
           type                                 = "processing"
         })
@@ -351,6 +462,7 @@ locals {
     #           { ec2_instance_name = "pd-ncr-web-2-b" },
     #           { ec2_instance_name = "pd-ncr-web-3-c" },
     #           { ec2_instance_name = "pd-ncr-web-4-a" },
+    #           { ec2_instance_name = "pd-ncr-web-admin-a" },
     #         ]
     #       }
     #     }
