@@ -581,7 +581,7 @@ if __name__ == "__main__":
         sys.exit(1)
     # -------------
 
-    jdbc_partition_col_upperbound = int(args['rds_table_total_rows']/jdbc_read_partitions_num)
+    jdbc_partition_col_upperbound = int(int(args['rds_table_total_rows'])/jdbc_read_partitions_num)
     LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
     
     df_rds_read = (rds_jdbc_conn_obj.get_df_read_rds_db_tbl_int_pkey(
