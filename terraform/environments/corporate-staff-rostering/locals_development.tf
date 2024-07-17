@@ -33,9 +33,7 @@ locals {
             "EC2S3BucketWriteAndDeleteAccessPolicy",
             "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
           ]
-          subnet_name                   = "private"
-          secretsmanager_secrets_prefix = "ec2/"
-          ssm_parameters_prefix         = "ec2/"
+          subnet_name = "private"
         }
         instance = {
           disable_api_termination      = false
@@ -57,11 +55,11 @@ locals {
           ]
         }
         tags = {
-          description = "For testing our base OL8.5 base image"
-          ami         = "base_ol_8_5" # remove
-          os-type     = "Linux"
-          component   = "test"
-          server-type = "base-ol-8-5" # fix
+          backup           = "false"
+          description      = "For testing our base OL8.5 base image"
+          os-type          = "Linux"
+          server-type      = "base-ol85"
+          update-ssm-agent = "patchgroup1"
         }
       }
 
@@ -79,7 +77,6 @@ locals {
         config = {
           ami_name                      = "base_windows_server_2012_r2_release_2023-*"
           ami_owner                     = "374269020027"
-          availability_zone             = "eu-west-2a" # TODO
           ebs_volumes_copy_all_from_ami = false
           iam_resource_names_prefix     = "ec2-instance"
           instance_profile_policies = [
@@ -89,10 +86,12 @@ locals {
             "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
             "CSRWebServerPolicy",
           ]
-          subnet_name                   = "private"
-          secretsmanager_secrets_prefix = "ec2/" # TODO
-          ssm_parameters_prefix         = "ec2/"
-          user_data_raw                 = base64encode(file("./templates/user-data.yaml")) # TODO update
+          subnet_name = "private"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "main"
+            }
+          ))
         }
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 192 } # minimum size has to be 128 due to snapshot sizes
@@ -106,10 +105,11 @@ locals {
           vpc_security_group_ids       = ["app", "domain", "jumpserver"]
         }
         tags = {
-          description = "Test AWS AMI Windows Server 2012 R2"
-          os-type     = "Windows"
-          component   = "appserver"
-          server-type = "test-server"
+          backup           = "false"
+          description      = "Test AWS AMI Windows Server 2012 R2"
+          os-type          = "Windows"
+          server-type      = "Base2012"
+          update-ssm-agent = "patchgroup1"
         }
       }
 
@@ -135,10 +135,12 @@ locals {
             "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
             "CSRWebServerPolicy",
           ]
-          subnet_name                   = "private"
-          secretsmanager_secrets_prefix = "ec2/"
-          ssm_parameters_prefix         = "ec2/"
-          user_data_raw                 = base64encode(file("./templates/user-data.yaml")) # TODO update
+          subnet_name = "private"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "main"
+            }
+          ))
         }
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
@@ -152,9 +154,11 @@ locals {
           vpc_security_group_ids       = ["domain", "jumpserver"]
         }
         tags = {
-          description = "Windows Server 2022 for testing"
-          os-type     = "Windows"
-          component   = "test"
+          backup           = "false"
+          description      = "Windows Server 2022 for testing"
+          os-type          = "Windows"
+          server-type      = "Base2022"
+          update-ssm-agent = "patchgroup1"
         }
       }
     }

@@ -6,14 +6,8 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
-        local.application_log_metric_alarms.app, {
-          instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
-            threshold           = "0"
-            evaluation_periods  = "5"
-            datapoints_to_alarm = "2"
-            period              = "60"
-            alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 60 and trigger if there are 2 events in 5 minutes."
-          })
+        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows,
+        local.cloudwatch_app_log_metric_alarms.app, {
           high-memory-usage = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows["high-memory-usage"], {
             threshold           = "75"
             period              = "60" # seconds
@@ -34,20 +28,16 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO
-        ssm_parameters_prefix         = "ec2/" # TODO
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       instance = {
-        disable_api_stop             = false # TODO
         disable_api_termination      = true
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         monitoring                   = true
         tags = {
-          backup-plan         = "daily-and-weekly"
-          instance-scheduling = "skip-scheduling" # TODO
+          backup-plan = "daily-and-weekly"
         }
         vpc_security_group_ids = ["domain", "app", "jumpserver"]
       }
@@ -66,8 +56,9 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_linux,
-        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup, {
-          # TODO review
+        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows,
+        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,
+        local.environment == "production" ? {} : {
           cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2["cpu-utilization-high"], {
             evaluation_periods  = "480"
             datapoints_to_alarm = "480"
@@ -79,13 +70,6 @@ locals {
             datapoints_to_alarm = "480"
             threshold           = "40"
             alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 8 hours allowing for DB refreshes.  See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
-          })
-          instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_linux["instance-or-cloudwatch-agent-stopped"], {
-            threshold           = "0"
-            evaluation_periods  = "5"
-            datapoints_to_alarm = "2"
-            period              = "60"
-            alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 60 and trigger if there are 2 events in 5 minutes."
           })
         }
       )
@@ -100,9 +84,7 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/" # TODO
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       ebs_volumes = {
         "/dev/sdb" = { label = "app" }   # /u01
@@ -121,14 +103,12 @@ locals {
         flash = { iops = 3000, throughput = 125 }
       }
       instance = {
-        disable_api_stop             = false # TODO
         disable_api_termination      = true
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
         tags = {
-          backup-plan         = "daily-and-weekly"
-          instance-scheduling = "skip-scheduling" # TODO
+          backup-plan = "daily-and-weekly"
         }
         vpc_security_group_ids = ["database"]
       }
@@ -142,18 +122,14 @@ locals {
           recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
         }
       }
-      # TODO
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
         }
-        scripts = [
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       tags = {
@@ -169,15 +145,8 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
-        local.application_log_metric_alarms.web, {
-          instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
-            threshold           = "0"
-            evaluation_periods  = "5"
-            datapoints_to_alarm = "2"
-            period              = "60"
-            alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 60 and trigger if there are 2 events in 5 minutes."
-          })
-        }
+        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows,
+        local.cloudwatch_app_log_metric_alarms.web,
       )
       config = {
         ami_owner                     = "self"
@@ -190,20 +159,16 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO
-        ssm_parameters_prefix         = "ec2/" # TODO
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       instance = {
-        disable_api_stop             = false # TODO
         disable_api_termination      = true
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         monitoring                   = true
         tags = {
-          backup-plan         = "daily-and-weekly"
-          instance-scheduling = "skip-scheduling" # TODO
+          backup-plan = "daily-and-weekly"
         }
         vpc_security_group_ids = ["domain", "web", "jumpserver"]
       }
