@@ -587,7 +587,7 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = ["local.application_data.accounts[local.environment].edw_management_cidr"]
+    cidr_blocks = [local.application_data.accounts[local.environment].edw_management_cidr]
     description = "RDS Workspace access"
   }
 
