@@ -6,14 +6,8 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
+        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows,
         local.cloudwatch_app_log_metric_alarms.app, {
-          instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
-            threshold           = "0"
-            evaluation_periods  = "5"
-            datapoints_to_alarm = "2"
-            period              = "60"
-            alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 60 and trigger if there are 2 events in 5 minutes."
-          })
           high-memory-usage = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows["high-memory-usage"], {
             threshold           = "75"
             period              = "60" # seconds
@@ -62,8 +56,9 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_linux,
-        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup, {
-          # TODO review
+        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows,
+        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,
+        local.environment == "production" ? {} : {
           cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2["cpu-utilization-high"], {
             evaluation_periods  = "480"
             datapoints_to_alarm = "480"
@@ -75,13 +70,6 @@ locals {
             datapoints_to_alarm = "480"
             threshold           = "40"
             alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 8 hours allowing for DB refreshes.  See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
-          })
-          instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_linux["instance-or-cloudwatch-agent-stopped"], {
-            threshold           = "0"
-            evaluation_periods  = "5"
-            datapoints_to_alarm = "2"
-            period              = "60"
-            alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 60 and trigger if there are 2 events in 5 minutes."
           })
         }
       )
@@ -157,15 +145,8 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2,
         module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_cwagent_windows,
-        local.cloudwatch_app_log_metric_alarms.web, {
-          instance-or-cloudwatch-agent-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows["instance-or-cloudwatch-agent-stopped"], {
-            threshold           = "0"
-            evaluation_periods  = "5"
-            datapoints_to_alarm = "2"
-            period              = "60"
-            alarm_description   = "Triggers if the instance or CloudWatch agent is stopped. Will check every 60 and trigger if there are 2 events in 5 minutes."
-          })
-        }
+        module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].ec2_instance_or_cwagent_stopped_windows,
+        local.cloudwatch_app_log_metric_alarms.web,
       )
       config = {
         ami_owner                     = "self"
