@@ -446,12 +446,15 @@ def process_dv_for_table(rds_db_name,
 
     parquet_tbl_folder_if_different = args.get('parquet_tbl_folder_if_different', '')
     if parquet_tbl_folder_if_different != '':
-        tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, parquet_tbl_folder_if_different)
+        tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, 
+                                                          parquet_tbl_folder_if_different)
+        LOGGER.info(f"""Using a different parquet folder: {parquet_tbl_folder_if_different}""")
     else:
         tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
-
     # -------------------------------------------------------
 
+    LOGGER.info(f"""tbl_prq_s3_folder_path: {tbl_prq_s3_folder_path}""")
+    
     pkey_partion_read_used = False
     if tbl_prq_s3_folder_path is not None:
         
