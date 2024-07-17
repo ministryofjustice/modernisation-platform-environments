@@ -615,6 +615,7 @@ if __name__ == "__main__":
     # ----------------------------------------------------
 
     if partition_by_cols:
+        LOGGER.info(f"""df_rds_read-Repartitioning on columns: {partition_by_cols}""")
         df_rds_read = df_rds_read.repartition(jdbc_read_partitions_num, *partition_by_cols).cache()
     else:
         df_rds_read = df_rds_read.cache()
