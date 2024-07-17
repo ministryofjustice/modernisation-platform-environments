@@ -313,7 +313,7 @@ locals {
       ami_name          = "base_ol_8_5_*"
       availability_zone = "eu-west-2a"
       instance_profile_policies = flatten([
-        module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
+        module.baseline_presets.ec2_instance.config.db.instance_profile_policies, ["AVServerPolicy"]
       ])
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default_db, {
