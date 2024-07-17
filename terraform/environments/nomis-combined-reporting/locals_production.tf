@@ -198,7 +198,7 @@ locals {
           ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.jumpserver_ec2_default.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
+            "Ec2PDReportingPolicy",
           ])
         })
         instance = merge(local.jumpserver_ec2_default.instance, {
