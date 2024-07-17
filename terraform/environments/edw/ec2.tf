@@ -48,21 +48,7 @@ wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.t
 easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz
 mkdir -p /run/cfn-init # Path to store cfn-init scripts
 
-####configure cfn-init variables
-export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
-export LOGS="${local.application_data.accounts[local.environment].edw_AppName}-EC2"
-export APPNAME="${local.application_data.accounts[local.environment].edw_AppName}"
-export ENV="${local.application_data.accounts[local.environment].edw_environment}"
-export BACKUPBUCKET="${local.application_data.accounts[local.environment].edw_s3_backup_bucket}"
-export SECRET=`/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id $${terraform output -raw edw_db_secret} --query SecretString --output text`
-export host="$ip4 $APPNAME-$ENV $APPNAME.${local.application_data.accounts[local.environment].edw_dns_extension}"
-export host2="${local.application_data.accounts[local.environment].edw_cis_ip} cis.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
-export host3="${local.application_data.accounts[local.environment].edw_eric_ip} eric.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
-export host3="${local.application_data.accounts[local.environment].edw_ccms_ip} ccms.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
-echo $host >>/etc/hosts
-echo $host2 >>/etc/hosts
-echo $host3 >>/etc/hosts
-mkdir -p /home/oracle/scripts
+
 
 ##### METADATA #####
 
@@ -536,8 +522,8 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].edw_management_cidr]
-    description = "SSH access"
+    cidr_blocks = ["10.26.56.0/21"]
+    description = "SCP temp"
   }
 
   ingress {
@@ -560,17 +546,34 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
-    description = "RDS env access"
+    cidr_blocks = ["10.26.56.0/21"]
+    description = "-"
+  }
+
+  ingress {
+    from_port   = 1158
+    to_port     = 1158
+    protocol    = "tcp"
+    cidr_blocks = ["10.200.0.0/20"]
+    description = "-"
+  }
+
+  ingress {
+    from_port   = 1158
+    to_port     = 1158
+    protocol    = "tcp"
+    cidr_blocks = ["10.202.0.0/20"]
+    description = "-"
   }
 
   ingress {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].edw_management_cidr]
-    description = "RDS Workspace access"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    description = "RDS env access"
   }
+
 
   ingress {
     from_port   = 1521
@@ -584,9 +587,26 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
+    cidr_blocks = ["local.application_data.accounts[local.environment].edw_management_cidr"]
+    description = "RDS Workspace access"
+  }
+
+  ingress {
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
     cidr_blocks = ["10.200.32.0/19"]
     description = "RDS Appstream access"
   }
+
+  egress {
+    from_port   = 0
+    to_port     = -1
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "-"
+  }
+
 }
 
 ###### DB DNS #######
