@@ -364,6 +364,8 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
 
     s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
+    LOGGER.info(f"""Parquet Source being used for comparison: {s3_table_folder_path}""")
+
     df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path).cache()
                                 
     df_parquet_read_sample = df_parquet_read.sample(validation_sample_fraction_float)
@@ -633,7 +635,7 @@ if __name__ == "__main__":
     total_files, total_size = get_s3_folder_info(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path)
     msg_part_1 = f"""total_files={total_files}"""
     msg_part_2 = f"""total_size_mb={total_size/1024/1024}"""
-    LOGGER.info(f"""{rds_sqlserver_db_table} written: msg_part_1, msg_part_2""")
+    LOGGER.info(f"""{rds_sqlserver_db_table} written: {msg_part_1}, {msg_part_2}""")
 
     validation_sample_fraction_float = float(args.get('validation_sample_fraction_float', 0))
     if validation_sample_fraction_float != 0:
