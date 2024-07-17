@@ -535,17 +535,16 @@ if __name__ == "__main__":
         sys.exit(1)
     # -------------------------------------------------------
 
-    rds_table_total_size_mb = args['rds_table_total_size_mb']
     if args.get("jdbc_read_256mb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(rds_table_total_size_mb/256)
+        jdbc_read_partitions_num = int(args['rds_table_total_size_mb']/256)
     elif args.get("jdbc_read_512mb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(rds_table_total_size_mb/512)
+        jdbc_read_partitions_num = int(args['rds_table_total_size_mb']/512)
     elif args.get("jdbc_read_1gb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(rds_table_total_size_mb/1024)
+        jdbc_read_partitions_num = int(args['rds_table_total_size_mb']/1024)
     else:
         jdbc_read_partitions_num = 1
 
-    jdbc_read_partitions_num = 1 if jdbc_read_partitions_num == 0 \
+    jdbc_read_partitions_num = 1 if jdbc_read_partitions_num <= 0 \
                                     else jdbc_read_partitions_num
 
     LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")

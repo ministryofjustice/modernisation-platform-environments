@@ -92,7 +92,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group_v2" {
 }
 
 resource "aws_cloudwatch_log_group" "rds_to_s3_parquet_migration" {
-  name              = "rds_to_s3_parquet_migration"
+  name              = "rds-to-s3-parquet-migration"
   retention_in_days = 14
 }
 # -------------------------------------------------------------------
@@ -242,7 +242,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--dv_parquet_output_s3_bucket"       = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
     "--glue_catalog_tbl_name"             = "glue_df_output"
-    "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
+    "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.rds_to_s3_parquet_migration.name}"
     "--enable-continuous-cloudwatch-log"  = "true"
     "--enable-continuous-log-filter"      = "true"
     "--enable-metrics"                    = "true"
