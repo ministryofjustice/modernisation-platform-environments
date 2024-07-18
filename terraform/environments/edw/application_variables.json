@@ -4,7 +4,7 @@
       "edw_AppName": "EDW2",
       "edw_environment": "dev",
       "edw_region": "eu-west-2",
-      "edw_ec2_ami_id": "ami-093381ebab6476c17",
+      "edw_ec2_ami_id": "ami-012aa1576af4948d1",
       "edw_ec2_instance_type": "m4.xlarge",
       "edw_ssh_key_name": "development-general",
       "edw_OrahomeVolumeSize": "150",
