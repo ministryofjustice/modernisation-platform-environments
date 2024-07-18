@@ -445,7 +445,7 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
     ]
     resources = [
       "${module.json-directory-structure-bucket.arn}/*",
-      module.json-directory-structure-bucket.arn
+      module.json-directory-structure-bucket.bucket.arn
     ]
   }
 }
