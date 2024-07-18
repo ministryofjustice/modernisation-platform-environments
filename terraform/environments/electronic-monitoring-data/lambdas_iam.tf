@@ -553,6 +553,7 @@ resource "aws_iam_role_policy_attachment" "load_json_table_vpc_access_execution"
 resource "aws_iam_role_policy_attachment" "load_json_table_lambda_sqs_queue_access_execution" {
   role       = aws_iam_role.load_json_table.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
 
 # ------------------------------------------
 # unzip_unstructured_files
