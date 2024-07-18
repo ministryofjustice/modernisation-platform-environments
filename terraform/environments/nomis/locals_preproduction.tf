@@ -2,7 +2,7 @@ locals {
 
   lb_maintenance_message_preproduction = {
     maintenance_title   = "Prison-NOMIS Environment Not Started"
-    maintenance_message = "Lsast weblogic is rarely used so is started on demand. Preprod is available during working hours. Please see <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> or contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel for more information"
+    maintenance_message = "Lsast weblogic is rarely used so is started on demand. Preprod is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
   baseline_presets_preproduction = {
@@ -394,13 +394,9 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
+            alarm_target_group_names  = [] # don't enable as environments are powered up/down frequently
             certificate_names_or_arns = ["nomis_wildcard_cert"]
-
-            alarm_target_group_names = [
-              # "lsast-nomis-web-a-http-7777",
-              "preprod-nomis-web-a-http-7777",
-              # "preprod-nomis-web-b-http-7777",
-            ]
+            cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].lb
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
