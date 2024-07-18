@@ -57,14 +57,13 @@ sudo ./aws/install
 export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
 export LOGS="${local.application_name}-EC2"
 export APPNAME="${local.application_name}"
-export ENV="${edw_environment}"
-export BACKUPBUCKET="${edw_s3_backup_bucket}"
-export ROLE="${edw_ec2_role}"
-export SECRET=`/usr/local/bin/aws --region ${edw_region} secretsmanager get-secret-value --secret-id $${terraform output -raw edw_db_secret} --query SecretString --output text`
-export host="$ip4 $APPNAME-$ENV $APPNAME.${edw_dns_extension}"
-export host2="${edw_cis_ip} cis.aws.${edw_environment}.legalservices.gov.uk"
-export host3="${edw_eric_ip} eric.aws.${edw_environment}.legalservices.gov.uk"
-export host3="${edw_ccms_ip} ccms.aws.${edw_environment}.legalservices.gov.uk"
+export ENV="${local.application_data.accounts[local.environment].edw_environment}"
+export BACKUPBUCKET="${local.application_data.accounts[local.environment].edw_s3_backup_bucket}"
+export SECRET=`/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id $${terraform output -raw edw_db_secret} --query SecretString --output text`
+export host="$ip4 $APPNAME-$ENV $APPNAME.${local.application_data.accounts[local.environment].edw_dns_extension}"
+export host2="${local.application_data.accounts[local.environment].edw_cis_ip} cis.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
+export host3="${local.application_data.accounts[local.environment].edw_eric_ip} eric.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
+export host3="${local.application_data.accounts[local.environment].edw_ccms_ip} ccms.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
 echo $host >>/etc/hosts
 echo $host2 >>/etc/hosts
 echo $host3 >>/etc/hosts
@@ -82,7 +81,7 @@ cat > /etc/awslogs/awscli.conf <<-EOF
 [plugins]
 cwlogs = cwlogs
 [default]
-region = ${AWS_REGION}
+region = ${local.application_data.accounts[local.environment].edw_region}
 
 echo "---creating /tmp/cwlogs/logstreams.conf"
 mkdir -p /tmp/cwlogs
@@ -91,36 +90,36 @@ cat > /tmp/cwlogs/logstreams.conf <<-EOF
 [general]
 state_file = /var/awslogs/agent-state
 [oracle_alert_log_errors]
-file = /oracle/software/product/10.2.0/admin/${APPNAME}/bdump/alert_${APPNAME}.log
-log_group_name = ${APPNAME}-OracleAlerts
+file = /oracle/software/product/10.2.0/admin/${local.application_name}/bdump/alert_${local.application_name}.log
+log_group_name = ${local.application_name}-OracleAlerts
 log_stream_name = {instance_id}
 
 [rman_backup_log_errors]
 file = /home/oracle/backup_logs/*_RMAN_disk_*.log
-log_group_name = ${APPNAME}-RMan
+log_group_name = ${local.application_name}-RMan
 log_stream_name = {instance_id}
 
 [rman_arch_backup_log_errors]
 file = /home/oracle/backup_logs/*_RMAN_disk_ARCH_*.log
-log_group_name = ${APPNAME}-RManArch
+log_group_name = ${local.application_name}-RManArch
 log_stream_name = {instance_id}
 
 # adding logs for space report
 [db_tablespace_space_alerts]
 file = /home/oracle/scripts/logs/freespace_alert.log
-log_group_name = ${APPNAME}-TBSFreespace
+log_group_name = ${local.application_name}-TBSFreespace
 log_stream_name = {instance_id}
 
 # adding logs for pmon monitor
 [db_PMON_status_alerts]
 file = /home/oracle/scripts/logs/pmon_status_alert.log
-log_group_name = ${APPNAME}-PMONstatus
+log_group_name = ${local.application_name}-PMONstatus
 log_stream_name = {instance_id}
 
 # adding logs for CDC monitor
 [db_CDC_status_alerts]
 file = /home/oracle/scripts/logs/cdc_check.log
-log_group_name = ${APPNAME}-CDCstatus
+log_group_name = ${local.application_name}-CDCstatus
 log_stream_name = {instance_id}
 
 
@@ -142,12 +141,6 @@ exit 1
 echo "---Install AWS logging"
 curl -O https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
 /usr/local/bin/python2.7 awslogs-agent-setup.py --no-proxy=NO_PROXY -n -r eu-west-2 -c /tmp/cwlogs/logstreams.conf || exit 2
-
-# Tag root volume
-echo "---tagging root volume"
-AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-ROOT_VOLUME_IDS=$(/usr/local/bin/aws ec2 describe-instances --region ${AWS_REGION} --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)
-/usr/local/bin/aws ec2 create-tags --resources $ROOT_VOLUME_IDS --region ${AWS_REGION} --tags Key=Name,Value=$APPNAME-root
 
 #### setup_file_systems
 echo "---setup_file_systems"
