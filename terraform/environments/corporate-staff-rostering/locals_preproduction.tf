@@ -9,35 +9,36 @@ locals {
   baseline_preproduction = {
 
     ec2_instances = {
-      pp-csr-db-a = merge(local.defaults_database_ec2, {
-        config = merge(local.defaults_database_ec2.config, {
+      pp-csr-db-a = merge(local.ec2_instances.db, {
+        config = merge(local.ec2_instances.db.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.defaults_database_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        ebs_volumes = merge(local.defaults_database_ec2.ebs_volumes, {
+        ebs_volumes = merge(local.ec2_instances.db.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
           "/dev/sdb"  = { label = "app", size = 100 } # /u01
           "/dev/sdc"  = { label = "app", size = 100 } # /u02
         })
-        ebs_volume_config = merge(local.defaults_database_ec2.ebs_volume_config, {
+        ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
           data  = { total_size = 1500 }
           flash = { total_size = 100 }
         })
-        instance = merge(local.defaults_database_ec2.instance, {
+        instance = merge(local.ec2_instances.db.instance, {
         })
-        tags = merge(local.defaults_database_ec2.tags, {
-          pre-migration = "PPCDL00019"
-          description   = "PP CSR DB server"
-          server-type   = "csr-db"
-          oracle-sids   = "PPIWFM"
+        tags = merge(local.ec2_instances.db.tags, {
+          description         = "PP CSR DB server"
+          instance-scheduling = "skip-scheduling"
+          oracle-sids         = "PPIWFM"
+          pre-migration       = "PPCDL00019"
+          server-type         = "csr-db"
         })
       })
 
-      pp-csr-a-13-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-csr-a-13-a = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-csr-a-13-a"
           availability_zone = "eu-west-2a"
         })
@@ -47,18 +48,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.ec2_instances.app.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPCAW00013"
-          description   = "Application Server Region 1"
-          ami           = "pp-csr-a-13-a"
+        tags = merge(local.ec2_instances.app.tags, {
+          ami                 = "pp-csr-a-13-a"
+          description         = "Application Server Region 1"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00013"
         })
       })
 
-      pp-csr-a-14-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-csr-a-14-b = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-csr-a-14-b"
           availability_zone = "eu-west-2b"
         })
@@ -68,18 +70,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 56 }
         }
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.ec2_instances.app.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPCAW00014"
-          description   = "Application Server Region 2"
-          ami           = "pp-csr-a-14-b"
+        tags = merge(local.ec2_instances.app.tags, {
+          ami                 = "pp-csr-a-14-b"
+          description         = "Application Server Region 2"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00014"
         })
       })
 
-      pp-csr-a-17-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-csr-a-17-a = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-csr-a-17-a"
           availability_zone = "eu-west-2a"
         })
@@ -89,18 +92,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.ec2_instances.app.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPCAW00017"
-          description   = "Application Server Region 3"
-          ami           = "pp-csr-a-17-a"
+        tags = merge(local.ec2_instances.app.tags, {
+          ami                 = "pp-csr-a-17-a"
+          description         = "Application Server Region 3"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00017"
         })
       })
 
-      pp-csr-a-18-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-csr-a-18-b = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-csr-a-18-b"
           availability_zone = "eu-west-2b"
         })
@@ -110,18 +114,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 56 }
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.ec2_instances.app.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPCAW00018"
-          description   = "Application Server Region 4"
-          ami           = "pp-csr-a-18-b"
+        tags = merge(local.ec2_instances.app.tags, {
+          ami                 = "pp-csr-a-18-b"
+          description         = "Application Server Region 4"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00018"
         })
       })
 
-      pp-csr-a-2-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-csr-a-2-b = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-csr-a-2-b"
           availability_zone = "eu-west-2b"
         })
@@ -129,18 +134,19 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.ec2_instances.app.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPCAW00002"
-          description   = "Application Server Region 5"
-          ami           = "pp-csr-a-2-b"
+        tags = merge(local.ec2_instances.app.tags, {
+          ami                 = "pp-csr-a-2-b"
+          description         = "Application Server Region 5"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00002"
         })
       })
 
-      pp-csr-a-3-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-csr-a-3-a = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-csr-a-3-a"
           availability_zone = "eu-west-2a"
         })
@@ -148,18 +154,19 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.ec2_instances.app.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPCAW00003"
-          description   = "Application Server Region 6"
-          ami           = "pp-csr-a-3-a"
+        tags = merge(local.ec2_instances.app.tags, {
+          ami                 = "pp-csr-a-3-a"
+          description         = "Application Server Region 6"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00003"
         })
       })
 
-      pp-csr-a-15-a = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-csr-a-15-a = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-csr-a-15-a"
           availability_zone = "eu-west-2a"
         })
@@ -169,18 +176,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.ec2_instances.app.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPCAW00015"
-          description   = "Application Server Training A"
-          ami           = "pp-csr-a-15-a"
+        tags = merge(local.ec2_instances.app.tags, {
+          ami                 = "pp-csr-a-15-a"
+          description         = "Application Server Training A"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00015"
         })
       })
 
-      pp-csr-a-16-b = merge(local.defaults_app_ec2, {
-        config = merge(local.defaults_app_ec2.config, {
+      pp-csr-a-16-b = merge(local.ec2_instances.app, {
+        config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-csr-a-16-b"
           availability_zone = "eu-west-2b"
         })
@@ -190,18 +198,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 128 }
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
-        instance = merge(local.defaults_app_ec2.instance, {
+        instance = merge(local.ec2_instances.app.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_app_ec2.tags, {
-          pre-migration = "PPCAW00016"
-          description   = "Application Server Training B"
-          ami           = "pp-csr-a-16-b"
+        tags = merge(local.ec2_instances.app.tags, {
+          ami                 = "pp-csr-a-16-b"
+          description         = "Application Server Training B"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCAW00016"
         })
       })
 
-      pp-csr-w-1-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-csr-w-1-a = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "PPCWW00001"
           availability_zone = "eu-west-2a"
         })
@@ -211,18 +220,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 129 }
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPCWW00001"
-          description   = "Web Server Region 1 and 2"
-          ami           = "PPCWW00001"
+        tags = merge(local.ec2_instances.web.tags, {
+          ami                 = "PPCWW00001"
+          description         = "Web Server Region 1 and 2"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00001"
         })
       })
 
-      pp-csr-w-2-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-csr-w-2-b = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-csr-w-2-b"
           availability_zone = "eu-west-2b"
         })
@@ -232,18 +242,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 56 }
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPCWW00002"
-          description   = "Web Server Region 1 and 2"
-          ami           = "pp-csr-w-2-b"
+        tags = merge(local.ec2_instances.web.tags, {
+          ami                 = "pp-csr-w-2-b"
+          description         = "Web Server Region 1 and 2"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00002"
         })
       })
 
-      pp-csr-w-5-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-csr-w-5-a = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "PPCWW00005"
           availability_zone = "eu-west-2a"
         })
@@ -252,18 +263,19 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
           "/dev/sdc"  = { type = "gp3", size = 129 }
         }
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPCWW00005"
-          description   = "Web Server Region 3 and 4"
-          ami           = "PPCWW00005"
+        tags = merge(local.ec2_instances.web.tags, {
+          ami                 = "PPCWW00005"
+          description         = "Web Server Region 3 and 4"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00005"
         })
       })
 
-      pp-csr-w-6-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-csr-w-6-b = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-csr-w-6-b"
           availability_zone = "eu-west-2b"
         })
@@ -273,18 +285,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 129 }
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPCWW00006"
-          description   = "Web Server Region 3 and 4"
-          ami           = "pp-csr-w-6-b"
+        tags = merge(local.ec2_instances.web.tags, {
+          ami                 = "pp-csr-w-6-b"
+          description         = "Web Server Region 3 and 4"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00006"
         })
       })
 
-      pp-csr-w-7-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-csr-w-7-a = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-csr-w-8-b"
           availability_zone = "eu-west-2a"
         })
@@ -292,18 +305,19 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 200 }
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPCWW00007"
-          description   = "Web Server Region 5 and 6"
-          ami           = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
+        tags = merge(local.ec2_instances.web.tags, {
+          ami                 = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
+          description         = "Web Server Region 5 and 6"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00007"
         })
       })
 
-      pp-csr-w-8-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-csr-w-8-b = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-csr-w-8-b"
           availability_zone = "eu-west-2b"
         })
@@ -311,18 +325,19 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 200 }
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPCWW00008"
-          description   = "Web Server Region 5 and 6"
-          ami           = "pp-csr-w-8-b"
+        tags = merge(local.ec2_instances.web.tags, {
+          ami                 = "pp-csr-w-8-b"
+          description         = "Web Server Region 5 and 6"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00008"
         })
       })
 
-      pp-csr-w-3-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-csr-w-3-a = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-csr-w-3-a"
           availability_zone = "eu-west-2a"
         })
@@ -332,18 +347,19 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 129 }
           "/dev/sdd"  = { type = "gp3", size = 56 }
         }
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPCWW00003"
-          description   = "Web Server Training A and B"
-          ami           = "pp-csr-w-3-a"
+        tags = merge(local.ec2_instances.web.tags, {
+          ami                 = "pp-csr-w-3-a"
+          description         = "Web Server Training A and B"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00003"
         })
       })
 
-      pp-csr-w-4-b = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      pp-csr-w-4-b = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-csr-w-4-b"
           availability_zone = "eu-west-2b"
         })
@@ -353,13 +369,14 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 129 }
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.web.instance, {
           instance_type = "m5.2xlarge"
         })
-        tags = merge(local.defaults_web_ec2.tags, {
-          pre-migration = "PPCWW00004"
-          description   = "Web Server Training A and B"
-          ami           = "pp-csr-w-4-b"
+        tags = merge(local.ec2_instances.web.tags, {
+          ami                 = "pp-csr-w-4-b"
+          description         = "Web Server Training A and B"
+          instance-scheduling = "skip-scheduling"
+          pre-migration       = "PPCWW00004"
         })
       })
     }
@@ -405,688 +422,285 @@ locals {
     }
 
     lbs = {
-      r12 = {
-        internal_lb              = true
-        enable_delete_protection = true
-        load_balancer_type       = "network"
-        force_destroy_bucket     = true
-        subnets = [
-          module.environment.subnet["private"]["eu-west-2a"].id,
-          module.environment.subnet["private"]["eu-west-2b"].id,
-        ]
-        security_groups                  = ["load-balancer"]
-        access_logs                      = false
-        enable_cross_zone_load_balancing = true
-
+      r12 = merge(local.lbs.rxy, {
         instance_target_groups = {
-          pp-csr-w-12-80 = {
-            port     = 80
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              port                = 80
-              protocol            = "TCP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          pp-csr-w-12-80 = merge(local.lbs.rxy.instance_target_groups.w-80, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
-          }
-          pp-csr-w-12-7770 = {
-            port     = 7770
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/isps/index.html"
-              port                = 7770
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-12-7770 = merge(local.lbs.rxy.instance_target_groups.w-7770, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
-          }
-          pp-csr-w-12-7771 = {
-            port     = 7771
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/isps/index.html"
-              port                = 7771
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-12-7771 = merge(local.lbs.rxy.instance_target_groups.w-7771, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
-          }
-          pp-csr-w-12-7780 = {
-            port     = 7780
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/"
-              port                = 7770
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-12-7780 = merge(local.lbs.rxy.instance_target_groups.w-7780, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
-          }
-          pp-csr-w-12-7781 = {
-            port     = 7781
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/"
-              port                = 7771
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-12-7781 = merge(local.lbs.rxy.instance_target_groups.w-7781, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-1-a" },
               { ec2_instance_name = "pp-csr-w-2-b" },
             ]
-          }
+          })
         }
 
         listeners = {
-          http = {
-            port     = 80
-            protocol = "TCP"
+          http = merge(local.lbs.rxy.listeners.http, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-12-80"
             }
-          }
-          http-7770 = {
-            port     = 7770
-            protocol = "TCP"
+          })
+          http-7770 = merge(local.lbs.rxy.listeners.http-7770, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-12-7770"
             }
-          }
-          http-7771 = {
-            port     = 7771
-            protocol = "TCP"
+          })
+          http-7771 = merge(local.lbs.rxy.listeners.http-7771, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-12-7771"
             }
-          }
-          http-7780 = {
-            port     = 7780
-            protocol = "TCP"
+          })
+          http-7780 = merge(local.lbs.rxy.listeners.http-7780, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-12-7780"
             }
-          }
-          http-7781 = {
-            port     = 7781
-            protocol = "TCP"
+          })
+          http-7781 = merge(local.lbs.rxy.listeners.http-7781, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-12-7781"
             }
-          }
+          })
         }
-      }
-      r34 = {
-        internal_lb              = true
-        enable_delete_protection = true
-        load_balancer_type       = "network"
-        force_destroy_bucket     = true
-        subnets = [
-          module.environment.subnet["private"]["eu-west-2a"].id,
-          module.environment.subnet["private"]["eu-west-2b"].id,
-        ]
-        security_groups                  = ["load-balancer"]
-        access_logs                      = false
-        enable_cross_zone_load_balancing = true
+      })
 
+      r34 = merge(local.lbs.rxy, {
         instance_target_groups = {
-          pp-csr-w-56-80 = {
-            port     = 80
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              port                = 80
-              protocol            = "TCP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          pp-csr-w-56-80 = merge(local.lbs.rxy.instance_target_groups.w-80, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
-          }
-          pp-csr-w-56-7770 = {
-            port     = 7770
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/isps/index.html"
-              port                = 7770
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-56-7770 = merge(local.lbs.rxy.instance_target_groups.w-7770, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
-          }
-          pp-csr-w-56-7771 = {
-            port     = 7771
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/isps/index.html"
-              port                = 7771
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-56-7771 = merge(local.lbs.rxy.instance_target_groups.w-7771, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
-          }
-          pp-csr-w-56-7780 = {
-            port     = 7780
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/"
-              port                = 7770
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-56-7780 = merge(local.lbs.rxy.instance_target_groups.w-7780, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
-          }
-          pp-csr-w-56-7781 = {
-            port     = 7781
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/"
-              port                = 7771
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-56-7781 = merge(local.lbs.rxy.instance_target_groups.w-7781, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-5-a" },
               { ec2_instance_name = "pp-csr-w-6-b" },
             ]
-          }
+          })
         }
 
         listeners = {
-          http = {
-            port     = 80
-            protocol = "TCP"
+          http = merge(local.lbs.rxy.listeners.http, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-56-80"
             }
-          }
-          http-7770 = {
-            port     = 7770
-            protocol = "TCP"
+          })
+          http-7770 = merge(local.lbs.rxy.listeners.http-7770, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-56-7770"
             }
-          }
-          http-7771 = {
-            port     = 7771
-            protocol = "TCP"
+          })
+          http-7771 = merge(local.lbs.rxy.listeners.http-7771, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-56-7771"
             }
-          }
-          http-7780 = {
-            port     = 7780
-            protocol = "TCP"
+          })
+          http-7780 = merge(local.lbs.rxy.listeners.http-7780, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-56-7780"
             }
-          }
-          http-7781 = {
-            port     = 7781
-            protocol = "TCP"
+          })
+          http-7781 = merge(local.lbs.rxy.listeners.http-7781, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-56-7781"
             }
-          }
+          })
         }
-      }
-      r56 = {
-        internal_lb              = true
-        enable_delete_protection = true
-        load_balancer_type       = "network"
-        force_destroy_bucket     = true
-        subnets = [
-          module.environment.subnet["private"]["eu-west-2a"].id,
-          module.environment.subnet["private"]["eu-west-2b"].id,
-        ]
-        security_groups                  = ["load-balancer"]
-        access_logs                      = false
-        enable_cross_zone_load_balancing = true
+      })
 
+      r56 = merge(local.lbs.rxy, {
         instance_target_groups = {
-          pp-csr-w-78-80 = {
-            port     = 80
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              port                = 80
-              protocol            = "TCP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          pp-csr-w-78-80 = merge(local.lbs.rxy.instance_target_groups.w-80, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
-          }
-          pp-csr-w-78-7770 = {
-            port     = 7770
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/isps/index.html"
-              port                = 7770
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-78-7770 = merge(local.lbs.rxy.instance_target_groups.w-7770, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
-          }
-          pp-csr-w-78-7771 = {
-            port     = 7771
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/isps/index.html"
-              port                = 7771
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-78-7771 = merge(local.lbs.rxy.instance_target_groups.w-7771, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
-          }
-          pp-csr-w-78-7780 = {
-            port     = 7780
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/"
-              port                = 7770
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-78-7780 = merge(local.lbs.rxy.instance_target_groups.w-7780, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
-          }
-          pp-csr-w-78-7781 = {
-            port     = 7781
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/"
-              port                = 7771
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-78-7781 = merge(local.lbs.rxy.instance_target_groups.w-7781, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-7-a" },
               { ec2_instance_name = "pp-csr-w-8-b" },
             ]
-          }
+          })
         }
 
         listeners = {
-          http = {
-            port     = 80
-            protocol = "TCP"
+          http = merge(local.lbs.rxy.listeners.http, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-78-80"
             }
-          }
-          http-7770 = {
-            port     = 7770
-            protocol = "TCP"
+          })
+          http-7770 = merge(local.lbs.rxy.listeners.http-7770, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-78-7770"
             }
-          }
-          http-7771 = {
-            port     = 7771
-            protocol = "TCP"
+          })
+          http-7771 = merge(local.lbs.rxy.listeners.http-7771, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-78-7771"
             }
-          }
-          http-7780 = {
-            port     = 7780
-            protocol = "TCP"
+          })
+          http-7780 = merge(local.lbs.rxy.listeners.http-7780, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-78-7780"
             }
-          }
-          http-7781 = {
-            port     = 7781
-            protocol = "TCP"
+          })
+          http-7781 = merge(local.lbs.rxy.listeners.http-7781, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-78-7781"
             }
-          }
+          })
         }
-      }
-      trainab = {
-        internal_lb              = true
-        enable_delete_protection = true
-        load_balancer_type       = "network"
-        force_destroy_bucket     = true
-        subnets = [
-          module.environment.subnet["private"]["eu-west-2a"].id,
-          module.environment.subnet["private"]["eu-west-2b"].id,
-        ]
-        security_groups                  = ["load-balancer"]
-        access_logs                      = false
-        enable_cross_zone_load_balancing = true
+      })
 
+      trainab = merge(local.lbs.rxy, {
         instance_target_groups = {
-          pp-csr-w-34-80 = {
-            port     = 80
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              port                = 80
-              protocol            = "TCP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          pp-csr-w-34-80 = merge(local.lbs.rxy.instance_target_groups.w-80, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-3-a" },
               { ec2_instance_name = "pp-csr-w-4-b" },
             ]
-          }
-          pp-csr-w-34-7770 = {
-            port     = 7770
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/isps/index.html"
-              port                = 7770
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-34-7770 = merge(local.lbs.rxy.instance_target_groups.w-7770, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-3-a" },
               { ec2_instance_name = "pp-csr-w-4-b" },
             ]
-          }
-          pp-csr-w-34-7771 = {
-            port     = 7771
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/isps/index.html"
-              port                = 7771
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-34-7771 = merge(local.lbs.rxy.instance_target_groups.w-7771, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-3-a" },
               { ec2_instance_name = "pp-csr-w-4-b" },
             ]
-          }
-          pp-csr-w-34-7780 = {
-            port     = 7780
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/"
-              port                = 7770
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-34-7780 = merge(local.lbs.rxy.instance_target_groups.w-7780, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-3-a" },
               { ec2_instance_name = "pp-csr-w-4-b" },
             ]
-          }
-          pp-csr-w-34-7781 = {
-            port     = 7781
-            protocol = "TCP"
-            health_check = {
-              enabled             = true
-              interval            = 5
-              healthy_threshold   = 3
-              path                = "/"
-              port                = 7771
-              protocol            = "HTTP"
-              timeout             = 4
-              unhealthy_threshold = 2
-            }
-            stickiness = {
-              enabled = true
-              type    = "source_ip"
-            }
+          })
+          pp-csr-w-34-7781 = merge(local.lbs.rxy.instance_target_groups.w-7781, {
             attachments = [
               { ec2_instance_name = "pp-csr-w-3-a" },
               { ec2_instance_name = "pp-csr-w-4-b" },
             ]
-          }
+          })
         }
 
         listeners = {
-          http = {
-            port     = 80
-            protocol = "TCP"
+          http = merge(local.lbs.rxy.listeners.http, {
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-80"
             }
-          }
-          http-7770 = {
+          })
+          http-7770 = merge(local.lbs.rxy.listeners.http-7770, {
             alarm_target_group_names = ["pp-csr-w-34-7770"]
-            port                     = 7770
-            protocol                 = "TCP"
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7770"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
-
-          }
-          http-7771 = {
+          })
+          http-7771 = merge(local.lbs.rxy.listeners.http-7771, {
             alarm_target_group_names = ["pp-csr-w-34-7771"]
-            port                     = 7771
-            protocol                 = "TCP"
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7771"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
-          }
-          http-7780 = {
+          })
+          http-7780 = merge(local.lbs.rxy.listeners.http-7780, {
             alarm_target_group_names = ["pp-csr-w-34-7780"]
-            port                     = 7780
-            protocol                 = "TCP"
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7780"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
-
-          }
-          http-7781 = {
+          })
+          http-7781 = merge(local.lbs.rxy.listeners.http-7781, {
             alarm_target_group_names = ["pp-csr-w-34-7781"]
-            port                     = 7781
-            protocol                 = "TCP"
+            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7781"
             }
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
-          }
+          })
         }
-      }
+      })
     }
 
     route53_zones = {

@@ -7,7 +7,7 @@ variable "dms_replication_instance_class" {
 variable "dms_engine_version" {
   description = "Replication Instance Engine Version"
   type        = string
-  default     = "3.5.1"
+  default     = "3.5.2"
 }
 
 variable "dms_availability_zone" {

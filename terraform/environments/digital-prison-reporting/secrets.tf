@@ -312,7 +312,7 @@ resource "random_password" "operational_db_password" {
 }
 
 resource "aws_secretsmanager_secret" "operational_db_secret" {
-  name = "${local.project}-rds-operational-db-secret"
+  name        = "${local.project}-rds-operational-db-secret"
   description = "Secret for RDS master username and password"
 
   tags = {
@@ -337,7 +337,7 @@ resource "random_password" "transfer_component_role_password" {
 }
 
 resource "aws_secretsmanager_secret" "transfer_component_role_secret" {
-  name = "${local.project}-rds-transfer-component-role-secret"
+  name        = "${local.project}-rds-transfer-component-role-secret"
   description = "Secret for transfer-component-role username and password"
 
   tags = {

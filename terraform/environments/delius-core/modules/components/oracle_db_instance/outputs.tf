@@ -3,5 +3,5 @@ output "oracle_db_instance" {
 }
 
 output "oracle_db_server_name" {
-    value = module.instance.aws_instance.tags.server-name
+  value = module.instance.aws_instance.tags.server-name
 }

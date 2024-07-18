@@ -110,15 +110,15 @@ locals {
     ec2_instance_or_cwagent_stopped_windows = {
       instance-or-cloudwatch-agent-stopped = {
         comparison_operator = "LessThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
+        evaluation_periods  = "2"
+        datapoints_to_alarm = "2"
         metric_name         = "CPU_IDLE"
         period              = "60"
         namespace           = "CWAgent"
         statistic           = "SampleCount"
         threshold           = "0"
         treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 2 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
@@ -168,15 +168,15 @@ locals {
     ec2_instance_or_cwagent_stopped_linux = {
       instance-or-cloudwatch-agent-stopped = {
         comparison_operator = "LessThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
+        evaluation_periods  = "2"
+        datapoints_to_alarm = "2"
         metric_name         = "cpu_usage_idle"
         period              = "60"
         namespace           = "CWAgent"
         statistic           = "SampleCount"
         threshold           = "0"
         treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 5 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
+        alarm_description   = "Triggers if the instance or cloudwatch agent is stopped after 2 minutes since the metric will not be collected. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4671340764/EC2+instance-or-cloudwatch-agent-stopped+alarm"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }

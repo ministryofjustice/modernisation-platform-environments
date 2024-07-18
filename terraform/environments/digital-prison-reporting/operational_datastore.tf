@@ -3,7 +3,7 @@ locals {
   operational_db_default_database       = "operational_db"
   operational_db_jdbc_connection_string = "jdbc:postgresql://${module.aurora_operational_db.rds_cluster_endpoints["static"]}:${local.operational_db_port}/${local.operational_db_default_database}"
 
-  name   = "${local.project}-operational-db"
+  name = "${local.project}-operational-db"
 
   operational_db_tags = merge(
     local.all_tags,
@@ -49,7 +49,7 @@ module "aurora_operational_db" {
     }
   }
 
-  vpc_id               = data.aws_vpc.shared.id
+  vpc_id = data.aws_vpc.shared.id
   security_group_rules = {
     vpc_ingress = {
       cidr_blocks = [data.aws_vpc.dpr.cidr_block]
@@ -70,15 +70,15 @@ module "aurora_operational_db" {
   db_cluster_parameter_group_description = "${local.name} cluster parameter group"
   db_cluster_parameter_group_parameters = [
     {
-        name         = "log_min_duration_statement"
-        value        = 4000
-        apply_method = "immediate"
-      }, 
-      {
-        name         = "rds.force_ssl"
-        value        = 1
-        apply_method = "immediate"
-      }   
+      name         = "log_min_duration_statement"
+      value        = 4000
+      apply_method = "immediate"
+    },
+    {
+      name         = "rds.force_ssl"
+      value        = 1
+      apply_method = "immediate"
+    }
   ]
 
   create_db_parameter_group      = true

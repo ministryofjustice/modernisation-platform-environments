@@ -76,7 +76,7 @@ resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
 ####### DB Instance #######
 
 resource "aws_key_pair" "edw_ec2_key" {
-  key_name   = "${local.application_name}-ssh-key"
+  key_name   = "${local.application_name}-ssh-key-new"
   public_key = local.application_data.accounts[local.environment].edw_ec2_key
 }
 
@@ -134,6 +134,8 @@ resource "aws_ebs_volume" "orahomeVolume" {
   size              = local.application_data.accounts[local.environment].edw_OrahomeVolumeSize
   encrypted         = true
   type              = "gp3"
+    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].orahome_snapshot_id # This is used for when data is being migrated
 
   tags = {
     Name = "${local.application_data.accounts[local.environment].edw_AppName}-orahome"
@@ -151,6 +153,8 @@ resource "aws_ebs_volume" "oratempVolume" {
   size              = local.application_data.accounts[local.environment].edw_OratempVolumeSize
   encrypted         = true
   type              = "gp3"
+    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
 
   tags = {
     Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraredo"
@@ -168,6 +172,8 @@ resource "aws_ebs_volume" "oradataVolume" {
   size              = local.application_data.accounts[local.environment].edw_OradataVolumeSize
   encrypted         = true
   type              = "gp3"
+    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
 
   tags = {
     Name = "${local.application_data.accounts[local.environment].edw_AppName}-oradata"
@@ -185,6 +191,8 @@ resource "aws_ebs_volume" "softwareVolume" {
   size              = local.application_data.accounts[local.environment].edw_SoftwareVolumeSize
   encrypted         = true
   type              = "gp3"
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].software_snapshot_id # This is used for when data is being migrated
 
   tags = {
     Name = "${local.application_data.accounts[local.environment].edw_AppName}-software"
@@ -202,6 +210,8 @@ resource "aws_ebs_volume" "ArchiveVolume" {
   size              = local.application_data.accounts[local.environment].edw_ArchiveVolumeSize
   encrypted         = true
   type              = "gp3"
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oraarch_snapshot_id # This is used for when data is being migrated
 
   tags = {
     Name                                               = "${local.application_data.accounts[local.environment].edw_AppName}-oraarch"

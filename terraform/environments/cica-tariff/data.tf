@@ -6,3 +6,4 @@ data "aws_ami" "shared_ami" {
     values = ["ami-0b03540afffcc04dd"]
   }
 }
+

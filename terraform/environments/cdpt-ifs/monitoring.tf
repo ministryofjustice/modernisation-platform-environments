@@ -6,7 +6,7 @@ resource "aws_sns_topic" "lb_5xx_alarm_topic" {
   name = "lb_5xx_alarm_topic"
 }
 
-locals{
+locals {
   lb_short_arn = join("/", slice(split("/", module.lb_access_logs_enabled.load_balancer_arn), 1, 4))
 }
 
@@ -24,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
   dimensions = {
     LoadBalancer = local.lb_short_arn
   }
-  treat_missing_data  = "notBreaching"
+  treat_missing_data = "notBreaching"
 }
 
 # Pager duty integration

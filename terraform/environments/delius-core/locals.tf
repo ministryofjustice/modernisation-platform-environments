@@ -21,13 +21,13 @@ locals {
   ordered_subnet_ids = [data.aws_subnets.shared-private-a.ids[0], data.aws_subnets.shared-private-b.ids[0], data.aws_subnets.shared-private-c.ids[0]]
 
   dms_client_account_arns = concat(
-      try(local.dms_config_dev.audit_target_endpoint.write_environment,null) == null ? [] : 
-          (local.dms_config_dev.audit_target_endpoint.write_environment == local.environment ? ["arn:aws:iam::${local.environment_management.account_ids["delius-core-development"]}:root"] : []) ,
-      try(local.dms_config_test.audit_target_endpoint.write_environment,null) == null ? [] : 
-          (local.dms_config_test.audit_target_endpoint.write_environment == local.environment ? ["arn:aws:iam::${local.environment_management.account_ids["delius-core-test"]}:root"] : []),
-      try(local.dms_config_stage.audit_target_endpoint.write_environment,null) == null ? [] : 
-          (local.dms_config_stage.audit_target_endpoint.write_environment == local.environment ? ["arn:aws:iam::${local.environment_management.account_ids["delius-core-stage"]}:root"] : []),
-      try(local.dms_config_preprod.audit_target_endpoint.write_environment,null) == null ? [] : 
-          (local.dms_config_preprod.audit_target_endpoint.write_environment == local.environment ? ["arn:aws:iam::${local.environment_management.account_ids["delius-core-preprod"]}:root"] : [])
-   )
+    try(local.dms_config_dev.audit_target_endpoint.write_environment, null) == null ? [] :
+    (local.dms_config_dev.audit_target_endpoint.write_environment == local.environment ? ["arn:aws:iam::${local.environment_management.account_ids["delius-core-development"]}:root"] : []),
+    try(local.dms_config_test.audit_target_endpoint.write_environment, null) == null ? [] :
+    (local.dms_config_test.audit_target_endpoint.write_environment == local.environment ? ["arn:aws:iam::${local.environment_management.account_ids["delius-core-test"]}:root"] : []),
+    try(local.dms_config_stage.audit_target_endpoint.write_environment, null) == null ? [] :
+    (local.dms_config_stage.audit_target_endpoint.write_environment == local.environment ? ["arn:aws:iam::${local.environment_management.account_ids["delius-core-stage"]}:root"] : []),
+    try(local.dms_config_preprod.audit_target_endpoint.write_environment, null) == null ? [] :
+    (local.dms_config_preprod.audit_target_endpoint.write_environment == local.environment ? ["arn:aws:iam::${local.environment_management.account_ids["delius-core-preprod"]}:root"] : [])
+  )
 }
