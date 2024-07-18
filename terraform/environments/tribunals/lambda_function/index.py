@@ -42,28 +42,6 @@ def lambda_handler(event, context):
     )
     cursor = conn.cursor()
 
-    # commands = [
-    #     f"CREATE LOGIN [{new_user_name}] WITH PASSWORD = '{new_password}'",
-    #     f"CREATE USER [{new_user_name}] FOR LOGIN [{new_user_name}]",
-    #     f"USE [{new_db_name}]; EXEC sp_addrolemember N'db_owner', N'{new_user_name}'"
-    # ]
-
-    # for command in commands:
-    #     cursor.execute(command)
-    #     conn.commit()
-
-    print("Running CREATE LOGIN")
-    cursor.execute(f"CREATE LOGIN [{new_user_name}] WITH PASSWORD = '{new_password}'")
-    conn.commit()
-
-    print("Running CREATE USER")
-    cursor.execute(f"CREATE USER [{new_user_name}] FOR LOGIN [{new_user_name}]")
-    conn.commit()
-
-    print("Running EXEC sp_addrolemember")
-    cursor.execute(f"USE [{new_db_name}]; EXEC sp_addrolemember N'db_owner', N'{new_user_name}'")
-    conn.commit()
-
     # Executing SQL script from file
     script_path = f"/{app_folder}/sp_migration.sql"
     with open(script_path, 'r') as file:
