@@ -559,7 +559,9 @@ data "aws_iam_policy_document" "load_json_into_athena_s3_policy_document" {
       "s3:GetObject",
       "s3:PutObject",
       "s3:ListBucket",
-      "s3:GetBucketLocation"
+      "s3:GetBucketLocation",
+      "s3:DeleteObject",
+      "s3:GetObjectAttributes"
     ]
     resources = [
       "${aws_s3_bucket.data_store.arn}/*",
@@ -617,4 +619,12 @@ resource "aws_iam_role_policy_attachment" "load_json_into_athena_vpc_access_exec
 resource "aws_iam_role_policy_attachment" "load_json_into_athena_lambda_sqs_queue_access_execution" {
   role       = aws_iam_role.load_json_into_athena.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
+resource "aws_lambda_permission" "s3_load_json_into_athena" {
+  statement_id  = "AllowLoadJsonIntoAthenaLamabdaExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = module.load_json_into_athena.lambda_function_arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.data_store.arn
 }
