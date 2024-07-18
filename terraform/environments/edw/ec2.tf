@@ -7,7 +7,7 @@ locals {
 ####install missing package and hostname change
 yum -y install libXp.i386
 yum -y install sshpass
-echo "HOSTNAME="${local.application_data.accounts[local.environment].edw_AppName}"."${local.application_data.accounts[local.environment].edw_dns_extension}"" >> /etc/sysconfig/network
+echo "HOSTNAME="${local.application_name}"."${local.application_data.accounts[local.environment].edw_dns_extension}"" >> /etc/sysconfig/network
 
 #### configure aws timesync (external ntp source)
 AwsTimeSync(){
@@ -162,39 +162,6 @@ chmod 777 /home/oracle/patchset.rsp
 
 su oracle -c "/stage/patches/10204/Disk1/runInstaller -silent -responseFile /home/oracle/patchset.rsp"
 /oracle/software/product/10.2.0/root.sh -silent
-
-#### create_blank_database
-
-# Create a blank database
-cp  -f /repo/databases/10.2/templates/edw_warehouse.dbt /run/cfn-init/edw_warehouse.dbt
-chown oracle:dba /run/cfn-init/edw_warehouse.dbt
-chmod 777 /run/cfn-init/edw_warehouse.dbt
-
-su oracle -l -c "dbca -silent -createDatabase -templateName /run/cfn-init/edw_warehouse.dbt -gdbname $APPNAME -sid $APPNAME -responseFile NO_VALUE -characterSet WE8ISO8859P1 -sysPassword $SECRET -systemPassword $SECRET -databaseType DATA_WAREHOUSING  -datafileDestination "/oracle/dbf/" -MEMORYPERCENTAGE 70"
-
-# create listener
-cp -f /repo/databases/10.2/templates/netca.rsp /run/cfn-init/netca.rsp
-chmod 777 /run/cfn-init/netca.rsp
-su oracle -l -c "netca /silent /responseFile /run/cfn-init/netca.rsp"
-su oracle -l -c "lsnrctl start"
-
-mkdir -p /var/opt/oracle
-chown oracle:dba /var/opt/oracle
-cp /repo/edwcreate/passwds.sql /var/opt/oracle
-cp -r /repo/edwcreate /home/oracle
-chown -R oracle:dba /home/oracle/edwcreate
-chmod -R 777 /home/oracle/edwcreate
-chown oracle:dba /var/opt/oracle/passwds.sql
-chmod 777 /var/opt/oracle/passwds.sql
-su oracle -l -c "cp /home/oracle/edwcreate/tnsnames.ora /oracle/software/product/10.2.0/network/admin"
-sed -i "s/tst/${local.application_data.accounts[local.environment].edw_environment}/g" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
-sed -i "s/EDW_SYS=welc0me/EDW_SYS=$SECRET/g" /var/opt/oracle/passwds.sql
-sed -i "s/EDW_SYSTEM=sysedw99/EDW_SYSTEM=$SECRET/g" /var/opt/oracle/passwds.sql
-
-chown -R oracle:dba /home/oracle/scripts/
-chmod -R 700 /home/oracle/scripts/
-chown oracle:dba /home/oracle
-chmod -R 777 /home/oracle
 
 #### Setup_owb
 
@@ -413,7 +380,7 @@ resource "aws_ebs_volume" "orahomeVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].orahome_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].edw_AppName}-orahome"
+    Name = "${local.application_name}-orahome"
   }
 }
 
@@ -432,7 +399,7 @@ resource "aws_ebs_volume" "oratempVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraredo"
+    Name = "${local.application_name}-oraredo"
   }
 }
 
@@ -451,7 +418,7 @@ resource "aws_ebs_volume" "oradataVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oradata"
+    Name = "${local.application_name}-oradata"
   }
 }
 
@@ -470,7 +437,7 @@ resource "aws_ebs_volume" "softwareVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].software_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].edw_AppName}-software"
+    Name = "${local.application_name}-software"
   }
 }
 
@@ -489,7 +456,7 @@ resource "aws_ebs_volume" "ArchiveVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].oraarch_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name                                               = "${local.application_data.accounts[local.environment].edw_AppName}-oraarch"
+    Name                                               = "${local.application_name}-oraarch"
     "dlm:snapshot-with:volume-hourly-35-day-retention" = "yes"
   }
 }
