@@ -559,7 +559,9 @@ data "aws_iam_policy_document" "load_json_into_athena_s3_policy_document" {
       "s3:GetObject",
       "s3:PutObject",
       "s3:ListBucket",
-      "s3:GetBucketLocation"
+      "s3:GetBucketLocation",
+      "s3:DeleteObject",
+      "s3:GetObjectAttributes"
     ]
     resources = [
       "${aws_s3_bucket.data_store.arn}/*",

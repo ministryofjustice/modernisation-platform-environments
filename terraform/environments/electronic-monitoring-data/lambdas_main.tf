@@ -299,7 +299,7 @@ module "load_json_into_athena" {
       BUCKET_URL                               = "s3://${aws_s3_bucket.data_store.id}/g4s/dev_access/2024-02-16/json_luke/"
       QUERY_RESULT_BUCKET                      = "s3://${module.athena-s3-bucket.bucket.id}/output"
       STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${module.athena-s3-bucket.bucket.id}/output"
-      # ATHENA_WORK_GROUP                        = aws_athena_workgroup.default.id
+      ATHENA_WORK_GROUP                        = aws_athena_workgroup.default.id
       DATASET_NAME                             = "atrium_unstructured"
       SCHEMA_PATH                              = "s3://${module.metadata-s3-bucket.bucket.id}/dlt_schemas"
       }
