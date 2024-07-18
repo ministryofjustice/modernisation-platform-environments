@@ -423,16 +423,29 @@ resource "aws_iam_role" "extract_metadata_from_atrium_unstructured" {
 
 data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_policy_document" {
   statement {
-    sid    = "S3PermissionsForUnzippingLambda"
+    sid    = "S3PermissionsForZipFileRetrieval"
     effect = "Allow"
     actions = [
+      "s3:ListBucket",
       "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket"
+      "s3:GetBucketLocation"
     ]
     resources = [
       "${aws_s3_bucket.data_store.arn}/*",
       aws_s3_bucket.data_store.arn
+    ]
+  }
+  statement {
+    sid    = "S3PermissionsForPlacingJsonInAnotherBucket"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${module.json-directory-structure-bucket.bucket.arn}/*",
+      module.json-directory-structure-bucket.bucket.arn
     ]
   }
 }

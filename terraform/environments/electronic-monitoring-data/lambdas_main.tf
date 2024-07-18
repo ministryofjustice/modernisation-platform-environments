@@ -251,7 +251,10 @@ module "output_file_structure_as_json_from_zip" {
   production_dev          = local.is-production ? "prod" : "dev"
   security_group_ids      = [aws_security_group.lambda_db_security_group.id]
   subnet_ids              = data.aws_subnets.shared-public.ids
-  environment_variables   = null
+  environment_variables = {
+    OUTPUT_BUCKET = module.json-directory-structure-bucket.bucket.id
+    SOURCE_BUCKET = aws_s3_bucket.data_store.id
+  }
 }
 
 # ------------------------------------------------------
