@@ -46,9 +46,6 @@ mkdir -p /opt/aws/bin
 cd /root
 wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
 easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz
-mkdir -p /run/cfn-init # Path to store cfn-init scripts
-
-
 
 ##### METADATA #####
 
@@ -507,7 +504,7 @@ resource "aws_volume_attachment" "ArchiveVolume-attachment" {
 ####### DB Security Groups #######
 
 resource "aws_security_group" "edw_db_security_group" {
-  name        = "${local.application_name}-Security Group"
+  name        = "${local.application_name} Security Group"
   description = "Security Group for DB EC2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -522,8 +519,8 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.26.56.0/21"]
-    description = "SCP temp"
+    cidr_blocks = [local.application_data.accounts[local.environment].edw_management_cidr]
+    description = "SSH access"
   }
 
   ingress {
@@ -546,41 +543,8 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = ["10.26.56.0/21"]
-    description = "-"
-  }
-
-  ingress {
-    from_port   = 1158
-    to_port     = 1158
-    protocol    = "tcp"
-    cidr_blocks = ["10.200.0.0/20"]
-    description = "-"
-  }
-
-  ingress {
-    from_port   = 1158
-    to_port     = 1158
-    protocol    = "tcp"
-    cidr_blocks = ["10.202.0.0/20"]
-    description = "-"
-  }
-
-  ingress {
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
     description = "RDS env access"
-  }
-
-
-  ingress {
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = ["10.200.96.0/19"]
-    description = "RDS Ireland Workspace access"
   }
 
   ingress {
@@ -595,18 +559,17 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
+    cidr_blocks = ["10.200.96.0/19"]
+    description = "RDS Ireland Workspace access"
+  }
+
+  ingress {
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
     cidr_blocks = ["10.200.32.0/19"]
     description = "RDS Appstream access"
   }
-
-  egress {
-    from_port   = 0
-    to_port     = -1
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "-"
-  }
-
 }
 
 ###### DB DNS #######
