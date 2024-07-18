@@ -43,7 +43,7 @@ def lambda_handler(event, context):
     cursor = conn.cursor()
 
     # Executing SQL script from file
-    script_path = f"{app_folder}/sp_migration.sql"
+    script_path = f".{app_folder}/sp_migration.sql"
     print(f"script_path is: {script_path}")
     with open(script_path, 'r') as file:
         script = file.read()
