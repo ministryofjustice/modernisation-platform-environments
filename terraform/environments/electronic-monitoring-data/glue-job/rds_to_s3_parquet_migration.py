@@ -399,10 +399,18 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                                                   jdbc_partition_column)
     # --------
 
+    # df_prq_leftanti_rds = df_parquet_read_sample_t1.alias("L")\
+    #                                     .join(df_rds_read_sample_t1.alias("R"), 
+    #                                           on=df_parquet_read_sample_t1.columns, 
+    #                                           how='leftanti')    
+
     df_prq_leftanti_rds = df_parquet_read_sample_t1.alias("L")\
-                                        .join(df_rds_read_sample_t1.alias("R"), 
-                                              on=df_parquet_read_sample_t1.columns, 
-                                              how='leftanti')    
+	                            .join(df_rds_read_sample_t1.alias("R"), 
+	                                  on=jdbc_partition_column, how='left')\
+	                            .where(" or ".join([f"L.{column} != R.{column}" 
+	                                                for column in df_rds_read_sample_t1.columns
+	                                                if column != jdbc_partition_column]))\
+	                            .select("L.*")
     
     df_prq_read_filtered_count = df_prq_leftanti_rds.count()
 
@@ -551,7 +559,7 @@ if __name__ == "__main__":
     elif args.get("jdbc_read_1gb_partitions", "false") == "true":
         jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/1024)
     elif args.get("jdbc_read_2gb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/1024)*2
+        jdbc_read_partitions_num = int(int(int(args['rds_table_total_size_mb'])/1024)/2)
     else:
         jdbc_read_partitions_num = 1
 
