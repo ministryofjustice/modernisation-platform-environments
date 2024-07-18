@@ -95,7 +95,7 @@ data "aws_secretsmanager_secret_version" "dbt_secrets" {
 }
 
 
-# TLS Certificate for OIDC URL, DBT K8s Platform 
+# TLS Certificate for OIDC URL, DBT K8s Platform
 data "tls_certificate" "dbt_analytics" {
   url = "https://oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}"
 }
@@ -116,4 +116,11 @@ data "aws_secretsmanager_secret" "transfer_component_role_secret" {
 
 data "aws_secretsmanager_secret_version" "transfer_component_role_secret_version" {
   secret_id = data.aws_secretsmanager_secret.transfer_component_role_secret.id
+}
+
+# For Lakeformation Management
+
+# Retrieves the source role of terraform's current caller identity
+data "aws_iam_session_context" "current" {
+  arn = data.aws_caller_identity.current.arn
 }
