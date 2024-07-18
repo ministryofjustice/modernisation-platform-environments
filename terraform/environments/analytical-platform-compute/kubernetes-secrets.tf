@@ -66,6 +66,7 @@ resource "kubernetes_secret" "ui_app_secrets" {
 
   type = "Opaque"
   data = {
-    secret_key = random_password.ui_app_secrets.result
+    environment = local.environment
+    secret_key  = random_password.ui_app_secrets.result
   }
 }

@@ -16,7 +16,7 @@
     {
       "rule-type": "selection",
       "rule-id": "02",
-      "rule-name": "02",
+      "rule-name": "02_exclude",
       "object-locator": {
         "schema-name": "dbo",
         "table-name": "D_Comments"

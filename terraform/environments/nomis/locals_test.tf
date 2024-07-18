@@ -2,7 +2,7 @@ locals {
 
   lb_maintenance_message_test = {
     maintenance_title   = "Prison-NOMIS Environment Not Started"
-    maintenance_message = "T1 and T2 are rarely used so are started on demand. T3 is available during working hours. Please see <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> or contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel for more information"
+    maintenance_message = "T1 and T2 are rarely used so are started on demand. T3 is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
   baseline_presets_test = {
@@ -200,6 +200,10 @@ locals {
       })
 
       test-nomis-client-a = merge(local.ec2_autoscaling_groups.client, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.client.autoscaling_group, {
+          desired_capacity = 3 # until we get some RD Licences
+          max_size         = 3
+        })
         tags = merge(local.ec2_autoscaling_groups.client.tags, {
           domain-name = "azure.noms.root"
         })
@@ -485,16 +489,8 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
+            alarm_target_group_names  = [] # don't enable as environments are powered up/down frequently
             certificate_names_or_arns = ["nomis_wildcard_cert"]
-
-            alarm_target_group_names = [
-              # "t1-nomis-web-a-http-7777",
-              # "t1-nomis-web-b-http-7777",
-              # "t2-nomis-web-a-http-7777",
-              "t2-nomis-web-b-http-7777",
-              # "t3-nomis-web-a-http-7777",
-              "t3-nomis-web-b-http-7777",
-            ]
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message

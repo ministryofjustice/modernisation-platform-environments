@@ -169,4 +169,22 @@ locals {
     environment             = local.environment
     extra_user_data_content = "yum install -y openldap-clients"
   }
+
+  dms_config_dev = {
+    replication_instance_class = "dms.t3.small"
+    engine_version             = "3.5.1"
+    # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
+    # Please ensure any changes made here are consistent with Ansible variables.
+    audit_source_endpoint = {
+      read_host     = "standbydb2"
+      read_database = "DMDNDAS2"
+    }
+    audit_target_endpoint = {
+      write_environment = "test"
+    }
+    user_source_endpoint = {}
+    user_target_endpoint = {
+      write_database = "DMDNDA"
+    }
+  }
 }

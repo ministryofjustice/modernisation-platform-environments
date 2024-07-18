@@ -52,7 +52,7 @@ locals {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.30.0-eksbuild.3"
         aws_ebs_csi_driver     = "v1.32.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.4-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.5-eksbuild.1"
         aws_guardduty_agent    = "v1.6.1-eksbuild.1"
         eks_pod_identity_agent = "v1.3.0-eksbuild.1"
         vpc_cni                = "v1.18.2-eksbuild.1"
@@ -69,6 +69,9 @@ locals {
 
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
+
+      /* UI */
+      ui_hostname = "development.analytical-platform.service.justice.gov.uk"
     }
     test = {
       /* VPC */
@@ -100,7 +103,7 @@ locals {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.30.0-eksbuild.3"
         aws_ebs_csi_driver     = "v1.32.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.4-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.5-eksbuild.1"
         aws_guardduty_agent    = "v1.6.1-eksbuild.1"
         eks_pod_identity_agent = "v1.3.0-eksbuild.1"
         vpc_cni                = "v1.18.2-eksbuild.1"
@@ -117,6 +120,9 @@ locals {
 
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
+
+      /* UI */
+      ui_hostname = "test.analytical-platform.service.justice.gov.uk"
     }
     production = {
       /* VPC */
@@ -147,7 +153,7 @@ locals {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.30.0-eksbuild.3"
         aws_ebs_csi_driver     = "v1.32.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.4-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.5-eksbuild.1"
         aws_guardduty_agent    = "v1.6.1-eksbuild.1"
         eks_pod_identity_agent = "v1.3.0-eksbuild.1"
         vpc_cni                = "v1.18.2-eksbuild.1"
@@ -164,6 +170,9 @@ locals {
 
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
+
+      /* UI */
+      ui_hostname = "analytical-platform.service.justice.gov.uk"
     }
   }
 }

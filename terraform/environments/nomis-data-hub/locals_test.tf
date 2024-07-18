@@ -13,6 +13,83 @@ locals {
   # please keep resources in alphabetical order
   baseline_test = {
 
+    ec2_instances = {
+      t1-ndh-app-a = merge(local.ec2_instances.ndh_app, {
+        config = merge(local.ec2_instances.ndh_app.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.ndh_app.config.instance_profile_policies, [
+            "Ec2t1Policy",
+          ])
+        })
+        instance = merge(local.ec2_instances.ndh_app.instance, {
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.ndh_app.tags, {
+          nomis-data-hub-environment = "t1"
+        })
+      })
+
+      t1-ndh-ems-a = merge(local.ec2_instances.ndh_ems, {
+        config = merge(local.ec2_instances.ndh_ems.config, {
+          ami_name          = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.ndh_ems.config.instance_profile_policies, [
+            "Ec2t1Policy",
+          ])
+        })
+        instance = merge(local.ec2_instances.ndh_ems.instance, {
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.ndh_ems.tags, {
+          nomis-data-hub-environment = "t1"
+        })
+      })
+
+      t2-ndh-app-a = merge(local.ec2_instances.ndh_app, {
+        config = merge(local.ec2_instances.ndh_app.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.ndh_app.config.instance_profile_policies, [
+            "Ec2t2Policy",
+          ])
+        })
+        instance = merge(local.ec2_instances.ndh_app.instance, {
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.ndh_app.tags, {
+          nomis-data-hub-environment = "t2"
+        })
+      })
+
+      t2-ndh-ems-a = merge(local.ec2_instances.ndh_ems, {
+        config = merge(local.ec2_instances.ndh_ems.config, {
+          ami_name          = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.ndh_ems.config.instance_profile_policies, [
+            "Ec2t2Policy",
+          ])
+        })
+        instance = merge(local.ec2_instances.ndh_ems.instance, {
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.ndh_ems.tags, {
+          nomis-data-hub-environment = "t2"
+        })
+      })
+
+      test-management-server-2022 = merge(local.ec2_instances.ndh_mgmt, {
+        config = merge(local.ec2_instances.ndh_mgmt.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
+          availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.ndh_mgmt.instance, {
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.ndh_mgmt.tags, {
+          nomis-data-hub-environment = "test"
+        })
+      })
+    }
+
     iam_policies = {
       Ec2t1Policy = {
         description = "Permissions required for t1 EC2s"
@@ -45,74 +122,6 @@ locals {
       }
     }
 
-    ec2_instances = {
-      t1-ndh-app-a = merge(local.ndh_app_a, {
-        config = merge(local.ndh_app_a.config, {
-          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2t1Policy",
-          ])
-        })
-        tags = merge(local.ndh_app_a.tags, {
-          nomis-data-hub-environment = "t1"
-        })
-      })
-
-      t1-ndh-ems-a = merge(local.ndh_ems_a, {
-        config = merge(local.ndh_ems_a.config, {
-          ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
-          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2t1Policy",
-          ])
-        })
-        tags = merge(local.ndh_ems_a.tags, {
-          nomis-data-hub-environment = "t1"
-        })
-      })
-
-      t2-ndh-app-a = merge(local.ndh_app_a, {
-        config = merge(local.ndh_app_a.config, {
-          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
-            "Ec2t2Policy",
-          ])
-        })
-        tags = merge(local.ndh_app_a.tags, {
-          nomis-data-hub-environment = "t2"
-        })
-      })
-
-      t2-ndh-ems-a = merge(local.ndh_ems_a, {
-        config = merge(local.ndh_ems_a.config, {
-          ami_name = "nomis_data_hub_rhel_7_9_ems_test_2023-04-02T00-00-21.281Z"
-          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
-            "Ec2t2Policy",
-          ])
-        })
-        tags = merge(local.ndh_ems_a.tags, {
-          nomis-data-hub-environment = "t2"
-        })
-      })
-
-      test-management-server-2022 = merge(local.management_server_2022, {
-        tags = merge(local.management_server_2022.tags, {
-          nomis-data-hub-environment = "test"
-        })
-      })
-    }
-
-    s3_buckets = {
-      offloc-upload = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
-        ]
-        iam_policies   = module.baseline_presets.s3_iam_policies
-        lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_three_months]
-        tags = {
-          backup = "false"
-        }
-      }
-    }
-
     #when changing the ems entries in prod or t2, also stop and start xtag to reconnect it.
     route53_zones = {
       "test.ndh.nomis.service.justice.gov.uk" = {
@@ -126,19 +135,8 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/ndh/t1" = local.ndh_secretsmanager_secrets
-      "/ndh/t2" = local.ndh_secretsmanager_secrets
-    }
-
-    ssm_parameters = {
-      "/offloc" = {
-        parameters = {
-          offloc_bucket_name = {
-            description          = "The name of the offloc upload bucket"
-            value_s3_bucket_name = "offloc-upload"
-          }
-        }
-      }
+      "/ndh/t1" = local.secretsmanager_secrets.ndh
+      "/ndh/t2" = local.secretsmanager_secrets.ndh
     }
   }
 }

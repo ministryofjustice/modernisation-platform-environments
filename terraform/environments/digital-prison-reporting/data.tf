@@ -42,22 +42,6 @@ data "aws_secretsmanager_secret_version" "datamart" {
   depends_on = [aws_secretsmanager_secret.redshift]
 }
 
-# Operational DataStore Secrets for use in DataHub
-data "aws_secretsmanager_secret" "operational_datastore" {
-  count = (local.environment == "development" ? 1 : 0)
-  name  = aws_secretsmanager_secret.operational_datastore[0].id
-
-  depends_on = [aws_secretsmanager_secret_version.operational_datastore[0]]
-}
-
-data "aws_secretsmanager_secret_version" "operational_datastore" {
-  count     = (local.environment == "development" ? 1 : 0)
-  secret_id = data.aws_secretsmanager_secret.operational_datastore[0].id
-
-  depends_on = [aws_secretsmanager_secret.operational_datastore[0]]
-}
-
-
 # AWS _IAM_ Policy
 data "aws_iam_policy" "rds_full_access" {
   arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
@@ -114,4 +98,22 @@ data "aws_secretsmanager_secret_version" "dbt_secrets" {
 # TLS Certificate for OIDC URL, DBT K8s Platform 
 data "tls_certificate" "dbt_analytics" {
   url = "https://oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}"
+}
+
+# AWS Secrets Manager for Operational DB Credentials
+data "aws_secretsmanager_secret" "operational_db_secret" {
+  name = aws_secretsmanager_secret.operational_db_secret.name
+}
+
+data "aws_secretsmanager_secret_version" "operational_db_secret_version" {
+  secret_id = data.aws_secretsmanager_secret.operational_db_secret.id
+}
+
+# AWS Secrets Manager for Transfer Component Role Credentials
+data "aws_secretsmanager_secret" "transfer_component_role_secret" {
+  name = aws_secretsmanager_secret.transfer_component_role_secret.name
+}
+
+data "aws_secretsmanager_secret_version" "transfer_component_role_secret_version" {
+  secret_id = data.aws_secretsmanager_secret.transfer_component_role_secret.id
 }

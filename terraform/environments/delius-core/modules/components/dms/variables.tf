@@ -34,8 +34,34 @@ variable "engine_version" {
 }
 
 variable "dms_config" {
+  type = any
+}
+
+variable "db_suffix" {
+  description = "identifier to append to name e.g. dsd, boe"
+  type        = string
+  default     = "db"
+}
+
+variable "database_application_passwords_secret_arn" {
+  type = any
+}
+
+variable "oracle_db_server_names" {
   type = object({
-    replication_instance_class = string
-    engine_version             = string
+    primarydb  = string
+    standbydb1 = string
+    standbydb2 = string
   })
+}
+
+variable "platform_vars" {
+  type = object({
+    environment_management = any
+  })
+}
+
+variable "db_ec2_sg_id" {
+  description = "Security group id of the database EC2 hosts"
+  type        = string
 }

@@ -17,7 +17,6 @@ from pyspark.sql import DataFrame
 # ===============================================================================
 
 sc = SparkContext()
-sc._jsc.hadoopConfiguration().set("spark.executor.cores", "3")
 sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.enabled", "true")
 sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "2g")
 sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.enabled", "true")
@@ -66,9 +65,10 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 OPTIONAL_INPUTS = [
     "rds_select_db_tbls",
     "rds_exclude_db_tbls",
-    "rds_db_tbl_pkeys_col_list"
+    "rds_db_tbl_pkeys_col_list",
     "rds_df_trim_micro_sec_ts_col_list",
-    "rds_read_rows_fetch_size"
+    "rds_read_rows_fetch_size",
+    "parquet_tbl_folder_if_different"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -444,10 +444,17 @@ def process_dv_for_table(rds_db_name,
 
     df_dv_output = spark.sql(sql_select_str).repartition(3)
 
-    tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
-
+    parquet_tbl_folder_if_different = args.get('parquet_tbl_folder_if_different', '')
+    if parquet_tbl_folder_if_different != '':
+        tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, 
+                                                          parquet_tbl_folder_if_different)
+        LOGGER.info(f"""Using a different parquet folder: {parquet_tbl_folder_if_different}""")
+    else:
+        tbl_prq_s3_folder_path = get_s3_table_folder_path(rds_db_name, rds_tbl_name)
     # -------------------------------------------------------
 
+    LOGGER.info(f"""tbl_prq_s3_folder_path: {tbl_prq_s3_folder_path}""")
+    
     pkey_partion_read_used = False
     if tbl_prq_s3_folder_path is not None:
         
@@ -456,7 +463,7 @@ def process_dv_for_table(rds_db_name,
             
             if RECORDED_PKEYS_LIST.get(rds_tbl_name, None) is None:
                 LOGGER.warn(f"""No READ-partition columns given !""")
-                df_rds_temp = get_rds_dataframe(rds_tbl_name, rds_tbl_name)
+                df_rds_temp = get_rds_dataframe(rds_db_name, rds_tbl_name)
 
             else:
 
@@ -533,9 +540,8 @@ def process_dv_for_table(rds_db_name,
         trim_str_msg = ""
         t2_rds_str_col_trimmed = False
         if args.get("rds_df_trim_str_columns", "false") == "true":
-            rds_df_trim_str_columns = args["rds_df_trim_str_columns"]
-            msg_prefix = f"""Given -> rds_df_trim_str_columns = {rds_df_trim_str_columns}"""
-            LOGGER.info(f"""{msg_prefix}, {type(rds_df_trim_str_columns)}""")
+            LOGGER.info(f"""Given -> rds_df_trim_str_columns = 'true'""")
+            LOGGER.warn(f""">> Stripping string column spaces <<""")
 
             df_rds_temp_t2 = df_rds_temp_t1.transform(rds_df_trim_str_columns)
 

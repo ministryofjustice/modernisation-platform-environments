@@ -20,22 +20,28 @@ locals {
 
   baseline_presets_all_environments = {
     options = {
-      cloudwatch_metric_alarms_default_actions = ["planetfm_pagerduty"]
-      # cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
-      # cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
-      # enable_backup_plan_daily_and_weekly = true
-      enable_business_unit_kms_cmks = true
-      enable_ec2_cloud_watch_agent  = true
-      enable_ec2_self_provision     = true
-      enable_ec2_user_keypair       = true
-      enable_hmpps_domain           = true
-      enable_image_builder          = true
-      enable_oracle_secure_web      = true
-      enable_s3_bucket              = true
-      enable_s3_software_bucket     = true
-      iam_policies_filter           = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-      iam_policies_ec2_default      = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-      s3_iam_policies               = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+      cloudwatch_dashboard_default_widget_groups = [
+        "lb",
+        "ec2",
+        "ec2_windows",
+      ]
+      cloudwatch_metric_alarms_default_actions   = ["planetfm_pagerduty"]
+      cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
+      cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
+      enable_backup_plan_daily_and_weekly        = true
+      enable_business_unit_kms_cmks              = true
+      enable_ec2_cloud_watch_agent               = true
+      enable_ec2_self_provision                  = true
+      enable_ec2_session_manager_cloudwatch_logs = true
+      enable_ec2_ssm_agent_update                = true
+      enable_ec2_user_keypair                    = true
+      enable_hmpps_domain                        = true
+      enable_image_builder                       = true
+      enable_s3_bucket                           = true
+      enable_s3_software_bucket                  = true
+      iam_policies_filter                        = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+      iam_policies_ec2_default                   = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+      s3_iam_policies                            = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
 
       sns_topics = {
         pagerduty_integrations = {

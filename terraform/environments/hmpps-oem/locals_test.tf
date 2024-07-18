@@ -16,45 +16,35 @@ locals {
   # please keep resources in alphabetical order
   baseline_test = {
 
-    cloudwatch_metric_alarms = merge(
-      module.baseline_presets.cloudwatch_metric_alarms.ec2,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
-    )
-
     ec2_autoscaling_groups = {
-      test-oem = merge(local.oem_ec2_default, {
-        autoscaling_group = merge(local.oem_ec2_default.autoscaling_group, {
-          desired_capacity = 0
-        })
-        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.oem_ec2_default.tags, {
+      test-oem = merge(local.ec2_instances.oem, {
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 1
+          force_delete        = true
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        cloudwatch_metric_alarms = {}
+        tags = merge(local.ec2_instances.oem.tags, {
           oracle-sids = "EMREP TRCVCAT"
         })
       })
     }
 
     ec2_instances = {
-      test-oem-a = merge(local.oem_ec2_default, {
-        cloudwatch_metric_alarms = merge(
-          local.oem_ec2_cloudwatch_metric_alarms.standard,
-          local.oem_ec2_cloudwatch_metric_alarms.backup,
-        )
-        config = merge(local.oem_ec2_default.config, {
+      test-oem-a = merge(local.ec2_instances.oem, {
+        config = merge(local.ec2_instances.oem.config, {
           availability_zone = "eu-west-2a"
         })
-        user_data_cloud_init = merge(local.oem_ec2_default.user_data_cloud_init, {
-          args = merge(local.oem_ec2_default.user_data_cloud_init.args, {
+        instance = merge(local.ec2_instances.oem.instance, {
+          disable_api_termination = true
+        })
+        user_data_cloud_init = merge(local.ec2_instances.oem.user_data_cloud_init, {
+          args = merge(local.ec2_instances.oem.user_data_cloud_init.args, {
             branch = "45027fb7482eb7fb601c9493513bb73658780dda" # 2023-08-11
           })
         })
-        tags = merge(local.oem_ec2_default.tags, {
+        tags = merge(local.ec2_instances.oem.tags, {
           oracle-sids = "EMREP TRCVCAT"
         })
       })
@@ -69,9 +59,9 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/oracle/oem"              = local.oem_secretsmanager_secrets
-      "/oracle/database/EMREP"   = local.oem_secretsmanager_secrets
-      "/oracle/database/TRCVCAT" = local.oem_secretsmanager_secrets
+      "/oracle/oem"              = local.secretsmanager_secrets.oem
+      "/oracle/database/EMREP"   = local.secretsmanager_secrets.oem
+      "/oracle/database/TRCVCAT" = local.secretsmanager_secrets.oem
     }
   }
 }

@@ -18,6 +18,8 @@ locals {
   create_sec_conf         = local.application_data.accounts[local.environment].create_security_conf
   env                     = local.environment
   s3_kms_arn              = aws_kms_key.s3.arn
+  operational_db_kms_arn  = aws_kms_key.operational_db.arn
+  operational_db_kms_id   = aws_kms_key.operational_db.key_id
   kinesis_kms_arn         = aws_kms_key.kinesis-kms-key.arn
   kinesis_kms_id          = data.aws_kms_key.kinesis_kms_key.key_id
   create_bucket           = local.application_data.accounts[local.environment].setup_buckets
@@ -229,6 +231,7 @@ locals {
   # Transfer Component
   enable_transfercomp_lambda         = local.application_data.accounts[local.environment].enable_transfer_component_lambda
   lambda_transfercomp_name           = "${local.project}-transfer-component"
+  lambda_transfercomp_ods_name       = "${local.project}-transfer-component-operational-datastore"
   lambda_transfercomp_runtime        = "java11"
   lambda_transfercomp_tracing        = "Active"
   lambda_transfercomp_handler        = "com.geekoosh.flyway.FlywayHandler"

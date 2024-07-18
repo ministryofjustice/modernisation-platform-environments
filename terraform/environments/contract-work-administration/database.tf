@@ -2,23 +2,11 @@ locals {
   db_userdata = <<EOF
 #!/bin/bash
 
-### Temp install of AWS CLI - removed once actual AMI is used
-# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-# sudo yum install -y unzip
-# unzip awscliv2.zip
-# sudo ./aws/install
-##############
-
 echo "Setting host name"
 hostname ${local.database_hostname}
 echo "${local.database_hostname}" > /etc/hostname
 sed -i '/^HOSTNAME/d' /etc/sysconfig/network
 echo "HOSTNAME=${local.database_hostname}" >> /etc/sysconfig/network
-
-### Command to use IMDSv2 instance to get userdata
-# TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`	
-# PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)	
-##############
 
 echo "Getting IP Addresses for /etc/hosts"
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
@@ -65,8 +53,28 @@ sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
 sed -i '/development-general$/d' /root/.ssh/authorized_keys
 sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
+## Add custom metric script
+echo "Adding the custom metrics script for CloudWatch"
+rm /var/cw-custom.sh
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-cw-custom.sh /var/cw-custom.sh
+chmod 700 /var/cw-custom.sh
+# This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+
 EOF
 
+}
+
+### Load custom metric script into an S3 bucket
+resource "aws_s3_object" "db_custom_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "db-cw-custom.sh"
+  source      = "./db-cw-custom.sh"
+  source_hash = filemd5("./db-cw-custom.sh")
+}
+
+resource "time_sleep" "wait_db_custom_script" {
+  create_duration = "1m"
+  depends_on      = [aws_s3_object.db_custom_script]
 }
 
 ######################################
@@ -83,7 +91,7 @@ resource "aws_instance" "database" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   metadata_options {
     http_tokens = "optional"
   }
@@ -93,6 +101,7 @@ resource "aws_instance" "database" {
     local.tags,
     { "Name" = local.database_ec2_name }
   )
+  depends_on = [time_sleep.wait_db_custom_script]
 }
 
 resource "aws_key_pair" "cwa" {
@@ -310,7 +319,7 @@ resource "aws_ebs_volume" "oradata" {
 }
 
 resource "aws_volume_attachment" "oradata" {
-  device_name = "/dev/sdf"
+  device_name = "/dev/sd${local.oradata_device_name_letter}"
   volume_id   = aws_ebs_volume.oradata.id
   instance_id = aws_instance.database.id
 }
@@ -334,7 +343,7 @@ resource "aws_ebs_volume" "oracle" {
 }
 
 resource "aws_volume_attachment" "oracle" {
-  device_name = "/dev/sdj"
+  device_name = "/dev/sd${local.oracle_device_name_letter}"
   volume_id   = aws_ebs_volume.oracle.id
   instance_id = aws_instance.database.id
 }
@@ -358,7 +367,7 @@ resource "aws_ebs_volume" "oraarch" {
 }
 
 resource "aws_volume_attachment" "oraarch" {
-  device_name = "/dev/sdg"
+  device_name = "/dev/sd${local.oraarch_device_name_letter}"
   volume_id   = aws_ebs_volume.oraarch.id
   instance_id = aws_instance.database.id
 }
@@ -382,7 +391,7 @@ resource "aws_ebs_volume" "oratmp" {
 }
 
 resource "aws_volume_attachment" "oratmp" {
-  device_name = "/dev/sdh"
+  device_name = "/dev/sd${local.oratmp_device_name_letter}"
   volume_id   = aws_ebs_volume.oratmp.id
   instance_id = aws_instance.database.id
 }
@@ -406,7 +415,7 @@ resource "aws_ebs_volume" "oraredo" {
 }
 
 resource "aws_volume_attachment" "oraredo" {
-  device_name = "/dev/sdi"
+  device_name = "/dev/sd${local.oraredo_device_name_letter}"
   volume_id   = aws_ebs_volume.oraredo.id
   instance_id = aws_instance.database.id
 }
@@ -430,7 +439,7 @@ resource "aws_ebs_volume" "share" {
 }
 
 resource "aws_volume_attachment" "share" {
-  device_name = "/dev/sdk"
+  device_name = "/dev/sd${local.share_device_name_letter}"
   volume_id   = aws_ebs_volume.share.id
   instance_id = aws_instance.database.id
 }

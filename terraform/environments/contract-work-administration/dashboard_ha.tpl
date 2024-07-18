@@ -11,15 +11,15 @@
                                 "title": "EC2 CPU Usage",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEc2CpuUtilisationTooHigh}"
+                                                "${database_cpu_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                        "period": ${DashboardRefreshPeriod},
-                        "region": "${AWS::Region}",
+                        "period": ${dashboard_refresh_period},
+                        "region": "${aws_region}",
                         "stacked": true
                         }
                 },
@@ -33,15 +33,15 @@
                                 "title": "EC2 Memory Usage",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEc2MemoryOverThreshold}"
+                                                "${database_memory_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -55,15 +55,15 @@
                                 "title": "EBS Disk Usage - Oradata",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEbsDiskSpaceUsedOverThresholdOradata}"
+                                                "${database_oradata_diskspace_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -77,15 +77,15 @@
                                 "title": "EBS Disk Usage - Oraarch",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEbsDiskSpaceUsedOverThresholdOraarch}"
+                                                "${database_oraarch_diskspace_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -99,15 +99,15 @@
                                 "title": "EBS Disk Usage - Oratmp",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEbsDiskSpaceUsedOverThresholdOratmp}"
+                                                "${database_oratmp_diskspace_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -121,15 +121,15 @@
                                 "title": "EBS Disk Usage - Oraredo",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEbsDiskSpaceUsedOverThresholdOraredo}"
+                                                "${database_oraredo_diskspace_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -143,15 +143,15 @@
                                 "title": "EBS Disk Usage - Oracle",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEbsDiskSpaceUsedOverThresholdOracle}"
+                                                "${database_oracle_diskspace_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -165,15 +165,15 @@
                                 "title": "EBS Disk Usage - Root",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEbsDiskSpaceUsedOverThresholdRoot}"
+                                                "${database_root_diskspace_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -186,15 +186,15 @@
                         "properties": {
                                 "title": "EC2 Network IO (Average Packet Count)",
                                 "metrics": [
-                                        [ "AWS/EC2", "NetworkPacketsIn", "InstanceId", "${CWADBInstance}"],
+                                        [ "AWS/EC2", "NetworkPacketsIn", "InstanceId", "${database_instance_id}"],
                                         [ ".", "NetworkPacketsOut", ".", "." ]
                                 ],
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "bottom"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -205,18 +205,18 @@
                         "height": 5,
                         "width": 6,
                         "properties": {
-                                "title": "EC2 RX Packets Dropped (${Ec2NetworkInterface})",
+                                "title": "EC2 RX Packets Dropped",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rNetworkRxDroppedPackets}"
+                                                "${database_rx_packet_dropped_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": false
                         }
                 },
@@ -227,18 +227,18 @@
                         "height": 5,
                         "width": 6,
                         "properties": {
-                                "title": "EC2 TX Packets Dropped (${Ec2NetworkInterface})",
+                                "title": "EC2 TX Packets Dropped",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rNetworkTxDroppedPackets}"
+                                                "${database_tx_packet_dropped_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": false
                         }
                 },
@@ -249,18 +249,18 @@
                         "height": 5,
                         "width": 6,
                         "properties": {
-                                "title": "EC2 RX Packet Errors (${Ec2NetworkInterface})",
+                                "title": "EC2 RX Packet Errors",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rNetworkRxErrors}"
+                                                "${database_rx_packet_errors_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": false
                         }
                 },
@@ -271,18 +271,18 @@
                         "height": 5,
                         "width": 6,
                         "properties": {
-                                "title": "EC2 TX Packet Errors (${Ec2NetworkInterface})",
+                                "title": "EC2 TX Packet Errors",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rNetworkTxErrors}"
+                                                "${database_tx_packet_errors_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": false
                         }
                 },
@@ -296,15 +296,15 @@
                                 "title": "Volume Read Ops - Oradata",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeReadsOverThresholdOradata}"
+                                                "${database_oradata_read_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -318,15 +318,15 @@
                                 "title": "Volume Read Ops - Oraarch",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeReadsOverThresholdOraarch}"
+                                                "${database_oraarch_read_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -340,15 +340,15 @@
                                 "title": "Volume Read Ops - Oratmp",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeReadsOverThresholdOratmp}"
+                                                "${database_oratmp_read_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -362,15 +362,15 @@
                                 "title": "Volume Read Ops - Oraredo",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeReadsOverThresholdOraredo}"
+                                                "${database_oraredo_read_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -384,15 +384,15 @@
                                 "title": "Volume Read Ops - Oracle",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeReadsOverThresholdOracle}"
+                                                "${database_oracle_read_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -406,15 +406,15 @@
                                 "title": "Volume Read Ops - Root",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeReadsOverThresholdRoot}"
+                                                "${database_root_read_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -428,15 +428,15 @@
                                 "title": "Volume Write Ops - Oradata",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeWritesOverThresholdOradata}"
+                                                "${database_oradata_writes_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -450,15 +450,15 @@
                                 "title": "Volume Write Ops - Oraarch",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeWritesOverThresholdOraarch}"
+                                                "${database_oraarch_writes_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -472,15 +472,15 @@
                                 "title": "Volume Write Ops - Oratmp",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeWritesOverThresholdOratmp}"
+                                                "${database_oratmp_writes_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -494,15 +494,15 @@
                                 "title": "Volume Write Ops - Oraredo",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeWritesOverThresholdOraredo}"
+                                                "${database_oraredo_writes_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -516,15 +516,15 @@
                                 "title": "Volume Write Ops - Oracle",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeWritesOverThresholdOracle}"
+                                                "${database_oracle_writes_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -538,81 +538,15 @@
                                 "title": "Volume Write Ops - Root",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rVolumeWritesOverThresholdRoot}"
+                                                "${database_root_writes_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
-                                "stacked": true
-                        }
-                },
-                {
-                        "type": "metric",
-                        "x": 6,
-                        "y": 6,
-                        "height": 5,
-                        "width": 6,
-                        "properties": {
-                                "title": "Status Check Failed - Instance",
-                                "annotations": {
-                                        "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rStatusCheckFailedInstance}"
-                                        ]
-                                },
-                                "view": "timeSeries",
-                                "legend": {
-                                        "position": "hidden"
-                                },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
-                                "stacked": true
-                        }
-                },
-                {
-                        "type": "metric",
-                        "x": 18,
-                        "y": 36,
-                        "height": 5,
-                        "width": 6,
-                        "properties": {
-                                "title": "Status Check Failed - Instance",
-                                "annotations": {
-                                        "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rStatusCheckFailedInstanceAppInstance}"
-                                        ]
-                                },
-                                "view": "timeSeries",
-                                "legend": {
-                                        "position": "hidden"
-                                },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
-                                "stacked": true
-                        }
-                },
-                {
-                        "type": "metric",
-                        "x": 18,
-                        "y": 40,
-                        "height": 5,
-                        "width": 6,
-                        "properties": {
-                                "title": "Status Check Failed - Instance",
-                                "annotations": {
-                                        "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rStatusCheckFailedInstanceConcurrentManagerInstance}"
-                                        ]
-                                },
-                                "view": "timeSeries",
-                                "legend": {
-                                        "position": "hidden"
-                                },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -623,18 +557,18 @@
                         "height": 5,
                         "width": 6,
                         "properties": {
-                                "title": "Status Check Failed",
+                                "title": "Database Status Check Failed",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rStatusCheckFailed}"
+                                                "${database_status_check_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -645,18 +579,18 @@
                         "height": 5,
                         "width": 6,
                         "properties": {
-                                "title": "Status Check Failed",
+                                "title": "Concurrent Manager Status Check Failed",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rStatusCheckFailedAppInstance}"
+                                                "${cm_status_check_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -667,18 +601,18 @@
                         "height": 5,
                         "width": 6,
                         "properties": {
-                                "title": "Status Check Failed",
+                                "title": "App Server 1 Status Check Failed",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rStatusCheckFailedConcurrentManagerInstance}"
+                                                "${app1_status_check_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -692,37 +626,15 @@
                                 "title": "ELB - Request Count",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rElbRequestCount}"
+                                                "${elb_request_count_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
-                                "stacked": true
-                        }
-                },
-                {
-                        "type": "metric",
-                        "x": 12,
-                        "y": 7,
-                        "height": 5,
-                        "width": 6,
-                        "properties": {
-                                "title": "ELB - Latency",
-                                "annotations": {
-                                        "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rElbLatency}"
-                                        ]
-                                },
-                                "view": "timeSeries",
-                                "legend": {
-                                        "position": "hidden"
-                                },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -736,15 +648,15 @@
                                 "title": "EFS - Data Read IO Bytes",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEfsDataReadIoOverThreshold}"
+                                                "${efs_data_read_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -758,15 +670,15 @@
                                 "title": "EFS - Data Write IO Bytes",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEfsDataWriteIoOverThreshold}"
+                                                "${efs_data_write_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 },
@@ -780,59 +692,15 @@
                                 "title": "Swap Used",
                                 "annotations": {
                                         "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rSwapUsedOverThreshold}"
+                                                "${database_ec2_swap_alarm}"
                                         ]
                                 },
                                 "view": "timeSeries",
                                 "legend": {
                                         "position": "hidden"
                                 },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
-                                "stacked": true
-                        }
-                },
-                {
-                        "type": "metric",
-                        "x": 12,
-                        "y": 9,
-                        "height": 5,
-                        "width": 6,
-                        "properties": {
-                                "title": "EC2 Data Write Ops",
-                                "annotations": {
-                                        "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEC2DataWriteOpsOverThreshold}"
-                                        ]
-                                },
-                                "view": "timeSeries",
-                                "legend": {
-                                        "position": "hidden"
-                                },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
-                                "stacked": true
-                        }
-                },
-                {
-                        "type": "metric",
-                        "x": 6,
-                        "y": 9,
-                        "height": 5,
-                        "width": 6,
-                        "properties": {
-                                "title": "EC2 Data Read Ops",
-                                "annotations": {
-                                        "alarms": [
-                                                "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${rEC2DataReadOpsOverThreshold}"
-                                        ]
-                                },
-                                "view": "timeSeries",
-                                "legend": {
-                                        "position": "hidden"
-                                },
-                                "period": ${DashboardRefreshPeriod},
-                                "region": "${AWS::Region}",
+                                "period": ${dashboard_refresh_period},
+                                "region": "${aws_region}",
                                 "stacked": true
                         }
                 }
