@@ -334,8 +334,3 @@ module "load_json_into_athena" {
     SCHEMA_PATH                              = "s3://${module.metadata-s3-bucket.bucket.id}/dlt_schemas"
   }
 }
-<<<<<<< HEAD
-
-  
-=======
->>>>>>> c6152607c (updated IAM taking into consideration new bucket for all unstructured json data)
