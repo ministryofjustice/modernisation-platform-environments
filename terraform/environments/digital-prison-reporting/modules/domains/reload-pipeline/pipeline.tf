@@ -214,28 +214,75 @@ module "reload_pipeline" {
           "Parameters" : {
             "JobName" : var.glue_create_reload_diff_job,
             "Arguments" : {
-              "--dpr.raw.s3.path" : var.s3_raw_bucket_id,
-              "--dpr.raw.archive.s3.path" : var.s3_raw_archive_bucket_id,
-              "--dpr.temp.reload.s3.path" : var.s3_temp_reload_bucket_id,
+              "--dpr.raw.s3.path" : "s3://${var.s3_raw_bucket_id}/",
+              "--dpr.raw.archive.s3.path" : "s3://${var.s3_raw_archive_bucket_id}/",
+              "--dpr.temp.reload.s3.path" : "s3://${var.s3_temp_reload_bucket_id}/",
               "--dpr.temp.reload.output.folder" : var.reload_diff_folder,
+              "--dpr.dms.replication.task.id" : var.replication_task_id,
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Move Reload Diffs to Archive Bucket"
+          "Next" : "Move Reload Diffs toInsert to Archive Bucket"
         },
-        "Move Reload Diffs to Archive Bucket" : {
+        "Move Reload Diffs toInsert to Archive Bucket" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_s3_file_transfer_job,
             "Arguments" : {
               "--dpr.file.transfer.source.bucket" : var.s3_temp_reload_bucket_id,
-              "--dpr.file.source.prefix" : var.reload_diff_folder,
+              "--dpr.file.source.prefix" : "${var.reload_diff_folder}/toInsert",
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.retention.period.amount" : "0",
-              "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.file.transfer.delete.copied.files" : "false",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            }
+          },
+          "Next" : "Move Reload Diffs toDelete to Archive Bucket"
+        },
+        "Move Reload Diffs toDelete to Archive Bucket" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_s3_file_transfer_job,
+            "Arguments" : {
+              "--dpr.file.transfer.source.bucket" : var.s3_temp_reload_bucket_id,
+              "--dpr.file.source.prefix" : "${var.reload_diff_folder}/toDelete",
+              "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
+              "--dpr.file.transfer.retention.period.amount" : "0",
+              "--dpr.file.transfer.delete.copied.files" : "false",
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            }
+          },
+          "Next" : "Move Reload Diffs toUpdate to Archive Bucket"
+        },
+        "Move Reload Diffs toUpdate to Archive Bucket" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_s3_file_transfer_job,
+            "Arguments" : {
+              "--dpr.file.transfer.source.bucket" : var.s3_temp_reload_bucket_id,
+              "--dpr.file.source.prefix" : "${var.reload_diff_folder}/toUpdate",
+              "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
+              "--dpr.file.transfer.retention.period.amount" : "0",
+              "--dpr.file.transfer.delete.copied.files" : "false",
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            }
+          },
+          "Next" : "Empty Raw Data"
+        },
+        "Empty Raw Data" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_s3_data_deletion_job,
+            "Arguments" : {
+              "--dpr.file.deletion.buckets" : var.s3_raw_bucket_id,
               "--dpr.config.key" : var.domain
             }
           },

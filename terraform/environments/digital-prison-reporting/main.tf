@@ -587,7 +587,7 @@ module "create_reload_diff_job" {
   name                          = "${local.project}-create-reload-diff-job-${local.env}"
   short_name                    = "${local.project}-create-reload-diff-job"
   command_type                  = "glueetl"
-  description                   = "Creates A Diff Between The Reload and Archive Data.\nArguments:\n--dpr.raw.s3.path: (Required) Path to the raw bucket\n--dpr.raw.archive.s3.path: (Required) Path to the raw archive bucket\n--dpr.temp.reload.s3.path: (Required) Bucket where the diffs will be written to\n--dpr.temp.reload.output.folder: (Required) Folder within the temp reload bucket where the diffs will be written to\n--dpr.config.s3.bucket: (Required) Bucket in which the configs are located\n--dpr.config.key: (Required) The configuration value e.g prisoner"
+  description                   = "Creates A Diff Between The Reload and Archive Data.\nArguments:\n--dpr.raw.s3.path: (Required) Path to the raw bucket\n--dpr.raw.archive.s3.path: (Required) Path to the raw archive bucket\n--dpr.temp.reload.s3.path: (Required) Bucket where the diffs will be written to\n--dpr.temp.reload.output.folder: (Required) Folder within the temp reload bucket where the diffs will be written to\n--dpr.config.s3.bucket: (Required) Bucket in which the configs are located\n--dpr.config.key: (Required) The configuration value e.g prisoner\n--dpr.contract.registryName: (Required) Bucket containing the schema contracts\n--dpr.batch.load.fileglobpattern: (Required) The file glob pattern to use"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-create-reload-diff-job-${local.env}/"
@@ -599,7 +599,7 @@ module "create_reload_diff_job" {
   aws_kms_key                   = local.s3_kms_arn
 
   execution_class             = "STANDARD"
-  worker_type                 = "G.1X"
+  worker_type                 = "G.2X"
   number_of_workers           = 3
   max_concurrent              = 64
   region                      = local.account_region
@@ -617,17 +617,20 @@ module "create_reload_diff_job" {
 
   arguments = {
 #    "--extra-jars"     = local.glue_jobs_latest_jar_location
-    "--extra-jars"     = "s3://dpr-artifact-store-development/digital-prison-reporting-jobs-0.0.1-SNAPSHOT-DPR2-714_test_1.jar"
-    "--extra-files"    = local.shared_log4j_properties_path
-    "--class"          = "uk.gov.justice.digital.job.CreateReloadDiffJob"
-    "--dpr.aws.region" = local.account_region
-    "--dpr.log.level"  = local.glue_job_common_log_level
+    "--extra-jars"                     = "s3://dpr-artifact-store-development/digital-prison-reporting-jobs-0.0.1-SNAPSHOT-DPR2-714_test_1.jar"
+    "--extra-files"                    = local.shared_log4j_properties_path
+    "--class"                          = "uk.gov.justice.digital.job.CreateReloadDiffJob"
+    "--dpr.contract.registryName"      = module.s3_schema_registry_bucket.bucket_id
+    "--dpr.batch.load.fileglobpattern" = "*.parquet"
+    "--dpr.aws.region"                 = local.account_region
+    "--dpr.log.level"                  = local.glue_job_common_log_level
   }
 
   depends_on = [
     module.s3_raw_bucket.bucket_id,
     module.s3_raw_archive_bucket.bucket_id,
-    module.s3_temp_reload_bucket.bucket_id
+    module.s3_temp_reload_bucket.bucket_id,
+    module.s3_schema_registry_bucket.bucket_id
   ]
 }
 
