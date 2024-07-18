@@ -22,7 +22,17 @@ def lambda_handler(event, context):
         autocommit=True
     )
     cursor = conn.cursor()
-    cursor.execute(f"CREATE DATABASE {new_db_name}")
+
+    # Check if the database already exists
+    cursor.execute(f"SELECT name FROM sys.databases WHERE name = '{new_db_name}'")
+    database_exists = cursor.fetchone()
+
+    if not database_exists:
+        print(f"Creating database [{new_db_name}]...")
+        cursor.execute(f"CREATE DATABASE [{new_db_name}]")
+    else:
+        print(f"Database [{new_db_name}] already exists.")
+
     cursor.close()
     conn.close()
 
@@ -32,16 +42,27 @@ def lambda_handler(event, context):
     )
     cursor = conn.cursor()
 
-    # Executing SQL commands
-    commands = [
-        f"CREATE LOGIN [{new_user_name}] WITH PASSWORD = '{new_password}'",
-        f"CREATE USER [{new_user_name}] FOR LOGIN [{new_user_name}]",
-        f"USE [{new_db_name}]; EXEC sp_addrolemember N'db_owner', N'{new_user_name}'"
-    ]
+    # commands = [
+    #     f"CREATE LOGIN [{new_user_name}] WITH PASSWORD = '{new_password}'",
+    #     f"CREATE USER [{new_user_name}] FOR LOGIN [{new_user_name}]",
+    #     f"USE [{new_db_name}]; EXEC sp_addrolemember N'db_owner', N'{new_user_name}'"
+    # ]
 
-    for command in commands:
-        cursor.execute(command)
-        conn.commit()
+    # for command in commands:
+    #     cursor.execute(command)
+    #     conn.commit()
+
+    print("Running CREATE LOGIN")
+    cursor.execute(f"CREATE LOGIN [{new_user_name}] WITH PASSWORD = '{new_password}'")
+    conn.commit()
+
+    print("Running CREATE USER")
+    cursor.execute(f"CREATE USER [{new_user_name}] FOR LOGIN [{new_user_name}]")
+    conn.commit()
+
+    print("Running EXEC sp_addrolemember")
+    cursor.execute(f"USE [{new_db_name}]; EXEC sp_addrolemember N'db_owner', N'{new_user_name}'")
+    conn.commit()
 
     # Executing SQL script from file
     script_path = f"/{app_folder}/sp_migration.sql"
