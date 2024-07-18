@@ -342,6 +342,7 @@ resource "aws_instance" "edw_db_instance" {
   vpc_security_group_ids = [aws_security_group.edw_db_security_group.id]
   user_data_base64            = base64encode(local.db_userdata)
   user_data_replace_on_change = false
+
   
   ebs_block_device {
     device_name = "/dev/sda1"
@@ -353,8 +354,9 @@ resource "aws_instance" "edw_db_instance" {
   }
 
   metadata_options {
-    http_endpoint               = "enabled"
-    http_put_response_hop_limit = 2
+    # http_endpoint               = "enabled"
+    # http_put_response_hop_limit = 2
+    http_tokens                 = "optional"
   }
 
   lifecycle {
