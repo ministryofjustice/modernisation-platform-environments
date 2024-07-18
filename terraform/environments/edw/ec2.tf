@@ -1,15 +1,20 @@
 locals {
   db_userdata = <<EOF
-#!/bin/bash
+echo "Hello, World!" > /home/ec2-user/hello.txt
+
+exec > /var/log/userdata.log 2>&1
+set -x
 
 ##### USERDATA #####
 
-####install missing package and hostname change
-yum -y install libXp.i386
-yum -y install sshpass
+#### install missing package and hostname change
+echo "---install missing package and hostname change"
+sudo yum -y install libXp.i386
+sudo yum -y install sshpass
 echo "HOSTNAME="${local.application_name}"."${local.application_data.accounts[local.environment].edw_dns_extension}"" >> /etc/sysconfig/network
 
 #### configure aws timesync (external ntp source)
+echo "---configure aws timesync (external ntp source)"
 AwsTimeSync(){
     local RHEL=$1
     local SOURCE=169.254.169.123
@@ -42,14 +47,88 @@ AwsTimeSync(){
 AwsTimeSync $(cat /etc/redhat-release | cut -d. -f1 | awk '{print $NF}')
 
 ####Install AWS cli
-mkdir -p /opt/aws/bin
-cd /root
-wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
-easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz
+echo "---Install AWS cli"
+sudo yum remove awscli
+sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+#configure cfn-init variables
+export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
+export LOGS="${local.application_name}-EC2"
+export APPNAME="${local.application_name}"
+export ENV="${edw_environment}"
+export BACKUPBUCKET="${edw_s3_backup_bucket}"
+export ROLE="${edw_ec2_role}"
+export SECRET=`/usr/local/bin/aws --region ${edw_region} secretsmanager get-secret-value --secret-id $${terraform output -raw edw_db_secret} --query SecretString --output text`
+export host="$ip4 $APPNAME-$ENV $APPNAME.${edw_dns_extension}"
+export host2="${edw_cis_ip} cis.aws.${edw_environment}.legalservices.gov.uk"
+export host3="${edw_eric_ip} eric.aws.${edw_environment}.legalservices.gov.uk"
+export host3="${edw_ccms_ip} ccms.aws.${edw_environment}.legalservices.gov.uk"
+echo $host >>/etc/hosts
+echo $host2 >>/etc/hosts
+echo $host3 >>/etc/hosts
+mkdir -p /home/oracle/scripts
+
+# Disable firewall
+service iptables stop
+chkconfig iptables off
+
+
+# Set up log files
+echo "---creating /etc/awslogs/awscli.conf"
+mkdir -p /etc/awslogs
+cat > /etc/awslogs/awscli.conf <<-EOF
+[plugins]
+cwlogs = cwlogs
+[default]
+region = ${AWS_REGION}
+
+echo "---creating /tmp/cwlogs/logstreams.conf"
+mkdir -p /tmp/cwlogs
+
+cat > /tmp/cwlogs/logstreams.conf <<-EOF
+[general]
+state_file = /var/awslogs/agent-state
+[oracle_alert_log_errors]
+file = /oracle/software/product/10.2.0/admin/${APPNAME}/bdump/alert_${APPNAME}.log
+log_group_name = ${APPNAME}-OracleAlerts
+log_stream_name = {instance_id}
+
+[rman_backup_log_errors]
+file = /home/oracle/backup_logs/*_RMAN_disk_*.log
+log_group_name = ${APPNAME}-RMan
+log_stream_name = {instance_id}
+
+[rman_arch_backup_log_errors]
+file = /home/oracle/backup_logs/*_RMAN_disk_ARCH_*.log
+log_group_name = ${APPNAME}-RManArch
+log_stream_name = {instance_id}
+
+# adding logs for space report
+[db_tablespace_space_alerts]
+file = /home/oracle/scripts/logs/freespace_alert.log
+log_group_name = ${APPNAME}-TBSFreespace
+log_stream_name = {instance_id}
+
+# adding logs for pmon monitor
+[db_PMON_status_alerts]
+file = /home/oracle/scripts/logs/pmon_status_alert.log
+log_group_name = ${APPNAME}-PMONstatus
+log_stream_name = {instance_id}
+
+# adding logs for CDC monitor
+[db_CDC_status_alerts]
+file = /home/oracle/scripts/logs/cdc_check.log
+log_group_name = ${APPNAME}-CDCstatus
+log_stream_name = {instance_id}
+
 
 ##### METADATA #####
 
 #### Install_aws_logging
+
+echo "---Install_aws_logging"
 
 # Error handeling
 error_exit()
@@ -59,12 +138,19 @@ exit 1
 }
 
 #Install AWS logs
+
 echo "---Install AWS logging"
 curl -O https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
 /usr/local/bin/python2.7 awslogs-agent-setup.py --no-proxy=NO_PROXY -n -r eu-west-2 -c /tmp/cwlogs/logstreams.conf || exit 2
 
+# Tag root volume
+echo "---tagging root volume"
+AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+ROOT_VOLUME_IDS=$(/usr/local/bin/aws ec2 describe-instances --region ${AWS_REGION} --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)
+/usr/local/bin/aws ec2 create-tags --resources $ROOT_VOLUME_IDS --region ${AWS_REGION} --tags Key=Name,Value=$APPNAME-root
 
 #### setup_file_systems
+echo "---setup_file_systems"
 
 # Create Oracle DBF file file system
 mkfs.ext4 /dev/xvdf
@@ -97,7 +183,7 @@ chmod 777 /stage
 
 
 #### setup_oracle_db_software
-
+echo "---setup_oracle_db_software"
 # Install wget / unzip
 yum install -y unzip
 
@@ -105,11 +191,19 @@ groupadd dba
 groupadd oinstall
 useradd -d /home/oracle -g dba oracle
 
+# Update limits / sysctl
+#cp -f /repo/databases/10.2/templates/limits.conf /etc/security/limits.conf
+#cp -f /repo/databases/10.2/templates/sysctl.conf /etc/sysctl.conf
+#sysctl -p
+
+
 #setup oracle user access
+echo "---setup oracle user access"
 cp -fr /home/ec2-user/.ssh /home/oracle/
 chown -R oracle:dba /home/oracle/.ssh
 
 # Unzip installers
+echo "---Unzip installers"
 mkdir -p /stage/databases
 mkdir -p /stage/patches/1020
 unzip /repo/databases/10.2/installers/B24792-01_1of5.zip -d /stage/databases
@@ -117,9 +211,12 @@ unzip /repo/databases/10.2/installers/B24792-01_2of5.zip -d /stage/databases
 unzip /repo/databases/10.2/installers/B24792-01_3of5.zip -d /stage/databases
 unzip /repo/databases/10.2/installers/B24792-01_4of5.zip -d /stage/databases
 unzip /repo/databases/10.2/installers/B24792-01_5of5.zip -d /stage/databases
+# Unzip patch files
+
 unzip /repo/databases/10.2/patches/db-patchset10204/p6810189_10204_Linux-x86-64.zip -d /stage/patches/10204
 
 # Create directories and set ownership
+echo "---Create directories and set ownership"
 mkdir -p /oracle/software/oraInventory
 mkdir -p /oracle/software/product
 mkdir -p /oracle/software/product/10.2.0
@@ -127,6 +224,7 @@ mkdir -p /oracle/software/product/10.2.0_owb
 chown -R oracle:dba /oracle
 
 # Create swap space
+echo "---Create swap space"
 dd if=/dev/zero of=/swapfile bs=1024M count=9
 chmod 600 /swapfile
 mkswap /swapfile
@@ -235,7 +333,6 @@ EOF
 
 resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
   name = "${local.application_name}-S3-${local.application_data.accounts[local.environment].edw_bucket_name}-edw-RW-ec2-profile"
-  path = "/"
   role = aws_iam_role.edw_ec2_role.name
   tags = merge(
     local.tags,
@@ -354,8 +451,8 @@ resource "aws_instance" "edw_db_instance" {
   }
 
   metadata_options {
-    # http_endpoint               = "enabled"
-    # http_put_response_hop_limit = 2
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 2
     http_tokens                 = "optional"
   }
 
