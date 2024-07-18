@@ -237,7 +237,8 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--validation_sample_df_repartition" = 0
     "--jdbc_read_256mb_partitions"       = "false"
     "--jdbc_read_512mb_partitions"       = "false"
-    "--jdbc_read_1gb_partitions"         = "true"
+    "--jdbc_read_1gb_partitions"         = "false"
+    "--jdbc_read_2gb_partitions"         = "false"
     "--rename_migrated_prq_tbl_folder"   = ""
     "--year_partition"                   = "false"
     "--month_partition"                  = "false"

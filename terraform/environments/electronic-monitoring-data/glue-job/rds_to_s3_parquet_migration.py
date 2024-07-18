@@ -61,6 +61,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "jdbc_read_256mb_partitions",
                        "jdbc_read_512mb_partitions",
                        "jdbc_read_1gb_partitions",
+                       "jdbc_read_2gb_partitions",
                        "rds_to_parquet_output_s3_bucket",
                        "rds_sqlserver_db",
                        "rds_sqlserver_db_schema",
@@ -546,9 +547,11 @@ if __name__ == "__main__":
     if args.get("jdbc_read_256mb_partitions", "false") == "true":
         jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/256)
     elif args.get("jdbc_read_512mb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb']/512))
+        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/512)
     elif args.get("jdbc_read_1gb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb']/1024))
+        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/1024)
+    elif args.get("jdbc_read_2gb_partitions", "false") == "true":
+        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/1024)*2
     else:
         jdbc_read_partitions_num = 1
 
