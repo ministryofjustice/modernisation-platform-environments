@@ -133,6 +133,7 @@ output "cluster_revision_number" {
 output "cluster_nodes" {
   description = "The nodes in the cluster. Each node is a map of the following attributes: `node_role`, `private_ip_address`, and `public_ip_address`"
   value       = module.datamart.cluster_nodes
+  sensitive   = true
 }
 
 ## EC2 Private key
