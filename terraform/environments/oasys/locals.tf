@@ -59,20 +59,7 @@ locals {
     }
     security_groups = local.security_groups
 
-    iam_policies = {
-      AVServerPolicy = {
-        description = "Policy allowing access to instances via the Serial Console"
-        statements = [{
-          effect = "Allow"
-          actions = [
-            "ec2-instance-connect:SendSerialConsoleSSHPublicKey",
-            "ssm:SendCommand",
-            "ds:describeDirectories",
-          ]
-          resources = ["*"]
-        }]
-      }
-    }
+    iam_policies = {}
   }
 
 }
