@@ -149,77 +149,7 @@ locals {
       }
     }
 
-    private-lb = {
-      description = "Security group for internal load-balancer"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        http_lb = {
-          description = "Allow http ingress"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_internal
-        }
-        https_lb = {
-          description = "Allow enduserclient https ingress"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_internal
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
-    }
-
-    load-balancer = {
-      description = "New security group for load-balancer"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        http_lb = {
-          description = "Allow http ingress"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_internal
-        }
-        https_lb = {
-          description = "Allow enduserclient https ingress"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_internal
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
-    }
+    # TODO - delete
     domain = {
       description = "Security group for Azure domain(s) access from Azure DCs"
       ingress = {

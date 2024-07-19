@@ -15,8 +15,6 @@ locals {
 
     acm_certificates = {
       remote_desktop_wildcard_cert = {
-        # domain_name limited to 64 chars so use modernisation platform domain for this
-        # and put the wildcard in the san
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "modernisation-platform.service.justice.gov.uk"
         external_validation_records_created = true
@@ -35,6 +33,7 @@ locals {
     ec2_autoscaling_groups = {
       test-rhel85 = merge(local.ec2_autoscaling_groups.base_linux, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_linux.autoscaling_group, {
+          # clean up Computer and DNS entry from azure.noms.root domain before using
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.base_linux.config, {
@@ -49,21 +48,19 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.base_linux.tags, {
-          description = "RHEL8.5"
-          ami         = "hmpps_rhel_8_5"
-          Patching    = "Yes"
+          ami         = "rhel_8_5"
+          description = "RHEL 8.5 instance for testing domain join and patching"
+          domain-name = "azure.noms.root"
         })
       })
 
       test-win-2012 = merge(local.ec2_autoscaling_groups.base_windows, {
-        # clean up test-win-2012 Computer and DNS entry from azure.noms.root domain before using
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
+          # clean up Computer and DNS entry from azure.noms.root domain before using
           desired_capacity = 0
         })
-        autoscaling_schedules = null # TODO
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
-          ami_name      = "base_windows_server_2012_r2_release*"
-          user_data_raw = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
+          ami_name = "base_windows_server_2012_r2_release*"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -73,19 +70,18 @@ locals {
         })
         tags = merge(local.ec2_autoscaling_groups.base_windows.tags, {
           description = "Windows Server 2012 for connecting to Azure domain"
-          server-type = "HmppsDomainServicesTest"
+          domain-name = "azure.noms.root"
         })
       })
 
       test-win-2022 = merge(local.ec2_autoscaling_groups.base_windows, {
-        # clean up test-win-2022 Computer and DNS entry from azure.noms.root domain before using
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
+          # clean up Computer and DNS entry from azure.noms.root domain before using
           desired_capacity = 0
         })
         autoscaling_schedules = null # TODO
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
-          ami_name      = "hmpps_windows_server_2022_release_2024-*"
-          user_data_raw = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
+          ami_name = "hmpps_windows_server_2022_release_2024-*"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
@@ -94,9 +90,8 @@ locals {
           instance_type = "t3.medium"
         })
         tags = merge(local.ec2_autoscaling_groups.base_windows.tags, {
-          description = "Windows Server 2022 for connecting to Azure domain"
-          server-type = "HmppsDomainServicesTest"
-          Patching    = "Yes"
+          description = "Windows Server 2022 instance for testing domain join and patching"
+          domain-name = "azure.noms.root"
         })
       })
     }
@@ -114,7 +109,7 @@ locals {
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.noms.root domain"
-          server-type = "RDGateway"
+          domain-name = "azure.noms.root"
         })
       })
     }

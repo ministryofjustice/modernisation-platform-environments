@@ -33,6 +33,7 @@ locals {
     ec2_autoscaling_groups = {
       dev-rhel85 = merge(local.ec2_autoscaling_groups.base_linux, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_linux.autoscaling_group, {
+          # clean up Computer and DNS entry from azure.noms.root domain before using
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.base_linux.config, {
@@ -47,25 +48,19 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.base_linux.tags, {
-          ami         = "hmpps_domain_services_rhel_8_5"
-          description = "RHEL8.5 for connection to Azure domain"
-          server-type = "hmpps-domain-services"
+          ami         = "rhel_8_5"
+          description = "RHEL 8.5 instance for testing domain join and patching"
+          domain-name = "azure.noms.root"
         })
       })
 
       dev-win-2012 = merge(local.ec2_autoscaling_groups.base_windows, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
+          # clean up Computer and DNS entry from azure.noms.root domain before using
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
           ami_name = "base_windows_server_2012_r2_release*"
-          instance_profile_policies = [
-            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-          ]
-          user_data_raw = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
@@ -74,17 +69,18 @@ locals {
           instance_type = "t3.medium"
         })
         tags = merge(local.ec2_autoscaling_groups.base_windows.tags, {
-          description = "Windows Server 2012 for connecting to Azure domain"
+          description = "Windows Server 2012 instance for testing domain join and patching"
+          domain-name = "azure.noms.root"
         })
       })
 
       dev-win-2022 = merge(local.ec2_autoscaling_groups.base_windows, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
+          # clean up Computer and DNS entry from azure.noms.root domain before using
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
-          ami_name      = "hmpps_windows_server_2022_release_2024-*"
-          user_data_raw = base64encode(file("./templates/rds-gateway-user-data.yaml"))
+          ami_name = "hmpps_windows_server_2022_release_2024-*"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
@@ -93,7 +89,8 @@ locals {
           instance_type = "t3.medium"
         })
         tags = merge(local.ec2_autoscaling_groups.base_windows.tags, {
-          description = "Windows Server 2022 for connecting to Azure domain"
+          description = "Windows Server 2022 instance for testing domain join and patching"
+          domain-name = "azure.noms.root"
         })
       })
     }
