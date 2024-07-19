@@ -115,22 +115,6 @@ locals {
         })
       })
 
-      # temporary instance for role testing
-      pd-ncr-db-2-c = merge(local.database_ec2_default, {
-        config = merge(local.database_ec2_default.config, {
-          availability_zone = "eu-west-2c"
-          instance_profile_policies = concat(local.database_ec2_default.config.instance_profile_policies, [
-            "Ec2PDDatabasePolicy",
-          ])
-        })
-        tags = merge(local.database_ec2_default.tags, {
-          description                          = "PROD TEST NCR ROLE DATABASE"
-          nomis-combined-reporting-environment = "pd"
-          oracle-sids                          = "PDBISYS PDBIAUD"
-          instance-scheduling                  = "skip-scheduling"
-        })
-      })
-
       # Comment out till needed for deployment
       pd-ncr-client-a = merge(local.jumpserver_ec2_default, {
         # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
