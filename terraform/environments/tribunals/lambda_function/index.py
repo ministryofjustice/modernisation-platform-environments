@@ -49,6 +49,7 @@ def lambda_handler(event, context):
         script = file.read()
         for statement in script.split('go'):
             if statement.strip():
+                print(f"statement is: {statement}")
                 cursor.execute(statement)
                 conn.commit()
 
