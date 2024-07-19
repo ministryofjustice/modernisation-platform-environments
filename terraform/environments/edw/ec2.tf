@@ -431,7 +431,7 @@ resource "aws_instance" "edw_db_instance" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids = [aws_security_group.edw_db_security_group.id]
   user_data_base64            = base64encode(local.db_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
 
   
   ebs_block_device {
@@ -455,9 +455,8 @@ resource "aws_instance" "edw_db_instance" {
 
   tags = merge(
     local.tags,
-    {
-      Name = "${local.application_data.accounts[local.environment].database_ec2_name}"
-    }
+    { "Name" = local.application_data.accounts[local.environment].database_ec2_name },
+    { "instance-scheduling" = "skip-scheduling" }
   )
 }
 
