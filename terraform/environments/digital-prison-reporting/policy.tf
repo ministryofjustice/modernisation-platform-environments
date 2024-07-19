@@ -760,6 +760,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     effect = "Allow"
     actions = [
       "iam:PutRolePolicy",
+      "iam:CreateServiceLinkedRole"
     ]
     resources = [
       "arn:aws:iam::${local.current_account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"
