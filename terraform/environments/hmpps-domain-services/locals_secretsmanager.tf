@@ -34,35 +34,31 @@ locals {
     ]
   }
 
-  domain_secret_policy_read = {
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-    ]
-    principals = {
-      type        = "AWS"
-      identifiers = local.domain_share_secret_principal_ids[local.environment]
+  secretsmanager_secret_policies = {
+    domain_read = {
+      effect = "Allow"
+      actions = [
+        "secretsmanager:GetSecretValue",
+      ]
+      principals = {
+        type        = "AWS"
+        identifiers = local.domain_share_secret_principal_ids[local.environment]
+      }
+      resources = ["*"]
     }
-    resources = ["*"]
   }
 
-  domain_secretsmanager_secrets = {
-    secrets = {
-      # passwords = {
-      #   description = "domain passwords only accessible by this account"
-      # }
-      shared-passwords = {
-        description = "domain passwords shared with other accounts"
-        policy = [
-          local.domain_secret_policy_read,
-        ]
+
+  secretsmanager_secrets = {
+    domain = {
+      secrets = {
+        shared-passwords = {
+          description = "domain passwords shared with other accounts"
+          policy = [
+            local.secretsmanager_secret_policies.domain_read,
+          ]
+        }
       }
-      # shared-config = {
-      #   description = "domain related config shared with other accounts"
-      #   policy = [
-      #     local.domain_secret_policy_read,
-      #   ]
-      # }
     }
   }
 }
