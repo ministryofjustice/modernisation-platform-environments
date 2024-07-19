@@ -47,7 +47,7 @@ def lambda_handler(event, context):
     print(f"script_path is: {script_path}")
     with open(script_path, 'r') as file:
         script = file.read()
-        for statement in script.split(';'):
+        for statement in script.split('go'):
             if statement.strip():
                 cursor.execute(statement)
                 conn.commit()
