@@ -350,21 +350,29 @@ def write_rds_df_to_s3_parquet(df_rds_read: DataFrame,
                                table_folder_path):
 
     # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_cap_dw/dbo/F_History/
+    # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_emsys_mvp/dbo/GPSPosition/
 
     s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
 
-    if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path):
+    # if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path):
 
-        LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
-        glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
+    #     LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
+    #     glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
     # --------------------------------------------------------------------
+
+    catalog_db, catalog_db_tbl = table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
 
     dydf = DynamicFrame.fromDF(df_rds_read, glueContext, "final_spark_df")
 
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
                                                      'path': f"""{s3_table_folder_path}/""",
-                                                     "partitionKeys": partition_by_cols
+                                                     "partitionKeys": partition_by_cols,
+                                                     "mode": "overwrite",
+                                                     "enableUpdateCatalog": True,           # Enable updating the Glue Data Catalog
+                                                     "updateBehavior": "UPDATE_IN_DATABASE",
+                                                     "database": catalog_db.lower(),        # Glue database name
+                                                     "tableName": catalog_db_tbl.lower()    # Glue table name
                                                  },
                                                  format_options={
                                                      'useGlueParquetWriter': True,
