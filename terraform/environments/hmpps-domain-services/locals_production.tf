@@ -34,57 +34,57 @@ locals {
     }
 
     ec2_instances = {
-      pd-rdgw-1-a = merge(local.rds_ec2_instance, {
-        config = merge(local.rds_ec2_instance.config, {
-          availability_zone         = "eu-west-2a"
-          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
+      pd-rdgw-1-a = merge(local.ec2_instances.rdgw, {
+        config = merge(local.ec2_instances.rdgw.config, {
+          availability_zone = "eu-west-2a"
+          user_data_raw     = base64encode(file("./templates/windows_server_2022-user-data.yaml")) # TODO
         })
-        tags = merge(local.rds_ec2_instance.tags, {
+        tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.hmpp.root domain"
+          # server-type = "RDGateway" # TODO
         })
       })
-      pd-rdgw-1-b = merge(local.rds_ec2_instance, {
-        config = merge(local.rds_ec2_instance.config, {
-          availability_zone         = "eu-west-2b"
-          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
+      pd-rdgw-1-b = merge(local.ec2_instances.rdgw, {
+        config = merge(local.ec2_instances.rdgw.config, {
+          availability_zone = "eu-west-2b"
+          user_data_raw     = base64encode(file("./templates/windows_server_2022-user-data.yaml")) # TODO
         })
-        tags = merge(local.rds_ec2_instance.tags, {
+        tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.hmpp.root domain"
+          # server-type = "RDGateway" # TODO
         })
       })
-      pd-rds-1-a = merge(local.rds_ec2_instance, {
-        config = merge(local.rds_ec2_instance.config, {
-          availability_zone         = "eu-west-2a"
-          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
-          user_data_raw             = base64encode(file("./templates/user-data-domain-join.yaml"))
+      pd-rds-1-a = merge(local.ec2_instances.rds, {
+        config = merge(local.ec2_instances.rds.config, {
+          availability_zone = "eu-west-2a"
+          user_data_raw     = base64encode(file("./templates/user-data-domain-join.yaml"))
         })
-        instance = merge(local.rds_ec2_instance.instance, {
+        instance = merge(local.ec2_instances.rds.instance, {
           instance_type = "t3.large"
         })
-        tags = merge(local.rds_ec2_instance.tags, {
+        tags = merge(local.ec2_instances.rds.tags, {
           description = "Remote Desktop Services for azure.hmpp.root domain"
         })
       })
     }
 
     lbs = {
-      public = merge(local.rds_lbs.public, {
+      public = merge(local.lbs.public, {
         instance_target_groups = {
-          pd-rdgw-1-http = merge(local.rds_target_groups.http, {
+          pd-rdgw-1-http = merge(local.lbs.public.instance_target_groups.http, {
             attachments = [
               { ec2_instance_name = "pd-rdgw-1-a" },
               { ec2_instance_name = "pd-rdgw-1-b" },
             ]
           })
-          pd-rds-1-https = merge(local.rds_target_groups.https, {
+          pd-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "pd-rds-1-a" },
             ]
           })
         }
-        listeners = {
-          http = local.rds_lb_listeners.http
-          https = merge(local.rds_lb_listeners.https, {
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
             certificate_names_or_arns = ["remote_desktop_wildcard_and_planetfm_cert"]
             rules = {
               pd-rdgw-1-http = {
@@ -118,7 +118,7 @@ locals {
               }
             }
           })
-        }
+        })
       })
     }
 
@@ -139,7 +139,7 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/microsoft/AD/azure.hmpp.root" = local.domain_secretsmanager_secrets
+      "/microsoft/AD/azure.hmpp.root" = local.secretsmanager_secrets.domain
     }
   }
 }
