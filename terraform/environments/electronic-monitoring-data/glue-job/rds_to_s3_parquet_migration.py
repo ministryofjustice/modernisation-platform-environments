@@ -195,7 +195,8 @@ class RDS_JDBC_CONNECTION():
     def get_df_read_rds_db_tbl_int_pkey(self,
                                         jdbc_partition_column, 
                                         jdbc_partition_col_upperbound,
-                                        jdbc_read_partitions_num
+                                        jdbc_read_partitions_num,
+                                        jdbc_partition_col_lowerbound=0,
                                         ) -> DataFrame:
         
         numPartitions = jdbc_read_partitions_num
@@ -215,7 +216,7 @@ class RDS_JDBC_CONNECTION():
                     .option("password", RDS_DB_INSTANCE_PWD)
                     .option("dbtable", f"""({query_str}) as t""")
                     .option("partitionColumn", jdbc_partition_column)
-                    .option("lowerBound", 0)
+                    .option("lowerBound", jdbc_partition_col_lowerbound)
                     .option("upperBound", jdbc_partition_col_upperbound)
                     .option("numPartitions", numPartitions)
                     .load())
