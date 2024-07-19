@@ -113,7 +113,7 @@ tasks:
                 $name = (aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Name" --output text).Split("`t")[-1]
 
                 # Run complete-lifecycle-action using AWS CLI
-                aws autoscaling complete-lifecycle-action --lifecycle-hook-name "$${name}-ready-hook" --auto-scaling-group-name $name --lifecycle-action-result CONTINUE --instance-id $instanceId --region $region
+                aws autoscaling complete-lifecycle-action --lifecycle-hook-name "$name-ready-hook" --auto-scaling-group-name $name --lifecycle-action-result CONTINUE --instance-id $instanceId --region $region
             }
           
             if(Test-Path $EC2LaunchRunOncePath) {
