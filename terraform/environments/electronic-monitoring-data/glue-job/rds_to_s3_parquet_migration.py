@@ -70,9 +70,9 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_table_total_size_mb",
                        "rds_table_total_rows",
                        "rds_df_repartition_num",
-                       "year_partition",
-                       "month_partition",
-                       "day_partition",
+                       "year_partition_bool",
+                       "month_partition_bool",
+                       "day_partition_bool",
                        "validation_only_run"
                        ]
 
@@ -80,7 +80,7 @@ OPTIONAL_INPUTS = [
     "date_partition_column_name",
     "other_partitionby_columns",
     "validation_sample_fraction_float",
-    "validation_sample_df_repartition",
+    "validation_sample_df_repartition_num",
     "rename_migrated_prq_tbl_folder"
 ]
 
@@ -258,6 +258,29 @@ class RDS_JDBC_CONNECTION():
                     .option("query", f"""{query_str}""")
                     .load())
 
+    # def get_min_max_pkey_given_year(self, 
+    #                                 pkey_col_name, 
+    #                                 year, 
+    #                                 agg_str) -> DataFrame:
+        
+    #     if agg_str not in ['min', 'max']:
+    #         raise ValueError(""">> The 'aggregate' function must be either 'min' or 'max' <<""")
+    #         sys.exit(1)
+        
+    #     query_str = f"""
+    #     SELECT {agg_str}({pkey_col_name}) as agg_value
+    #     FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+    #     WHERE YEAR(RecordedDatetime) = {year}
+    #     """.strip()
+
+    #     return (spark.read.format("jdbc")
+    #                     .option("url", self.rds_jdbc_url_v2)
+    #                     .option("driver", RDS_DB_INSTANCE_DRIVER)
+    #                     .option("user", RDS_DB_INSTANCE_USER)
+    #                     .option("password", RDS_DB_INSTANCE_PWD)
+    #                     .option("query", f"""{query_str}""")
+    #                     .load()).collect()[0].agg_value
+
 # ---------------------------------------------------------------------
 # PYTHON CLASS 'RDS_JDBC_CONNECTION' - END
 # ---------------------------------------------------------------------
@@ -382,9 +405,9 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                         *get_nvl_select_list(rds_jdbc_conn_obj, 
                                                              df_parquet_read_sample))
     
-    validation_sample_df_repartition = int(args['validation_sample_df_repartition'])
-    if validation_sample_df_repartition != 0:
-        df_parquet_read_sample_t1 = df_parquet_read_sample_t1.repartition(validation_sample_df_repartition, 
+    validation_sample_df_repartition_num = int(args['validation_sample_df_repartition_num'])
+    if validation_sample_df_repartition_num != 0:
+        df_parquet_read_sample_t1 = df_parquet_read_sample_t1.repartition(validation_sample_df_repartition_num, 
                                                                           jdbc_partition_column)
     # --------
 
@@ -396,8 +419,8 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     df_rds_read_sample_t1 = df_rds_read_sample.selectExpr(
                                         *get_nvl_select_list(rds_jdbc_conn_obj, 
                                                              df_rds_read_sample))
-    if validation_sample_df_repartition != 0:
-        df_rds_read_sample_t1 = df_rds_read_sample_t1.repartition(validation_sample_df_repartition, 
+    if validation_sample_df_repartition_num != 0:
+        df_rds_read_sample_t1 = df_rds_read_sample_t1.repartition(validation_sample_df_repartition_num, 
                                                                   jdbc_partition_column)
     # --------
 
@@ -459,21 +482,22 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     return df_dv_output
 
 
-def write_to_s3_parquet(df_dv_output: DataFrame, 
-                        database, 
+def write_to_s3_parquet(df_dv_output: DataFrame,
+                        rds_jdbc_conn_obj,
                         db_sch_tbl_name):
 
+    db_name = rds_jdbc_conn_obj.rds_db_name
     df_dv_output = df_dv_output.repartition(1)
 
     table_folder_path = f"""{args["glue_catalog_db_name"]}/{args["glue_catalog_tbl_name"]}"""
     s3_table_folder_path = f'''s3://{DV_PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}'''
 
     if check_s3_folder_path_if_exists(DV_PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                      f'''{table_folder_path}/database_name={database}/full_table_name={db_sch_tbl_name}'''
+                                      f'''{table_folder_path}/database_name={db_name}/full_table_name={db_sch_tbl_name}'''
                                       ):
-        LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}/database_name={database}/full_table_name={db_sch_tbl_name}""")
+        LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}/database_name={db_name}/full_table_name={db_sch_tbl_name}""")
 
-        glueContext.purge_s3_path(f"""{s3_table_folder_path}/database_name={database}/full_table_name={db_sch_tbl_name}""",
+        glueContext.purge_s3_path(f"""{s3_table_folder_path}/database_name={db_name}/full_table_name={db_sch_tbl_name}""",
                                   options={"retentionPeriod": 0}
                                   )
     # ---------------------------------------------------------------------
@@ -615,22 +639,23 @@ if __name__ == "__main__":
                                               jdbc_read_partitions_num)
     # ---------------------------------------------------------------
 
-    if args['validation_only_run'] != "true":
+    validation_only_run = args['validation_only_run']
+    if validation_only_run != "true":
         partition_by_cols = list()
 
         if args.get('date_partition_column_name', None) is not None:
             given_date_column = args['date_partition_column_name']
             LOGGER.info(f"""given_date_column = {given_date_column}""")
 
-            if args['year_partition'] == 'true':
+            if args['year_partition_bool'] == 'true':
                 df_rds_read = df_rds_read.withColumn("year", F.year(given_date_column))
                 partition_by_cols.append("year")
 
-            if args['month_partition'] == 'true':
+            if args['month_partition_bool'] == 'true':
                 df_rds_read = df_rds_read.withColumn("month", F.month(given_date_column))
                 partition_by_cols.append("month")
 
-            if args['day_partition'] == 'true':
+            if args['day_partition_bool'] == 'true':
                 df_rds_read = df_rds_read.withColumn("day", F.dayofmonth(given_date_column))
                 partition_by_cols.append("day")
 
@@ -645,9 +670,12 @@ if __name__ == "__main__":
         # ----------------------------------------------------
 
         if partition_by_cols:
+            orderby_columns = partition_by_cols + [jdbc_read_partitions_num]
             LOGGER.info(f"""df_rds_read-OrderBy on partitionBy columns: {partition_by_cols}""")
-            df_rds_read = df_rds_read.orderBy(*partition_by_cols)
+            df_rds_read = df_rds_read.orderBy(*orderby_columns)
         # -----------------------------------
+    else:
+        LOGGER.info(f"""** validation_only_run = {validation_only_run} **""")
     # ---------------------------------------
 
     rename_output_table_folder = args.get('rename_migrated_prq_tbl_folder', '')
@@ -659,7 +687,7 @@ if __name__ == "__main__":
 
     df_rds_read = df_rds_read.cache()
 
-    if args['validation_only_run'] != "true":
+    if validation_only_run != "true":
         write_rds_df_to_s3_parquet(df_rds_read, 
                                    partition_by_cols,
                                    table_folder_path)
@@ -680,7 +708,7 @@ if __name__ == "__main__":
                                                    validation_sample_fraction_float)
 
 
-        write_to_s3_parquet(df_dv_output, rds_db_name, db_sch_tbl)
+        write_to_s3_parquet(df_dv_output, rds_jdbc_conn_obj, db_sch_tbl)
     # ------------------------------------------------------------
 
     df_rds_read.unpersist(True)
