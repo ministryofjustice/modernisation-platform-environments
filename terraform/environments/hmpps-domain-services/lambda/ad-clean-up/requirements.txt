@@ -1,4 +1,0 @@
-pyasn1~=0.5
-ldap3~=2.9
-boto3
-json
