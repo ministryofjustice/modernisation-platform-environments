@@ -71,7 +71,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_table_total_rows",
                        "year_partition",
                        "month_partition",
-                       "day_partition"
+                       "day_partition",
+                       "validation_only_run"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -368,10 +369,10 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
     LOGGER.info(f"""Parquet Source being used for comparison: {s3_table_folder_path}""")
 
-    df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path).cache()
+    df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path)
 
     df_compare_columns_list = [col for col in df_parquet_read.columns 
-                                if col not in ['year', 'month', 'day']]
+                               if col not in ['year', 'month', 'day']]
     
     df_parquet_read_sample = df_parquet_read.sample(validation_sample_fraction_float)\
                                 .select(*df_compare_columns_list)
@@ -454,8 +455,6 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
         df_dv_output = df_dv_output.union(df_subtract_temp)
     # -----------------------------------------------------
 
-    df_parquet_read.unpersist(True)
-
     return df_dv_output
 
 
@@ -525,7 +524,6 @@ if __name__ == "__main__":
     rds_jdbc_conn_obj = RDS_JDBC_CONNECTION(args['rds_sqlserver_db'],
                                             args['rds_sqlserver_db_schema'],
                                             args['rds_sqlserver_db_table'])
-    
     # -------------------------------------------
 
     try:
@@ -562,6 +560,7 @@ if __name__ == "__main__":
         jdbc_read_partitions_num = int(int(int(args['rds_table_total_size_mb'])/1024)/2)
     else:
         jdbc_read_partitions_num = 1
+    # ------------------------------
 
     jdbc_read_partitions_num = 1 if jdbc_read_partitions_num <= 0 \
                                     else jdbc_read_partitions_num
@@ -573,8 +572,7 @@ if __name__ == "__main__":
     df_rds_dtype_dict = get_dtypes_dict(rds_db_table_empty_df)
     int_dtypes_colname_list = [colname for colname, dtype in df_rds_dtype_dict.items() 
                                 if dtype in INT_DATATYPES_LIST]
-    # -------------------------------------------------------
-
+    
     if args.get('rds_db_tbl_pkeys_col_list', None) is None:
         try:
             rds_db_tbl_pkeys_col_list = [column.strip() 
@@ -609,40 +607,40 @@ if __name__ == "__main__":
                                             jdbc_read_partitions_num))
     LOGGER.info(f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
 
-    partition_by_cols = list()
+    if args['validation_only_run'] != "true":
+        partition_by_cols = list()
 
-    if args.get('date_partition_column_name', None) is not None:
-        given_date_column = args['date_partition_column_name']
-        LOGGER.info(f"""given_date_column = {given_date_column}""")
+        if args.get('date_partition_column_name', None) is not None:
+            given_date_column = args['date_partition_column_name']
+            LOGGER.info(f"""given_date_column = {given_date_column}""")
 
-        if args['year_partition'] == 'true':
-            df_rds_read = df_rds_read.withColumn("year", F.year(given_date_column))
-            partition_by_cols.append("year")
+            if args['year_partition'] == 'true':
+                df_rds_read = df_rds_read.withColumn("year", F.year(given_date_column))
+                partition_by_cols.append("year")
 
-        if args['month_partition'] == 'true':
-            df_rds_read = df_rds_read.withColumn("month", F.month(given_date_column))
-            partition_by_cols.append("month")
+            if args['month_partition'] == 'true':
+                df_rds_read = df_rds_read.withColumn("month", F.month(given_date_column))
+                partition_by_cols.append("month")
 
-        if args['day_partition'] == 'true':
-            df_rds_read = df_rds_read.withColumn("day", F.dayofmonth(given_date_column))
-            partition_by_cols.append("day")
+            if args['day_partition'] == 'true':
+                df_rds_read = df_rds_read.withColumn("day", F.dayofmonth(given_date_column))
+                partition_by_cols.append("day")
 
-        #df_rds_read = df_rds_read.repartition("year", "month", "day")
-    # ----------------------------------------------------
+            #df_rds_read = df_rds_read.repartition("year", "month", "day")
+        # ----------------------------------------------------
 
-    if args.get('other_partitionby_columns', None) is not None:
-        other_partitionby_columns = [f"""{column.strip().strip("'").strip('"')}""" 
-                                    for column in args['other_partitionby_columns'].split(",")]
-        LOGGER.info(f"""other_partitionby_columns = {other_partitionby_columns}""")
-        partition_by_cols.extend(other_partitionby_columns)
-    # ----------------------------------------------------
+        if args.get('other_partitionby_columns', None) is not None:
+            other_partitionby_columns = [f"""{column.strip().strip("'").strip('"')}""" 
+                                         for column in args['other_partitionby_columns'].split(",")]
+            LOGGER.info(f"""other_partitionby_columns = {other_partitionby_columns}""")
+            partition_by_cols.extend(other_partitionby_columns)
+        # ----------------------------------------------------
 
-    if partition_by_cols:
-        LOGGER.info(f"""df_rds_read-Repartitioning on columns: {partition_by_cols}""")
-        df_rds_read = df_rds_read.repartition(jdbc_read_partitions_num, *partition_by_cols).cache()
-    else:
-        df_rds_read = df_rds_read.cache()
-    # -----------------------------------
+        if partition_by_cols:
+            LOGGER.info(f"""df_rds_read-OrderBy on partitionBy columns: {partition_by_cols}""")
+            df_rds_read = df_rds_read.orderBy(*partition_by_cols)
+        # -----------------------------------
+    # ---------------------------------------
 
     rename_output_table_folder = args.get('rename_migrated_prq_tbl_folder', '')
     if rename_output_table_folder == '':
@@ -651,10 +649,13 @@ if __name__ == "__main__":
         table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rename_output_table_folder}"""
     # ---------------------------------------
 
+    df_rds_read = df_rds_read.cache()
 
-    write_rds_df_to_s3_parquet(df_rds_read, 
-                               partition_by_cols,
-                               table_folder_path)
+    if args['validation_only_run'] != "true":
+        write_rds_df_to_s3_parquet(df_rds_read, 
+                                   partition_by_cols,
+                                   table_folder_path)
+    # -----------------------------------------------
 
     total_files, total_size = get_s3_folder_info(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path)
     msg_part_1 = f"""total_files={total_files}"""
@@ -670,10 +671,10 @@ if __name__ == "__main__":
                                                    table_folder_path,
                                                    validation_sample_fraction_float)
 
-        df_rds_read.unpersist(True)
-
 
         write_to_s3_parquet(df_dv_output, rds_db_name, db_sch_tbl)
     # ------------------------------------------------------------
+
+    df_rds_read.unpersist(True)
 
     job.commit()

@@ -243,6 +243,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--year_partition"                   = "false"
     "--month_partition"                  = "false"
     "--day_partition"                    = "false"
+    "--validation_only_run"              = "false"
     "--rds_to_parquet_output_s3_bucket"  = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--dv_parquet_output_s3_bucket"      = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
