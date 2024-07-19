@@ -97,22 +97,21 @@ locals {
     }
 
     lbs = {
-      public = merge(local.rds_lbs.public, {
+      public = merge(local.lbs.public, {
         instance_target_groups = {
-          pp-rdgw-1-http = merge(local.rds_target_groups.http, {
+          pp-rdgw-1-http = merge(local.lbs.public.instance_target_groups.http, {
             attachments = [
               { ec2_instance_name = "pp-rdgw-1-a" },
             ]
           })
-          pp-rds-1-https = merge(local.rds_target_groups.https, {
+          pp-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "pp-rds-1-a" },
             ]
           })
         }
-        listeners = {
-          http = local.rds_lb_listeners.http
-          https = merge(local.rds_lb_listeners.https, {
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
             certificate_names_or_arns = ["remote_desktop_and_planetfm_wildcard_cert"]
             rules = {
               pp-rdgw-1-http = {
@@ -146,7 +145,7 @@ locals {
               }
             }
           })
-        }
+        })
       })
     }
 

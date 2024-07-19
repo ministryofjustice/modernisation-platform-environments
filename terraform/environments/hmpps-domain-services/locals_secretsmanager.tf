@@ -55,7 +55,7 @@ locals {
         shared-passwords = {
           description = "domain passwords shared with other accounts"
           policy = [
-            local.secretsmanager_secret_policie.domain_read,
+            local.secretsmanager_secret_policies.domain_read,
           ]
         }
       }

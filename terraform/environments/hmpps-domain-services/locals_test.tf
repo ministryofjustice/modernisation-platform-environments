@@ -145,17 +145,16 @@ locals {
     }
 
     lbs = {
-      public = merge(local.rds_lbs.public, {
+      public = merge(local.lbs.public, {
         instance_target_groups = {
-          test-rdgw-1-http = merge(local.rds_target_groups.http, {
+          test-rdgw-1-http = merge(local.lbs.public.instance_target_groups.http, {
             attachments = [
               { ec2_instance_name = "test-rdgw-1-a" },
             ]
           })
         }
-        listeners = {
-          http = local.rds_lb_listeners.http
-          https = merge(local.rds_lb_listeners.https, {
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
             rules = {
               test-rdgw-1-http = {
                 priority = 100
@@ -174,7 +173,7 @@ locals {
               }
             }
           })
-        }
+        })
       })
     }
 
