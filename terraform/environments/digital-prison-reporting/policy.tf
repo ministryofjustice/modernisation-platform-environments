@@ -757,8 +757,11 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   }
 
   statement {
-    effect  = "Allow"
-    actions = ["iam:PutRolePolicy"]
+    effect = "Allow"
+    actions = [
+      "iam:PutRolePolicy",
+      "iam:GetRole"
+    ]
     resources = [
       "arn:aws:iam::${local.current_account_id}:role/*/AWSServiceRoleForLakeFormationDataAccess"
     ]
@@ -803,7 +806,8 @@ resource "aws_iam_role" "analytical_platform_share_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${each.value.target_account_id}:root"
+          # In case consumer has a central location for terraform state storage that isn't the target account.
+          AWS = "arn:aws:iam::${try(each.value.assume_account_id, each.value.target_account_id)}:root"
         }
         Action = "sts:AssumeRole"
       }
