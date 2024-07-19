@@ -69,6 +69,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_db_tbl_pkeys_col_list",
                        "rds_table_total_size_mb",
                        "rds_table_total_rows",
+                       "rds_df_repartition_num",
                        "year_partition",
                        "month_partition",
                        "day_partition",
@@ -606,6 +607,13 @@ if __name__ == "__main__":
                                             jdbc_partition_col_upperbound,
                                             jdbc_read_partitions_num))
     LOGGER.info(f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
+
+    rds_df_repartition_num = args['rds_df_repartition_num']
+    if rds_df_repartition_num != 0:
+        LOGGER.info(f"""df_rds_read-Repartitioning: {rds_df_repartition_num}""")
+        df_rds_read = df_rds_read.repartition(rds_df_repartition_num, 
+                                              jdbc_read_partitions_num)
+    # ---------------------------------------------------------------
 
     if args['validation_only_run'] != "true":
         partition_by_cols = list()
