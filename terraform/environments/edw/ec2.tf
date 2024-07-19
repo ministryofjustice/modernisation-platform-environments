@@ -1,5 +1,6 @@
 locals {
   db_userdata = <<EOF
+#!/bin/bash
 echo "Hello, World!" > /home/ec2-user/hello.txt
 
 exec > /var/log/userdata.log 2>&1
