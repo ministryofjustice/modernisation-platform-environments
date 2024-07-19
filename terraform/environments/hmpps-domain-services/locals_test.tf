@@ -79,7 +79,6 @@ locals {
           # clean up Computer and DNS entry from azure.noms.root domain before using
           desired_capacity = 0
         })
-        autoscaling_schedules = null # TODO
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
           ami_name = "hmpps_windows_server_2022_release_2024-*"
         })
