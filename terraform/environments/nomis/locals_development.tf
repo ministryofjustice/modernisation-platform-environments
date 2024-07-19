@@ -110,6 +110,31 @@ locals {
         })
       })
 
+      dev-donotuse-client-b = merge(local.ec2_autoscaling_groups.client, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.client.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 0
+                    
+          initial_lifecycle_hooks = {
+            "ready-hook" = {
+              default_result       = "ABANDON"
+              heartbeat_timeout    = 1800
+              lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+            }
+          }
+        })
+        tags = merge(local.ec2_autoscaling_groups.client.tags, {
+          domain-name = "azure.noms.root"
+        })
+        config = merge(local.ec2_autoscaling_groups.client.config, {
+          user_data_raw = base64encode(templatefile(
+          "templates/user-data-pwsh-ready-hook.yaml.tftpl", {
+            branch = "main"
+            }
+          ))
+        })
+      })
+
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
       })
     }
