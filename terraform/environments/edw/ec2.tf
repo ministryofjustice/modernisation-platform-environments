@@ -1,6 +1,10 @@
 locals {
   db_userdata = <<EOF
 #!/bin/bash
+
+# Disable requiretty
+sed -i 's/^\(Defaults\s*requiretty\)/#\1/' /etc/sudoers
+
 echo "Hello, World!" > /home/ec2-user/hello.txt
 
 exec > /var/log/userdata.log 2>&1
