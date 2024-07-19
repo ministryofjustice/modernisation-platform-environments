@@ -749,7 +749,9 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:BatchRevokePermissions",
       "lakeformation:RegisterResource",
       "lakeformation:DeregisterResource",
-      "lakeformation:ListPermissions"
+      "lakeformation:ListPermissions",
+      "lakeformation:DescribeResource",
+
     ]
     resources = [
       "arn:aws:lakeformation:${local.current_account_region}:${local.current_account_id}:catalog:${local.current_account_id}"
