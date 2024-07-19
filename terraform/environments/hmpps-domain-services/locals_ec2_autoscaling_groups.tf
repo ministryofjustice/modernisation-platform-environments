@@ -19,38 +19,33 @@ locals {
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-          "SSMPolicy",
-          "PatchBucketAccessPolicy",
         ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       instance = {
         disable_api_termination      = false
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = false
         vpc_security_group_ids       = ["rds-ec2s"]
       }
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "--tags ec2provision"
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
         }
-        scripts = [
-          "install-ssm-agent.sh.tftpl",
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       tags = {
-        component = "test"
-        os-type   = "Linux"
+        backup           = "false"
+        os-type          = "Linux"
+        Patching         = "Yes"
+        server-type      = "hmpps-domain-services"
+        update-ssm-agent = "patchgroup1"
       }
     }
 
@@ -73,13 +68,13 @@ locals {
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-          "SSMPolicy",
-          "PatchBucketAccessPolicy",
         ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO
-        ssm_parameters_prefix         = "ec2/"
         subnet_name                   = "private"
-        user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 128 }
@@ -93,8 +88,11 @@ locals {
         vpc_security_group_ids       = ["rds-ec2s"]
       }
       tags = {
-        component = "test"
-        os-type   = "Windows"
+        backup           = "false"
+        os-type          = "Windows"
+        Patching         = "Yes"
+        server-type      = "HmppsDomainServicesTest"
+        update-ssm-agent = "patchgroup1"
       }
     }
   }

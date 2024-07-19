@@ -15,8 +15,6 @@ locals {
 
     acm_certificates = {
       remote_desktop_wildcard_and_planetfm_cert = {
-        # domain_name limited to 64 chars so use modernisation platform domain for this
-        # and put the wildcard in the san
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "modernisation-platform.service.justice.gov.uk"
         external_validation_records_created = true
@@ -37,33 +35,35 @@ locals {
       pd-rdgw-1-a = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
-          user_data_raw     = base64encode(file("./templates/windows_server_2022-user-data.yaml")) # TODO
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.hmpp.root domain"
-          # server-type = "RDGateway" # TODO
+          description      = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name      = "azure.hmpp.root"
+          update-ssm-agent = "patchgroup1"
         })
       })
+
       pd-rdgw-1-b = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2b"
-          user_data_raw     = base64encode(file("./templates/windows_server_2022-user-data.yaml")) # TODO
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.hmpp.root domain"
-          # server-type = "RDGateway" # TODO
+          description      = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name      = "azure.hmpp.root"
+          update-ssm-agent = "patchgroup2"
         })
       })
+
       pd-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           availability_zone = "eu-west-2a"
-          user_data_raw     = base64encode(file("./templates/user-data-domain-join.yaml"))
         })
         instance = merge(local.ec2_instances.rds.instance, {
           instance_type = "t3.large"
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name = "azure.hmpp.root"
         })
       })
     }

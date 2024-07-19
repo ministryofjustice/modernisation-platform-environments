@@ -12,32 +12,35 @@ locals {
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-          "SSMPolicy",
-          "PatchBucketAccessPolicy",
         ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
-        user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
-        # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
       }
       instance = {
         disable_api_termination      = false
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = false
         vpc_security_group_ids       = ["rds-ec2s"]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
       }
       tags = {
-        os-type     = "Windows"
-        component   = "remotedesktop"
-        backup-plan = "daily-and-weekly" # TODO
+        backup           = "false"
+        os-type          = "Windows"
+        server-type      = "HmppsRDGateway"
+        update-ssm-agent = "patchgroup1"
       }
     }
+
     rds = {
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2024-01-16T09-48-13.663Z"
@@ -49,30 +52,32 @@ locals {
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-          "SSMPolicy",
-          "PatchBucketAccessPolicy",
         ]
-        secretsmanager_secrets_prefix = "ec2/" # TODO
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
-        user_data_raw                 = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
-        # user_data_raw                 = base64encode(file("./templates/windows_server_2022-user-data.yaml"))
+        subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
       }
       instance = {
         disable_api_termination      = false
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = false
         vpc_security_group_ids       = ["rds-ec2s"]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
       }
       tags = {
-        os-type     = "Windows"
-        component   = "remotedesktop"
-        backup-plan = "daily-and-weekly" # TODO
+        backup           = "false"
+        os-type          = "Windows"
+        server-type      = "HmppsRDServices"
+        update-ssm-agent = "patchgroup1"
       }
     }
   }
