@@ -632,11 +632,11 @@ if __name__ == "__main__":
                                             jdbc_read_partitions_num))
     LOGGER.info(f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
 
-    rds_df_repartition_num = args['rds_df_repartition_num']
+    rds_df_repartition_num = int(args['rds_df_repartition_num'])
     if rds_df_repartition_num != 0:
         LOGGER.info(f"""df_rds_read-Repartitioning: {rds_df_repartition_num}""")
         df_rds_read = df_rds_read.repartition(rds_df_repartition_num, 
-                                              jdbc_read_partitions_num)
+                                              jdbc_partition_column)
     # ---------------------------------------------------------------
 
     validation_only_run = args['validation_only_run']
@@ -675,7 +675,7 @@ if __name__ == "__main__":
             df_rds_read = df_rds_read.orderBy(*orderby_columns)
         # -----------------------------------
     else:
-        LOGGER.info(f"""** validation_only_run = {validation_only_run} **""")
+        LOGGER.info(f"""** validation_only_run = '{validation_only_run}' **""")
     # ---------------------------------------
 
     rename_output_table_folder = args.get('rename_migrated_prq_tbl_folder', '')
