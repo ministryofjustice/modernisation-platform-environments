@@ -345,6 +345,37 @@ def check_s3_folder_path_if_exists(in_bucket_name, in_folder_path):
 # ==================================================================
 
 
+def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
+                                  partition_by_cols,
+                                  table_folder_path):
+    """
+    Write dynamic frame in S3 and catalog it.
+    """
+    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
+
+    catalog_db, catalog_db_tbl = table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
+
+    dynamic_df_write = glueContext.getSink(
+                            format_options = {
+                                "compression": "snappy", 
+                                "useGlueParquetWriter": True
+                                },
+                            path = f"""{s3_table_folder_path}/""",
+                            connection_type = "s3",
+                            updateBehavior = "UPDATE_IN_DATABASE",
+                            partitionKeys = partition_by_cols,
+                            enableUpdateCatalog = True,
+                            transformation_ctx = "dynamic_df_write",
+    )
+    dynamic_df_write.setCatalogInfo(
+                        catalogDatabase = catalog_db.lower(), 
+                        catalogTableName = catalog_db_tbl.lower()
+    )
+    dynamic_df_write.setFormat("glueparquet")
+    dynamic_df_write.writeFrame(df_rds_read)
+    LOGGER.info(f"""{db_sch_tbl} table data written to -> {s3_table_folder_path}/""")
+
+
 def write_rds_df_to_s3_parquet(df_rds_read: DataFrame, 
                                partition_by_cols,
                                table_folder_path):
@@ -354,25 +385,20 @@ def write_rds_df_to_s3_parquet(df_rds_read: DataFrame,
 
     s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
 
-    # if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path):
+    if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path):
 
-    #     LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
-    #     glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
+        LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
+        glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
     # --------------------------------------------------------------------
 
-    catalog_db, catalog_db_tbl = table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
+    # catalog_db, catalog_db_tbl = table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
 
     dydf = DynamicFrame.fromDF(df_rds_read, glueContext, "final_spark_df")
 
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
                                                      'path': f"""{s3_table_folder_path}/""",
-                                                     "partitionKeys": partition_by_cols,
-                                                     "mode": "overwrite",
-                                                     "enableUpdateCatalog": True,           # Enable updating the Glue Data Catalog
-                                                     "updateBehavior": "UPDATE_IN_DATABASE",
-                                                     "database": catalog_db.lower(),        # Glue database name
-                                                     "tableName": catalog_db_tbl.lower()    # Glue table name
+                                                     "partitionKeys": partition_by_cols
                                                  },
                                                  format_options={
                                                      'useGlueParquetWriter': True,
@@ -380,7 +406,7 @@ def write_rds_df_to_s3_parquet(df_rds_read: DataFrame,
                                                      'blockSize': 13421773,
                                                      'pageSize': 1048576
                                                  })
-    LOGGER.info(f"""{db_sch_tbl} table data written to -> {s3_table_folder_path}/""")
+    LOGGER.info(f"""'{db_sch_tbl}' table data written to -> {s3_table_folder_path}/""")
 
 
 def compare_rds_parquet_samples(rds_jdbc_conn_obj,
@@ -524,7 +550,7 @@ def write_to_s3_parquet(df_dv_output: DataFrame,
                                                      'blockSize': 13421773,
                                                      'pageSize': 1048576
                                                  })
-    LOGGER.info(f"""{db_sch_tbl_name} validation report written to -> {s3_table_folder_path}/""")
+    LOGGER.info(f"""'{db_sch_tbl_name}' validation report written to -> {s3_table_folder_path}/""")
 
 
 # ===================================================================================================
