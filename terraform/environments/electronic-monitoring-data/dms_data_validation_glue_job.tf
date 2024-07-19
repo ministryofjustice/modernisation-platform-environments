@@ -256,6 +256,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--enable-auto-scaling"                  = "true"
     "--conf"                                 = <<EOF
 spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.sources.partitionOverwriteMode=dynamic
 --conf spark.sql.parquet.aggregatePushdown=true 
 --conf spark.sql.shuffle.partitions=2001 
 --conf spark.sql.files.maxPartitionBytes=256m 

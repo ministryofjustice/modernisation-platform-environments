@@ -18,8 +18,6 @@ from pyspark.sql import DataFrame
 # ===============================================================================
 
 sc = SparkContext()
-sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.enabled", "true")
-sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "3g")
 sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.enabled", "true")
 
 glueContext = GlueContext(sc)
@@ -351,9 +349,16 @@ def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
     """
     Write dynamic frame in S3 and catalog it.
     """
+
+    # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_emsys_mvp/dbo/GPSPosition/
+
     s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
 
-    catalog_db, catalog_db_tbl = table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
+    # if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path):
+
+    #     LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
+    #     glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
+    # # --------------------------------------------------------------------
 
     dynamic_df_write = glueContext.getSink(
                             format_options = {
@@ -367,12 +372,18 @@ def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
                             enableUpdateCatalog = True,
                             transformation_ctx = "dynamic_df_write",
     )
+
+    catalog_db, catalog_db_tbl = table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
     dynamic_df_write.setCatalogInfo(
                         catalogDatabase = catalog_db.lower(), 
                         catalogTableName = catalog_db_tbl.lower()
     )
+
     dynamic_df_write.setFormat("glueparquet")
-    dynamic_df_write.writeFrame(df_rds_read)
+
+    dydf_rds_read = DynamicFrame.fromDF(df_rds_read, glueContext, "final_spark_df")
+    dynamic_df_write.writeFrame(dydf_rds_read)
+
     LOGGER.info(f"""{db_sch_tbl} table data written to -> {s3_table_folder_path}/""")
 
 
@@ -381,7 +392,6 @@ def write_rds_df_to_s3_parquet(df_rds_read: DataFrame,
                                table_folder_path):
 
     # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_cap_dw/dbo/F_History/
-    # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_emsys_mvp/dbo/GPSPosition/
 
     s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
 
