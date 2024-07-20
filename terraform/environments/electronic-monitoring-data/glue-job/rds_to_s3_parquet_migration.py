@@ -97,6 +97,7 @@ job.init(args["JOB_NAME"], args)
 # ------------------------------
 
 S3_CLIENT = boto3.client("s3")
+ATHENA_CLIENT = boto3.client("athena", region_name='eu-west-2')
 
 # ------------------------------
 
@@ -127,6 +128,40 @@ RECORDED_PKEYS_LIST = {
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
 # ----------------------
+
+
+def run_athena_query(sql_statement_str):
+    response = ATHENA_CLIENT.start_query_execution(
+        QueryString = sql_statement_str,
+        ResultConfiguration = {"OutputLocation": ATHENA_RUN_OUTPUT_LOCATION}
+    )
+    return response["QueryExecutionId"]
+
+# F11 - Function to check the status of the submitted athena query
+# Uses 'BOTO3'/athena library.
+def has_query_succeeded(execution_id):
+    state = "RUNNING"
+    max_execution = 5
+
+    while max_execution > 0 and state in ["RUNNING", "QUEUED"]:
+        max_execution -= 1
+        response = ATHENA_CLIENT.get_query_execution(
+            QueryExecutionId=execution_id)
+        if (
+            "QueryExecution" in response
+            and "Status" in response["QueryExecution"]
+            and "State" in response["QueryExecution"]["Status"]
+        ):
+            state = response["QueryExecution"]["Status"]["State"]
+            if state == "SUCCEEDED":
+                return True
+
+        time.sleep(30)
+
+    return False
+
+
+# ==================================================================
 
 class RDS_JDBC_CONNECTION():
 
@@ -374,42 +409,6 @@ def check_s3_folder_path_if_exists(in_bucket_name, in_folder_path):
 # ==================================================================
 
 
-ATHENA_CLIENT = boto3.client("athena", region_name='eu-west-2')
-
-def run_athena_query(sql_statement_str):
-    response = ATHENA_CLIENT.start_query_execution(
-        QueryString = sql_statement_str,
-        ResultConfiguration = {"OutputLocation": ATHENA_RUN_OUTPUT_LOCATION}
-    )
-    return response["QueryExecutionId"]
-
-# F11 - Function to check the status of the submitted athena query
-# Uses 'BOTO3'/athena library.
-def has_query_succeeded(execution_id):
-    state = "RUNNING"
-    max_execution = 5
-
-    while max_execution > 0 and state in ["RUNNING", "QUEUED"]:
-        max_execution -= 1
-        response = ATHENA_CLIENT.get_query_execution(
-            QueryExecutionId=execution_id)
-        if (
-            "QueryExecution" in response
-            and "Status" in response["QueryExecution"]
-            and "State" in response["QueryExecution"]["Status"]
-        ):
-            state = response["QueryExecution"]["Status"]["State"]
-            if state == "SUCCEEDED":
-                return True
-
-        time.sleep(30)
-
-    return False
-
-
-# ==================================================================
-
-
 def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
                                   partition_by_cols,
                                   prq_table_folder_path):
@@ -453,16 +452,16 @@ def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
 
     LOGGER.info(f"""{db_sch_tbl} table data written to -> {s3_table_folder_path}/""")
 
-    ddl_refresh_table_partitions = f"msck repair table {catalog_db.lower()}.{catalog_db_tbl.lower()}"
-    LOGGER.info(f"""ddl_refresh_table_partitions:> \n{ddl_refresh_table_partitions}""")
+    # ddl_refresh_table_partitions = f"msck repair table {catalog_db.lower()}.{catalog_db_tbl.lower()}"
+    # LOGGER.info(f"""ddl_refresh_table_partitions:> \n{ddl_refresh_table_partitions}""")
                 
-    # Refresh table prtitions
-    execution_id = run_athena_query(ddl_refresh_table_partitions)
-    LOGGER.info(f"SQL-Statement execution id: {execution_id}")
+    # # Refresh table prtitions
+    # execution_id = run_athena_query(ddl_refresh_table_partitions)
+    # LOGGER.info(f"SQL-Statement execution id: {execution_id}")
 
-    # Check query execution
-    query_status = has_query_succeeded(execution_id=execution_id)
-    LOGGER.info(f"Query state: {query_status}")
+    # # Check query execution
+    # query_status = has_query_succeeded(execution_id=execution_id)
+    # LOGGER.info(f"Query state: {query_status}")
 
 
 def write_rds_df_to_s3_parquet(df_rds_read: DataFrame, 
