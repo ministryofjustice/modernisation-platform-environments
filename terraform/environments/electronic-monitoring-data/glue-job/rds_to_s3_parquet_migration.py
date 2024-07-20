@@ -1,5 +1,6 @@
 import sys
 import boto3
+import time
 # from logging import getLogger
 # import pandas as pd
 
@@ -107,6 +108,8 @@ RDS_DB_INSTANCE_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
 
 PARQUET_OUTPUT_S3_BUCKET_NAME = args["rds_to_parquet_output_s3_bucket"]
 DV_PARQUET_OUTPUT_S3_BUCKET_NAME = args["dv_parquet_output_s3_bucket"]
+
+ATHENA_RUN_OUTPUT_LOCATION = f"s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/athena_temp_store/"
 
 NVL_DTYPE_DICT = {
     'tinyint': 0, 'smallint': 0, 'int': 0, 'bigint':0,
@@ -371,18 +374,54 @@ def check_s3_folder_path_if_exists(in_bucket_name, in_folder_path):
 # ==================================================================
 
 
+ATHENA_CLIENT = boto3.client("athena", region_name='eu-west-2')
+
+def run_athena_query(sql_statement_str):
+    response = ATHENA_CLIENT.start_query_execution(
+        QueryString = sql_statement_str,
+        ResultConfiguration = {"OutputLocation": ATHENA_RUN_OUTPUT_LOCATION}
+    )
+    return response["QueryExecutionId"]
+
+# F11 - Function to check the status of the submitted athena query
+# Uses 'BOTO3'/athena library.
+def has_query_succeeded(execution_id):
+    state = "RUNNING"
+    max_execution = 5
+
+    while max_execution > 0 and state in ["RUNNING", "QUEUED"]:
+        max_execution -= 1
+        response = ATHENA_CLIENT.get_query_execution(
+            QueryExecutionId=execution_id)
+        if (
+            "QueryExecution" in response
+            and "Status" in response["QueryExecution"]
+            and "State" in response["QueryExecution"]["Status"]
+        ):
+            state = response["QueryExecution"]["Status"]["State"]
+            if state == "SUCCEEDED":
+                return True
+
+        time.sleep(30)
+
+    return False
+
+
+# ==================================================================
+
+
 def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
                                   partition_by_cols,
-                                  table_folder_path):
+                                  prq_table_folder_path):
     """
     Write dynamic frame in S3 and catalog it.
     """
 
     # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_emsys_mvp/dbo/GPSPosition/
 
-    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
+    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{prq_table_folder_path}"""
 
-    # if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path):
+    # if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, prq_table_folder_path):
 
     #     LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
     #     glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
@@ -401,7 +440,7 @@ def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
                             transformation_ctx = "dynamic_df_write",
     )
 
-    catalog_db, catalog_db_tbl = table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
+    catalog_db, catalog_db_tbl = prq_table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
     dynamic_df_write.setCatalogInfo(
                         catalogDatabase = catalog_db.lower(), 
                         catalogTableName = catalog_db_tbl.lower()
@@ -414,22 +453,33 @@ def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
 
     LOGGER.info(f"""{db_sch_tbl} table data written to -> {s3_table_folder_path}/""")
 
+    ddl_refresh_table_partitions = f"msck repair table {catalog_db.lower()}.{catalog_db_tbl.lower()}"
+    LOGGER.info(f"""ddl_refresh_table_partitions:> \n{ddl_refresh_table_partitions}""")
+                
+    # Refresh table prtitions
+    execution_id = run_athena_query(ddl_refresh_table_partitions)
+    LOGGER.info(f"SQL-Statement execution id: {execution_id}")
+
+    # Check query execution
+    query_status = has_query_succeeded(execution_id=execution_id)
+    LOGGER.info(f"Query state: {query_status}")
+
 
 def write_rds_df_to_s3_parquet(df_rds_read: DataFrame, 
                                partition_by_cols,
-                               table_folder_path):
+                               prq_table_folder_path):
 
     # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_cap_dw/dbo/F_History/
 
-    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
+    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{prq_table_folder_path}"""
 
-    if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path):
+    if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, prq_table_folder_path):
 
         LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
         glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
     # --------------------------------------------------------------------
 
-    # catalog_db, catalog_db_tbl = table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
+    # catalog_db, catalog_db_tbl = prq_table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
 
     dydf = DynamicFrame.fromDF(df_rds_read, glueContext, "final_spark_df")
 
@@ -450,7 +500,7 @@ def write_rds_df_to_s3_parquet(df_rds_read: DataFrame,
 def compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                 df_rds_read: DataFrame, 
                                 jdbc_partition_column,
-                                table_folder_path, 
+                                prq_table_folder_path, 
                                 validation_sample_fraction_float) -> DataFrame:
     
     df_dv_output_schema = T.StructType(
@@ -463,7 +513,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     
     df_dv_output = get_pyspark_empty_df(df_dv_output_schema)
 
-    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}"""
+    s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{prq_table_folder_path}"""
     LOGGER.info(f"""Parquet Source being used for comparison: {s3_table_folder_path}""")
 
     df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path)
@@ -562,11 +612,11 @@ def write_to_s3_parquet(df_dv_output: DataFrame,
     db_name = rds_jdbc_conn_obj.rds_db_name
     df_dv_output = df_dv_output.repartition(1)
 
-    table_folder_path = f"""{args["glue_catalog_db_name"]}/{args["glue_catalog_tbl_name"]}"""
-    s3_table_folder_path = f'''s3://{DV_PARQUET_OUTPUT_S3_BUCKET_NAME}/{table_folder_path}'''
+    prq_table_folder_path = f"""{args["glue_catalog_db_name"]}/{args["glue_catalog_tbl_name"]}"""
+    s3_table_folder_path = f'''s3://{DV_PARQUET_OUTPUT_S3_BUCKET_NAME}/{prq_table_folder_path}'''
 
     if check_s3_folder_path_if_exists(DV_PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                      f'''{table_folder_path}/database_name={db_name}/full_table_name={db_sch_tbl_name}'''
+                                      f'''{prq_table_folder_path}/database_name={db_name}/full_table_name={db_sch_tbl_name}'''
                                       ):
         LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}/database_name={db_name}/full_table_name={db_sch_tbl_name}""")
 
@@ -771,10 +821,12 @@ if __name__ == "__main__":
 
     rename_output_table_folder = args.get('rename_migrated_prq_tbl_folder', '')
     if rename_output_table_folder == '':
-        table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}"""
+        rds_db_table_name = rds_sqlserver_db_table
     else:
-        table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rename_output_table_folder}"""
+        rds_db_table_name = rename_output_table_folder
     # ---------------------------------------
+
+    prq_table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_db_table_name}"""
 
     df_rds_read = df_rds_read.cache()
 
@@ -786,13 +838,13 @@ if __name__ == "__main__":
     if validation_only_run != "true":
         write_rds_df_to_s3_parquet(df_rds_read, 
                                    partition_by_cols,
-                                   table_folder_path)
+                                   prq_table_folder_path)
     # -----------------------------------------------
 
-    total_files, total_size = get_s3_folder_info(PARQUET_OUTPUT_S3_BUCKET_NAME, table_folder_path)
+    total_files, total_size = get_s3_folder_info(PARQUET_OUTPUT_S3_BUCKET_NAME, prq_table_folder_path)
     msg_part_1 = f"""total_files={total_files}"""
     msg_part_2 = f"""total_size_mb={total_size/1024/1024}"""
-    LOGGER.info(f"""'{table_folder_path}': {msg_part_1}, {msg_part_2}""")
+    LOGGER.info(f"""'{prq_table_folder_path}': {msg_part_1}, {msg_part_2}""")
 
     validation_sample_fraction_float = float(args.get('validation_sample_fraction_float', 0))
     if validation_sample_fraction_float != 0:
@@ -800,7 +852,7 @@ if __name__ == "__main__":
         df_dv_output = compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                                    df_rds_read,
                                                    jdbc_partition_column,
-                                                   table_folder_path,
+                                                   prq_table_folder_path,
                                                    validation_sample_fraction_float)
 
 
