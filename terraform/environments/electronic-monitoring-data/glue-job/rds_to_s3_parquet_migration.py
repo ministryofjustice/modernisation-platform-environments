@@ -72,7 +72,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "month_partition_bool",
                        "day_partition_bool",
                        "validation_only_run",
-                       "rds_query_where_clause"
+                       "rds_query_where_clause",
+                       "default_jdbc_read_partition_num"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -656,7 +657,7 @@ if __name__ == "__main__":
     elif args.get("jdbc_read_2gb_partitions", "false") == "true":
         jdbc_read_partitions_num = int(int(int(args['rds_table_total_size_mb'])/1024)/2)
     else:
-        jdbc_read_partitions_num = 1
+        jdbc_read_partitions_num = int(args['default_jdbc_read_partition_num'])
     # ------------------------------
 
     jdbc_read_partitions_num = 1 if jdbc_read_partitions_num <= 0 \
