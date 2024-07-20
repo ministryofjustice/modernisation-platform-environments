@@ -71,7 +71,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "year_partition_bool",
                        "month_partition_bool",
                        "day_partition_bool",
-                       "validation_only_run"
+                       "validation_only_run",
+                       "rds_query_where_clause"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -190,6 +191,26 @@ class RDS_JDBC_CONNECTION():
 
         return rds_db_tbl_temp_list
 
+    def get_rds_dataframe(self) -> DataFrame:
+
+        query_str = f"""
+        SELECT *
+          FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+        """.strip()
+
+        if args.get('rds_query_where_clause', '') != '':
+            query_str = query_str + f""" WHERE {args['rds_query_where_clause'].strip()}"""
+
+        LOGGER.info(f"""query_str-(SingleJDBCConn):> \n{query_str}""")
+        
+        return (spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", RDS_DB_INSTANCE_DRIVER)
+                    .option("user", RDS_DB_INSTANCE_USER)
+                    .option("password", RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({query_str}) as t""")
+                    .load())
+
     def get_df_read_rds_db_tbl_int_pkey(self,
                                         jdbc_partition_column, 
                                         jdbc_partition_col_upperbound,
@@ -204,8 +225,13 @@ class RDS_JDBC_CONNECTION():
 
         query_str = f"""
         SELECT *
-        FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+          FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
         """.strip()
+
+        if args.get('rds_query_where_clause', '') != '':
+            query_str = query_str + f""" WHERE {args['rds_query_where_clause'].strip()}"""
+        
+        LOGGER.info(f"""query_str-(ParallelJDBCConn):> \n{query_str}""")
 
         return (spark.read.format("jdbc")
                     .option("url", self.rds_jdbc_url_v2)
@@ -257,28 +283,29 @@ class RDS_JDBC_CONNECTION():
                     .option("query", f"""{query_str}""")
                     .load())
 
-    # def get_min_max_pkey_given_year(self, 
-    #                                 pkey_col_name, 
-    #                                 year, 
-    #                                 agg_str) -> DataFrame:
+    def get_min_max_pkey(self, pkey_col_name, agg_str) -> DataFrame:
         
-    #     if agg_str not in ['min', 'max']:
-    #         raise ValueError(""">> The 'aggregate' function must be either 'min' or 'max' <<""")
-    #         sys.exit(1)
-        
-    #     query_str = f"""
-    #     SELECT {agg_str}({pkey_col_name}) as agg_value
-    #     FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
-    #     WHERE YEAR(RecordedDatetime) = {year}
-    #     """.strip()
+        if agg_str not in ['min', 'max']:
+            raise ValueError(""">> The 'aggregate' function must be either 'min' or 'max' <<""")
+            sys.exit(1)
 
-    #     return (spark.read.format("jdbc")
-    #                     .option("url", self.rds_jdbc_url_v2)
-    #                     .option("driver", RDS_DB_INSTANCE_DRIVER)
-    #                     .option("user", RDS_DB_INSTANCE_USER)
-    #                     .option("password", RDS_DB_INSTANCE_PWD)
-    #                     .option("query", f"""{query_str}""")
-    #                     .load()).collect()[0].agg_value
+        query_str = f"""
+        SELECT {agg_str}({pkey_col_name}) as agg_value
+          FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+        """.strip()
+
+        if args.get('rds_query_where_clause', '') != '':
+            query_str = query_str + f""" WHERE {args['rds_query_where_clause'].strip()}"""
+
+        LOGGER.info(f"""query_str-(Aggregate):> \n{query_str}""")
+
+        return (spark.read.format("jdbc")
+                        .option("url", self.rds_jdbc_url_v2)
+                        .option("driver", RDS_DB_INSTANCE_DRIVER)
+                        .option("user", RDS_DB_INSTANCE_USER)
+                        .option("password", RDS_DB_INSTANCE_PWD)
+                        .option("query", f"""{query_str}""")
+                        .load()).collect()[0].agg_value
 
 # ---------------------------------------------------------------------
 # PYTHON CLASS 'RDS_JDBC_CONNECTION' - END
@@ -668,14 +695,31 @@ if __name__ == "__main__":
         sys.exit(1)
     # -------------
 
-    jdbc_partition_col_upperbound = int(int(args['rds_table_total_rows'])/jdbc_read_partitions_num)
-    LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
-    
-    df_rds_read = (rds_jdbc_conn_obj.get_df_read_rds_db_tbl_int_pkey(
-                                            jdbc_partition_column,
-                                            jdbc_partition_col_upperbound,
-                                            jdbc_read_partitions_num))
+    if jdbc_read_partitions_num == 1:
+        df_rds_read = rds_jdbc_conn_obj.get_rds_dataframe()
+    else:
+        jdbc_partition_col_upperbound_1 = int(
+            int(args.get('rds_table_total_rows', 0))/jdbc_read_partitions_num
+            )
+        jdbc_partition_col_upperbound_2 = int(
+            (rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 
+                                                'max') - rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 
+                                                                                            'min')
+             )/jdbc_read_partitions_num
+            )
+
+        jdbc_partition_col_upperbound = jdbc_partition_col_upperbound_2 \
+                                            if jdbc_partition_col_upperbound_2 >= jdbc_partition_col_upperbound_1 \
+                                                else jdbc_partition_col_upperbound_1
+
+        LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
+        
+        df_rds_read = (rds_jdbc_conn_obj.get_df_read_rds_db_tbl_int_pkey(
+                                                jdbc_partition_column,
+                                                jdbc_partition_col_upperbound,
+                                                jdbc_read_partitions_num))
     LOGGER.info(f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
+    # ----------------------------------------------------------
 
     rds_df_repartition_num = int(args['rds_df_repartition_num'])
     if rds_df_repartition_num != 0:
@@ -715,7 +759,7 @@ if __name__ == "__main__":
         # ----------------------------------------------------
 
         if partition_by_cols:
-            orderby_columns = partition_by_cols + [jdbc_read_partitions_num]
+            orderby_columns = partition_by_cols + [jdbc_partition_column]
             LOGGER.info(f"""df_rds_read-OrderBy on partitionBy columns: {partition_by_cols}""")
             df_rds_read = df_rds_read.orderBy(*orderby_columns)
         # -----------------------------------
