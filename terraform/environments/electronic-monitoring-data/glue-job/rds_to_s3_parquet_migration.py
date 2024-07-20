@@ -142,7 +142,7 @@ class RDS_JDBC_CONNECTION():
     def check_if_rds_db_exists(self):
         sql_sys_databases = f"""
         SELECT name FROM sys.databases
-        WHERE name IN ('{self.rds_db_name}')
+         WHERE name IN ('{self.rds_db_name}')
         """.strip()
 
         LOGGER.info(f"""Using SQL Statement >>>\n{sql_sys_databases}""")
@@ -160,9 +160,9 @@ class RDS_JDBC_CONNECTION():
     def get_all_the_existing_tables_as_df(self) -> DataFrame:
         sql_information_schema = f"""
         SELECT table_catalog, table_schema, table_name
-        FROM information_schema.tables
-        WHERE table_type = 'BASE TABLE'
-        AND table_schema = '{self.rds_db_schema_name}'
+          FROM information_schema.tables
+         WHERE table_type = 'BASE TABLE'
+           AND table_schema = '{self.rds_db_schema_name}'
         """.strip()
 
         LOGGER.info(f"using the SQL Statement:\n{sql_information_schema}")
@@ -251,9 +251,9 @@ class RDS_JDBC_CONNECTION():
 
         sql_statement = f"""
         SELECT column_name, data_type, is_nullable 
-        FROM information_schema.columns
-        WHERE table_schema = '{self.rds_db_schema_name}'
-        AND table_name = '{self.rds_db_table_name}'
+          FROM information_schema.columns
+         WHERE table_schema = '{self.rds_db_schema_name}'
+           AND table_name = '{self.rds_db_table_name}'
         """.strip()
         # ORDER BY ordinal_position
 
@@ -272,8 +272,8 @@ class RDS_JDBC_CONNECTION():
         
         query_str = f"""
         SELECT *
-        FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
-        WHERE 1 = 2
+          FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+         WHERE 1 = 2
         """.strip()
 
         return (spark.read.format("jdbc")
@@ -719,8 +719,9 @@ if __name__ == "__main__":
                                                 jdbc_partition_column,
                                                 jdbc_partition_col_upperbound,
                                                 jdbc_read_partitions_num))
-    LOGGER.info(f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
     # ----------------------------------------------------------
+    LOGGER.info(f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
+
 
     rds_df_repartition_num = int(args['rds_df_repartition_num'])
     if rds_df_repartition_num != 0:
@@ -761,7 +762,7 @@ if __name__ == "__main__":
 
         if partition_by_cols:
             orderby_columns = partition_by_cols + [jdbc_partition_column]
-            LOGGER.info(f"""df_rds_read-OrderBy on partitionBy columns: {partition_by_cols}""")
+            LOGGER.info(f"""df_rds_read-OrderBy on: partitionBy columns -> {partition_by_cols}""")
             df_rds_read = df_rds_read.orderBy(*orderby_columns)
         # -----------------------------------
     else:
@@ -776,6 +777,11 @@ if __name__ == "__main__":
     # ---------------------------------------
 
     df_rds_read = df_rds_read.cache()
+
+    # NOTE: When filtered rows (ex: based on 'year') are run in separate consecutive batches, 
+    #       consider to appropriately use the features in built in the below dataframe-write-parquet functions.
+    # - write_rds_df_to_s3_parquet: Overwrites the existing partitions by default.
+    # - write_rds_df_to_s3_parquet_v2: Adds the new partitions and also the corresponding partitions are updated in athena tables.
 
     if validation_only_run != "true":
         write_rds_df_to_s3_parquet(df_rds_read, 
