@@ -73,7 +73,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "day_partition_bool",
                        "validation_only_run",
                        "validation_sample_fraction_float",
-                       "validation_sample_df_repartition_num",
+                       "validation_sample_df_repartition_num"
                        ]
 
 OPTIONAL_INPUTS = [
