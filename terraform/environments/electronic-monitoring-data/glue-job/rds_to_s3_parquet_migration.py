@@ -230,6 +230,7 @@ class RDS_JDBC_CONNECTION():
 
         return rds_db_tbl_temp_list
 
+
     def get_rds_dataframe(self) -> DataFrame:
 
         query_str = f"""
@@ -249,6 +250,7 @@ class RDS_JDBC_CONNECTION():
                     .option("password", RDS_DB_INSTANCE_PWD)
                     .option("dbtable", f"""({query_str}) as t""")
                     .load())
+
 
     def get_df_read_rds_db_tbl_int_pkey(self,
                                         jdbc_partition_column, 
@@ -321,6 +323,7 @@ class RDS_JDBC_CONNECTION():
                     .option("password", RDS_DB_INSTANCE_PWD)
                     .option("query", f"""{query_str}""")
                     .load())
+
 
     def get_min_max_pkey(self, pkey_col_name, agg_str) -> DataFrame:
         
@@ -831,8 +834,8 @@ if __name__ == "__main__":
 
     # NOTE: When filtered rows (ex: based on 'year') are used in separate consecutive batch runs, 
     # consider to appropriately use the parquet write functions with features in built as per the below details.
-    # - write_rds_df_to_s3_parquet: Overwrites the existing partitions by default.
-    # - write_rds_df_to_s3_parquet_v2: Adds the new partitions and also the corresponding partitions are updated in athena tables.
+    # - write_rds_df_to_s3_parquet(): Overwrites the existing partitions by default.
+    # - write_rds_df_to_s3_parquet_v2(): Adds the new partitions & also the corresponding partitions are updated in athena tables.
 
     if validation_only_run != "true":
         write_rds_df_to_s3_parquet_v2(df_rds_read, 
