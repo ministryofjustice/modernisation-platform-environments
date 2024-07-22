@@ -53,27 +53,26 @@ locals {
         })
       })
 
-      # Comment out till needed for deployment
-      # pd-ncr-cms-b = merge(local.bip_ec2_default, {
-      #   #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
-      #   config = merge(local.bip_ec2_default.config, {
-      #     ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-      #     availability_zone = "eu-west-2b"
-      #     instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
-      #       "Ec2PDReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.bip_ec2_default.instance, {
-      #     instance_type = "m6i.xlarge",
-      #   })
-      #   tags = merge(local.bip_ec2_default.tags, {
-      #     description                          = "Prod SAP BI Platform CMS installation and configurations"
-      #     instance-scheduling                  = "skip-scheduling"
-      #     node                                 = "2"
-      #     nomis-combined-reporting-environment = "pd"
-      #     type                                 = "management"
-      #   })
-      # })
+      pd-ncr-cms-b = merge(local.bip_ec2_default, {
+        #cloudwatch_metric_alarms = local.bip_cloudwatch_metric_alarms # comment in when commissioned
+        config = merge(local.bip_ec2_default.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.bip_ec2_default.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        instance = merge(local.bip_ec2_default.instance, {
+          instance_type = "m6i.xlarge",
+        })
+        tags = merge(local.bip_ec2_default.tags, {
+          description                          = "Prod SAP BI Platform CMS installation and configurations"
+          instance-scheduling                  = "skip-scheduling"
+          node                                 = "2"
+          nomis-combined-reporting-environment = "pd"
+          type                                 = "management"
+        })
+      })
 
       pd-ncr-db-1-a = merge(local.database_ec2_default, {
         cloudwatch_metric_alarms = merge(
