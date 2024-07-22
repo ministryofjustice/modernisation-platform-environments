@@ -27,7 +27,7 @@ locals {
       ]
       cloudwatch_metric_alarms_default_actions   = ["hmpps_domain_services_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
-      # cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
+      cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
       enable_backup_plan_daily_and_weekly        = true
       enable_business_unit_kms_cmks              = true
       enable_ec2_cloud_watch_agent               = true
