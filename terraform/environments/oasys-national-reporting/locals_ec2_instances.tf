@@ -159,8 +159,9 @@ locals {
 
     jumpserver = {
       config = {
-        ami_name                  = "base_windows_server_2012_r2_release_2024-*"
-        iam_resource_names_prefix = "ec2-instance"
+        ami_name                      = "base_windows_server_2012_r2_release_2024-*"
+        ebs_volumes_copy_all_from_ami = false
+        iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies = [
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
