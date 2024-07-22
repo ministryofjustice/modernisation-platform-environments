@@ -1,5 +1,6 @@
 import os
 import pyodbc
+import re
 
 def lambda_handler(event, context):
     # Fetching environment variables
@@ -47,7 +48,9 @@ def lambda_handler(event, context):
     print(f"script_path is: {script_path}")
     with open(script_path, 'r') as file:
         script = file.read()
-        for statement in script.split('go'):
+        # Split the script by the full keyword 'GO' (case-insensitive)
+        statements = re.split(r'\bGO\b', script, flags=re.IGNORECASE)
+        for statement in statements:
             if statement.strip():
                 print(f"statement is: {statement}")
                 cursor.execute(statement)
