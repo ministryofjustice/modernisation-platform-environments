@@ -835,9 +835,9 @@ if __name__ == "__main__":
     # - write_rds_df_to_s3_parquet_v2: Adds the new partitions and also the corresponding partitions are updated in athena tables.
 
     if validation_only_run != "true":
-        write_rds_df_to_s3_parquet(df_rds_read, 
-                                   partition_by_cols,
-                                   prq_table_folder_path)
+        write_rds_df_to_s3_parquet_v2(df_rds_read, 
+                                      partition_by_cols,
+                                      prq_table_folder_path)
     # -----------------------------------------------
 
     total_files, total_size = get_s3_folder_info(PARQUET_OUTPUT_S3_BUCKET_NAME, prq_table_folder_path)
