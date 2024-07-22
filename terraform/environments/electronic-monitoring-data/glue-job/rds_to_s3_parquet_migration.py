@@ -450,7 +450,7 @@ def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
     dydf_rds_read = DynamicFrame.fromDF(df_rds_read, glueContext, "final_spark_df")
     dynamic_df_write.writeFrame(dydf_rds_read)
 
-    LOGGER.info(f"""{db_sch_tbl} table data written to -> {s3_table_folder_path}/""")
+    LOGGER.info(f"""'{db_sch_tbl}' table data written to -> {s3_table_folder_path}/""")
 
     # ddl_refresh_table_partitions = f"msck repair table {catalog_db.lower()}.{catalog_db_tbl.lower()}"
     # LOGGER.info(f"""ddl_refresh_table_partitions:> \n{ddl_refresh_table_partitions}""")
@@ -829,8 +829,8 @@ if __name__ == "__main__":
 
     df_rds_read = df_rds_read.cache()
 
-    # NOTE: When filtered rows (ex: based on 'year') are run in separate consecutive batches, 
-    #       consider to appropriately use the features in built in the below dataframe-write-parquet functions.
+    # NOTE: When filtered rows (ex: based on 'year') are used in separate consecutive batch runs, 
+    # consider to appropriately use the parquet write functions with features in built as per the below details.
     # - write_rds_df_to_s3_parquet: Overwrites the existing partitions by default.
     # - write_rds_df_to_s3_parquet_v2: Adds the new partitions and also the corresponding partitions are updated in athena tables.
 
