@@ -2,13 +2,6 @@ locals {
 
   baseline_presets_test = {
     options = {
-      # sns_topics = {
-      #   pagerduty_integrations = {
-      #     dso_pagerduty               = "oasys_nonprod_alarms"
-      #     dba_pagerduty               = "hmpps_shef_dba_non_prod" 
-      #     dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
-      #   }
-      # }
     }
   }
 
@@ -67,94 +60,91 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      t2-test-web-asg = merge(local.defaults_web_ec2, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      t2-test-web-asg = merge(local.ec2_autoscaling_groups.boe_web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.boe_web.autoscaling_group, {
           desired_capacity = 0
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        availability_zone     = "eu-west-2a"
-        config = merge(local.defaults_web_ec2.config, {
-          instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
+        config = merge(local.ec2_autoscaling_groups.boe_web.config, {
+          ami_owner = "self"
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.boe_web.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
         })
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_autoscaling_groups.boe_web.instance, {
           instance_type = "m4.large"
         })
-        tags = merge(local.defaults_web_ec2.tags, {
+        tags = merge(local.ec2_autoscaling_groups.boe_web.tags, {
           oasys-national-reporting-environment = "t2"
         })
       })
 
       # IMPORTANT: this is just for testing at the moment
-      t2-rhel6-web-asg = merge(local.defaults_web_ec2, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      t2-rhel6-web-asg = merge(local.ec2_autoscaling_groups.boe_web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.boe_web.autoscaling_group, {
           desired_capacity = 0
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        config = merge(local.defaults_web_ec2.config, {
+        config = merge(local.ec2_autoscaling_groups.boe_web.config, {
           ami_name          = "base_rhel_6_10_*"
-          ami_owner         = "374269020027"
           availability_zone = "eu-west-2a"
-          instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
+          instance_profile_policies = setunion(local.ec2_autoscaling_groups.boe_web.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
         })
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_autoscaling_groups.boe_web.instance, {
           instance_type                = "m4.large"
           metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
         })
-        tags = merge(local.defaults_web_ec2.tags, {
+        tags = merge(local.ec2_autoscaling_groups.boe_web.tags, {
           ami                                  = "base_rhel_6_10"
           oasys-national-reporting-environment = "t2"
         })
       })
 
       # TODO: this is just for testing, remove when not needed
-      t2-test-boe-asg = merge(local.defaults_boe_ec2, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      t2-test-boe-asg = merge(local.ec2_autoscaling_groups.boe_app, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.boe_app.autoscaling_group, {
           desired_capacity = 0
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        config = merge(local.defaults_boe_ec2.config, {
+        config = merge(local.ec2_autoscaling_groups.boe_app.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = setunion(local.defaults_boe_ec2.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.boe_app.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
         })
-        instance = merge(local.defaults_boe_ec2.instance, {
+        instance = merge(local.ec2_autoscaling_groups.boe_app.instance, {
           instance_type = "m4.xlarge"
         })
-        tags = merge(local.defaults_boe_ec2.tags, {
+        tags = merge(local.ec2_autoscaling_groups.boe_app.tags, {
           oasys-national-reporting-environment = "t2"
         })
       })
 
-      test-bods-asg = merge(local.defaults_bods_ec2, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      test-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
           desired_capacity = 0
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        config = merge(local.defaults_bods_ec2.config, {
+        config = merge(local.ec2_autoscaling_groups.bods.config, {
+          ami_owner         = "self"
           availability_zone = "eu-west-2a"
         })
-        instance = merge(local.defaults_bods_ec2.instance, {
+        instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
         })
       })
     }
 
     ec2_instances = {
-      t2-onr-bods-1-a = merge(local.defaults_bods_ec2, {
-        config = merge(local.defaults_bods_ec2.config, {
+      t2-onr-bods-1-a = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
           ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z" # fixed to a specific version
+          ami_owner         = "self"
           availability_zone = "eu-west-2a"
         })
-        instance = merge(local.defaults_bods_ec2.instance, {
+        instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
         # volumes are a direct copy of BODS in NCR
-        ebs_volumes = merge(local.defaults_bods_ec2.ebs_volumes, {
+        ebs_volumes = merge(local.ec2_instances.bods.ebs_volumes, {
           "/dev/sda1" = { type = "gp3", size = 100 }
           "/dev/sdb"  = { type = "gp3", size = 100 }
           "/dev/sdc"  = { type = "gp3", size = 100 }
@@ -162,42 +152,41 @@ locals {
         })
       })
 
-      t2-onr-boe-1-a = merge(local.defaults_boe_ec2, {
-        config = merge(local.defaults_boe_ec2.config, {
+      t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
+        config = merge(local.ec2_instances.boe_app.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = setunion(local.defaults_boe_ec2.config.instance_profile_policies, [
+          instance_profile_policies = setunion(local.ec2_instances.boe_app.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
         })
-        instance = merge(local.defaults_boe_ec2.instance, {
+        instance = merge(local.ec2_instances.boe_app.instance, {
           instance_type = "m4.xlarge"
         })
-        tags = merge(local.defaults_boe_ec2.tags, {
+        tags = merge(local.ec2_instances.boe_app.tags, {
           oasys-national-reporting-environment = "t2"
         })
       })
 
       # NOTE: currently using a Rhel 6 instance for onr-web instances, not Rhel 7 & independent Tomcat install
-      t2-onr-web-1-a = merge(local.defaults_web_ec2, {
-        config = merge(local.defaults_web_ec2.config, {
+      t2-onr-web-1-a = merge(local.ec2_instances.boe_web, {
+        config = merge(local.ec2_instances.boe_web.config, {
           ami_name          = "base_rhel_6_10_*"
-          ami_owner         = "374269020027"
           availability_zone = "eu-west-2a"
-          instance_profile_policies = setunion(local.defaults_web_ec2.config.instance_profile_policies, [
+          instance_profile_policies = setunion(local.ec2_instances.boe_web.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
         })
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_instances.boe_web.instance, {
           instance_type                = "m4.large"
           metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
         })
-        tags = merge(local.defaults_web_ec2.tags, {
+        tags = merge(local.ec2_instances.boe_web.tags, {
           ami                                  = "base_rhel_6_10"
           oasys-national-reporting-environment = "t2"
         })
       })
-      t2-onr-client-a = merge(local.jumpserver_ec2, {
-        config = merge(local.jumpserver_ec2.config, {
+      t2-onr-client-a = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
           ami_name = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
         })
       })
@@ -333,11 +322,11 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/ec2/onr-bods/t2"         = local.bods_secretsmanager_secrets
-      "/ec2/onr-boe/t2"          = local.boe_secretsmanager_secrets
-      "/ec2/onr-web/t2"          = local.web_secretsmanager_secrets
-      "/oracle/database/T2BOSYS" = local.database_secretsmanager_secrets
-      "/oracle/database/T2BOAUD" = local.database_secretsmanager_secrets
+      "/ec2/onr-bods/t2"         = local.secretsmanager_secrets.bods
+      "/ec2/onr-boe/t2"          = local.secretsmanager_secrets.boe_app
+      "/ec2/onr-web/t2"          = local.secretsmanager_secrets.boe_web
+      "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
+      "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
     }
   }
 }

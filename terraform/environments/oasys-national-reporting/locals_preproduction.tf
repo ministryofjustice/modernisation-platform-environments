@@ -15,16 +15,17 @@ locals {
   baseline_preproduction = {
 
     ec2_instances = {
-      pp-onr-bods-1-a = merge(local.defaults_bods_ec2, {
-        config = merge(local.defaults_bods_ec2.config, {
+      pp-onr-bods-1-a = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
           ami_name          = "hmpps_windows_server_2019_release_2024-07-02T00-00-37.755Z"
+          ami_owner         = "self"
           availability_zone = "eu-west-2a"
         })
-        instance = merge(local.defaults_bods_ec2.instance, {
+        instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m6i.2xlarge"
         })
         # volumes are a direct copy of BODS in NCR
-        ebs_volumes = merge(local.defaults_bods_ec2.ebs_volumes, {
+        ebs_volumes = merge(local.ec2_instances.bods.ebs_volumes, {
           "/dev/sda1" = { type = "gp3", size = 100 }
           "/dev/sdb"  = { type = "gp3", size = 100 }
           "/dev/sdc"  = { type = "gp3", size = 100 }

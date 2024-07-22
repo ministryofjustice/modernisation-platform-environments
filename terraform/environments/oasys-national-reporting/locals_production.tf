@@ -2,13 +2,6 @@ locals {
 
   baseline_presets_production = {
     options = {
-      # sns_topics = {
-      #   pagerduty_integrations = {
-      #     dso_pagerduty               = "oasys_alarms"
-      #     dba_pagerduty               = "hmpps_shef_dba_low_priority"
-      #     dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
-      #   }
-      # }      
     }
   }
 
