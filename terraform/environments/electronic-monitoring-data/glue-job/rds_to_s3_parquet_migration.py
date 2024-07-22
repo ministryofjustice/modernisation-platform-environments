@@ -57,6 +57,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "dv_parquet_output_s3_bucket",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
+                       "default_jdbc_read_partition_num",
                        "jdbc_read_256mb_partitions",
                        "jdbc_read_512mb_partitions",
                        "jdbc_read_1gb_partitions",
@@ -66,23 +67,22 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_schema",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
-                       "rds_table_total_size_mb",
-                       "rds_table_total_rows",
                        "rds_df_repartition_num",
                        "year_partition_bool",
                        "month_partition_bool",
                        "day_partition_bool",
                        "validation_only_run",
-                       "rds_query_where_clause",
-                       "default_jdbc_read_partition_num"
+                       "validation_sample_fraction_float",
+                       "validation_sample_df_repartition_num",
                        ]
 
 OPTIONAL_INPUTS = [
     "date_partition_column_name",
     "other_partitionby_columns",
-    "validation_sample_fraction_float",
-    "validation_sample_df_repartition_num",
-    "rename_migrated_prq_tbl_folder"
+    "rename_migrated_prq_tbl_folder",
+    "rds_table_total_size_mb",
+    "rds_table_total_rows",
+    "rds_query_where_clause"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
