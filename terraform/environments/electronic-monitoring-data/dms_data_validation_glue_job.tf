@@ -219,7 +219,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
   glue_version      = "4.0"
-  worker_type       = "G.2X"
+  worker_type       = "G.1X"
   number_of_workers = 5
   default_arguments = {
     "--script_bucket_name"                   = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
@@ -228,8 +228,9 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--rds_sqlserver_db"                     = ""
     "--rds_sqlserver_db_schema"              = "dbo"
     "--rds_sqlserver_db_table"               = ""
+    "--rds_query_where_clause"               = ""
     "--rds_db_tbl_pkeys_col_list"            = ""
-    "--rds_table_total_size_mb"              = ""
+    "--rds_table_total_size_mb"              = 0
     "--rds_table_total_rows"                 = ""
     "--rds_df_repartition_num"               = 0
     "--date_partition_column_name"           = ""
@@ -240,6 +241,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--jdbc_read_512mb_partitions"           = "false"
     "--jdbc_read_1gb_partitions"             = "false"
     "--jdbc_read_2gb_partitions"             = "false"
+    "--default_jdbc_read_partition_num"      = 1
     "--rename_migrated_prq_tbl_folder"       = ""
     "--year_partition_bool"                  = "false"
     "--month_partition_bool"                 = "false"
