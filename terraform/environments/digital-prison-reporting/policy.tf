@@ -834,3 +834,11 @@ resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
   role   = aws_iam_role.analytical_platform_share_role[each.key].name
   policy = data.aws_iam_policy_document.analytical_platform_share_policy[each.key].json
 }
+
+# ref: https://docs.aws.amazon.com/lake-formation/latest/dg/cross-account-prereqs.html
+resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_attachment" {
+  for_each = local.analytical_platform_share
+
+  role       = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
+}
