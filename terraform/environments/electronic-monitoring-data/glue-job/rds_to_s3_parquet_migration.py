@@ -68,6 +68,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkeys_col_list",
                        "rds_df_repartition_num",
+                       "rds_table_total_size_mb",
                        "year_partition_bool",
                        "month_partition_bool",
                        "day_partition_bool",
@@ -80,7 +81,6 @@ OPTIONAL_INPUTS = [
     "date_partition_column_name",
     "other_partitionby_columns",
     "rename_migrated_prq_tbl_folder",
-    "rds_table_total_size_mb",
     "rds_table_total_rows",
     "rds_query_where_clause"
 ]
@@ -700,23 +700,6 @@ if __name__ == "__main__":
         sys.exit(1)
     # -------------------------------------------------------
 
-    if args.get("jdbc_read_256mb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/256)
-    elif args.get("jdbc_read_512mb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/512)
-    elif args.get("jdbc_read_1gb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/1024)
-    elif args.get("jdbc_read_2gb_partitions", "false") == "true":
-        jdbc_read_partitions_num = int(int(int(args['rds_table_total_size_mb'])/1024)/2)
-    else:
-        jdbc_read_partitions_num = int(args['default_jdbc_read_partition_num'])
-    # ------------------------------
-
-    jdbc_read_partitions_num = 1 if jdbc_read_partitions_num <= 0 \
-                                    else jdbc_read_partitions_num
-
-    LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
-
     rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df()
 
     df_rds_dtype_dict = get_dtypes_dict(rds_db_table_empty_df)
@@ -747,6 +730,22 @@ if __name__ == "__main__":
         LOGGER.error(f"""PrimaryKey column(s) are more than one (OR) not an integer datatype column!""")
         sys.exit(1)
     # -------------
+
+    if args['rds_table_total_size_mb'] != 0:
+        if args.get("jdbc_read_256mb_partitions", "false") == "true":
+            jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/256)
+        elif args.get("jdbc_read_512mb_partitions", "false") == "true":
+            jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/512)
+        elif args.get("jdbc_read_1gb_partitions", "false") == "true":
+            jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/1024)
+        elif args.get("jdbc_read_2gb_partitions", "false") == "true":
+            jdbc_read_partitions_num = int(int(int(args['rds_table_total_size_mb'])/1024)/2)
+    else:
+        jdbc_read_partitions_num = int(args['default_jdbc_read_partition_num'])
+    # ------------------------------
+
+    jdbc_read_partitions_num = 1 if jdbc_read_partitions_num <= 0 else jdbc_read_partitions_num
+    LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
 
     if jdbc_read_partitions_num == 1:
         df_rds_read = rds_jdbc_conn_obj.get_rds_dataframe()

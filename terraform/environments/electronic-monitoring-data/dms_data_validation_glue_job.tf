@@ -230,7 +230,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--rds_sqlserver_db_table"               = ""
     "--rds_query_where_clause"               = ""
     "--rds_db_tbl_pkeys_col_list"            = ""
-    "--rds_table_total_size_mb"              = ""
+    "--rds_table_total_size_mb"              = 0
     "--rds_table_total_rows"                 = ""
     "--rds_df_repartition_num"               = 0
     "--date_partition_column_name"           = ""
