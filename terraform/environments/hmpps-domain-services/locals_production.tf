@@ -24,6 +24,7 @@ locals {
           "hmpps-az-gw1.justice.gov.uk",
           "*.hmpps-az-gw1.justice.gov.uk",
           "*.planetfm.service.justice.gov.uk",
+          "cafmtx.az.justice.gov.uk",
         ]
         tags = {
           description = "wildcard cert for hmpps domain load balancer"
