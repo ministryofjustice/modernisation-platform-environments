@@ -1,6 +1,4 @@
 locals {
-  rds_url            = aws_db_instance.rdsdb.address
-  app_load_balancer  = aws_lb.tribunals_lb
   rds_user           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
   rds_port           = "1433"
   rds_password       = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
@@ -21,14 +19,14 @@ module "appeals" {
   app_db_name                  = "ossc"
   app_db_login_name            = "ossc-app"
   app_source_db_name           = "Ossc"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -50,6 +48,7 @@ module "appeals" {
   target_group_attachment_port = var.services["appeals"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "ahmlr" {
@@ -62,14 +61,14 @@ module "ahmlr" {
   app_db_name                  = "hmlands"
   app_db_login_name            = "hmlands-app"
   app_source_db_name           = "hmlands"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -91,6 +90,7 @@ module "ahmlr" {
   target_group_attachment_port = var.services["ahmlr"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "care_standards" {
@@ -103,14 +103,14 @@ module "care_standards" {
   app_db_name                  = "carestandards"
   app_db_login_name            = "carestandards-app"
   app_source_db_name           = "carestandards"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -132,6 +132,7 @@ module "care_standards" {
   target_group_attachment_port = var.services["care_standards"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "cicap" {
@@ -144,11 +145,11 @@ module "cicap" {
   app_db_name                  = "cicap"
   app_db_login_name            = "cicap-app"
   app_source_db_name           = "cicap"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -173,6 +174,7 @@ module "cicap" {
   target_group_attachment_port = var.services["cicap"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "employment_appeals" {
@@ -185,11 +187,11 @@ module "employment_appeals" {
   app_db_name                  = "eat"
   app_db_login_name            = "eat-app"
   app_source_db_name           = "eat"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -214,6 +216,7 @@ module "employment_appeals" {
   target_group_attachment_port = var.services["employment_appeals"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "finance_and_tax" {
@@ -226,11 +229,11 @@ module "finance_and_tax" {
   app_db_name                  = "ftt"
   app_db_login_name            = "ftt-app"
   app_source_db_name           = "ftt"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -255,6 +258,7 @@ module "finance_and_tax" {
   target_group_attachment_port = var.services["finance_and_tax"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "immigration_services" {
@@ -267,11 +271,11 @@ module "immigration_services" {
   app_db_name                  = "imset"
   app_db_login_name            = "imset-app"
   app_source_db_name           = "imset"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -296,6 +300,7 @@ module "immigration_services" {
   target_group_attachment_port = var.services["immigration_services"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "information_tribunal" {
@@ -308,11 +313,11 @@ module "information_tribunal" {
   app_db_name                  = "it"
   app_db_login_name            = "it-app"
   app_source_db_name           = "it"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -337,6 +342,7 @@ module "information_tribunal" {
   target_group_attachment_port = var.services["information_tribunal"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "lands_tribunal" {
@@ -349,11 +355,11 @@ module "lands_tribunal" {
   app_db_name                  = "lands"
   app_db_login_name            = "lands-app"
   app_source_db_name           = "lands"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -378,6 +384,7 @@ module "lands_tribunal" {
   target_group_attachment_port = var.services["lands_tribunal"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "transport" {
@@ -390,11 +397,11 @@ module "transport" {
   app_db_name                  = "transport"
   app_db_login_name            = "transport-app"
   app_source_db_name           = "Transport"
-  app_rds_url                  = local.rds_url
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = local.app_load_balancer
+  app_load_balancer            = aws_lb.tribunals_lb
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -419,6 +426,7 @@ module "transport" {
   target_group_attachment_port = var.services["transport"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
 }
 
 module "charity_tribunal_decisions" {
@@ -446,7 +454,7 @@ module "charity_tribunal_decisions" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["charity_tribunal_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["charity_tribunal_decisions"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -476,7 +484,7 @@ module "claims_management_decisions" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["claims_management_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["claims_management_decisions"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -506,7 +514,7 @@ module "consumer_credit_appeals" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["consumer_credit_appeals"].port
   target_group_attachment_port_sftp = var.sftp_services["consumer_credit_appeals"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -536,7 +544,7 @@ module "estate_agent_appeals" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["estate_agent_appeals"].port
   target_group_attachment_port_sftp = var.sftp_services["estate_agent_appeals"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -566,7 +574,7 @@ module "primary_health_lists" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["primary_health_lists"].port
   target_group_attachment_port_sftp = var.sftp_services["primary_health_lists"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -596,7 +604,7 @@ module "siac" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["siac"].port
   target_group_attachment_port_sftp = var.sftp_services["siac"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -626,7 +634,7 @@ module "sscs_venue_pages" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["sscs_venue_pages"].port
   target_group_attachment_port_sftp = var.sftp_services["sscs_venue_pages"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -656,7 +664,7 @@ module "tax_chancery_decisions" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["tax_chancery_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["tax_chancery_decisions"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -686,7 +694,7 @@ module "tax_tribunal_decisions" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["tax_tribunal_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["tax_tribunal_decisions"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -716,7 +724,7 @@ module "ftp_admin_appeals" {
   waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["ftp_admin_appeals"].port
   target_group_attachment_port_sftp = var.sftp_services["ftp_admin_appeals"].sftp_port
-  app_load_balancer                 = local.app_load_balancer
+  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }

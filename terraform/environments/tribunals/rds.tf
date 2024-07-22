@@ -13,10 +13,10 @@ resource "aws_db_instance" "rdsdb" {
   skip_final_snapshot = true
 
   license_model       = "license-included"
-  publicly_accessible = true
+  publicly_accessible = false
 
   multi_az               = false
-  db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
+  db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.sqlserver_db_sc.id]
 
   tags = {
@@ -24,30 +24,15 @@ resource "aws_db_instance" "rdsdb" {
   }
 }
 
-resource "aws_db_subnet_group" "dbsubnetgroup" {
+resource "aws_db_subnet_group" "db_subnet_group" {
   name       = "dbsubnetgroup"
-  subnet_ids = data.aws_subnets.shared-public.ids
+  subnet_ids = data.aws_subnets.shared-private.ids
 }
 
 resource "aws_security_group" "sqlserver_db_sc" {
   name        = "sqlserver_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    description = "Allows Mateusz to access RDS"
-    cidr_blocks = ["82.1.119.170/32"]
-  }
-  ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    description = "Allows Matt to access RDS"
-    cidr_blocks = ["109.154.193.219/32"]
-  }
   ingress {
     from_port   = 1433
     to_port     = 1433

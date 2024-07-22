@@ -151,54 +151,74 @@ variable "services" {
 variable "web_app_services" {
   default = {
     "appeals" = {
-      name_prefix = "administrativeappeals"
-      module_key  = "appeals"
-      port        = 49100
+      name_prefix        = "administrativeappeals"
+      module_key         = "appeals"
+      port               = 49100
+      app_db_name        = "ossc"
+      sql_migration_path = "/scripts/administrative_appeals"
     },
     "ahmlr" = {
-      name_prefix = "landregistrationdivision"
-      module_key  = "ahmlr"
-      port        = 49101
+      name_prefix        = "landregistrationdivision"
+      module_key         = "ahmlr"
+      port               = 49101
+      app_db_name        = "hmlands"
+      sql_migration_path = "/scripts/ahmlr"
     }
     "care_standards" = {
-      name_prefix = "carestandards"
-      module_key  = "care_standards"
-      port        = 49102
+      name_prefix        = "carestandards"
+      module_key         = "care_standards"
+      port               = 49102
+      app_db_name        = "carestandards"
+      sql_migration_path = "/scripts/care_standards"
     },
     "cicap" = {
-      name_prefix = "cicap"
-      module_key  = "cicap"
-      port        = 49103
+      name_prefix        = "cicap"
+      module_key         = "cicap"
+      port               = 49103
+      app_db_name        = "cicap"
+      sql_migration_path = "/scripts/cicap"
     },
     "employment_appeals" = {
-      name_prefix = "employmentappeals"
-      module_key  = "employment_appeals"
-      port        = 49104
+      name_prefix        = "employmentappeals"
+      module_key         = "employment_appeals"
+      port               = 49104
+      app_db_name        = "eat"
+      sql_migration_path = "/scripts/employment_appeals"
     },
     "finance_and_tax" = {
-      name_prefix = "financeandtax"
-      module_key  = "finance_and_tax"
-      port        = 49105
+      name_prefix        = "financeandtax"
+      module_key         = "finance_and_tax"
+      port               = 49105
+      app_db_name        = "ftt"
+      sql_migration_path = "/scripts/finance_and_tax"
     },
     "immigration_services" = {
-      name_prefix = "immigrationservices"
-      module_key  = "immigration_services"
-      port        = 49106
+      name_prefix        = "immigrationservices"
+      module_key         = "immigration_services"
+      port               = 49106
+      app_db_name        = "imset"
+      sql_migration_path = "/scripts/immigration_services"
     },
     "information_tribunal" = {
-      name_prefix = "informationrights"
-      module_key  = "information_tribunal"
-      port        = 49107
+      name_prefix        = "informationrights"
+      module_key         = "information_tribunal"
+      port               = 49107
+      app_db_name        = "it"
+      sql_migration_path = "/scripts/information_tribunal"
     },
     "lands_tribunal" = {
-      name_prefix = "landschamber"
-      module_key  = "lands_tribunal"
-      port        = 49108
+      name_prefix        = "landschamber"
+      module_key         = "lands_tribunal"
+      port               = 49108
+      app_db_name        = "lands"
+      sql_migration_path = "/scripts/lands_chamber"
     },
     "transport" = {
-      name_prefix = "transportappeals"
-      module_key  = "transport"
-      port        = 49109
+      name_prefix        = "transportappeals"
+      module_key         = "transport"
+      port               = 49109
+      app_db_name        = "transport"
+      sql_migration_path = "/scripts/transport"
     }
   }
 }
