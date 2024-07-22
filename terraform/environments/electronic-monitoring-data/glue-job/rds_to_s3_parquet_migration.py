@@ -731,15 +731,16 @@ if __name__ == "__main__":
         sys.exit(1)
     # -------------
 
-    if args['rds_table_total_size_mb'] != 0:
+    rds_table_total_size_mb = int(args['rds_table_total_size_mb'])
+    if rds_table_total_size_mb != 0:
         if args.get("jdbc_read_256mb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/256)
+            jdbc_read_partitions_num = int(rds_table_total_size_mb/256)
         elif args.get("jdbc_read_512mb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/512)
+            jdbc_read_partitions_num = int(rds_table_total_size_mb/512)
         elif args.get("jdbc_read_1gb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(int(args['rds_table_total_size_mb'])/1024)
+            jdbc_read_partitions_num = int(rds_table_total_size_mb/1024)
         elif args.get("jdbc_read_2gb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(int(int(args['rds_table_total_size_mb'])/1024)/2)
+            jdbc_read_partitions_num = int(int(rds_table_total_size_mb/1024)/2)
     else:
         jdbc_read_partitions_num = int(args['default_jdbc_read_partition_num'])
     # ------------------------------
