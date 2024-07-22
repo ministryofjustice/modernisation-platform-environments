@@ -485,7 +485,7 @@ resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zi
 # ------------------------------------------
 
 resource "aws_iam_role" "load_json_table" {
-  name               = "load_json_table"
+  name                = "load_json_table"
   assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
@@ -502,15 +502,15 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
     ]
     resources = [
       "${module.json-directory-structure-bucket.bucket.arn}/*",
-        module.json-directory-structure-bucket.bucket.arn,
-       "${module.athena-s3-bucket.bucket.arn}/*",
-       module.athena-s3-bucket.bucket.arn,
-       module.metadata-s3-bucket.bucket.arn,
-       "${module.metadata-s3-bucket.bucket.arn}/*",
-     ]
+      module.json-directory-structure-bucket.bucket.arn,
+      "${module.athena-s3-bucket.bucket.arn}/*",
+      module.athena-s3-bucket.bucket.arn,
+      module.metadata-s3-bucket.bucket.arn,
+      "${module.metadata-s3-bucket.bucket.arn}/*",
+    ]
   }
   statement {
-    sid   = "AthenaPermissionsForLoadingJsonTable"
+    sid    = "AthenaPermissionsForLoadingJsonTable"
     effect = "Allow"
     actions = [
       "athena:StartQueryExecution",
@@ -521,7 +521,7 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
     resources = ["*"]
   }
   statement {
-    sid  = "GluePermissionsForLoadingJsonTable"
+    sid    = "GluePermissionsForLoadingJsonTable"
     effect = "Allow"
     actions = [
       "glue:GetTable",
@@ -535,8 +535,8 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
     ]
     resources = ["*"]
   }
-    statement {
-    sid  = "SecretGetSlackKey"
+  statement {
+    sid    = "SecretGetSlackKey"
     effect = "Allow"
     actions = [
       "secretsmanager:GetSecretValue",

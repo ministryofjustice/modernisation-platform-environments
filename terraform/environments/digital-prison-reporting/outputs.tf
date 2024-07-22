@@ -140,7 +140,7 @@ output "cluster_nodes" {
 output "ec2_private_key" {
   description = "Ec2 Private Key"
   value       = module.ec2_kinesis_agent.private_key
-  sensitive = true 
+  sensitive   = true
 }
 
 # DMS Subnet ids

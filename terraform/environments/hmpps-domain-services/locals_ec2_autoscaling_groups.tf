@@ -69,7 +69,7 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
-        subnet_name                   = "private"
+        subnet_name = "private"
         user_data_raw = base64encode(templatefile(
           "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
             branch = "main"
