@@ -48,14 +48,14 @@ EOF
 ######################################
 
 resource "aws_instance" "smtp" {
-  ami                         = local.application_data.accounts[local.environment].smtp_ami_id
-  availability_zone           = "eu-west-2a"
-  instance_type               = local.application_data.accounts[local.environment].smtp_instance_type
-  monitoring                  = true
-  vpc_security_group_ids      = [aws_security_group.smtp.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.smtp.id
-#   key_name                    = aws_key_pair.cwa.key_name
+  ami                    = local.application_data.accounts[local.environment].smtp_ami_id
+  availability_zone      = "eu-west-2a"
+  instance_type          = local.application_data.accounts[local.environment].smtp_instance_type
+  monitoring             = true
+  vpc_security_group_ids = [aws_security_group.smtp.id]
+  subnet_id              = data.aws_subnet.data_subnets_a.id
+  iam_instance_profile   = aws_iam_instance_profile.smtp.id
+  #   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.smtp_userdata)
   user_data_replace_on_change = true
   metadata_options {
@@ -92,11 +92,11 @@ resource "aws_vpc_security_group_egress_rule" "smtp_outbound" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "smtp_vpc" {
-  security_group_id            = aws_security_group.smtp.id
-  description                  = "SMTP access"
-  cidr_ipv4                    = data.aws_vpc.shared.cidr_block
-  from_port                    = 25
-  ip_protocol                  = "tcp"
-  to_port                      = 25
+  security_group_id = aws_security_group.smtp.id
+  description       = "SMTP access"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 25
+  ip_protocol       = "tcp"
+  to_port           = 25
 }
 

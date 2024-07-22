@@ -87,7 +87,7 @@ locals {
 
       pp-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
-          availability_zone         = "eu-west-2a"
+          availability_zone = "eu-west-2a"
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description = "Remote Desktop Services for azure.hmpp.root domain"
