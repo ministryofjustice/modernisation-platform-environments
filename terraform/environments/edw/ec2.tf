@@ -1,12 +1,11 @@
 locals {
-  db_userdata = <<EOF
+  db_userdata = <<-EOF
 #!/bin/bash
 
 # Disable requiretty
 sed -i 's/^\(Defaults\s*requiretty\)/#\1/' /etc/sudoers
 
-echo "Hello, World!" > /home/ec2-user/hello.txt
-
+# Redirect all output to a log file and enable debugging
 exec > /var/log/userdata.log 2>&1
 set -x
 
@@ -16,7 +15,7 @@ set -x
 echo "---install missing package and hostname change"
 sudo yum -y install libXp.i386
 sudo yum -y install sshpass
-echo "HOSTNAME="${local.application_name}"."${local.application_data.accounts[local.environment].edw_dns_extension}"" >> /etc/sysconfig/network
+echo "HOSTNAME=${local.application_name}.${local.application_data.accounts[local.environment].edw_dns_extension}" >> /etc/sysconfig/network
 
 #### configure aws timesync (external ntp source)
 echo "---configure aws timesync (external ntp source)"
@@ -26,7 +25,7 @@ AwsTimeSync(){
 
     NtpD(){
         local CONF=/etc/ntp.conf
-        sed -i 's/server \S/#server \S/g' $CONF && \
+        sed -i 's/server \\S/#server \\S/g' $CONF && \
         sed -i "20i\server $SOURCE prefer iburst" $CONF
         /etc/init.d/ntpd status >/dev/null 2>&1 \
             && /etc/init.d/ntpd restart || /etc/init.d/ntpd start
@@ -34,7 +33,7 @@ AwsTimeSync(){
     }
     ChronyD(){
         local CONF=/etc/chrony.conf
-        sed -i 's/server \S/#server \S/g' $CONF && \
+        sed -i 's/server \\S/#server \\S/g' $CONF && \
         sed -i "7i\server $SOURCE prefer iburst" $CONF
         systemctl status chronyd >/dev/null 2>&1 \
             && systemctl restart chronyd || systemctl start chronyd
@@ -51,7 +50,7 @@ AwsTimeSync(){
 }
 AwsTimeSync $(cat /etc/redhat-release | cut -d. -f1 | awk '{print $NF}')
 
-####Install AWS cli
+#### Install AWS cli
 echo "---Install AWS cli"
 sudo yum remove awscli
 sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -64,36 +63,40 @@ export LOGS="${local.application_name}-EC2"
 export APPNAME="${local.application_name}"
 export ENV="${local.application_data.accounts[local.environment].edw_environment}"
 export BACKUPBUCKET="${local.application_data.accounts[local.environment].edw_s3_backup_bucket}"
-export SECRET=`/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id $${terraform output -raw edw_db_secret} --query SecretString --output text`
+export SECRET=$(/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id $(terraform output -raw edw_db_secret) --query SecretString --output text)
 export host="$ip4 $APPNAME-$ENV $APPNAME.${local.application_data.accounts[local.environment].edw_dns_extension}"
 export host2="${local.application_data.accounts[local.environment].edw_cis_ip} cis.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
 export host3="${local.application_data.accounts[local.environment].edw_eric_ip} eric.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
-export host3="${local.application_data.accounts[local.environment].edw_ccms_ip} ccms.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
+export host4="${local.application_data.accounts[local.environment].edw_ccms_ip} ccms.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
 echo $host >>/etc/hosts
 echo $host2 >>/etc/hosts
 echo $host3 >>/etc/hosts
+echo $host4 >>/etc/hosts
 mkdir -p /home/oracle/scripts
 
 # Disable firewall
 service iptables stop
 chkconfig iptables off
 
-
 # Set up log files
 echo "---creating /etc/awslogs/awscli.conf"
 mkdir -p /etc/awslogs
-cat > /etc/awslogs/awscli.conf <<-EOF
+cat > /etc/awslogs/awscli.conf <<-EOC1
 [plugins]
 cwlogs = cwlogs
 [default]
 region = ${local.application_data.accounts[local.environment].edw_region}
 
+EOC1
+
 echo "---creating /tmp/cwlogs/logstreams.conf"
 mkdir -p /tmp/cwlogs
 
-cat > /tmp/cwlogs/logstreams.conf <<-EOF
+cat > /tmp/cwlogs/logstreams.conf <<-EOC2
+
 [general]
 state_file = /var/awslogs/agent-state
+
 [oracle_alert_log_errors]
 file = /oracle/software/product/10.2.0/admin/${local.application_name}/bdump/alert_${local.application_name}.log
 log_group_name = ${local.application_name}-OracleAlerts
@@ -109,24 +112,22 @@ file = /home/oracle/backup_logs/*_RMAN_disk_ARCH_*.log
 log_group_name = ${local.application_name}-RManArch
 log_stream_name = {instance_id}
 
-# adding logs for space report
 [db_tablespace_space_alerts]
 file = /home/oracle/scripts/logs/freespace_alert.log
 log_group_name = ${local.application_name}-TBSFreespace
 log_stream_name = {instance_id}
 
-# adding logs for pmon monitor
 [db_PMON_status_alerts]
 file = /home/oracle/scripts/logs/pmon_status_alert.log
 log_group_name = ${local.application_name}-PMONstatus
 log_stream_name = {instance_id}
 
-# adding logs for CDC monitor
 [db_CDC_status_alerts]
 file = /home/oracle/scripts/logs/cdc_check.log
 log_group_name = ${local.application_name}-CDCstatus
 log_stream_name = {instance_id}
 
+EOC2
 
 ##### METADATA #####
 
@@ -134,7 +135,7 @@ log_stream_name = {instance_id}
 
 echo "---Install_aws_logging"
 
-# Error handeling
+# Error handling
 error_exit()
 {
 echo "$1" 1>&2
@@ -167,7 +168,7 @@ echo "/dev/xvdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
 
 #Create oracle_home
 mkfs.ext4 /dev/xvdi
-mkdir -p /oracle/software
+mkdir --p /oracle/software
 echo "/dev/xvdi /oracle/software ext4 defaults 0 0" >> /etc/fstab
 
 #Create temp_undo
@@ -189,12 +190,6 @@ groupadd dba
 groupadd oinstall
 useradd -d /home/oracle -g dba oracle
 
-# Update limits / sysctl
-#cp -f /repo/databases/10.2/templates/limits.conf /etc/security/limits.conf
-#cp -f /repo/databases/10.2/templates/sysctl.conf /etc/sysctl.conf
-#sysctl -p
-
-
 #setup oracle user access
 echo "---setup oracle user access"
 cp -fr /home/ec2-user/.ssh /home/oracle/
@@ -209,8 +204,8 @@ unzip /repo/databases/10.2/installers/B24792-01_2of5.zip -d /stage/databases
 unzip /repo/databases/10.2/installers/B24792-01_3of5.zip -d /stage/databases
 unzip /repo/databases/10.2/installers/B24792-01_4of5.zip -d /stage/databases
 unzip /repo/databases/10.2/installers/B24792-01_5of5.zip -d /stage/databases
-# Unzip patch files
 
+# Unzip patch files
 unzip /repo/databases/10.2/patches/db-patchset10204/p6810189_10204_Linux-x86-64.zip -d /stage/patches/10204
 
 # Create directories and set ownership
@@ -632,6 +627,14 @@ resource "aws_security_group" "edw_db_security_group" {
     protocol    = "tcp"
     cidr_blocks = ["10.200.32.0/19"]
     description = "RDS Appstream access"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = -1
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "-"
   }
 }
 
