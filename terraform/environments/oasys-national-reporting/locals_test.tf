@@ -65,7 +65,6 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.boe_web.config, {
-          ami_owner = "self"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.boe_web.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
@@ -122,7 +121,6 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bods.config, {
-          ami_owner = "self"
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
@@ -133,8 +131,8 @@ locals {
     ec2_instances = {
       t2-onr-bods-1-a = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
-          ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z" # fixed to a specific version
-          ami_owner         = "self"
+          ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
+          ami_owner         = "self" # remove this if this is ever rebuilt, you can reference AMI direct from core-shared-services-production
           availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_instances.bods.instance, {

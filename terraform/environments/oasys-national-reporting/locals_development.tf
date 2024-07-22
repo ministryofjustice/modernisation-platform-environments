@@ -46,7 +46,6 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bods.config, {
-          ami_owner = "self"
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "t3.large"

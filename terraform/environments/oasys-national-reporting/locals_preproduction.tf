@@ -41,7 +41,7 @@ locals {
       pp-onr-bods-1-a = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
           ami_name          = "hmpps_windows_server_2019_release_2024-07-02T00-00-37.755Z"
-          ami_owner         = "self"
+          ami_owner         = "self" # remove this if this is ever rebuilt, you can reference AMI direct from core-shared-services-production
           availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_instances.bods.instance, {
