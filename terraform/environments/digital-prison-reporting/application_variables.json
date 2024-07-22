@@ -574,22 +574,24 @@
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
-      "analytical_platform_share": [{
-        "target_account_name": "analytical-platform-data-production",
-        "target_account_id": "593291632749",
-        "assume_account_name": "analytical-platform-management-production",
-        "assume_account_id": "042130406152",
-        "data_locations": [
-          "dpr-structured-historical-preproduction"
-        ],
-        "resource_shares": [{
-        "glue_database": "curated_prisons_history_preprod_dbt",
-        "glue_tables": [
-          "nomis_offender_course_attendances",
-          "nomis_offender_program_profiles"
-        ]
-      }]
-      }]
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-preproduction"],
+          "resource_shares": [
+            {
+              "glue_database": "curated_prisons_history_preprod_dbt",
+              "glue_tables": [
+                "nomis_offender_course_attendances",
+                "nomis_offender_program_profiles"
+              ]
+            }
+          ]
+        }
+      ]
     },
     "production": {
       "project_short_id": "dpr",

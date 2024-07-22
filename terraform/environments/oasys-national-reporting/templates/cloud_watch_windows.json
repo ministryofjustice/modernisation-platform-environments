@@ -111,10 +111,10 @@
             "num_threads",
             "pid_count",
             "pid",
-            "read_bytes",    
+            "read_bytes",
             "write_bytes"
           ]
-        },        
+        },
         {
           "exe": "SvcMgr",
           "measurement": [
@@ -124,10 +124,10 @@
             "num_threads",
             "pid_count",
             "pid",
-            "read_bytes",    
+            "read_bytes",
             "write_bytes"
           ]
-        }        
+        }
       ]
     },
     "append_dimensions": {

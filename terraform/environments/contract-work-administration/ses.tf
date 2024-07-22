@@ -2,7 +2,7 @@ resource "aws_sesv2_email_identity" "cwa" {
   email_identity         = local.environment == "production" ? "tbc" : data.aws_route53_zone.external.name
   configuration_set_name = local.environment == "production" ? aws_sesv2_configuration_set.cwa[0].configuration_set_name : null
   dkim_signing_attributes {
-    next_signing_key_length    = "RSA_1024_BIT"
+    next_signing_key_length = "RSA_1024_BIT"
   }
   tags = local.tags
 }
@@ -142,7 +142,7 @@ resource "aws_secretsmanager_secret" "smtp_sesrsa" {
 ## TODO Create Kinesis Data Firehose and IAM role for Production, then enable below to set event destination
 
 resource "aws_sesv2_configuration_set" "cwa" {
-  count    = contains(["production"], local.environment) ? 1 : 0
+  count                  = contains(["production"], local.environment) ? 1 : 0
   configuration_set_name = "${local.environment}-configuration-set"
 
   delivery_options {

@@ -47,7 +47,6 @@
       "smtp_instance_type": "t2.large",
       "old_mail_server_url": "mail.aws.dev.legalservices.gov.uk",
       "old_domain_name": "dev.legalservices.gov.uk"
-
     },
     "test": {
       "example_var": "test-data"

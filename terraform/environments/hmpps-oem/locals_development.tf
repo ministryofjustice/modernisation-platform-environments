@@ -33,7 +33,7 @@ locals {
             "EC2S3BucketWriteAndDeleteAccessPolicy",
             "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
           ]
-          subnet_name           = "private"
+          subnet_name = "private"
         }
         instance = {
           disable_api_termination      = false
