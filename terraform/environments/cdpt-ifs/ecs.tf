@@ -368,7 +368,7 @@ resource "aws_ecs_service" "ecs_service" {
   task_definition                   = data.aws_ecs_task_definition.latest_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
-  force_new_deployment = true
+  force_new_deployment              = true
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.ifs.name
     weight            = 1
@@ -546,9 +546,4 @@ resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
 resource "aws_iam_role_policy_attachment" "bastion_managed" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   role       = aws_iam_role.ec2_instance_role.name
-}
-
-output "ami_id" {
-  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-  sensitive = true
 }

@@ -14,30 +14,45 @@ locals {
   baseline_preproduction = {
 
     ec2_instances = {
-      pp-ndh-app-a = merge(local.ndh_app_a, {
-        config = merge(local.ndh_app_a.config, {
-          instance_profile_policies = concat(local.ndh_app_a.config.instance_profile_policies, [
+      pp-ndh-app-a = merge(local.ec2_instances.ndh_app, {
+        config = merge(local.ec2_instances.ndh_app.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.ndh_app.config.instance_profile_policies, [
             "Ec2ppPolicy",
           ])
         })
-        tags = merge(local.ndh_app_a.tags, {
+        instance = merge(local.ec2_instances.ndh_app.instance, {
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.ndh_app.tags, {
           nomis-data-hub-environment = "pp"
         })
       })
 
-      pp-ndh-ems-a = merge(local.ndh_ems_a, {
-        config = merge(local.ndh_ems_a.config, {
-          instance_profile_policies = concat(local.ndh_ems_a.config.instance_profile_policies, [
+      pp-ndh-ems-a = merge(local.ec2_instances.ndh_ems, {
+        config = merge(local.ec2_instances.ndh_ems.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.ndh_ems.config.instance_profile_policies, [
             "Ec2ppPolicy",
           ])
         })
-        tags = merge(local.ndh_ems_a.tags, {
+        instance = merge(local.ec2_instances.ndh_ems.instance, {
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.ndh_ems.tags, {
           nomis-data-hub-environment = "pp"
         })
       })
 
-      preprodution-management-server-2022 = merge(local.management_server_2022, {
-        tags = merge(local.management_server_2022.tags, {
+      preprodution-management-server-2022 = merge(local.ec2_instances.ndh_mgmt, {
+        config = merge(local.ec2_instances.ndh_mgmt.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2023-12-02T00-00-15.711Z"
+          availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.ndh_mgmt.instance, {
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.ndh_mgmt.tags, {
           nomis-data-hub-environment = "preprodution"
         })
       })
@@ -69,8 +84,9 @@ locals {
         ]
       }
     }
+
     secretsmanager_secrets = {
-      "/ndh/pp" = local.ndh_secretsmanager_secrets
+      "/ndh/pp" = local.secretsmanager_secrets.ndh
     }
   }
 }

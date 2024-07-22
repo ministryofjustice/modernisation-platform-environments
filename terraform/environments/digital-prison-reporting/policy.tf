@@ -41,6 +41,26 @@ data "aws_iam_policy_document" "glue-policy-data" {
       type        = "AWS"
     }
   }
+
+  statement {
+    # Required for cross-account sharing via LakeFormation if producer has existing Glue policy
+    # ref: https://docs.aws.amazon.com/lake-formation/latest/dg/hybrid-cross-account.html
+    effect = "Allow"
+
+    actions = [
+      "glue:ShareResource"
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ram.amazonaws.com"]
+    }
+    resources = [
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/*/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
+    ]
+  }
 }
 
 # Resuse for all S3 read Only
@@ -412,7 +432,7 @@ resource "aws_iam_role_policy" "dmsvpcpolicy" {
 EOF
 }
 
-### Iam User Role for AWS Redshift Spectrum, 
+### Iam User Role for AWS Redshift Spectrum,
 resource "aws_iam_role" "redshift-spectrum-role" {
   name = "${local.project}-redshift-spectrum-role"
 
@@ -538,7 +558,8 @@ data "aws_iam_policy_document" "redshift_dataapi" {
       "redshift-data:DescribeTable",
       "redshift-data:ListSchemas",
       "redshift-data:ListDatabases",
-      "redshift-data:ExecuteStatement"
+      "redshift-data:ExecuteStatement",
+      "redshift-data:BatchExecuteStatement"
     ]
     resources = [
       "arn:aws:redshift:${local.account_region}:${local.account_id}:cluster:*"
@@ -712,4 +733,112 @@ resource "aws_iam_policy" "glue_catalog_readonly" {
   name        = "${local.project}-glue-catalog-readonly"
   description = "Glue Catalog Readonly Policy"
   policy      = data.aws_iam_policy_document.glue_catalog_readonly.json
+}
+
+# Analytical Platform Share Policy & Role
+
+data "aws_iam_policy_document" "analytical_platform_share_policy" {
+  for_each = local.analytical_platform_share
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:RegisterResource",
+      "lakeformation:DeregisterResource",
+      "lakeformation:ListPermissions",
+      "lakeformation:DescribeResource",
+
+    ]
+    resources = [
+      "arn:aws:lakeformation:${local.current_account_region}:${local.current_account_id}:catalog:${local.current_account_id}"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:PutRolePolicy",
+      "iam:CreateServiceLinkedRole"
+    ]
+    resources = [
+      "arn:aws:iam::${local.current_account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"
+    ]
+  }
+  # Needed for LakeFormationAdmin to check the presense of the Lake Formation Service Role
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:GetRolePolicy",
+      "iam:GetRole"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ram:CreateResourceShare",
+      "ram:DeleteResourceShare"
+    ]
+    resources = [
+      "arn:aws:ram:${local.current_account_region}:${local.current_account_id}:resource-share/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetPartition"
+    ]
+    resources = flatten([
+      for resource in each.value.resource_shares : [
+        "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/${resource.glue_database}",
+        formatlist("arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/${resource.glue_database}/%s", resource.glue_tables),
+        "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
+      ]
+    ])
+  }
+}
+
+resource "aws_iam_role" "analytical_platform_share_role" {
+  for_each = local.analytical_platform_share
+
+  name = "${each.value.target_account_name}-share-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          # In case consumer has a central location for terraform state storage that isn't the target account.
+          AWS = "arn:aws:iam::${try(each.value.assume_account_id, each.value.target_account_id)}:root"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
+  for_each = local.analytical_platform_share
+
+  name   = "${each.value.target_account_name}-share-policy"
+  role   = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy = data.aws_iam_policy_document.analytical_platform_share_policy[each.key].json
+}
+
+# ref: https://docs.aws.amazon.com/lake-formation/latest/dg/cross-account-prereqs.html
+resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_attachment" {
+  for_each = local.analytical_platform_share
+
+  role       = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
 }

@@ -2,54 +2,83 @@ locals {
   cm_userdata = <<EOF
 #!/bin/bash
 
-### Temp install of AWS CLI - removed once actual AMI is used
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo yum install -y unzip
-unzip awscliv2.zip
-sudo ./aws/install
-##############
+echo "Setting host name"
+hostname ${local.cm_hostname}
+echo "${local.cm_hostname}" > /etc/hostname
+sed -i '/^HOSTNAME/d' /etc/sysconfig/network
+echo "HOSTNAME=${local.cm_hostname}" >> /etc/sysconfig/network
 
-### Temp command to use V2 of metadata to get userdata - removed once actual AMI is used
-TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
-PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
-##############
-
-hostnamectl set-hostname ${local.cm_hostname}
-
-# PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+echo "Getting IP Addresses for /etc/hosts"
+PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 APP1_IP=""
-DB_IP=""
+CM_IP=""
 
 while [ -z "$APP1_IP" ] || [ -z "$DB_IP" ]
 do
   sleep 5
-  APP1_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values="${local.appserver1_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
-  DB_IP=$(aws ec2 describe-instances --filter Name=tag:Name,Values="${local.database_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
+  APP1_IP=$(/usr/local/bin/aws ec2 describe-instances --filter Name=tag:Name,Values="${local.appserver1_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
+  DB_IP=$(/usr/local/bin/aws ec2 describe-instances --filter Name=tag:Name,Values="${local.database_ec2_name}" Name=instance-state-name,Values="pending","running" |grep PrivateIpAddress |head -1|sed "s/[\"PrivateIpAddress:,\"]//g" | awk '{$1=$1;print}')
 done
 
-sudo sed -i '/cwa-db$/d' /etc/hosts
-sudo sed -i '/cwa-app1$/d' /etc/hosts
-sudo sed -i '/cwa-app2$/d' /etc/hosts
-sudo bash -c "echo '$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}' >> /etc/hosts"
-sudo bash -c "echo '$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}' >> /etc/hosts"
-sudo bash -c "echo '$PRIVATE_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}' >> /etc/hosts"
+echo "Updating /etc/hosts"
+sed -i '/cwa-db$/d' /etc/hosts
+sed -i '/cwa-app1$/d' /etc/hosts
+sed -i '/cwa-app2$/d' /etc/hosts
+echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
+echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
+echo "$PRIVATE_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
 
 ## Mounting to EFS - uncomment when AMI has been applied
-# echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# mount -a
-# mount_status=$?
-# while [[ $mount_status != 0 ]]
-# do
-#   sleep 10
-#   mount -a
-#   mount_status=$?
-# done
+echo "Updating /etc/fstab"
+sed -i '/^fs-/d' /etc/fstab
+sed -i '/^s3fs/d' /etc/fstab
+echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
 
+## Update the send mail url
+echo "Updating the sendmail config"
+sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.cf
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.mc
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
+/etc/init.d/sendmail restart
 
+## Remove SSH key allowed
+echo "Removing old SSH key"
+sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
+sed -i '/development-general$/d' /root/.ssh/authorized_keys
+sed -i '/testimage$/d' /root/.ssh/authorized_keys
+
+## Add custom metric script
+echo "Adding the custom metrics script for CloudWatch"
+rm /var/cw-custom.sh
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/cm-cw-custom.sh /var/cw-custom.sh
+chmod 700 /var/cw-custom.sh
+#  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
 
 EOF
 
+}
+
+### Load custom metric script into an S3 bucket
+resource "aws_s3_object" "cm_custom_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "cm-cw-custom.sh"
+  source      = "./cm-cw-custom.sh"
+  source_hash = filemd5("./cm-cw-custom.sh")
+}
+
+resource "time_sleep" "wait_cm_custom_script" {
+  create_duration = "1m"
+  depends_on      = [aws_s3_object.cm_custom_script]
 }
 
 ######################################
@@ -66,7 +95,10 @@ resource "aws_instance" "concurrent_manager" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.cm_userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
+  metadata_options {
+    http_tokens = "optional"
+  }
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
@@ -135,7 +167,7 @@ resource "aws_ebs_volume" "concurrent_manager" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].concurrent_manager_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].concurrent_manager_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]

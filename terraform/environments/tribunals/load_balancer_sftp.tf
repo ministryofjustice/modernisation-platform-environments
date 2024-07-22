@@ -17,6 +17,13 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   vpc_id      = data.aws_vpc.shared.id
 
 //Might need to update this to just the DOM1 IP range
+  ingress {
+    description = "allow all traffic on HTTPS port 22"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   dynamic "ingress" {
     for_each = var.sftp_services
     content {

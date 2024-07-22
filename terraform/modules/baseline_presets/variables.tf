@@ -25,7 +25,6 @@ variable "options" {
     db_backup_more_permissions                   = optional(bool, false)           # allow cross-account delete access for db-backup S3 buckets
     enable_application_environment_wildcard_cert = optional(bool, false)           # create ACM cert with mod platform business unit
     enable_azure_sas_token                       = optional(bool, false)           # create /azure SSM parameter and pipeline role
-    enable_offloc_sync                           = optional(bool, false)           # create role for offloc pipeline
     enable_backup_plan_daily_and_weekly          = optional(bool, false)           # create backup plan with daily + weekly backups
     enable_business_unit_kms_cmks                = optional(bool, false)           # create grant + policies for business unit KMS access
     enable_hmpps_domain                          = optional(bool, false)           # create policy for accessing secrets in hmpps-domain account

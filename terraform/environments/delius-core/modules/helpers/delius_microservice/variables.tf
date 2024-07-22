@@ -255,6 +255,7 @@ variable "certificate_arn" {
 variable "microservice_lb" {
   description = "load balancer to use for the target group"
   type        = any
+  default     = null
 }
 
 variable "microservice_lb_https_listener_arn" {
@@ -375,6 +376,7 @@ variable "alb_security_group_id" {
 variable "health_check_path" {
   description = "The health check path for the alb target group"
   type        = string
+  default     = "/"
 }
 
 variable "health_check_interval" {
@@ -571,4 +573,16 @@ variable "extra_task_role_policies" {
   description = "A map of data \"aws_iam_policy_document\" objects, keyed by name, to attach to the task role"
   type        = map(any)
   default     = {}
+}
+
+variable "health_check" {
+  description = "The health check configuration for the container"
+  type = object({
+    command     = list(string)
+    interval    = number
+    timeout     = number
+    retries     = number
+    startPeriod = number
+  })
+  default = null
 }

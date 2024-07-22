@@ -20,16 +20,21 @@ resource "aws_db_instance" "database" {
   storage_encrypted                   = true
   iam_database_authentication_enabled = false
   vpc_security_group_ids              = [aws_security_group.db.id]
-  snapshot_identifier                 = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].db_snapshot_identifier)
-  backup_retention_period             = 30
-  maintenance_window                  = "Mon:00:00-Mon:03:00"
-  backup_window                       = "03:00-06:00"
-  final_snapshot_identifier           = "final-snapshot"
-  kms_key_id                          = aws_kms_key.rds.arn
-  deletion_protection                 = false
-  option_group_name                   = aws_db_option_group.db_option_group.name
-  db_subnet_group_name                = aws_db_subnet_group.db.id
-  enabled_cloudwatch_logs_exports     = ["error"]
+  #snapshot_identifier                 = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].db_snapshot_identifier)
+  backup_retention_period         = 30
+  maintenance_window              = "Mon:00:00-Mon:03:00"
+  backup_window                   = "03:00-06:00"
+  final_snapshot_identifier       = "final-snapshot"
+  kms_key_id                      = aws_kms_key.rds.arn
+  deletion_protection             = false
+  option_group_name               = aws_db_option_group.db_option_group.name
+  db_subnet_group_name            = aws_db_subnet_group.db.id
+  enabled_cloudwatch_logs_exports = ["error"]
+  ca_cert_identifier              = "rds-ca-rsa2048-g1"
+  # BE VERY CAREFUL with apply_immediately = true. Useful if you want to see the results, but can cause a reboot
+  # of RDS meaning the connected app will fail.
+  # When apply_immediately=false, RDS changes are applied during the next maintenance_window
+  apply_immediately = false
 
   # timeouts {
   #   create = "40m"

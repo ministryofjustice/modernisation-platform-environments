@@ -59,7 +59,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr" {
 data "aws_secretsmanager_secret_version" "actions_runners_airflow" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
-  secret_id = module.actions_runners_airflow[0].secret_id
+  secret_id = module.actions_runners_airflow_secret[0].secret_id
 }
 
 resource "helm_release" "actions_runner_mojas_airflow" {

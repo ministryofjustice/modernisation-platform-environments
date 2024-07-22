@@ -18,6 +18,8 @@ locals {
   create_sec_conf         = local.application_data.accounts[local.environment].create_security_conf
   env                     = local.environment
   s3_kms_arn              = aws_kms_key.s3.arn
+  operational_db_kms_arn  = aws_kms_key.operational_db.arn
+  operational_db_kms_id   = aws_kms_key.operational_db.key_id
   kinesis_kms_arn         = aws_kms_key.kinesis-kms-key.arn
   kinesis_kms_id          = data.aws_kms_key.kinesis_kms_key.key_id
   create_bucket           = local.application_data.accounts[local.environment].setup_buckets
@@ -229,6 +231,7 @@ locals {
   # Transfer Component
   enable_transfercomp_lambda         = local.application_data.accounts[local.environment].enable_transfer_component_lambda
   lambda_transfercomp_name           = "${local.project}-transfer-component"
+  lambda_transfercomp_ods_name       = "${local.project}-transfer-component-operational-datastore"
   lambda_transfercomp_runtime        = "java11"
   lambda_transfercomp_tracing        = "Active"
   lambda_transfercomp_handler        = "com.geekoosh.flyway.FlywayHandler"
@@ -298,14 +301,14 @@ locals {
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 
-  # Setup Athena Workgroups 
+  # Setup Athena Workgroups
   setup_dpr_generic_athena_workgroup       = local.application_data.accounts[local.environment].dpr_generic_athena_workgroup
   setup_analytics_generic_athena_workgroup = local.application_data.accounts[local.environment].analytics_generic_athena_workgroup
 
   # Sonatype Secrets
   setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
 
-  # Nomis Secrets PlaceHolder 
+  # Nomis Secrets PlaceHolder
   nomis_secrets_placeholder = {
     db_name  = "nomis"
     password = "placeholder"
@@ -316,7 +319,7 @@ locals {
     port     = "1521"
   }
 
-  # Bodmis Secrets PlaceHolder 
+  # Bodmis Secrets PlaceHolder
   bodmis_secrets_placeholder = {
     db_name  = "bodmis"
     password = "placeholder"
@@ -370,7 +373,7 @@ locals {
     cloud_platform_k8s_cluster_context = "placeholder"
   }
 
-  # Analytics Platform, DBT Secrets 
+  # Analytics Platform, DBT Secrets
   enable_dbt_k8s_secrets = local.application_data.accounts[local.environment].enable_dbt_k8s_secrets
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder"
@@ -390,6 +393,9 @@ locals {
     port                = "5439"
     username            = module.datamart.redshift_master_user
   }
+
+  analytical_platform_share = can(local.application_data.accounts[local.environment].analytical_platform_share) ? { for share in local.application_data.accounts[local.environment].analytical_platform_share : share.target_account_name => share } : {}
+
 
   all_tags = merge(
     local.tags,

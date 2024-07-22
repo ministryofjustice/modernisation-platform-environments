@@ -102,12 +102,12 @@ variable "core_shared_services_id" {
   description = "The account number of the core shared services account"
   type        = number
   default     = null
-  nullable = true
+  nullable    = true
 }
 
 variable "production_dev" {
   description = "The environment the lambda is being deployed to"
-  type = string
-  nullable = true
+  type        = string
+  nullable    = true
   default     = null
 }

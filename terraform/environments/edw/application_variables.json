@@ -4,7 +4,7 @@
       "edw_AppName": "EDW2",
       "edw_environment": "dev",
       "edw_region": "eu-west-2",
-      "edw_ec2_ami_id": "ami-01d4d23fbf3fcc925",
+      "edw_ec2_ami_id": "ami-093381ebab6476c17",
       "edw_ec2_instance_type": "m4.xlarge",
       "edw_ssh_key_name": "development-general",
       "edw_OrahomeVolumeSize": "150",
@@ -57,7 +57,15 @@
       "edw_dashboard_refresh_period": "60",
       "edw_disk_path": "/oracle/dbf",
       "edw_disk_device": "/dev/xvdf",
-      "edw_disk_fs_type": "ext4"
+      "edw_disk_fs_type": "ext4",
+      "database_ec2_name": "edw-db-instance",
+      "edw_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCTLaLYlRp9nXnprXkvSd9pxHxJq4KrZENz0PQ4fy8xe93x54TRfqzMEJdG4tl9Yb5Uv0HEmvi9kMSKZ8uorM67v9oFI5/xtnFoxO9M/cDLXbUmIQ5QFP6+BlDAPWPTV8hh9jAhY1VhkFJTGF0vMBCxdqfIwKH4l6wTciP/lrPYqp4uKddicg0T9mfk6y1EvaZhVTgpMdtj374xC+t57JN6TEuYxwcxsdUA4tB9y4B51LE9WEG7w1up8SeTduCAyGNpUu0lKVnLgpkcrJ3hD/pavUzdAmFESYmMjJkvtKHIuEaAVlxaWQDhHFAJ0BdMlJV4jAARaqgtqgLpsjp3NPnM4FOu3wXRY6+gw3cwDyg7TFlwksnayCHG3ZrSs3fF2cVGF/VQ9L0QZyayPNxnh1g+B7Nnuly3eXLOwD0KQ8XtNDvAX0kV7e2QGiDO0//n+LQHqDMFMTvVWo5g2Ct2HjP97Wf+QgYZ2wbAxb/JSnlHMxbrjeAo0DejscoYzp9f3AM= fani.foteva@MJ004598",
+      "edw_pagerduty_integration_key_name": "laa_edw_nonprod_alarms",
+      "oradata_snapshot_id": "snap-08e331d215e456fec",
+      "orahome_snapshot_id": "snap-076f7b759f1cbfa2b",
+      "oraarch_snapshot_id": "snap-00dbc56ab1d6c9930",
+      "software_snapshot_id": "snap-01e51c08b7e397fdc",
+      "oraredo_snapshot_id": "snap-0936e759e58c09af9"
     },
     "test": {
       "example_var": "test-data"

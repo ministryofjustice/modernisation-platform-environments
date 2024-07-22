@@ -7,7 +7,14 @@ module "dms_task" {
     "capita_alcohol_monitoring",
     "g4s_atrium",
     "civica_orca",
-    "g4s_subject_history"
+    "g4s_subject_history",
+    "g4s_telephony",
+    "g4s_atv",
+    "g4s_rf_hours",
+    "g4s_tasking",
+    "g4s_fep",
+    "g4s_emsys_tpims",
+    "capita_forms_and_subject_id"
   ] : ["test"])
 
   database_name = each.key

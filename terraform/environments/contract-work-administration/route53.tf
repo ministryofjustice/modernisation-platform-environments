@@ -50,3 +50,13 @@ resource "aws_route53_record" "external" {
     evaluate_target_health = true
   }
 }
+
+# Domain A record for SMTP server
+resource "aws_route53_record" "smtp" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name_short}-mail.${data.aws_route53_zone.external.name}"
+  type     = "A"
+  ttl      = "60"
+  records  = [aws_instance.smtp.private_ip]
+}

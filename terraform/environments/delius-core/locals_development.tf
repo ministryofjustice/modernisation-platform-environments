@@ -153,12 +153,12 @@ locals {
     }
 
     pdf_creation = {
-      image_tag      = "5.7.6"
-      container_port = 80
+      image_tag      = "2021-06-24.995.8c1da2c"
+      container_port = 8080
     }
 
     newtech = {
-      image_tag      = "5.7.6"
+      image_tag      = "2024-05-28.10054.9e25657"
       container_port = 80
     }
   }
@@ -168,5 +168,23 @@ locals {
     subnet_set              = local.subnet_set
     environment             = local.environment
     extra_user_data_content = "yum install -y openldap-clients"
+  }
+
+  dms_config_dev = {
+    replication_instance_class = "dms.t3.small"
+    engine_version             = "3.5.1"
+    # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
+    # Please ensure any changes made here are consistent with Ansible variables.
+    audit_source_endpoint = {
+      read_host     = "standbydb2"
+      read_database = "DMDNDAS2"
+    }
+    audit_target_endpoint = {
+      write_environment = "test"
+    }
+    user_source_endpoint = {}
+    user_target_endpoint = {
+      write_database = "DMDNDA"
+    }
   }
 }

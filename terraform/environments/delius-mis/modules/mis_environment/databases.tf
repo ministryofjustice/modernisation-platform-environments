@@ -80,6 +80,8 @@ module "oracle_db_dsd" {
 
   deploy_oracle_stats = false
 
+  sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
+
   providers = {
     aws                       = aws
     aws.bucket-replication    = aws
@@ -132,6 +134,8 @@ module "oracle_db_boe" {
 
   deploy_oracle_stats = false
 
+  sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
+
   providers = {
     aws                       = aws
     aws.bucket-replication    = aws
@@ -183,6 +187,8 @@ module "oracle_db_mis" {
   instance_profile_policies = local.mis_instance_policies
 
   deploy_oracle_stats = false
+
+  sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
 
   providers = {
     aws                       = aws
