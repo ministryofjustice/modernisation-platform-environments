@@ -14,7 +14,6 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.boe_web.config, {
-          availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_autoscaling_groups.boe_web.instance, {
           instance_type = "t3.large"
@@ -31,7 +30,6 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.boe_app.config, {
-          availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_autoscaling_groups.boe_app.instance, {
           instance_type = "t2.large"
@@ -48,8 +46,6 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bods.config, {
-          ami_owner         = "self"
-          availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "t3.large"
