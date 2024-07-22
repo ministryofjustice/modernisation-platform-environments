@@ -740,7 +740,7 @@ if __name__ == "__main__":
         elif args.get("jdbc_read_1gb_partitions", "false") == "true":
             jdbc_read_partitions_num = int(rds_table_total_size_mb/1024)
         elif args.get("jdbc_read_2gb_partitions", "false") == "true":
-            jdbc_read_partitions_num = int(int(rds_table_total_size_mb/1024)/2)
+            jdbc_read_partitions_num = int((rds_table_total_size_mb/1024)/2)
         else:
             raise ValueError(""">> When 'rds_table_total_size_mb' != 0, one of the 'jdbc_read_partition' size needs to be enabled ! <<""")
             sys.exit(1)
