@@ -151,8 +151,6 @@ resource "aws_lambda_function" "app_setup_db" {
       USER_NAME     = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
       PASSWORD      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
       NEW_DB_NAME   = each.value.app_db_name
-      NEW_USER_NAME = each.value.app_db_login_name
-      NEW_PASSWORD  = random_password.app_new_password.result
       APP_FOLDER    = each.value.sql_migration_path
     }
   }
@@ -185,20 +183,3 @@ resource "aws_security_group_rule" "allow_lambda_access_to_rds" {
   security_group_id        = aws_security_group.sqlserver_db_sc.id
   source_security_group_id = aws_security_group.lambda_sg.id
 }
-
-# resource "null_resource" "app_setup_db" {
-#   for_each = aws_lambda_function.app_setup_db
-
-#   provisioner "local-exec" {
-#     command = <<-EOT
-#       aws lambda invoke \
-#         --function-name ${each.value.function_name} \
-#         --payload '{}' \
-#         response.json
-#     EOT
-#   }
-
-#   triggers = {
-#     always_run = "${timestamp()}"
-#   }
-# }

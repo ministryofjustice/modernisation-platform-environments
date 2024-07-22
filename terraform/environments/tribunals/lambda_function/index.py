@@ -8,8 +8,6 @@ def lambda_handler(event, context):
     user_name = os.getenv("USER_NAME")
     password = os.getenv("PASSWORD")
     new_db_name = os.getenv("NEW_DB_NAME")
-    new_user_name = os.getenv("NEW_USER_NAME")
-    new_password = os.getenv("NEW_PASSWORD")
     app_folder = os.getenv("APP_FOLDER")
 
     print(f"exported ENV values are 1: {db_url}")
@@ -45,14 +43,12 @@ def lambda_handler(event, context):
 
     # Executing SQL script from file
     script_path = f".{app_folder}/sp_migration.sql"
-    print(f"script_path is: {script_path}")
     with open(script_path, 'r') as file:
         script = file.read()
         # Split the script by the full keyword 'GO' (case-insensitive)
         statements = re.split(r'\bGO\b', script, flags=re.IGNORECASE)
         for statement in statements:
             if statement.strip():
-                print(f"statement is: {statement}")
                 cursor.execute(statement)
                 conn.commit()
 
