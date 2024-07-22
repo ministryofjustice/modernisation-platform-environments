@@ -24,6 +24,21 @@ locals {
           "hmpps-az-gw1.justice.gov.uk",
           "*.hmpps-az-gw1.justice.gov.uk",
           "*.planetfm.service.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for hmpps domain load balancer"
+        }
+      }
+      remote_desktop_wildcard_and_planetfm_cert_v2 = {
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "modernisation-platform.service.justice.gov.uk"
+        external_validation_records_created = false
+        subject_alternate_names = [
+          "*.hmpps-domain-services.hmpps-production.modernisation-platform.service.justice.gov.uk",
+          "*.hmpps-domain.service.justice.gov.uk",
+          "hmpps-az-gw1.justice.gov.uk",
+          "*.hmpps-az-gw1.justice.gov.uk",
+          "*.planetfm.service.justice.gov.uk",
           "cafmtx.az.justice.gov.uk",
         ]
         tags = {
