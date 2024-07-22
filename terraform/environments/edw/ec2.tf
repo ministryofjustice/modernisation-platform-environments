@@ -51,11 +51,10 @@ AwsTimeSync(){
 AwsTimeSync $(cat /etc/redhat-release | cut -d. -f1 | awk '{print $NF}')
 
 #### Install AWS cli
-echo "---Install AWS cli"
-sudo yum remove awscli
-sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
+echo "---Installing AWS cli"
+wget -O awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+unzip -o awscliv2.zip
+sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
 
 #configure cfn-init variables
 export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
@@ -75,8 +74,9 @@ echo $host4 >>/etc/hosts
 mkdir -p /home/oracle/scripts
 
 # Disable firewall
-service iptables stop
-chkconfig iptables off
+sudo /etc/init.d/iptables stop
+sudo /sbin/chkconfig iptables off
+
 
 # Set up log files
 echo "---creating /etc/awslogs/awscli.conf"
@@ -131,22 +131,18 @@ EOC2
 
 ##### METADATA #####
 
-#### Install_aws_logging
+# #### Install_aws_logging
 
-echo "---Install_aws_logging"
+# echo "---Install_aws_logging"
 
-# Error handling
-error_exit()
-{
-echo "$1" 1>&2
-exit 1
-}
+# #Install AWS logs
 
-#Install AWS logs
+# echo "---Install AWS logging"
+# sudo yum install wget openssl-devel bzip2-devel libffi-devel -y
+# wget https://amazoncloudwatch-agent.s3.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+# sudo yum update rpm
 
-echo "---Install AWS logging"
-curl -O https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
-/usr/local/bin/python2.7 awslogs-agent-setup.py --no-proxy=NO_PROXY -n -r eu-west-2 -c /tmp/cwlogs/logstreams.conf || exit 2
+
 
 #### setup_file_systems
 echo "---setup_file_systems"
