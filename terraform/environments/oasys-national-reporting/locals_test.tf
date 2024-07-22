@@ -84,8 +84,7 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.boe_web.config, {
-          ami_name          = "base_rhel_6_10_*"
-          availability_zone = "eu-west-2a"
+          ami_name = "base_rhel_6_10_*"
           instance_profile_policies = setunion(local.ec2_autoscaling_groups.boe_web.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
@@ -106,7 +105,6 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.boe_app.config, {
-          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.boe_app.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
@@ -124,8 +122,7 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bods.config, {
-          ami_owner         = "self"
-          availability_zone = "eu-west-2a"
+          ami_owner = "self"
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
@@ -187,7 +184,8 @@ locals {
       })
       t2-onr-client-a = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
+          ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
+          availability_zone = "eu-west-2a"
         })
       })
     }
