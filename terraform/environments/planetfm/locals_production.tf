@@ -23,6 +23,22 @@ locals {
           description = "wildcard cert for planetfm production domains"
         }
       }
+      remote_desktop_wildcard_and_planetfm_cert_v2 = {
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "modernisation-platform.service.justice.gov.uk"
+        external_validation_records_created = false # change this later
+        subject_alternate_names = [
+          "*.planetfm.service.justice.gov.uk",
+          "cafmwebx.az.justice.gov.uk",
+          "cafmwebx2.az.justice.gov.uk",
+          "cafmtx.az.justice.gov.uk",
+          "cafmtrainweb.az.justice.gov.uk",
+          "*.az.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for planetfm production domains and remote desktop"
+        }
+      }
     }
 
     ec2_instances = {
