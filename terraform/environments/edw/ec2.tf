@@ -72,7 +72,7 @@ echo $host >>/etc/hosts
 echo $host2 >>/etc/hosts
 echo $host3 >>/etc/hosts
 echo $host4 >>/etc/hosts
-mkdir -p /home/oracle/scripts
+mkdir -p /stage/oracle/scripts
 
 # Disable firewall
 sudo /etc/init.d/iptables stop
@@ -102,27 +102,27 @@ log_group_name = ${local.application_name}-OracleAlerts
 log_stream_name = {instance_id}
 
 [rman_backup_log_errors]
-file = /home/oracle/backup_logs/*_RMAN_disk_*.log
+file = /stage/oracle/backup_logs/*_RMAN_disk_*.log
 log_group_name = ${local.application_name}-RMan
 log_stream_name = {instance_id}
 
 [rman_arch_backup_log_errors]
-file = /home/oracle/backup_logs/*_RMAN_disk_ARCH_*.log
+file = /stage/oracle/backup_logs/*_RMAN_disk_ARCH_*.log
 log_group_name = ${local.application_name}-RManArch
 log_stream_name = {instance_id}
 
 [db_tablespace_space_alerts]
-file = /home/oracle/scripts/logs/freespace_alert.log
+file = /stage/oracle/scripts/logs/freespace_alert.log
 log_group_name = ${local.application_name}-TBSFreespace
 log_stream_name = {instance_id}
 
 [db_PMON_status_alerts]
-file = /home/oracle/scripts/logs/pmon_status_alert.log
+file = /stage/oracle/scripts/logs/pmon_status_alert.log
 log_group_name = ${local.application_name}-PMONstatus
 log_stream_name = {instance_id}
 
 [db_CDC_status_alerts]
-file = /home/oracle/scripts/logs/cdc_check.log
+file = /stage/oracle/scripts/logs/cdc_check.log
 log_group_name = ${local.application_name}-CDCstatus
 log_stream_name = {instance_id}
 EOC2
@@ -146,33 +146,37 @@ echo "---setup_file_systems"
 sudo yum install e2fsprogs
 
 # Create Oracle DBF file file system (oradata)
-sudo /sbin/mkfs.ext4 /dev/sdf
+sudo /sbin/mkfs.ext4 /dev/xvdf
 mkdir -p /oracle/dbf
-grep -qxF "/dev/sdf /oracle/dbf ext4 defaults 0 0" /etc/fstab || echo "/dev/sdf /oracle/dbf ext4 defaults 0 0" >> /etc/fstab
+grep -qxF "/dev/xvdf /oracle/dbf ext4 defaults 0 0" /etc/fstab || echo "/dev/sdf /dev/xvdf ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 dev/xvdf /oracle/dbf
 
-# Create home file system
-sudo /sbin/mkfs.ext4 /dev/sdi
-mkdir -p /home
-grep -qxF "/dev/sdi /home ext4 defaults 0 0" /etc/fstab || echo "/dev/sdi /home ext4 defaults 0 0" >> /etc/fstab
+# Create stage (orahome) file system
+sudo /sbin/mkfs.ext4 /dev/xvdg
+mkdir -p /stage
+chmod 777 /stage
+grep -qxF "/dev/xvdg /stage ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdg /stage ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 /dev/xvdg /stage
+
 
 # Create archive file system
-sudo /sbin/mkfs.ext4 /dev/sdh
+sudo /sbin/mkfs.ext4 /dev/xvdh
 mkdir -p /oracle/ar
-grep -qxF "/dev/sdh /oracle/ar ext4 defaults 0 0" /etc/fstab || echo "/dev/sdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
+grep -qxF "/dev/xvdh /oracle/ar ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 /dev/xvdh /oracle/ar
+
 
 #Create oracle_software
-sudo /sbin/mkfs.ext4 /dev/sdg
+sudo /sbin/mkfs.ext4 /dev/xvdi
 mkdir --p /oracle/software
-grep -qxF "/dev/sdg /oracle/software ext4 defaults 0 0" /etc/fstab || echo "/dev/sdg /oracle/software ext4 defaults 0 0" >> /etc/fstab
+grep -qxF "/dev/xvdi /oracle/software ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdi /oracle/software ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 /dev/xvdi /oracle/software
 
 #Create temp_undo (oraredo)
-sudo /sbin/mkfs.ext4 /dev/sdj
+sudo /sbin/mkfs.ext4 /dev/xvdj
 mkdir -p /oracle/temp_undo
-grep -qxF "/dev/sdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/sdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
-
-# Mount all file systems in fstab
-mount -a
-chmod 777 /home
+grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
 
 
 #### setup_oracle_db_software
@@ -182,25 +186,25 @@ yum install -y unzip
 
 groupadd dba
 groupadd oinstall
-useradd -d /home/oracle -g dba oracle
+useradd -d /stage/oracle -g dba oracle
 
 #setup oracle user access
 echo "---setup oracle user access"
-cp -fr /home/ec2-user/.ssh /home/oracle/
-chown -R oracle:dba /home/oracle/.ssh
+cp -fr /stage/ec2-user/.ssh /stage/oracle/
+chown -R oracle:dba /stage/oracle/.ssh
 
 # Unzip installers
 echo "---Unzip installers"
-mkdir -p /home/databases
-mkdir -p /home/patches/1020
-unzip /repo/databases/10.2/installers/B24792-01_1of5.zip -d /home/databases
-unzip /repo/databases/10.2/installers/B24792-01_2of5.zip -d /home/databases
-unzip /repo/databases/10.2/installers/B24792-01_3of5.zip -d /home/databases
-unzip /repo/databases/10.2/installers/B24792-01_4of5.zip -d /home/databases
-unzip /repo/databases/10.2/installers/B24792-01_5of5.zip -d /home/databases
+mkdir -p /stage/databases
+mkdir -p /stage/patches/1020
+unzip /repo/databases/10.2/installers/B24792-01_1of5.zip -d /stage/databases
+unzip /repo/databases/10.2/installers/B24792-01_2of5.zip -d /stage/databases
+unzip /repo/databases/10.2/installers/B24792-01_3of5.zip -d /stage/databases
+unzip /repo/databases/10.2/installers/B24792-01_4of5.zip -d /stage/databases
+unzip /repo/databases/10.2/installers/B24792-01_5of5.zip -d /stage/databases
 
 # Unzip patch files
-unzip /repo/databases/10.2/patches/db-patchset10204/p6810189_10204_Linux-x86-64.zip -d /home/patches/10204
+unzip /repo/databases/10.2/patches/db-patchset10204/p6810189_10204_Linux-x86-64.zip -d /stage/patches/10204
 
 # Create directories and set ownership
 echo "---Create directories and set ownership"
@@ -229,57 +233,57 @@ sed -i 's/{{ oracle_database_oracle_home_name }}/"db_home"/g'                   
 
 # Run installer and post install
 export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
-su oracle -c "/home/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
+su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
 
 /oracle/software/oraInventory/orainstRoot.sh -silent
 /oracle/software/product/10.2.0/root.sh -silent
 
 # Update oracle login script
-echo "export ORACLE_SID=EDW" >> /home/oracle/.bash_profile
-echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /home/oracle/.bash_profile
-echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /home/oracle/.bash_profile
+echo "export ORACLE_SID=EDW" >> /stage/oracle/.bash_profile
+echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
+echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
 
 # patch the database to 10.2.0.4
-cp -f /repo/databases/10.2/templates/patchset.rsp /home/oracle/patchset.rsp
-chown oracle:dba /home/oracle/patchset.rsp
-chmod 777 /home/oracle/patchset.rsp
+cp -f /repo/databases/10.2/templates/patchset.rsp /stage/oracle/patchset.rsp
+chown oracle:dba /stage/oracle/patchset.rsp
+chmod 777 /stage/oracle/patchset.rsp
 
-su oracle -c "/home/patches/10204/Disk1/runInstaller -silent -responseFile /home/oracle/patchset.rsp"
+su oracle -c "/stage/patches/10204/Disk1/runInstaller -silent -responseFile /stage/oracle/patchset.rsp"
 /oracle/software/product/10.2.0/root.sh -silent
 
 #### Setup_owb
 
 # Create directories for OWB setup
-mkdir -p /home/owb/owb101
-mkdir -p /home/owb/owb104
-mkdir -p /home/owb/owb105
+mkdir -p /stage/owb/owb101
+mkdir -p /stage/owb/owb104
+mkdir -p /stage/owb/owb105
 
 # Unzip OWB software packages
-unzip /repo/Software/OWB10/B30394-01_1of2.zip -d /home/owb/owb101
-unzip /repo/Software/OWB10/B30394-01_2of2.zip -d /home/owb/owb101
-unzip /repo/Software/OWB10/p7005587_10204_Linux-x86-64.zip -d /home/owb/owb104
-unzip /repo/Software/OWB10/p8515097_10205_Linux-x86-64.zip -d /home/owb/owb105
+unzip /repo/Software/OWB10/B30394-01_1of2.zip -d /stage/owb/owb101
+unzip /repo/Software/OWB10/B30394-01_2of2.zip -d /stage/owb/owb101
+unzip /repo/Software/OWB10/p7005587_10204_Linux-x86-64.zip -d /stage/owb/owb104
+unzip /repo/Software/OWB10/p8515097_10205_Linux-x86-64.zip -d /stage/owb/owb105
 
 # Copy response files to staging directory
-cp -f /repo/Software/OWB10/*.rsp /home/owb/
+cp -f /repo/Software/OWB10/*.rsp /stage/owb/
 
 # Set permissions for staging directory
-chmod -R 777 /home/owb/
+chmod -R 777 /stage/owb/
 
 # Install OWB components
-su oracle -l -c "/home/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /home/owb/owb.rsp"
+su oracle -l -c "/stage/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /stage/owb/owb.rsp"
 /oracle/software/product/10.2.0_owb/root.sh -silent
 
-su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /home/owb/owb104.rsp"
+su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb104.rsp"
 /oracle/software/product/10.2.0_owb/root.sh -silent
 
-su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /home/owb/owb105.rsp"
+su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
 /oracle/software/product/10.2.0_owb/root.sh -silent
 
 # Unzip additional files and configure environment
-unzip /repo/edwcreate/refresh.zip -d /home
-unzip /repo/edwcreate/templates.zip -d /home
-echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /home/oracle/.bash_profile
+unzip /repo/edwcreate/refresh.zip -d /stage
+unzip /repo/edwcreate/templates.zip -d /stage
+echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
 
 EOF
 }
