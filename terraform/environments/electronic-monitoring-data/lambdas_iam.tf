@@ -493,8 +493,10 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
     sid    = "S3PermissionsForLoadingJsonTable"
     effect = "Allow"
     actions = [
-      "s3:GetObject",
       "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:GetObjectAttributes",
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
