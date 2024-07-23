@@ -32,11 +32,11 @@ locals {
     ec2_instances = {
 
       ls-ncr-db-1-a = merge(local.ec2_instances.db, {
-        #cloudwatch_metric_alarms = merge(
-        #  local.cloudwatch_metric_alarms.db,
-        #  local.cloudwatch_metric_alarms.db_connected,
-        #  local.cloudwatch_metric_alarms.db_backup,
-        #)
+        cloudwatch_metric_alarms = merge(
+          local.cloudwatch_metric_alarms.db,
+          local.cloudwatch_metric_alarms.db_connected,
+          local.cloudwatch_metric_alarms.db_backup,
+        )
         config = merge(local.ec2_instances.db.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
@@ -46,7 +46,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "LSAST NCR DATABASE"
           nomis-combined-reporting-environment = "lsast"
-          oracle-sids                          = ""
+          oracle-sids                          = "LSBIPSYS LSBIPAUD"
           instance-scheduling                  = "skip-scheduling"
         })
       })
@@ -241,15 +241,6 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
@@ -281,15 +272,6 @@ locals {
       Ec2PPDatabasePolicy = {
         description = "Permissions required for PREPROD Database EC2s"
         statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
           {
             effect = "Allow"
             actions = [

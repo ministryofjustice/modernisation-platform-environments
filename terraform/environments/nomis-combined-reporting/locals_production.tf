@@ -46,7 +46,6 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_app.tags, {
           description                          = "Prod SAP BI Platform CMS installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
           node                                 = "1"
           nomis-combined-reporting-environment = "pd"
           type                                 = "management"
@@ -67,7 +66,6 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_app.tags, {
           description                          = "Prod SAP BI Platform CMS installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
           node                                 = "2"
           nomis-combined-reporting-environment = "pd"
           type                                 = "management"
@@ -90,16 +88,14 @@ locals {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
           oracle-sids                          = "PDBIPSYS PDBIPAUD"
-          instance-scheduling                  = "skip-scheduling"
         })
       })
 
       pd-ncr-db-1-b = merge(local.ec2_instances.db, {
-        # TODO: comment in when commissioned
-        # cloudwatch_metric_alarms = merge(
-        #   local.cloudwatch_metric_alarms.db,
-        #   local.cloudwatch_metric_alarms.db_connected,
-        # )
+        cloudwatch_metric_alarms = merge(
+          local.cloudwatch_metric_alarms.db,
+          local.cloudwatch_metric_alarms.db_connected,
+        )
         config = merge(local.ec2_instances.db.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
@@ -109,8 +105,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
-          oracle-sids                          = ""
-          instance-scheduling                  = "skip-scheduling"
+          oracle-sids                          = "DRBIPSYS DRBIPAUD"
         })
       })
 
@@ -129,7 +124,6 @@ locals {
         })
         tags = merge(local.ec2_autoscaling_groups.jumpserver.tags, {
           description                          = "Prod Jumpserver and Client Tools"
-          instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pd"
         })
       })
@@ -149,7 +143,6 @@ locals {
         })
         tags = merge(local.ec2_instances.bods.tags, {
           description                          = "Prod SAP BI Platform ETL installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pd"
         })
       })
@@ -169,7 +162,6 @@ locals {
       #   })
       #   tags = merge(local.ec2_instances.bods.tags, {
       #     description                          = "Prod SAP BI Platform ETL installation and configurations"
-      #     instance-scheduling                  = "skip-scheduling"
       #     nomis-combined-reporting-environment = "pd"
       #   })
       # })
@@ -189,7 +181,6 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_app.tags, {
           description                          = "Prod SAP BI Platform installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
           node                                 = "3"
           nomis-combined-reporting-environment = "pd"
           type                                 = "processing"
@@ -211,7 +202,6 @@ locals {
       #   })
       #   tags = merge(local.ec2_instances.bip_app.tags, {
       #     description                          = "Prod SAP BI Platform installation and configurations"
-      #     instance-scheduling                  = "skip-scheduling"
       #     node                                 = "4"
       #     nomis-combined-reporting-environment = "pd"
       #     type                                 = "processing"
@@ -233,7 +223,6 @@ locals {
       #   })
       #   tags = merge(local.ec2_instances.bip_app.tags, {
       #     description                          = "Prod SAP BI Platform installation and configurations"
-      #     instance-scheduling                  = "skip-scheduling"
       #     node                                 = "5"
       #     nomis-combined-reporting-environment = "pd"
       #     type                                 = "processing"
@@ -255,7 +244,6 @@ locals {
       #   })
       #   tags = merge(local.ec2_instances.bip_app.tags, {
       #     description                          = "Prod SAP BI Platform installation and configurations"
-      #     instance-scheduling                  = "skip-scheduling"
       #     node                                 = "6"
       #     nomis-combined-reporting-environment = "pd"
       #     type                                 = "processing"
@@ -277,7 +265,6 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_web.tags, {
           description                          = "Prod SAP BI Platform web-tier installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pd"
         })
       })
@@ -297,7 +284,6 @@ locals {
       #   })
       #   tags = merge(local.ec2_instances.bip_web.tags, {
       #     description                          = "Prod SAP BI Platform web-tier installation and configurations"
-      #     instance-scheduling                  = "skip-scheduling"
       #     nomis-combined-reporting-environment = "pd"
       #   })
       # })
@@ -317,7 +303,6 @@ locals {
       #   })
       #   tags = merge(local.ec2_instances.bip_web.tags, {
       #     description                          = "Prod SAP BI Platform web-tier installation and configurations"
-      #     instance-scheduling                  = "skip-scheduling"
       #     nomis-combined-reporting-environment = "pd"
       #   })
       # })
@@ -337,7 +322,6 @@ locals {
       #   })
       #   tags = merge(local.ec2_instances.bip_web.tags, {
       #     description                          = "Prod SAP BI Platform web-tier installation and configurations"
-      #     instance-scheduling                  = "skip-scheduling"
       #     nomis-combined-reporting-environment = "pd"
       #   })
       # })
@@ -356,7 +340,6 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_web.tags, {
           description                          = "Prod SAP BI Platform web-tier admin installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pd"
         })
       })
@@ -371,15 +354,6 @@ locals {
       Ec2PDDatabasePolicy = {
         description = "Permissions required for PROD Database EC2s"
         statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
           {
             effect = "Allow"
             actions = [
