@@ -411,6 +411,43 @@ locals {
       }
     }
 
+    lbs = {
+      private = merge(local.lbs.private, {
+
+        instance_target_groups = {
+          pd-ncr-web = merge(local.lbs.private.instance_target_groups.web, {
+            attachments = [
+              { ec2_instance_name = "pd-ncr-web-1-a" },
+              # add more instances here when deployed
+            ]
+          })
+        }
+        listeners = merge(local.lbs.private.listeners, {
+          https = merge(local.lbs.private.listeners.https, {
+            certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
+
+            rules = {
+              pd-ncr-web = {
+                priority = 4580
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-ncr-web"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "production.reporting.nomis.service.justice.gov.uk",
+                      "reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
+    }
+
     route53_zones = {
       "reporting.nomis.service.justice.gov.uk" = {
         ns_records = [
