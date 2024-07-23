@@ -267,7 +267,7 @@ module "load_json_table" {
   is_image                = true
   role_name               = aws_iam_role.load_json_table.name
   role_arn                = aws_iam_role.load_json_table.arn
-  memory_size             = 1024
+  memory_size             = 2048
   timeout                 = 900
   env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
