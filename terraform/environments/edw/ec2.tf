@@ -188,9 +188,25 @@ groupadd dba
 groupadd oinstall
 useradd -d /stage/oracle -g dba oracle
 
+sudo mkdir -p /stage/oracle
+sudo chown oracle:dba /stage/oracle
+sudo chmod 700 /stage/oracle
+sudo rsync -a /home/oracle/ /stage/oracle/
+sudo usermod -d /stage/oracle oracle
+sudo chown -R oracle:dba /stage/oracle
+sudo chmod 700 /stage/oracle
+sudo mkdir -p /stage/oracle/.ssh
+sudo cp -r /home/oracle/.ssh/* /stage/oracle/.ssh/
+sudo chown -R oracle:dba /stage/oracle/.ssh
+sudo chmod 700 /stage/oracle/.ssh
+sudo chmod 600 /stage/oracle/.ssh/id_rsa
+sudo chmod 644 /stage/oracle/.ssh/id_rsa.pub
+sudo rm -rf /home/oracle
+
+
 #setup oracle user access
 echo "---setup oracle user access"
-cp -fr /stage/ec2-user/.ssh /stage/oracle/
+cp -fr /home/ec2-user/.ssh/* /stage/oracle/.ssh/
 chown -R oracle:dba /stage/oracle/.ssh
 
 # Unzip installers
