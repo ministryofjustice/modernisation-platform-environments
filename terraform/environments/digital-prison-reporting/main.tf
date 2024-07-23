@@ -600,7 +600,7 @@ module "create_reload_diff_job" {
 
   execution_class             = "STANDARD"
   worker_type                 = "G.2X"
-  number_of_workers           = 3
+  number_of_workers           = 5
   max_concurrent              = 64
   region                      = local.account_region
   account                     = local.account_id
