@@ -2,6 +2,25 @@ locals {
 
   ec2_instances = {
 
+    windows = {
+      cloudwatch_metric_alarms = {
+        cwagent-process-count = {
+          alarm_description   = "The CloudWatch agent runs 2 processes. If the PID count drops below 2, the agent is not functioning as expected."
+          namespace           = "CWAgent"
+          metric_name         = "procstat_lookup pid_count"
+          period              = 60
+          evaluation_periods  = 1
+          statistic           = "Average"
+          comparison_operator = "LessThanThreshold"
+          threshold           = 2 # CloudWatch agent runs 2 processes
+          treat_missing_data  = "breaching"
+          dimensions = {
+            exe = "amazon-cloudwatch-agent"
+          }
+        }
+      }
+    }
+
     bods = {
       config = {
         ami_name                      = "hmpps_windows_server_2019_release_*"
@@ -47,6 +66,7 @@ locals {
         server-type      = "OnrBods"
         update-ssm-agent = "patchgroup1"
       }
+      cloudwatch_metric_alarms = locals.ec2_instances.windows.cloudwatch_metric_alarms
     }
 
     boe_app = {
