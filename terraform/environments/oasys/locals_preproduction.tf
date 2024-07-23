@@ -44,20 +44,20 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      pp-oasys-web-a = merge(local.webserver, {
+      pp-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri" }
           scale_down = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
         }
-        config = merge(local.webserver.config, {
+        config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
           iam_resource_names_prefix = "ec2-web-pp"
-          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2PreprodWebPolicy",
           ])
           ssm_parameters_prefix = "ec2-web-pp/"
         })
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
           oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
           oracle-db-sid      = "PPOASYS" # "OASPROD"
           oasys-environment  = "preproduction"
@@ -66,9 +66,10 @@ locals {
     }
 
     ec2_instances = {
-      pp-oasys-db-a = merge(local.database_a, {
-        config = merge(local.database_a.config, {
-          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+      pp-oasys-db-a = merge(local.ec2_instances.db19c, {
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
@@ -80,10 +81,10 @@ locals {
           "/dev/sdj" = { label = "flash", size = 1000 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
-        instance = merge(local.database_a.instance, {
+        instance = merge(local.ec2_instances.db19c.instance, {
           instance_type = "r6i.2xlarge"
         })
-        tags = merge(local.database_a.tags, {
+        tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "PPBIPINF"
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "preproduction"
@@ -91,13 +92,14 @@ locals {
         })
       })
 
-      pp-onr-db-a = merge(local.database_onr_a, {
-        config = merge(local.database_onr_a.config, {
-          instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
+      pp-onr-db-a = merge(local.ec2_instances.db11g, {
+        config = merge(local.ec2_instances.db11g.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
             "Ec2PreprodDatabasePolicy",
           ])
         })
-        instance = merge(local.database_onr_a.instance, {
+        instance = merge(local.ec2_instances.db11g.instance, {
           instance_type = "r6i.2xlarge"
         })
         ebs_volumes = {
@@ -112,20 +114,21 @@ locals {
             branch = "oracle_11g_oasys_patchset_addition"
           })
         })
-        tags = merge(local.database_onr_a.tags, {
+        tags = merge(local.ec2_instances.db11g.tags, {
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "preproduction"
           oracle-sids         = "PPONRBOD PPOASREP PPONRSYS PPONRAUD"
         })
       })
 
-      pp-oasys-bip-a = merge(local.bip_a, {
-        config = merge(local.bip_a.config, {
-          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+      pp-oasys-bip-a = merge(local.ec2_instances.bip, {
+        config = merge(local.ec2_instances.bip.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
             "Ec2PreprodBipPolicy",
           ])
         })
-        tags = merge(local.bip_a.tags, {
+        tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname   = "pp-oasys-db-a"
           bip-db-name       = "PPBIPINF"
           oasys-db-hostname = "pp-oasys-db-a"
@@ -338,19 +341,19 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/oracle/bip/preproduction" = local.secretsmanager_secrets_bip
-      "/oracle/database/PPOASYS"  = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/PPOASREP" = local.secretsmanager_secrets_db
-      "/oracle/database/PPBIPINF" = local.secretsmanager_secrets_bip_db
-      "/oracle/database/PPMISTRN" = local.secretsmanager_secrets_db
-      "/oracle/database/PPONRSYS" = local.secretsmanager_secrets_db
-      "/oracle/database/PPONRAUD" = local.secretsmanager_secrets_db
-      "/oracle/database/PPONRBDS" = local.secretsmanager_secrets_db
-      "/oracle/database/PPMISTN2" = local.secretsmanager_secrets_db
-      "/oracle/database/PPOASRP2" = local.secretsmanager_secrets_db
+      "/oracle/bip/preproduction" = local.secretsmanager_secrets.bip
+      "/oracle/database/PPOASYS"  = local.secretsmanager_secrets.db_oasys
+      "/oracle/database/PPOASREP" = local.secretsmanager_secrets.db
+      "/oracle/database/PPBIPINF" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/PPMISTRN" = local.secretsmanager_secrets.db
+      "/oracle/database/PPONRSYS" = local.secretsmanager_secrets.db
+      "/oracle/database/PPONRAUD" = local.secretsmanager_secrets.db
+      "/oracle/database/PPONRBDS" = local.secretsmanager_secrets.db
+      "/oracle/database/PPMISTN2" = local.secretsmanager_secrets.db
+      "/oracle/database/PPOASRP2" = local.secretsmanager_secrets.db
 
       # for azure, remove when migrated to aws db
-      "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/OASPROD" = local.secretsmanager_secrets.db_oasys
     }
   }
 }
