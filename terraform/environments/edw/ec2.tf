@@ -62,7 +62,8 @@ export LOGS="${local.application_name}-EC2"
 export APPNAME="${local.application_name}"
 export ENV="${local.application_data.accounts[local.environment].edw_environment}"
 export BACKUPBUCKET="${local.application_data.accounts[local.environment].edw_s3_backup_bucket}"
-export SECRET=$(/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id $(terraform output -raw ${aws_secretsmanager_secret.db-master-password.name} --query SecretString --output text)
+export ROLE="${aws_iam_role.edw_ec2_role.name}"
+export SECRET=$(/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db-master-password.name} --query SecretString --output text)
 export host="$ip4 $APPNAME-$ENV $APPNAME.${local.application_data.accounts[local.environment].edw_dns_extension}"
 export host2="${local.application_data.accounts[local.environment].edw_cis_ip} cis.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
 export host3="${local.application_data.accounts[local.environment].edw_eric_ip} eric.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
@@ -86,14 +87,12 @@ cat > /etc/awslogs/awscli.conf <<-EOC1
 cwlogs = cwlogs
 [default]
 region = ${local.application_data.accounts[local.environment].edw_region}
-
 EOC1
 
 echo "---creating /tmp/cwlogs/logstreams.conf"
 mkdir -p /tmp/cwlogs
 
 cat > /tmp/cwlogs/logstreams.conf <<-EOC2
-
 [general]
 state_file = /var/awslogs/agent-state
 
@@ -126,7 +125,6 @@ log_stream_name = {instance_id}
 file = /home/oracle/scripts/logs/cdc_check.log
 log_group_name = ${local.application_name}-CDCstatus
 log_stream_name = {instance_id}
-
 EOC2
 
 ##### METADATA #####
@@ -141,8 +139,6 @@ EOC2
 # sudo yum install wget openssl-devel bzip2-devel libffi-devel -y
 # wget https://amazoncloudwatch-agent.s3.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 # sudo yum update rpm
-
-/dev/sdi /oracle/ar ext4 defaults 0 0
 
 #### setup_file_systems
 echo "---setup_file_systems"
@@ -228,9 +224,8 @@ sed -i 's/{{ oracle_database_inventory_location }}/"\/oracle\/software\/oraInven
 sed -i 's/{{ oracle_database_oracle_home }}/"\/oracle\/software\/product\/10.2.0"/g'     /run/cfn-init/db-install-10g.rsp
 sed -i 's/{{ oracle_database_oracle_base }}/"\/oracle\/software\/product"/g'             /run/cfn-init/db-install-10g.rsp
 sed -i 's/{{ oracle_database_edition }}/"EE"/g'                                          /run/cfn-init/db-install-10g.rsp
-sed -i 's/{{ oracle_database_os_group }}/"dba"  /g'                                      /run/cfn-init/db-install-10g.rsp
+sed -i 's/{{ oracle_database_os_group }}/"dba"/g'                                      /run/cfn-init/db-install-10g.rsp
 sed -i 's/{{ oracle_database_oracle_home_name }}/"db_home"/g'                            /run/cfn-init/db-install-10g.rsp
-
 
 # Run installer and post install
 export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
@@ -287,8 +282,8 @@ unzip /repo/edwcreate/templates.zip -d /home
 echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /home/oracle/.bash_profile
 
 EOF
-
 }
+
 
 ####### IAM role #######
 
