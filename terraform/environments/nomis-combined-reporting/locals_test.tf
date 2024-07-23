@@ -136,6 +136,13 @@ locals {
       }
     }
 
+    lbs = {
+      private = merge(local.lbs.private, {
+        instance_target_groups = {}
+        listeners              = {}
+      })
+    }
+
     route53_zones = {
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
