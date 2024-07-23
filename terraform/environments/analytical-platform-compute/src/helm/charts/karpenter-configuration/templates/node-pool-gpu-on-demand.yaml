@@ -14,7 +14,7 @@ spec:
       nodeClassRef:
         apiVersion: karpenter.k8s.aws/v1beta1
         kind: EC2NodeClass
-        name: bottlerocket-general
+        name: bottlerocket-gpu
       taints:
         - key: compute.analytical-platform.service.justice.gov.uk/karpenter-node-pool
           value: "gpu-on-demand"
