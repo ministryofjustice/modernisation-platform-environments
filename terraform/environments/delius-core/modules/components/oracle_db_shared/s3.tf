@@ -323,7 +323,7 @@ data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
 module "s3_bucket_oracle_statistics" {
   count = var.deploy_oracle_stats ? 1 : 0
 
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.0.1"
   bucket_name         = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-statistics-backup-data"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
