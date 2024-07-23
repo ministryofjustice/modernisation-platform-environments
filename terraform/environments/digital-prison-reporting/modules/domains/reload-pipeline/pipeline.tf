@@ -212,16 +212,7 @@ module "reload_pipeline" {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : var.glue_create_reload_diff_job,
-            "Arguments" : {
-              "--dpr.raw.s3.path" : "s3://${var.s3_raw_bucket_id}/",
-              "--dpr.raw.archive.s3.path" : "s3://${var.s3_raw_archive_bucket_id}/",
-              "--dpr.temp.reload.s3.path" : "s3://${var.s3_temp_reload_bucket_id}/",
-              "--dpr.temp.reload.output.folder" : var.reload_diff_folder,
-              "--dpr.dms.replication.task.id" : var.replication_task_id,
-              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-              "--dpr.config.key" : var.domain
-            }
+            "JobName" : var.glue_create_reload_diff_job
           },
           "Next" : "Move Reload Diffs toInsert to Archive Bucket"
         },
