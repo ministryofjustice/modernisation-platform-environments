@@ -226,7 +226,7 @@ module "reload_pipeline" {
               "--dpr.file.source.prefix" : "${var.reload_diff_folder}/toInsert",
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.retention.period.amount" : "0",
-              "--dpr.file.transfer.delete.copied.files" : "false",
+              "--dpr.file.transfer.delete.copied.files" : "true",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
@@ -243,7 +243,7 @@ module "reload_pipeline" {
               "--dpr.file.source.prefix" : "${var.reload_diff_folder}/toDelete",
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.retention.period.amount" : "0",
-              "--dpr.file.transfer.delete.copied.files" : "false",
+              "--dpr.file.transfer.delete.copied.files" : "true",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
@@ -260,7 +260,7 @@ module "reload_pipeline" {
               "--dpr.file.source.prefix" : "${var.reload_diff_folder}/toUpdate",
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.retention.period.amount" : "0",
-              "--dpr.file.transfer.delete.copied.files" : "false",
+              "--dpr.file.transfer.delete.copied.files" : "true",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
