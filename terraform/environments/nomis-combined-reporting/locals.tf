@@ -25,6 +25,7 @@ locals {
         "ec2",
         "ec2_linux",
         "ec2_instance_linux",
+        "ec2_instance_oracle_db_with_backup",
         "ec2_windows",
       ]
       cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
