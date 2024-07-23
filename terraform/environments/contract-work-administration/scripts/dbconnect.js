@@ -1,10 +1,13 @@
 /////////////////////////////////////////////////////////////////////
-// CWA automated backup script
+// Automated backup script
 // - Makes call to lambda which connects to EC2 instance and put
 //   DB in backup mode
 // - Call Oracle SQL scripts as Oracle user
 //
-//   version: 1.0 (for migration to MP)
+//   version: 1.1 (for migration to MP)
+//   - Added error catching for failed SSH
+//   - Added error catching for stdout for SSH exec
+//   - Filter for running EC2 instances only to connect to
 /////////////////////////////////////////////////////////////////////
 
 const SSH = require("simple-ssh");
@@ -35,12 +38,12 @@ today = dd + "-" + mm + "-" + yyyy;
 //EC2 object
 let ec2 = new AWS.EC2({ apiVersion: "2014-10-31" });
 
-//Get private IP address for EC2 instances tagged with Name:{ appname }
+// Get private IP address for EC2 instances tagged with Name:{ appname } that are running
 // May return more than 1 instance if there are multiple instances with the same name
 async function getInstances(appname) {
   console.log("Getting all instances tagged with Name:", appname);
   return ec2
-    .describeInstances({ Filters: [{ Name: "tag:Name", Values: [appname] }] })
+    .describeInstances({ Filters: [{ Name: "tag:Name", Values: [appname] }, {Name: "instance-state-name", Values: ["running"]}]})
     .promise();
 }
 
@@ -105,9 +108,9 @@ async function connSSH(action, appname) {
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log("standard output: " + stdout);
+                // console.log("standard output: " + stdout);
                 console.log("standard error: " + stderr);
-                if (code == 0) {
+                if (code == 0 && !stdout.toUpperCase().includes("ERROR")) {
                   resolve();
                 } else {
                   reject();
@@ -115,8 +118,16 @@ async function connSSH(action, appname) {
               },
             }
           )
-          .start();
+          .start(
+            {
+              fail: function (err) {
+                console.error("SSH failed: " + err);
+                reject();
+              }
+            }
+          );
       } else if (action == "end"){
+        console.log("[+] Trying connecting to EC2 ==>> " + address);
         console.log(`[+] Running "end backup commands" as Oracle`);
 
         ssh
@@ -137,9 +148,9 @@ async function connSSH(action, appname) {
               out: console.log.bind(console),
               exit: function (code, stdout, stderr) {
                 console.log("operation exited with code: " + code);
-                console.log("standard output: " + stdout);
+                // console.log("standard output: " + stdout);
                 console.log("standard error: " + stderr);
-                if (code == 0) {
+                if (code == 0 && !stdout.toUpperCase().includes("ERROR")) {
                   resolve();
                 } else {
                   reject();
@@ -147,7 +158,14 @@ async function connSSH(action, appname) {
               },
             }
           )
-          .start();
+          .start(
+            {
+              fail: function (err) {
+                console.error("SSH failed: " + err);
+                reject();
+              }
+            }
+          );
       }
     });
     try {
@@ -155,7 +173,7 @@ async function connSSH(action, appname) {
       ssh.end();
       console.log(`[+] Completed DB alter state: ${action} ==>> ` + address);
     } catch (e) {
-      throw new Error("SSH Exec did not run successfully on the database. " + e);
+      throw new Error(`SSH Exec did not run successfully on the instance ${address}: ` + e );
     }
   }
 }
