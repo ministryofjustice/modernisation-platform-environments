@@ -28,8 +28,8 @@ locals {
         "ec2_instance_oracle_db_with_backup",
         "ec2_windows",
       ]
-      cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
-      # cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
+      cloudwatch_metric_oam_links_ssm_parameters  = ["hmpps-oem-${local.environment}"]
+      cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
       db_backup_bucket_name                       = "ncr-db-backup-bucket"
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
