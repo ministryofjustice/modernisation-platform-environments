@@ -1,9 +1,7 @@
 locals {
-  # rds_user           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-  rds_user           = "test"
+  rds_user           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
   rds_port           = "1433"
-  # rds_password       = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-  rds_password       = "test"
+  rds_password       = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
   source_db_url      = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
   source_db_user     = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   source_db_password = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
@@ -21,7 +19,7 @@ module "appeals" {
   app_db_name                  = "ossc"
   app_db_login_name            = "ossc-app"
   app_source_db_name           = "Ossc"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
@@ -63,7 +61,7 @@ module "ahmlr" {
   app_db_name                  = "hmlands"
   app_db_login_name            = "hmlands-app"
   app_source_db_name           = "hmlands"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
@@ -105,7 +103,7 @@ module "care_standards" {
   app_db_name                  = "carestandards"
   app_db_login_name            = "carestandards-app"
   app_source_db_name           = "carestandards"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
@@ -147,7 +145,7 @@ module "cicap" {
   app_db_name                  = "cicap"
   app_db_login_name            = "cicap-app"
   app_source_db_name           = "cicap"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
@@ -189,7 +187,7 @@ module "employment_appeals" {
   app_db_name                  = "eat"
   app_db_login_name            = "eat-app"
   app_source_db_name           = "eat"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
@@ -231,7 +229,7 @@ module "finance_and_tax" {
   app_db_name                  = "ftt"
   app_db_login_name            = "ftt-app"
   app_source_db_name           = "ftt"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
@@ -273,7 +271,7 @@ module "immigration_services" {
   app_db_name                  = "imset"
   app_db_login_name            = "imset-app"
   app_source_db_name           = "imset"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
@@ -315,7 +313,7 @@ module "information_tribunal" {
   app_db_name                  = "it"
   app_db_login_name            = "it-app"
   app_source_db_name           = "it"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
@@ -357,7 +355,7 @@ module "lands_tribunal" {
   app_db_name                  = "lands"
   app_db_login_name            = "lands-app"
   app_source_db_name           = "lands"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
@@ -399,7 +397,7 @@ module "transport" {
   app_db_name                  = "transport"
   app_db_login_name            = "transport-app"
   app_source_db_name           = "Transport"
-  app_rds_url                  = "test"
+  app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
