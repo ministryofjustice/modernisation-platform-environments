@@ -59,13 +59,13 @@ locals {
     }
   }
 
-  database_ec2_a = merge(local.database_ec2_default, {
-    config = merge(local.database_ec2_default.config, {
+  database_ec2_a = merge(local.ec2_instances.db, {
+    config = merge(local.ec2_instances.db.config, {
       availability_zone = "eu-west-2a"
     })
   })
-  database_ec2_b = merge(local.database_ec2_default, {
-    config = merge(local.database_ec2_default.config, {
+  database_ec2_b = merge(local.ec2_instances.db, {
+    config = merge(local.ec2_instances.db.config, {
       availability_zone = "eu-west-2b"
     })
   })
