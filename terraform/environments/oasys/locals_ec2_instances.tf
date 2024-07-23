@@ -13,47 +13,36 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/"
-        subnet_name                   = "private"
+        subnet_name = "private"
       }
       instance = {
-        disable_api_termination      = false
-        instance_type                = "t3.xlarge"
-        key_name                     = "ec2-user"
-        metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["bip"]
+        disable_api_termination = false
+        instance_type           = "t3.xlarge"
+        key_name                = "ec2-user"
+        vpc_security_group_ids  = ["bip"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
       }
-      secretsmanager_secrets = {}
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "" # built from base AMI to amibuild and ec2provision tasks are run
+          branch       = "main"
+          ansible_args = ""
         }
-        scripts = [
-          "install-ssm-agent.sh.tftpl",
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       tags = {
-        backup              = "false" # opt out of mod platform default backup plan
-        component           = "bip"
-        description         = "${local.environment} oasys bip"
-        environment-name    = terraform.workspace
-        instance-scheduling = "skip-scheduling"
-        monitored           = true
-        os-major-version    = 7
-        os-type             = "Linux"
-        os-version          = "RHEL 7.9"
-        "Patch Group"       = "RHEL"
-        server-type         = "oasys-bip"
+        backup           = "false" # opt out of mod platform default backup plan
+        description      = "${local.environment} oasys bip"
+        os-major-version = 7
+        os-type          = "Linux"
+        os-version       = "RHEL 7.9"
+        server-type      = "oasys-bip"
+        update-ssm-agent = "patchgroup1"
       }
     }
 
@@ -73,15 +62,13 @@ locals {
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
         secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2/"
         subnet_name                   = "data"
       }
       instance = {
-        disable_api_termination      = true
+        disable_api_termination      = false
         instance_type                = "r6i.4xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        monitoring                   = true
         vpc_security_group_ids       = ["data"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -99,31 +86,25 @@ locals {
       }
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = "" # built from base AMI to amibuild and ec2provision tasks are run
+          branch       = "main"
+          ansible_args = "" # built from base AMI to amibuild and ec2provision tasks are run
         }
-        scripts = [
-          "install-ssm-agent.sh.tftpl",
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       tags = {
         backup                      = "false" # opt out of mod platform default backup plan
-        component                   = "data"
         description                 = "${local.environment} onr database"
-        environment-name            = terraform.workspace
         licence-requirements        = "Oracle Database"
-        monitored                   = true
         OracleDbLTS-ManagedInstance = true # oracle license tracking
         os-type                     = "Linux"
         os-major-version            = 8
         os-version                  = "RHEL 8.5"
-        "Patch Group"               = "RHEL"
         server-type                 = "onr-db"
+        update-ssm-agent            = "patchgroup1"
       }
     }
 
@@ -142,16 +123,14 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        ssm_parameters_prefix         = "ec2/"
         secretsmanager_secrets_prefix = "ec2/"
         subnet_name                   = "data"
       }
       instance = {
-        disable_api_termination      = true
+        disable_api_termination      = false
         instance_type                = "r6i.4xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        monitoring                   = true
         vpc_security_group_ids       = ["data"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -159,16 +138,13 @@ locals {
       }
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = ""
+          branch       = "main"
+          ansible_args = ""
         }
-        scripts = [
-          "install-ssm-agent.sh.tftpl",
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       route53_records = {
@@ -185,15 +161,13 @@ locals {
         backup                      = "false" # opt out of mod platform default backup plan
         component                   = "data"
         description                 = "${local.environment} oasys database"
-        environment-name            = terraform.workspace # used in provisioning script to select group vars
         licence-requirements        = "Oracle Database"
-        monitored                   = true
         OracleDbLTS-ManagedInstance = true # oracle license tracking
         os-type                     = "Linux"
         os-major-version            = 8
         os-version                  = "RHEL 8.5"
-        "Patch Group"               = "RHEL"
         server-type                 = "oasys-db"
+        update-ssm-agent            = "patchgroup1"
       }
     }
   }

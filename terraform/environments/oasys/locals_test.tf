@@ -33,13 +33,173 @@ locals {
       }
     }
 
-    cloudwatch_log_groups = {
-      session-manager-logs     = { retention_in_days = 7 }
-      cwagent-var-log-messages = { retention_in_days = 7 }
-      cwagent-var-log-secure   = { retention_in_days = 7 }
-      cwagent-windows-system   = { retention_in_days = 7 }
-      cwagent-oasys-autologoff = { retention_in_days = 7 }
-      cwagent-web-logs         = { retention_in_days = 7 }
+    ec2_autoscaling_groups = {
+      t1-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
+        autoscaling_schedules = {
+          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
+          scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+        }
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
+          iam_resource_names_prefix = "ec2-web-t1"
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+            "Ec2T1WebPolicy",
+          ])
+        })
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
+          description        = "t1 oasys web"
+          oasys-environment  = "t1"
+          oracle-db-hostname = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
+          oracle-db-sid      = "T1OASYS" # for each env using azure DB will need to be OASPROD
+        })
+      })
+
+      t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
+        autoscaling_schedules = {
+          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
+          scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+        }
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
+          iam_resource_names_prefix = "ec2-web-t2"
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+            "Ec2T2WebPolicy",
+          ])
+        })
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
+          description        = "t2 oasys web"
+          oasys-environment  = "t2"
+          oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+          oracle-db-sid      = "T2OASYS" # for each env using azure DB will need to be OASPROD
+        })
+      })
+    }
+
+    ec2_instances = {
+      t1-oasys-bip-a = merge(local.ec2_instances.bip, {
+        config = merge(local.ec2_instances.bip.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
+            "Ec2T1BipPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip.tags, {
+          bip-db-hostname     = "t1-oasys-db-a"
+          bip-db-name         = "T1BIPINF"
+          instance-scheduling = "skip-scheduling"
+          oasys-db-hostname   = "t1-oasys-db-a"
+          oasys-db-name       = "T1OASYS"
+          oasys-environment   = "t1"
+        })
+      })
+
+      t1-oasys-db-a = merge(local.ec2_instances.db19c, {
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
+            "Ec2T1DatabasePolicy",
+          ])
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { label = "app", size = 100 } # /u01
+          "/dev/sdc" = { label = "app", size = 500 } # /u02
+          "/dev/sde" = { label = "data", size = 500 }
+          "/dev/sdf" = { label = "data", size = 50 }
+          "/dev/sdj" = { label = "flash", size = 50 }
+          "/dev/sds" = { label = "swap", size = 2 }
+        }
+        instance = merge(local.ec2_instances.db19c.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.xlarge"
+        })
+        tags = merge(local.ec2_instances.db19c.tags, {
+          bip-db-name         = "T1BIPINF"
+          description         = "t1 oasys database"
+          instance-scheduling = "skip-scheduling"
+          oasys-environment   = "t1"
+          oracle-sids         = "T1BIPINF T1MISTRN T1OASREP T1OASYS T1ONRAUD T1ONRBDS T1ONRSYS"
+        })
+      })
+
+      t2-oasys-bip-a = merge(local.ec2_instances.bip, {
+        config = merge(local.ec2_instances.bip.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
+            "Ec2T2BipPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip.tags, {
+          bip-db-hostname     = "t2-oasys-db-a"
+          bip-db-name         = "T2BIPINF"
+          instance-scheduling = "skip-scheduling"
+          oasys-db-hostname   = "t2-oasys-db-a"
+          oasys-db-name       = "T2OASYS"
+          oasys-environment   = "t2"
+        })
+      })
+
+      t2-oasys-db-a = merge(local.ec2_instances.db19c, {
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
+            "Ec2T2DatabasePolicy",
+          ])
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { label = "app", size = 100 } # /u01
+          "/dev/sdc" = { label = "app", size = 500 } # /u02
+          "/dev/sde" = { label = "data", size = 500, iops = 12000, throughput = 750 }
+          "/dev/sdf" = { label = "data", size = 50 }
+          "/dev/sdj" = { label = "flash", size = 50, iops = 5000, throughput = 500 }
+          "/dev/sds" = { label = "swap", size = 2 }
+        }
+        instance = merge(local.ec2_instances.db19c.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.xlarge"
+        })
+        tags = merge(local.ec2_instances.db19c.tags, {
+          bip-db-name         = "T2BIPINF"
+          description         = "t2 oasys database"
+          instance-scheduling = "skip-scheduling"
+          oasys-environment   = "t2"
+          oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
+        })
+      })
+
+      t2-onr-db-a = merge(local.ec2_instances.db11g, {
+        config = merge(local.ec2_instances.db11g.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
+            "Ec2T2DatabasePolicy",
+          ])
+        })
+        ebs_volumes = {
+          "/dev/sdb" = { label = "app", size = 100 } # /u01
+          "/dev/sdc" = { label = "app", size = 500 } # /u02
+          "/dev/sde" = { label = "data", size = 2000 }
+          "/dev/sdj" = { label = "flash", size = 600 }
+          "/dev/sds" = { label = "swap", size = 2 }
+        }
+        instance = merge(local.ec2_instances.db11g.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.xlarge"
+        })
+        tags = merge(local.ec2_instances.db11g.tags, {
+          instance-scheduling = "skip-scheduling"
+          oasys-environment   = "test"             # should be T2
+          oracle-sids         = "OASPROD BIPINFRA" # should be T2BOSYS T2BOAUD
+        })
+      })
     }
 
     iam_policies = {
@@ -62,15 +222,6 @@ locals {
       Ec2T1DatabasePolicy = {
         description = "Permissions required for T1 Database EC2s"
         statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
           {
             effect = "Allow"
             actions = [
@@ -121,15 +272,6 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
@@ -154,172 +296,6 @@ locals {
           }
         ]
       }
-    }
-
-    ec2_autoscaling_groups = {
-      t1-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
-        autoscaling_schedules = {
-          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
-          scale_down = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
-        }
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "oasys_webserver_release_*"
-          iam_resource_names_prefix = "ec2-web-t1"
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
-            "Ec2T1WebPolicy",
-          ])
-          ssm_parameters_prefix = "ec2-web-t1/"
-        })
-        tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          description        = "t1 oasys web"
-          oasys-environment  = "t1"
-          oracle-db-hostname = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
-          oracle-db-sid      = "T1OASYS" # for each env using azure DB will need to be OASPROD
-        })
-      })
-
-      t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
-        autoscaling_schedules = {
-          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
-          scale_down = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
-        }
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "oasys_webserver_release_*"
-          iam_resource_names_prefix = "ec2-web-t2"
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
-            "Ec2T2WebPolicy",
-          ])
-          ssm_parameters_prefix = "ec2-web-t2/"
-        })
-        tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          description        = "t2 oasys web"
-          oasys-environment  = "t2"
-          oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
-          oracle-db-sid      = "T2OASYS" # for each env using azure DB will need to be OASPROD
-        })
-      })
-    }
-
-    ec2_instances = {
-      t1-oasys-bip-a = merge(local.ec2_instances.bip, {
-        config = merge(local.ec2_instances.bip.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
-            "Ec2T1BipPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
-          args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_instances.bip.tags, {
-          bip-db-hostname   = "t1-oasys-db-a"
-          bip-db-name       = "T1BIPINF"
-          oasys-db-hostname = "t1-oasys-db-a"
-          oasys-db-name     = "T1OASYS"
-          oasys-environment = "t1"
-        })
-      })
-
-      t1-oasys-db-a = merge(local.ec2_instances.db19c, {
-        config = merge(local.ec2_instances.db19c.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
-            "Ec2T1DatabasePolicy",
-          ])
-        })
-        ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 } # /u01
-          "/dev/sdc" = { label = "app", size = 500 } # /u02
-          "/dev/sde" = { label = "data", size = 500 }
-          "/dev/sdf" = { label = "data", size = 50 }
-          "/dev/sdj" = { label = "flash", size = 50 }
-          "/dev/sds" = { label = "swap", size = 2 }
-        }
-        instance = merge(local.ec2_instances.db19c.instance, {
-          instance_type = "r6i.xlarge"
-        })
-        tags = merge(local.ec2_instances.db19c.tags, {
-          bip-db-name         = "T1BIPINF"
-          description         = "t1 oasys database"
-          instance-scheduling = "skip-scheduling"
-          oasys-environment   = "t1"
-          oracle-sids         = "T1BIPINF T1MISTRN T1OASREP T1OASYS T1ONRAUD T1ONRBDS T1ONRSYS"
-        })
-      })
-
-      t2-oasys-bip-a = merge(local.ec2_instances.bip, {
-        config = merge(local.ec2_instances.bip.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
-            "Ec2T2BipPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
-          args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_instances.bip.tags, {
-          bip-db-hostname   = "t2-oasys-db-a"
-          bip-db-name       = "T2BIPINF"
-          oasys-db-hostname = "t2-oasys-db-a"
-          oasys-db-name     = "T2OASYS"
-          oasys-environment = "t2"
-        })
-      })
-
-      t2-oasys-db-a = merge(local.ec2_instances.db19c, {
-        config = merge(local.ec2_instances.db19c.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 } # /u01
-          "/dev/sdc" = { label = "app", size = 500 } # /u02
-          "/dev/sde" = { label = "data", size = 500, iops = 12000, throughput = 750 }
-          "/dev/sdf" = { label = "data", size = 50 }
-          "/dev/sdj" = { label = "flash", size = 50, iops = 5000, throughput = 500 }
-          "/dev/sds" = { label = "swap", size = 2 }
-        }
-        instance = merge(local.ec2_instances.db19c.instance, {
-          instance_type = "r6i.xlarge"
-        })
-        tags = merge(local.ec2_instances.db19c.tags, {
-          bip-db-name         = "T2BIPINF"
-          description         = "t2 oasys database"
-          instance-scheduling = "skip-scheduling"
-          oasys-environment   = "t2"
-          oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
-
-      t2-onr-db-a = merge(local.ec2_instances.db11g, {
-        config = merge(local.ec2_instances.db11g.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 } # /u01
-          "/dev/sdc" = { label = "app", size = 500 } # /u02
-          "/dev/sde" = { label = "data", size = 2000 }
-          "/dev/sdj" = { label = "flash", size = 600 }
-          "/dev/sds" = { label = "swap", size = 2 }
-        }
-        instance = merge(local.ec2_instances.db11g.instance, {
-          instance_type = "r6i.xlarge"
-        })
-        tags = merge(local.ec2_instances.db11g.tags, {
-          instance-scheduling = "skip-scheduling"
-          oasys-environment   = "test"             # should be T2
-          oracle-sids         = "OASPROD BIPINFRA" # should be T2BOSYS T2BOAUD
-        })
-      })
     }
 
     # options for LBs https://docs.google.com/presentation/d/1RpXpfNY_hw7FjoMw0sdMAdQOF7kZqLUY6qVVtLNavWI/edit?usp=sharing

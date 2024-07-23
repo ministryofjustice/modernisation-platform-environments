@@ -20,17 +20,13 @@ locals {
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
         secretsmanager_secrets_prefix = "ec2/"
-        ssm_parameters_prefix         = "ec2-web/" # TODO
         subnet_name                   = "private"
       }
       instance = {
-        disable_api_termination      = false
-        instance_type                = "t3.medium"
-        key_name                     = "ec2-user"
-        metadata_options_http_tokens = "required"
-        monitoring                   = true
-        vpc_security_group_ids       = ["private"]
-        vpc_security_group_ids       = ["private_web"]
+        disable_api_termination = false
+        instance_type           = "t3.medium"
+        key_name                = "ec2-user"
+        vpc_security_group_ids  = ["private_web"]
       }
       lb_target_groups = {
         pb-http-8080 = {
@@ -88,28 +84,23 @@ locals {
       }
       user_data_cloud_init = {
         args = {
-          lifecycle_hook_name  = "ready-hook"
-          branch               = "main"
-          ansible_repo         = "modernisation-platform-configuration-management"
-          ansible_repo_basedir = "ansible"
-          ansible_args         = ""
+          branch       = "main"
+          ansible_args = ""
         }
-        scripts = [
-          "install-ssm-agent.sh.tftpl",
-          "ansible-ec2provision.sh.tftpl",
-          "post-ec2provision.sh.tftpl"
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
         ]
       }
       tags = {
-        component        = "web"
+        backup           = "false"
         description      = "${local.environment} oasys web"
-        environment-name = terraform.workspace
-        monitored        = true
         os-type          = "Linux"
         os-major-version = 7
         os-version       = "RHEL 7.9"
-        "Patch Group"    = "RHEL"
         server-type      = "oasys-web"
+        update-ssm-agent = "patchgroup1"
       }
     }
   }
