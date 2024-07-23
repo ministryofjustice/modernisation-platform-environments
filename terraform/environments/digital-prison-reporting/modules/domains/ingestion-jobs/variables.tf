@@ -558,7 +558,7 @@ variable "glue_create_reload_diff_job_language" {
   description = "(Optional) The script programming language."
 
   validation {
-    condition     = contains(["scala", "python"], var.glue_archive_language)
+    condition     = contains(["scala", "python"], var.glue_create_reload_diff_job_language)
     error_message = "Accepts a value of 'scala' or 'python'."
   }
 }
