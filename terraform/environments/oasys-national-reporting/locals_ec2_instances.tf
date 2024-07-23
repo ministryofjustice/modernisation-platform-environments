@@ -66,7 +66,7 @@ locals {
         server-type      = "OnrBods"
         update-ssm-agent = "patchgroup1"
       }
-      cloudwatch_metric_alarms = locals.ec2_instances.windows.cloudwatch_metric_alarms
+      cloudwatch_metric_alarms = local.ec2_instances.windows.cloudwatch_metric_alarms
     }
 
     boe_app = {
