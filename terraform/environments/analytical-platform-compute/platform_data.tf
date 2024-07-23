@@ -3,6 +3,10 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+data "aws_iam_session_context" "current" {
+  arn = data.aws_caller_identity.current.arn
+}
+
 # Route53 DNS data
 data "aws_route53_zone" "network-services" {
   provider = aws.core-network-services
