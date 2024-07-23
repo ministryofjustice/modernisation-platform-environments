@@ -5,7 +5,7 @@ locals {
     private = {
       enable_cross_zone_load_balancing = true
       enable_delete_protection         = false
-      force_destroy_bucket             = false # todo
+      force_destroy_bucket             = true
       idle_timeout                     = 3600
       internal_lb                      = true
       security_groups                  = ["lb"]

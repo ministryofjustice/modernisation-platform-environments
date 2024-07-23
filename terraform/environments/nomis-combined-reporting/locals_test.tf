@@ -15,19 +15,6 @@ locals {
   # please keep resources in alphabetical order
   baseline_test = {
 
-    acm_certificates = {
-      nomis_combined_reporting_wildcard_cert = {
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name              = "modernisation-platform.service.justice.gov.uk"
-        subject_alternate_names = [
-          "*.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
-        ]
-        tags = {
-          description = "Wildcard certificate for the test environment"
-        }
-      }
-    }
-
     ec2_instances = {
       t1-ncr-db-1-a = merge(local.ec2_instances.db, {
         cloudwatch_metric_alarms = merge(
@@ -120,15 +107,6 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
@@ -160,7 +138,6 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
-        # enable when environment ready
         instance_target_groups = {}
         listeners              = {}
       })
