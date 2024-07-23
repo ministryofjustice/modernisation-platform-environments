@@ -1,5 +1,5 @@
 module "ecs" {
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.2.1"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v4.3.0"
   name                      = "nextcloud-${var.env_name}-cluster"
   enable_container_insights = "enabled"
   tags                      = var.tags
