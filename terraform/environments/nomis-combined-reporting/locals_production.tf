@@ -342,25 +342,24 @@ locals {
       #   })
       # })
 
-      # # Comment out till needed for deployment
-      # pd-ncr-web-admin-a = merge(local.ec2_instances.bip_web, {
-      #   # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
-      #   config = merge(local.ec2_instances.bip_web.config, {
-      #     ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-      #     availability_zone = "eu-west-2a"
-      #     instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-      #       "Ec2PDReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_web.instance, {
-      #     instance_type = "r6i.large",
-      #   })
-      #   tags = merge(local.ec2_instances.bip_web.tags, {
-      #     description                          = "Prod SAP BI Platform web-tier admin installation and configurations"
-      #     instance-scheduling                  = "skip-scheduling"
-      #     nomis-combined-reporting-environment = "pd"
-      #   })
-      # })
+      pd-ncr-web-admin-a = merge(local.ec2_instances.bip_web, {
+        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
+        config = merge(local.ec2_instances.bip_web.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.large",
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          description                          = "Prod SAP BI Platform web-tier admin installation and configurations"
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
     }
 
     # Comment out till needed for deployment
