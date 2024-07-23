@@ -133,7 +133,7 @@ module "production-eu-west-2a" {
 module "production-eu-west-2b" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   # This is an internal module so commit hashes are not needed
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v3.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v3.1.0"
   count  = local.is-production == true ? 1 : 0
   providers = {
     aws.bucket-replication = aws
