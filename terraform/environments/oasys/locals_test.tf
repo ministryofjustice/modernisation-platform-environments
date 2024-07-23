@@ -41,6 +41,7 @@ locals {
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
+          availability_zone         = "eu-west-2a"
           iam_resource_names_prefix = "ec2-web-t1"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2T1WebPolicy",
@@ -61,6 +62,7 @@ locals {
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
+          availability_zone         = "eu-west-2a"
           iam_resource_names_prefix = "ec2-web-t2"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2T2WebPolicy",
