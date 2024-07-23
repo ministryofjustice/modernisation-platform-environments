@@ -53,7 +53,7 @@ module "nextcloud_service" {
   ]
   mount_points = [for k, v in module.nextcloud_efs : {
     sourceVolume  = v.name
-    containerPath = "/var/www/${k}"
+    containerPath = k == "data" ? "/var/nextcloud/data" : "/var/www/${k}"
     readOnly      = false
   }]
 
@@ -109,7 +109,7 @@ module "nextcloud_service" {
     NEXTCLOUD_ADMIN_USER      = "admin"
     NEXTCLOUD_TRUSTED_DOMAINS = aws_route53_record.nextcloud_external.fqdn
     S3_BUCKET_CONFIG          = module.s3_bucket_config.bucket.id
-    LDAP_PASSWORD_SECRET_ARN  = "arn:aws:secretsmanager:eu-west-2:${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:secret:ldap-admin-password"
+    LDAP_PASSWORD_SECRET_ARN  = "arn:aws:secretsmanager:eu-west-2:${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:secret:ldap-admin-password-${var.env_name}"
   }
 
   container_vars_env_specific = {}
