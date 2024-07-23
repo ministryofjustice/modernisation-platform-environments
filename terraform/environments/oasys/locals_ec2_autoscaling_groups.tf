@@ -9,26 +9,7 @@ locals {
         force_delete        = true
         vpc_zone_identifier = module.environment.subnets["private"].ids
       }
-      cloudwatch_metric_alarms = merge(
-        module.baseline_presets.cloudwatch_metric_alarms.ec2,
-        module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
-        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
-        {
-          low-inodes = {
-            comparison_operator = "GreaterThanOrEqualToThreshold"
-            evaluation_periods  = "15"
-            datapoints_to_alarm = "15"
-            metric_name         = "collectd_inode_used_percent_value"
-            namespace           = "CWAgent"
-            period              = "60"
-            statistic           = "Maximum"
-            threshold           = "85"
-            alarm_description   = "Triggers if free inodes falls below the threshold for an hour"
-            alarm_actions       = ["dso_pagerduty"]
-          }
-        }
-      )
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
       config = {
         ami_name                  = "oasys_webserver_release_2023-07-02*"
         iam_resource_names_prefix = "ec2-web"
