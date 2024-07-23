@@ -50,34 +50,34 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      pd-oasys-web-a = merge(local.webserver, {
-        autoscaling_group = merge(local.webserver.autoscaling_group, {
+      pd-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
           max_size         = 0
         })
-        config = merge(local.webserver.config, {
-          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
+        config = merge(local.ec2_autoscaling_groups.web.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2ProdWebPolicy",
           ])
         })
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
           oasys-environment  = "production"
           oracle-db-hostname = "db.oasys.hmpps-production.modernisation-platform.internal"
           oracle-db-sid      = "PDOASYS"
         })
       })
 
-      pd-oasys-web-b = merge(local.webserver, {
-        autoscaling_group = merge(local.webserver.autoscaling_group, {
+      pd-oasys-web-b = merge(local.ec2_autoscaling_groups.web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 4
           max_size         = 4
         })
-        config = merge(local.webserver.config, {
-          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
+        config = merge(local.ec2_autoscaling_groups.web.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2ProdWebPolicy",
           ])
         })
-        instance = merge(local.webserver.instance, {
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
           instance_type = "t3.large"
         })
         user_data_cloud_init = {
@@ -94,22 +94,22 @@ locals {
             "post-ec2provision.sh.tftpl"
           ]
         }
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
           oasys-environment  = "production"
           oracle-db-hostname = "db.oasys.hmpps-production.modernisation-platform.internal"
           oracle-db-sid      = "PDOASYS"
         })
       })
 
-      ptc-oasys-web-a = merge(local.webserver, {
-        config = merge(local.webserver.config, {
+      ptc-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
+        config = merge(local.ec2_autoscaling_groups.web.config, {
           iam_resource_names_prefix = "ec2-web-ptc"
-          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2PtcWebPolicy",
           ])
           ssm_parameters_prefix = "ec2-web-ptc/"
         })
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "${local.environment} practice oasys web"
           oasys-environment  = "ptc"
           oracle-db-sid      = "PROASYS"
@@ -117,15 +117,15 @@ locals {
         })
       })
 
-      trn-oasys-web-a = merge(local.webserver, {
-        config = merge(local.webserver.config, {
+      trn-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
+        config = merge(local.ec2_autoscaling_groups.web.config, {
           iam_resource_names_prefix = "ec2-web-trn"
-          instance_profile_policies = concat(local.webserver.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2TrnWebPolicy",
           ])
           ssm_parameters_prefix = "ec2-web-trn/"
         })
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "${local.environment} training oasys web"
           oasys-environment  = "trn"
           oracle-db-sid      = "TROASYS"
@@ -135,13 +135,14 @@ locals {
     }
 
     ec2_instances = {
-      pd-oasys-bip-a = merge(local.bip_a, {
-        config = merge(local.bip_a.config, {
-          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+      pd-oasys-bip-a = merge(local.ec2_instances.bip, {
+        config = merge(local.ec2_instances.bip.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
             "Ec2ProdBipPolicy",
           ])
         })
-        tags = merge(local.bip_a.tags, {
+        tags = merge(local.ec2_instances.bip.tags, {
           bip-db-name       = "PDBIPINF"
           bip-db-hostname   = "pd-oasys-db-a"
           oasys-db-name     = "PDOASYS"
@@ -149,9 +150,10 @@ locals {
           oasys-environment = "production"
         })
       })
-      pd-oasys-db-a = merge(local.database_a, {
-        config = merge(local.database_a.config, {
-          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+      pd-oasys-db-a = merge(local.ec2_instances.db19c, {
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
@@ -163,15 +165,16 @@ locals {
           "/dev/sdj" = { label = "flash", size = 1000, iops = 5000, throughput = 500 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
-        tags = merge(local.database_a.tags, {
+        tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name       = "PDBIPINF"
           oasys-environment = "production"
           oracle-sids       = "PDBIPINF PDOASYS"
         })
       })
-      pd-oasys-db-b = merge(local.database_b, {
-        config = merge(local.database_b.config, {
-          instance_profile_policies = concat(local.database_b.config.instance_profile_policies, [
+      pd-oasys-db-b = merge(local.ec2_instances.db19c, {
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
@@ -183,15 +186,16 @@ locals {
           "/dev/sdj" = { label = "flash", size = 1000, iops = 5000, throughput = 500 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
-        tags = merge(local.database_b.tags, {
+        tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name       = "PDBIPINF"
           oasys-environment = "production"
           oracle-sids       = "PDBIPINF PDOASYS"
         })
       })
-      pd-onr-db-a = merge(local.database_onr_a, {
-        config = merge(local.database_onr_a.config, {
-          instance_profile_policies = concat(local.database_onr_a.config.instance_profile_policies, [
+      pd-onr-db-a = merge(local.ec2_instances.db11g, {
+        config = merge(local.ec2_instances.db11g.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
             "Ec2ProdDatabasePolicy",
           ])
         })
@@ -202,20 +206,21 @@ locals {
           "/dev/sdj" = { label = "flash", size = 600 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
-        tags = merge(local.database_onr_a.tags, {
+        tags = merge(local.ec2_instances.db11g.tags, {
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "production"
           oracle-sids         = "PDMISTRN PDONRBDS PDONRSYS PDONRAUD PDOASREP"
         })
       })
 
-      ptctrn-oasys-db-a = merge(local.database_a, {
-        config = merge(local.database_a.config, {
-          instance_profile_policies = concat(local.database_a.config.instance_profile_policies, [
+      ptctrn-oasys-db-a = merge(local.ec2_instances.db19c, {
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
             "Ec2PtcTrnDatabasePolicy",
           ])
         })
-        instance = merge(local.database_a.instance, {
+        instance = merge(local.ec2_instances.db19c.instance, {
           instance_type = "r6i.xlarge"
         })
         ebs_volumes = {
@@ -225,7 +230,7 @@ locals {
           "/dev/sdj" = { label = "flash", size = 200 } # FLASH01
           "/dev/sds" = { label = "swap", size = 2 }
         }
-        tags = merge(local.database_a.tags, {
+        tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name       = "TRBIPINF"
           description       = "practice and training oasys database"
           oasys-environment = "ptctrn"
@@ -233,13 +238,14 @@ locals {
         })
       })
 
-      trn-oasys-bip-a = merge(local.bip_a, {
-        config = merge(local.bip_a.config, {
-          instance_profile_policies = concat(local.bip_a.config.instance_profile_policies, [
+      trn-oasys-bip-a = merge(local.ec2_instances.bip, {
+        config = merge(local.ec2_instances.bip.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
             "Ec2TrnBipPolicy",
           ])
         })
-        tags = merge(local.bip_a.tags, {
+        tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname   = "ptctrn-oasys-db-a"
           bip-db-name       = "TRBIPINF"
           oasys-db-hostname = "ptctrn-oasys-db-a"
@@ -735,25 +741,25 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/oracle/bip/production" = local.secretsmanager_secrets_bip
-      "/oracle/bip/trn"        = local.secretsmanager_secrets_bip
+      "/oracle/bip/production" = local.secretsmanager_secrets.bip
+      "/oracle/bip/trn"        = local.secretsmanager_secrets.bip
 
-      "/oracle/database/PDOASYS" = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/PROASYS" = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/TROASYS" = local.secretsmanager_secrets_oasys_db
-      "/oracle/database/DROASYS" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/PDOASYS" = local.secretsmanager_secrets.db_oasys
+      "/oracle/database/PROASYS" = local.secretsmanager_secrets.db_oasys
+      "/oracle/database/TROASYS" = local.secretsmanager_secrets.db_oasys
+      "/oracle/database/DROASYS" = local.secretsmanager_secrets.db_oasys
 
-      "/oracle/database/PDOASREP" = local.secretsmanager_secrets_db
-      "/oracle/database/PDBIPINF" = local.secretsmanager_secrets_bip_db
-      "/oracle/database/PDMISTRN" = local.secretsmanager_secrets_db
-      "/oracle/database/PDONRSYS" = local.secretsmanager_secrets_db
-      "/oracle/database/PDONRAUD" = local.secretsmanager_secrets_db
-      "/oracle/database/PDONRBDS" = local.secretsmanager_secrets_db
+      "/oracle/database/PDOASREP" = local.secretsmanager_secrets.db
+      "/oracle/database/PDBIPINF" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/PDMISTRN" = local.secretsmanager_secrets.db
+      "/oracle/database/PDONRSYS" = local.secretsmanager_secrets.db
+      "/oracle/database/PDONRAUD" = local.secretsmanager_secrets.db
+      "/oracle/database/PDONRBDS" = local.secretsmanager_secrets.db
 
-      "/oracle/database/TRBIPINF" = local.secretsmanager_secrets_bip_db
+      "/oracle/database/TRBIPINF" = local.secretsmanager_secrets.db_bip
 
       # for azure, remove when migrated to aws db
-      "/oracle/database/OASPROD" = local.secretsmanager_secrets_oasys_db
+      "/oracle/database/OASPROD" = local.secretsmanager_secrets.db_oasys
     }
   }
 
