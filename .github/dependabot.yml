@@ -18,6 +18,26 @@ updates:
   # a dependabot configuration, so we need to add all directories individually
   # See: github.com/dependabot/dependabot-core/issues/2178
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-compute"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-compute/modules/routes"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-ingestion"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-ingestion/modules/transfer-family/user"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-ingestion/modules/transfer-family/user-with-egress"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/apex"
     schedule:
       interval: "daily"
@@ -46,18 +66,6 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/ccms-ebs/modules"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/ccms-ebs/modules/cw-ec2"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/ccms-ebs/modules/cw-logs"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs-upgrade"
     schedule:
       interval: "daily"
@@ -74,6 +82,18 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/ccms-ebs/modules"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/ccms-ebs/modules/cw-ec2"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/ccms-ebs/modules/cw-logs"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/cdpt-chaps"
     schedule:
       interval: "daily"
@@ -86,15 +106,27 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/cica-data-extraction"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/cica-tariff"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/contract-work-administration"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/cooker"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/corporate-staff-rostering"
+    directory: "/terraform/environments/corporate-information-system"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/cortex-xsiam"
+    directory: "/terraform/environments/corporate-staff-rostering"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -118,19 +150,11 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/data-platform-compute"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-core/modules/components/delius_microservice"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-core/modules/components/ebs_volume"
+    directory: "/terraform/environments/delius-core/modules/components/dms"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -146,23 +170,35 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-core/modules/ecs_policies"
+    directory: "/terraform/environments/delius-core/modules/delius_environment"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-core/modules/efs"
+    directory: "/terraform/environments/delius-core/modules/helpers/delius_microservice"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-core/modules/environment_all_components"
+    directory: "/terraform/environments/delius-core/modules/helpers/ebs_volume"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-core/modules/ldap_efs_datasync"
+    directory: "/terraform/environments/delius-core/modules/helpers/ecs_policies"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-core/modules/nlb"
+    directory: "/terraform/environments/delius-core/modules/helpers/efs"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/delius-core/modules/helpers/nlb"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/delius-core/modules/helpers/secret"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/delius-core/modules/helpers/ssm_params"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -178,11 +214,35 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/delius-mis/modules/mis_environment"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/delius-nextcloud"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/delius-nextcloud/modules/components/nextcloud"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/delius-nextcloud/modules/environment"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/apigateway/serverless-lambda-gw"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/athena_federated_query_connectors/oracle"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/athena_workgroups"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -238,6 +298,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/domains/replay-pipeline"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/dynamo_tables"
     schedule:
       interval: "daily"
@@ -274,15 +338,15 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/lambda_trigger"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/lambdas/generic"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/lambdas/layer"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/digital-prison-reporting/modules/lambda_trigger"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -295,6 +359,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/notifications/sns"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/rds/aws-aurora"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -322,7 +390,19 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/edw"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/dms"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/lambdas"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -362,11 +442,11 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/hmpps-domain-services"
+    directory: "/terraform/environments/genesys-call-centre-data"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/hmpps-intelligence-management"
+    directory: "/terraform/environments/hmpps-domain-services"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -430,10 +510,6 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/nomis/cloudwatch_dashboard"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis-combined-reporting"
     schedule:
       interval: "daily"
@@ -462,11 +538,27 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/oasys-national-reporting"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/observability-platform/modules/grafana/amazon-prometheus-query-source"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/grafana/cloudwatch-source"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/observability-platform/modules/grafana/contact-point/pagerduty"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/observability-platform/modules/grafana/contact-point/slack"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -483,6 +575,14 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/prometheus/iam-role"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/operations-engineering"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/panda-cyber-appsec-lab"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -518,15 +618,31 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/tariff"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
     directory: "/terraform/environments/tipstaff"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/tribunals"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/tribunals/modules/dms"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/tribunals/modules/ecs_loadbalancer"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/tribunals/modules/ecs_task"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/tribunals/modules/tribunal"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/tribunals/modules/tribunal_ftp"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -550,11 +666,23 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/modules/cloudwatch_dashboard"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/modules/cost_usage_report"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/modules/efs"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/modules/environment"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/modules/fsx_windows"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -566,6 +694,6 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/modules/rds_instance"
+    directory: "/terraform/modules/shield_advanced"
     schedule:
       interval: "daily"
