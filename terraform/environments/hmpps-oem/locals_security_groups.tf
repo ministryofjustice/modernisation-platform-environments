@@ -33,7 +33,7 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
-    data_oem = {
+    data-oem = {
       description = "Security group for OEM servers"
       ingress = {
         all-from-self = {

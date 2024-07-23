@@ -2,6 +2,9 @@ locals {
 
   baseline_presets_development = {
     options = {
+      # disabling some features in development as the environment gets nuked
+      cloudwatch_metric_oam_links_ssm_parameters = []
+      cloudwatch_metric_oam_links                = []
     }
   }
 
@@ -9,89 +12,51 @@ locals {
   baseline_development = {
 
     ec2_autoscaling_groups = {
-      dev-web-asg = merge(local.defaults_web_ec2.config, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      dev-web-asg = merge(local.ec2_autoscaling_groups.boe_web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.boe_web.autoscaling_group, {
           desired_capacity = 0
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        config = merge(local.defaults_web_ec2.config, {
-          availability_zone = "eu-west-2a"
+        config = merge(local.ec2_autoscaling_groups.boe_web.config, {
         })
-        instance = merge(local.defaults_web_ec2.instance, {
+        instance = merge(local.ec2_autoscaling_groups.boe_web.instance, {
           instance_type = "t3.large"
         })
-        user_data_cloud_init = merge(local.defaults_web_ec2.user_data_cloud_init, {
-          args = merge(local.defaults_web_ec2.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.boe_web.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.boe_web.user_data_cloud_init.args, {
             branch = "main"
           })
         })
       })
 
-      dev-boe-asg = merge(local.defaults_boe_ec2, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      dev-boe-asg = merge(local.ec2_autoscaling_groups.boe_app, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.boe_app.autoscaling_group, {
           desired_capacity = 0
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        config = merge(local.defaults_boe_ec2.config, {
-          availability_zone = "eu-west-2a"
+        config = merge(local.ec2_autoscaling_groups.boe_app.config, {
         })
-        instance = merge(local.defaults_boe_ec2.instance, {
+        instance = merge(local.ec2_autoscaling_groups.boe_app.instance, {
           instance_type = "t2.large"
         })
-        user_data_cloud_init = merge(local.defaults_web_ec2.user_data_cloud_init, {
-          args = merge(local.defaults_web_ec2.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.boe_app.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.boe_app.user_data_cloud_init.args, {
             branch = "main"
           })
         })
       })
 
-      dev-bods-asg = merge(local.defaults_bods_ec2, {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+      dev-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
           desired_capacity = 0
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        config = merge(local.defaults_bods_ec2.config, {
-          availability_zone = "eu-west-2a"
+        config = merge(local.ec2_autoscaling_groups.bods.config, {
         })
-        instance = merge(local.defaults_bods_ec2.instance, {
+        instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "t3.large"
         })
       })
     }
 
     ec2_instances = {
-      #   dev-web-a = merge(local.defaults_web_ec2,
-      #   {
-      #     config = merge(local.defaults_web_ec2.config, {
-      #       availability_zone = "eu-west-2a"
-      #     })
-      #     instance = merge(local.defaults_web_ec2.instance, {
-      #       instance_type = "t3.large"
-      #     })
-      #   })
-      #   dev-boe-a = merge(local.defaults_boe_ec2,
-      #   {
-      #     config = merge(local.defaults_boe_ec2.config, {
-      #       availability_zone = "eu-west-2a"
-      #     })
-      #     instance = merge(local.defaults_boe_ec2.instance, {
-      #       instance_type = "t2.large"
-      #     })
-      #     user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-      #       args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-      #         branch = "main"
-      #       })
-      #     })
-      #   })
-      #   dev-bods-a = merge(local.defaults_bods_ec2,
-      #   {
-      #     config = merge(local.defaults_bods_ec2.config, {
-      #       availability_zone = "eu-west-2a"
-      #     })
-      #     instance = merge(local.defaults_bods_ec2.instance, {
-      #       instance_type = "t3.large"
-      #     })
-      #   })
     }
 
     route53_zones = {

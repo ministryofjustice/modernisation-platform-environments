@@ -36,5 +36,5 @@ module "environment_test" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = merge(local.dms_config_test,{client_account_arns = local.dms_client_account_arns})
+  dms_config = merge(local.dms_config_test, { client_account_arns = local.dms_client_account_arns })
 }

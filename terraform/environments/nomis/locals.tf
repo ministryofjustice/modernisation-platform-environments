@@ -42,11 +42,11 @@ locals {
       enable_ec2_session_manager_cloudwatch_logs  = true
       enable_ec2_ssm_agent_update                 = true
       enable_ec2_user_keypair                     = true
+      enable_hmpps_domain                         = true # Syscon users are collaborators so need domain creds to access nomis-client EC2s
+      enable_image_builder                        = true
       enable_s3_bucket                            = true
       enable_s3_db_backup_bucket                  = true
       enable_s3_software_bucket                   = true
-      enable_image_builder                        = true
-      enable_hmpps_domain                         = true # Syscon users are collaborators so need domain creds to access nomis-client EC2s
       iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       route53_resolver_rules                      = { outbound-data-and-private-subnets = ["azure-fixngo-domain"] }

@@ -1,0 +1,99 @@
+locals {
+
+  ec2_autoscaling_groups = {
+    base_linux = {
+      autoscaling_group = {
+        desired_capacity    = 1
+        max_size            = 1
+        force_delete        = true
+        vpc_zone_identifier = module.environment.subnets["private"].ids
+      }
+      autoscaling_schedules = {
+        scale_up   = { recurrence = "0 7 * * Mon-Fri" }
+        scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+      }
+      config = {
+        iam_resource_names_prefix = "ec2-instance"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name = "private"
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "t3.medium"
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "required"
+        vpc_security_group_ids       = ["rds-ec2s"]
+      }
+      user_data_cloud_init = {
+        args = {
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
+        }
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+        ]
+      }
+      tags = {
+        backup           = "false"
+        os-type          = "Linux"
+        Patching         = "Yes"
+        server-type      = "hmpps-domain-services"
+        update-ssm-agent = "patchgroup1"
+      }
+    }
+
+    base_windows = {
+      autoscaling_group = {
+        desired_capacity    = 1
+        max_size            = 1
+        force_delete        = true
+        vpc_zone_identifier = module.environment.subnets["private"].ids
+      }
+      autoscaling_schedules = {
+        scale_up   = { recurrence = "0 7 * * Mon-Fri" }
+        scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+      }
+      config = {
+        ebs_volumes_copy_all_from_ami = false
+        iam_resource_names_prefix     = "ec2-instance"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
+      }
+      ebs_volumes = {
+        "/dev/sda1" = { type = "gp3", size = 128 }
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "t3.medium"
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "required"
+        monitoring                   = false
+        vpc_security_group_ids       = ["rds-ec2s"]
+      }
+      tags = {
+        backup           = "false"
+        os-type          = "Windows"
+        Patching         = "Yes"
+        server-type      = "HmppsDomainServicesTest"
+        update-ssm-agent = "patchgroup1"
+      }
+    }
+  }
+}

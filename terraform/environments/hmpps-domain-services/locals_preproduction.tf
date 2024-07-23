@@ -15,8 +15,6 @@ locals {
 
     acm_certificates = {
       remote_desktop_and_planetfm_wildcard_cert = {
-        # domain_name limited to 64 chars so use modernisation platform domain for this
-        # and put the wildcard in the san
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "modernisation-platform.service.justice.gov.uk"
         external_validation_records_created = true
@@ -32,98 +30,88 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      dev-win-2022 = {
-        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                      = "hmpps_windows_server_2022_release_2024-*"
-          availability_zone             = null
-          ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(file("./templates/rds-gateway-user-data.yaml"))
-          instance_profile_policies     = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
+      dev-win-2022 = merge(local.ec2_autoscaling_groups.base_windows, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
+          # clean up Computer and DNS entry from azure.hmpp.root domain before using
+          desired_capacity = 0
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["rds-ec2s"]
+        config = merge(local.ec2_autoscaling_groups.base_windows.config, {
+          ami_name = "hmpps_windows_server_2022_release_2024-*"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+        instance = merge(local.ec2_autoscaling_groups.base_windows.instance, {
+          instance_type = "t3.medium"
+        })
+        tags = merge(local.ec2_autoscaling_groups.base_windows.tags, {
+          description = "Windows Server 2022 instance for testing domain join and patching"
+          domain-name = "azure.hmpp.root"
+        })
+      })
+
+      dev-rhel85 = merge(local.ec2_autoscaling_groups.base_linux, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.base_linux.autoscaling_group, {
+          # clean up Computer and DNS entry from azure.hmpp.root domain before using
           desired_capacity = 0
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description = "Windows Server 2022 for connecting to Azure domain"
-          os-type     = "Windows"
-          component   = "test"
-        }
-      }
-
-      dev-rhel85 = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "base_rhel_8_5*"
-          availability_zone         = null
-          instance_profile_policies = concat(module.baseline_presets.ec2_instance.config.default.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
+        config = merge(local.ec2_autoscaling_groups.base_linux.config, {
+          ami_name = "base_rhel_8_5*"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["rds-ec2s"]
+        instance = merge(local.ec2_autoscaling_groups.base_linux.instance, {
+          instance_type = "t3.medium"
         })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.base_linux.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.base_linux.user_data_cloud_init.args, {
             branch = "main"
           })
         })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+        tags = merge(local.ec2_autoscaling_groups.base_linux.tags, {
+          ami         = "rhel_8_5"
+          description = "RHEL 8.5 instance for testing domain join and patching"
+          domain-name = "azure.hmpp.root"
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description = "RHEL8.5 for connection to Azure domain"
-          ami         = "hmpps_rhel_8_5"
-          os-type     = "Linux"
-          component   = "test"
-        }
-      }
+      })
     }
 
     ec2_instances = {
-      pp-rdgw-1-a = merge(local.rds_ec2_instance, {
-        config = merge(local.rds_ec2_instance.config, {
-          availability_zone         = "eu-west-2a"
-          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
+      pp-rdgw-1-a = merge(local.ec2_instances.rdgw, {
+        config = merge(local.ec2_instances.rdgw.config, {
+          availability_zone = "eu-west-2a"
         })
-        tags = merge(local.rds_ec2_instance.tags, {
+        tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name = "azure.hmpp.root"
         })
       })
-      pp-rds-1-a = merge(local.rds_ec2_instance, {
-        config = merge(local.rds_ec2_instance.config, {
-          availability_zone         = "eu-west-2a"
-          instance_profile_policies = concat(local.rds_ec2_instance.config.instance_profile_policies, ["SSMPolicy", "PatchBucketAccessPolicy"])
-          user_data_raw             = base64encode(file("./templates/user-data-domain-join.yaml"))
+
+      pp-rds-1-a = merge(local.ec2_instances.rds, {
+        config = merge(local.ec2_instances.rds.config, {
+          availability_zone = "eu-west-2a"
         })
-        tags = merge(local.rds_ec2_instance.tags, {
+        tags = merge(local.ec2_instances.rds.tags, {
           description = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name = "azure.hmpp.root"
         })
       })
     }
 
     lbs = {
-      public = merge(local.rds_lbs.public, {
+      public = merge(local.lbs.public, {
         instance_target_groups = {
-          pp-rdgw-1-http = merge(local.rds_target_groups.http, {
+          pp-rdgw-1-http = merge(local.lbs.public.instance_target_groups.http, {
             attachments = [
               { ec2_instance_name = "pp-rdgw-1-a" },
             ]
           })
-          pp-rds-1-https = merge(local.rds_target_groups.https, {
+          pp-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "pp-rds-1-a" },
             ]
           })
         }
-        listeners = {
-          http = local.rds_lb_listeners.http
-          https = merge(local.rds_lb_listeners.https, {
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
             certificate_names_or_arns = ["remote_desktop_and_planetfm_wildcard_cert"]
             rules = {
               pp-rdgw-1-http = {
@@ -157,7 +145,7 @@ locals {
               }
             }
           })
-        }
+        })
       })
     }
 

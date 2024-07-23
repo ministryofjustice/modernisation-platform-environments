@@ -77,31 +77,6 @@ resource "aws_secretsmanager_secret_version" "dps" {
   }
 }
 
-# Operational DataStore Secrets for use in DataHub
-# PlaceHolder Secrets
-resource "aws_secretsmanager_secret" "operational_datastore" {
-  count = (local.environment == "development" ? 1 : 0)
-  name  = "external/operational_data_store"
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "external/operational_data_store"
-      Resource_Type = "Secrets"
-    }
-  )
-}
-
-resource "aws_secretsmanager_secret_version" "operational_datastore" {
-  count         = (local.environment == "development" ? 1 : 0)
-  secret_id     = aws_secretsmanager_secret.operational_datastore[0].id
-  secret_string = jsonencode(local.operational_datastore_secrets_placeholder)
-
-  lifecycle {
-    ignore_changes = [secret_string, ]
-  }
-}
-
 # Redshift Access Secrets
 resource "aws_secretsmanager_secret" "redshift" {
   name = "dpr-redshift-sqlworkbench-${local.env}"
@@ -337,7 +312,7 @@ resource "random_password" "operational_db_password" {
 }
 
 resource "aws_secretsmanager_secret" "operational_db_secret" {
-  name = "${local.project}-rds-operational-db-secret"
+  name        = "${local.project}-rds-operational-db-secret"
   description = "Secret for RDS master username and password"
 
   tags = {
@@ -362,7 +337,7 @@ resource "random_password" "transfer_component_role_password" {
 }
 
 resource "aws_secretsmanager_secret" "transfer_component_role_secret" {
-  name = "${local.project}-rds-transfer-component-role-secret"
+  name        = "${local.project}-rds-transfer-component-role-secret"
   description = "Secret for transfer-component-role username and password"
 
   tags = {

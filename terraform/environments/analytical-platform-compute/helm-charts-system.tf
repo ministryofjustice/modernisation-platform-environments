@@ -4,7 +4,7 @@ resource "helm_release" "kyverno" {
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
-  version    = "3.2.5"
+  version    = "3.2.6"
   namespace  = kubernetes_namespace.kyverno.metadata[0].name
   values = [
     templatefile(
@@ -45,7 +45,7 @@ resource "helm_release" "aws_for_fluent_bit" {
   name       = "aws-for-fluent-bit"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-for-fluent-bit"
-  version    = "0.1.33"
+  version    = "0.1.34"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -68,7 +68,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "61.1.0"
+  version    = "61.3.2"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -236,7 +236,7 @@ resource "helm_release" "ingress_nginx" {
   name       = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
-  version    = "4.10.1"
+  version    = "4.11.1"
   namespace  = kubernetes_namespace.ingress_nginx.metadata[0].name
   values = [
     templatefile(
@@ -257,7 +257,7 @@ resource "helm_release" "external_secrets" {
   name       = "external-secrets"
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
-  version    = "0.9.19"
+  version    = "0.9.20"
   namespace  = kubernetes_namespace.external_secrets.metadata[0].name
   values = [
     templatefile(

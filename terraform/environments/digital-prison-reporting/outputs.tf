@@ -133,13 +133,14 @@ output "cluster_revision_number" {
 output "cluster_nodes" {
   description = "The nodes in the cluster. Each node is a map of the following attributes: `node_role`, `private_ip_address`, and `public_ip_address`"
   value       = module.datamart.cluster_nodes
+  sensitive   = true
 }
 
 ## EC2 Private key
 output "ec2_private_key" {
   description = "Ec2 Private Key"
   value       = module.ec2_kinesis_agent.private_key
-  #  sensitive = true 
+  sensitive   = true
 }
 
 # DMS Subnet ids

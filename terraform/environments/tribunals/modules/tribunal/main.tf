@@ -15,9 +15,6 @@ locals {
   app_source_db_user           = var.app_source_db_user
   app_source_db_password       = var.app_source_db_password
   documents_location           = var.documents_location
-  app_user_data = base64encode(templatefile("user_data.sh", {
-    cluster_name = "${local.app}_app_cluster"
-  }))
   app_container_definition = jsonencode([{
     command : [
       "New-Item -Path C:\\inetpub\\wwwroot\\index.html -Type file -Value '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p>'; C:\\ServiceMonitor.exe w3svc"
@@ -112,33 +109,6 @@ module "app_dms" {
 
 ############################################################################
 
-resource "random_password" "app_new_password" {
-  length  = 16
-  special = false
-}
-
-resource "null_resource" "app_setup_db" {
-
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
-
-    environment = {
-      DB_URL        = local.app_rds_url
-      USER_NAME     = local.app_rds_user
-      PASSWORD      = local.app_rds_password
-      NEW_DB_NAME   = local.app_db_name
-      NEW_USER_NAME = local.app_db_login_name
-      NEW_PASSWORD  = random_password.app_new_password.result
-      APP_FOLDER    = local.sql_migration_path
-    }
-  }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
-
 resource "aws_secretsmanager_secret" "app_db_credentials" {
   name                    = "${local.app}-credentials-db-2"
   recovery_window_in_days = 0
@@ -149,7 +119,7 @@ resource "aws_secretsmanager_secret_version" "app_db_credentials_version" {
   secret_string = <<EOF
 {
   "username": "${local.app_db_login_name}",
-  "password": "${random_password.app_new_password.result}",
+  "password": "${var.new_db_password}",
   "host": "${local.app_rds_url}",
   "database_name": "${local.app_db_name}"
 }

@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data",
+      "env_short": "dev",
       "lb_access_logs_existing_bucket_name": "",
       "db_ami_id": "ami-0b6f37d7bc47eeac0",
       "db_instance_type": "m4.xlarge",
@@ -42,7 +42,11 @@
       "database_packet_dropped_alarm_threshold": "100",
       "database_diskspace_threshold": "95",
       "database_read_write_ops_threshold": "1100000",
-      "database_oradata_queue_length_threshold": "3"
+      "database_oradata_queue_length_threshold": "3",
+      "smtp_ami_id": "ami-07c2c2bf769d5174d",
+      "smtp_instance_type": "t2.large",
+      "old_mail_server_url": "mail.aws.dev.legalservices.gov.uk",
+      "old_domain_name": "dev.legalservices.gov.uk"
     },
     "test": {
       "example_var": "test-data"

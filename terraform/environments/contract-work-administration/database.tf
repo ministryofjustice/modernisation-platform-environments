@@ -43,9 +43,12 @@ do
 done
 
 ## Update the send mail url
-echo "Updating the send mail config"
-sed -i 's/aws.dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
-sed -i 's/dev.legalservices.gov.uk/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+echo "Updating the sendmail config"
+sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.cf
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.mc
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
+/etc/init.d/sendmail restart
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
@@ -66,10 +69,10 @@ EOF
 
 ### Load custom metric script into an S3 bucket
 resource "aws_s3_object" "db_custom_script" {
-    bucket = aws_s3_bucket.scripts.id
-    key    = "db-cw-custom.sh"
-    source = "./db-cw-custom.sh"
-    source_hash  = filemd5("./db-cw-custom.sh")
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "db-cw-custom.sh"
+  source      = "./db-cw-custom.sh"
+  source_hash = filemd5("./db-cw-custom.sh")
 }
 
 resource "time_sleep" "wait_db_custom_script" {
@@ -101,7 +104,7 @@ resource "aws_instance" "database" {
     local.tags,
     { "Name" = local.database_ec2_name }
   )
-  depends_on          = [time_sleep.wait_db_custom_script]
+  depends_on = [time_sleep.wait_db_custom_script]
 }
 
 resource "aws_key_pair" "cwa" {

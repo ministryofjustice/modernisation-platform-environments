@@ -120,3 +120,7 @@ variable "target_group_arns_sftp" {
   description = "Map of target group ARNs for sftp"
   type        = map(string)
 }
+
+variable "new_db_password" {
+  description = "Randomly generated password for each db"
+}

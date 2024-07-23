@@ -20,17 +20,20 @@ locals {
 
   baseline_presets_all_environments = {
     options = {
-      # cloudwatch_dashboard_default_widget_groups = [
-      #   "ec2",
-      # ]
-      cloudwatch_metric_alarms_default_actions = ["hmpps_domain_services_pagerduty"]
-      # cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
-      # cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
+      cloudwatch_dashboard_default_widget_groups = [
+        "lb",
+        "ec2",
+        "ec2_windows",
+      ]
+      cloudwatch_metric_alarms_default_actions   = ["hmpps_domain_services_pagerduty"]
+      cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
+      cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
       enable_backup_plan_daily_and_weekly        = true
       enable_business_unit_kms_cmks              = true
       enable_ec2_cloud_watch_agent               = true
       enable_ec2_self_provision                  = true
       enable_ec2_session_manager_cloudwatch_logs = true
+      enable_ec2_ssm_agent_update                = true
       enable_ec2_user_keypair                    = true
       enable_hmpps_domain                        = true
       enable_image_builder                       = true
@@ -42,39 +45,6 @@ locals {
   }
 
   baseline_all_environments = {
-    iam_policies = {
-      SSMPolicy = {
-        description = "Policy to allow ssm actions"
-        statements = [{
-          effect = "Allow"
-          actions = [
-            "ssm:SendCommand"
-          ]
-          resources = ["*"]
-        }]
-      },
-      PatchBucketAccessPolicy = {
-        description = "Permissions to upload and download patches"
-        statements = [{
-          effect = "Allow"
-          actions = [
-            "s3:ListBucket",
-          ]
-          resources = ["arn:aws:s3:::hmpps-domain-services-development-*"]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "s3:PutObject",
-              "s3:GetObject",
-              "s3:DeleteObject",
-              "s3:PutObjectAcl"
-            ]
-            resources = ["arn:aws:s3:::hmpps-domain-services-development-*/*"]
-          }
-      ] }
-    }
-
     security_groups = local.security_groups
   }
 }

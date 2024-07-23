@@ -239,40 +239,46 @@ module "update_log_table" {
 #-----------------------------------------------------------------------------------
 
 module "output_file_structure_as_json_from_zip" {
-  source                = "./modules/lambdas"
-  function_name         = "extract_metadata_from_atrium_unstructured"
-  is_image              = true
-  role_name             = aws_iam_role.extract_metadata_from_atrium_unstructured.name
-  role_arn              = aws_iam_role.extract_metadata_from_atrium_unstructured.arn
-  memory_size           = 1024
-  timeout               = 900
-  env_account_id        = local.env_account_id
+  source                  = "./modules/lambdas"
+  function_name           = "extract_metadata_from_atrium_unstructured"
+  is_image                = true
+  role_name               = aws_iam_role.extract_metadata_from_atrium_unstructured.name
+  role_arn                = aws_iam_role.extract_metadata_from_atrium_unstructured.arn
+  memory_size             = 1024
+  timeout                 = 900
+  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev = local.is-production ? "prod" : "dev"
-  security_group_ids    = [aws_security_group.lambda_db_security_group.id]
-  subnet_ids            = data.aws_subnets.shared-public.ids
-  environment_variables = null
+  production_dev          = local.is-production ? "prod" : "dev"
+  security_group_ids      = [aws_security_group.lambda_db_security_group.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    OUTPUT_BUCKET = module.json-directory-structure-bucket.bucket.id
+    SOURCE_BUCKET = aws_s3_bucket.data_store.id
+  }
 }
 
-# ------------------------------------------------------
-# Unzip single file in zip store
-# ------------------------------------------------------
+#-----------------------------------------------------------------------------------
+# Load data from S3 to Athena
+#-----------------------------------------------------------------------------------
 
-module "unzip_unstructured_files" {
+module "load_json_table" {
   source                  = "./modules/lambdas"
-  function_name           = "unzip_unstructured_files"
+  function_name           = "load_json_table"
   is_image                = true
-  role_name               = aws_iam_role.unzip_unstructured_files.name
-  role_arn                = aws_iam_role.unzip_unstructured_files.arn
+  role_name               = aws_iam_role.load_json_table.name
+  role_arn                = aws_iam_role.load_json_table.arn
   memory_size             = 1024
   timeout                 = 900
   env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
-    UNSTRUCTURED_BUCKET_NAME = module.unzipped-s3-data-store.bucket.id
-    DATA_STORE_BUCKET_NAME   = aws_s3_bucket.data_store.id
+    DLT_PROJECT_DIR : "/tmp"
+    DLT_DATA_DIR : "/tmp"
+    DLT_PIPELINE_DIR : "/tmp"
+    BUCKET_URI                               = "s3://${module.json-directory-structure-bucket.bucket.id}"
+    STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${module.athena-s3-bucket.bucket.id}/output"
+    SCHEMA_PATH                              = "s3://${module.metadata-s3-bucket.bucket.id}/dlt_schemas"
   }
-  security_group_ids = [aws_security_group.lambda_db_security_group.id]
-  subnet_ids         = data.aws_subnets.shared-public.ids
 }
+

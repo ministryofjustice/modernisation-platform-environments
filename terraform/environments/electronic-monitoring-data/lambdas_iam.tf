@@ -418,21 +418,33 @@ resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
 resource "aws_iam_role" "extract_metadata_from_atrium_unstructured" {
   name                = "extract_metadata_from_atrium_unstructured"
   assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
 }
 
 data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_policy_document" {
   statement {
-    sid    = "S3PermissionsForUnzippingLambda"
+    sid    = "S3PermissionsForZipFileRetrieval"
     effect = "Allow"
     actions = [
+      "s3:ListBucket",
       "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket"
+      "s3:GetBucketLocation"
     ]
     resources = [
       "${aws_s3_bucket.data_store.arn}/*",
       aws_s3_bucket.data_store.arn
+    ]
+  }
+  statement {
+    sid    = "S3PermissionsForPlacingJsonInAnotherBucket"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${module.json-directory-structure-bucket.bucket.arn}/*",
+      module.json-directory-structure-bucket.bucket.arn
     ]
   }
 }
@@ -466,57 +478,92 @@ resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zi
   source_arn    = aws_s3_bucket.data_store.arn
 }
 
+
 # ------------------------------------------
-# unzip_unstructured_files
+# load table from json to athena
 # ------------------------------------------
 
-resource "aws_iam_role" "unzip_unstructured_files" {
-  name               = "unzip_unstructured_files"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+resource "aws_iam_role" "load_json_table" {
+  name                = "load_json_table"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.unzip_unstructured_files.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
+  statement {
+    sid    = "S3PermissionsForLoadingJsonTable"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:GetObjectAttributes",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${module.json-directory-structure-bucket.bucket.arn}/*",
+      module.json-directory-structure-bucket.bucket.arn,
+      "${module.athena-s3-bucket.bucket.arn}/*",
+      module.athena-s3-bucket.bucket.arn,
+      module.metadata-s3-bucket.bucket.arn,
+      "${module.metadata-s3-bucket.bucket.arn}/*",
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadingJsonTable"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "GluePermissionsForLoadingJsonTable"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "SecretGetSlackKey"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:ListSecrets",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = ["arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:dlt-slack-test/*"]
+  }
 }
 
-resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_lambda_vpc_access_execution" {
-  role       = aws_iam_role.unzip_unstructured_files.name
+resource "aws_iam_policy" "load_json_table" {
+  name        = "load-json-table-s3-policy"
+  description = "Policy for Lambda to use S3 for lambda"
+  policy      = data.aws_iam_policy_document.load_json_table_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_json_table_s3_policy_policy_attachment" {
+  role       = aws_iam_role.load_json_table.name
+  policy_arn = aws_iam_policy.load_json_table.arn
+}
+
+resource "aws_iam_role_policy_attachment" "load_json_table_vpc_access_execution" {
+  role       = aws_iam_role.load_json_table.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
-data "aws_iam_policy_document" "get_put_zip_s3_files" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-      "s3:GetObject",
-      "s3:GetBucketLocation"
-    ]
-    resources = [
-      aws_s3_bucket.data_store.arn,
-      "${aws_s3_bucket.data_store.arn}/*"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-      "s3:PutObject",
-      "s3:GetBucketLocation"
-    ]
-    resources = [
-      module.unzipped-s3-data-store.bucket.arn,
-      "${module.unzipped-s3-data-store.bucket.arn}/*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "get_put_zip_s3_files" {
-  name   = "get_put_zip_s3_files"
-  policy = data.aws_iam_policy_document.get_put_zip_s3_files.json
-}
-resource "aws_iam_role_policy_attachment" "unzip_unstructured_files_get_put_zip_s3_files" {
-  role       = aws_iam_role.unzip_unstructured_files.name
-  policy_arn = aws_iam_policy.get_put_zip_s3_files.arn
+resource "aws_iam_role_policy_attachment" "load_json_table_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.load_json_table.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
