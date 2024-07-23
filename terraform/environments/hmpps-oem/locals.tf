@@ -99,6 +99,19 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
         ]
       }
+      "nomis-combined-reporting-${local.environment}" = {
+        account_name   = "nomis-combined-reporting-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
+        ]
+      }
       "nomis-data-hub-${local.environment}" = {
         account_name   = "nomis-data-hub-${local.environment}"
         periodOverride = "auto"
