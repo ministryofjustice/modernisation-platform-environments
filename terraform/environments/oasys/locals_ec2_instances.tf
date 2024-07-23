@@ -87,7 +87,7 @@ locals {
       user_data_cloud_init = {
         args = {
           branch       = "main"
-          ansible_args = "" # built from base AMI to amibuild and ec2provision tasks are run
+          ansible_args = "" # built from base AMI to amibuild and ec2provision tasks are run
         }
         scripts = [ # paths are relative to templates/ dir
           "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",

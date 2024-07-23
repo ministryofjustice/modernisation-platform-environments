@@ -39,7 +39,7 @@ locals {
           scale_up   = { recurrence = "0 5 * * Mon-Fri" }
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
+        config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
           iam_resource_names_prefix = "ec2-web-t1"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
@@ -59,7 +59,7 @@ locals {
           scale_up   = { recurrence = "0 5 * * Mon-Fri" }
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
+        config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
           iam_resource_names_prefix = "ec2-web-t2"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
