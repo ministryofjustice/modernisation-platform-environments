@@ -1,5 +1,0 @@
-cat > /etc/dhcp/dhclient-eth0.conf << 'EOF'
-append domain-search "${region}.compute.internal"; 
-append domain-search "${application_name}.${vpc_name}-${environment}.modernisation-platform.internal";
-EOF
-systemctl restart network
