@@ -3,7 +3,7 @@ module "vpc_endpoints" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "5.8.1"
+  version = "5.9.0"
 
   vpc_id             = module.vpc.vpc_id
   subnet_ids         = module.vpc.private_subnets

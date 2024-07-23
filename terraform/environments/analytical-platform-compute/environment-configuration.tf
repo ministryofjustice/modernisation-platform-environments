@@ -17,7 +17,7 @@ locals {
   eks_cloudwatch_log_group_retention_in_days = 400
 
   /* Kube Prometheus Stack */
-  prometheus_operator_crd_version = "v0.75.0"
+  prometheus_operator_crd_version = "v0.75.1"
 
   /* Environment Configuration */
   environment_configuration = local.environment_configurations[local.environment]
@@ -47,7 +47,7 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
       eks_cluster_version = "1.30"
-      eks_node_version    = "1.20.3-5d9ac849"
+      eks_node_version    = "1.20.4-b6163b2a"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.30.0-eksbuild.3"
@@ -98,7 +98,7 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.30"
-      eks_node_version    = "1.20.3-5d9ac849"
+      eks_node_version    = "1.20.4-b6163b2a"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.30.0-eksbuild.3"
@@ -148,7 +148,7 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.30"
-      eks_node_version    = "1.20.3-5d9ac849"
+      eks_node_version    = "1.20.4-b6163b2a"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.1-eksbuild.9"
         kube_proxy             = "v1.30.0-eksbuild.3"
