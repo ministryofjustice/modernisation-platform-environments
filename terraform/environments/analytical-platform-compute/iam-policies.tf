@@ -210,7 +210,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     effect = "Allow"
     actions = [
       "iam:GetRolePolicy",
-      "iam:GetRole"
+      "iam:GetRole",
+      "lakeformation:GetDataAccess"
     ]
     resources = [
       "*"
