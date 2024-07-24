@@ -237,14 +237,14 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     resources = ["*"]
   }
 }
-module "gha_mojas_airflow_iam_policy" {
+module "analytical_platform_lake_formation_share_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.41.0"
 
-  name_prefix = "lake-formation-sharing-policy"
+  name_prefix = "analytical-platform-lake-formation-sharing-policy"
 
   policy = data.aws_iam_policy_document.analytical_platform_share_policy.json
 }
