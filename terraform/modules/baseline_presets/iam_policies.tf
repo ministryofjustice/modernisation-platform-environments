@@ -4,8 +4,6 @@ locals {
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_hmpps_domain ? ["HmppsDomainSecretsPolicy"] : [],
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
-    var.options.enable_image_builder ? ["ImageBuilderS3BucketReadOnlyAccessPolicy"] : [],
-    var.options.enable_image_builder ? ["ImageBuilderS3BucketWriteAccessPolicy"] : [],
     var.options.enable_image_builder ? ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_delius_dba_secrets_access ? ["DeliusDbaSecretsPolicy"] : [],
@@ -80,14 +78,6 @@ locals {
 
     # see corresponding policy in core-shared-services-production
     # https://github.com/ministryofjustice/modernisation-platform-ami-builds/blob/main/modernisation-platform/iam.tf
-    ImageBuilderS3BucketReadOnlyAccessPolicy = {
-      description = "Permissions to access shared ImageBuilder bucket read-only"
-      statements  = local.iam_policy_statements_ec2.S3ReadShared
-    }
-    ImageBuilderS3BucketWriteAccessPolicy = {
-      description = "Permissions to access shared ImageBuilder bucket read-write"
-      statements  = local.iam_policy_statements_ec2.S3ReadSharedWriteLimited
-    }
     ImageBuilderS3BucketWriteAndDeleteAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-write-delete"
       statements  = local.iam_policy_statements_ec2.S3ReadSharedWriteDelete

@@ -28,7 +28,7 @@ variable "options" {
     enable_backup_plan_daily_and_weekly          = optional(bool, false)           # create backup plan with daily + weekly backups
     enable_business_unit_kms_cmks                = optional(bool, false)           # create grant + policies for business unit KMS access
     enable_hmpps_domain                          = optional(bool, false)           # create policy for accessing secrets in hmpps-domain account
-    enable_image_builder                         = optional(bool, false)           # create role for accessing AMIs in core-shared-services-production
+    enable_image_builder                         = optional(bool, false)           # create role and policies for accessing AMIs in core-shared-services-production
     enable_ec2_cloud_watch_agent                 = optional(bool, false)           # create EC2 policy for cloudwatch agent
     enable_ec2_delius_dba_secrets_access         = optional(bool, false)           # create role for accessing secrets in delius account
     enable_ec2_self_provision                    = optional(bool, false)           # create EC2 policy for ansible provisioning
