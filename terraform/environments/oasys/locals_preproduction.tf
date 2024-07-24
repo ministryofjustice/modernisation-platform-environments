@@ -34,20 +34,11 @@ locals {
       }
     }
 
-    cloudwatch_log_groups = {
-      session-manager-logs     = { retention_in_days = 14 }
-      cwagent-var-log-messages = { retention_in_days = 14 }
-      cwagent-var-log-secure   = { retention_in_days = 14 }
-      cwagent-windows-system   = { retention_in_days = 14 }
-      cwagent-oasys-autologoff = { retention_in_days = 14 }
-      cwagent-web-logs         = { retention_in_days = 14 }
-    }
-
     ec2_autoscaling_groups = {
       pp-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri" }
-          scale_down = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
+          scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
@@ -55,7 +46,6 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2PreprodWebPolicy",
           ])
-          ssm_parameters_prefix = "ec2-web-pp/"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
@@ -66,6 +56,23 @@ locals {
     }
 
     ec2_instances = {
+      pp-oasys-bip-a = merge(local.ec2_instances.bip, {
+        config = merge(local.ec2_instances.bip.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
+            "Ec2PreprodBipPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip.tags, {
+          bip-db-hostname     = "pp-oasys-db-a"
+          bip-db-name         = "PPBIPINF"
+          instance-scheduling = "skip-scheduling"
+          oasys-db-hostname   = "pp-oasys-db-a"
+          oasys-db-name       = "PPOASYS"
+          oasys-environment   = "preproduction"
+        })
+      })
+
       pp-oasys-db-a = merge(local.ec2_instances.db19c, {
         config = merge(local.ec2_instances.db19c.config, {
           availability_zone = "eu-west-2a"
@@ -82,7 +89,8 @@ locals {
           "/dev/sds" = { label = "swap", size = 2 }
         }
         instance = merge(local.ec2_instances.db19c.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "PPBIPINF"
@@ -100,7 +108,8 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.db11g.instance, {
-          instance_type = "r6i.2xlarge"
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
         })
         ebs_volumes = {
           "/dev/sdb" = { label = "app", size = 100 } # /u01
@@ -109,8 +118,8 @@ locals {
           "/dev/sdj" = { label = "flash", size = 600 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+        user_data_cloud_init = merge(local.ec2_instances.db11g.user_data_cloud_init, {
+          args = merge(local.ec2_instances.db11g.user_data_cloud_init.args, {
             branch = "oracle_11g_oasys_patchset_addition"
           })
         })
@@ -118,22 +127,6 @@ locals {
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "preproduction"
           oracle-sids         = "PPONRBOD PPOASREP PPONRSYS PPONRAUD"
-        })
-      })
-
-      pp-oasys-bip-a = merge(local.ec2_instances.bip, {
-        config = merge(local.ec2_instances.bip.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
-            "Ec2PreprodBipPolicy",
-          ])
-        })
-        tags = merge(local.ec2_instances.bip.tags, {
-          bip-db-hostname   = "pp-oasys-db-a"
-          bip-db-name       = "PPBIPINF"
-          oasys-db-hostname = "pp-oasys-db-a"
-          oasys-db-name     = "PPOASYS"
-          oasys-environment = "preproduction"
         })
       })
     }
@@ -179,15 +172,6 @@ locals {
           {
             effect = "Allow"
             actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
-          {
-            effect = "Allow"
-            actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
             ]
@@ -217,32 +201,10 @@ locals {
 
     # options for LBs https://docs.google.com/presentation/d/1RpXpfNY_hw7FjoMw0sdMAdQOF7kZqLUY6qVVtLNavWI/edit?usp=sharing
     lbs = {
-      public = {
-        access_logs              = true
-        enable_delete_protection = false
-        idle_timeout             = 3600 # 60 is default
-        internal_lb              = false
-        force_destroy_bucket     = true
-        s3_versioning            = false
-        security_groups          = ["public_lb"]
-        subnets                  = module.environment.subnets["public"].ids
-        tags                     = local.tags
-
-        listeners = {
-          https = {
+      public = merge(local.lbs.public, {
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
             certificate_names_or_arns = ["pp_oasys_cert"]
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Use pp.oasys.service.justice.gov.uk"
-                status_code  = "200"
-              }
-            }
 
             rules = {
               pp-web-http-8080 = {
@@ -264,27 +226,14 @@ locals {
                 ]
               }
             }
-          }
-        }
-      }
+          })
+        })
+      })
 
-      private = {
-        access_logs              = true
-        enable_delete_protection = false
-        force_destroy_bucket     = true
-        idle_timeout             = 3600 # 60 is default
-        internal_lb              = true
-        s3_versioning            = false
-        security_groups          = ["private_lb"]
-        subnets                  = module.environment.subnets["private"].ids
-        tags                     = local.tags
-
-        listeners = {
-          https = {
+      private = merge(local.lbs.private, {
+        listeners = merge(local.lbs.private.listeners, {
+          https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["pp_oasys_cert"]
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
             default_action = {
               type = "redirect"
@@ -317,9 +266,9 @@ locals {
                 ]
               }
             }
-          }
-        }
-      }
+          })
+        })
+      })
     }
 
     route53_zones = {

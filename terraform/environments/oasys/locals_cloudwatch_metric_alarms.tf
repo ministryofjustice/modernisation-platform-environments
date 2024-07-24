@@ -13,6 +13,7 @@ locals {
         threshold           = "85"
         alarm_description   = "Triggers if free inodes falls below the threshold for an hour"
         alarm_actions       = ["dso_pagerduty"]
+        ok_actions          = ["dso_pagerduty"]
       }
     }
   }
