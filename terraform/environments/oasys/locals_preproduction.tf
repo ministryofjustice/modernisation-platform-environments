@@ -126,7 +126,7 @@ locals {
         tags = merge(local.ec2_instances.db11g.tags, {
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "preproduction"
-          oracle-sids         = "PPONRBOD PPOASREP PPONRSYS PPONRAUD"
+          oracle-sids         = "PPONRBDS PPOASREP PPONRSYS PPONRAUD"
         })
       })
     }
