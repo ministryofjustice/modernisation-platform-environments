@@ -34,6 +34,36 @@ variable "stop_dms_task_job" {
   default     = ""
 }
 
+variable "glue_unprocessed_raw_files_check_job" {
+  description = "Name of job to ensure raw files have been processed"
+  type        = string
+  default     = ""
+}
+
+variable "glue_trigger_activation_job" {
+  description = "Name of job to which activates/deactivates a glue trigger"
+  type        = string
+  default     = ""
+}
+
+variable "archive_job_trigger_name" {
+  description = "Name of the trigger for a glue trigger"
+  type        = string
+  default     = ""
+}
+
+variable "glue_archive_job" {
+  description = "Name of the glue job which archives the raw data"
+  type        = string
+  default     = ""
+}
+
+variable "glue_create_reload_diff_job" {
+  description = "Name of job which generates the diffs between the load and the archive"
+  type        = string
+  default     = ""
+}
+
 variable "glue_s3_file_transfer_job" {
   description = "Name of s3 file transfer job"
   type        = string
@@ -130,4 +160,10 @@ variable "domain" {
   type        = string
   default     = ""
   description = "Domain Name"
+}
+
+variable "reload_diff_folder" {
+  type        = string
+  default     = "diffs"
+  description = "Folder for the reload diff"
 }
