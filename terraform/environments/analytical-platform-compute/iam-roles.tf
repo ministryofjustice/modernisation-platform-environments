@@ -232,7 +232,7 @@ module "gha_mojas_airflow_iam_role" {
   tags = local.tags
 }
 
-module "gha_mojas_airflow_iam_role" {
+module "lake_formation_share_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
