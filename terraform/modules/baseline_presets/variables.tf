@@ -28,7 +28,7 @@ variable "options" {
     enable_backup_plan_daily_and_weekly          = optional(bool, false)           # create backup plan with daily + weekly backups
     enable_business_unit_kms_cmks                = optional(bool, false)           # create grant + policies for business unit KMS access
     enable_hmpps_domain                          = optional(bool, false)           # create policy for accessing secrets in hmpps-domain account
-    enable_image_builder                         = optional(bool, false)           # create role for accessing AMIs in core-shared-services-production
+    enable_image_builder                         = optional(bool, false)           # create role and policies for accessing AMIs in core-shared-services-production
     enable_ec2_cloud_watch_agent                 = optional(bool, false)           # create EC2 policy for cloudwatch agent
     enable_ec2_delius_dba_secrets_access         = optional(bool, false)           # create role for accessing secrets in delius account
     enable_ec2_self_provision                    = optional(bool, false)           # create EC2 policy for ansible provisioning
@@ -44,8 +44,6 @@ variable "options" {
     enable_s3_software_bucket                    = optional(bool, false)           # create software S3 bucket in test account for image builder/configuration-management
     enable_vmimport                              = optional(bool, false)           # create role for vm imports
     route53_resolver_rules                       = optional(map(list(string)), {}) # create route53 resolver rules; list of map keys to filter local.route53_resolver_rules_all
-    iam_policies_filter                          = optional(list(string), [])      # any policies to add from local.iam_policies which haven't been added automatically by the enable options
-    iam_policies_ec2_default                     = optional(list(string), [])      # any policies to add to the default EC2 policy which haven't been added automatically the above enable_ec2 options
     iam_service_linked_roles                     = optional(list(string))          # create iam service linked roles; list of map keys to filter local.iam_service_linked_roles; default is to create all
     s3_bucket_name                               = optional(string)                # override default general purpose bucket name
     s3_iam_policies                              = optional(list(string))          # create default iam policies for bucket access, list of map keys to filter local.s3_iam_policies

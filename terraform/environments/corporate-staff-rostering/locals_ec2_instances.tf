@@ -35,7 +35,6 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = true
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -166,7 +165,6 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = true
         tags = {
           backup-plan = "daily-and-weekly"
         }

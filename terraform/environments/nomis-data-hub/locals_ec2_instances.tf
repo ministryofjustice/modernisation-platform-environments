@@ -26,7 +26,6 @@ locals {
         instance_type                = "t3.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = true
         vpc_security_group_ids       = ["ndh_app"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -77,7 +76,6 @@ locals {
         instance_type                = "t3.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = true
         vpc_security_group_ids       = ["ndh_ems"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -135,7 +133,6 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = false
         vpc_security_group_ids       = ["management_server"]
         tags = {
           backup-plan = "daily-and-weekly"

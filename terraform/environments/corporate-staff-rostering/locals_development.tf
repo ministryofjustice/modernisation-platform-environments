@@ -40,7 +40,6 @@ locals {
           instance_type                = "t3.medium"
           key_name                     = "ec2-user"
           metadata_options_http_tokens = "required"
-          monitoring                   = false
           vpc_security_group_ids       = ["database"]
         }
         user_data_cloud_init = {
@@ -101,7 +100,6 @@ locals {
           instance_type                = "t3.medium"
           key_name                     = "ec2-user"
           metadata_options_http_tokens = "required"
-          monitoring                   = false
           vpc_security_group_ids       = ["app", "domain", "jumpserver"]
         }
         tags = {
@@ -150,7 +148,6 @@ locals {
           instance_type                = "t3.medium"
           key_name                     = "ec2-user"
           metadata_options_http_tokens = "required"
-          monitoring                   = false
           vpc_security_group_ids       = ["domain", "jumpserver"]
         }
         tags = {
