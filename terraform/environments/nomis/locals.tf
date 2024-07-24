@@ -47,7 +47,6 @@ locals {
       enable_s3_bucket                            = true
       enable_s3_db_backup_bucket                  = true
       enable_s3_software_bucket                   = true
-      iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       route53_resolver_rules                      = { outbound-data-and-private-subnets = ["azure-fixngo-domain"] }
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
       software_bucket_name                        = "ec2-image-builder-nomis"

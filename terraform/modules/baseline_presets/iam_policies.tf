@@ -18,20 +18,6 @@ locals {
     "EC2Db",
   ]))
 
-  # for adding policies - be careful not to run into the limit
-  iam_policies_ec2_default = flatten([
-    "EC2Default",
-    var.options.enable_ec2_reduced_ssm_policy ? [] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
-    var.options.iam_policies_ec2_default,
-  ])
-
-  # for adding policies - be careful not to run into the limit
-  iam_policies_ec2_db = flatten([
-    "EC2Db",
-    var.options.enable_ec2_reduced_ssm_policy ? [] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
-    var.options.iam_policies_ec2_default,
-  ])
-
   iam_policy_statements_in_ec2_default = flatten([
     var.options.enable_business_unit_kms_cmks ? local.iam_policy_statements_ec2.business_unit_kms_cmk : [],
     var.options.enable_ec2_cloud_watch_agent ? local.iam_policy_statements_ec2.CloudWatchAgentServerReduced : [],

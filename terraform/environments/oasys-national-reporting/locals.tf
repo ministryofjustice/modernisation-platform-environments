@@ -40,7 +40,6 @@ locals {
       enable_image_builder                       = true
       enable_s3_bucket                           = true
       enable_s3_shared_bucket                    = true
-      iam_policies_ec2_default                   = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       s3_iam_policies                            = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }
