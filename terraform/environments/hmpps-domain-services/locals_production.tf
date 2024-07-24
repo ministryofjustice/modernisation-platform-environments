@@ -101,7 +101,7 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            certificate_names_or_arns = ["remote_desktop_wildcard_and_planetfm_cert"]
+            certificate_names_or_arns = ["remote_desktop_wildcard_and_planetfm_cert_v2"]
             rules = {
               pd-rdgw-1-http = {
                 priority = 100
