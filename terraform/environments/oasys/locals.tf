@@ -55,6 +55,7 @@ locals {
     options = {
       enable_resource_explorer = true
     }
+
     security_groups = local.security_groups
   }
 

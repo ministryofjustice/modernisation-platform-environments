@@ -55,6 +55,10 @@ locals {
   }
 
   baseline_all_environments = {
+    options = {
+      enable_resource_explorer = true
+    }
+
     cloudwatch_log_groups = merge(local.ssm_doc_cloudwatch_log_groups, {
       cwagent-windows-application = {
         retention_in_days = 30

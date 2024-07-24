@@ -49,6 +49,10 @@ locals {
   }
 
   baseline_all_environments = {
+    options = {
+      enable_resource_explorer = true
+    }
+
     cloudwatch_dashboards = {
       "corporate-staff-rostering-${local.environment}" = {
         account_name   = "corporate-staff-rostering-${local.environment}"
@@ -145,6 +149,7 @@ locals {
         ]
       }
     }
+
     iam_policies = {
       Ec2OracleEnterpriseManagerPolicy = {
         description = "Permissions required for Oracle Enterprise Manager"

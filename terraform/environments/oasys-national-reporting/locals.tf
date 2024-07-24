@@ -45,19 +45,11 @@ locals {
   }
 
   baseline_all_environments = {
-    cloudwatch_log_groups = local.ssm_doc_cloudwatch_log_groups
-    iam_policies = {
-      SSMPolicy = {
-        description = "Policy to allow ssm actions"
-        statements = [{
-          effect = "Allow"
-          actions = [
-            "ssm:SendCommand"
-          ]
-          resources = ["*"]
-        }]
-      }
+    options = {
+      enable_resource_explorer = true
     }
-    security_groups = local.security_groups
+
+    cloudwatch_log_groups = local.ssm_doc_cloudwatch_log_groups
+    security_groups       = local.security_groups
   }
 }
