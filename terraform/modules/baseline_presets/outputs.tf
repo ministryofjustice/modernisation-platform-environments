@@ -58,18 +58,6 @@ output "cloudwatch_metric_alarms_by_sns_topic" {
   }
 }
 
-output "ec2_autoscaling_group" {
-  description = "Common EC2 autoscaling group configuration for ec2_autoscaling_group module"
-
-  value = local.ec2_autoscaling_group
-}
-
-output "ec2_autoscaling_schedules" {
-  description = "Common EC2 autoscaling schedules configuration for ec2_autoscaling_group module"
-
-  value = local.ec2_autoscaling_schedules
-}
-
 output "iam_roles" {
   description = "Map of iam roles to create depending on options provided"
 

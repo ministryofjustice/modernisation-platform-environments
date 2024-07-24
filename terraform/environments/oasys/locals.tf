@@ -46,7 +46,6 @@ locals {
       enable_s3_db_backup_bucket                  = true
       enable_s3_shared_bucket                     = true
       enable_vmimport                             = true
-      iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy", "Ec2OracleEnterpriseManagerPolicy"]
       iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       s3_bucket_name                              = "${local.application_name}-${local.environment}"
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
