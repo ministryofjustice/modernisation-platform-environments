@@ -209,6 +209,7 @@ locals {
           node                                 = "4"
           nomis-combined-reporting-environment = "pd"
           type                                 = "processing"
+          application-software-state           = "installed"
         })
       })
 
@@ -230,6 +231,7 @@ locals {
           node                                 = "5"
           nomis-combined-reporting-environment = "pd"
           type                                 = "processing"
+          application-software-state           = "installed"
         })
       })
 
@@ -251,6 +253,7 @@ locals {
           node                                 = "6"
           nomis-combined-reporting-environment = "pd"
           type                                 = "processing"
+          application-software-state           = "installed"
         })
       })
 
@@ -290,6 +293,7 @@ locals {
         tags = merge(local.ec2_instances.bip_web.tags, {
           description                          = "Prod SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "pd"
+          application-software-state           = "installed"
         })
       })
 
@@ -309,6 +313,7 @@ locals {
         tags = merge(local.ec2_instances.bip_web.tags, {
           description                          = "Prod SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "pd"
+          application-software-state           = "installed"
         })
       })
 
@@ -328,6 +333,7 @@ locals {
         tags = merge(local.ec2_instances.bip_web.tags, {
           description                          = "Prod SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "pd"
+          application-software-state           = "installed"
         })
       })
 
