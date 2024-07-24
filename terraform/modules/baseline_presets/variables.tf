@@ -44,7 +44,6 @@ variable "options" {
     enable_s3_software_bucket                    = optional(bool, false)           # create software S3 bucket in test account for image builder/configuration-management
     enable_vmimport                              = optional(bool, false)           # create role for vm imports
     route53_resolver_rules                       = optional(map(list(string)), {}) # create route53 resolver rules; list of map keys to filter local.route53_resolver_rules_all
-    iam_policies_filter                          = optional(list(string), [])      # any policies to add from local.iam_policies which haven't been added automatically by the enable options
     iam_policies_ec2_default                     = optional(list(string), [])      # any policies to add to the default EC2 policy which haven't been added automatically the above enable_ec2 options
     iam_service_linked_roles                     = optional(list(string))          # create iam service linked roles; list of map keys to filter local.iam_service_linked_roles; default is to create all
     s3_bucket_name                               = optional(string)                # override default general purpose bucket name

@@ -4,6 +4,9 @@ locals {
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_hmpps_domain ? ["HmppsDomainSecretsPolicy"] : [],
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
+    var.options.enable_image_builder ? ["ImageBuilderS3BucketReadOnlyAccessPolicy"] : [],
+    var.options.enable_image_builder ? ["ImageBuilderS3BucketWriteAccessPolicy"] : [],
+    var.options.enable_image_builder ? ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_delius_dba_secrets_access ? ["DeliusDbaSecretsPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
@@ -11,7 +14,6 @@ locals {
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_vmimport ? ["vmimportPolicy"] : [],
-    var.options.iam_policies_filter,
     "EC2Default",
     "EC2Db",
   ]))
