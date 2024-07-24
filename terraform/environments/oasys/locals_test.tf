@@ -198,8 +198,8 @@ locals {
         })
         tags = merge(local.ec2_instances.db11g.tags, {
           instance-scheduling = "skip-scheduling"
-          oasys-environment   = "test"             # should be T2
-          oracle-sids         = "OASPROD BIPINFRA" # should be T2BOSYS T2BOAUD
+          oasys-environment   = "t2"
+          oracle-sids         = "T2BOSYS T2BOAUD"
         })
       })
     }
