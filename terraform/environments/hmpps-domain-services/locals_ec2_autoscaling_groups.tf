@@ -84,7 +84,6 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = false
         vpc_security_group_ids       = ["rds-ec2s"]
       }
       tags = {
