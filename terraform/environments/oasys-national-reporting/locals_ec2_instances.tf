@@ -16,6 +16,20 @@ locals {
           exe = "amazon-cloudwatch-agent"
         }
       }
+      ssm-agent-process-count = {
+        alarm_description   = "The SSM agent runs 2 processes. If the PID count drops below 2, the agent is not functioning as expected."
+        namespace           = "CWAgent"
+        metric_name         = "procstat_lookup pid_count"
+        period              = 60
+        evaluation_periods  = 1
+        statistic           = "Average"
+        comparison_operator = "LessThanThreshold"
+        threshold           = 2 # SSM agent runs 2 processes
+        treat_missing_data  = "breaching"
+        dimensions = {
+          exe = "ssm-agent"
+        }
+      }
     }
   }
 
