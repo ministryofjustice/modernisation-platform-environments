@@ -70,12 +70,6 @@ output "ec2_autoscaling_schedules" {
   value = local.ec2_autoscaling_schedules
 }
 
-output "ec2_instance" {
-  description = "Common EC2 instance configuration for ec2_instance module"
-
-  value = local.ec2_instance
-}
-
 output "iam_roles" {
   description = "Map of iam roles to create depending on options provided"
 
