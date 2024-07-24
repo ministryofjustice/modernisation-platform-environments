@@ -26,10 +26,12 @@ locals {
           }
         }
         https = {
+          certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
+          cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
           port                      = 443
           protocol                  = "HTTPS"
           ssl_policy                = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-          certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
+
           default_action = {
             type = "fixed-response"
             fixed_response = {

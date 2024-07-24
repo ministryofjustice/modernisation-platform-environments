@@ -6,6 +6,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring,
@@ -57,6 +58,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
       )
@@ -107,6 +109,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
       )
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2023-*"

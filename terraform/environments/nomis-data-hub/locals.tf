@@ -47,6 +47,10 @@ locals {
   }
 
   baseline_all_environments = {
+    options = {
+      enable_resource_explorer = true
+    }
+
     s3_buckets = {
       offloc-upload = {
         custom_kms_key = module.environment.kms_keys["general"].arn

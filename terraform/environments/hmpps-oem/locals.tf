@@ -21,6 +21,7 @@ locals {
   baseline_presets_all_environments = {
     options = {
       cloudwatch_dashboard_default_widget_groups = [
+        "network_lb",
         "lb",
         "ec2",
         "ec2_linux",
@@ -49,12 +50,17 @@ locals {
   }
 
   baseline_all_environments = {
+    options = {
+      enable_resource_explorer = true
+    }
+
     cloudwatch_dashboards = {
       "corporate-staff-rostering-${local.environment}" = {
         account_name   = "corporate-staff-rostering-${local.environment}"
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
@@ -95,6 +101,7 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
         ]
       }
       "nomis-combined-reporting-${local.environment}" = {
@@ -123,6 +130,20 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
         ]
       }
+      "oasys-${local.environment}" = {
+        account_name   = "oasys-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_autoscaling_group_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
+        ]
+      }
       "oasys-national-reporting-${local.environment}" = {
         account_name   = "oasys-national-reporting-${local.environment}"
         periodOverride = "auto"
@@ -145,6 +166,7 @@ locals {
         ]
       }
     }
+
     iam_policies = {
       Ec2OracleEnterpriseManagerPolicy = {
         description = "Permissions required for Oracle Enterprise Manager"
