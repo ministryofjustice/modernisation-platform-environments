@@ -239,7 +239,9 @@ module "lake_formation_share_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.41.0"
 
-  name = "lake-formation-share"
+  create_role = true
+
+  role_name_prefix = "lake-formation-share"
 
   number_of_custom_role_policy_arns = 2
 
