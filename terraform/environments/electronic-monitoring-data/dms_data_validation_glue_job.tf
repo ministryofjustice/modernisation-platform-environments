@@ -66,6 +66,13 @@ resource "aws_s3_object" "rds_to_s3_parquet_migration_v2" {
   etag   = filemd5("glue-job/rds_to_s3_parquet_migration_v2.py")
 }
 
+resource "aws_s3_object" "compacting_small_files" {
+  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  key    = "compacting_small_files.py"
+  source = "glue-job/compacting_small_files.py"
+  etag   = filemd5("glue-job/compacting_small_files.py")
+}
+
 resource "aws_s3_object" "catalog_dv_table_glue_job_s3_object" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
   key    = "create_or_replace_dv_table.py"
@@ -100,6 +107,11 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group_v2" {
 
 resource "aws_cloudwatch_log_group" "rds_to_s3_parquet_migration" {
   name              = "rds-to-s3-parquet-migration"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "compacting_small_files" {
+  name              = "compacting-small-files"
   retention_in_days = 14
 }
 # -------------------------------------------------------------------
@@ -345,6 +357,54 @@ EOF
   command {
     python_version  = "3"
     script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/rds_to_s3_parquet_migration_v2.py"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
+}
+
+
+resource "aws_glue_job" "compacting_small_files" {
+  name              = "compacting-small-files"
+  description       = "Table migration & validation Glue-Job (PySpark)."
+  role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 5
+  default_arguments = {
+    "--script_bucket_name"               = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--s3_prq_read_db_folder"            = ""
+    "--s3_prq_read_db_schema_folder"     = ""
+    "--s3_prq_read_table_folder"         = ""
+    "--s3_prq_write_table_folder"        = ""
+    "--year_partition_str"               = ""
+    "--month_partition_str"              = ""
+    "--day_partition_str"                = ""
+    "--s3_prq_read_bucket_name"          = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--s3_prq_write_bucket_name"         = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.compacting_small_files.name}"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = "true"
+    "--enable-auto-scaling"              = "true"
+    "--conf"                             = <<EOF
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.sources.partitionOverwriteMode=dynamic
+--conf spark.sql.parquet.aggregatePushdown=true
+--conf spark.sql.files.maxPartitionBytes=256m 
+EOF
+
+  }
+
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  command {
+    python_version  = "3"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/compacting_small_files.py"
   }
 
   tags = merge(
