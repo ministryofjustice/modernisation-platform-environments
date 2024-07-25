@@ -181,84 +181,69 @@ mkdir -p /oracle/temp_undo
 grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
 sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
 
-
 #### setup_oracle_db_software
 echo "---setup_oracle_db_software"
 # Install wget / unzip
 yum install -y unzip
 
-# groupadd dba
-# groupadd oinstall
-# useradd -d /stage/oracle -g dba oracle
+# Create DBA user (already created in image)
+groupadd dba
+groupadd oinstall
+useradd -d /stage/oracle -g dba oracle
 
-# sudo mkdir -p /stage/oracle
-# sudo chown oracle:dba /stage/oracle
-# sudo chmod 700 /stage/oracle
-# sudo rsync -a /home/oracle/ /stage/oracle/
-# sudo usermod -d /stage/oracle oracle
-# sudo chown -R oracle:dba /stage/oracle
-# sudo chmod 700 /stage/oracle
-# sudo mkdir -p /stage/oracle/.ssh
-# sudo cp -r /home/oracle/.ssh/* /stage/oracle/.ssh/
-# sudo chown -R oracle:dba /stage/oracle/.ssh
-# sudo chmod 700 /stage/oracle/.ssh
-# sudo chmod 600 /stage/oracle/.ssh/id_rsa
-# sudo chmod 644 /stage/oracle/.ssh/id_rsa.pub
-# sudo rm -rf /home/oracle
-
-# #setup oracle user access
-# echo "---setup oracle user access"
-# cp -fr /home/ec2-user/.ssh/* /stage/oracle/.ssh/
-# chown -R oracle:dba /stage/oracle/.ssh
+#setup oracle user access
+echo "---setup oracle user access"
+cp -fr /home/ec2-user/.ssh /home/oracle/
+chown -R oracle:dba /home/oracle/.ssh
 
 # # Create directories and set ownership
-# echo "---set ownership"
-# chown -R oracle:dba /oracle
+echo "---set ownership"
+chown -R oracle:dba /oracle
 
 # # Create swap space
-# echo "---Create swap space"
-# dd if=/dev/zero of=/swapfile bs=1024M count=9
-# chmod 600 /swapfile
-# mkswap /swapfile
-# swapon /swapfile
+echo "---Create swap space"
+dd if=/dev/zero of=/swapfile bs=1024M count=9
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
 
-# # Run Oracle installer
-# chmod 777 /run/cfn-init/db-install-10g.rsp
+# Run Oracle installer
+chmod 777 /run/cfn-init/db-install-10g.rsp
 
-# # Run installer and post install
-# export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
-# su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
+# Run installer and post install
+export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
+su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
 
-# /oracle/software/oraInventory/orainstRoot.sh -silent
-# /oracle/software/product/10.2.0/root.sh -silent
+/oracle/software/oraInventory/orainstRoot.sh -silent
+/oracle/software/product/10.2.0/root.sh -silent
 
-# # Update oracle login script
-# echo "export ORACLE_SID=EDW" >> /stage/oracle/.bash_profile
-# echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
-# echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
+# Update oracle login script
+echo "export ORACLE_SID=EDW" >> /stage/oracle/.bash_profile
+echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
+echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
 
-# #### Setup_owb
+#### Setup_owb
 
-# # Create directories for OWB setup
-# mkdir -p /stage/owb/owb101
-# mkdir -p /stage/owb/owb104
-# mkdir -p /stage/owb/owb105
+# Create directories for OWB setup (already created in ami)
+mkdir -p /stage/owb/owb101
+mkdir -p /stage/owb/owb104
+mkdir -p /stage/owb/owb105
 
-# # Set permissions for staging directory
-# chmod -R 777 /stage/owb/
+# Set permissions for staging directory
+chmod -R 777 /stage/owb/
 
-# # Install OWB components
-# su oracle -l -c "/stage/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /stage/owb/owb.rsp"
-# /oracle/software/product/10.2.0_owb/root.sh -silent
+# Install OWB components
+su oracle -l -c "/stage/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /stage/owb/owb.rsp"
+/oracle/software/product/10.2.0_owb/root.sh -silent
 
-# su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb104.rsp"
-# /oracle/software/product/10.2.0_owb/root.sh -silent
+su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb104.rsp"
+/oracle/software/product/10.2.0_owb/root.sh -silent
 
-# su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
-# /oracle/software/product/10.2.0_owb/root.sh -silent
+su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
+/oracle/software/product/10.2.0_owb/root.sh -silent
 
-# # configure environment
-# echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
+# configure environment
+echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
 
 EOF
 }
