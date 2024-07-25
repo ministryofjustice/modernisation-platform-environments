@@ -62,9 +62,9 @@ export LOGS="${local.application_name}-EC2"
 export APPNAME="${local.application_name}"
 export ENV="${local.application_data.accounts[local.environment].edw_environment}"
 export BACKUPBUCKET="${local.application_data.accounts[local.environment].edw_s3_backup_bucket}"
-export ROLE="${aws_iam_role.edw_ec2_role.name}"
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
 export SECRET=$(/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db-master-password.name} --query SecretString --output text)
+export STACKNAME=${aws_cloudformation_stack.edw-cloudwatch-stack.name}
 export host="$ip4 $APPNAME-$ENV $APPNAME.${local.application_data.accounts[local.environment].edw_dns_extension}"
 export host2="${local.application_data.accounts[local.environment].edw_cis_ip} cis.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
 export host3="${local.application_data.accounts[local.environment].edw_eric_ip} eric.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
@@ -75,10 +75,11 @@ echo $host3 >>/etc/hosts
 echo $host4 >>/etc/hosts
 mkdir -p /stage/oracle/scripts
 
+trap '/opt/aws/bin/cfn-signal -e $? --stack $STACKNAME --resource DBInstance --region $REGION' ERR
+
 # Disable firewall
 sudo /etc/init.d/iptables stop
 sudo /sbin/chkconfig iptables off
-
 
 # Set up log files
 echo "---creating /etc/awslogs/awscli.conf"
@@ -87,7 +88,7 @@ cat > /etc/awslogs/awscli.conf <<-EOC1
 [plugins]
 cwlogs = cwlogs
 [default]
-region = ${local.application_data.accounts[local.environment].edw_region}
+region = $REGION
 EOC1
 
 echo "---creating /tmp/cwlogs/logstreams.conf"
@@ -98,33 +99,33 @@ cat > /tmp/cwlogs/logstreams.conf <<-EOC2
 state_file = /var/awslogs/agent-state
 
 [oracle_alert_log_errors]
-file = /oracle/software/product/10.2.0/admin/${local.application_name}/bdump/alert_${local.application_name}.log
-log_group_name = ${local.application_name}-OracleAlerts
+file = /oracle/software/product/10.2.0/admin/$APPNAME/bdump/alert_$APPNAME.log
+log_group_name = $APPNAME-OracleAlerts
 log_stream_name = {instance_id}
 
 [rman_backup_log_errors]
 file = /stage/oracle/backup_logs/*_RMAN_disk_*.log
-log_group_name = ${local.application_name}-RMan
+log_group_name = $APPNAME-RMan
 log_stream_name = {instance_id}
 
 [rman_arch_backup_log_errors]
 file = /stage/oracle/backup_logs/*_RMAN_disk_ARCH_*.log
-log_group_name = ${local.application_name}-RManArch
+log_group_name = $APPNAME-RManArch
 log_stream_name = {instance_id}
 
 [db_tablespace_space_alerts]
 file = /stage/oracle/scripts/logs/freespace_alert.log
-log_group_name = ${local.application_name}-TBSFreespace
+log_group_name = $APPNAME-TBSFreespace
 log_stream_name = {instance_id}
 
 [db_PMON_status_alerts]
 file = /stage/oracle/scripts/logs/pmon_status_alert.log
-log_group_name = ${local.application_name}-PMONstatus
+log_group_name = $APPNAME-PMONstatus
 log_stream_name = {instance_id}
 
 [db_CDC_status_alerts]
 file = /stage/oracle/scripts/logs/cdc_check.log
-log_group_name = ${local.application_name}-CDCstatus
+log_group_name = $APPNAME-CDCstatus
 log_stream_name = {instance_id}
 EOC2
 
@@ -141,11 +142,11 @@ EOC2
 # wget https://amazoncloudwatch-agent.s3.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 # sudo yum update rpm
 
-# # Tag root volume
-# echo "---tagging root volume"
-# AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-# ROOT_VOLUME_IDS=$(/usr/local/bin/aws ec2 describe-instances --region ${local.application_data.accounts[local.environment].edw_region} --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)
-# /usr/local/bin/aws ec2 create-tags --resources $ROOT_VOLUME_IDS --region ${local.application_data.accounts[local.environment].edw_region} --tags Key=Name,Value=$APPNAME-root
+# Tag root volume
+echo "---tagging root volume"
+AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+ROOT_VOLUME_IDS=$(/usr/local/bin/aws ec2 describe-instances --region $REGION --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)
+/usr/local/bin/aws ec2 create-tags --resources $ROOT_VOLUME_IDS --region $REGION --tags Key=Name,Value=$APPNAME-root
 
 #### setup_file_systems
 echo "---setup_file_systems"
@@ -165,13 +166,11 @@ chmod 777 /stage
 grep -qxF "/dev/xvdg /stage ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdg /stage ext4 defaults 0 0" >> /etc/fstab
 sudo mount -t ext4 /dev/xvdg /stage
 
-
 # Create archive file system
 sudo /sbin/mkfs.ext4 /dev/xvdh
 mkdir -p /oracle/ar
 grep -qxF "/dev/xvdh /oracle/ar ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
 sudo mount -t ext4 /dev/xvdh /oracle/ar
-
 
 #Create oracle_software
 sudo /sbin/mkfs.ext4 /dev/xvdi
@@ -186,19 +185,10 @@ grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/d
 sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
 
 
-# # Mount repo
-# echo "---configure and mount /repo"
-# mkdir -p /repo
-# s3fs laa-software-library /repo -o allow_other -o use_cache=/tmp -o endpoint=${local.application_data.accounts[local.environment].edw_region} -o uid=500 -o mp_umask=002 -o multireq_max=5 -o iam_role=$ROLE
-# echo "---get uid of Oracle user"
-# OUSERID=`id -u oracle`
-# echo "s3fs#laa-software-library /repo fuse allow_other,use_cache=/tmp,endpoint=${local.application_data.accounts[local.environment].edw_region},uid=$OUSERID,mp_umask=002,multireq_max=5,iam_role=$ROLE 0 0" >> /etc/fstab
-
-
-# #### setup_oracle_db_software
-# echo "---setup_oracle_db_software"
-# # Install wget / unzip
-# yum install -y unzip
+#### setup_oracle_db_software
+echo "---setup_oracle_db_software"
+# Install wget / unzip
+yum install -y unzip
 
 # groupadd dba
 # groupadd oinstall
@@ -224,25 +214,8 @@ sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
 # cp -fr /home/ec2-user/.ssh/* /stage/oracle/.ssh/
 # chown -R oracle:dba /stage/oracle/.ssh
 
-# # Unzip installers
-# echo "---Unzip installers"
-# mkdir -p /stage/databases
-# mkdir -p /stage/patches/1020
-# unzip /repo/databases/10.2/installers/B24792-01_1of5.zip -d /stage/databases
-# unzip /repo/databases/10.2/installers/B24792-01_2of5.zip -d /stage/databases
-# unzip /repo/databases/10.2/installers/B24792-01_3of5.zip -d /stage/databases
-# unzip /repo/databases/10.2/installers/B24792-01_4of5.zip -d /stage/databases
-# unzip /repo/databases/10.2/installers/B24792-01_5of5.zip -d /stage/databases
-
-# # Unzip patch files
-# unzip /repo/databases/10.2/patches/db-patchset10204/p6810189_10204_Linux-x86-64.zip -d /stage/patches/10204
-
 # # Create directories and set ownership
-# echo "---Create directories and set ownership"
-# mkdir -p /oracle/software/oraInventory
-# mkdir -p /oracle/software/product
-# mkdir -p /oracle/software/product/10.2.0
-# mkdir -p /oracle/software/product/10.2.0_owb
+# echo "---set ownership"
 # chown -R oracle:dba /oracle
 
 # # Create swap space
@@ -253,14 +226,7 @@ sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
 # swapon /swapfile
 
 # # Run Oracle installer
-# cp -f /repo/databases/10.2/templates/db-install-10g.rsp /run/cfn-init/db-install-10g.rsp
 # chmod 777 /run/cfn-init/db-install-10g.rsp
-# sed -i 's/{{ oracle_database_inventory_location }}/"\/oracle\/software\/oraInventory"/g' /run/cfn-init/db-install-10g.rsp
-# sed -i 's/{{ oracle_database_oracle_home }}/"\/oracle\/software\/product\/10.2.0"/g'     /run/cfn-init/db-install-10g.rsp
-# sed -i 's/{{ oracle_database_oracle_base }}/"\/oracle\/software\/product"/g'             /run/cfn-init/db-install-10g.rsp
-# sed -i 's/{{ oracle_database_edition }}/"EE"/g'                                          /run/cfn-init/db-install-10g.rsp
-# sed -i 's/{{ oracle_database_os_group }}/"dba"/g'                                      /run/cfn-init/db-install-10g.rsp
-# sed -i 's/{{ oracle_database_oracle_home_name }}/"db_home"/g'                            /run/cfn-init/db-install-10g.rsp
 
 # # Run installer and post install
 # export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
@@ -274,29 +240,12 @@ sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
 # echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
 # echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
 
-# # patch the database to 10.2.0.4
-# cp -f /repo/databases/10.2/templates/patchset.rsp /stage/oracle/patchset.rsp
-# chown oracle:dba /stage/oracle/patchset.rsp
-# chmod 777 /stage/oracle/patchset.rsp
-
-# su oracle -c "/stage/patches/10204/Disk1/runInstaller -silent -responseFile /stage/oracle/patchset.rsp"
-# /oracle/software/product/10.2.0/root.sh -silent
-
 # #### Setup_owb
 
 # # Create directories for OWB setup
 # mkdir -p /stage/owb/owb101
 # mkdir -p /stage/owb/owb104
 # mkdir -p /stage/owb/owb105
-
-# # Unzip OWB software packages
-# unzip /repo/Software/OWB10/B30394-01_1of2.zip -d /stage/owb/owb101
-# unzip /repo/Software/OWB10/B30394-01_2of2.zip -d /stage/owb/owb101
-# unzip /repo/Software/OWB10/p7005587_10204_Linux-x86-64.zip -d /stage/owb/owb104
-# unzip /repo/Software/OWB10/p8515097_10205_Linux-x86-64.zip -d /stage/owb/owb105
-
-# # Copy response files to staging directory
-# cp -f /repo/Software/OWB10/*.rsp /stage/owb/
 
 # # Set permissions for staging directory
 # chmod -R 777 /stage/owb/
@@ -311,9 +260,7 @@ sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
 # su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
 # /oracle/software/product/10.2.0_owb/root.sh -silent
 
-# # Unzip additional files and configure environment
-# unzip /repo/edwcreate/refresh.zip -d /stage
-# unzip /repo/edwcreate/templates.zip -d /stage
+# # configure environment
 # echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
 
 EOF
