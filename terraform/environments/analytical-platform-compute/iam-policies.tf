@@ -213,7 +213,9 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "iam:GetRole",
       "lakeformation:GetDataAccess",
       "glue:*",
-      "lakeformation:*"
+      "lakeformation:*",
+      "sso:*",
+      "iam:*"
     ]
     resources = [
       "*"
