@@ -26,7 +26,7 @@ module "transfer_comp_Lambda" {
   runtime        = local.lambda_transfercomp_runtime
   policies       = local.lambda_transfercomp_policies
   tracing        = local.lambda_transfercomp_tracing
-  timeout        = 60
+  timeout        = 300
   lambda_trigger = false
   layers         = [module.transfer_comp_lambda_layer.lambda_layer_arn, ]
 
