@@ -216,7 +216,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:*",
       "sso:*",
       "iam:*",
-      "sso-directory:*"
+      "sso-directory:*",
+      "athena:*"
     ]
     resources = [
       "*"
