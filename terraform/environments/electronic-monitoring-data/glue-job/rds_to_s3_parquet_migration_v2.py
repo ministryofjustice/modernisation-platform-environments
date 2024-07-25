@@ -74,7 +74,9 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "day_partition_bool",
                        "validation_only_run",
                        "validation_sample_fraction_float",
-                       "validation_sample_df_repartition_num"
+                       "validation_sample_df_repartition_num",
+                       "rds_df_filter_year",
+                       "rds_df_filter_month"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -230,15 +232,13 @@ class RDS_JDBC_CONNECTION():
         return rds_db_tbl_temp_list
 
 
-    def get_rds_dataframe(self) -> DataFrame:
+    def get_rds_dataframe(self, jdbc_partition_column, pkey_min, pkey_max) -> DataFrame:
 
         query_str = f"""
         SELECT *
           FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+         WHERE {jdbc_partition_column} between {pkey_min} and {pkey_max}
         """.strip()
-
-        if args.get('rds_query_where_clause', '') != '':
-            query_str = query_str + f"""\n WHERE {args['rds_query_where_clause'].strip()}"""
 
         LOGGER.info(f"""query_str-(SingleJDBCConn):> \n{query_str}""")
         
@@ -251,12 +251,12 @@ class RDS_JDBC_CONNECTION():
                     .load())
 
 
-    def get_df_read_rds_db_tbl_int_pkey(self,
-                                        jdbc_partition_column, 
-                                        jdbc_partition_col_upperbound,
-                                        jdbc_read_partitions_num,
-                                        jdbc_partition_col_lowerbound=0,
-                                        ) -> DataFrame:
+    def get_rds_df_parallel_jdbc(self,
+                                 jdbc_partition_column, 
+                                 jdbc_partition_col_upperbound,
+                                 jdbc_read_partitions_num,
+                                 jdbc_partition_col_lowerbound=0,
+                                ) -> DataFrame:
         
         numPartitions = jdbc_read_partitions_num
         # Note: numPartitions is normally equal to number of executors defined.
@@ -272,10 +272,8 @@ class RDS_JDBC_CONNECTION():
         query_str = f"""
         SELECT *
           FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+         WHERE {jdbc_partition_column} between {jdbc_partition_col_lowerbound} and {jdbc_partition_col_upperbound}
         """.strip()
-
-        if args.get('rds_query_where_clause', '') != '':
-            query_str = query_str + f"""\n WHERE {args['rds_query_where_clause'].strip()}"""
         
         LOGGER.info(f"""query_str-(ParallelJDBCConn):> \n{query_str}""")
 
@@ -549,8 +547,12 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
 
     df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path)
 
-    if args.get('rds_query_where_clause', '') != '':
-        df_parquet_read = df_parquet_read.where(f"""{args['rds_query_where_clause'].strip()}""")
+    rds_df_filter_year = args.get('rds_df_filter_year', 0)
+    rds_df_filter_month = args.get('rds_df_filter_month', 0)
+    if rds_df_filter_year != 0:
+        df_parquet_read = df_parquet_read.where(f"""year = {rds_df_filter_year}""")
+    if rds_df_filter_month != 0:
+        df_parquet_read = df_parquet_read.where(f"""month = {rds_df_filter_month}""")
 
     df_compare_columns_list = [col for col in df_parquet_read.columns 
                                if col not in ['year', 'month', 'day']]
@@ -763,6 +765,13 @@ if __name__ == "__main__":
         sys.exit(1)
     # -------------
 
+    rds_df_filter_year = args.get('rds_df_filter_year', 0)
+    rds_df_filter_month = args.get('rds_df_filter_month', 0)
+    if args.get('rds_query_where_clause', '') != '':
+        if rds_df_filter_year == 0 or rds_df_filter_month == 0:
+            LOGGER.error(f"""The values for 'rds_df_filter_year' or 'rds_df_filter_month' not given""")
+            sys.exit(1)
+
     rds_table_total_size_mb = int(args['rds_table_total_size_mb'])
     if rds_table_total_size_mb != 0:
         if args.get("jdbc_read_256mb_partitions", "false") == "true":
@@ -783,18 +792,19 @@ if __name__ == "__main__":
     jdbc_read_partitions_num = 1 if jdbc_read_partitions_num <= 0 else jdbc_read_partitions_num
     LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
 
+    # rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 'min')
+    # rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 'max')
+    agg_row_dict = rds_jdbc_conn_obj.get_min_max_pkey_v2(jdbc_partition_column)
+    min_pkey = agg_row_dict['min_value']
+    max_pkey = agg_row_dict['max_value']
     if jdbc_read_partitions_num == 1:
-        df_rds_read = rds_jdbc_conn_obj.get_rds_dataframe()
+        df_rds_read = rds_jdbc_conn_obj.get_rds_dataframe(jdbc_partition_column,
+                                                          min_pkey,
+                                                          max_pkey)
     else:
-        # rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 'min')
-        # rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 'max')
-        agg_row_dict = rds_jdbc_conn_obj.get_min_max_pkey_v2(jdbc_partition_column)
-        min_pkey = agg_row_dict['min_value']
-        max_pkey = agg_row_dict['max_value']
-
         jdbc_partition_col_upperbound = max_pkey
         
-        df_rds_read = rds_jdbc_conn_obj.get_df_read_rds_db_tbl_int_pkey(
+        df_rds_read = rds_jdbc_conn_obj.get_rds_df_parallel_jdbc(
                                                 jdbc_partition_column,
                                                 jdbc_partition_col_upperbound,
                                                 jdbc_read_partitions_num,
@@ -835,9 +845,15 @@ if __name__ == "__main__":
             LOGGER.info(f"""other_partitionby_columns = {other_partitionby_columns}""")
             partition_by_cols.extend(other_partitionby_columns)
         # ----------------------------------------------------
-        LOGGER.info(f"""partition_by_cols = {partition_by_cols}""")
+
+        if rds_df_filter_year != 0:
+            df_rds_read = df_rds_read.where(f"""year = {rds_df_filter_year}""")
+        if rds_df_filter_month != 0:
+            df_rds_read = df_rds_read.where(f"""month = {rds_df_filter_month}""")
+        # ----------------------------------------------------
 
         if partition_by_cols and rds_df_repartition_num != 0:
+            LOGGER.info(f"""partition_by_cols = {partition_by_cols}""")
             # Note: Default 'orderby_columns' values may not be appropriate for all the scenarios.
             # So, the user can edit the list-'orderby_columns' value(s) if required at runtime.
             # Example: orderby_columns = ['month']
