@@ -95,6 +95,11 @@ module "aurora_operational_db" {
       name         = "shared_preload_libraries"
       value        = "pg_stat_statements,pg_cron"
       apply_method = "pending-reboot"
+    },
+    {
+      name         = "cron.database_name"
+      value        = local.operational_db_default_database
+      apply_method = "immediate"
     }
   ]
 
