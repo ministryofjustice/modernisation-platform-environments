@@ -99,7 +99,7 @@ module "aurora_operational_db" {
     {
       name         = "cron.database_name"
       value        = local.operational_db_default_database
-      apply_method = "immediate"
+      apply_method = "pending-reboot"
     }
   ]
 
