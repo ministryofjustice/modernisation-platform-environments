@@ -61,9 +61,7 @@ export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
 export LOGS="${local.application_name}-EC2"
 export APPNAME="${local.application_name}"
 export ENV="${local.application_data.accounts[local.environment].edw_environment}"
-export BACKUPBUCKET="${local.application_data.accounts[local.environment].edw_s3_backup_bucket}"
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
-export SECRET=$(/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db-master-password.name} --query SecretString --output text)
 export host="$ip4 $APPNAME-$ENV $APPNAME.${local.application_data.accounts[local.environment].edw_dns_extension}"
 export host2="${local.application_data.accounts[local.environment].edw_cis_ip} cis.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
 export host3="${local.application_data.accounts[local.environment].edw_eric_ip} eric.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
@@ -134,16 +132,11 @@ EOC2
 
 # #Install AWS logs
 
+# Does not work in LZ, need to fix in next ticket
 # echo "---Install AWS logging"
 # sudo yum install wget openssl-devel bzip2-devel libffi-devel -y
 # wget https://amazoncloudwatch-agent.s3.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 # sudo yum update rpm
-
-# Tag root volume
-echo "---tagging root volume"
-AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-ROOT_VOLUME_IDS=$(/usr/local/bin/aws ec2 describe-instances --region $REGION --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)
-/usr/local/bin/aws ec2 create-tags --resources $ROOT_VOLUME_IDS --region $REGION --tags Key=Name,Value=$APPNAME-root
 
 #### setup_file_systems
 echo "---setup_file_systems"
