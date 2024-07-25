@@ -13,7 +13,8 @@ locals {
         treat_missing_data  = "breaching"
         datapoints_to_alarm = 1
         dimensions = {
-          exe = "amazon-cloudwatch-agent"
+          exe        = "amazon-cloudwatch-agent"
+          pid_finder = "native"
         }
       }
       ssm-agent-process-count = {
@@ -28,7 +29,8 @@ locals {
         treat_missing_data  = "breaching"
         datapoints_to_alarm = 1
         dimensions = {
-          exe = "ssm-agent"
+          exe        = "ssm-agent"
+          pid_finder = "native"
         }
       }
     }
@@ -45,7 +47,8 @@ locals {
         treat_missing_data  = "breaching"
         datapoints_to_alarm = 1
         dimensions = {
-          exe = "CMS"
+          exe        = "CMS"
+          pid_finder = "native"
         }
       }
       bods-svcmgr-process-count = {
@@ -60,7 +63,8 @@ locals {
         treat_missing_data  = "breaching"
         datapoints_to_alarm = 1
         dimensions = {
-          exe = "SvcMgr"
+          exe        = "SvcMgr"
+          pid_finder = "native"
         }
       }
     }
