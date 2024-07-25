@@ -217,7 +217,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "sso:*",
       "iam:*",
       "sso-directory:*",
-      "athena:*"
+      "athena:*",
+      "s3:*"
     ]
     resources = [
       "*"
