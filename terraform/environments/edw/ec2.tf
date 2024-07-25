@@ -75,8 +75,6 @@ echo $host3 >>/etc/hosts
 echo $host4 >>/etc/hosts
 mkdir -p /stage/oracle/scripts
 
-trap '/opt/aws/bin/cfn-signal -e $? --stack $STACKNAME --resource DBInstance --region $REGION' ERR
-
 # Disable firewall
 sudo /etc/init.d/iptables stop
 sudo /sbin/chkconfig iptables off

@@ -538,20 +538,6 @@ resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
 EOF
 }
 
-# ############# CLOUDFORMATION STACK #############
-
-resource "aws_cloudformation_stack" "edw-cloudwatch-stack" {
-  name          = "${local.application_name}-cloudwatch-stack"
-  capabilities = ["CAPABILITY_IAM"]
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-edw-cloudwatch-stack"
-    }
-  )  
-}
-
 ############# SNS TOPIC #############
 
 # SNS topic for monitoring to send alarms to
