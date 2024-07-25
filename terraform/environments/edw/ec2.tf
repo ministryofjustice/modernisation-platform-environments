@@ -64,7 +64,6 @@ export ENV="${local.application_data.accounts[local.environment].edw_environment
 export BACKUPBUCKET="${local.application_data.accounts[local.environment].edw_s3_backup_bucket}"
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
 export SECRET=$(/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db-master-password.name} --query SecretString --output text)
-export STACKNAME=${aws_cloudformation_stack.edw-cloudwatch-stack.name}
 export host="$ip4 $APPNAME-$ENV $APPNAME.${local.application_data.accounts[local.environment].edw_dns_extension}"
 export host2="${local.application_data.accounts[local.environment].edw_cis_ip} cis.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
 export host3="${local.application_data.accounts[local.environment].edw_eric_ip} eric.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
