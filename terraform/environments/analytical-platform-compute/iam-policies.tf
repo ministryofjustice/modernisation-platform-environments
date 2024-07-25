@@ -215,7 +215,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "glue:*",
       "lakeformation:*",
       "sso:*",
-      "iam:*"
+      "iam:*",
+      "sso-directory:*"
     ]
     resources = [
       "*"
