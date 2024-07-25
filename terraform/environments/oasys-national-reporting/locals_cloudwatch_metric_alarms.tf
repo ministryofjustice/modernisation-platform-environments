@@ -11,6 +11,7 @@ locals {
         comparison_operator = "LessThanThreshold"
         threshold           = 2 # CloudWatch agent runs 2 processes
         treat_missing_data  = "breaching"
+        datapoints_to_alarm = 1
         dimensions = {
           exe = "amazon-cloudwatch-agent"
         }
@@ -25,6 +26,7 @@ locals {
         comparison_operator = "LessThanThreshold"
         threshold           = 2 # SSM agent runs 2 processes
         treat_missing_data  = "breaching"
+        datapoints_to_alarm = 1
         dimensions = {
           exe = "ssm-agent"
         }
@@ -41,6 +43,7 @@ locals {
         comparison_operator = "LessThanThreshold"
         threshold           = 1
         treat_missing_data  = "breaching"
+        datapoints_to_alarm = 1
         dimensions = {
           exe = "CMS"
         }
@@ -55,6 +58,7 @@ locals {
         comparison_operator = "LessThanThreshold"
         threshold           = 1
         treat_missing_data  = "breaching"
+        datapoints_to_alarm = 1
         dimensions = {
           exe = "SvcMgr"
         }
