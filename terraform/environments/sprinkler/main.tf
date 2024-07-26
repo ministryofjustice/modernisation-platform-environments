@@ -802,6 +802,7 @@ resource "aws_db_instance" "app" {
 #------------------------------------------------------------------------------
 # Logging
 #------------------------------------------------------------------------------
+
 #tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "app" {
   #checkov:skip=CKV_AWS_158
