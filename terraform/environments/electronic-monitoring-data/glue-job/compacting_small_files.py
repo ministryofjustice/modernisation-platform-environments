@@ -54,13 +54,15 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "s3_prq_read_db_folder",
                        "s3_prq_read_db_schema_folder",
                        "s3_prq_read_table_folder",
-                       "year_partition_str",
-                       "month_partition_str",
-                       "day_partition_str",
-                       "s3_prq_write_table_folder"
+                       "year_int",
+                       "month_int",
+                       "s3_prq_write_table_folder",
+                       "coalesce_int",
+                       "prq_df_repartition_int"
                        ]
 
 OPTIONAL_INPUTS = [
+    "primarykey_column"
 ]
 
 AVAILABLE_ARGS_LIST = resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -148,48 +150,57 @@ def write_to_s3_parquet(df_prq_write: DataFrame,
 if __name__ == "__main__":
 
 
-    partition_by_cols = list()
-    
-    year_partition_str = args.get('year_partition_str', '')
-    if year_partition_str != '':
-        read_prq_partitioned_path = PRQ_READ_TABLE_FOLDER_PATH+f"""/{year_partition_str}"""
-
-        write_prq_partitioned_path = PRQ_WRITE_TABLE_FOLDER_PATH+f"""/{year_partition_str}"""
-        partition_by_cols.append("year")
-    
-    month_partition_str = args.get('month_partition_str', '')
-    if month_partition_str != '':
-        read_prq_partitioned_path = read_prq_partitioned_path+f"""/{month_partition_str}"""
-
-        write_prq_partitioned_path = write_prq_partitioned_path+f"""/{month_partition_str}"""
-        partition_by_cols.append("month")
-    
-    day_partition_str = args.get('day_partition_str', '')
-    if day_partition_str != '':
-        read_prq_partitioned_path = read_prq_partitioned_path+f"""/{day_partition_str}"""
-        
-        write_prq_partitioned_path = write_prq_partitioned_path+f"""/{day_partition_str}"""
-        partition_by_cols.append("day")
-
-    s3_prq_read_table_folder_path = f"""s3://{PARQUET_READ_S3_BUCKET_NAME}/{read_prq_partitioned_path}"""
+    s3_prq_read_table_folder_path = f"""s3://{PARQUET_READ_S3_BUCKET_NAME}/{PRQ_READ_TABLE_FOLDER_PATH}/"""
     LOGGER.info(f"""Parquet Source being used for compactionm: {s3_prq_read_table_folder_path}""")
 
     if check_s3_folder_path_if_exists(PARQUET_READ_S3_BUCKET_NAME, 
-                                      read_prq_partitioned_path):
-        df_parquet_read = spark.read.parquet(read_prq_partitioned_path)
+                                      PRQ_READ_TABLE_FOLDER_PATH):
+        df_parquet_read = spark.read.parquet(s3_prq_read_table_folder_path)
     else:
-        raise FileNotFoundError(f"""PATH NOT FOUND:>> {read_prq_partitioned_path}""")
-
+        raise FileNotFoundError(f"""PATH NOT FOUND:>> {s3_prq_read_table_folder_path}""")
     LOGGER.info(f"""df_parquet_read-{s3_prq_read_table_folder_path}:\n> READ PARTITIONS = {df_parquet_read.rdd.getNumPartitions()}""")
 
-    write_to_s3_parquet(df_parquet_read.coalesce(1), 
+
+    partition_by_cols = list()
+    
+    year_partition_int = int(args.get('year_int', 0))
+    if year_partition_int != 0:
+        df_parquet_read = df_parquet_read.where(f"""year = {year_partition_int}""")
+        partition_by_cols.append("year")
+    
+    month_partition_int = int(args.get('month_int', 0))
+    if month_partition_int != 0:
+        df_parquet_read = df_parquet_read.where(f"""month = {month_partition_int}""")
+        partition_by_cols.append("month")
+
+    LOGGER.info(f"""partition_by_cols = {partition_by_cols}""")
+
+    prq_df_repartition_int = int(args.get('prq_df_repartition_int', 0))
+    primarykey_column = args.get('primarykey_column', '')
+    if partition_by_cols and prq_df_repartition_int != 0:
+        LOGGER.info(f"""df_parquet_read-Repartitioning ({prq_df_repartition_int}) on {partition_by_cols}.""")
+        df_parquet_read = df_parquet_read.repartition(prq_df_repartition_int, *partition_by_cols)
+    elif prq_df_repartition_int != 0 and primarykey_column != '':
+        # Note: repartitioning on 'jdbc_partition_column' may optimize the joins on this column downstream.
+        LOGGER.info(f"""df_rds_read-Repartitioning ({prq_df_repartition_int}) on {primarykey_column}.""")
+        df_parquet_read = df_parquet_read.repartition(prq_df_repartition_int, primarykey_column)
+    elif prq_df_repartition_int != 0:
+        # Note: repartitioning on 'jdbc_partition_column' may optimize the joins on this column downstream.
+        LOGGER.info(f"""df_rds_read-Repartitioning to {prq_df_repartition_int} partitions.""")
+        df_parquet_read = df_parquet_read.repartition(prq_df_repartition_int)
+
+    if prq_df_repartition_int != 0:
+        LOGGER.info(f"""df_parquet_read: After Repartitioning -> {df_parquet_read.rdd.getNumPartitions()} partitions.""")
+
+    coalesce_int = int(args.get('coalesce_int', 1))
+    write_to_s3_parquet(df_parquet_read.coalesce(coalesce_int), 
                         partition_by_cols)
     # -----------------------------------------------
 
-    total_files, total_size = get_s3_folder_info(PARQUET_WRITE_S3_BUCKET_NAME, write_prq_partitioned_path)
+    total_files, total_size = get_s3_folder_info(PARQUET_WRITE_S3_BUCKET_NAME, PRQ_WRITE_TABLE_FOLDER_PATH)
     msg_part_1 = f"""total_files={total_files}"""
     msg_part_2 = f"""total_size_mb={total_size/1024/1024:.2f}"""
-    LOGGER.info(f"""'{write_prq_partitioned_path}': {msg_part_1}, {msg_part_2}""")
+    LOGGER.info(f"""'{PRQ_WRITE_TABLE_FOLDER_PATH}': {msg_part_1}, {msg_part_2}""")
 
 
     job.commit()
