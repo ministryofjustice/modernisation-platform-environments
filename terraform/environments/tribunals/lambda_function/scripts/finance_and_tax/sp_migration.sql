@@ -1866,8 +1866,9 @@ IF @Is_published = 1
 
 go
 
-
-
+-- Add this ALTER TABLE statement to make the id column an identity column
+ALTER TABLE Judgment ALTER COLUMN id INT IDENTITY(1,1) NOT NULL
+go
 
 CREATE PROCEDURE [dbo].[spAddSubCategory] 
 
