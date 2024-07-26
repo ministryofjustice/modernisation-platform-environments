@@ -1866,11 +1866,51 @@ IF @Is_published = 1
 
 go
 
-IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('Judgment') AND name = 'id')
+-- Check if the Judgment table exists, if not, create it
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Judgment]') AND type in (N'U'))
 BEGIN
-    ALTER TABLE Judgment ADD CONSTRAINT DF_Judgment_id DEFAULT (NEXT VALUE FOR Judgment_id_seq) FOR id;
-    ALTER TABLE Judgment ALTER COLUMN id INT NOT NULL;
+    CREATE TABLE [dbo].[Judgment](
+        [id] [int] IDENTITY(1,1) NOT NULL,
+        [Is_published] [bit] NULL,
+        [File_no_1] [varchar](5) NULL,
+        [File_no_2] [varchar](5) NULL,
+        [File_no_3] [varchar](4) NULL,
+        [Decision_datetime] [datetime] NULL,
+        [Claimants] [ntext] NULL,
+        [Respondent] [ntext] NULL,
+        [Main_subcategory_id] [int] NULL,
+        [Sec_subcategory_id] [int] NULL,
+        [Headnote_summary] [ntext] NULL,
+        [Created_datetime] [datetime] NULL,
+        [Last_updatedtime] [datetime] NULL,
+        [Publication_datetime] [datetime] NULL,
+        [Reported_no_1] [varchar](3) NULL,
+        [Reported_no_2] [varchar](3) NULL,
+        [Reported_no_3] [varchar](2) NULL,
+        CONSTRAINT [PK_Judgment] PRIMARY KEY CLUSTERED ([id] ASC)
+    )
 END
+ELSE
+BEGIN
+
+    -- If the table exists but the id column is not an identity column, modify it
+    IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('Judgment') AND name = 'id')
+    BEGIN
+        -- First, we need to drop the primary key if it exists
+        IF EXISTS (SELECT * FROM sys.key_constraints WHERE object_id = OBJECT_ID('PK_Judgment'))
+        BEGIN
+            ALTER TABLE Judgment DROP CONSTRAINT PK_Judgment
+        END
+
+        -- Now we can modify the column to be an identity column
+        ALTER TABLE Judgment DROP COLUMN id
+        ALTER TABLE Judgment ADD id INT IDENTITY(1,1) NOT NULL
+
+        -- Re-add the primary key
+        ALTER TABLE Judgment ADD CONSTRAINT PK_Judgment PRIMARY KEY CLUSTERED (id ASC)
+    END
+END
+
 go
 
 CREATE PROCEDURE [dbo].[spAddSubCategory] 
