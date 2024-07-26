@@ -4,7 +4,7 @@ locals {
     public = {
       access_logs              = true
       enable_delete_protection = false
-      idle_timeout             = 3600 # 60 is default
+      idle_timeout             = 240
       internal_lb              = false
       force_destroy_bucket     = true
       s3_versioning            = false
