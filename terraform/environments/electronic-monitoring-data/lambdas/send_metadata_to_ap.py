@@ -5,7 +5,6 @@ takes the json mojap metadatas of each table and moves them to the AP
 import boto3
 import os
 import logging
-import datetime
 import json
 
 s3 = boto3.client("s3")
@@ -27,10 +26,11 @@ def handler(event, context):
     logger.info(
         f"Copying metadata... Database: {database_name}, Table: {table_name}, File: {file_name}"
     )
-    current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
-    if "_" not in database_name:
-        database_name = f"{database_name}_add_underscore"
-    destination_key = f"electronic_monitoring/metadata/database_name={database_name}/table_name={table_name}/{file_name}"
+    if not file_name.endswith(".json"):
+        msg = f"File {file_name} is not a json file"
+        logger.error(msg)
+        raise Exception(msg)
+    destination_key = f"electronic_monitoring/metadata/database_name={database_name}/{table_name}.json"
     logger.info(f"Copying to: {destination_bucket}, {destination_key}")
     # Specify from where file needs to be copied
     copy_object = {"Bucket": source_bucket_name, "Key": file_key}
