@@ -30,7 +30,7 @@ def handler(event, context):
     current_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%SZ")
     if "_" not in database_name:
         database_name = f"{database_name}_add_underscore"
-    destination_key = f"electronic_monitoring/metadata/database_name={database_name}/table_name={table_name}/extraction_timestamp={current_timestamp}/{file_name}"
+    destination_key = f"electronic_monitoring/metadata/database_name={database_name}/table_name={table_name}/{file_name}"
     logger.info(f"Copying to: {destination_bucket}, {destination_key}")
     # Specify from where file needs to be copied
     copy_object = {"Bucket": source_bucket_name, "Key": file_key}
