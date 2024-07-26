@@ -37,6 +37,12 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
           }
           name = "SizeRestrictions_BODY"
         }
+        rule_action_override {
+          action_to_use {
+            allow {}
+          }
+          name = "CrossSiteScripting_COOKIE"
+        }
       }
     }
 

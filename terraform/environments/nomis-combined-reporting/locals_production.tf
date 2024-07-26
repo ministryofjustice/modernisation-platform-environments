@@ -31,7 +31,7 @@ locals {
 
     ec2_instances = {
 
-      # Comment out till needed for deployment
+      # Turn off via AWS console till needed for prod deployment
       pd-ncr-cms-a = merge(local.ec2_instances.bip_app, {
         #cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
         config = merge(local.ec2_instances.bip_app.config, {
@@ -49,9 +49,11 @@ locals {
           node                                 = "1"
           nomis-combined-reporting-environment = "pd"
           type                                 = "management"
+          application-software-state           = "installed"
         })
       })
 
+      # Turn off via AWS console till needed for prod deployment
       pd-ncr-cms-b = merge(local.ec2_instances.bip_app, {
         #cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
         config = merge(local.ec2_instances.bip_app.config, {
@@ -69,6 +71,7 @@ locals {
           node                                 = "2"
           nomis-combined-reporting-environment = "pd"
           type                                 = "management"
+          application-software-state           = "installed"
         })
       })
 
@@ -109,7 +112,7 @@ locals {
         })
       })
 
-      # Comment out till needed for deployment
+      # Turn off via AWS console till needed for prod deployment
       pd-ncr-client-a = merge(local.ec2_autoscaling_groups.jumpserver, {
         # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
         config = merge(local.ec2_autoscaling_groups.jumpserver.config, {
@@ -128,7 +131,7 @@ locals {
         })
       })
 
-      # Comment out till needed for deployment
+      # Turn off via AWS console till needed for prod deployment
       pd-ncr-etl-1-a = merge(local.ec2_instances.bods, {
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bods # comment in when commissioned
         config = merge(local.ec2_instances.bods.config, {
@@ -166,7 +169,7 @@ locals {
       #   })
       # })
 
-      # Comment out till needed for deployment
+      # Turn off via AWS console till needed for prod deployment
       pd-ncr-processing-1-a = merge(local.ec2_instances.bip_app, {
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
         config = merge(local.ec2_instances.bip_app.config, {
@@ -184,73 +187,77 @@ locals {
           node                                 = "3"
           nomis-combined-reporting-environment = "pd"
           type                                 = "processing"
+          application-software-state           = "installed"
         })
       })
 
       # Comment out till needed for deployment
-      # pd-ncr-processing-2-b = merge(local.ec2_instances.bip_app, {
-      #   # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
-      #   config = merge(local.ec2_instances.bip_app.config, {
-      #     ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-      #     availability_zone = "eu-west-2b"
-      #     instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
-      #       "Ec2PDReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_app.instance, {
-      #     instance_type = "m6i.4xlarge",
-      #   })
-      #   tags = merge(local.ec2_instances.bip_app.tags, {
-      #     description                          = "Prod SAP BI Platform installation and configurations"
-      #     node                                 = "4"
-      #     nomis-combined-reporting-environment = "pd"
-      #     type                                 = "processing"
-      #   })
-      # })
-
-      # # Comment out till needed for deployment
-      # pd-ncr-processing-3-c = merge(local.ec2_instances.bip_app, {
-      #   # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
-      #   config = merge(local.ec2_instances.bip_app.config, {
-      #     ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-      #     availability_zone = "eu-west-2c"
-      #     instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
-      #       "Ec2PDReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_app.instance, {
-      #     instance_type = "m6i.4xlarge",
-      #   })
-      #   tags = merge(local.ec2_instances.bip_app.tags, {
-      #     description                          = "Prod SAP BI Platform installation and configurations"
-      #     node                                 = "5"
-      #     nomis-combined-reporting-environment = "pd"
-      #     type                                 = "processing"
-      #   })
-      # })
-
-      # # Comment out till needed for deployment
-      # pd-ncr-processing-4-a = merge(local.ec2_instances.bip_app, {
-      #   # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
-      #   config = merge(local.ec2_instances.bip_app.config, {
-      #     ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-      #     availability_zone = "eu-west-2a"
-      #     instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
-      #       "Ec2PDReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_app.instance, {
-      #     instance_type = "m6i.4xlarge",
-      #   })
-      #   tags = merge(local.ec2_instances.bip_app.tags, {
-      #     description                          = "Prod SAP BI Platform installation and configurations"
-      #     node                                 = "6"
-      #     nomis-combined-reporting-environment = "pd"
-      #     type                                 = "processing"
-      #   })
-      # })
+      pd-ncr-processing-2-b = merge(local.ec2_instances.bip_app, {
+        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
+        config = merge(local.ec2_instances.bip_app.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_app.instance, {
+          instance_type = "m6i.4xlarge",
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          description                          = "Prod SAP BI Platform installation and configurations"
+          node                                 = "4"
+          nomis-combined-reporting-environment = "pd"
+          type                                 = "processing"
+          application-software-state           = "installed"
+        })
+      })
 
       # Comment out till needed for deployment
+      pd-ncr-processing-3-c = merge(local.ec2_instances.bip_app, {
+        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
+        config = merge(local.ec2_instances.bip_app.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2c"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_app.instance, {
+          instance_type = "m6i.4xlarge",
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          description                          = "Prod SAP BI Platform installation and configurations"
+          node                                 = "5"
+          nomis-combined-reporting-environment = "pd"
+          type                                 = "processing"
+          application-software-state           = "installed"
+        })
+      })
+
+      # Comment out till needed for deployment
+      pd-ncr-processing-4-a = merge(local.ec2_instances.bip_app, {
+        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
+        config = merge(local.ec2_instances.bip_app.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_app.instance, {
+          instance_type = "m6i.4xlarge",
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          description                          = "Prod SAP BI Platform installation and configurations"
+          node                                 = "6"
+          nomis-combined-reporting-environment = "pd"
+          type                                 = "processing"
+          application-software-state           = "installed"
+        })
+      })
+
+      # Turn off via AWS console till needed for prod deployment
       pd-ncr-web-1-a = merge(local.ec2_instances.bip_web, {
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
         config = merge(local.ec2_instances.bip_web.config, {
@@ -266,66 +273,71 @@ locals {
         tags = merge(local.ec2_instances.bip_web.tags, {
           description                          = "Prod SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "pd"
+          application-software-state           = "installed"
         })
       })
 
       # Comment out till needed for deployment
-      # pd-ncr-web-2-b = merge(local.ec2_instances.bip_web, {
-      #   # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
-      #   config = merge(local.ec2_instances.bip_web.config, {
-      #     ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-      #     availability_zone = "eu-west-2b"
-      #     instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-      #       "Ec2PDReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_web.instance, {
-      #     instance_type = "r6i.xlarge",
-      #   })
-      #   tags = merge(local.ec2_instances.bip_web.tags, {
-      #     description                          = "Prod SAP BI Platform web-tier installation and configurations"
-      #     nomis-combined-reporting-environment = "pd"
-      #   })
-      # })
+      pd-ncr-web-2-b = merge(local.ec2_instances.bip_web, {
+        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
+        config = merge(local.ec2_instances.bip_web.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.xlarge",
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          description                          = "Prod SAP BI Platform web-tier installation and configurations"
+          nomis-combined-reporting-environment = "pd"
+          application-software-state           = "installed"
+        })
+      })
 
-      # # Comment out till needed for deployment
-      # pd-ncr-web-3-c = merge(local.ec2_instances.bip_web, {
-      #   # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
-      #   config = merge(local.ec2_instances.bip_web.config, {
-      #     ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-      #     availability_zone = "eu-west-2c"
-      #     instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-      #       "Ec2PDReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_web.instance, {
-      #     instance_type = "r6i.xlarge",
-      #   })
-      #   tags = merge(local.ec2_instances.bip_web.tags, {
-      #     description                          = "Prod SAP BI Platform web-tier installation and configurations"
-      #     nomis-combined-reporting-environment = "pd"
-      #   })
-      # })
+      # Comment out till needed for deployment
+      pd-ncr-web-3-c = merge(local.ec2_instances.bip_web, {
+        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
+        config = merge(local.ec2_instances.bip_web.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2c"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.xlarge",
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          description                          = "Prod SAP BI Platform web-tier installation and configurations"
+          nomis-combined-reporting-environment = "pd"
+          application-software-state           = "installed"
+        })
+      })
 
-      # # Comment out till needed for deployment
-      # pd-ncr-web-4-a = merge(local.ec2_instances.bip_web, {
-      #   # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
-      #   config = merge(local.ec2_instances.bip_web.config, {
-      #     ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-      #     availability_zone = "eu-west-2a"
-      #     instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-      #       "Ec2PDReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_web.instance, {
-      #     instance_type = "r6i.xlarge",
-      #   })
-      #   tags = merge(local.ec2_instances.bip_web.tags, {
-      #     description                          = "Prod SAP BI Platform web-tier installation and configurations"
-      #     nomis-combined-reporting-environment = "pd"
-      #   })
-      # })
+      # Comment out till needed for deployment
+      pd-ncr-web-4-a = merge(local.ec2_instances.bip_web, {
+        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
+        config = merge(local.ec2_instances.bip_web.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.xlarge",
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          description                          = "Prod SAP BI Platform web-tier installation and configurations"
+          nomis-combined-reporting-environment = "pd"
+          application-software-state           = "installed"
+        })
+      })
 
+      # Turn off via AWS console till needed for prod deployment
       pd-ncr-web-admin-a = merge(local.ec2_instances.bip_web, {
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
         config = merge(local.ec2_instances.bip_web.config, {
@@ -341,6 +353,7 @@ locals {
         tags = merge(local.ec2_instances.bip_web.tags, {
           description                          = "Prod SAP BI Platform web-tier admin installation and configurations"
           nomis-combined-reporting-environment = "pd"
+          application-software-state           = "installed"
         })
       })
     }

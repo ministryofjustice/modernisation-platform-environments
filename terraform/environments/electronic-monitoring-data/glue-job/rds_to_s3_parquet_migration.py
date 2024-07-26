@@ -1,6 +1,7 @@
 import sys
 import boto3
 import time
+import typing as RT
 # from logging import getLogger
 # import pandas as pd
 
@@ -47,7 +48,6 @@ def resolve_args(args_list):
 # *NOTE:* "EXEC sp_spaceused N'[g4s_emsys_mvp].[dbo].[GPSPosition]';"
 # The above SQL Server stored procedure call helps to find the values for 
 #   - rds_table_total_size_mb
-#   - rds_table_total_rows
 
 # Organise capturing input parameters.
 DEFAULT_INPUTS_LIST = ["JOB_NAME",
@@ -74,14 +74,15 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "day_partition_bool",
                        "validation_only_run",
                        "validation_sample_fraction_float",
-                       "validation_sample_df_repartition_num"
+                       "validation_sample_df_repartition_num",
+                       "rds_df_filter_year",
+                       "rds_df_filter_month"
                        ]
 
 OPTIONAL_INPUTS = [
     "date_partition_column_name",
     "other_partitionby_columns",
     "rename_migrated_prq_tbl_folder",
-    "rds_table_total_rows",
     "rds_query_where_clause"
 ]
 
@@ -231,15 +232,13 @@ class RDS_JDBC_CONNECTION():
         return rds_db_tbl_temp_list
 
 
-    def get_rds_dataframe(self) -> DataFrame:
+    def get_rds_dataframe(self, jdbc_partition_column, pkey_min, pkey_max) -> DataFrame:
 
         query_str = f"""
         SELECT *
           FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+         WHERE {jdbc_partition_column} between {pkey_min} and {pkey_max}
         """.strip()
-
-        if args.get('rds_query_where_clause', '') != '':
-            query_str = query_str + f""" WHERE {args['rds_query_where_clause'].strip()}"""
 
         LOGGER.info(f"""query_str-(SingleJDBCConn):> \n{query_str}""")
         
@@ -252,25 +251,29 @@ class RDS_JDBC_CONNECTION():
                     .load())
 
 
-    def get_df_read_rds_db_tbl_int_pkey(self,
-                                        jdbc_partition_column, 
-                                        jdbc_partition_col_upperbound,
-                                        jdbc_read_partitions_num,
-                                        jdbc_partition_col_lowerbound=0,
-                                        ) -> DataFrame:
+    def get_rds_df_parallel_jdbc(self,
+                                 jdbc_partition_column, 
+                                 jdbc_partition_col_upperbound,
+                                 jdbc_read_partitions_num,
+                                 jdbc_partition_col_lowerbound=0,
+                                ) -> DataFrame:
         
         numPartitions = jdbc_read_partitions_num
         # Note: numPartitions is normally equal to number of executors defined.
         # The maximum number of partitions that can be used for parallelism in table reading and writing. 
         # This also determines the maximum number of concurrent JDBC connections. 
 
+        LOGGER.info(f"""jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
+        LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
+
+        fetchSize = int((jdbc_partition_col_upperbound - jdbc_partition_col_lowerbound)/jdbc_read_partitions_num)
+        LOGGER.info(f"""fetchSize = {fetchSize}""")
+
         query_str = f"""
         SELECT *
           FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+         WHERE {jdbc_partition_column} between {jdbc_partition_col_lowerbound} and {jdbc_partition_col_upperbound}
         """.strip()
-
-        if args.get('rds_query_where_clause', '') != '':
-            query_str = query_str + f""" WHERE {args['rds_query_where_clause'].strip()}"""
         
         LOGGER.info(f"""query_str-(ParallelJDBCConn):> \n{query_str}""")
 
@@ -284,6 +287,7 @@ class RDS_JDBC_CONNECTION():
                     .option("lowerBound", jdbc_partition_col_lowerbound)
                     .option("upperBound", jdbc_partition_col_upperbound)
                     .option("numPartitions", numPartitions)
+                    .option("fetchSize", fetchSize)
                     .load())
 
 
@@ -325,7 +329,7 @@ class RDS_JDBC_CONNECTION():
                     .load())
 
 
-    def get_min_max_pkey(self, pkey_col_name, agg_str) -> DataFrame:
+    def get_min_max_pkey(self, pkey_col_name, agg_str):
         
         if agg_str not in ['min', 'max']:
             raise ValueError(""">> The 'aggregate' function must be either 'min' or 'max' <<""")
@@ -349,6 +353,26 @@ class RDS_JDBC_CONNECTION():
                         .option("query", f"""{query_str}""")
                         .load()).collect()[0].agg_value
 
+    def get_min_max_pkey_v2(self, pkey_col_name):
+
+        query_str = f"""
+        SELECT min({pkey_col_name}) as min_value, max({pkey_col_name}) as max_value
+          FROM {self.rds_db_schema_name}.[{self.rds_db_table_name}]
+        """.strip()
+
+        if args.get('rds_query_where_clause', '') != '':
+            query_str = query_str + f""" WHERE {args['rds_query_where_clause'].strip()}"""
+
+        LOGGER.info(f"""query_str-(Aggregate):> \n{query_str}""")
+
+        return (spark.read.format("jdbc")
+                        .option("url", self.rds_jdbc_url_v2)
+                        .option("driver", RDS_DB_INSTANCE_DRIVER)
+                        .option("user", RDS_DB_INSTANCE_USER)
+                        .option("password", RDS_DB_INSTANCE_PWD)
+                        .option("query", f"""{query_str}""")
+                        .load()).collect()[0]
+    
 # ---------------------------------------------------------------------
 # PYTHON CLASS 'RDS_JDBC_CONNECTION' - END
 # ---------------------------------------------------------------------
@@ -412,21 +436,24 @@ def check_s3_folder_path_if_exists(in_bucket_name, in_folder_path):
 # ==================================================================
 
 
-def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
+def write_rds_df_to_s3_parquet_v2(df_rds_write: DataFrame,
                                   partition_by_cols,
                                   prq_table_folder_path):
     """
     Write dynamic frame in S3 and catalog it.
     """
 
-    # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_emsys_mvp/dbo/GPSPosition/
+    # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_emsys_mvp/dbo/GPSPosition_V2/
+    # s3://dms-rds-to-parquet-20240606144708618700000001/g4s_emsys_mvp/dbo/GPSPosition_V2/year=2019/month=10/
 
     s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{prq_table_folder_path}"""
 
-    # if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, prq_table_folder_path):
+    # Note: The below block of code erases the existing partition & use cautiously.
+    # partition_path = f"""{s3_table_folder_path}/year=2019/month=10/"""
+    # if check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, partition_path):
 
-    #     LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
-    #     glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
+    #     LOGGER.info(f"""Purging S3-path: {partition_path}""")
+    #     glueContext.purge_s3_path(partition_path, options={"retentionPeriod": 0})
     # # --------------------------------------------------------------------
 
     dynamic_df_write = glueContext.getSink(
@@ -450,7 +477,7 @@ def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
 
     dynamic_df_write.setFormat("glueparquet")
 
-    dydf_rds_read = DynamicFrame.fromDF(df_rds_read, glueContext, "final_spark_df")
+    dydf_rds_read = DynamicFrame.fromDF(df_rds_write, glueContext, "final_spark_df")
     dynamic_df_write.writeFrame(dydf_rds_read)
 
     LOGGER.info(f"""'{db_sch_tbl}' table data written to -> {s3_table_folder_path}/""")
@@ -467,7 +494,7 @@ def write_rds_df_to_s3_parquet_v2(df_rds_read: DataFrame,
     # LOGGER.info(f"Query state: {query_status}")
 
 
-def write_rds_df_to_s3_parquet(df_rds_read: DataFrame, 
+def write_rds_df_to_s3_parquet(df_rds_write: DataFrame, 
                                partition_by_cols,
                                prq_table_folder_path):
 
@@ -483,7 +510,7 @@ def write_rds_df_to_s3_parquet(df_rds_read: DataFrame,
 
     # catalog_db, catalog_db_tbl = prq_table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
 
-    dydf = DynamicFrame.fromDF(df_rds_read, glueContext, "final_spark_df")
+    dydf = DynamicFrame.fromDF(df_rds_write, glueContext, "final_spark_df")
 
     glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
                                                  connection_options={
@@ -519,6 +546,13 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     LOGGER.info(f"""Parquet Source being used for comparison: {s3_table_folder_path}""")
 
     df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path)
+
+    rds_df_filter_year = args.get('rds_df_filter_year', 0)
+    rds_df_filter_month = args.get('rds_df_filter_month', 0)
+    if rds_df_filter_year != 0:
+        df_parquet_read = df_parquet_read.where(f"""year = {rds_df_filter_year}""")
+    if rds_df_filter_month != 0:
+        df_parquet_read = df_parquet_read.where(f"""month = {rds_df_filter_month}""")
 
     df_compare_columns_list = [col for col in df_parquet_read.columns 
                                if col not in ['year', 'month', 'day']]
@@ -731,6 +765,13 @@ if __name__ == "__main__":
         sys.exit(1)
     # -------------
 
+    rds_df_filter_year = args.get('rds_df_filter_year', 0)
+    rds_df_filter_month = args.get('rds_df_filter_month', 0)
+    if args.get('rds_query_where_clause', '') != '':
+        if rds_df_filter_year == 0 or rds_df_filter_month == 0:
+            LOGGER.error(f"""The values for 'rds_df_filter_year' or 'rds_df_filter_month' not given""")
+            sys.exit(1)
+
     rds_table_total_size_mb = int(args['rds_table_total_size_mb'])
     if rds_table_total_size_mb != 0:
         if args.get("jdbc_read_256mb_partitions", "false") == "true":
@@ -751,44 +792,33 @@ if __name__ == "__main__":
     jdbc_read_partitions_num = 1 if jdbc_read_partitions_num <= 0 else jdbc_read_partitions_num
     LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
 
+    # rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 'min')
+    # rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 'max')
+    agg_row_dict = rds_jdbc_conn_obj.get_min_max_pkey_v2(jdbc_partition_column)
+    min_pkey = agg_row_dict['min_value']
+    max_pkey = agg_row_dict['max_value']
     if jdbc_read_partitions_num == 1:
-        df_rds_read = rds_jdbc_conn_obj.get_rds_dataframe()
+        df_rds_read = rds_jdbc_conn_obj.get_rds_dataframe(jdbc_partition_column,
+                                                          min_pkey,
+                                                          max_pkey)
     else:
-        jdbc_partition_col_upperbound_1 = int(
-            int(args.get('rds_table_total_rows', 0))/jdbc_read_partitions_num
-            )
-        jdbc_partition_col_upperbound_2 = int(
-            (rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 
-                                                'max') - rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 
-                                                                                            'min')
-             )/jdbc_read_partitions_num
-            )
-
-        jdbc_partition_col_upperbound = jdbc_partition_col_upperbound_2 \
-                                            if jdbc_partition_col_upperbound_2 >= jdbc_partition_col_upperbound_1 \
-                                                else jdbc_partition_col_upperbound_1
-
-        LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
+        jdbc_partition_col_upperbound = max_pkey
         
-        df_rds_read = (rds_jdbc_conn_obj.get_df_read_rds_db_tbl_int_pkey(
+        df_rds_read = rds_jdbc_conn_obj.get_rds_df_parallel_jdbc(
                                                 jdbc_partition_column,
                                                 jdbc_partition_col_upperbound,
-                                                jdbc_read_partitions_num))
+                                                jdbc_read_partitions_num,
+                                                jdbc_partition_col_lowerbound=min_pkey)
     # ----------------------------------------------------------
     LOGGER.info(f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
 
-
     rds_df_repartition_num = int(args['rds_df_repartition_num'])
-    if rds_df_repartition_num != 0:
-        LOGGER.info(f"""df_rds_read-Repartitioning: {rds_df_repartition_num}""")
-        df_rds_read = df_rds_read.repartition(rds_df_repartition_num, 
-                                              jdbc_partition_column)
-    # ---------------------------------------------------------------
-
     validation_only_run = args['validation_only_run']
+
     if validation_only_run != "true":
         partition_by_cols = list()
 
+        # Add 'YEAR', 'MONTH', 'DAY' columns to the dataframe.
         if args.get('date_partition_column_name', None) is not None:
             given_date_column = args['date_partition_column_name']
             LOGGER.info(f"""given_date_column = {given_date_column}""")
@@ -801,11 +831,12 @@ if __name__ == "__main__":
                 df_rds_read = df_rds_read.withColumn("month", F.month(given_date_column))
                 partition_by_cols.append("month")
 
-            if args['day_partition_bool'] == 'true':
-                df_rds_read = df_rds_read.withColumn("day", F.dayofmonth(given_date_column))
-                partition_by_cols.append("day")
-
-            #df_rds_read = df_rds_read.repartition("year", "month", "day")
+            # if args['day_partition_bool'] == 'true':
+            #     df_rds_read = df_rds_read.withColumn("day", F.dayofmonth(given_date_column))
+            #     partition_by_cols.append("day")
+            # ----------------------------------------------------
+        else:
+            LOGGER.warn(f""">> 'date_partition_column_name' input not given <<""")
         # ----------------------------------------------------
 
         if args.get('other_partitionby_columns', None) is not None:
@@ -815,14 +846,46 @@ if __name__ == "__main__":
             partition_by_cols.extend(other_partitionby_columns)
         # ----------------------------------------------------
 
-        if partition_by_cols:
+        if rds_df_filter_year != 0:
+            df_rds_read = df_rds_read.where(f"""year = {rds_df_filter_year}""")
+        if rds_df_filter_month != 0:
+            df_rds_read = df_rds_read.where(f"""month = {rds_df_filter_month}""")
+        # ----------------------------------------------------
+
+        if partition_by_cols and rds_df_repartition_num != 0:
+            LOGGER.info(f"""partition_by_cols = {partition_by_cols}""")
+            # Note: Default 'orderby_columns' values may not be appropriate for all the scenarios.
+            # So, the user can edit the list-'orderby_columns' value(s) if required at runtime.
+            # Example: orderby_columns = ['month']
+            # The above scenario may be when the rds-source-dataframe filtered on single 'year' value.
             orderby_columns = partition_by_cols + [jdbc_partition_column]
-            LOGGER.info(f"""df_rds_read-OrderBy on: partitionBy columns -> {partition_by_cols}""")
-            df_rds_read = df_rds_read.orderBy(*orderby_columns)
-        # -----------------------------------
+
+            LOGGER.info(f"""df_rds_read-Repartitioning ({rds_df_repartition_num}) on {orderby_columns}""")
+            df_rds_read = df_rds_read.repartition(rds_df_repartition_num, *orderby_columns)
+        elif rds_df_repartition_num != 0:
+            # Note: repartitioning on 'jdbc_partition_column' may optimize the joins on this column downstream.
+            LOGGER.info(f"""df_rds_read-Repartitioning ({rds_df_repartition_num}) on {jdbc_partition_column}""")
+            df_rds_read = df_rds_read.repartition(rds_df_repartition_num, jdbc_partition_column)
+        # ----------------------------------------------------
     else:
         LOGGER.info(f"""** validation_only_run = '{validation_only_run}' **""")
+
+        if rds_df_filter_year != 0:
+            df_rds_read = df_rds_read.where(f"""year = {rds_df_filter_year}""")
+        if rds_df_filter_month != 0:
+            df_rds_read = df_rds_read.where(f"""month = {rds_df_filter_month}""")
+            
+        if rds_df_repartition_num != 0:
+            LOGGER.info(f"""df_rds_read-Repartitioning ({rds_df_repartition_num}) on {jdbc_partition_column}""")
+            df_rds_read = df_rds_read.repartition(rds_df_repartition_num, jdbc_partition_column)
+        # ----------------------------------------------------
+    if rds_df_repartition_num != 0:
+        LOGGER.info(f"""df_rds_read: After Repartitioning -> {df_rds_read.rdd.getNumPartitions()} partitions.""")
     # ---------------------------------------
+
+    validation_sample_fraction_float = float(args.get('validation_sample_fraction_float', 0))
+    if validation_sample_fraction_float != 0:
+        df_rds_read = df_rds_read.cache()
 
     rename_output_table_folder = args.get('rename_migrated_prq_tbl_folder', '')
     if rename_output_table_folder == '':
@@ -833,14 +896,16 @@ if __name__ == "__main__":
 
     prq_table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_db_table_name}"""
 
-    df_rds_read = df_rds_read.cache()
-
-    # NOTE: When filtered rows (ex: based on 'year') are used in separate consecutive batch runs, 
-    # consider to appropriately use the parquet write functions with features in built as per the below details.
-    # - write_rds_df_to_s3_parquet(): Overwrites the existing partitions by default.
-    # - write_rds_df_to_s3_parquet_v2(): Adds the new partitions & also the corresponding partitions are updated in athena tables.
-
     if validation_only_run != "true":
+
+        # Note: If many small size parquet files are created for each partition, 
+        # consider using 'orderBy', 'coalesce' features appropriately before writing dataframe into S3 bucket.
+        # df_rds_write = df_rds_read.coalesce(1)
+
+        # NOTE: When filtered rows (ex: based on 'year') are used in separate consecutive batch runs, 
+        # consider to appropriately use the parquet write functions with features in built as per the below details.
+        # - write_rds_df_to_s3_parquet(): Overwrites the existing partitions by default.
+        # - write_rds_df_to_s3_parquet_v2(): Adds the new partitions & also the corresponding partitions are updated in athena tables.
         write_rds_df_to_s3_parquet_v2(df_rds_read, 
                                       partition_by_cols,
                                       prq_table_folder_path)
@@ -848,10 +913,9 @@ if __name__ == "__main__":
 
     total_files, total_size = get_s3_folder_info(PARQUET_OUTPUT_S3_BUCKET_NAME, prq_table_folder_path)
     msg_part_1 = f"""total_files={total_files}"""
-    msg_part_2 = f"""total_size_mb={total_size/1024/1024}"""
+    msg_part_2 = f"""total_size_mb={total_size/1024/1024:.2f}"""
     LOGGER.info(f"""'{prq_table_folder_path}': {msg_part_1}, {msg_part_2}""")
 
-    validation_sample_fraction_float = float(args.get('validation_sample_fraction_float', 0))
     if validation_sample_fraction_float != 0:
         LOGGER.info(f"""Validating {validation_sample_fraction_float}-sample rows from the migrated data.""")
         df_dv_output = compare_rds_parquet_samples(rds_jdbc_conn_obj,
@@ -862,8 +926,10 @@ if __name__ == "__main__":
 
 
         write_to_s3_parquet(df_dv_output, rds_jdbc_conn_obj, db_sch_tbl)
-    # ------------------------------------------------------------
 
-    df_rds_read.unpersist(True)
+        df_rds_read.unpersist(True)
+    else:
+        LOGGER.warn(f""">> No data validation process was run <<""")
+    # ------------------------------------------------------------
 
     job.commit()

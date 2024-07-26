@@ -12,6 +12,7 @@ locals {
     "--dpr.operational.data.store.glue.connection.name"       = aws_glue_connection.glue_operational_datastore_connection.name
     "--dpr.operational.data.store.loading.schema.name"        = "loading"
     "--dpr.operational.data.store.tables.to.write.table.name" = "configuration.datahub_managed_tables"
+    "--dpr.operational.data.store.jdbc.batch.size"            = 5000
   } : {})
 }
 

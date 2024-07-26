@@ -37,6 +37,10 @@ locals {
       })
 
       pd-csr-db-b = merge(local.ec2_instances.db, {
+        cloudwatch_metric_alarms = merge(
+          local.cloudwatch_metric_alarms.db,
+          # local.cloudwatch_metric_alarms.db_backup,
+        )
         config = merge(local.ec2_instances.db.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-07-14T15-36-30.795Z"
           availability_zone = "eu-west-2b"
@@ -318,15 +322,6 @@ locals {
       Ec2ProdDatabasePolicy = {
         description = "Permissions required for prod Database EC2s"
         statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "ssm:GetParameter",
-            ]
-            resources = [
-              "arn:aws:ssm:*:*:parameter/azure/*",
-            ]
-          },
           {
             effect = "Allow"
             actions = [

@@ -93,3 +93,14 @@ resource "kubernetes_namespace" "ui" {
     }
   }
 }
+
+resource "kubernetes_namespace" "ollamate" {
+  metadata {
+    name = "ollamate"
+    labels = {
+      "pod-security.kubernetes.io/enforce"                          = "restricted"
+      "compute.analytical-platform.service.justice.gov.uk/workload" = "ollamate"
+    }
+  }
+}
+

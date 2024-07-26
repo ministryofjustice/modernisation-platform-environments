@@ -111,7 +111,6 @@ select @iObjectCount = 0
     if @iReturn <> 0 GOTO E_OAError
 
 
-    /* Create Project in SS */
     exec @iReturn = sp_OAMethod @iObjectId,
                                 'AddProjectToSourceSafe',
                                 NULL,
@@ -130,11 +129,7 @@ select @iObjectCount = 0
 
     if @iReturn <> 0 GOTO E_OAError
 
-    /* Set Database Properties */
-
     begin tran SetProperties
-
-    /* add high level object */
 
     exec @iPropertyObjectId = dbo.dt_adduserobject_vcs 'VCSProjectID'
 
@@ -217,7 +212,6 @@ CleanUp:
     return
 
 E_General_Error:
-    /* this is an all or nothing.  No specific error messages */
     goto CleanUp
 
 E_OAError:
@@ -265,7 +259,6 @@ select @iObjectCount = 0
     if @iReturn <> 0 GOTO E_OAError
 
 
-    /* Create Project in SS */
     exec @iReturn = sp_OAMethod @iObjectId,
                                 'AddProjectToSourceSafe',
                                 NULL,
@@ -284,11 +277,9 @@ select @iObjectCount = 0
 
     if @iReturn <> 0 GOTO E_OAError
 
-    /* Set Database Properties */
 
     begin tran SetProperties
 
-    /* add high level object */
 
     exec @iPropertyObjectId = dbo.dt_adduserobject_vcs 'VCSProjectID'
 
@@ -371,7 +362,6 @@ CleanUp:
     return
 
 E_General_Error:
-    /* this is an all or nothing.  No specific error messages */
     goto CleanUp
 
 E_OAError:
@@ -382,15 +372,9 @@ E_OAError:
 ;
 GO
 
-/*
-**	Add an object to the dtproperties table
-*/
 create procedure dbo.dt_adduserobject
 as
 	set nocount on
-	/*
-	** Create the user object if it does not exist already
-	*/
 	begin transaction
 		insert dbo.dtproperties (property) VALUES ('DtgSchemaOBJECT')
 		update dbo.dtproperties set objectid=@@identity 
@@ -408,9 +392,6 @@ as
 set nocount on
 
 declare @iReturn int
-    /*
-    ** Create the user object if it does not exist already
-    */
     begin transaction
         select @iReturn = objectid from dbo.dtproperties where property = @vchProperty
         if @iReturn IS NULL
@@ -434,8 +415,8 @@ create proc dbo.dt_checkinobject
     @vchLoginName  varchar(255),
     @vchPassword   varchar(255)='',
     @iVCSFlags     int = 0,
-    @iActionFlag   int = 0,   /* 0 => AddFile, 1 => CheckIn */
-    @txStream1     Text = '', /* There is a bug that if items are NULL they do not pass to OLE servers */
+    @iActionFlag   int = 0,
+    @txStream1     Text = '',
     @txStream2     Text = '',
     @txStream3     Text = ''
 
@@ -470,12 +451,9 @@ select @iPropertyObjectId  = 0
     begin
         if @iActionFlag = 1
         begin
-            /* Procedure Can have up to three streams
-            Drop Stream, Create Stream, GRANT stream */
 
             begin tran compile_all
 
-            /* try to compile the streams */
             exec (@txStream1)
             if @@error <> 0 GOTO E_Compile_Fail
 
@@ -595,8 +573,8 @@ create proc dbo.dt_checkinobject_u
     @vchLoginName  nvarchar(255),
     @vchPassword   nvarchar(255)='',
     @iVCSFlags     int = 0,
-    @iActionFlag   int = 0,   /* 0 => AddFile, 1 => CheckIn */
-    @txStream1     Text = '', /* There is a bug that if items are NULL they do not pass to OLE servers */
+    @iActionFlag   int = 0,
+    @txStream1     Text = '',
     @txStream2     Text = '',
     @txStream3     Text = ''
 
@@ -631,12 +609,9 @@ select @iPropertyObjectId  = 0
     begin
         if @iActionFlag = 1
         begin
-            /* Procedure Can have up to three streams
-            Drop Stream, Create Stream, GRANT stream */
 
             begin tran compile_all
 
-            /* try to compile the streams */
             exec (@txStream1)
             if @@error <> 0 GOTO E_Compile_Fail
 
@@ -756,7 +731,7 @@ create proc dbo.dt_checkoutobject
     @vchLoginName  varchar(255),
     @vchPassword   varchar(255),
     @iVCSFlags     int = 0,
-    @iActionFlag   int = 0/* 0 => Checkout, 1 => GetLatest, 2 => UndoCheckOut */
+    @iActionFlag   int = 0
 
 as
 
@@ -774,7 +749,6 @@ select @iReturnValue = 0
 
 declare @vchTempText varchar(255)
 
-/* this is for our strings */
 declare @iStreamObjectId int
 select @iStreamObjectId = 0
 
@@ -792,8 +766,6 @@ select @iStreamObjectId = 0
 
     if @chObjectType = 'PROC'
     begin
-        /* Procedure Can have up to three streams
-           Drop Stream, Create Stream, GRANT stream */
 
         exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
 
@@ -855,7 +827,7 @@ create proc dbo.dt_checkoutobject_u
     @vchLoginName  nvarchar(255),
     @vchPassword   nvarchar(255),
     @iVCSFlags     int = 0,
-    @iActionFlag   int = 0/* 0 => Checkout, 1 => GetLatest, 2 => UndoCheckOut */
+    @iActionFlag   int = 0
 
 as
 
@@ -873,7 +845,6 @@ select @iReturnValue = 0
 
 declare @vchTempText nvarchar(255)
 
-/* this is for our strings */
 declare @iStreamObjectId int
 select @iStreamObjectId = 0
 
@@ -891,8 +862,6 @@ select @iStreamObjectId = 0
 
     if @chObjectType = 'PROC'
     begin
-        /* Procedure Can have up to three streams
-           Drop Stream, Create Stream, GRANT stream */
 
         exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
 
@@ -991,12 +960,6 @@ declare @vchDescription nvarchar(255)
 ;
 GO
 
-/*
-**	Drop one or all the associated properties of an object or an attribute 
-**
-**	dt_dropproperties objid, null or '' -- drop all properties of the object itself
-**	dt_dropproperties objid, property -- drop the property
-*/
 create procedure dbo.dt_droppropertiesbyid
 	@id int,
 	@property varchar(64)
@@ -1012,9 +975,6 @@ as
 ;
 GO
 
-/*
-**	Drop an object from the dbo.dtproperties table
-*/
 create procedure dbo.dt_dropuserobjectbyid
 	@id int
 as
@@ -1023,9 +983,6 @@ as
 ;
 GO
 
-/* 
-**	Generate an ansi name that is unique in the dtproperties.value column 
-*/ 
 create procedure dbo.dt_generateansiname(@name varchar(255) output) 
 as 
 	declare @prologue varchar(20) 
@@ -1059,9 +1016,6 @@ TooMany:
 ;
 GO
 
-/*
-**	Retrieve the owner object(s) of a given property
-*/
 create procedure dbo.dt_getobjwithprop
 	@property varchar(30),
 	@value varchar(255)
@@ -1084,9 +1038,6 @@ as
 ;
 GO
 
-/*
-**	Retrieve the owner object(s) of a given property
-*/
 create procedure dbo.dt_getobjwithprop_u
 	@property varchar(30),
 	@uvalue nvarchar(255)
@@ -1109,12 +1060,6 @@ as
 ;
 GO
 
-/*
-**	Retrieve properties by id's
-**
-**	dt_getproperties objid, null or '' -- retrieve all properties of the object itself
-**	dt_getproperties objid, property -- retrieve the property specified
-*/
 create procedure dbo.dt_getpropertiesbyid
 	@id int,
 	@property varchar(64)
@@ -1132,12 +1077,6 @@ as
 ;
 GO
 
-/*
-**	Retrieve properties by id's
-**
-**	dt_getproperties objid, null or '' -- retrieve all properties of the object itself
-**	dt_getproperties objid, property -- retrieve the property specified
-*/
 create procedure dbo.dt_getpropertiesbyid_u
 	@id int,
 	@property varchar(64)
@@ -1194,7 +1133,7 @@ GO
 create proc dbo.dt_isundersourcecontrol
     @vchLoginName varchar(255) = '',
     @vchPassword  varchar(255) = '',
-    @iWhoToo      int = 0 /* 0 => Just check project;  GO 1 => get list of objs */
+    @iWhoToo      int = 0
 
 as
 
@@ -1236,7 +1175,6 @@ declare @vchTempText varchar(255)
     if @iWhoToo = 1
     begin
 
-        /* Get List of Procs in the project */
         exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
         if @iReturn <> 0 GOTO E_OAError
 
@@ -1284,7 +1222,7 @@ GO
 create proc dbo.dt_isundersourcecontrol_u
     @vchLoginName nvarchar(255) = '',
     @vchPassword  nvarchar(255) = '',
-    @iWhoToo      int = 0 /* 0 => Just check project;  GO 1 => get list of objs */
+    @iWhoToo      int = 0
 
 as
 
@@ -1326,7 +1264,6 @@ as
     if @iWhoToo = 1
     begin
 
-        /* Get List of Procs in the project */
         exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
         if @iReturn <> 0 GOTO E_OAError
 
@@ -1382,7 +1319,6 @@ as
 
     exec dbo.dt_droppropertiesbyid @iPropertyObjectId, null
 
-    /* -1 is returned by dt_droppopertiesbyid */
     if @@error <> 0 and @@error <> -1 return 1
 
     return 0
@@ -1391,13 +1327,6 @@ as
 ;
 GO
 
-/*
-**	If the property already exists, reset the value;  GO otherwise add property
-**		id -- the id in sysobjects of the object
-**		property -- the name of the property
-**		value -- the text value of the property
-**		lvalue -- the binary value of the property (image)
-*/
 create procedure dbo.dt_setpropertybyid
 	@id int,
 	@property varchar(64),
@@ -1428,13 +1357,6 @@ as
 ;
 GO
 
-/*
-**	If the property already exists, reset the value;  GO otherwise add property
-**		id -- the id in sysobjects of the object
-**		property -- the name of the property
-**		uvalue -- the text value of the property
-**		lvalue -- the binary value of the property (image)
-*/
 create procedure dbo.dt_setpropertybyid_u
 	@id int,
 	@property varchar(64),
@@ -1580,17 +1502,12 @@ select @VSSGUID = 'SQLVersionControl.VCS_SQL'
 
     declare @iReturn int
     exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
-    if @iReturn <> 0 raiserror('', 16, -1) /* Can't Load Helper DLLC */
+    if @iReturn <> 0 raiserror('', 16, -1)
 
 
 ;
 GO
 
-/*
-**	This procedure returns the version number of the stored
-**    procedures used by the Microsoft Visual Database Tools.
-**    Current version is 7.0.00.
-*/
 create procedure dbo.dt_verstamp006
 as
 	select 7000

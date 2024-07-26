@@ -149,6 +149,9 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = [
+              "test-rdgw-1-http",
+            ]
             rules = {
               test-rdgw-1-http = {
                 priority = 100

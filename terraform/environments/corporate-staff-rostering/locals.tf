@@ -44,8 +44,6 @@ locals {
       enable_s3_db_backup_bucket                  = true
       enable_s3_shared_bucket                     = true
       enable_s3_software_bucket                   = true
-      iam_policies_filter                         = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-      iam_policies_ec2_default                    = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
       software_bucket_name                        = "csr-software"
       sns_topics = {
@@ -57,6 +55,10 @@ locals {
   }
 
   baseline_all_environments = {
+    options = {
+      enable_resource_explorer = true
+    }
+
     cloudwatch_log_groups = merge(local.ssm_doc_cloudwatch_log_groups, {
       cwagent-windows-application = {
         retention_in_days = 30

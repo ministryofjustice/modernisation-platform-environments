@@ -1,76 +1,368 @@
+locals {
+  db_userdata = <<-EOF
+#!/bin/bash
 
-####### EC2 Role #######
+# Disable requiretty
+sed -i 's/^\(Defaults\s*requiretty\)/#\1/' /etc/sudoers
+
+# Redirect all output to a log file and enable debugging
+exec > /var/log/userdata.log 2>&1
+set -x
+
+##### USERDATA #####
+
+#### install missing package and hostname change
+echo "---install missing package and hostname change"
+sudo yum -y install libXp.i386
+sudo yum -y install sshpass
+echo "HOSTNAME=${local.application_name}.${local.application_data.accounts[local.environment].edw_dns_extension}" >> /etc/sysconfig/network
+
+#### configure aws timesync (external ntp source)
+echo "---configure aws timesync (external ntp source)"
+AwsTimeSync(){
+    local RHEL=$1
+    local SOURCE=169.254.169.123
+
+    NtpD(){
+        local CONF=/etc/ntp.conf
+        sed -i 's/server \\S/#server \\S/g' $CONF && \
+        sed -i "20i\server $SOURCE prefer iburst" $CONF
+        /etc/init.d/ntpd status >/dev/null 2>&1 \
+            && /etc/init.d/ntpd restart || /etc/init.d/ntpd start
+        ntpq -p
+    }
+    ChronyD(){
+        local CONF=/etc/chrony.conf
+        sed -i 's/server \\S/#server \\S/g' $CONF && \
+        sed -i "7i\server $SOURCE prefer iburst" $CONF
+        systemctl status chronyd >/dev/null 2>&1 \
+            && systemctl restart chronyd || systemctl start chronyd
+        chronyc sources
+    }
+    case $RHEL in
+        5)
+            NtpD
+            ;;
+        7)
+            ChronyD
+            ;;
+    esac
+}
+AwsTimeSync $(cat /etc/redhat-release | cut -d. -f1 | awk '{print $NF}')
+
+#### Install AWS cli
+echo "---Installing AWS cli"
+wget -O awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+unzip -o awscliv2.zip
+sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+
+#configure variables
+export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
+export LOGS="${local.application_name}-EC2"
+export APPNAME="${local.application_name}"
+export ENV="${local.application_data.accounts[local.environment].edw_environment}"
+export REGION="${local.application_data.accounts[local.environment].edw_region}"
+export host="$ip4 $APPNAME-$ENV $APPNAME.${local.application_data.accounts[local.environment].edw_dns_extension}"
+export host2="${local.application_data.accounts[local.environment].edw_cis_ip} cis.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
+export host3="${local.application_data.accounts[local.environment].edw_eric_ip} eric.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
+export host4="${local.application_data.accounts[local.environment].edw_ccms_ip} ccms.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
+echo $host >>/etc/hosts
+echo $host2 >>/etc/hosts
+echo $host3 >>/etc/hosts
+echo $host4 >>/etc/hosts
+mkdir -p /stage/oracle/scripts
+
+# Disable firewall
+sudo /etc/init.d/iptables stop
+sudo /sbin/chkconfig iptables off
+
+# Set up log files
+echo "---creating /etc/awslogs/awscli.conf"
+mkdir -p /etc/awslogs
+cat > /etc/awslogs/awscli.conf <<-EOC1
+[plugins]
+cwlogs = cwlogs
+[default]
+region = $REGION
+EOC1
+
+echo "---creating /tmp/cwlogs/logstreams.conf"
+mkdir -p /tmp/cwlogs
+
+cat > /tmp/cwlogs/logstreams.conf <<-EOC2
+[general]
+state_file = /var/awslogs/agent-state
+
+[oracle_alert_log_errors]
+file = /oracle/software/product/10.2.0/admin/$APPNAME/bdump/alert_$APPNAME.log
+log_group_name = $APPNAME-OracleAlerts
+log_stream_name = {instance_id}
+
+[rman_backup_log_errors]
+file = /stage/oracle/backup_logs/*_RMAN_disk_*.log
+log_group_name = $APPNAME-RMan
+log_stream_name = {instance_id}
+
+[rman_arch_backup_log_errors]
+file = /stage/oracle/backup_logs/*_RMAN_disk_ARCH_*.log
+log_group_name = $APPNAME-RManArch
+log_stream_name = {instance_id}
+
+[db_tablespace_space_alerts]
+file = /stage/oracle/scripts/logs/freespace_alert.log
+log_group_name = $APPNAME-TBSFreespace
+log_stream_name = {instance_id}
+
+[db_PMON_status_alerts]
+file = /stage/oracle/scripts/logs/pmon_status_alert.log
+log_group_name = $APPNAME-PMONstatus
+log_stream_name = {instance_id}
+
+[db_CDC_status_alerts]
+file = /stage/oracle/scripts/logs/cdc_check.log
+log_group_name = $APPNAME-CDCstatus
+log_stream_name = {instance_id}
+EOC2
+
+##### METADATA #####
+
+# #### Install_aws_logging
+
+# echo "---Install_aws_logging"
+
+# #Install AWS logs
+
+# Does not work in LZ, need to fix in next ticket
+# echo "---Install AWS logging"
+# sudo yum install wget openssl-devel bzip2-devel libffi-devel -y
+# wget https://amazoncloudwatch-agent.s3.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+# sudo yum update rpm
+
+#### setup_file_systems
+echo "---setup_file_systems"
+
+sudo yum install e2fsprogs
+
+# Create Oracle DBF file file system (oradata)
+sudo /sbin/mkfs.ext4 /dev/xvdf
+mkdir -p /oracle/dbf
+grep -qxF "/dev/xvdf /oracle/dbf ext4 defaults 0 0" /etc/fstab || echo "/dev/sdf /dev/xvdf ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 dev/xvdf /oracle/dbf
+
+# Create stage (orahome) file system
+sudo /sbin/mkfs.ext4 /dev/xvdg
+mkdir -p /stage
+chmod 777 /stage
+grep -qxF "/dev/xvdg /stage ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdg /stage ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 /dev/xvdg /stage
+
+# Create archive file system
+sudo /sbin/mkfs.ext4 /dev/xvdh
+mkdir -p /oracle/ar
+grep -qxF "/dev/xvdh /oracle/ar ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 /dev/xvdh /oracle/ar
+
+#Create oracle_software
+sudo /sbin/mkfs.ext4 /dev/xvdi
+mkdir --p /oracle/software
+grep -qxF "/dev/xvdi /oracle/software ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdi /oracle/software ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 /dev/xvdi /oracle/software
+
+#Create temp_undo (oraredo)
+sudo /sbin/mkfs.ext4 /dev/xvdj
+mkdir -p /oracle/temp_undo
+grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
+sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
+
+#### setup_oracle_db_software
+echo "---setup_oracle_db_software"
+# Install wget / unzip
+yum install -y unzip
+
+# Create DBA user (already created in image)
+groupadd dba
+groupadd oinstall
+useradd -d /stage/oracle -g dba oracle
+
+#setup oracle user access
+echo "---setup oracle user access"
+cp -fr /home/ec2-user/.ssh /home/oracle/
+chown -R oracle:dba /home/oracle/.ssh
+
+# # Create directories and set ownership
+echo "---set ownership"
+chown -R oracle:dba /oracle
+
+# # Create swap space
+echo "---Create swap space"
+dd if=/dev/zero of=/swapfile bs=1024M count=9
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+
+# Run Oracle installer
+chmod 777 /run/cfn-init/db-install-10g.rsp
+
+# Run installer and post install
+export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
+su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
+
+/oracle/software/oraInventory/orainstRoot.sh -silent
+/oracle/software/product/10.2.0/root.sh -silent
+
+# Update oracle login script
+echo "export ORACLE_SID=EDW" >> /stage/oracle/.bash_profile
+echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
+echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
+
+#### Setup_owb
+
+# Create directories for OWB setup (already created in ami)
+mkdir -p /stage/owb/owb101
+mkdir -p /stage/owb/owb104
+mkdir -p /stage/owb/owb105
+
+# Set permissions for staging directory
+chmod -R 777 /stage/owb/
+
+# Install OWB components
+su oracle -l -c "/stage/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /stage/owb/owb.rsp"
+/oracle/software/product/10.2.0_owb/root.sh -silent
+
+su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb104.rsp"
+/oracle/software/product/10.2.0_owb/root.sh -silent
+
+su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
+/oracle/software/product/10.2.0_owb/root.sh -silent
+
+# configure environment
+echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
+
+EOF
+}
+
+
+####### IAM role #######
+
 resource "aws_iam_role" "edw_ec2_role" {
-  name = "${local.application_name}-ec2-role"
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Effect    = "Allow"
-      Principal = { Service = ["ec2.amazonaws.com"] }
-      Action    = ["sts:AssumeRole"]
-    }]
-  })
-
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-  ]
-
-  path = "/"
-
-  inline_policy {
-    name = "${local.application_name}-ec2-policy"
-    policy = jsonencode({
-      Statement = [
-        {
-          Effect   = "Allow"
-          Action   = ["s3:ListBucket"]
-          Resource = ["arn:aws:s3:::laa-software-library", "arn:aws:s3:::laa-software-library/*"]
-        },
-        {
-          Effect   = "Allow"
-          Action   = ["s3:GetObject"]
-          Resource = ["arn:aws:s3:::laa-software-library/*"]
-        },
-        {
-          Effect   = "Allow"
-          Action   = ["secretsmanager:GetSecretValue"]
-          Resource = ["arn:aws:secretsmanager:${local.application_data.accounts[local.environment].edw_region}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}/app/*"]
-        },
-        {
-          Effect   = "Allow"
-          Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:DescribeLogStreams", "logs:PutRetentionPolicy", "logs:PutLogEvents", "ec2:DescribeInstances"]
-          Resource = ["*"]
-        },
-        {
-          Effect   = "Allow"
-          Action   = ["ec2:CreateTags"]
-          Resource = ["*"]
-        },
-      ]
-    })
-  }
-
+  name = "${local.application_name}-ec2-instance-role"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]    
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-db-instance-role"
+      Name = "${local.application_name}-ec2-instance-role"
     }
   )
-}
+  path               = "/"
+  assume_role_policy = <<EOF
+{
 
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
 
 ####### DB Instance Profile #######
 
 resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
   name = "${local.application_name}-S3-${local.application_data.accounts[local.environment].edw_bucket_name}-edw-RW-ec2-profile"
-  path = "/"
   role = aws_iam_role.edw_ec2_role.name
-
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-db-instance-profile"
+      Name = "${local.application_name}-ec2-instance-profile"
     }
   )
+}
+
+####### DB Policy #######
+
+resource "aws_iam_policy" "edw_ec2_role_policy" {
+  name = "${local.application_name}-ec2-policy"
+  path               = "/" 
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-policy"
+    }
+  )
+  policy = <<EOF
+{
+    "Version" : "2012-10-17",
+      "Statement": [
+        {
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::laa-software-library",
+                "arn:aws:s3:::laa-software-library/*"
+            ],
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::laa-software-library/*"
+            ],
+            "Effect": "Allow"
+        }, 
+        {
+            "Action": [
+                "secretsmanager:GetSecretValue"
+            ],
+            "Resource": [
+                "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}/app/*"
+            ],
+            "Effect": "Allow"
+        },  
+        {
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutRetentionPolicy",
+                "logs:PutLogEvents",
+                "ec2:DescribeInstances"
+            ],
+            "Resource": ["*"],
+            "Effect": "Allow"
+        }, 
+        {
+            "Action": [
+                "ec2:CreateTags"
+            ],
+            "Resource": ["*"],
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+
+####### DB Policy attachments #######
+
+resource "aws_iam_role_policy_attachment" "edw_cw_agent_policy_attachment" {
+  role       = aws_iam_role.edw_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "edw_ec2_policy_attachments" {
+  role       = aws_iam_role.edw_ec2_role.name
+  policy_arn = aws_iam_policy.edw_ec2_role_policy.arn
 }
 
 ####### DB Instance #######
@@ -88,19 +380,10 @@ resource "aws_instance" "edw_db_instance" {
   key_name               = aws_key_pair.edw_ec2_key.key_name
   subnet_id              = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids = [aws_security_group.edw_db_security_group.id]
-  user_data = base64encode(templatefile("edw-ec2-user-data.sh", {
-    edw_app_name         = local.application_data.accounts[local.environment].edw_AppName
-    edw_dns_extension    = local.application_data.accounts[local.environment].edw_dns_extension
-    edw_environment      = local.application_data.accounts[local.environment].edw_environment
-    edw_region           = local.application_data.accounts[local.environment].edw_region
-    edw_ec2_role         = aws_iam_role.edw_ec2_role.name
-    edw_s3_backup_bucket = local.application_data.accounts[local.environment].edw_s3_backup_bucket
-    edw_cis_ip           = local.application_data.accounts[local.environment].edw_cis_ip
-    edw_eric_ip          = local.application_data.accounts[local.environment].edw_eric_ip
-    edw_ccms_ip          = local.application_data.accounts[local.environment].edw_ccms_ip
-  }))
+  user_data_base64            = base64encode(local.db_userdata)
+  user_data_replace_on_change = true
 
-
+  
   ebs_block_device {
     device_name = "/dev/sda1"
     volume_size = local.application_data.accounts[local.environment].edw_root_volume_size
@@ -113,6 +396,7 @@ resource "aws_instance" "edw_db_instance" {
   metadata_options {
     http_endpoint               = "enabled"
     http_put_response_hop_limit = 2
+    http_tokens                 = "optional"
   }
 
   lifecycle {
@@ -121,9 +405,8 @@ resource "aws_instance" "edw_db_instance" {
 
   tags = merge(
     local.tags,
-    {
-      Name = "${local.application_data.accounts[local.environment].database_ec2_name}"
-    }
+    { "Name" = local.application_data.accounts[local.environment].database_ec2_name },
+    { "instance-scheduling" = "skip-scheduling" }
   )
 }
 
@@ -138,12 +421,12 @@ resource "aws_ebs_volume" "orahomeVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].orahome_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].edw_AppName}-orahome"
+    Name = "${local.application_name}-orahome"
   }
 }
 
 resource "aws_volume_attachment" "orahomeVolume-attachment" {
-  device_name = "/dev/sdi"
+  device_name = "/dev/sdi" 
   volume_id   = aws_ebs_volume.orahomeVolume.id
   instance_id = aws_instance.edw_db_instance.id
 }
@@ -157,12 +440,12 @@ resource "aws_ebs_volume" "oratempVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oraredo"
+    Name = "${local.application_name}-oraredo"
   }
 }
 
 resource "aws_volume_attachment" "oratempVolume-attachment" {
-  device_name = "/dev/sdj"
+  device_name = "/dev/sdj" 
   volume_id   = aws_ebs_volume.oratempVolume.id
   instance_id = aws_instance.edw_db_instance.id
 }
@@ -176,12 +459,12 @@ resource "aws_ebs_volume" "oradataVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].edw_AppName}-oradata"
+    Name = "${local.application_name}-oradata"
   }
 }
 
 resource "aws_volume_attachment" "oradataVolume-attachment" {
-  device_name = "/dev/sdf"
+  device_name = "/dev/sdf" 
   volume_id   = aws_ebs_volume.oradataVolume.id
   instance_id = aws_instance.edw_db_instance.id
 }
@@ -195,12 +478,12 @@ resource "aws_ebs_volume" "softwareVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].software_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name = "${local.application_data.accounts[local.environment].edw_AppName}-software"
+    Name = "${local.application_name}-software"
   }
 }
 
 resource "aws_volume_attachment" "softwareVolume-attachment" {
-  device_name = "/dev/sdg"
+  device_name = "/dev/sdg" 
   volume_id   = aws_ebs_volume.softwareVolume.id
   instance_id = aws_instance.edw_db_instance.id
 }
@@ -214,7 +497,7 @@ resource "aws_ebs_volume" "ArchiveVolume" {
   snapshot_id       = local.application_data.accounts[local.environment].oraarch_snapshot_id # This is used for when data is being migrated
 
   tags = {
-    Name                                               = "${local.application_data.accounts[local.environment].edw_AppName}-oraarch"
+    Name                                               = "${local.application_name}-oraarch"
     "dlm:snapshot-with:volume-hourly-35-day-retention" = "yes"
   }
 }
@@ -229,7 +512,7 @@ resource "aws_volume_attachment" "ArchiveVolume-attachment" {
 ####### DB Security Groups #######
 
 resource "aws_security_group" "edw_db_security_group" {
-  name        = "${local.application_name} Security Group"
+  name        = "${local.application_name}-Security Group"
   description = "Security Group for DB EC2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -294,6 +577,14 @@ resource "aws_security_group" "edw_db_security_group" {
     protocol    = "tcp"
     cidr_blocks = ["10.200.32.0/19"]
     description = "RDS Appstream access"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "-"
   }
 }
 
