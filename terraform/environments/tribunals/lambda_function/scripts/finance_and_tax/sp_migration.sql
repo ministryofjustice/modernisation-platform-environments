@@ -1866,8 +1866,11 @@ IF @Is_published = 1
 
 go
 
--- Add this ALTER TABLE statement to make the id column an identity column
-ALTER TABLE Judgment ALTER COLUMN id INT IDENTITY(1,1) NOT NULL
+IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('Judgment') AND name = 'id')
+BEGIN
+    ALTER TABLE Judgment ADD CONSTRAINT DF_Judgment_id DEFAULT (NEXT VALUE FOR Judgment_id_seq) FOR id;
+    ALTER TABLE Judgment ALTER COLUMN id INT NOT NULL;
+END
 go
 
 CREATE PROCEDURE [dbo].[spAddSubCategory] 
