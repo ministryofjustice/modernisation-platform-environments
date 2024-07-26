@@ -21,7 +21,7 @@ No production environment.
 
 ### **Incident response hours:**
 
-N/A this is a development account with no incident repsonse hours.
+N/A this is a development account with no incident response hours.
 
 ### **Incident contact details:**
 
