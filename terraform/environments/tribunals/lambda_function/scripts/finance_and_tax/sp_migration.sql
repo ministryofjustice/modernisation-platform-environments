@@ -1870,23 +1870,23 @@ go
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Judgment]') AND type in (N'U'))
 BEGIN
     CREATE TABLE [dbo].[Judgment](
-        [id] [int] IDENTITY(1,1) NOT NULL,
-        [Is_published] [bit] NULL,
+        [id] [bigint] IDENTITY(1,1) NOT NULL,
+        [Is_published] [tinyint] NULL,
         [File_no_1] [varchar](5) NULL,
         [File_no_2] [varchar](5) NULL,
-        [File_no_3] [varchar](4) NULL,
+        [File_no_3] [varchar](5) NULL,
         [Decision_datetime] [datetime] NULL,
         [Claimants] [ntext] NULL,
         [Respondent] [ntext] NULL,
-        [Main_subcategory_id] [int] NULL,
-        [Sec_subcategory_id] [int] NULL,
+        [Main_subcategory_id] [bigint] NULL,
+        [Sec_subcategory_id] [bigint] NULL,
         [Headnote_summary] [ntext] NULL,
         [Created_datetime] [datetime] NULL,
         [Last_updatedtime] [datetime] NULL,
         [Publication_datetime] [datetime] NULL,
-        [Reported_no_1] [varchar](3) NULL,
-        [Reported_no_2] [varchar](3) NULL,
-        [Reported_no_3] [varchar](2) NULL,
+        [Reported_no_1] [varchar](5) NULL,
+        [Reported_no_2] [varchar](5) NULL,
+        [Reported_no_3] [varchar](5) NULL,
         CONSTRAINT [PK_Judgment] PRIMARY KEY CLUSTERED ([id] ASC)
     )
 END
