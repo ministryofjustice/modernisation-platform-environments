@@ -1,7 +1,7 @@
 resource "aws_efs_file_system" "edw" {
 
   performance_mode = "maxIO"
-  throughput_mode  = "Bursting"
+  throughput_mode  = "bursting"
   encrypted  = "true"
   kms_key_id = aws_kms_key.efs.arn
 
