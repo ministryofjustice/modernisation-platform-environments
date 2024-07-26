@@ -62,6 +62,7 @@ export LOGS="${local.application_name}-EC2"
 export APPNAME="${local.application_name}"
 export ENV="${local.application_data.accounts[local.environment].edw_environment}"
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
+export EFS="${aws_efs_file_system.edw.id}"
 export host="$ip4 $APPNAME-$ENV $APPNAME.${local.application_data.accounts[local.environment].edw_dns_extension}"
 export host2="${local.application_data.accounts[local.environment].edw_cis_ip} cis.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
 export host3="${local.application_data.accounts[local.environment].edw_eric_ip} eric.aws.${local.application_data.accounts[local.environment].edw_environment}.legalservices.gov.uk"
@@ -173,6 +174,12 @@ sudo /sbin/mkfs.ext4 /dev/xvdj
 mkdir -p /oracle/temp_undo
 grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
 sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
+
+#Create EFS file system
+sudo yum install -y amazon-efs-utils
+mkdir /backups
+mount -t efs -o tls $EFS:/ /backups
+echo "$EFS:/ /backups efs defaults,_netdev 0 0" >> /etc/fstab
 
 #### setup_oracle_db_software
 echo "---setup_oracle_db_software"
