@@ -20,3 +20,5 @@ resource "aws_athena_workgroup" "default" {
     }
   }
 }
+
+# Possibly add a aws_athena_named_query here later?
