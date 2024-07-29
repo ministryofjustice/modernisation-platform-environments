@@ -128,14 +128,14 @@ resource "aws_s3_object" "db_prereqs_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-prereqs.sh"
   source      = "./db-prereqs.sh"
-  source_hash = filemd5("./db-prereqs.sh")
+  source_hash = filemd5("./scripts/db-prereqs.sh")
 }
 
 resource "aws_s3_object" "db_postbuild_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-postbuild.sh"
   source      = "./db-postbuild.sh"
-  source_hash = filemd5("./db-postbuild.sh")
+  source_hash = filemd5("./scripts/db-postbuild.sh")
 }
 
 resource "time_sleep" "wait_db_userdata_scripts" {
