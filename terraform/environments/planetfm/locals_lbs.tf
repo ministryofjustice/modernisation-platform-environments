@@ -28,7 +28,7 @@ locals {
           protocol = "HTTP"
           stickiness = {
             enabled = true
-            type    = "lb_cookie"
+            type    = "source_ip"
           }
         }
       }
