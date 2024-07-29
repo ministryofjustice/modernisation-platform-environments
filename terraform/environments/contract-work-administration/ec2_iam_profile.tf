@@ -73,7 +73,8 @@ resource "aws_iam_policy" "cwa" {
         },
         {
             "Action": [
-                "ec2:CreateTags"
+                "ec2:CreateTags",
+                "ec2:CreateSnapshots"
             ],
             "Resource": "*",
             "Effect": "Allow"

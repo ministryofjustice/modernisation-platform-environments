@@ -2,11 +2,51 @@ locals {
   db_userdata = <<EOF
 #!/bin/bash
 
+mkdir /userdata
+echo "Running prerequisite steps to set up instance..."
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-prereqs.sh /userdata/prereqs.sh
+chmod 700 /userdata/prereqs.sh
+. /userdata/prereqs.sh
+
+## Mounting to EFS - uncomment when AMI has been applied
+echo "Updating /etc/fstab"
+cat <<EOT > /etc/fstab
+dev/VolGroup00/LogVol00        /       ext3    defaults       1 1
+LABEL=/boot     /boot   ext3    defaults        1 2
+tmpfs   /dev/shm        tmpfs   defaults        0 0
+devpts  /dev/pts        devpts  gid=5,mode=620  0 0
+sysfs   /sys    sysfs   defaults        0 0
+proc    /proc   proc    defaults        0 0
+/dev/VolGroup00/LogVol01        swap    swap    defaults        0 0
+/dev/xvd${local.oradata_device_name_letter} /CWA/oradata ext4 defaults  0 0
+/dev/xvd${local.oraarch_device_name_letter} /CWA/oraarch ext4 defaults  0 0
+/dev/xvd${local.oratmp_device_name_letter} /CWA/oratmp  ext4 defaults  0 0
+/dev/xvd${local.oraredo_device_name_letter} /CWA/oraredo ext4 defaults  0 0
+/dev/xvd${local.oracle_device_name_letter} /CWA/oracle  ext4 defaults  0 0
+/dev/xvd${local.share_device_name_letter} /CWA/share  ext4 defaults  0 0
+${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
+EOT
+
+mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
+
+echo "Running postbuild steps to set up instance..."
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-postbuild.sh /userdata/postbuild.sh
+chmod 700 /userdata/postbuild.sh
+. /userdata/postbuild.sh
+
 echo "Setting host name"
 hostname ${local.database_hostname}
 echo "${local.database_hostname}" > /etc/hostname
 sed -i '/^HOSTNAME/d' /etc/sysconfig/network
 echo "HOSTNAME=${local.database_hostname}" >> /etc/sysconfig/network
+/etc/init.d/network restart
 
 echo "Getting IP Addresses for /etc/hosts"
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
@@ -28,27 +68,36 @@ echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.ext
 echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
 echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
-## Mounting to EFS - uncomment when AMI has been applied
-echo "Updating /etc/fstab"
-sed -i '/^fs-/d' /etc/fstab
-sed -i '/^s3fs/d' /etc/fstab
-echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-mount -a
-mount_status=$?
-while [[ $mount_status != 0 ]]
-do
-  sleep 10
-  mount -a
-  mount_status=$?
-done
-
 ## Update the send mail url
-echo "Updating the sendmail config"
+echo "Update Sendmail configurations"
 sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.cf
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
 sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.mc
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
+
+echo "Set up AWS EBS backup"
+INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
+#!/bin/bash
+/usr/local/bin/aws ec2 create-snapshots \
+--instance-specification InstanceId=$INSTANCE_ID \
+--description "AWS crash-consistent snapshots of CWA database volumes, automatically created snapshot from oracle_cron inside EC2" \
+--tag-specifications 'ResourceType=snapshot,Tags=[{Key="Name",Value="CWA database server EBS Automated Snapshots"}]'
+EOT
+chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
+
+echo "Set up cron jobs"
+cat <<EOT > /etc/cron.d/oracle_cron
+00 01 * * 0 /home/oracle/scripts/rman_backup.sh CWA /efs/cwa_rman > /tmp/rman_backup.log 2>&1
+00 07 * * 1-5 /home/oracle/scripts/freespace.sh >/home/oracle/scripts/log/freespace_CWA.trc 2>&1
+00 06 * * 1-5 /home/oracle/scripts/clean_trace_dump.sh 60 >/home/oracle/scripts/log/clean_trace_dump_cwa.trc 2>&1
+15 07 * * * /home/oracle/scripts/alert_rota.sh CWA 2>&1
+00 07 * * * /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/log/simple_cdc_check.log
+00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log
+EOT
+chmod 700 /etc/cron.d/oracle_cron
+
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
@@ -67,7 +116,7 @@ EOF
 
 }
 
-### Load custom metric script into an S3 bucket
+### Load userdata scripts into an S3 bucket
 resource "aws_s3_object" "db_custom_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-cw-custom.sh"
@@ -75,9 +124,23 @@ resource "aws_s3_object" "db_custom_script" {
   source_hash = filemd5("./db-cw-custom.sh")
 }
 
-resource "time_sleep" "wait_db_custom_script" {
+resource "aws_s3_object" "db_prereqs_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "db-prereqs.sh"
+  source      = "./db-prereqs.sh"
+  source_hash = filemd5("./db-prereqs.sh")
+}
+
+resource "aws_s3_object" "db_postbuild_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "db-postbuild.sh"
+  source      = "./db-postbuild.sh"
+  source_hash = filemd5("./db-postbuild.sh")
+}
+
+resource "time_sleep" "wait_db_userdata_scripts" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.db_custom_script]
+  depends_on      = [aws_s3_object.db_custom_script, aws_s3_object.db_prereqs_script, aws_s3_object.db_postbuild_script]
 }
 
 ######################################
@@ -104,7 +167,7 @@ resource "aws_instance" "database" {
     local.tags,
     { "Name" = local.database_ec2_name }
   )
-  depends_on = [time_sleep.wait_db_custom_script]
+  depends_on = [time_sleep.wait_db_userdata_scripts]
 }
 
 resource "aws_key_pair" "cwa" {
