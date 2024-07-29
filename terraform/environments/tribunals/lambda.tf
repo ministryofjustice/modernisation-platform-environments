@@ -22,8 +22,8 @@ resource "aws_iam_policy" "lambda_custom_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect: "Allow",
-        Action: [
+        Effect : "Allow",
+        Action : [
           "ec2:CreateSecurityGroup",
           "ec2:DescribeSecurityGroups",
           "ec2:DescribeSubnets",
@@ -35,11 +35,11 @@ resource "aws_iam_policy" "lambda_custom_policy" {
           "ec2:DeleteNetworkInterface",
           "ec2:DescribeNetworkInterfaces"
         ],
-        Resource: "*"
+        Resource : "*"
       },
       {
-        Effect: "Allow",
-        Action: [
+        Effect : "Allow",
+        Action : [
           "rds-db:connect",
           "rds:CreateDBProxy",
           "rds:CreateDBInstance",
@@ -54,37 +54,37 @@ resource "aws_iam_policy" "lambda_custom_policy" {
           "rds:ModifyDBInstance",
           "rds:ModifyDBProxy"
         ],
-        Resource: "*"
+        Resource : "*"
       },
       {
-        Effect: "Allow",
-        Action: [
+        Effect : "Allow",
+        Action : [
           "lambda:CreateFunction",
           "lambda:ListFunctions",
           "lambda:UpdateFunctionConfiguration"
         ],
-        Resource: "*"
+        Resource : "*"
       },
       {
-        Effect: "Allow",
-        Action: [
+        Effect : "Allow",
+        Action : [
           "iam:AttachRolePolicy",
           "iam:AttachPolicy",
           "iam:CreateRole",
           "iam:CreatePolicy"
         ],
-        Resource: "*"
+        Resource : "*"
       },
       {
-        Effect: "Allow",
-        Action: [
+        Effect : "Allow",
+        Action : [
           "secretsmanager:GetResourcePolicy",
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds",
           "secretsmanager:CreateSecret"
         ],
-        Resource: "*"
+        Resource : "*"
       }
     ]
   })
@@ -130,8 +130,8 @@ resource "random_password" "app_new_password" {
 }
 
 resource "aws_lambda_layer_version" "pyodbc_layer" {
-  filename   = "pyodbc311.zip"
-  layer_name = "pyodbc_layer"
+  filename            = "pyodbc311.zip"
+  layer_name          = "pyodbc_layer"
   compatible_runtimes = ["python3.11"]
 }
 
@@ -147,11 +147,11 @@ resource "aws_lambda_function" "app_setup_db" {
 
   environment {
     variables = {
-      DB_URL        = aws_db_instance.rdsdb.address
-      USER_NAME     = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-      PASSWORD      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-      NEW_DB_NAME   = each.value.app_db_name
-      APP_FOLDER    = each.value.sql_migration_path
+      DB_URL      = aws_db_instance.rdsdb.address
+      USER_NAME   = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+      PASSWORD    = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+      NEW_DB_NAME = each.value.app_db_name
+      APP_FOLDER  = each.value.sql_migration_path
     }
   }
 
