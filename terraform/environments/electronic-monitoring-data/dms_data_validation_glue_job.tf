@@ -111,7 +111,7 @@ resource "aws_cloudwatch_log_group" "rds_to_s3_parquet_migration" {
 }
 
 resource "aws_cloudwatch_log_group" "resizing_parquet_files" {
-  name              = "compacting-small-files"
+  name              = "resizing-parquet-files"
   retention_in_days = 14
 }
 # -------------------------------------------------------------------
@@ -356,7 +356,7 @@ EOF
 
 
 resource "aws_glue_job" "resizing_parquet_files" {
-  name              = "compacting-small-files"
+  name              = "resizing-parquet-files"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
   glue_version      = "4.0"
