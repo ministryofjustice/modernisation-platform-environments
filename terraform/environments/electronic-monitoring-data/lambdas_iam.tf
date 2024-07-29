@@ -416,8 +416,8 @@ resource "aws_iam_role_policy_attachment" "update_log_table_get_log_s3_files" {
 # ------------------------------------------
 
 resource "aws_iam_role" "extract_metadata_from_atrium_unstructured" {
-  name                = "extract_metadata_from_atrium_unstructured"
-  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  name               = "extract_metadata_from_atrium_unstructured"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_policy_document" {
@@ -484,8 +484,8 @@ resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zi
 # ------------------------------------------
 
 resource "aws_iam_role" "load_json_table" {
-  name                = "load_json_table"
-  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role.json
+  name               = "load_json_table"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
