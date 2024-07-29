@@ -41,28 +41,24 @@ alias sql='sqlplus / as sysdba'
 alias alert='cd /CWA/oracle/product/10.2.0/db_1/admin/CWA_base/bdump'
 
 alias scripts='cd /efs/stage/scripts'
-
-
 EOT
 
 # User specific environment and startup programs
 
 echo "Postbuild - Setting alias"
-PATH=$PATH:$HOME/bin
-export PATH
-. /CWA/oracle/product/10.2.0/db_1/CWA_cwa-db.env
+# PATH=$PATH:$HOME/bin
+# export PATH
+# . /CWA/oracle/product/10.2.0/db_1/CWA_cwa-db.env
 alias sql='sqlplus / as sysdba'
 alias alert='cd /CWA/oracle/product/10.2.0/db_1/admin/CWA_base/bdump'
-
 alias scripts='cd /efs/stage/scripts'
-EOT
 
-echo "Postbuild - Setting up ntp"
-echo development > /etc/cwaenv
-
+echo "mp-development" > /etc/cwaenv
+sed -i '/^PS1=/d' /etc/bashrc
 printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
 
-cp -p /etc/ntp.conf  /etc/ntp.conf.bck
+echo "Postbuild - Setting up ntp"
+/bin/cp -p -f /etc/ntp.conf /etc/ntp.conf.bck
 sed -i "s/server 0.rhel.pool.ntp.org/server 169.254.169.123/g" /etc/ntp.conf
 sed -i "s/server 1.rhel.pool.ntp.org/#server 1.rhel.pool.ntp.org/g" /etc/ntp.conf
 sed -i "s/server 2.rhel.pool.ntp.org/#server 2.rhel.pool.ntp.org/g" /etc/ntp.conf
@@ -71,7 +67,7 @@ service ntpd start
 chkconfig ntpd on
 
 echo "Postbuild - Setting up oracle directories"
-cp /etc/cron.d/oracle_cron  /home/oracle/oraclecrontab.txt
+/bin/cp -f /etc/cron.d/oracle_cron  /home/oracle/oraclecrontab.txt
 chown oracle:dba /home/oracle/oraclecrontab.txt
 chmod 744 /home/oracle/oraclecrontab.txt
 su oracle -c "crontab /home/oracle/oraclecrontab.txt"

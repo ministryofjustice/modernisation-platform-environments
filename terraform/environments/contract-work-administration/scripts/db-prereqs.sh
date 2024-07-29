@@ -1,6 +1,6 @@
 echo "Prereq - Installing tools"
 setenforce Permissive
-yum -y install sysstat sharutils 
+# yum -y install sysstat sharutils 
 # yum -y install postfix
 
 # unzip /home/ec2-user/awscliv2.zip

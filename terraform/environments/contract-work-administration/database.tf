@@ -39,6 +39,7 @@ done
 echo "Running postbuild steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-postbuild.sh /userdata/postbuild.sh
 chmod 700 /userdata/postbuild.sh
+sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
 . /userdata/postbuild.sh
 
 echo "Setting host name"
@@ -107,7 +108,7 @@ sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 ## Add custom metric script
 echo "Adding the custom metrics script for CloudWatch"
-rm /var/cw-custom.sh
+/bin/cp -f /var/cw-custom.sh /var/cw-custom.sh.bak
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-cw-custom.sh /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
 # This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
