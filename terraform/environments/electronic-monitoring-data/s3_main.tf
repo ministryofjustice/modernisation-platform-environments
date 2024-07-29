@@ -75,7 +75,7 @@ resource "aws_s3_bucket_notification" "send_metadata_to_ap" {
     id                  = "metadata_bucket_notification"
     lambda_function_arn = module.send_metadata_to_ap.lambda_function_arn
     events              = ["s3:ObjectCreated:*"]
-    filter_suffix       = ".yaml"
+    filter_suffix       = ".json"
   }
 
   depends_on = [aws_lambda_permission.send_metadata_to_ap]
