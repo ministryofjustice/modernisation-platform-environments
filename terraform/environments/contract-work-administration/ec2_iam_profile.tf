@@ -88,7 +88,9 @@ resource "aws_iam_policy" "cwa" {
                 "s3:GetObjectAcl",
                 "s3:DeleteObject"
             ],
-            "Resource":"arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-cw-custom.sh"
+            "Resource":"arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-cw-custom.sh",
+            "Resource":"arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-prereqs.sh",
+            "Resource":"arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-postbuild.sh"
         }
     ]
 }
