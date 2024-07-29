@@ -127,14 +127,14 @@ resource "aws_s3_object" "db_custom_script" {
 resource "aws_s3_object" "db_prereqs_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-prereqs.sh"
-  source      = "./db-prereqs.sh"
+  source      = "./scripts/db-prereqs.sh"
   source_hash = filemd5("./scripts/db-prereqs.sh")
 }
 
 resource "aws_s3_object" "db_postbuild_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-postbuild.sh"
-  source      = "./db-postbuild.sh"
+  source      = "./scripts/db-postbuild.sh"
   source_hash = filemd5("./scripts/db-postbuild.sh")
 }
 
@@ -157,7 +157,7 @@ resource "aws_instance" "database" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
   }
