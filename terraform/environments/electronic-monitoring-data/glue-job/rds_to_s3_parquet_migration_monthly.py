@@ -563,13 +563,7 @@ if __name__ == "__main__":
     jdbc_read_partitions_num = int(args['default_jdbc_read_partition_num'])
     LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
 
-    date_partition_column_name = args.get('date_partition_column_name', '')
-    if date_partition_column_name == '':
-        raise ValueError(f""">> 'date_partition_column_name' not given in the input.<<""")
-    LOGGER.info(f"""date_partition_column_name = {date_partition_column_name}""")
-    # ----------------------------------------------------
     rds_df_repartition_num = int(args['rds_df_repartition_num'])
-    validation_only_run = args['validation_only_run']
 
     partition_by_cols = list()
     if args['year_partition_bool'] == 'true':
@@ -577,6 +571,13 @@ if __name__ == "__main__":
 
     if args['month_partition_bool'] == 'true':
         partition_by_cols.append("month")
+    # ----------------------------------------------------
+    
+    date_partition_column_name = args.get('date_partition_column_name', '')
+    if partition_by_cols and date_partition_column_name == '':
+        raise ValueError(f""">> 'date_partition_column_name' not given in the input.<<""")
+    
+    LOGGER.info(f"""date_partition_column_name = {date_partition_column_name}""")
     # ----------------------------------------------------
 
     if args.get('other_partitionby_columns', None) is not None:
@@ -595,23 +596,24 @@ if __name__ == "__main__":
 
         agg_row_year = agg_row_dict['year']
         agg_row_month = agg_row_dict['month']
-        min_pkey = agg_row_dict['min_value']
-        max_pkey = agg_row_dict['max_value']
+        min_pkey_value = agg_row_dict['min_pkey_value']
+        max_pkey_value = agg_row_dict['max_pkey_value']
+        LOGGER.info(f"""agg_row_year = {agg_row_year}""")
         LOGGER.info(f"""agg_row_month = {agg_row_month}""")
-        LOGGER.info(f"""min_pkey = {min_pkey}""")
-        LOGGER.info(f"""max_pkey = {max_pkey}""")
+        LOGGER.info(f"""min_pkey_value = {min_pkey_value}""")
+        LOGGER.info(f"""max_pkey_value = {max_pkey_value}""")
 
         if jdbc_read_partitions_num == 1:
             df_rds_read = rds_jdbc_conn_obj.get_rds_dataframe(jdbc_partition_column,
-                                                              min_pkey, max_pkey)
+                                                              min_pkey_value, max_pkey_value)
         else:
-            jdbc_partition_col_upperbound = max_pkey
+            jdbc_partition_col_upperbound = max_pkey_value
 
             df_rds_read = rds_jdbc_conn_obj.get_rds_df_parallel_jdbc(
                                 jdbc_partition_column,
                                 jdbc_partition_col_upperbound,
                                 jdbc_read_partitions_num,
-                                jdbc_partition_col_lowerbound=min_pkey)
+                                jdbc_partition_col_lowerbound=min_pkey_value)
         # ----------------------------------------------------------
         LOGGER.info(
             f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
@@ -620,9 +622,13 @@ if __name__ == "__main__":
             df_rds_read = df_rds_read.where(f"""{args['rds_query_where_clause'].strip()}""")
         # ----------------------------------------------------
 
-        if partition_by_cols:
-            for partition_col in partition_by_cols:
-                df_rds_read = df_rds_read.withColumn(f"{partition_col}", f"""F.{partition_col}(date_partition_column_name)""")
+        if 'year' in partition_by_cols \
+            and 'year' not in df_rds_read.columns:
+            df_rds_read = df_rds_read.withColumn("year", F.year(date_partition_column_name))
+
+        if 'month' in partition_by_cols \
+            and 'month' not in df_rds_read.columns:
+            df_rds_read = df_rds_read.withColumn("month", F.month(date_partition_column_name))
 
         df_rds_read = df_rds_read.where(f"""year = {agg_row_year} and month = {agg_row_month}""")
 
@@ -656,7 +662,14 @@ if __name__ == "__main__":
         # consider to appropriately use the parquet write functions with features in built as per the below details.
         # - write_rds_df_to_s3_parquet(): Overwrites the existing partitions by default.
         # - write_rds_df_to_s3_parquet_v2(): Adds the new partitions & also the corresponding partitions are updated in athena tables.
-        write_rds_df_to_s3_parquet_v2(df_rds_read.coalesce(int(args['coalesce_int'])),
+        coalesce_int = int(args.get('coalesce_int', 0))
+        if coalesce_int != 0:
+            LOGGER.warn(f"""df_rds_read:> coalesce_int = {coalesce_int}""")
+            df_rds_write = df_rds_read.coalesce(coalesce_int)
+        else:
+            df_rds_write = df_rds_read.alias("df_rds_write")
+
+        write_rds_df_to_s3_parquet_v2(df_rds_write,
                                       partition_by_cols,
                                       prq_table_folder_path)
         

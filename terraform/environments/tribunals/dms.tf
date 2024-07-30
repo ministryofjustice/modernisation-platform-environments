@@ -24,10 +24,10 @@ resource "aws_security_group" "vpc_dms_replication_instance_group" {
   description = "allow dms replication instance access to the shared vpc on the modernisation platform"
 
   ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    description = "Allow all inbound traffic from ec2"
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allow all inbound traffic from ec2"
     security_groups = [aws_security_group.cluster_ec2.id]
   }
 
