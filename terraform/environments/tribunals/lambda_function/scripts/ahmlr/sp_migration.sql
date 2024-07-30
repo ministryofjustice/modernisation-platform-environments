@@ -1,6 +1,48 @@
 use hmlands
 go
 
+-- Check if the DECISIONSold table exists, if not, create it
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DECISIONSold]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[DECISIONSold](
+        [id] [bigint] IDENTITY(1,1) NOT NULL,
+        [caseref1] [varchar](50) NULL,
+        [caseref2] [varchar](50) NULL,
+        [caseref3] [varchar](50) NULL,
+        [hearingdate] [datetime] NULL,
+        [depadj] [int] NULL,
+        [applicant] [varchar](200) NULL,
+        [respondent] [varchar](200) NULL,
+        [cat1] [int] NULL,
+        [subcat1] [int] NULL,
+        [cat2] [int] NULL,
+        [subcat2] [int] NULL,
+        [notes] [ntext] NULL,
+        CONSTRAINT [PK_decisions] PRIMARY KEY CLUSTERED ([id] ASC)
+    )
+END
+ELSE
+BEGIN
+    -- If the table exists but the id column is not an identity column, modify it
+    IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('DECISIONSold') AND name = 'id')
+    BEGIN
+        -- First, we need to drop the primary key if it exists
+        IF EXISTS (SELECT * FROM sys.key_constraints WHERE object_id = OBJECT_ID('PK_decisions'))
+        BEGIN
+            ALTER TABLE DECISIONSold DROP CONSTRAINT PK_decisions
+        END
+
+        -- Now we can modify the column to be an identity column
+        ALTER TABLE DECISIONSold DROP COLUMN id
+        ALTER TABLE DECISIONSold ADD id INT IDENTITY(1,1) NOT NULL
+
+        -- Re-add the primary key
+        ALTER TABLE DECISIONSold ADD CONSTRAINT PK_decisions PRIMARY KEY CLUSTERED (id ASC)
+    END
+END
+
+go
+
 create proc dbo.dt_addtosourcecontrol
     @vchSourceSafeINI varchar(255) = '',
     @vchProjectName   varchar(255) ='',
@@ -1568,7 +1610,7 @@ BEGIN
         [cat2] [int] NULL,
         [subcat2] [int] NULL,
         [notes] [ntext] NULL,
-        CONSTRAINT [PK_DECISIONS] PRIMARY KEY CLUSTERED ([id] ASC)
+        CONSTRAINT [PK_DECISIONSnew] PRIMARY KEY CLUSTERED ([id] ASC)
     )
 END
 ELSE
@@ -1577,9 +1619,9 @@ BEGIN
     IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('DECISIONS') AND name = 'id')
     BEGIN
         -- First, we need to drop the primary key if it exists
-        IF EXISTS (SELECT * FROM sys.key_constraints WHERE object_id = OBJECT_ID('PK_DECISIONS'))
+        IF EXISTS (SELECT * FROM sys.key_constraints WHERE object_id = OBJECT_ID('PK_DECISIONSnew'))
         BEGIN
-            ALTER TABLE DECISIONS DROP CONSTRAINT PK_DECISIONS
+            ALTER TABLE DECISIONS DROP CONSTRAINT PK_DECISIONSnew
         END
 
         -- Now we can modify the column to be an identity column
@@ -1587,7 +1629,7 @@ BEGIN
         ALTER TABLE DECISIONS ADD id INT IDENTITY(1,1) NOT NULL
 
         -- Re-add the primary key
-        ALTER TABLE DECISIONS ADD CONSTRAINT PK_DECISIONS PRIMARY KEY CLUSTERED (id ASC)
+        ALTER TABLE DECISIONS ADD CONSTRAINT PK_DECISIONSnew PRIMARY KEY CLUSTERED (id ASC)
     END
 END
 
