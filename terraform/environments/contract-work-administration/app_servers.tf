@@ -8,36 +8,6 @@ echo "Running prerequisite steps to set up instance..."
 chmod 700 /userdata/prereqs.sh
 . /userdata/prereqs.sh
 
-## Mounting to EFS - uncomment when AMI has been applied
-cat <<EOT > /etc/fstab
-/dev/VolGroup00/LogVol00        /       ext3    defaults        1 1
-LABEL=/boot     /boot   ext3    defaults        1 2
-tmpfs   /dev/shm        tmpfs   defaults        0 0
-devpts  /dev/pts        devpts  gid=5,mode=620  0 0
-sysfs   /sys    sysfs   defaults        0 0
-proc    /proc   proc    defaults        0 0
-/dev/VolGroup00/LogVol01        swap    swap    defaults        0 0
-/dev/xvdf /CWA/app ext4 defaults 0 0
-${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
-cwa-db:/CWA/share /CWA/share nfs rw,nolock 0 0
-EOT
-
-mount -a
-mount_status=$?
-while [[ $mount_status != 0 ]]
-do
-  sleep 10
-  mount -a
-  mount_status=$?
-done
-
-echo "Running postbuild steps to set up instance..."
-/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
-chmod 700 /userdata/postbuild.sh
-sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
-. /userdata/postbuild.sh
-
-
 echo "Setting host name"
 hostname ${local.appserver1_hostname}
 echo "${local.appserver1_hostname}" > /etc/hostname
@@ -58,13 +28,41 @@ do
 done
 
 echo "Updating /etc/hosts"
-sed -i '/cwa-db$/d' /etc/hosts
-sed -i '/cwa-app1$/d' /etc/hosts
-sed -i '/cwa-app2$/d' /etc/hosts
+sed -i '/${local.database_hostname}$/d' /etc/hosts
+sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
+sed -i '/${local.cm_hostname}$/d' /etc/hosts
 echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
 echo "$PRIVATE_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
 echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
+echo "Updating /etc/fstab file and mount"
+cat <<EOT > /etc/fstab
+/dev/VolGroup00/LogVol00        /       ext3    defaults        1 1
+LABEL=/boot     /boot   ext3    defaults        1 2
+tmpfs   /dev/shm        tmpfs   defaults        0 0
+devpts  /dev/pts        devpts  gid=5,mode=620  0 0
+sysfs   /sys    sysfs   defaults        0 0
+proc    /proc   proc    defaults        0 0
+/dev/VolGroup00/LogVol01        swap    swap    defaults        0 0
+/dev/xvdf /CWA/app ext4 defaults 0 0
+${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
+${local.database_hostname}:/CWA/share /CWA/share nfs rw,nolock 0 0
+EOT
+
+mount -a
+mount_status=$?
+while [[ $mount_status != 0 ]]
+do
+  sleep 10
+  mount -a
+  mount_status=$?
+done
+
+echo "Running postbuild steps to set up instance..."
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
+chmod 700 /userdata/postbuild.sh
+sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
+. /userdata/postbuild.sh
 
 
 ## Update the send mail url
@@ -135,7 +133,7 @@ resource "aws_instance" "app1" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.app_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
   }
