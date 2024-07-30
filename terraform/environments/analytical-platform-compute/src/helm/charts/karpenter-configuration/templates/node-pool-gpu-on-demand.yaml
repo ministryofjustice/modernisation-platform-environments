@@ -5,7 +5,8 @@ metadata:
   name: gpu-on-demand
 spec:
   disruption:
-    consolidationPolicy: WhenUnderutilized
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
   template:
     metadata:
       labels:
