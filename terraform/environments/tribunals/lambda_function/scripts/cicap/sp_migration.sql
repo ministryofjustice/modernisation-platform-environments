@@ -1,6 +1,47 @@
 use cicap
 go
 
+-- Check if the CaseDetails table exists, if not, create it
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CaseDetails]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[CaseDetails](
+        [CaseID] [bigint] IDENTITY(1,1) NOT NULL,
+        [Citation1] [varchar](50) NULL,
+        [Citation2] [varchar](50) NULL,
+        [Citation3] [varchar](50) NULL,
+        [Citation4] [varchar](50) NULL,
+        [DecisionDate] [datetime] NULL,
+        [CaseName] [varchar](500) NULL,
+        [Scheme] [int] NULL,
+        [ParaNumber] [varchar](50) NULL,
+        [Keywords] [ntext] NULL,
+        [Summary] [ntext] NULL,
+        [Disabled] [bit] NULL,
+        CONSTRAINT [PK_CaseDetails] PRIMARY KEY CLUSTERED ([CaseID] ASC)
+    )
+END
+ELSE
+BEGIN
+    -- If the table exists but the CaseID column is not an identity column, modify it
+    IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('CaseDetails') AND name = 'CaseID')
+    BEGIN
+        -- First, we need to drop the primary key if it exists
+        IF EXISTS (SELECT * FROM sys.key_constraints WHERE object_id = OBJECT_ID('PK_CaseDetails'))
+        BEGIN
+            ALTER TABLE CaseDetails DROP CONSTRAINT PK_CaseDetails
+        END
+
+        -- Now we can modify the column to be an identity column
+        ALTER TABLE CaseDetails DROP COLUMN CaseID
+        ALTER TABLE CaseDetails ADD CaseID INT IDENTITY(1,1) NOT NULL
+
+        -- Re-add the primary key
+        ALTER TABLE CaseDetails ADD CONSTRAINT PK_CaseDetails PRIMARY KEY CLUSTERED (CaseID ASC)
+    END
+END
+
+GO
+
 create proc dbo.dt_addtosourcecontrol
     @vchSourceSafeINI varchar(255) = '',
     @vchProjectName   varchar(255) ='',
