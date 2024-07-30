@@ -1,6 +1,53 @@
 use it
 go
 
+-- Check if the DECISIONS1 table exists, if not, create it
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DECISIONS1]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[DECISIONS1](
+        [DecisionID] [int] IDENTITY(1,1) NOT NULL,
+        [JurisdictionID] [int] NULL,
+        [Jurisdiction1ID] [int] NULL,
+        [Date] [datetime] NULL,
+        [AppealNumber] [varchar](100) NULL,
+        [Appellant] [varchar](250) NULL,
+        [Respondent] [varchar](500) NULL,
+        [AddParties] [varchar](500) NULL,
+        [SubjectDetail] [ntext] NULL,
+        [Appealed] [varchar](50) NULL,
+        [Disabled] [bit] NULL,
+        [File1_Name] [varchar](250) NULL,
+        [File2_Name] [varchar](250) NULL,
+        [File2_Title] [varchar](250) NULL,
+        [File3_Name] [varchar](250) NULL,
+        [File3_Title] [varchar](250) NULL,
+        [AppealURL] [varchar](1000) NULL,
+        [TextURL] [varchar](250) NULL,
+        CONSTRAINT [PK_DECISIONS1] PRIMARY KEY CLUSTERED ([DecisionID] ASC)
+    )
+END
+ELSE
+BEGIN
+    -- If the table exists but the DecisionID column is not an identity column, modify it
+    IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('DECISIONS1') AND name = 'DecisionID')
+    BEGIN
+        -- First, we need to drop the primary key if it exists
+        IF EXISTS (SELECT * FROM sys.key_constraints WHERE object_id = OBJECT_ID('PK_DECISIONS1'))
+        BEGIN
+            ALTER TABLE DECISIONS1 DROP CONSTRAINT PK_DECISIONS1
+        END
+
+        -- Now we can modify the column to be an identity column
+        ALTER TABLE DECISIONS1 DROP COLUMN DecisionID
+        ALTER TABLE DECISIONS1 ADD DecisionID BIGINT IDENTITY(1,1) NOT NULL
+
+        -- Re-add the primary key
+        ALTER TABLE DECISIONS1 ADD CONSTRAINT PK_DECISIONS1 PRIMARY KEY CLUSTERED (DecisionID ASC)
+    END
+END
+
+GO
+
 create proc dbo.dt_addtosourcecontrol
     @vchSourceSafeINI varchar(255) = '',
     @vchProjectName   varchar(255) ='',
