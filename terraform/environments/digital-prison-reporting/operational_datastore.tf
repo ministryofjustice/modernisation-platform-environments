@@ -49,6 +49,8 @@ module "aurora_operational_db" {
     }
   }
 
+  ca_cert_identifier = "rds-ca-rsa2048-g1" # Updated on 29th July 2024
+
   vpc_id = data.aws_vpc.shared.id
   security_group_rules = {
     vpc_ingress = {
