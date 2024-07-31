@@ -26,6 +26,7 @@ mainSteps:
         notificationArn: "arn:aws:sns:eu-west-2:612659970365:dso_pagerduty"
         notificationEvents:
           - Failed
+          - Success
         notificationType: Command
       runCommand:
         - |
