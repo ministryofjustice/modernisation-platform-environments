@@ -19,7 +19,7 @@ resource "helm_release" "ollamate" {
   /* https://github.com/ministryofjustice/analytical-platform-ollamate */
   name       = "ollamate"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "0.0.1"
+  version    = "0.0.2"
   chart      = "analytical-platform-ollamate"
   namespace  = kubernetes_namespace.ollamate.metadata[0].name
   values = [
