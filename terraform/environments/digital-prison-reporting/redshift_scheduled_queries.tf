@@ -1,5 +1,5 @@
 module "redshift_scheduled_query_clear_expired_tables" {
-  source = "modules/redshift_scheduled_query"
+  source = "./modules/redshift_scheduled_query"
 
   env                          = local.env
   name                         = "clear_expired_tables"
