@@ -63,13 +63,27 @@ locals {
   dms_s3_local_bucket_secret_access_role_arns = [for account_id in concat(var.dms_config.client_account_arns,[local.dms_repository_account_id]) : "arn:aws:iam::${account_id}:role/${local.dms_s3_local_bucket_secret_access_role}"]
 }
 
+data "aws_iam_role" "dms_s3_local_bucket_secret_access_roles" {
+   for_each = toset(local.dms_s3_local_bucket_secret_access_role_arns)
+   name     = split("/",each.key)[length(split("/",each.key)) - 1]
+}
+
+# Filter the roles which have access to this secret to those which already exist
+# This avoids a terraform error regarding an unsupported principal
+locals {
+  dms_s3_local_bucket_secret_access_role_arns_existing = [
+    for role in data.aws_iam_role.dms_s3_local_bucket_secret_access_roles :
+      role.arn if try(role.id != null, false)
+  ]
+}
+
 data "aws_iam_policy_document" "dms_s3_local_bucket_secret" {
   statement {
-    sid    = "AllowAuditClientsToReadTheBucketName"
+    sid    = "AllowAuditRepositoryAndClientsToReadTheBucketName"
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = local.dms_s3_local_bucket_secret_access_role_arns
+      identifiers = local.dms_s3_local_bucket_secret_access_role_arns_existing
     }
     actions   = ["secretsmanager:GetSecretValue"]
     resources = [aws_secretsmanager_secret.dms_s3_local_bucket_secret.arn]
