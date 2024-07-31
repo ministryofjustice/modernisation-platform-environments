@@ -278,7 +278,7 @@ locals {
       })
 
       t1-nomis-xtag-a = merge(local.ec2_instances.xtag, {
-        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.xtag
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.xtag_t1_t2
         config = merge(local.ec2_instances.xtag.config, {
           ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
           availability_zone = "eu-west-2a"
@@ -333,7 +333,7 @@ locals {
       })
 
       t2-nomis-xtag-a = merge(local.ec2_instances.xtag, {
-        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.xtag
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.xtag_t1_t2
         config = merge(local.ec2_instances.xtag.config, {
           ami_name          = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-12-21T17-09-11.541Z"
           availability_zone = "eu-west-2a"
