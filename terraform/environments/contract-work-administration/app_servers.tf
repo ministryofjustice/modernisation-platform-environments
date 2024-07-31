@@ -64,6 +64,18 @@ chmod 700 /userdata/postbuild.sh
 sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
 . /userdata/postbuild.sh
 
+echo "Setting up crontab for applmgr"
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-disk-space-alert.sh /home/applmgr/scripts/disk_space.sh
+export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Value --output text`
+
+cat <<EOT > /home/applmgr/applmgrcrontab.txt
+0 07 * * 1-5 /home/applmgr/scripts/purge_apache_logs.sh 60 >/tmp/purge_apache_logs.trc 2>&1
+0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} $SLACK_ALERT_URL >/tmp/disk_space.trc 2>&1
+EOT
+chown applmgr:applmgr /home/applmgr/applmgrcrontab.txt
+chmod 744 /home/applmgr/applmgrcrontab.txt
+su applmgr -c "crontab /home/applmgr/applmgrcrontab.txt"
+
 
 ## Update the send mail url
 echo "Update Sendmail configurations"
@@ -86,6 +98,7 @@ rm /var/cw-custom.sh
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-cw-custom.sh /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
 #  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+
 
 EOF
 
@@ -113,9 +126,16 @@ resource "aws_s3_object" "app_postbuild_script" {
   source_hash = filemd5("./scripts/app-postbuild.sh")
 }
 
+resource "aws_s3_object" "app_disk_space_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "app-disk-space-alert.sh"
+  source      = "./scripts/disk-space-alert.sh"
+  source_hash = filemd5("./scripts/disk-space-alert.sh")
+}
+
 resource "time_sleep" "wait_app_userdata_scripts" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.app_custom_script, aws_s3_object.app_prereqs_script, aws_s3_object.app_postbuild_script]
+  depends_on      = [aws_s3_object.app_custom_script, aws_s3_object.app_prereqs_script, aws_s3_object.app_postbuild_script, aws_s3_object.app_disk_space_script]
 }
 
 
@@ -133,7 +153,7 @@ resource "aws_instance" "app1" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.app_userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   metadata_options {
     http_tokens = "optional"
   }

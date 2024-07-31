@@ -66,9 +66,3 @@ sed -i "s/server 2.rhel.pool.ntp.org/#server 2.rhel.pool.ntp.org/g" /etc/ntp.con
 
 service ntpd start
 chkconfig ntpd on
-
-echo "Postbuild - Setting up crontab"
-/bin/cp -f /etc/cron.d/applmgr_cron /home/applmgr/applmgrcrontab.txt
-chown applmgr:applmgr /home/applmgr/applmgrcrontab.txt
-chmod 744 /home/applmgr/applmgrcrontab.txt
-su applmgr -c "crontab /home/applmgr/applmgrcrontab.txt"
