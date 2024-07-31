@@ -22,6 +22,11 @@ mainSteps:
         - platformType
         - Windows
     inputs:
+      notificationConfig:
+        notificationArn: "arn:aws:sns:eu-west-2:612659970365:dso_pagerduty"
+        notificationEvents:
+          - Failed
+        notificationType: Command
       runCommand:
         - |
           # Run UserData powershell from modernisation-platform-configuration-management repo
