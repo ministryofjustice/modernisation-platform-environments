@@ -60,7 +60,7 @@ resource "aws_iam_role_policy" "dms_s3_local_bucket_secret_access_role_policy" {
 #     (This will be an empty list if no audit replication is required, or if this account is itself an audit repository)
 # No account may be simultaneouesly both an Audit Client and Audit Repository.  It may be Client or Repository, or neither.
 locals {
-  dms_s3_local_bucket_secret_access_role_arns = [for account_id in compact(concat(var.dms_config.client_account_arns,[local.dms_repository_account_id])) : "arn:aws:iam::${account_id}:role/${local.dms_s3_local_bucket_secret_access_role}"]
+  dms_s3_local_bucket_secret_access_role_arns = nonsensitive([for account_id in compact(concat(var.dms_config.client_account_arns,[local.dms_repository_account_id])) : "arn:aws:iam::${account_id}:role/${local.dms_s3_local_bucket_secret_access_role}"])
 }
 
 data "aws_iam_role" "dms_s3_local_bucket_secret_access_roles" {
