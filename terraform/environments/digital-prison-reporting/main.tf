@@ -1099,6 +1099,10 @@ module "datamart" {
     wlm_json_configuration = {
       name  = "wlm_json_configuration"
       value = jsonencode(jsondecode(file("./datamart-redshift-wlm.json")))
+    },
+    enable_user_activity_logging = {
+      name  = "enable_user_activity_logging"
+      value = "true"
     }
   }
 
