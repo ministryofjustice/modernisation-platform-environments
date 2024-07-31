@@ -11,5 +11,5 @@ module "redshift_scheduled_query_clear_expired_tables" {
   schedule_expression          = "rate(1 hour)"
   sql_statement                = "SELECT 1;"
 
-  tags = local.tags
+  tags = local.all_tags
 }
