@@ -83,3 +83,33 @@ resource "helm_release" "actions_runner_mojas_airflow" {
     )
   ]
 }
+
+/* airflow-create-a-pipeline */
+
+data "aws_secretsmanager_secret_version" "actions_runners_airflow_create_a_pipeline" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  secret_id = module.actions_runners_airflow_create_a_pipeline_secret[0].secret_id
+}
+
+resource "helm_release" "actions_runner_mojas_airflow_create_a_pipeline" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
+  name       = "actions-runner-mojas-airflow-create-a-pipeline"
+  repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
+  version    = "2.318.0"
+  chart      = "actions-runner"
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/actions-runners/airflow-create-a-pipeline/values.yml.tftpl",
+      {
+        github_organisation  = "moj-analytical-services"
+        github_repository    = "airflow-create-a-pipeline"
+        github_token         = data.aws_secretsmanager_secret_version.actions_runners_airflow_create_a_pipeline[0].secret_string
+        github_runner_labels = "analytical-platform"
+      }
+    )
+  ]
+}
