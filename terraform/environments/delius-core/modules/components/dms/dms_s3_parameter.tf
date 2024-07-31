@@ -24,7 +24,7 @@ resource "aws_ram_resource_association" "ssm_parameter_share_for_dms_bucket_name
 # We need to share the parameter with any remote clients associated with this account
 # and any remote repository associated with this account
 resource "aws_ram_principal_association" "ssm_parameter_share_for_dms_bucket_name" {
-  for_each           = toset(concat(var.dms_config.client_account_arns,local.dms_repository_account_id))
+  for_each           = toset(concat(var.dms_config.client_account_arns,[local.dms_repository_account_id]))
   resource_share_arn = aws_ram_resource_share.ssm_parameter_share_for_dms_bucket_name.arn
   principal          = each.value
 }
