@@ -66,7 +66,11 @@ sed -i 's/development/${local.application_data.accounts[local.environment].env_s
 
 echo "Setting up crontab for applmgr"
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-disk-space-alert.sh /home/applmgr/scripts/disk_space.sh
-export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Value --output text`
+chown applmgr /home/applmgr/scripts/disk_space.sh
+chgrp oinstall /home/applmgr/scripts/disk_space.sh
+chmod 744 /home/applmgr/scripts/disk_space.sh
+
+export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
 
 cat <<EOT > /home/applmgr/applmgrcrontab.txt
 0 07 * * 1-5 /home/applmgr/scripts/purge_apache_logs.sh 60 >/tmp/purge_apache_logs.trc 2>&1
@@ -153,7 +157,7 @@ resource "aws_instance" "app1" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.app_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
   }
