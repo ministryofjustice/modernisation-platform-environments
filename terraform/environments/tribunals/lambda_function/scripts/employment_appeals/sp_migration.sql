@@ -1,6 +1,38 @@
 use eat
 go
 
+-- Check if the ValidUsers table exists, if not, create it
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ValidUsers]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[ValidUsers](
+        [id] [int] IDENTITY(1,1) NOT NULL,
+        [username] [varchar](255) NOT NULL,
+        [password] [varchar](255) NOT NULL,
+        CONSTRAINT [PK_ValidUsers] PRIMARY KEY CLUSTERED ([id] ASC)
+    )
+END
+ELSE
+BEGIN
+    -- If the table exists but the id column is not an identity column, modify it
+    IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('ValidUsers') AND name = 'id')
+    BEGIN
+        -- First, we need to drop the primary key if it exists
+        IF EXISTS (SELECT * FROM sys.key_constraints WHERE object_id = OBJECT_ID('PK_ValidUsers'))
+        BEGIN
+            ALTER TABLE ValidUsers DROP CONSTRAINT PK_ValidUsers
+        END
+
+        -- Now we can modify the column to be an identity column
+        ALTER TABLE ValidUsers DROP COLUMN id
+        ALTER TABLE ValidUsers ADD id INT IDENTITY(1,1) NOT NULL
+
+        -- Re-add the primary key
+        ALTER TABLE ValidUsers ADD CONSTRAINT PK_ValidUsers PRIMARY KEY CLUSTERED (id ASC)
+    END
+END
+
+go
+
 create proc dbo.dt_addtosourcecontrol
     @vchSourceSafeINI varchar(255) = '',
     @vchProjectName   varchar(255) ='',
