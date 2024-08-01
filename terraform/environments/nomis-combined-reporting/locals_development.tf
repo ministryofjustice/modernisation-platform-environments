@@ -27,7 +27,7 @@ locals {
       })
     }
 
-    ec2_instance_linux = {
+    ec2_instances = {
       dev-ncr-cms-a = merge(local.ec2_instances.bip_app, {
         #cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
         config = merge(local.ec2_instances.bip_app.config, {
