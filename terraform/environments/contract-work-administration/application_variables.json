@@ -3,7 +3,7 @@
     "development": {
       "env_short": "dev",
       "lb_access_logs_existing_bucket_name": "",
-      "db_ami_id": "ami-0b6f37d7bc47eeac0",
+      "db_ami_id": "ami-04060a9e2f2deb62f",
       "db_instance_type": "m4.xlarge",
       "workspaces_local_cidr1": "10.200.2.0/24",
       "workspaces_local_cidr2": "10.200.3.0/24",
@@ -16,7 +16,7 @@
       "cm_ami_id": "ami-07139570f6fafb6e4",
       "cm_instance_type": "m4.xlarge",
       "ebs_concurrent_manager_size": "200",
-      "app_ami_id": "ami-07139570f6fafb6e4",
+      "app_ami_id": "ami-0a1d24a978b41de16",
       "app_instance_type": "m4.xlarge",
       "ebs_app_size": "200",
       "cwa_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC92LfXDL43cbcigHidm0PIm2gxZa82nu6F/p8XTMbCZzD6NJKgzA5voB/htRuK8FVlhYf89TXDeiabLBJgH9666W99m/Su3Tn4YX2NcOshKelVMt6cQIRdRv35s2nhPl+a6lVE2JxeK8hmkrrSAs4h1JoUQeK//SeVTzLQz2SOe9v0l3yB8EN0hGt/0VyOyMkP5KHxywvBQd0hA3k/1zTadtCWkh0YcGO0kYo7uQ6rG1joeKCYZFYjw7H8bgx1DyrB0+baRqxkwfCw+YdynKXLK4IvakjBuNfybrs8qnmTKUZx8nb9ALKM6D9vZ1my/zi0GxQaK9nStgwp7Dqkz96n8B0riuyMK6TPIhoGebSdcVZWmyYAEeMzcf6yOLZkIgKw42hxgjZ+m9GE8FgWU0XDFf50FlACcR/KXBmNu0mskzoD3kDkssVfVeIUpfi/yluMtEmHeLLVIudNPLe96g8GnYEpjRc3fxoRjUCk/U0qrjQG/LDcoSsQuKI76PvcLnc= vincent.cheung@MJ004609",
@@ -27,12 +27,12 @@
       "elb_request_count_alarm_threshold": "1000",
       "status_check_alarm_threshold": "1",
       "database_ec2_swap_alarm_threshold": "50",
-      "oradata_snapshot_id": "snap-0a14498e1aabc04f5",
-      "oracle_snapshot_id": "snap-06a2c2f2d5416ecdd",
-      "oraarch_snapshot_id": "snap-0c0c14e6fe5572f9b",
-      "oratmp_snapshot_id": "snap-0f9052f7f68ba8d25",
-      "oraredo_snapshot_id": "snap-0e05faeec41ffd5be",
-      "share_snapshot_id": "snap-0e4f93177b88c076f",
+      "oradata_snapshot_id": "snap-00448bbb6cc78265a",
+      "oracle_snapshot_id": "snap-0f3a8b6579fd4996a",
+      "oraarch_snapshot_id": "snap-085e7434022ad331e",
+      "oratmp_snapshot_id": "snap-0789bcf8f451e1d9c",
+      "oraredo_snapshot_id": "snap-0b9f8a19e2e64d32a",
+      "share_snapshot_id": "snap-02324f0d03e75a53a",
       "app_snapshot_id": "snap-0713966f6fbd5d43c",
       "concurrent_manager_snapshot_id": "snap-012a415b26337ede1",
       "alert_period": "60",
@@ -46,7 +46,8 @@
       "smtp_ami_id": "ami-07c2c2bf769d5174d",
       "smtp_instance_type": "t2.large",
       "old_mail_server_url": "mail.aws.dev.legalservices.gov.uk",
-      "old_domain_name": "dev.legalservices.gov.uk"
+      "old_domain_name": "dev.legalservices.gov.uk",
+      "app_disk_space_alert_threshold": "92"
     },
     "test": {
       "example_var": "test-data"
