@@ -241,6 +241,21 @@ locals {
   create_transfercomp_lambda_layer   = local.application_data.accounts[local.environment].create_transfer_component_lambda_layer
   lambda_transfercomp_layer_name     = "${local.project}-redhift-jdbc-dependency-layer"
 
+  # Redshift Expired External Table Remover Lambda
+  lambda_redshift_table_expiry_enabled             = true
+  lambda_redshift_table_expiry_name                = "${local.project}-redshift-expired-external-table-remover"
+  lambda_redshift_table_expiry_runtime             = "java11"
+  lambda_redshift_table_expiry_tracing             = "Active"
+  lambda_redshift_table_expiry_handler             = "io.micronaut.function.aws.proxy.MicronautLambdaHandler"
+  lambda_redshift_table_expiry_code_s3_bucket      = module.s3_artifacts_store.bucket_id
+  lambda_redshift_table_expiry_code_s3_key         = "build-artifacts/redshift-expired-external-table-remover/jars/redshift-expired-external-table-remover-vLatest-all.jar"
+  lambda_redshift_table_expiry_policies            = [
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    aws_iam_policy.redshift_dataapi_cross_policy.arn,
+  ]
+  lambda_redshift_table_expiry_secret_arn          = data.aws_secretsmanager_secret.datamart.arn
+  lambda_redshift_table_expiry_schedule_expression = "rate(1 hour)"
+
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
   # s3 transfer
