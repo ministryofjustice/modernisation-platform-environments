@@ -255,6 +255,7 @@ locals {
   ]
   lambda_redshift_table_expiry_secret_arn          = data.aws_secretsmanager_secret.datamart.arn
   lambda_redshift_table_expiry_schedule_expression = "rate(1 hour)"
+  lambda_redshift_table_expiry_seconds             = "86400"
 
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 

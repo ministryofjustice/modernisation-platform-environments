@@ -16,6 +16,7 @@ module "redshift_table_expiry_lambda" {
 
   env_vars = {
     "DB_CREDENTIAL_SECRET_ARN" = local.lambda_redshift_table_expiry_secret_arn
+    "EXPIRY_SECONDS"           = local.lambda_redshift_table_expiry_seconds
   }
 
   tags = merge(
