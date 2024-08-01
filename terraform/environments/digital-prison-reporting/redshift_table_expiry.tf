@@ -15,8 +15,10 @@ module "redshift_table_expiry_lambda" {
   log_retention_in_days = local.lambda_log_retention_in_days
 
   env_vars = {
-    "DB_CREDENTIAL_SECRET_ARN" = local.lambda_redshift_table_expiry_secret_arn
-    "EXPIRY_SECONDS"           = local.lambda_redshift_table_expiry_seconds
+    "CLUSTER_ID"            = local.lambda_redshift_table_expiry_cluster_id
+    "DB_NAME"               = local.lambda_redshift_table_expiry_database_name
+    "CREDENTIAL_SECRET_ARN" = local.lambda_redshift_table_expiry_secret_arn
+    "EXPIRY_SECONDS"        = local.lambda_redshift_table_expiry_seconds
   }
 
   tags = merge(
