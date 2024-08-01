@@ -33,6 +33,46 @@ END
 
 go
 
+-- Check if the Judgment table exists, if not, create it
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Judgment]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[Judgment](
+        [id] [int] IDENTITY(1,1) NOT NULL,
+        [eatnum] [varchar](80) NULL,
+		[judge] [varchar](100) NULL,
+		[appellant] [varchar](400) NULL,
+		[respondent] [varchar](400) NULL,
+        [date] [datetime] NULL,
+        [upload_date] [datetime] NULL,
+        [uploaded_by] [varchar](50) NULL,
+		[filename] [varchar](150) NULL,
+		[STARRED] [char](1) NULL,
+        CONSTRAINT [PK_Judgment] PRIMARY KEY CLUSTERED ([id] ASC)
+    )
+END
+ELSE
+BEGIN
+    -- If the table exists but the id column is not an identity column, modify it
+    IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('Judgment') AND name = 'id')
+    BEGIN
+        -- First, we need to drop the primary key if it exists
+        IF EXISTS (SELECT * FROM sys.key_constraints WHERE object_id = OBJECT_ID('PK_Judgment'))
+        BEGIN
+            ALTER TABLE Judgment DROP CONSTRAINT PK_Judgment
+        END
+
+        -- Now we can modify the column to be an identity column
+        ALTER TABLE Judgment DROP COLUMN id
+        ALTER TABLE Judgment ADD id INT IDENTITY(1,1) NOT NULL
+
+        -- Re-add the primary key
+        ALTER TABLE Judgment ADD CONSTRAINT PK_Judgment PRIMARY KEY CLUSTERED (id ASC)
+    END
+END
+
+go
+
+
 create proc dbo.dt_addtosourcecontrol
     @vchSourceSafeINI varchar(255) = '',
     @vchProjectName   varchar(255) ='',
