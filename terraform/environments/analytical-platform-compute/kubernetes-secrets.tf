@@ -70,3 +70,17 @@ resource "kubernetes_secret" "ui_app_secrets" {
     secret_key  = random_password.ui_app_secrets.result
   }
 }
+
+resource "kubernetes_secret" "ollamate_app_secrets" {
+  metadata {
+    name      = "ollamate-app-secrets"
+    namespace = kubernetes_namespace.ollamate.metadata[0].name
+  }
+
+  type = "Opaque"
+  data = {
+    environment = local.environment
+    secret_key  = random_password.ollamate_app_secrets.result
+  }
+}
+
