@@ -246,7 +246,7 @@ locals {
   lambda_redshift_table_expiry_name                = "${local.project}-redshift-expired-external-table-remover"
   lambda_redshift_table_expiry_runtime             = "java11"
   lambda_redshift_table_expiry_tracing             = "Active"
-  lambda_redshift_table_expiry_handler             = "io.micronaut.function.aws.proxy.MicronautLambdaHandler"
+  lambda_redshift_table_expiry_handler             = "uk.gov.justice.digital.lambda.RedShiftTableExpiryLambda::handleRequest"
   lambda_redshift_table_expiry_code_s3_bucket      = module.s3_artifacts_store.bucket_id
   lambda_redshift_table_expiry_code_s3_key         = "build-artifacts/redshift-expired-external-table-remover/jars/redshift-expired-external-table-remover-vLatest-all.jar"
   lambda_redshift_table_expiry_policies            = [
