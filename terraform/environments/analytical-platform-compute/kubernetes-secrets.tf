@@ -71,6 +71,22 @@ resource "kubernetes_secret" "ui_app_secrets" {
   }
 }
 
+resource "kubernetes_secret" "ollamate_rds" {
+  metadata {
+    name      = "ollamate-rds"
+    namespace = kubernetes_namespace.ollamate.metadata[0].name
+  }
+
+  type = "Opaque"
+  data = {
+    username                   = module.ollamate_rds.db_instance_username
+    password                   = random_password.ollamate_rds.result
+    address                    = module.ollamate_rds.db_instance_address
+    port                       = module.ollamate_rds.db_instance_port
+    postgres_connection_string = "postgresql://${module.ollamate_rds.db_instance_username}:${random_password.ollamate_rds.result}@${module.ollamate_rds.db_instance_address}:${module.ollamate_rds.db_instance_port}/ollamate"
+  }
+}
+
 resource "kubernetes_secret" "ollamate_app_secrets" {
   metadata {
     name      = "ollamate-app-secrets"
