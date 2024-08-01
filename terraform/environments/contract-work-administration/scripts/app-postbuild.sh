@@ -45,7 +45,7 @@ PATH=$PATH:$HOME/bin
 export PATH
 export LDEMULATION=elf_i386
 export PATH=/usr/bin32:/sbin:/usr/sbin:/bin:/usr/bin
-. /CWA/app/appl/APPSCWA_cwa-app1.env
+. /CWA/app/appl/APPSCWA_SERVER_HOSTNAME.env
 EOT
 
 
@@ -54,10 +54,6 @@ echo "Postbuild - Setting up ntp"
 sed -i.bak '/kernel/s/$/ nfs.enable_ino64=0/' /boot/grub/grub.conf
 
 su applmgr -c "rm /CWA/app/comn/html/jsp/bsc/bscpgraph.jsp"
-
-echo "mp-development" > /etc/cwaenv
-sed -i '/^PS1=/d' /etc/bashrc
-printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
 
 /bin/cp -f -p /etc/ntp.conf /etc/ntp.conf.bck
 sed -i "s/server 0.rhel.pool.ntp.org/server 169.254.169.123/g" /etc/ntp.conf
