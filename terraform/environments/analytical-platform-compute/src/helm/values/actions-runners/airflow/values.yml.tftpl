@@ -1,5 +1,12 @@
 ---
-replicaCount: ${replicaCount}
+ephemeral:
+  enabled: true
+  karpenter:
+    enabled: true
+    nodePool: "general-on-demand"
+  keda:
+    maxReplicaCount: 10
+    pollingInterval: 15
 
 github:
   organisation: ${github_organisation}
