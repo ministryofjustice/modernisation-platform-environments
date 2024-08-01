@@ -66,14 +66,13 @@ resource "helm_release" "actions_runner_mojas_airflow" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.317.0-3"
+  version    = "2.318.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow/values.yml.tftpl",
       {
-        replicaCount         = 5
         github_organisation  = "moj-analytical-services"
         github_repository    = "airflow"
         github_token         = data.aws_secretsmanager_secret_version.actions_runners_airflow[0].secret_string
