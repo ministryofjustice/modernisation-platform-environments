@@ -4,7 +4,10 @@ mojap metadata type and writes out the list of metadata for all tables in the da
 """
 
 import awswrangler as wr
-from mojap_metadata.converters.sqlalchemy_converter import SQLAlchemyConverter
+from mojap_metadata.converters.sqlalchemy_converter import (
+    SQLAlchemyConverter,
+    SQLAlchemyConverterOptions,
+)
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from sqlalchemy import create_engine
 import os
@@ -68,9 +71,10 @@ def add_db_to_meta(meta, db_name):
     """
     meta.database_name = db_name
     return meta
-    
+
+
 def remove_comments_from_meta(meta):
-    for col in meta['columns']:
+    for col in meta["columns"]:
         col["description"] = ""
     return meta
 
@@ -79,13 +83,16 @@ def handler(event, context):
     db_name = event.get("db_name")
     conn = get_rds_connection(db_name)
     engine = create_engine("mssql+pyodbc://", creator=lambda: conn)
-    sqlc = SQLAlchemyConverter(engine)
+    opt = SQLAlchemyConverterOptions(convert_to_snake=True)
+    sqlc = SQLAlchemyConverter(engine, opt)
     metadata_list = sqlc.generate_to_meta_list(schema="dbo")
     metadata_list = [add_db_to_meta(meta, db_name) for meta in metadata_list]
     for meta in metadata_list:
         write_meta_to_s3(meta)
     dict_metadata_list = [meta.to_dict() for meta in metadata_list]
-    dict_metadata_list = [remove_comments_from_meta(meta) for meta in dict_metadata_list]
+    dict_metadata_list = [
+        remove_comments_from_meta(meta) for meta in dict_metadata_list
+    ]
     create_glue_database(db_name)
     result = {
         "status": "success",
