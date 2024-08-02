@@ -58,6 +58,13 @@ do
   mount_status=$?
 done
 
+echo "Updating /etc/rc.local file"
+## Note this will keep appending to the file, like the set up in LZ
+echo "Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
+export DISPLAY=${local.appserver1_hostname}:0.0
+twm &
+xhost +" >> /etc/rc.local
+
 echo "Running postbuild steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
 chmod 700 /userdata/postbuild.sh

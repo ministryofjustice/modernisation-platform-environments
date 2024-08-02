@@ -60,8 +60,9 @@ do
 done
 
 echo "Updating /etc/rc.local file"
+## Note this will keep appending to the file, like the set up in LZ
 echo "Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
-export DISPLAY=${local.application_name_short}-${local.cm_hostname}:0.0
+export DISPLAY=${local.cm_hostname}:0.0
 twm &
 xhost +" >> /etc/rc.local
 
