@@ -94,7 +94,7 @@ chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
 echo "Update Slack alert URL for Oracle scripts"
 export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
-sed -i 's/DB_SLACK_ALERT_URL/$SLACK_ALERT_URL/g' /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
+sed -i 's/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g' /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
 
 echo "Set up cron jobs"
 cat <<EOT > /etc/cron.d/oracle_cron
