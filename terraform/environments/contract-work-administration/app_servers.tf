@@ -58,11 +58,23 @@ do
   mount_status=$?
 done
 
+echo "Updating /etc/rc.local file"
+## Note this will keep appending to the file, like the set up in LZ
+echo "Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
+export DISPLAY=${local.appserver1_hostname}:0.0
+twm &
+xhost +" >> /etc/rc.local
+
 echo "Running postbuild steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
 chmod 700 /userdata/postbuild.sh
+sed -i 's/. \/CWA\/app\/appl\/APPSCWA_SERVER_HOSTNAME.env/. \/CWA\/app\/appl\/APPSCWA_${local.appserver1_hostname}.env/g' /userdata/postbuild.sh
 sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
 . /userdata/postbuild.sh
+
+echo "mp-${local.environment}" > /etc/cwaenv
+sed -i '/^PS1=/d' /etc/bashrc
+printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
 
 echo "Setting up crontab for applmgr"
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-disk-space-alert.sh /home/applmgr/scripts/disk_space.sh

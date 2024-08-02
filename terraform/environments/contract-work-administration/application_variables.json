@@ -13,7 +13,7 @@
       "ebs_oratmp_size": "100",
       "ebs_oraredo_size": "100",
       "ebs_share_size": "50",
-      "cm_ami_id": "ami-07139570f6fafb6e4",
+      "cm_ami_id": "ami-0812a7521ac7832f4",
       "cm_instance_type": "m4.xlarge",
       "ebs_concurrent_manager_size": "200",
       "app_ami_id": "ami-0a1d24a978b41de16",
