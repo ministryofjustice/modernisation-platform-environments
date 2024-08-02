@@ -51,7 +51,8 @@ EOT
 
 
 echo "Postbuild - Setting up ntp"
-sed -i.bak '/kernel/s/$/ nfs.enable_ino64=0/' /boot/grub/grub.conf
+sed -i.bak 's/ nfs.enable_ino64=0//g' /boot/grub/grub.conf
+sed -i '/kernel/s/$/ nfs.enable_ino64=0/' /boot/grub/grub.conf
 
 su applmgr -c "rm /CWA/app/comn/html/jsp/bsc/bscpgraph.jsp"
 

@@ -59,6 +59,12 @@ do
   mount_status=$?
 done
 
+echo "Updating /etc/rc.local file"
+echo "Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
+export DISPLAY=${local.application_name_short}-${local.cm_hostname}:0.0
+twm &
+xhost +" >> /etc/rc.local
+
 echo "Running postbuild steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
 chmod 700 /userdata/postbuild.sh
