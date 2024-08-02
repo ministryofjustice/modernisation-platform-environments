@@ -38,4 +38,3 @@ module "s3_bucket_dms_destination" {
 
   tags = var.tags
 }
-
