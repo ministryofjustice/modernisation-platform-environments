@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={db_url};UID={user_name};PWD={password}",
         autocommit=True
     )
-    cursor = conn.cursor()
+    cursor = conn.cursor(f"use [{new_db_name}] go")
 
     # Executing SQL script from file
     script_path = f".{app_folder}/post_migration.sql"
@@ -36,5 +36,5 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': 'Database setup completed successfully'
+        'body': 'Database post migration script completed successfully'
     }
