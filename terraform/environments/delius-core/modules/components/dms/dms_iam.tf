@@ -29,19 +29,20 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   role       = aws_iam_role.dms-vpc-role.name
 }
 
-
-
-resource "aws_iam_role" "dms_client_s3_put_role" {
- count = length(var.dms_config.client_account_ids) > 0 ? 1 : 0
-  name = "dms-client-s3-put-role"
+# Create a Role to Allow any Audit Clients of this environment, or any Repository
+# for this environment to write to the DMS S3 bucket
+resource "aws_iam_role" "dms_s3_writer_role" {
+ count = length(local.dms_s3_writer_account_ids) > 0 ? 1 : 0
+  name = local.dms_s3_writer_role_name
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
-      for principal in var.dms_config.client_account_ids:
+      for principal in local.dms_s3_writer_account_ids:
       {
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::${principal}:root"
+          AWS = "arn:aws:iam::${principal}:root",
+          service = "dms.amazonaws.com"
         },
         Action = "sts:AssumeRole"
       }
@@ -49,61 +50,26 @@ resource "aws_iam_role" "dms_client_s3_put_role" {
   })
 }
 
-data "aws_iam_policy_document" "dms_client_s3_put_policy_data"  {
+data "aws_iam_policy_document" "dms_s3_writer_policy_data"  {
  statement {
     actions = [
       "s3:PutObject",
-      "s3:PutObjectAcl",
+      "s3:PutObjectAcl"
     ]
 
-    resources = [
-      "arn:aws:s3:::${local.dms_s3_local_bucket_prefix}*",
-      "arn:aws:s3:::${local.dms_s3_local_bucket_prefix}*/*"
-    ]
+    resources = [ "arn:aws:s3:::${module.s3_bucket_dms_destination.bucket.bucket}" ]
   }
 }
 
-resource "aws_iam_policy" "dms_client_s3_put_policy" {
-  count       = length(var.dms_config.client_account_ids) > 0 ? 1 : 0
-  name        = "dms-client-s3-put-policy"
-  description = "Policy to allow audit clients putting data to S3 buckets with DMS destination prefix"
-  policy      = data.aws_iam_policy_document.dms_client_s3_put_policy_data.json
+resource "aws_iam_policy" "dms_s3_writer_policy" {
+  count       = length(local.dms_s3_writer_account_ids) > 0 ? 1 : 0
+  name        = "dms-s3-writer-policy"
+  description = "Policy to allow audit clients and repository putting data to the DMS S3 bucket"
+  policy      = data.aws_iam_policy_document.dms_s3_writer_policy_data.json
 }
 
-resource "aws_iam_role_policy_attachment" "dms_client_s3_put_policy_attachment" {
-  count      = length(var.dms_config.client_account_ids) > 0 ? 1 : 0
-  role       = aws_iam_role.dms_client_s3_put_role[0].name
-  policy_arn = aws_iam_policy.dms_client_s3_put_policy[0].arn
+resource "aws_iam_role_policy_attachment" "dms_s3_writer_policy_attachment" {
+  count      = length(local.dms_s3_writer_account_ids) > 0 ? 1 : 0
+  role       = aws_iam_role.dms_s3_writer_role[0].name
+  policy_arn = aws_iam_policy.dms_s3_writer_policy[0].arn
 }
-
-
-resource "aws_iam_policy" "dms_s3_audit_target_policy" {
-  count       = local.dms_s3_repository_bucket.prefix == null ? 0 : 1
-  name        = "dms-s3-target-policy"
-  description = "Policy to allow DMS to write Audit data to the repository S3 bucket"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject"
-        ]
-        Resource = [
-          "arn:aws:s3:::${local.dms_s3_repository_bucket.prefix}*",
-          "arn:aws:s3:::${local.dms_s3_repository_bucket.prefix}*/*"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "dms_s3_audit_target_policy_attachment" {
-  count      = local.dms_s3_repository_bucket.prefix == null ? 0 : 1
-  role       = aws_iam_role.dms-vpc-role.name
-  policy_arn = aws_iam_policy.dms_s3_audit_target_policy[0].arn
-}
-
-

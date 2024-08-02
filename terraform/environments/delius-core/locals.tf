@@ -20,6 +20,12 @@ locals {
 
   ordered_subnet_ids = [data.aws_subnets.shared-private-a.ids[0], data.aws_subnets.shared-private-b.ids[0], data.aws_subnets.shared-private-c.ids[0]]
 
+  all_mp_account_names = keys(local.environment_management.account_ids)
+
+  # delius_module_names = [  
+  #     for module_suffix in flatten(values(local.delius_environments_per_account)) : "environment_${module_suffix}"
+  # ]
+  
   dms_client_account_ids = flatten(concat(
     try(local.dms_config_dev.audit_target_endpoint.write_environment, null) == null ? [] :
     (local.dms_config_dev.audit_target_endpoint.write_environment == local.environment ? [local.environment_management.account_ids["delius-core-development"]] : []),
