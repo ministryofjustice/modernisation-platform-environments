@@ -17,7 +17,8 @@ def lambda_handler(event, context):
         f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={db_url};UID={user_name};PWD={password}",
         autocommit=True
     )
-    cursor = conn.cursor(f"use [{new_db_name}] go")
+    cursor = conn.cursor()
+    cursor.execute(f"use [{new_db_name}] go")
 
     # Executing SQL script from file
     script_path = f".{app_folder}/post_migration.sql"
