@@ -1872,8 +1872,8 @@ IF @Is_published = 1
 	SELECT @Id = SCOPE_IDENTITY()
 go
 
-SET IDENTITY_INSERT dbo.Judgment ON
-GO
+-- SET IDENTITY_INSERT dbo.Judgment ON
+-- GO
 
 -- Check if the Judgment table exists, if not, create it
 -- IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Judgment]') AND type in (N'U'))
