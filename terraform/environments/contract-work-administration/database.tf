@@ -42,6 +42,10 @@ chmod 700 /userdata/postbuild.sh
 sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
 . /userdata/postbuild.sh
 
+echo "mp-${local.environment}" > /etc/cwaenv
+sed -i '/^PS1=/d' /etc/bashrc
+printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
+
 echo "Setting host name"
 hostname ${local.database_hostname}
 echo "${local.database_hostname}" > /etc/hostname
@@ -62,9 +66,9 @@ do
 done
 
 echo "Updating /etc/hosts"
-sed -i '/cwa-db$/d' /etc/hosts
-sed -i '/cwa-app1$/d' /etc/hosts
-sed -i '/cwa-app2$/d' /etc/hosts
+sed -i '/${local.database_hostname}$/d' /etc/hosts
+sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
+sed -i '/${local.cm_hostname}$/d' /etc/hosts
 echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
 echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
 echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
@@ -87,6 +91,10 @@ cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
 --tag-specifications 'ResourceType=snapshot,Tags=[{Key="Name",Value="CWA database server EBS Automated Snapshots"}]'
 EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
+
+echo "Update Slack alert URL for Oracle scripts"
+export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+sed -i 's/DB_SLACK_ALERT_URL/$SLACK_ALERT_URL/g' /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
 
 echo "Set up cron jobs"
 cat <<EOT > /etc/cron.d/oracle_cron

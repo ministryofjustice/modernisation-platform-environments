@@ -53,10 +53,6 @@ alias sql='sqlplus / as sysdba'
 alias alert='cd /CWA/oracle/product/10.2.0/db_1/admin/CWA_base/bdump'
 alias scripts='cd /efs/stage/scripts'
 
-echo "mp-development" > /etc/cwaenv
-sed -i '/^PS1=/d' /etc/bashrc
-printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
-
 echo "Postbuild - Setting up ntp"
 /bin/cp -p -f /etc/ntp.conf /etc/ntp.conf.bck
 sed -i "s/server 0.rhel.pool.ntp.org/server 169.254.169.123/g" /etc/ntp.conf
