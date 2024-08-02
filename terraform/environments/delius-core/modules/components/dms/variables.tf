@@ -65,3 +65,8 @@ variable "db_ec2_sg_id" {
   description = "Security group id of the database EC2 hosts"
   type        = string
 }
+
+variable "delius_account_names" {
+  description = "List of names of all of the delius-core AWS accounts"
+  type        = list(string)
+}

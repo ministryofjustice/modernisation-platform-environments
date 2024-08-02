@@ -99,3 +99,8 @@ variable "db_suffix" {
   type        = string
   default     = "db"
 }
+
+variable "delius_account_names" {
+  description = "List of names of all of the delius-core AWS accounts"
+  type        = list(string)
+}
