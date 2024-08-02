@@ -18,7 +18,7 @@ def lambda_handler(event, context):
         autocommit=True
     )
     cursor = conn.cursor()
-    cursor.execute(f"use [{new_db_name}] go")
+    cursor.execute(f"use [{new_db_name}]")
 
     # Executing SQL script from file
     script_path = f".{app_folder}/post_migration.sql"
