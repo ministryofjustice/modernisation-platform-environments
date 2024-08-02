@@ -37,7 +37,7 @@ resource "aws_dms_replication_task" "migration-task" {
       LobChunkSize = 64
     },
     FullLoadSettings = {
-      TargetTablePrepMode = "TRUNCATE_BEFORE_LOAD"
+      TargetTablePrepMode = "DO_NOTHING"
     },
     ControlTablesSettings = {
       historyTimeslotInMinutes = 5

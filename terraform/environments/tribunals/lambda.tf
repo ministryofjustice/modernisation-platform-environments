@@ -137,10 +137,38 @@ resource "aws_lambda_layer_version" "pyodbc_layer" {
 
 resource "aws_lambda_function" "app_setup_db" {
   for_each      = var.web_app_services
-  filename      = "lambda_function/my_deployment_package.zip"
+  filename      = "lambda_function/db_setup_deployment_package.zip"
   function_name = "${each.value.name_prefix}-setup-db"
   role          = aws_iam_role.lambda_role.arn
-  handler       = "index.lambda_handler"
+  handler       = "app_setup_db.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 300
+  architectures = ["x86_64"]
+
+  environment {
+    variables = {
+      DB_URL        = aws_db_instance.rdsdb.address
+      USER_NAME     = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+      PASSWORD      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+      NEW_DB_NAME   = each.value.app_db_name
+      APP_FOLDER    = each.value.sql_migration_path
+    }
+  }
+
+  vpc_config {
+    subnet_ids         = data.aws_subnets.shared-private.ids
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+
+  layers = [aws_lambda_layer_version.pyodbc_layer.arn]
+}
+
+resource "aws_lambda_function" "app_post_migrate" {
+  for_each      = var.web_app_services
+  filename      = "lambda_function/post_migrate_deployment_package.zip"
+  function_name = "${each.value.name_prefix}-post-migrate-script"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "app_post_migrate.lambda_handler"
   runtime       = "python3.11"
   timeout       = 300
   architectures = ["x86_64"]
