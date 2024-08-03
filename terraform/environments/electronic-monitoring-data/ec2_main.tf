@@ -1,0 +1,91 @@
+data "aws_ami" "linux_2_image" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+resource "aws_instance" "data_load_transfer_server" {
+  ami           = data.aws_ami.linux_2_image.id
+  instance_type = "t2.micro"
+  subnet_id = data.aws_subnet.private_subnets_a.id
+  
+  tags = {
+    Name = "DataLoadTransformServer"
+  }
+
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y
+              yum install -y docker
+              service docker start
+              usermod -a -G docker ec2-user
+              curl -sSL https://get.docker.com/ | sh
+              curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              chmod +x /usr/local/bin/docker-compose
+              mkdir /opt/dagster
+              cd /opt/dagster
+              cat <<EOT >> docker-compose.yml
+              version: '3.8'
+              services:
+                dagster:
+                  image: dagster/dagster:latest
+                  ports:
+                    - "3000:3000"
+              EOT
+              docker-compose up -d
+              EOF
+
+  # Security group to allow SSH and HTTP access
+  vpc_security_group_ids = [aws_security_group.data_load_transform_sg.id]
+}
+
+resource "aws_security_group" "data_load_transform_sg" {
+  name_prefix = "data-load-transform-sg"
+  vpc_id      = data.aws_vpc.shared.id
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_dynamodb_table" "data_load_transform_state" {
+  name           = "data-load-transform-state"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "PK"
+  range_key      = "SK"
+
+  attribute {
+    name = "PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "SK"
+    type = "S"
+  }
+}
