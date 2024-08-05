@@ -83,9 +83,8 @@ sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/
 /etc/init.d/sendmail restart
 
 echo "Update Slack alert URL for Oracle scripts"
-### TODO - Need to replace the scripts' Slack url with DB_SLACK_ALERT_URL first
 export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
-sed -i 's/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g' /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
+sed -i "s/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g" /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
 
 echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
