@@ -93,7 +93,7 @@ cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
 /usr/local/bin/aws ec2 create-snapshots \
 --instance-specification InstanceId=$INSTANCE_ID \
 --description "AWS crash-consistent snapshots of CWA database volumes, automatically created snapshot from oracle_cron inside EC2" \
---tag-specifications 'ResourceType=snapshot,Tags=[{Key="Name",Value="CWA database server EBS Automated Snapshots"}]'
+--copy-tags-from-source volume
 EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
@@ -184,6 +184,14 @@ resource "aws_instance" "database" {
   user_data_replace_on_change = false
   metadata_options {
     http_tokens = "optional"
+  }
+
+  root_block_device {
+    tags = merge(
+      { "instance-scheduling" = "skip-scheduling" },
+      local.tags,
+      { "Name" = "${local.application_name}-root"}
+    )
   }
 
   tags = merge(
