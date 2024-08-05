@@ -42,6 +42,10 @@ chmod 700 /userdata/postbuild.sh
 sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
 . /userdata/postbuild.sh
 
+echo "mp-${local.environment}" > /etc/cwaenv
+sed -i '/^PS1=/d' /etc/bashrc
+printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
+
 echo "Setting host name"
 hostname ${local.database_hostname}
 echo "${local.database_hostname}" > /etc/hostname
@@ -62,9 +66,10 @@ do
 done
 
 echo "Updating /etc/hosts"
-sed -i '/cwa-db$/d' /etc/hosts
-sed -i '/cwa-app1$/d' /etc/hosts
-sed -i '/cwa-app2$/d' /etc/hosts
+sed -i '/${local.database_hostname}$/d' /etc/hosts
+sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
+sed -i '/${local.cm_hostname}$/d' /etc/hosts
+sed -i '/laa-oem-app$/d' /etc/hosts # This is removed for POC
 echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
 echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
 echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
@@ -77,7 +82,11 @@ sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_u
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
-echo "Set up AWS EBS backup"
+echo "Update Slack alert URL for Oracle scripts"
+export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+sed -i "s/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g" /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
+
+echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
 #!/bin/bash
@@ -88,7 +97,7 @@ cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
 EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
-echo "Set up cron jobs"
+echo "Setting up cron jobs"
 cat <<EOT > /etc/cron.d/oracle_cron
 00 01 * * 0 /home/oracle/scripts/rman_backup.sh CWA /efs/cwa_rman > /tmp/rman_backup.log 2>&1
 00 07 * * 1-5 /home/oracle/scripts/freespace.sh >/home/oracle/scripts/log/freespace_CWA.trc 2>&1
@@ -96,8 +105,19 @@ cat <<EOT > /etc/cron.d/oracle_cron
 15 07 * * * /home/oracle/scripts/alert_rota.sh CWA 2>&1
 00 07 * * * /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/log/simple_cdc_check.log
 00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log
+00,15,30,45 07,08,09,10,11,12,13,14,15,16,17 * * 1-5 /home/oracle/scripts/scan_alert.sh >/home/oracle/scripts/log/scan_alert.log 2>&1
+00,30 07,08,09,10,11,12,13,14,15,16,17 * * 1-5  /home/oracle/scripts/mailer_check_1.sh >/tmp/check_workflow_mailer.trc  2>&1
+#00 07 * * * /home/oracle/scripts/space1.sh
+0,30 08-17 * * 1-5 /home/oracle/scripts/disk_space.sh DEV 94  >/tmp/disk_space.trc 2>&1
+00 07 * * * /home/oracle/scripts/tablespace1.sh
+
 EOT
 chmod 700 /etc/cron.d/oracle_cron
+/bin/cp -f /etc/cron.d/oracle_cron  /home/oracle/oraclecrontab.txt
+chown oracle:oinstall /home/oracle/oraclecrontab.txt
+chmod 744 /home/oracle/oraclecrontab.txt
+su oracle -c "crontab /home/oracle/oraclecrontab.txt"
+chown -R oracle:dba /home/oracle/scripts
 
 
 ## Remove SSH key allowed
@@ -111,7 +131,10 @@ echo "Adding the custom metrics script for CloudWatch"
 /bin/cp -f /var/cw-custom.sh /var/cw-custom.sh.bak
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-cw-custom.sh /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
-# This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+cat <<EOT > /etc/cron.d/custom_cloudwatch_metrics
+#!/bin/bash
+*/1 * * * * root /var/cw-custom.sh > /dev/null 2>&1
+EOT
 
 EOF
 
