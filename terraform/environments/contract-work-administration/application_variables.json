@@ -3,7 +3,7 @@
     "development": {
       "env_short": "dev",
       "lb_access_logs_existing_bucket_name": "",
-      "db_ami_id": "ami-0b753107f91d2a97f",
+      "db_ami_id": "ami-036b999a63d626436",
       "db_instance_type": "m4.xlarge",
       "workspaces_local_cidr1": "10.200.2.0/24",
       "workspaces_local_cidr2": "10.200.3.0/24",
