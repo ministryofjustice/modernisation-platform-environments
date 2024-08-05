@@ -9,7 +9,7 @@ sed -i 's/^\(Defaults\s*requiretty\)/#\1/' /etc/sudoers
 exec > /var/log/userdata.log 2>&1
 set -x
 
-##### USERDATA #####
+#### USERDATA ######
 
 #### install missing package and hostname change
 echo "---install missing package and hostname change"
