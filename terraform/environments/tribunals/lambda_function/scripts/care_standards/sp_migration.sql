@@ -1353,58 +1353,6 @@ INSERT
 SELECT @id = SCOPE_IDENTITY()
 go
 
--- Check if the DECISION table exists, if not, create it
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DECISION]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE [dbo].[DECISION](
-        [id] [bigint] IDENTITY(1,1) NOT NULL,
-        [file_no_1] [varchar](100) NULL,
-        [file_no_2] [varchar](100) NULL,
-        [file_no_3] [varchar](100) NULL,
-        [decision_datetime] [datetime] NULL,
-        [appellant] [varchar](500) NULL,
-        [respondent] [varchar](500) NULL,
-        [chairman_id] [bigint] NULL,
-        [schedule_id] [bigint] NULL,
-        [main_category_id] [bigint] NULL,
-        [main_subcategory_id] [bigint] NULL,
-        [headnote_summary] [ntext] NULL,
-        [created_datetime] [datetime] NULL,
-        [last_updatedtime] [datetime] NULL,
-        [publication_datetime] [datetime] NULL,
-        [Is_public] [bigint] NULL,
-        [usersID] [bigint] NULL,
-        CONSTRAINT [PK_DECISION] PRIMARY KEY CLUSTERED ([id] ASC)
-    )
-END
-ELSE
-BEGIN
-    -- If the table exists but the id column is not an identity column, modify it
-    IF NOT EXISTS (SELECT * FROM sys.identity_columns WHERE object_id = OBJECT_ID('DECISION') AND name = 'id')
-    BEGIN
-        -- First, we need to drop the primary key if it exists
-        IF EXISTS (SELECT * FROM sys.key_constraints WHERE object_id = OBJECT_ID('PK_DECISION'))
-        BEGIN
-            ALTER TABLE DECISION DROP CONSTRAINT PK_DECISION
-        END
-
-        -- Now we can modify the column to be an identity column
-        ALTER TABLE DECISION DROP COLUMN id
-        ALTER TABLE DECISION ADD id INT IDENTITY(1,1) NOT NULL
-
-        -- Re-add the primary key
-        ALTER TABLE DECISION ADD CONSTRAINT PK_DECISION PRIMARY KEY CLUSTERED (id ASC)
-    END
-
-    -- If the usersID column doesn't exist, add it
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('DECISION') AND name = 'usersID')
-    BEGIN
-        ALTER TABLE DECISION ADD usersID INT NULL
-    END
-END
-
-go
-
 CREATE PROCEDURE dbo.spAddSchedule 
 
 @description varchar(100)
