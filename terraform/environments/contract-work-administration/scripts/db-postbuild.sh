@@ -45,22 +45,40 @@ EOT
 
 # User specific environment and startup programs
 
-echo "Postbuild - Setting alias"
-# PATH=$PATH:$HOME/bin
-# export PATH
-# . /CWA/oracle/product/10.2.0/db_1/CWA_cwa-db.env
-alias sql='sqlplus / as sysdba'
-alias alert='cd /CWA/oracle/product/10.2.0/db_1/admin/CWA_base/bdump'
-alias scripts='cd /efs/stage/scripts'
+# echo "Postbuild - Setting up ntp"
+# /bin/cp -p -f /etc/ntp.conf /etc/ntp.conf.bck
+# sed -i "s/server 0.rhel.pool.ntp.org/server 169.254.169.123/g" /etc/ntp.conf
+# sed -i "s/server 1.rhel.pool.ntp.org/#server 1.rhel.pool.ntp.org/g" /etc/ntp.conf
+# sed -i "s/server 2.rhel.pool.ntp.org/#server 2.rhel.pool.ntp.org/g" /etc/ntp.conf
 
-echo "Postbuild - Setting up ntp"
-/bin/cp -p -f /etc/ntp.conf /etc/ntp.conf.bck
-sed -i "s/server 0.rhel.pool.ntp.org/server 169.254.169.123/g" /etc/ntp.conf
-sed -i "s/server 1.rhel.pool.ntp.org/#server 1.rhel.pool.ntp.org/g" /etc/ntp.conf
-sed -i "s/server 2.rhel.pool.ntp.org/#server 2.rhel.pool.ntp.org/g" /etc/ntp.conf
+# service ntpd start
+# chkconfig ntpd on
 
-service ntpd start
-chkconfig ntpd on
+## Install chrony to ensure database time is accurate, instead of ntpd
+echo "Postbuild - Installing chrony"
+yum -y install chrony
+cat <<EOT > /etc/chrony.conf
+server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4
+
+# Record the rate at which the system clock gains/losses time.
+driftfile /var/lib/chrony/drift
+
+# Enable kernel RTC synchronization.
+rtcsync
+
+# In first three updates step the system clock instead of slew
+# if the adjustment is larger than 1.0 seconds.
+makestep 1.0 3
+
+logdir /var/log/chrony
+
+# Select which information is logged
+log measurements statistics tracking
+EOT
+
+service chronyd start
+chkconfig chronyd on
+
 
 echo "Postbuild - Setting up oracle directories"
 /bin/cp -f /etc/cron.d/oracle_cron  /home/oracle/oraclecrontab.txt

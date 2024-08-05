@@ -93,6 +93,7 @@ EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
 echo "Update Slack alert URL for Oracle scripts"
+### TODO - Need to replace the scripts' Slack url with DB_SLACK_ALERT_URL first
 export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
 sed -i 's/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g' /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
 
@@ -104,6 +105,12 @@ cat <<EOT > /etc/cron.d/oracle_cron
 15 07 * * * /home/oracle/scripts/alert_rota.sh CWA 2>&1
 00 07 * * * /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/log/simple_cdc_check.log
 00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log
+00,15,30,45 07,08,09,10,11,12,13,14,15,16,17 * * 1-5 /home/oracle/scripts/scan_alert.sh >/home/oracle/scripts/log/scan_alert.log 2>&1
+00,30 07,08,09,10,11,12,13,14,15,16,17 * * 1-5  /home/oracle/scripts/mailer_check_1.sh >/tmp/check_workflow_mailer.trc  2>&1
+#00 07 * * * /home/oracle/scripts/space1.sh
+0,30 08-17 * * 1-5 /home/oracle/scripts/disk_space.sh DEV 94  >/tmp/disk_space.trc 2>&1
+00 07 * * * /home/oracle/scripts/tablespace1.sh
+
 EOT
 chmod 700 /etc/cron.d/oracle_cron
 
@@ -166,7 +173,7 @@ resource "aws_instance" "database" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
   }
