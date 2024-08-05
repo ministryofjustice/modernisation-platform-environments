@@ -54,13 +54,13 @@ BEGIN
     ALTER TABLE Users ADD NewId BIGINT IDENTITY(1,1);
 
     -- Step 3: Drop the old id column
-    ALTER TABLE Users DROP COLUMN id;
+    ALTER TABLE Users DROP COLUMN UserID;
 
     -- Step 4: Rename the new identity column to id
-    EXEC sp_rename 'Users.NewId', 'id', 'COLUMN';
+    EXEC sp_rename 'Users.NewId', 'UserID', 'COLUMN';
 
     -- Step 5: Recreate the primary key constraint
-    ALTER TABLE Users ADD CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (id);
+    ALTER TABLE Users ADD CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (UserID);
 END
 go
 
@@ -121,13 +121,13 @@ BEGIN
     -- Step 2: Add a new identity column
     ALTER TABLE Category ADD NewId BIGINT IDENTITY(1,1);
 
-    -- Step 3: Drop the old id column
-    ALTER TABLE Category DROP COLUMN id;
+    -- Step 3: Drop the old num column
+    ALTER TABLE Category DROP COLUMN num;
 
-    -- Step 4: Rename the new identity column to id
-    EXEC sp_rename 'Category.NewId', 'id', 'COLUMN';
+    -- Step 4: Rename the new identity column to num
+    EXEC sp_rename 'Category.NewId', 'num', 'COLUMN';
 
     -- Step 5: Recreate the primary key constraint
-    ALTER TABLE Category ADD CONSTRAINT PK_Category PRIMARY KEY CLUSTERED (id);
+    ALTER TABLE Category ADD CONSTRAINT PK_Category PRIMARY KEY CLUSTERED (num);
 END
 go
