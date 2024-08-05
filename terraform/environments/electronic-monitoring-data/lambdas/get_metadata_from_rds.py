@@ -69,6 +69,7 @@ def add_db_to_meta(meta, db_name):
     Database is currently down as dbo -
     reassign to actual DB Name
     """
+    meta.file_format = "parquet"
     meta.database_name = db_name
     return meta
 
