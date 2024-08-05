@@ -1,0 +1,15 @@
+---
+ingress:
+  enabled: true
+  className: "default"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production-http01
+  hosts:
+    - host: ${ollamate_hostname}
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: ollamate-tls
+      hosts:
+        - ${ollamate_hostname}
