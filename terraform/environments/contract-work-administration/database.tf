@@ -119,7 +119,6 @@ chmod 744 /home/oracle/oraclecrontab.txt
 su oracle -c "crontab /home/oracle/oraclecrontab.txt"
 chown -R oracle:dba /home/oracle/scripts
 
-
 ## Remove SSH key allowed
 echo "Removing old SSH key"
 sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
