@@ -9,7 +9,7 @@ locals {
   dms_repository_account_id = nonsensitive(try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null))
   # The accounts which may write to the DMS S3 bucket are all Audit Clients of the current environment (if it is itself a Repository),
   # or the Audit Repository for the current environment (if it is itself a Client).
-  dms_s3_writer_account_ids = concat(var.dms_config.client_account_ids,[local.dms_repository_account_id])
+  dms_s3_writer_account_ids = compact(concat(var.dms_config.client_account_ids,[local.dms_repository_account_id]))
   dms_s3_writer_role_name = "dms-s3-writer-role"
   dms_s3_repository_bucket = {
     prefix = try("${var.dms_config.audit_target_endpoint.write_environment}-dms-destination-bucket",null)
