@@ -76,7 +76,7 @@ resource "aws_iam_policy" "cwa" {
             "Action": [
                 "ssm:GetParameter"
             ],
-            "Resource": "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/SLACK_ALERT_URL"
+            "Resource": "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/*SLACK_ALERT_URL"
         },
         {
             "Action": [

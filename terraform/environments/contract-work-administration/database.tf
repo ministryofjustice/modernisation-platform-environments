@@ -69,6 +69,7 @@ echo "Updating /etc/hosts"
 sed -i '/${local.database_hostname}$/d' /etc/hosts
 sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
 sed -i '/${local.cm_hostname}$/d' /etc/hosts
+sed -i '/laa-oem-app$/d' /etc/hosts # This is removed for POC
 echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
 echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
 echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
@@ -81,7 +82,12 @@ sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_u
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
-echo "Set up AWS EBS backup"
+echo "Update Slack alert URL for Oracle scripts"
+### TODO - Need to replace the scripts' Slack url with DB_SLACK_ALERT_URL first
+export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+sed -i 's/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g' /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
+
+echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
 #!/bin/bash
@@ -92,12 +98,7 @@ cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
 EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
-echo "Update Slack alert URL for Oracle scripts"
-### TODO - Need to replace the scripts' Slack url with DB_SLACK_ALERT_URL first
-export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
-sed -i 's/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g' /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
-
-echo "Set up cron jobs"
+echo "Setting up cron jobs"
 cat <<EOT > /etc/cron.d/oracle_cron
 00 01 * * 0 /home/oracle/scripts/rman_backup.sh CWA /efs/cwa_rman > /tmp/rman_backup.log 2>&1
 00 07 * * 1-5 /home/oracle/scripts/freespace.sh >/home/oracle/scripts/log/freespace_CWA.trc 2>&1
@@ -113,6 +114,11 @@ cat <<EOT > /etc/cron.d/oracle_cron
 
 EOT
 chmod 700 /etc/cron.d/oracle_cron
+/bin/cp -f /etc/cron.d/oracle_cron  /home/oracle/oraclecrontab.txt
+chown oracle:oinstall /home/oracle/oraclecrontab.txt
+chmod 744 /home/oracle/oraclecrontab.txt
+su oracle -c "crontab /home/oracle/oraclecrontab.txt"
+chown -R oracle:dba /home/oracle/scripts
 
 
 ## Remove SSH key allowed

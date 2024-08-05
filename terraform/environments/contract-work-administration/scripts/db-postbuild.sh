@@ -80,13 +80,8 @@ service chronyd start
 chkconfig chronyd on
 
 
-echo "Postbuild - Setting up oracle directories"
-/bin/cp -f /etc/cron.d/oracle_cron  /home/oracle/oraclecrontab.txt
-chown oracle:dba /home/oracle/oraclecrontab.txt
-chmod 744 /home/oracle/oraclecrontab.txt
-su oracle -c "crontab /home/oracle/oraclecrontab.txt"
-chown -R oracle:dba /home/oracle/scripts
 
+echo "Postbuild - Setting up oracle directories"
 mkdir -p /efs/cwa_rman
 chmod 777 /efs/cwa_rman
 mkdir -p /home/oracle/backup_logs
