@@ -29,3 +29,4 @@ BEGIN
     -- Step 5: Recreate the primary key constraint
     ALTER TABLE Judgment ADD CONSTRAINT PK_Judgment PRIMARY KEY CLUSTERED (id);
 END
+go
