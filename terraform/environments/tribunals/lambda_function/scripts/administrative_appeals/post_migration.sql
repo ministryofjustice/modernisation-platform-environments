@@ -16,21 +16,16 @@ BEGIN
         SET @SQL = 'ALTER TABLE Judgment DROP CONSTRAINT ' + QUOTENAME(@ConstraintName);
         EXEC sp_executesql @SQL;
     END
-    go
 
     -- Step 2: Add a new identity column
     ALTER TABLE Judgment ADD NewId BIGINT IDENTITY(1,1);
-    go
 
     -- Step 3: Drop the old id column
     ALTER TABLE Judgment DROP COLUMN id;
-    go
 
     -- Step 4: Rename the new identity column to id
     EXEC sp_rename 'Judgment.NewId', 'id', 'COLUMN';
-    go
 
     -- Step 5: Recreate the primary key constraint
     ALTER TABLE Judgment ADD CONSTRAINT PK_Judgment PRIMARY KEY CLUSTERED (id);
 END
-go
