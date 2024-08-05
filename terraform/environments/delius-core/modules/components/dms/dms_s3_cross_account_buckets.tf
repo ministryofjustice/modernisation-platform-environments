@@ -1,4 +1,4 @@
-data "terraform_remote_state" "get_dms_s3_buckets" {
+data "terraform_remote_state" "get_dms_s3_bucket_info" {
   for_each = toset(var.delius_account_names)
   backend  = "s3"
   config   = {
@@ -9,13 +9,15 @@ data "terraform_remote_state" "get_dms_s3_buckets" {
 }
 
 locals {
-  dms_s3_bucket_list = [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_buckets[account_name].outputs.dms_s3_bucket_name,null) ]
+  dms_s3_bucket_list = [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_bucket_name,null) ]
 
-  dms_s3_bucket_info = merge([
+  dms_s3_cross_account_bucket_names = merge([
     for bucket_map in local.dms_s3_bucket_list : bucket_map
   ]...)
+
+  dms_s3_name_to_account_id_map = [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.aws_account_id,null) ]
+
+  dms_s3_role_exists = [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn,null) == null ? false : true ]
+
 }
 
-output "dms_s3_bucket_info" {
-  value = local.dms_s3_bucket_info
-}

@@ -14,4 +14,10 @@ locals {
     prefix = try("${var.dms_config.audit_target_endpoint.write_environment}-dms-destination-bucket",null)
     # account_id = try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null)
   }
+
+   dms_s3_bucket_info = {
+       dms_s3_bucket_name = {(var.env_name) = module.s3_bucket_dms_destination.bucket.bucket}
+       dms_s3_cross_account_bucket_names = local.dms_s3_cross_account_bucket_names
+       dms_s3_role_arn = aws_iam_role.dms_s3_writer_role.arn
+   }    
 }
