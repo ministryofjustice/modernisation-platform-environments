@@ -27,8 +27,5 @@ locals {
     standbydb2 = try(module.oracle_db_standby[1].oracle_db_server_name, "none")
   }
   
-  dms_s3_bucket_name = module.dms.dms_s3_bucket_name
-
   dms_s3_bucket_info = module.dms.dms_s3_bucket_info
-
 }

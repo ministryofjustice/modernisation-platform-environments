@@ -21,9 +21,8 @@ output "delius_account_names" {
   value = local.delius_account_names
 }
 
-output "dms_s3_bucket_name" {
- value = (
-   local.is-development ? module.environment_dev[0].dms_s3_bucket_name :
-     local.is-test ? module.environment_test[0].dms_s3_bucket_name :
-       local.is-preproduction ? module.environment_preprod[0].dms_s3_bucket_name : null )
+# Output the ID of this account so that we can reference it when 
+# reading the remote state file from another account
+output "aws_account_id" {
+  value = data.aws_caller_identity.current.account_id
 }
