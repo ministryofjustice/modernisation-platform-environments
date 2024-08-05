@@ -119,6 +119,10 @@ chmod 744 /home/oracle/oraclecrontab.txt
 su oracle -c "crontab /home/oracle/oraclecrontab.txt"
 chown -R oracle:dba /home/oracle/scripts
 
+cat <<EOT > /etc/cron.d/custom_cloudwatch_metrics
+#!/bin/bash
+*/1 * * * * root /var/cw-custom.sh > /dev/null 2>&1
+EOT
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
@@ -131,7 +135,7 @@ echo "Adding the custom metrics script for CloudWatch"
 /bin/cp -f /var/cw-custom.sh /var/cw-custom.sh.bak
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-cw-custom.sh /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
-# This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+# This script will be ran by the cron job in c
 
 EOF
 
