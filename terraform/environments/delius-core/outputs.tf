@@ -11,3 +11,8 @@ output "dms_s3_bucket_info" {
      local.is-test ? module.environment_test[0].dms_s3_bucket_info :
        local.is-preproduction ? module.environment_preprod[0].dms_s3_bucket_info : null )
 }
+
+output "dms_client_account_ids" {
+  value = local.dms_client_account_ids
+  sensitive = true
+}
