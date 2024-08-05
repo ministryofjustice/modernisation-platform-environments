@@ -28,10 +28,8 @@ def lambda_handler(event, context):
         statements = re.split(r'\bGO\b', script, flags=re.IGNORECASE)
         for statement in statements:
             if statement.strip():
-                # Check if the statement is a valid SQL command before executing
-                if statement.lower().startswith("if object_id"):
-                    cursor.execute(statement)
-                    conn.commit()
+                cursor.execute(statement)
+                conn.commit()
 
     # Closing the connection
     cursor.close()
