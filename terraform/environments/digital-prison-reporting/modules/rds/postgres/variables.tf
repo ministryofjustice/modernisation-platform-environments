@@ -68,6 +68,11 @@ variable "allocated_size" {
   default     = "10"
 }
 
+variable "ca_cert_identifier" {
+  description = "The identifier of the CA certificate for the DB instance"
+  type        = string
+  default     = null
+}
 
 variable "max_allocated_size" {
   type        = string

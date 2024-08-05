@@ -89,6 +89,7 @@ module "domain_builder_backend_db" {
   master_user        = local.rds_dbuilder_user
   storage_type       = local.rds_dbuilder_store_type
   parameter_group    = local.rds_dbuilder_parameter_group
+  ca_cert_identifier = "rds-ca-rsa2048-g1" # Updated on 29th July 2024
 
   tags = merge(
     local.all_tags,

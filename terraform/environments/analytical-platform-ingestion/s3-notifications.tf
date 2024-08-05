@@ -2,7 +2,7 @@ module "ingestion_landing_bucket_notification" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
-  version = "4.1.0"
+  version = "4.1.2"
 
   bucket = module.landing_bucket.s3_bucket_id
 
@@ -19,7 +19,7 @@ module "ingestion_transfer_bucket_notification" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
-  version = "4.1.0"
+  version = "4.1.2"
 
   bucket = module.processed_bucket.s3_bucket_id
 
@@ -36,7 +36,7 @@ module "ingestion_quarantine_bucket_notification" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
-  version = "4.1.0"
+  version = "4.1.2"
 
   bucket = module.quarantine_bucket.s3_bucket_id
 

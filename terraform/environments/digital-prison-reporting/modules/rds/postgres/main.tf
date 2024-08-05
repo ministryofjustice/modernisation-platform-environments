@@ -53,6 +53,7 @@ resource "aws_db_instance" "default" {
   apply_immediately       = true
   allocated_storage       = var.allocated_size
   max_allocated_storage   = var.max_allocated_size
+  ca_cert_identifier      = var.ca_cert_identifier
   tags = merge(
     var.tags,
     {

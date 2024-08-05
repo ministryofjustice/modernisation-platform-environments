@@ -66,11 +66,11 @@ resource "aws_s3_object" "rds_to_s3_parquet_migration" {
   etag   = filemd5("glue-job/rds_to_s3_parquet_migration.py")
 }
 
-resource "aws_s3_object" "compacting_small_files" {
+resource "aws_s3_object" "resizing_parquet_files" {
   bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-  key    = "compacting_small_files.py"
-  source = "glue-job/compacting_small_files.py"
-  etag   = filemd5("glue-job/compacting_small_files.py")
+  key    = "resizing_parquet_files.py"
+  source = "glue-job/resizing_parquet_files.py"
+  etag   = filemd5("glue-job/resizing_parquet_files.py")
 }
 
 resource "aws_s3_object" "create_or_replace_dv_table" {
@@ -110,8 +110,8 @@ resource "aws_cloudwatch_log_group" "rds_to_s3_parquet_migration" {
   retention_in_days = 14
 }
 
-resource "aws_cloudwatch_log_group" "compacting_small_files" {
-  name              = "compacting-small-files"
+resource "aws_cloudwatch_log_group" "resizing_parquet_files" {
+  name              = "resizing-parquet-files"
   retention_in_days = 14
 }
 # -------------------------------------------------------------------
@@ -233,62 +233,6 @@ EOF
 }
 
 
-resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
-  name              = "rds-to-s3-parquet-migration-monthly"
-  description       = "Table migration Glue-Job (PySpark)."
-  role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
-  glue_version      = "4.0"
-  worker_type       = "G.1X"
-  number_of_workers = 5
-  default_arguments = {
-    "--script_bucket_name"               = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
-    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
-    "--rds_sqlserver_db"                 = ""
-    "--rds_sqlserver_db_schema"          = "dbo"
-    "--rds_sqlserver_db_table"           = ""
-    "--rds_query_where_clause"           = ""
-    "--rds_db_tbl_pkeys_col_list"        = ""
-    "--date_partition_column_name"       = ""
-    "--other_partitionby_columns"        = ""
-    "--default_jdbc_read_partition_num"  = 1
-    "--rds_df_repartition_num"           = 0
-    "--coalesce_int"                     = 1
-    "--rename_migrated_prq_tbl_folder"   = ""
-    "--year_partition_bool"              = "false"
-    "--month_partition_bool"             = "false"
-    "--rds_to_parquet_output_s3_bucket"  = aws_s3_bucket.dms_target_ep_s3_bucket.id
-    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.rds_to_s3_parquet_migration.name}"
-    "--enable-continuous-cloudwatch-log" = "true"
-    "--enable-continuous-log-filter"     = "true"
-    "--enable-metrics"                   = "true"
-    "--enable-auto-scaling"              = "true"
-    "--conf"                             = <<EOF
-spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
---conf spark.sql.sources.partitionOverwriteMode=dynamic
---conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.sql.shuffle.partitions=2001 
-EOF
-
-  }
-
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
-  command {
-    python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/rds_to_s3_parquet_migration_monthly.py"
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
-    }
-  )
-
-}
-
-
-
 resource "aws_glue_job" "rds_to_s3_parquet_migration" {
   name              = "rds-to-s3-parquet-migration"
   description       = "Table migration & validation Glue-Job (PySpark)."
@@ -333,9 +277,8 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--enable-auto-scaling"                  = "true"
     "--conf"                                 = <<EOF
 spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
---conf spark.sql.sources.partitionOverwriteMode=dynamic
+--conf spark.sql.sources.partitionOverwriteMode=dynamic 
 --conf spark.sql.parquet.aggregatePushdown=true 
---conf spark.sql.shuffle.partitions=2001 
 --conf spark.sql.files.maxPartitionBytes=256m 
 EOF
 
@@ -357,8 +300,63 @@ EOF
 }
 
 
-resource "aws_glue_job" "compacting_small_files" {
-  name              = "compacting-small-files"
+
+resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
+  name              = "rds-to-s3-parquet-migration-monthly"
+  description       = "Table migration Glue-Job (PySpark)."
+  role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 5
+  default_arguments = {
+    "--script_bucket_name"               = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
+    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+    "--rds_sqlserver_db"                 = ""
+    "--rds_sqlserver_db_schema"          = "dbo"
+    "--rds_sqlserver_db_table"           = ""
+    "--rds_query_where_clause"           = ""
+    "--rds_db_tbl_pkeys_col_list"        = ""
+    "--date_partition_column_name"       = ""
+    "--other_partitionby_columns"        = ""
+    "--default_jdbc_read_partition_num"  = 1
+    "--rds_df_repartition_num"           = 0
+    "--coalesce_int"                     = 0
+    "--rename_migrated_prq_tbl_folder"   = ""
+    "--year_partition_bool"              = "false"
+    "--month_partition_bool"             = "false"
+    "--rds_to_parquet_output_s3_bucket"  = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.rds_to_s3_parquet_migration.name}"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = "true"
+    "--enable-auto-scaling"              = "true"
+    "--conf"                             = <<EOF
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.sources.partitionOverwriteMode=dynamic 
+--conf spark.sql.parquet.aggregatePushdown=true 
+EOF
+
+  }
+
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  command {
+    python_version  = "3"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/rds_to_s3_parquet_migration_monthly.py"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
+}
+
+
+resource "aws_glue_job" "resizing_parquet_files" {
+  name              = "resizing-parquet-files"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
   glue_version      = "4.0"
@@ -367,26 +365,31 @@ resource "aws_glue_job" "compacting_small_files" {
   default_arguments = {
     "--script_bucket_name"               = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
     "--s3_prq_read_db_folder"            = ""
-    "--s3_prq_read_db_schema_folder"     = ""
+    "--s3_prq_read_db_schema_folder"     = "dbo"
     "--s3_prq_read_table_folder"         = ""
     "--s3_prq_write_table_folder"        = ""
     "--primarykey_column"                = ""
-    "--year_int"                         = 0
-    "--month_int"                        = 0
+    "--date_partition_column"            = ""
+    "--s3_prq_read_where_clause"         = ""
+    "--year_int_filter"                  = 0
+    "--month_int_filter"                 = 0
     "--prq_df_repartition_int"           = 0
-    "--coalesce_int"                     = 1
+    "--coalesce_int"                     = 0
+    "--year_bool_partition"              = "true"
+    "--month_bool_partition"             = "true"
+    "--day_bool_partition"               = "false"
     "--s3_prq_read_bucket_name"          = aws_s3_bucket.dms_target_ep_s3_bucket.id
     "--s3_prq_write_bucket_name"         = aws_s3_bucket.dms_target_ep_s3_bucket.id
-    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.compacting_small_files.name}"
+    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.resizing_parquet_files.name}"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
     "--enable-metrics"                   = "true"
     "--enable-auto-scaling"              = "true"
     "--conf"                             = <<EOF
 spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
---conf spark.sql.sources.partitionOverwriteMode=dynamic
---conf spark.sql.parquet.aggregatePushdown=true
---conf spark.sql.files.maxPartitionBytes=256m 
+--conf spark.sql.sources.partitionOverwriteMode=dynamic 
+--conf spark.sql.parquet.aggregatePushdown=true 
+--conf spark.sql.files.maxPartitionBytes=512m 
 EOF
 
   }
@@ -394,7 +397,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/compacting_small_files.py"
+    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/resizing_parquet_files.py"
   }
 
   tags = merge(

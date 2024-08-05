@@ -9,7 +9,7 @@
     "s3BucketName": "",
     "s3KeyPrefix": "",
     "s3EncryptionEnabled": false,
-    "idleSessionTimeout": "40",
+    "idleSessionTimeout": "60",
     "kmsKeyId": "",
     "runAsEnabled": false,
     "runAsDefaultUser": "",

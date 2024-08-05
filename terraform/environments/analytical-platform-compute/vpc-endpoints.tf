@@ -120,6 +120,9 @@ module "vpc_endpoints" {
       )
     },
     /* Gateways */
+    /*
+      Removing the S3 VPC endpoint while we investigate how APC Airflow workloads can do cross-region actions.
+      Destination buckets are in eu-west-1.
     s3 = {
       service      = "s3"
       service_type = "Gateway"
@@ -133,6 +136,7 @@ module "vpc_endpoints" {
         { Name = format("%s-s3", module.vpc.name) }
       )
     }
+    */
   }
 
   tags = local.tags
