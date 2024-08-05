@@ -11,13 +11,13 @@ resource "random_string" "db-master-pass-string" {
 }
 
 resource "aws_secretsmanager_secret" "db-master-password" {
-  name        = "${local.application_name}/app/db-master-password-"
+  name        = "${local.application_name}/app/db-master-password"
   description = "EDW DB EC2 Root Password"
 
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-db-master-password"
+      Name = "${local.application_name}-db-master-password-"
     }
   )
 }

@@ -12,6 +12,7 @@ locals {
     "--dpr.operational.data.store.glue.connection.name"       = aws_glue_connection.glue_operational_datastore_connection.name
     "--dpr.operational.data.store.loading.schema.name"        = "loading"
     "--dpr.operational.data.store.tables.to.write.table.name" = "configuration.datahub_managed_tables"
+    "--dpr.operational.data.store.jdbc.batch.size"            = 5000
   } : {})
 }
 
@@ -1098,6 +1099,10 @@ module "datamart" {
     wlm_json_configuration = {
       name  = "wlm_json_configuration"
       value = jsonencode(jsondecode(file("./datamart-redshift-wlm.json")))
+    },
+    enable_user_activity_logging = {
+      name  = "enable_user_activity_logging"
+      value = "true"
     }
   }
 

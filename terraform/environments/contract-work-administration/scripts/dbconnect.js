@@ -1,13 +1,16 @@
 /////////////////////////////////////////////////////////////////////
-// CWA automated backup script
+// CWA Automated backup script
 // - Makes call to lambda which connects to EC2 instance and put
 //   DB in backup mode
 // - Call Oracle SQL scripts as Oracle user
 //
-//   version: 1.0 (for migration to MP)
+//   version: 2.0 (for migration to MP)
+//   - Using ssh2 instead of simple-ssh package to allow for
+//     kex algorithm specified
+//
 /////////////////////////////////////////////////////////////////////
 
-const SSH = require("simple-ssh");
+const { Client } = require('ssh2');
 const AWS = require("aws-sdk");
 
 //SSM object with temp parms
@@ -17,30 +20,15 @@ const ssm = new AWS.SSM({ apiVersion: "2014-11-06" });
 const pem = "EC2_SSH_KEY";
 const username = "ec2-user";
 
-//Set date format
-var today = new Date();
-var dd = today.getDate();
-var mm = today.getMonth() + 1;
-var yyyy = today.getFullYear();
-
-if (dd < 10) {
-  dd = "0" + dd;
-}
-
-if (mm < 10) {
-  mm = "0" + mm;
-}
-today = dd + "-" + mm + "-" + yyyy;
-
 //EC2 object
 let ec2 = new AWS.EC2({ apiVersion: "2014-10-31" });
 
-//Get private IP address for EC2 instances tagged with Name:{ appname }
+// Get private IP address for EC2 instances tagged with Name:{ appname } that are running
 // May return more than 1 instance if there are multiple instances with the same name
 async function getInstances(appname) {
   console.log("Getting all instances tagged with Name:", appname);
   return ec2
-    .describeInstances({ Filters: [{ Name: "tag:Name", Values: [appname] }] })
+    .describeInstances({ Filters: [{ Name: "tag:Name", Values: [appname] }, {Name: "instance-state-name", Values: ["running"]}]})
     .promise();
 }
 
@@ -63,102 +51,126 @@ async function getSSMparam() {
   return await ssm.getParameter({ Name: pem, WithDecryption: true }).promise();
 }
 
-// Trigger SSH connection to the EC2 instance
-// Run SSH command
+///////////////////////////////////////
+
 
 async function connSSH(action, appname) {
-  //get ssm key
   const key = await getSSMparam();
-
   const myKey = key["Parameter"]["Value"];
-
   const addresses = await getIPaddress(appname);
-  // all this config could be passed in via the event
+  var exec_error = false;
   for(var address of addresses){
-    const ssh = new SSH({
-      host: address,
-      port: 22,
-      user: username,
-      key: myKey,
-    });
-
     let prom = new Promise(function (resolve, reject) {
       if (action == "begin") {
         console.log("[+] Trying connecting to EC2 ==>> " + address);
+        const conn = new Client();
+        console.log(`[+] Running "begin backup commands" as Oracle`);
+        conn.on('ready', () => {
+          console.log('Client :: ready');
+          conn.exec('sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
+          "\n" +
+          "alter system switch logfile;" +
+          "\n" +
+          "alter system switch logfile;" +
+          "\n" +
+          "alter database begin backup;" +
+          "\n" +
+          "exit;" +
+          "\n" +
+          'EOFUM"',
+          {
+            pty: true
+          },
+          (err, stream) => {
+            if (err) {
+              reject(err);
+            }  
+            stream.on('close', (code, signal) => {
+              conn.end();
+              console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
+              setTimeout(() => {  resolve(); }, 2000); // Ugly solution to wait until the ssh socket closes before resolving...
+            }).on('data', (data) => {
+              console.log('STDOUT: ' + data);
+              if (data.toString().toUpperCase().includes("ERROR")) exec_error = true;
+            }).stderr.on('data', (data) => {
+              console.log('STDERR: ' + data);
+              if (data.toString().toUpperCase().includes("ERROR")) exec_error = true;
+            })
+            ;
+          });
+        }).connect({
+          host: address,
+          port: 22,
+          username: username,
+          privateKey: myKey,
+          // debug: console.log, // Uncomment to get more detailed logs
+          algorithms: {
+            kex: ["diffie-hellman-group1-sha1"]
+          }
+        });
+      } else if (action == "end"){
+        console.log("[+] Trying connecting to EC2 ==>> " + address);
         console.log(`[+] Running "begin backup commands" as Oracle`);
 
-        ssh
-          .exec(
-            'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
-              "\n" +
-              "alter system switch logfile;" +
-              "\n" +
-              "alter system switch logfile;" +
-              "\n" +
-              "alter database begin backup;" +
-              "\n" +
-              "exit;" +
-              "\n" +
-              'EOFUM"',
-            {
-              pty: true,
-              out: console.log.bind(console),
-              exit: function (code, stdout, stderr) {
-                console.log("operation exited with code: " + code);
-                console.log("standard output: " + stdout);
-                console.log("standard error: " + stderr);
-                if (code == 0) {
-                  resolve();
-                } else {
-                  reject();
-                }
-              },
-            }
-          )
-          .start();
-      } else if (action == "end"){
-        console.log(`[+] Running "end backup commands" as Oracle`);
-
-        ssh
-          .exec(
-            'sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
-              "\n" +
-              "alter database end backup;" +
-              "\n" +
-              "alter system switch logfile;" +
-              "\n" +
-              "alter system switch logfile;" +
-              "\n" +
-              "exit;" +
-              "\n" +
-              'EOFUM"',
-            {
-              pty: true,
-              out: console.log.bind(console),
-              exit: function (code, stdout, stderr) {
-                console.log("operation exited with code: " + code);
-                console.log("standard output: " + stdout);
-                console.log("standard error: " + stderr);
-                if (code == 0) {
-                  resolve();
-                } else {
-                  reject();
-                }
-              },
-            }
-          )
-          .start();
+        const conn = new Client();
+        conn.on('ready', () => {
+          console.log('Client :: ready');
+          conn.exec('sudo su - oracle -c "sqlplus / as sysdba <<EOFUM' +
+          "\n" +
+          "alter database end backup;" +
+          "\n" +
+          "alter system switch logfile;" +
+          "\n" +
+          "alter system switch logfile;" +
+          "\n" +
+          "exit;" +
+          "\n" +
+          'EOFUM"',
+          {
+            pty: true
+          },
+          (err, stream) => {
+            if (err) {
+              reject(err);
+            }  
+            stream.on('close', (code, signal) => {
+              conn.end();
+              console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
+              setTimeout(() => {  resolve(); }, 2000); // Ugly solution to wait until the ssh socket closes before resolving...
+            }).on('data', (data) => {
+              console.log('STDOUT: ' + data);
+              if (data.toString().toUpperCase().includes("ERROR")) exec_error = true;
+            }).stderr.on('data', (data) => {
+              console.log('STDERR: ' + data);
+              if (data.toString().toUpperCase().includes("ERROR")) exec_error = true;
+            })
+            ;
+          });
+        }).connect({
+          host: address,
+          port: 22,
+          username: username,
+          privateKey: myKey,
+          // debug: console.log, // Uncomment to get more detailed logs
+          algorithms: {
+            kex: ["diffie-hellman-group1-sha1"]
+          }
+        });
       }
     });
     try {
       await prom;
-      ssh.end();
+      console.log('EXEC_ERROR: ' + exec_error);
+      if (exec_error) {
+        throw new Error('Please see logs above for more detail.')
+      }
       console.log(`[+] Completed DB alter state: ${action} ==>> ` + address);
     } catch (e) {
-      throw new Error("SSH Exec did not run successfully on the database. " + e);
+      throw new Error(`SSH Exec did not run successfully on the instance ${address}: ` + e );
     }
   }
 }
+
 
 exports.handler = async (event, context) => {
   try {

@@ -6,6 +6,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring,
@@ -26,7 +27,6 @@ locals {
         instance_type                = "t3.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = true
         vpc_security_group_ids       = ["ndh_app"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -58,6 +58,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
       )
@@ -77,7 +78,6 @@ locals {
         instance_type                = "t3.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = true
         vpc_security_group_ids       = ["ndh_ems"]
         tags = {
           backup-plan = "daily-and-weekly"
@@ -109,6 +109,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
       )
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2023-*"
@@ -135,7 +136,6 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        monitoring                   = false
         vpc_security_group_ids       = ["management_server"]
         tags = {
           backup-plan = "daily-and-weekly"

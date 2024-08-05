@@ -2,6 +2,12 @@ locals {
 
   ec2_instances = {
     rdgw = {
+      cloudwatch_metric_alarms = merge(
+        module.baseline_presets.cloudwatch_metric_alarms.ec2,
+        # TODO: enable below once CWAgent configured
+        # module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        # module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+      )
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2024-01-16T09-48-13.663Z"
         availability_zone             = "eu-west-2a"
@@ -42,6 +48,12 @@ locals {
     }
 
     rds = {
+      cloudwatch_metric_alarms = merge(
+        module.baseline_presets.cloudwatch_metric_alarms.ec2,
+        # TODO: enable below once CWAgent configured
+        # module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        # module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+      )
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2024-01-16T09-48-13.663Z"
         availability_zone             = "eu-west-2a"

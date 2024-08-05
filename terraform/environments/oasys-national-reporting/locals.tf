@@ -40,26 +40,16 @@ locals {
       enable_image_builder                       = true
       enable_s3_bucket                           = true
       enable_s3_shared_bucket                    = true
-      iam_policies_filter                        = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
-      iam_policies_ec2_default                   = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
       s3_iam_policies                            = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }
 
   baseline_all_environments = {
-    cloudwatch_log_groups = local.ssm_doc_cloudwatch_log_groups
-    iam_policies = {
-      SSMPolicy = {
-        description = "Policy to allow ssm actions"
-        statements = [{
-          effect = "Allow"
-          actions = [
-            "ssm:SendCommand"
-          ]
-          resources = ["*"]
-        }]
-      }
+    options = {
+      enable_resource_explorer = true
     }
-    security_groups = local.security_groups
+
+    cloudwatch_log_groups = local.ssm_doc_cloudwatch_log_groups
+    security_groups       = local.security_groups
   }
 }

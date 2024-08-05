@@ -23,8 +23,12 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
-        subnet_name   = "private"
-        user_data_raw = module.baseline_presets.ec2_instance.user_data_raw["user-data-pwsh"]
+        subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }

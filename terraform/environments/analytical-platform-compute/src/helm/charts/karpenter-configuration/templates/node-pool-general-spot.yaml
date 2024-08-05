@@ -4,6 +4,9 @@ kind: NodePool
 metadata:
   name: general-spot
 spec:
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
   template:
     metadata:
       labels:

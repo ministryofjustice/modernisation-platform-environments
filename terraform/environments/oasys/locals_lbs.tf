@@ -4,17 +4,19 @@ locals {
     public = {
       access_logs              = true
       enable_delete_protection = false
-      idle_timeout             = 3600 # 60 is default
+      idle_timeout             = 240
       internal_lb              = false
       force_destroy_bucket     = true
+      s3_versioning            = false
       security_groups          = ["public_lb"]
       subnets                  = module.environment.subnets["public"].ids
 
       listeners = {
         https = {
-          port       = 443
-          protocol   = "HTTPS"
-          ssl_policy = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].lb
+          port                     = 443
+          protocol                 = "HTTPS"
+          ssl_policy               = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
           default_action = {
             type = "fixed-response"
@@ -39,9 +41,10 @@ locals {
 
       listeners = {
         https = {
-          port       = 443
-          protocol   = "HTTPS"
-          ssl_policy = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].lb
+          port                     = 443
+          protocol                 = "HTTPS"
+          ssl_policy               = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
           default_action = {
             type = "fixed-response"

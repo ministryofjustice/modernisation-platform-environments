@@ -12,14 +12,13 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.317.0"
+  version    = "2.318.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        replicaCount         = 5
         github_organisation  = "moj-analytical-services"
         github_repository    = "create-a-derived-table"
         github_token         = data.aws_secretsmanager_secret_version.actions_runners_create_a_derived_table[0].secret_string
@@ -36,14 +35,13 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-dpr"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.317.0"
+  version    = "2.318.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        replicaCount         = 1
         github_organisation  = "moj-analytical-services"
         github_repository    = "create-a-derived-table"
         github_token         = data.aws_secretsmanager_secret_version.actions_runners_create_a_derived_table[0].secret_string
@@ -68,19 +66,48 @@ resource "helm_release" "actions_runner_mojas_airflow" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.317.0-3"
+  version    = "2.318.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow/values.yml.tftpl",
       {
-        replicaCount         = 5
         github_organisation  = "moj-analytical-services"
         github_repository    = "airflow"
         github_token         = data.aws_secretsmanager_secret_version.actions_runners_airflow[0].secret_string
         github_runner_labels = "analytical-platform"
         eks_role_arn         = "arn:aws:iam::593291632749:role/data-iam-creator"
+      }
+    )
+  ]
+}
+
+/* airflow-create-a-pipeline */
+
+data "aws_secretsmanager_secret_version" "actions_runners_airflow_create_a_pipeline" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  secret_id = module.actions_runners_airflow_create_a_pipeline_secret[0].secret_id
+}
+
+resource "helm_release" "actions_runner_mojas_airflow_create_a_pipeline" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
+  name       = "actions-runner-mojas-airflow-create-a-pipeline"
+  repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
+  version    = "2.318.0"
+  chart      = "actions-runner"
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/actions-runners/airflow-create-a-pipeline/values.yml.tftpl",
+      {
+        github_organisation  = "moj-analytical-services"
+        github_repository    = "airflow-create-a-pipeline"
+        github_token         = data.aws_secretsmanager_secret_version.actions_runners_airflow_create_a_pipeline[0].secret_string
+        github_runner_labels = "analytical-platform"
       }
     )
   ]

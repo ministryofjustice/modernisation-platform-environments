@@ -4,6 +4,7 @@ locals {
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_hmpps_domain ? ["HmppsDomainSecretsPolicy"] : [],
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
+    var.options.enable_image_builder ? ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_delius_dba_secrets_access ? ["DeliusDbaSecretsPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
@@ -11,24 +12,9 @@ locals {
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_vmimport ? ["vmimportPolicy"] : [],
-    var.options.iam_policies_filter,
     "EC2Default",
     "EC2Db",
   ]))
-
-  # for adding policies - be careful not to run into the limit
-  iam_policies_ec2_default = flatten([
-    "EC2Default",
-    var.options.enable_ec2_reduced_ssm_policy ? [] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
-    var.options.iam_policies_ec2_default,
-  ])
-
-  # for adding policies - be careful not to run into the limit
-  iam_policies_ec2_db = flatten([
-    "EC2Db",
-    var.options.enable_ec2_reduced_ssm_policy ? [] : ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
-    var.options.iam_policies_ec2_default,
-  ])
 
   iam_policy_statements_in_ec2_default = flatten([
     var.options.enable_business_unit_kms_cmks ? local.iam_policy_statements_ec2.business_unit_kms_cmk : [],
@@ -92,14 +78,6 @@ locals {
 
     # see corresponding policy in core-shared-services-production
     # https://github.com/ministryofjustice/modernisation-platform-ami-builds/blob/main/modernisation-platform/iam.tf
-    ImageBuilderS3BucketReadOnlyAccessPolicy = {
-      description = "Permissions to access shared ImageBuilder bucket read-only"
-      statements  = local.iam_policy_statements_ec2.S3ReadShared
-    }
-    ImageBuilderS3BucketWriteAccessPolicy = {
-      description = "Permissions to access shared ImageBuilder bucket read-write"
-      statements  = local.iam_policy_statements_ec2.S3ReadSharedWriteLimited
-    }
     ImageBuilderS3BucketWriteAndDeleteAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-write-delete"
       statements  = local.iam_policy_statements_ec2.S3ReadSharedWriteDelete

@@ -13,6 +13,7 @@ locals {
         threshold           = "85"
         alarm_description   = "Triggers if free inodes falls below the threshold for an hour"
         alarm_actions       = ["dso_pagerduty"]
+        ok_actions          = ["dso_pagerduty"]
       }
     }
   }
@@ -22,6 +23,7 @@ locals {
     db = merge(
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_or_cwagent_stopped_linux,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
       local.cloudwatch_metric_alarms_additional.ec2,
@@ -50,6 +52,7 @@ locals {
     bip = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
       local.cloudwatch_metric_alarms_additional.ec2,

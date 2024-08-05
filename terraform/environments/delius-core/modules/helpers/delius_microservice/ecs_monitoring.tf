@@ -3,7 +3,7 @@ locals {
   cluster_name = split("/", var.ecs_cluster_arn)[1]
 }
 
-# Alarm for high CPU usage
+# Alarm for critical CPU usage
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_critical_threshold" {
   alarm_name          = "${var.name}-${var.env_name}-ecs-cpu-critical-threshold"
   alarm_description   = "Triggers alarm if ECS CPU crosses a critical threshold"
@@ -24,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_critical_threshold" {
   }
 }
 
-# Alarm for high memory usage
+# Alarm for critical memory usage
 resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_critical_threshold" {
   alarm_name          = "${var.name}-${var.env_name}-ecs-memory-critical-threshold"
   alarm_description   = "Triggers alarm if ECS memory crosses a critical threshold"
@@ -46,75 +46,45 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_critical_threshold" {
 
 }
 
-# Alarm for high CPU usage anomaly detection
-resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_threshold" {
+# Alarm for warning CPU usage
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_warning_threshold" {
   alarm_name          = "${var.name}-${var.env_name}-ecs-cpu-threshold"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
-  actions_enabled     = true
+  namespace           = "AWS/ECS"
+  metric_name         = "MemoryUtilization"
+  statistic           = "Average"
+  period              = "60"
+  evaluation_periods  = "5"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  evaluation_periods  = 5
-  datapoints_to_alarm = 5
-  threshold_metric_id = "ad1"
-  comparison_operator = "GreaterThanUpperThreshold"
+  threshold           = "80"
   treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
 
-  metric_query {
-    id          = "m1"
-    return_data = true
-    metric {
-      namespace   = "AWS/ECS"
-      metric_name = "CPUUtilization"
-      dimensions = {
-        ServiceName = var.name
-        ClusterName = local.cluster_name
-      }
-      period = 60
-      stat   = "Average"
-    }
-  }
-
-  metric_query {
-    id          = "ad1"
-    label       = "CPUUtilization (expected)"
-    return_data = true
-    expression  = "ANOMALY_DETECTION_BAND(m1, ${var.ecs_monitoring_anomaly_detection_thresholds.cpu})"
+  dimensions = {
+    ServiceName = var.name
+    ClusterName = local.cluster_name
   }
 }
 
-# Alarm for high memory usage anomaly detection
-resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_threshold" {
+# Alarm for warning memory usage
+resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_warning_threshold" {
   alarm_name          = "${var.name}-${var.env_name}-ecs-memory-threshold"
   alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
-  actions_enabled     = true
+  namespace           = "AWS/ECS"
+  metric_name         = "CPUUtilization"
+  statistic           = "Average"
+  period              = "60"
+  evaluation_periods  = "5"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
-  evaluation_periods  = 5
-  datapoints_to_alarm = 5
-  threshold_metric_id = "ad1"
-  comparison_operator = "GreaterThanUpperThreshold"
+  threshold           = "80"
   treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
 
-  metric_query {
-    id          = "m1"
-    return_data = true
-    metric {
-      namespace   = "AWS/ECS"
-      metric_name = "MemoryUtilization"
-      dimensions = {
-        ServiceName = var.name
-        ClusterName = local.cluster_name
-      }
-      period = 60
-      stat   = "Average"
-    }
-  }
-
-  metric_query {
-    id          = "ad1"
-    label       = "MemoryUtilization (expected)"
-    return_data = true
-    expression  = "ANOMALY_DETECTION_BAND(m1, ${var.ecs_monitoring_anomaly_detection_thresholds.memory})"
+  dimensions = {
+    ServiceName = var.name
+    ClusterName = local.cluster_name
   }
 }
 

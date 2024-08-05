@@ -2,11 +2,18 @@ locals {
   cm_userdata = <<EOF
 #!/bin/bash
 
+mkdir /userdata
+echo "Running prerequisite steps to set up instance..."
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-prereqs.sh /userdata/prereqs.sh
+chmod 700 /userdata/prereqs.sh
+. /userdata/prereqs.sh
+
 echo "Setting host name"
 hostname ${local.cm_hostname}
 echo "${local.cm_hostname}" > /etc/hostname
 sed -i '/^HOSTNAME/d' /etc/sysconfig/network
 echo "HOSTNAME=${local.cm_hostname}" >> /etc/sysconfig/network
+/etc/init.d/network restart
 
 echo "Getting IP Addresses for /etc/hosts"
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
@@ -21,19 +28,28 @@ do
 done
 
 echo "Updating /etc/hosts"
-sed -i '/cwa-db$/d' /etc/hosts
-sed -i '/cwa-app1$/d' /etc/hosts
-sed -i '/cwa-app2$/d' /etc/hosts
+sed -i '/${local.database_hostname}$/d' /etc/hosts
+sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
+sed -i '/${local.cm_hostname}$/d' /etc/hosts
 echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
 echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
 echo "$PRIVATE_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
 
-## Mounting to EFS - uncomment when AMI has been applied
-echo "Updating /etc/fstab"
-sed -i '/^fs-/d' /etc/fstab
-sed -i '/^s3fs/d' /etc/fstab
-echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "Updating /etc/fstab file and mount"
+cat <<EOT > /etc/fstab
+/dev/VolGroup00/LogVol00        /       ext3    defaults        1 1
+LABEL=/boot     /boot   ext3    defaults        1 2
+tmpfs   /dev/shm        tmpfs   defaults        0 0
+devpts  /dev/pts        devpts  gid=5,mode=620  0 0
+sysfs   /sys    sysfs   defaults        0 0
+proc    /proc   proc    defaults        0 0
+/dev/VolGroup00/LogVol01        swap    swap    defaults        0 0
+/dev/xvdf /CWA/app ext4 defaults 0 0
+${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
+${local.database_hostname}:/CWA/share /CWA/share nfs rw,nolock 0 0
+EOT
+
 mount -a
 mount_status=$?
 while [[ $mount_status != 0 ]]
@@ -42,6 +58,40 @@ do
   mount -a
   mount_status=$?
 done
+
+echo "Updating /etc/rc.local file"
+## Note this will keep appending to the file, like the set up in LZ
+echo "Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
+export DISPLAY=${local.cm_hostname}:0.0
+twm &
+xhost +" >> /etc/rc.local
+
+echo "Running postbuild steps to set up instance..."
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
+chmod 700 /userdata/postbuild.sh
+sed -i 's/. \/CWA\/app\/appl\/APPSCWA_SERVER_HOSTNAME.env/. \/CWA\/app\/appl\/APPSCWA_${local.cm_hostname}.env/g' /userdata/postbuild.sh
+sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
+. /userdata/postbuild.sh
+
+echo "mp-${local.environment}" > /etc/cwaenv
+sed -i '/^PS1=/d' /etc/bashrc
+printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
+
+echo "Setting up crontab for applmgr"
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-disk-space-alert.sh /home/applmgr/scripts/disk_space.sh
+chown applmgr /home/applmgr/scripts/disk_space.sh
+chgrp oinstall /home/applmgr/scripts/disk_space.sh
+chmod 744 /home/applmgr/scripts/disk_space.sh
+
+export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+
+cat <<EOT > /home/applmgr/applmgrcrontab.txt
+0 07 * * 1-5 /home/applmgr/scripts/purge_apache_logs.sh 60 >/tmp/purge_apache_logs.trc 2>&1
+0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} $SLACK_ALERT_URL >/tmp/disk_space.trc 2>&1
+EOT
+chown applmgr:applmgr /home/applmgr/applmgrcrontab.txt
+chmod 744 /home/applmgr/applmgrcrontab.txt
+su applmgr -c "crontab /home/applmgr/applmgrcrontab.txt"
 
 ## Update the send mail url
 echo "Updating the sendmail config"
@@ -95,7 +145,7 @@ resource "aws_instance" "concurrent_manager" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.cm_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
   }
