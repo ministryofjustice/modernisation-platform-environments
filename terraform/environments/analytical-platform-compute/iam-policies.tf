@@ -245,6 +245,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     resources = ["*"]
   }
 }
+
 module "analytical_platform_lake_formation_share_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
