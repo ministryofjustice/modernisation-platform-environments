@@ -37,8 +37,6 @@ mlflow:
           key:  postgres_connection_string
     - name: "MLFLOW_SERVER_DEFAULT_ARTIFACT_ROOT"
       value: "s3://${s3_bucket_name}/tracking"
-    - name: "MLFLOW_SERVER_DEV_MODE"
-      value: "true"
 
 securityContext:
   allowPrivilegeEscalation: false
