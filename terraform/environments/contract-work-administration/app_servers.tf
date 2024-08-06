@@ -2,11 +2,18 @@ locals {
   app_userdata = <<EOF
 #!/bin/bash
 
+mkdir /userdata
+echo "Running prerequisite steps to set up instance..."
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-prereqs.sh /userdata/prereqs.sh
+chmod 700 /userdata/prereqs.sh
+. /userdata/prereqs.sh
+
 echo "Setting host name"
 hostname ${local.appserver1_hostname}
 echo "${local.appserver1_hostname}" > /etc/hostname
 sed -i '/^HOSTNAME/d' /etc/sysconfig/network
 echo "HOSTNAME=${local.appserver1_hostname}" >> /etc/sysconfig/network
+/etc/init.d/network restart
 
 echo "Getting IP Addresses for /etc/hosts"
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
@@ -21,18 +28,27 @@ do
 done
 
 echo "Updating /etc/hosts"
-sed -i '/cwa-db$/d' /etc/hosts
-sed -i '/cwa-app1$/d' /etc/hosts
-sed -i '/cwa-app2$/d' /etc/hosts
+sed -i '/${local.database_hostname}$/d' /etc/hosts
+sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
+sed -i '/${local.cm_hostname}$/d' /etc/hosts
 echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
 echo "$PRIVATE_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
 echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
-## Mounting to EFS - uncomment when AMI has been applied
-echo "Updating /etc/fstab"
-sed -i '/^fs-/d' /etc/fstab
-sed -i '/^s3fs/d' /etc/fstab
-echo "${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+echo "Updating /etc/fstab file and mount"
+cat <<EOT > /etc/fstab
+/dev/VolGroup00/LogVol00        /       ext3    defaults        1 1
+LABEL=/boot     /boot   ext3    defaults        1 2
+tmpfs   /dev/shm        tmpfs   defaults        0 0
+devpts  /dev/pts        devpts  gid=5,mode=620  0 0
+sysfs   /sys    sysfs   defaults        0 0
+proc    /proc   proc    defaults        0 0
+/dev/VolGroup00/LogVol01        swap    swap    defaults        0 0
+/dev/xvdf /CWA/app ext4 defaults 0 0
+${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
+${local.database_hostname}:/CWA/share /CWA/share nfs rw,nolock 0 0
+EOT
+
 mount -a
 mount_status=$?
 while [[ $mount_status != 0 ]]
@@ -42,13 +58,57 @@ do
   mount_status=$?
 done
 
+echo "Updating /etc/rc.local file"
+cat <<EOT > etc/rc.local
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+touch /var/lock/subsys/local
+Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
+export DISPLAY=${local.appserver1_hostname}:0.0
+twm &
+xhost +
+EOT
+
+echo "Running postbuild steps to set up instance..."
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
+chmod 700 /userdata/postbuild.sh
+sed -i 's/. \/CWA\/app\/appl\/APPSCWA_SERVER_HOSTNAME.env/. \/CWA\/app\/appl\/APPSCWA_${local.appserver1_hostname}.env/g' /userdata/postbuild.sh
+sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
+. /userdata/postbuild.sh
+
+echo "mp-${local.environment}" > /etc/cwaenv
+sed -i '/^PS1=/d' /etc/bashrc
+printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
+
+echo "Setting up crontab for applmgr"
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-disk-space-alert.sh /home/applmgr/scripts/disk_space.sh
+chown applmgr /home/applmgr/scripts/disk_space.sh
+chgrp oinstall /home/applmgr/scripts/disk_space.sh
+chmod 744 /home/applmgr/scripts/disk_space.sh
+
+export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+
+cat <<EOT > /home/applmgr/applmgrcrontab.txt
+0 07 * * 1-5 /home/applmgr/scripts/purge_apache_logs.sh 60 >/tmp/purge_apache_logs.trc 2>&1
+0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} $SLACK_ALERT_URL >/tmp/disk_space.trc 2>&1
+EOT
+chown applmgr:applmgr /home/applmgr/applmgrcrontab.txt
+chmod 744 /home/applmgr/applmgrcrontab.txt
+su applmgr -c "crontab /home/applmgr/applmgrcrontab.txt"
+
+
 ## Update the send mail url
-echo "Updating the sendmail config"
+echo "Update Sendmail configurations"
 sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.cf
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
 sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.mc
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
+
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
@@ -63,6 +123,7 @@ rm /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
 #  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
 
+
 EOF
 
 }
@@ -75,10 +136,32 @@ resource "aws_s3_object" "app_custom_script" {
   source_hash = filemd5("./app-cw-custom.sh")
 }
 
-resource "time_sleep" "wait_app_custom_script" {
-  create_duration = "1m"
-  depends_on      = [aws_s3_object.app_custom_script]
+resource "aws_s3_object" "app_prereqs_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "app-prereqs.sh"
+  source      = "./scripts/app-prereqs.sh"
+  source_hash = filemd5("./scripts/app-prereqs.sh")
 }
+
+resource "aws_s3_object" "app_postbuild_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "app-postbuild.sh"
+  source      = "./scripts/app-postbuild.sh"
+  source_hash = filemd5("./scripts/app-postbuild.sh")
+}
+
+resource "aws_s3_object" "app_disk_space_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "app-disk-space-alert.sh"
+  source      = "./scripts/disk-space-alert.sh"
+  source_hash = filemd5("./scripts/disk-space-alert.sh")
+}
+
+resource "time_sleep" "wait_app_userdata_scripts" {
+  create_duration = "1m"
+  depends_on      = [aws_s3_object.app_custom_script, aws_s3_object.app_prereqs_script, aws_s3_object.app_postbuild_script, aws_s3_object.app_disk_space_script]
+}
+
 
 ######################################
 # app Instance
@@ -94,9 +177,17 @@ resource "aws_instance" "app1" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.app_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
+  }
+
+  root_block_device {
+    tags = merge(
+      { "instance-scheduling" = "skip-scheduling" },
+      local.tags,
+      { "Name" = "${local.application_name_short}-app1-root"}
+    )
   }
 
   tags = merge(
@@ -105,6 +196,9 @@ resource "aws_instance" "app1" {
     { "Name" = local.appserver1_ec2_name },
     { "snapshot-with-daily-35-day-retention" = "yes" }
   )
+  
+  depends_on          = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
+
 }
 
 resource "aws_instance" "app2" {
@@ -120,12 +214,23 @@ resource "aws_instance" "app2" {
   #   user_data_base64            = base64encode(local.app_userdata)
   #   user_data_replace_on_change = true
 
+  root_block_device {
+    tags = merge(
+      { "instance-scheduling" = "skip-scheduling" },
+      local.tags,
+      { "Name" = "${local.application_name_short}-app2-root"}
+    )
+  }
+
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${upper(local.application_name_short)} App Instance 2" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
+
+  depends_on          = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
+
 }
 
 #################################
@@ -278,7 +383,7 @@ resource "aws_ebs_volume" "app1" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-app1" },
+    { "Name" = "${local.application_name_short}-app1-data" },
   )
 }
 
@@ -303,7 +408,7 @@ resource "aws_ebs_volume" "app2" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-app2" },
+    { "Name" = "${local.application_name_short}-app2-data" },
   )
 }
 

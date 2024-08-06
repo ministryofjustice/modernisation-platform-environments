@@ -72,8 +72,16 @@ resource "aws_iam_policy" "cwa" {
             "Effect": "Allow"
         },
         {
+            "Effect": "Allow",
             "Action": [
-                "ec2:CreateTags"
+                "ssm:GetParameter"
+            ],
+            "Resource": "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/*SLACK_ALERT_URL"
+        },
+        {
+            "Action": [
+                "ec2:CreateTags",
+                "ec2:CreateSnapshots"
             ],
             "Resource": "*",
             "Effect": "Allow"
@@ -87,7 +95,12 @@ resource "aws_iam_policy" "cwa" {
                 "s3:GetObjectAcl",
                 "s3:DeleteObject"
             ],
-            "Resource":"arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-cw-custom.sh"
+            "Resource": [
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-cw-custom.sh",
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-prereqs.sh",
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-postbuild.sh",
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/app-disk-space-alert.sh"
+            ]
         }
     ]
 }
