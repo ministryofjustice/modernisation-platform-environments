@@ -21,6 +21,7 @@ locals {
        dms_s3_cross_account_bucket_names = local.dms_s3_cross_account_bucket_names
        dms_s3_role_arn = {(var.env_name) = aws_iam_role.dms_s3_writer_role.arn}
        dms_s3_existing_roles_list = local.dms_s3_existing_roles_list
+       dms_s3_existing_roles_list_2 = local.dms_s3_existing_roles_list_2
        dms_s3_cross_account_existing_roles = local.dms_s3_cross_account_existing_roles
    }    
 }
