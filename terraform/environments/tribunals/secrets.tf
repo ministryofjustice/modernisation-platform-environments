@@ -97,5 +97,5 @@ data "aws_secretsmanager_secret" "tribunals_admin_site_secret" {
 
 data "aws_secretsmanager_secret_version" "tribunals_admin_site_credentials_secret_current" {
   depends_on = [aws_secretsmanager_secret_version.tribunals_admin_site_credentials_current]
-  secret_id  = data.aws_secretsmanager_secret.source_db_secret.id
+  secret_id  = data.aws_secretsmanager_secret.tribunals_admin_site_secret.id
 }
