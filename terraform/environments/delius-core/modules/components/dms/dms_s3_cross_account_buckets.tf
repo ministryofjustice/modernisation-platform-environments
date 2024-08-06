@@ -15,7 +15,11 @@ locals {
     for bucket_map in local.dms_s3_bucket_list : bucket_map
   ]...)
 
-  dms_s3_role_exists = {for account_name in var.delius_account_names : account_name => try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn,null) == null ? false : true }
+  dms_s3_existing_roles_base = {}
+
+  dms_s3_existing_roles = [for account_name in var.delius_account_names : {
+                             for environment_name in var.delius_environment_names : environment_name => merge(local.dms_s3_existing_roles_base, try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn[environment_name],null) == null ? {} : { environment_name = true })
+                            }
+                          ]
 
 }
-

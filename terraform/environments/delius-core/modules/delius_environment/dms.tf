@@ -11,6 +11,7 @@ module "dms" {
   oracle_db_server_names                    = local.oracle_db_server_names
   db_ec2_sg_id                              = module.oracle_db_shared.db_ec2_sg_id
   delius_account_names                      = var.delius_account_names
+  delius_environment_names                  = var.delius_environment_names
 
   providers = {
     aws                       = aws
