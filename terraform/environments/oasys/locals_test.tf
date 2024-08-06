@@ -202,6 +202,19 @@ locals {
           oracle-sids         = "T2BOSYS T2BOAUD"
         })
       })
+
+      # audit-vault = merge(local.ec2_instances.audit_vault, {
+      #   ebs_volumes = {
+      #     # "/dev/sdb" = { label = "app", snapshot_id = "snap-072a42704cb38f785", size = 300 }
+      #     "/dev/sdb" = { label = "app", size = 300 }
+      #   }
+      #   instance = merge(local.ec2_instances.audit_vault.instance, {
+      #     instance_type = "r7i.xlarge"
+      #   })
+      #   tags = merge(local.ec2_instances.audit_vault.tags, {
+      #     instance-scheduling = "skip-scheduling"
+      #   })
+      # })
     }
 
     iam_policies = {
