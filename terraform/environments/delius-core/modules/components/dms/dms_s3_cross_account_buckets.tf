@@ -18,7 +18,7 @@ locals {
   dms_s3_existing_roles_base = {}
 
   dms_s3_existing_roles = [for account_name in var.delius_account_names : {
-                             for environment_name in var.delius_environment_names : var.env_name => merge(local.dms_s3_existing_roles_base, try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn[environment_name],null) == null ? {} : { environment_name = true })
+                             for delius_environment_name in var.delius_environment_names : delius_environment_name => merge(local.dms_s3_existing_roles_base, try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn[delius_environment_name],null) == null ? {} : { environment_name = true })
                             }
                           ]
 
