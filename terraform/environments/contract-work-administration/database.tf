@@ -93,7 +93,7 @@ cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
 /usr/local/bin/aws ec2 create-snapshots \
 --instance-specification InstanceId=$INSTANCE_ID \
 --description "AWS crash-consistent snapshots of CWA database volumes, automatically created snapshot from oracle_cron inside EC2" \
---tag-specifications 'ResourceType=snapshot,Tags=[{Key="Name",Value="CWA database server EBS Automated Snapshots"}]'
+--copy-tags-from-source volume
 EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
@@ -118,7 +118,6 @@ chown oracle:oinstall /home/oracle/oraclecrontab.txt
 chmod 744 /home/oracle/oraclecrontab.txt
 su oracle -c "crontab /home/oracle/oraclecrontab.txt"
 chown -R oracle:dba /home/oracle/scripts
-
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
@@ -184,6 +183,14 @@ resource "aws_instance" "database" {
   user_data_replace_on_change = false
   metadata_options {
     http_tokens = "optional"
+  }
+
+  root_block_device {
+    tags = merge(
+      { "instance-scheduling" = "skip-scheduling" },
+      local.tags,
+      { "Name" = "${local.application_name_short}-database-root"}
+    )
   }
 
   tags = merge(
@@ -413,7 +420,7 @@ resource "aws_ebs_volume" "oradata" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oradata" },
+    { "Name" = "${local.application_name_short}-database-oradata" },
   )
 }
 
@@ -437,7 +444,7 @@ resource "aws_ebs_volume" "oracle" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oracle" },
+    { "Name" = "${local.application_name_short}-database-oracle" },
   )
 }
 
@@ -461,7 +468,7 @@ resource "aws_ebs_volume" "oraarch" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oraarch" },
+    { "Name" = "${local.application_name_short}-database-oraarch" },
   )
 }
 
@@ -485,7 +492,7 @@ resource "aws_ebs_volume" "oratmp" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oratmp" },
+    { "Name" = "${local.application_name_short}-database-oratmp" },
   )
 }
 
@@ -509,7 +516,7 @@ resource "aws_ebs_volume" "oraredo" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oraredo" },
+    { "Name" = "${local.application_name_short}-database-oraredo" },
   )
 }
 
@@ -533,7 +540,7 @@ resource "aws_ebs_volume" "share" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-share" },
+    { "Name" = "${local.application_name_short}-database-share" },
   )
 }
 

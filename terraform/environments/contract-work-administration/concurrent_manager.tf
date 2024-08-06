@@ -60,11 +60,19 @@ do
 done
 
 echo "Updating /etc/rc.local file"
-## Note this will keep appending to the file, like the set up in LZ
-echo "Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
+cat <<EOT > etc/rc.local
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+touch /var/lock/subsys/local
+Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
 export DISPLAY=${local.cm_hostname}:0.0
 twm &
-xhost +" >> /etc/rc.local
+xhost +
+EOT
 
 echo "Running postbuild steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
@@ -128,7 +136,7 @@ resource "aws_s3_object" "cm_custom_script" {
 
 resource "time_sleep" "wait_cm_custom_script" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.cm_custom_script]
+  depends_on      = [aws_s3_object.cm_custom_script, aws_s3_object.app_prereqs_script, aws_s3_object.app_postbuild_script, aws_s3_object.app_disk_space_script]
 }
 
 ######################################
@@ -145,9 +153,17 @@ resource "aws_instance" "concurrent_manager" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.cm_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
+  }
+
+  root_block_device {
+    tags = merge(
+      { "instance-scheduling" = "skip-scheduling" },
+      local.tags,
+      { "Name" = "${local.application_name_short}-concurrent-manager-root"}
+    )
   }
 
   tags = merge(
@@ -156,6 +172,9 @@ resource "aws_instance" "concurrent_manager" {
     { "Name" = local.cm_ec2_name },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "no" } : { "snapshot-with-daily-35-day-retention" = "yes" }
   )
+
+  depends_on          = [time_sleep.wait_cm_custom_script] # This resource creation will be delayed to ensure object exists in the bucket
+
 }
 
 #################################
@@ -225,7 +244,7 @@ resource "aws_ebs_volume" "concurrent_manager" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-concurrent_manager" },
+    { "Name" = "${local.application_name_short}-concurrent-manager-data" },
   )
 }
 
