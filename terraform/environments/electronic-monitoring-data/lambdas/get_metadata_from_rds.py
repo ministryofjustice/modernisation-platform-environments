@@ -80,6 +80,14 @@ def remove_comments_from_meta(meta):
     return meta
 
 
+def reassign_binary_cols(meta):
+    for col in meta["columns"]:
+        if col["type"] == "binary":
+            if col["name"] == "row_v":
+                col["type"] == "string"
+    return meta
+
+
 def handler(event, context):
     db_name = event.get("db_name")
     conn = get_rds_connection(db_name)
@@ -88,6 +96,7 @@ def handler(event, context):
     sqlc = SQLAlchemyConverter(engine, opt)
     metadata_list = sqlc.generate_to_meta_list(schema="dbo")
     metadata_list = [add_db_to_meta(meta, db_name) for meta in metadata_list]
+    metadata_list = [reassign_binary_cols(meta) for meta in metadata_list]
     for meta in metadata_list:
         write_meta_to_s3(meta)
     dict_metadata_list = [meta.to_dict() for meta in metadata_list]
