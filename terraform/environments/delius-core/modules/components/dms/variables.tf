@@ -70,3 +70,8 @@ variable "delius_account_names" {
   description = "List of names of all of the delius-core AWS accounts"
   type        = list(string)
 }
+
+variable "delius_environment_names" {
+  description = "List of names of all of the delius-core environments"
+  type        = list(string)
+}

@@ -39,6 +39,7 @@ module "environment_stage" {
   dms_config = merge(local.dms_config_stage, { client_account_ids = local.dms_client_account_ids })
 
   delius_account_names = local.delius_account_names
+  delius_environment_names = local.delius_environment_names
 }
 
 module "environment_preprod" {
@@ -77,4 +78,5 @@ module "environment_preprod" {
   dms_config = merge(local.dms_config_preprod, { client_account_ids = local.dms_client_account_ids })
 
   delius_account_names = local.delius_account_names
+  delius_environment_names = local.delius_environment_names
 }

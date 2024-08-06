@@ -18,6 +18,8 @@ locals {
     dev      = ["dev"]
   }
 
+  delius_environment_names = flatten(values(local.delius_environments_per_account))
+
   ordered_subnet_ids = [data.aws_subnets.shared-private-a.ids[0], data.aws_subnets.shared-private-b.ids[0], data.aws_subnets.shared-private-c.ids[0]]
 
   all_mp_account_names = keys(local.environment_management.account_ids)

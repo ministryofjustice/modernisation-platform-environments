@@ -9,7 +9,8 @@ locals {
   # The accounts which may write to the DMS S3 bucket are all Audit Clients of the current environment (if it is itself a Repository),
   # or the Audit Repository for the current environment (if it is itself a Client).
   dms_s3_writer_account_ids = compact(concat(var.dms_config.client_account_ids,[local.dms_repository_account_id]))
-  dms_s3_writer_role_name = "dms-s3-writer-role"
+  # We define an S3 writer role for each Delius environment (rather than for the account)
+  dms_s3_writer_role_name = "${var.env_name}-dms-s3-writer-role"
   dms_s3_repository_bucket = {
     prefix = try("${var.dms_config.audit_target_endpoint.write_environment}-dms-destination-bucket",null)
     # account_id = try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null)
@@ -18,7 +19,7 @@ locals {
    dms_s3_bucket_info = {
        dms_s3_bucket_name = {(var.env_name) = module.s3_bucket_dms_destination.bucket.bucket}
        dms_s3_cross_account_bucket_names = local.dms_s3_cross_account_bucket_names
-       dms_s3_role_arn = {(local.delius_account_id) = aws_iam_role.dms_s3_writer_role.arn}
-       dms_s3_role_exists = local.dms_s3_role_exists
+       dms_s3_role_arn = {(var.env_name) = aws_iam_role.dms_s3_writer_role.arn}
+       dms_s3_existing_roles = local.dms_s3_existing_roles
    }    
 }
