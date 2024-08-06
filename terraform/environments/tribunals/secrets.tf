@@ -70,3 +70,21 @@ data "aws_secretsmanager_secret_version" "source_db_secret_current" {
   depends_on = [aws_secretsmanager_secret_version.resource_source_db_secret_current]
   secret_id  = data.aws_secretsmanager_secret.source_db_secret.id
 }
+
+//admin site credentials secret definition, will be filled manually
+//employment appeals (eat) uses a different encryption method for the password
+resource "aws_secretsmanager_secret" "tribunals_admin_site_credentials" {
+  name                    = "tribunals-admin-site-credentials"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "tribunals_admin_site_credentials_current" {
+  secret_id     = aws_secretsmanager_secret.tribunals_admin_site_credentials.id
+  secret_string = <<EOF
+  {
+    "admin_username": "",
+    "admin_password": "",
+    "admin_password_eat": ""
+  }
+  EOF
+}

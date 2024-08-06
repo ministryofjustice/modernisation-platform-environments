@@ -9,6 +9,9 @@ def lambda_handler(event, context):
     password = os.getenv("PASSWORD")
     new_db_name = os.getenv("NEW_DB_NAME")
     app_folder = os.getenv("APP_FOLDER")
+    admin_username = os.getenv("ADMIN_USERNAME")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+    admin_password_eat = os.getenv("ADMIN_PASSWORD_EAT")
 
     print(f"exported ENV values are 1: {db_url}")
     print(f"DB_URL is <{db_url}>")
@@ -19,6 +22,18 @@ def lambda_handler(event, context):
     )
     cursor = conn.cursor()
     cursor.execute(f"use [{new_db_name}]")
+
+    # Insert legacy apps admin user into the database
+    if (new_db_name == 'eat'):
+        cursor.execute(
+            "INSERT INTO ValidUsers (UserID, Username, Password, Firstname, Lastname) VALUES (?, ?, ?, ?, ?);",
+            (100, admin_username, admin_password_eat, 'DTS Legacy Apps', 'Team Login')
+        )
+    else:
+        cursor.execute(
+            "INSERT INTO Users (UserID, Username, Password, Firstname, Lastname) VALUES (?, ?, ?, ?, ?);",
+            (100, admin_username, admin_password, 'DTS Legacy Apps', 'Team Login')
+        )
 
     # Executing SQL script from file
     script_path = f".{app_folder}/post_migration.sql"
