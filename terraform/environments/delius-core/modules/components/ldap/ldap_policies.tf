@@ -9,7 +9,8 @@ module "ldap_ecs_policies" {
     "elasticfilesystem:ClientMount"
   ]
   extra_task_role_policies = {
-    migration_s3 = data.aws_iam_policy_document.migration_s3
+    migration_s3      = data.aws_iam_policy_document.migration_s3,
+    get_ssm_parameter = data.aws_iam_policy_document.get_ssm_parameter
   }
 }
 
@@ -25,6 +26,17 @@ data "aws_iam_policy_document" "migration_s3" {
     ]
     resources = [
       module.s3_bucket_migration.bucket.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "get_ssm_parameter" {
+  statement {
+    actions = [
+      "ssm:GetParameter"
+    ]
+    resources = [
+      aws_ssm_parameter.delius_core_ldap_rbac_version.arn
     ]
   }
 }
