@@ -84,7 +84,18 @@ resource "aws_secretsmanager_secret_version" "tribunals_admin_site_credentials_c
   {
     "admin_username": "",
     "admin_password": "",
-    "admin_password_eat": ""
+    "admin_password_eat": "",
+    "admin_password_unencrypted": ""
   }
   EOF
+}
+
+data "aws_secretsmanager_secret" "tribunals_admin_site_secret" {
+  depends_on = [aws_secretsmanager_secret_version.tribunals_admin_site_credentials_current]
+  arn        = aws_secretsmanager_secret_version.tribunals_admin_site_credentials_current.arn
+}
+
+data "aws_secretsmanager_secret_version" "tribunals_admin_site_credentials_secret_current" {
+  depends_on = [aws_secretsmanager_secret_version.tribunals_admin_site_credentials_current]
+  secret_id  = data.aws_secretsmanager_secret.source_db_secret.id
 }

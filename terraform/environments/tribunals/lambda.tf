@@ -178,9 +178,9 @@ resource "aws_lambda_function" "app_post_migrate" {
       DB_URL             = aws_db_instance.rdsdb.address
       USER_NAME          = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
       PASSWORD           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-      ADMIN_USERNAME     = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_current.secret_string)["admin_username"]
-      ADMIN_PASSWORD     = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_current.secret_string)["admin_password"]
-      ADMIN_PASSWORD_EAT = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_current.secret_string)["admin_password_eat"]
+      ADMIN_USERNAME     = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_username"]
+      ADMIN_PASSWORD     = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_password"]
+      ADMIN_PASSWORD_EAT = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_password_eat"]
       NEW_DB_NAME        = each.value.app_db_name
       APP_FOLDER         = each.value.sql_migration_path
     }
