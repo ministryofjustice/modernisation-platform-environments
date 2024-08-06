@@ -12,6 +12,12 @@ locals {
   dms_s3_writer_account_ids = compact(concat(var.dms_config.client_account_ids,[local.dms_repository_account_id]))
   # We define an S3 writer role for each Delius environment (rather than for the account)
   dms_s3_writer_role_name = "${var.env_name}-dms-s3-writer-role"
+  
+  dms_s3_writer_role_cross_account_arns = [for delius_account_name in var.delius_account_names : {
+                                               for delius_environment_name in var.delius_environment_names : delius_environment_name => data.terraform_remote_state.get_dms_s3_bucket_info[delius_account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn[delius_environment_name] if try(data.terraform_remote_state.get_dms_s3_bucket_info[delius_account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn[delius_environment_name],null) != null 
+                                            }
+                                          ]
+  
   dms_s3_repository_bucket = {
     prefix = try("${var.dms_config.audit_target_endpoint.write_environment}-dms-destination-bucket",null)
     # account_id = try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null)
@@ -21,8 +27,7 @@ locals {
        dms_s3_bucket_name = {(var.env_name) = module.s3_bucket_dms_destination.bucket.bucket}
        dms_s3_cross_account_bucket_names = local.dms_s3_cross_account_bucket_names
        dms_s3_role_arn = {(var.env_name) = aws_iam_role.dms_s3_writer_role.arn}
-       dms_s3_existing_roles_list = local.dms_s3_existing_roles_list
-       dms_s3_existing_roles_list_2 = local.dms_s3_existing_roles_list_2
        dms_s3_cross_account_existing_roles = local.dms_s3_cross_account_existing_roles
+       dms_s3_writer_role_cross_account_arns = local.dms_s3_writer_role_cross_account_arns
    }    
 }
