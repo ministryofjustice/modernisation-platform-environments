@@ -137,7 +137,7 @@ data "aws_iam_policy_document" "mlflow" {
     ]
     resources = [
       "${module.mlflow_bucket.s3_bucket_arn}/*",
-      "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}"
+      "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}/*"
     ]
   }
 }
