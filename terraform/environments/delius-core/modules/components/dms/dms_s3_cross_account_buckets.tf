@@ -20,6 +20,11 @@ locals {
                             }
                           ]
 
+  dms_s3_existing_roles_list_2 = [for account_name in var.delius_account_names : {
+                             for delius_environment_name in var.delius_environment_names : delius_environment_name => true if try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn[delius_environment_name],null) != null
+                             }
+                          ]
+
   dms_s3_cross_account_existing_roles = merge([
     for role_exists_map in local.dms_s3_existing_roles_list : role_exists_map
   ]...)  
