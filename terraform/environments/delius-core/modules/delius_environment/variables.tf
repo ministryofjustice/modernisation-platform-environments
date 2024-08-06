@@ -100,7 +100,15 @@ variable "db_suffix" {
   default     = "db"
 }
 
+# Note that Delius Accounts and Delius Environments are not equivalent.
+# delius_account_names are the AWS accounts (delius-core-development etc.)
+# delius_environment_names are the environments within these accounts (dev etc.)
 variable "delius_account_names" {
   description = "List of names of all of the delius-core AWS accounts"
+  type        = list(string)
+}
+
+variable "delius_environment_names" {
+  description = "List of names of all of the delius-core environments"
   type        = list(string)
 }
