@@ -26,8 +26,8 @@ def lambda_handler(event, context):
     # Insert legacy apps admin user into the database
     if (new_db_name == 'eat'):
         cursor.execute(
-            "INSERT INTO ValidUsers (UserID, Username, Password, Firstname, Lastname) VALUES (?, ?, ?, ?, ?);",
-            (100, admin_username, admin_password_eat, 'DTS Legacy Apps', 'Team Login')
+            "INSERT INTO ValidUsers (id, UserName, Password) VALUES (?, ?, ?);",
+            (100, admin_username, admin_password_eat)
         )
     else:
         cursor.execute(
