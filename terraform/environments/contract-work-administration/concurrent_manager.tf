@@ -128,7 +128,7 @@ resource "aws_s3_object" "cm_custom_script" {
 
 resource "time_sleep" "wait_cm_custom_script" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.cm_custom_script]
+  depends_on      = [aws_s3_object.cm_custom_script, aws_s3_object.app_prereqs_script, aws_s3_object.app_postbuild_script, aws_s3_object.app_disk_space_script]
 }
 
 ######################################
@@ -150,12 +150,23 @@ resource "aws_instance" "concurrent_manager" {
     http_tokens = "optional"
   }
 
+  root_block_device {
+    tags = merge(
+      { "instance-scheduling" = "skip-scheduling" },
+      local.tags,
+      { "Name" = "${local.application_name_short}-concurrent-manager-root"}
+    )
+  }
+
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = local.cm_ec2_name },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "no" } : { "snapshot-with-daily-35-day-retention" = "yes" }
   )
+
+  depends_on          = [time_sleep.wait_cm_custom_script] # This resource creation will be delayed to ensure object exists in the bucket
+
 }
 
 #################################
@@ -225,7 +236,7 @@ resource "aws_ebs_volume" "concurrent_manager" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-concurrent_manager" },
+    { "Name" = "${local.application_name_short}-concurrent-manager-data" },
   )
 }
 

@@ -189,7 +189,7 @@ resource "aws_instance" "database" {
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },
       local.tags,
-      { "Name" = "${local.application_name}-root"}
+      { "Name" = "${local.application_name_short}-database-root"}
     )
   }
 
@@ -420,7 +420,7 @@ resource "aws_ebs_volume" "oradata" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oradata" },
+    { "Name" = "${local.application_name_short}-database-oradata" },
   )
 }
 
@@ -444,7 +444,7 @@ resource "aws_ebs_volume" "oracle" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oracle" },
+    { "Name" = "${local.application_name_short}-database-oracle" },
   )
 }
 
@@ -468,7 +468,7 @@ resource "aws_ebs_volume" "oraarch" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oraarch" },
+    { "Name" = "${local.application_name_short}-database-oraarch" },
   )
 }
 
@@ -492,7 +492,7 @@ resource "aws_ebs_volume" "oratmp" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oratmp" },
+    { "Name" = "${local.application_name_short}-database-oratmp" },
   )
 }
 
@@ -516,7 +516,7 @@ resource "aws_ebs_volume" "oraredo" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-oraredo" },
+    { "Name" = "${local.application_name_short}-database-oraredo" },
   )
 }
 
@@ -540,7 +540,7 @@ resource "aws_ebs_volume" "share" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-share" },
+    { "Name" = "${local.application_name_short}-database-share" },
   )
 }
 
