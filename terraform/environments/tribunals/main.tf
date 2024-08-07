@@ -261,47 +261,47 @@ module "finance_and_tax" {
   new_db_password              = random_password.app_new_password.result
 }
 
-module "immigration_services" {
-  is_ftp_app                   = false
-  source                       = "./modules/tribunal"
-  app_name                     = "immigration-services"
-  app_url                      = "immigrationservices"
-  module_name                  = "immigration_services"
-  sql_migration_path           = "../scripts/immigration_services"
-  app_db_name                  = "imset"
-  app_db_login_name            = "imset-app"
-  app_source_db_name           = "imset"
-  app_rds_url                  = aws_db_instance.rdsdb.address
-  app_rds_user                 = local.rds_user
-  app_rds_port                 = local.rds_port
-  app_rds_password             = local.rds_password
-  app_load_balancer            = aws_lb.tribunals_lb
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
-  environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
-  tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
-  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
-  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  app_count                    = local.application_data.accounts[local.environment].app_count
-  server_port                  = local.application_data.accounts[local.environment].server_port_1
-  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
-  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
-  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
-  documents_location           = "JudgmentFiles"
-  waf_arn                      = local.waf_arn
-  target_group_attachment_port = var.services["immigration_services"].port
-  target_group_arns            = local.target_group_arns
-  target_group_arns_sftp       = local.target_group_arns_sftp
-  new_db_password              = random_password.app_new_password.result
-}
+# module "immigration_services" {
+#   is_ftp_app                   = false
+#   source                       = "./modules/tribunal"
+#   app_name                     = "immigration-services"
+#   app_url                      = "immigrationservices"
+#   module_name                  = "immigration_services"
+#   sql_migration_path           = "../scripts/immigration_services"
+#   app_db_name                  = "imset"
+#   app_db_login_name            = "imset-app"
+#   app_source_db_name           = "imset"
+#   app_rds_url                  = aws_db_instance.rdsdb.address
+#   app_rds_user                 = local.rds_user
+#   app_rds_port                 = local.rds_port
+#   app_rds_password             = local.rds_password
+#   app_load_balancer            = aws_lb.tribunals_lb
+#   app_source_db_url            = local.source_db_url
+#   app_source_db_user           = local.source_db_user
+#   app_source_db_password       = local.source_db_password
+#   environment                  = local.environment
+#   application_data             = local.application_data.accounts[local.environment]
+#   tags                         = local.tags
+#   dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
+#   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
+#   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
+#   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
+#   ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+#   ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+#   app_count                    = local.application_data.accounts[local.environment].app_count
+#   server_port                  = local.application_data.accounts[local.environment].server_port_1
+#   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
+#   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
+#   vpc_shared_id                = data.aws_vpc.shared.id
+#   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
+#   aws_acm_certificate_external = aws_acm_certificate.external
+#   documents_location           = "JudgmentFiles"
+#   waf_arn                      = local.waf_arn
+#   target_group_attachment_port = var.services["immigration_services"].port
+#   target_group_arns            = local.target_group_arns
+#   target_group_arns_sftp       = local.target_group_arns_sftp
+#   new_db_password              = random_password.app_new_password.result
+# }
 
 module "information_tribunal" {
   is_ftp_app                   = false
