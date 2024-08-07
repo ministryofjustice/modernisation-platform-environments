@@ -25,6 +25,45 @@ locals {
           desired_capacity = 0
         })
       })
+      # NOTE: see if it's possible to run this as an ASG for testing purposes
+      dev-ncr-cms-a = merge(local.ec2_instances.bip_app, {
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 1
+          force_delete        = true
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        autoscaling_schedules = {
+          scale_up   = { recurrence = "0 7 * * Mon-Fri" }
+          scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+        }
+        #cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
+        config = merge(local.ec2_instances.bip_app.config, {
+          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
+          availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.bip_app.instance, {
+          instance_type = "m6i.xlarge",
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_app.user_data_cloud_init, {        
+          args = {
+            branch       = "DSO/DSOS-2909/fix-oracle-19c-client-role"
+            ansible_args = "--tags ec2provision"
+          }
+          scripts = [ # paths are relative to templates/ dir
+            "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+            "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+            "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+          ]
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          description                          = "TEST INSTANCE ONLY - DO NOT USE"
+          instance-scheduling                  = "skip-scheduling"
+          # node                                 = "1"
+          # nomis-combined-reporting-environment = "pp"
+          # type                                 = "management"
+        })
+      })
     }
 
     ec2_instances = {
