@@ -75,11 +75,11 @@ variable "services" {
       module_key  = "finance_and_tax"
       port        = 49105
     },
-    # "immigration_services" = {
-    #   name_prefix = "immigrationservices"
-    #   module_key  = "immigration_services"
-    #   port        = 49106
-    # },
+    "immigration_services" = {
+      name_prefix = "immigrationservices"
+      module_key  = "immigration_services"
+      port        = 49106
+    },
     "information_tribunal" = {
       name_prefix = "informationrights"
       module_key  = "information_tribunal"
@@ -192,13 +192,13 @@ variable "web_app_services" {
       app_db_name        = "ftt"
       sql_migration_path = "/scripts/finance_and_tax"
     },
-    # "immigration_services" = {
-    #   name_prefix        = "immigrationservices"
-    #   module_key         = "immigration_services"
-    #   port               = 49106
-    #   app_db_name        = "imset"
-    #   sql_migration_path = "/scripts/immigration_services"
-    # },
+    "immigration_services" = {
+      name_prefix        = "immigrationservices"
+      module_key         = "immigration_services"
+      port               = 49106
+      app_db_name        = "imset"
+      sql_migration_path = "/scripts/immigration_services"
+    },
     "information_tribunal" = {
       name_prefix        = "informationrights"
       module_key         = "information_tribunal"
@@ -286,7 +286,7 @@ locals {
     cicap                       = module.cicap
     employment_appeals          = module.employment_appeals
     finance_and_tax             = module.finance_and_tax
-    # immigration_services        = module.immigration_services
+    immigration_services        = module.immigration_services
     information_tribunal        = module.information_tribunal
     lands_tribunal              = module.lands_tribunal
     transport                   = module.transport

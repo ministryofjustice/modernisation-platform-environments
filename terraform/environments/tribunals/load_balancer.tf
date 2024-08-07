@@ -103,20 +103,20 @@ resource "aws_lb_listener" "tribunals_lb" {
     }
   }
 }
-# resource "aws_lb_listener_rule" "tribunals_lb_rule" {
-#   for_each = local.listener_header_to_target_group
+resource "aws_lb_listener_rule" "tribunals_lb_rule" {
+  for_each = local.listener_header_to_target_group
 
-#   listener_arn = aws_lb_listener.tribunals_lb.arn
-#   priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = each.value
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = each.value
+  }
 
-#   condition {
-#     host_header {
-#       values = ["*${each.key}.*"]
-#     }
-#   }
-# }
+  condition {
+    host_header {
+      values = ["*${each.key}.*"]
+    }
+  }
+}
