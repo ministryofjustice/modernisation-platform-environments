@@ -35,6 +35,7 @@
 /terraform/environments/hmpps-domain-services @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-oem @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-infra-azure-ad-sso @ministryofjustice/laa-ccms-webops @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
+/terraform/environments/laa-mail-relay @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/laa-oem @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/long-term-storage @ministryofjustice/modernisation-platform-long-term-storage @ministryofjustice/modernisation-platform
 /terraform/environments/maat @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
