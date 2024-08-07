@@ -5,7 +5,7 @@
 # In client environments the dms_audit_source_endpoint.read_database must be defined
 # The endpoint for audit (AUDITED_INTERACTION) is the Delius database.
 resource "aws_dms_endpoint" "dms_audit_target_endpoint_s3" {
-   count                           = try(var.dms_config.audit_target_endpoint.write_environment, null) == null ? 0 : (try(local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment], null) == null ? 0 : (local.dms_s3_bucket_info.dms_s3_role_exists[var.dms_config.audit_target_endpoint.write_environment] ? 1 : 0))
+   count                           = try(var.dms_config.audit_target_endpoint.write_environment, null) == null ? 0 : (try(local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment], null) == null ? 0 : (local.dms_s3_bucket_info.dms_s3_cross_account_existing_roles[var.dms_config.audit_target_endpoint.write_environment] ? 1 : 0))
    endpoint_id                     = "s3-staging-of-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
    endpoint_type                   = "target"
    engine_name                     = "s3"
