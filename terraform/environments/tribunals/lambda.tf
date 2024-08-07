@@ -135,64 +135,64 @@ resource "aws_lambda_layer_version" "pyodbc_layer" {
   compatible_runtimes = ["python3.11"]
 }
 
-# resource "aws_lambda_function" "app_setup_db" {
-#   for_each      = var.web_app_services
-#   filename      = "lambda_function/db_setup_deployment_package.zip"
-#   function_name = "${each.value.name_prefix}-setup-db"
-#   role          = aws_iam_role.lambda_role.arn
-#   handler       = "app_setup_db.lambda_handler"
-#   runtime       = "python3.11"
-#   timeout       = 300
-#   architectures = ["x86_64"]
+resource "aws_lambda_function" "app_setup_db" {
+  for_each      = var.web_app_services
+  filename      = "lambda_function/db_setup_deployment_package.zip"
+  function_name = "${each.value.name_prefix}-setup-db"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "app_setup_db.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 300
+  architectures = ["x86_64"]
 
-#   environment {
-#     variables = {
-#       DB_URL        = aws_db_instance.rdsdb.address
-#       USER_NAME     = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-#       PASSWORD      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-#       NEW_DB_NAME   = each.value.app_db_name
-#       APP_FOLDER    = each.value.sql_migration_path
-#     }
-#   }
+  environment {
+    variables = {
+      DB_URL        = aws_db_instance.rdsdb.address
+      USER_NAME     = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+      PASSWORD      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+      NEW_DB_NAME   = each.value.app_db_name
+      APP_FOLDER    = each.value.sql_migration_path
+    }
+  }
 
-#   vpc_config {
-#     subnet_ids         = data.aws_subnets.shared-private.ids
-#     security_group_ids = [aws_security_group.lambda_sg.id]
-#   }
+  vpc_config {
+    subnet_ids         = data.aws_subnets.shared-private.ids
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
 
-#   layers = [aws_lambda_layer_version.pyodbc_layer.arn]
-# }
+  layers = [aws_lambda_layer_version.pyodbc_layer.arn]
+}
 
-# resource "aws_lambda_function" "app_post_migrate" {
-#   for_each      = var.web_app_services
-#   filename      = "lambda_function/post_migrate_deployment_package.zip"
-#   function_name = "${each.value.name_prefix}-post-migration-script"
-#   role          = aws_iam_role.lambda_role.arn
-#   handler       = "app_post_migrate.lambda_handler"
-#   runtime       = "python3.11"
-#   timeout       = 300
-#   architectures = ["x86_64"]
+resource "aws_lambda_function" "app_post_migrate" {
+  for_each      = var.web_app_services
+  filename      = "lambda_function/post_migrate_deployment_package.zip"
+  function_name = "${each.value.name_prefix}-post-migration-script"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "app_post_migrate.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 300
+  architectures = ["x86_64"]
 
-#   environment {
-#     variables = {
-#       DB_URL             = aws_db_instance.rdsdb.address
-#       USER_NAME          = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-#       PASSWORD           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-#       ADMIN_USERNAME     = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_username"]
-#       ADMIN_PASSWORD     = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_password"]
-#       ADMIN_PASSWORD_EAT = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_password_eat"]
-#       NEW_DB_NAME        = each.value.app_db_name
-#       APP_FOLDER         = each.value.sql_migration_path
-#     }
-#   }
+  environment {
+    variables = {
+      DB_URL             = aws_db_instance.rdsdb.address
+      USER_NAME          = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+      PASSWORD           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+      ADMIN_USERNAME     = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_username"]
+      ADMIN_PASSWORD     = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_password"]
+      ADMIN_PASSWORD_EAT = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_password_eat"]
+      NEW_DB_NAME        = each.value.app_db_name
+      APP_FOLDER         = each.value.sql_migration_path
+    }
+  }
 
-#   vpc_config {
-#     subnet_ids         = data.aws_subnets.shared-private.ids
-#     security_group_ids = [aws_security_group.lambda_sg.id]
-#   }
+  vpc_config {
+    subnet_ids         = data.aws_subnets.shared-private.ids
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
 
-#   layers = [aws_lambda_layer_version.pyodbc_layer.arn]
-# }
+  layers = [aws_lambda_layer_version.pyodbc_layer.arn]
+}
 
 resource "aws_security_group" "lambda_sg" {
   name   = "lambda_sg"
