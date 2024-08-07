@@ -174,3 +174,87 @@ module "gha_mojas_airflow_iam_policy" {
 
   policy = data.aws_iam_policy_document.gha_mojas_airflow.json
 }
+
+data "aws_iam_policy_document" "analytical_platform_share_policy" {
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:RegisterResource",
+      "lakeformation:DeregisterResource",
+      "lakeformation:ListPermissions",
+      "lakeformation:DescribeResource",
+      "lakeformation:GetDataAccess",
+    ]
+    resources = [
+      "arn:aws:lakeformation:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:PutRolePolicy",
+      "iam:CreateServiceLinkedRole"
+    ]
+    resources = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"
+    ]
+  }
+  # Needed for LakeFormationAdmin to check the presense of the Lake Formation Service Role
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:GetRolePolicy",
+      "iam:GetRole",
+      "lakeformation:GetDataAccess",
+      "glue:*",
+      "lakeformation:*",
+      "sso:*",
+      "iam:*",
+      "sso-directory:*",
+      "athena:*",
+      "s3:*",
+      "quicksight:*"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ram:CreateResourceShare",
+      "ram:DeleteResourceShare"
+    ]
+    resources = [
+      "arn:aws:ram:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:resource-share/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetPartition"
+    ]
+    resources = ["*"]
+  }
+}
+
+module "analytical_platform_lake_formation_share_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.41.0"
+
+  name_prefix = "analytical-platform-lake-formation-sharing-policy"
+
+  policy = data.aws_iam_policy_document.analytical_platform_share_policy.json
+}
