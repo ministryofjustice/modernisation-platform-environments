@@ -82,10 +82,6 @@ sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_u
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
-echo "Update Slack alert URL for Oracle scripts"
-export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
-sed -i "s/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g" /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
-
 echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
@@ -98,7 +94,7 @@ EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
 echo "Setting up cron jobs"
-cat <<EOT > /etc/cron.d/oracle_cron
+cat <<EOT > /home/oracle/oraclecrontab.txt
 00 01 * * 0 /home/oracle/scripts/rman_backup.sh CWA /efs/cwa_rman > /tmp/rman_backup.log 2>&1
 00 07 * * 1-5 /home/oracle/scripts/freespace.sh >/home/oracle/scripts/log/freespace_CWA.trc 2>&1
 00 06 * * 1-5 /home/oracle/scripts/clean_trace_dump.sh 60 >/home/oracle/scripts/log/clean_trace_dump_cwa.trc 2>&1
@@ -112,12 +108,10 @@ cat <<EOT > /etc/cron.d/oracle_cron
 00 07 * * * /home/oracle/scripts/tablespace1.sh
 
 EOT
-chmod 700 /etc/cron.d/oracle_cron
-/bin/cp -f /etc/cron.d/oracle_cron  /home/oracle/oraclecrontab.txt
 chown oracle:oinstall /home/oracle/oraclecrontab.txt
 chmod 744 /home/oracle/oraclecrontab.txt
 su oracle -c "crontab /home/oracle/oraclecrontab.txt"
-chown -R oracle:dba /home/oracle/scripts
+chown -R oracle:oinstall /home/oracle/scripts
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
