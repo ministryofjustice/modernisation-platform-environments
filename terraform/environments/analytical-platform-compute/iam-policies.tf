@@ -218,7 +218,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "iam:*",
       "sso-directory:*",
       "athena:*",
-      "s3:*"
+      "s3:*",
+      "quicksight:*"
     ]
     resources = [
       "*"
