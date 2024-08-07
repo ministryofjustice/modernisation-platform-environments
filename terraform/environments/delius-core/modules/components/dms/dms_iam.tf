@@ -67,6 +67,7 @@ resource "aws_iam_role" "dms_s3_writer_role" {
 }
 
 resource "aws_s3_bucket_policy" "dms_s3_bucket_policy" {
+  count  = length(keys(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns)) > 0 ? 1 : 0
   bucket = module.s3_bucket_dms_destination.bucket.id
 
   policy = jsonencode({
