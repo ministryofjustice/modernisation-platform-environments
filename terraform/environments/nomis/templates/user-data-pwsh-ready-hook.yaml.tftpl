@@ -103,7 +103,12 @@ tasks:
 
             $EC2LaunchRunOncePath = "C:\ProgramData\Amazon\EC2Launch\state\.run-once"
 
-            function Set-ReadyHookContinue {
+            function Set-ReadyHook {
+
+                param(
+                    [ValidateSet('CONTINUE', 'ABANDON')]
+                    [string]$lifecycleActionResult = 'CONTINUE' # Default to CONTINUE
+                )
                 # Get token
                 $token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds" = "21600"} -Method PUT -Uri "http://169.254.169.254/latest/api/token"
                 
@@ -113,16 +118,29 @@ tasks:
                 $name = (aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Name" --output text).Split("`t")[-1]
 
                 # Run complete-lifecycle-action using AWS CLI
-                aws autoscaling complete-lifecycle-action --lifecycle-hook-name "$name-ready-hook" --auto-scaling-group-name $name --lifecycle-action-result CONTINUE --instance-id $instanceId --region $region
-            }
-          
-            if(Test-Path $EC2LaunchRunOncePath) {
-                Write-Output "EC2Launch .run-once file exists, previous steps completed"
-                Write-Output "Sending $name-ready-hook CONTINUE lifecycle action result"
-                Set-ReadyHookContinue
-            } else {
-                Write-Output "EC2Launch .run-once file does not yet exist"
-                Write-Output "Defer sending $name-ready-hook CONTINUE lifecycle action result" 
+                aws autoscaling complete-lifecycle-action --lifecycle-hook-name "$name-ready-hook" --auto-scaling-group-name $name --lifecycle-action-result $lifecycleActionResult --instance-id $instanceId --region $region
             }
 
+            $startTime = Get-Date
+
+            while ($true) {
+          
+              if(Test-Path $EC2LaunchRunOncePath) {
+                  Write-Output "EC2Launch .run-once file exists, previous steps completed"
+                  Write-Output "Sending $name-ready-hook CONTINUE lifecycle action result"
+                  Set-ReadyHook $lifeCycleActionResult 'CONTINUE'
+                  break
+              }
+
+              $elapsedTime = (Get-Date) - $startTime
+              if ($elapsedTime.TotalMinutes -gt 15) {
+                  Write-Output "EC2Launch .run-once file does not yet exist"
+                  Write-Output "EC2Launch tasks have not completed within 15 minutes"
+                  Set-ReadyHook $lifeCycleActionResult 'ABANDON' 
+                  break
+              }
+
+              # Sleep for a short interval before checking again
+              Start-Sleep -Seconds 10
+            }
 
