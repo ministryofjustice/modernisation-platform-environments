@@ -12,8 +12,8 @@ module "s3_bucket_dms_destination" {
   bucket_policy_v2 = [{
           effect     = "Allow"
           principals = {
-            type = "AWS"
-            AWS = values(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns)
+            type        = "AWS"
+            identifiers = values(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns)
           }
           actions    = [
             "s3:PutObject",
