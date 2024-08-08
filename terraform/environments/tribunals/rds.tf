@@ -29,26 +29,6 @@ resource "aws_db_subnet_group" "db_subnet_group" {
   subnet_ids = data.aws_subnets.shared-private.ids
 }
 
-resource "aws_security_group" "test" {
-  name        = "test"
-  description = "control access to the database"
-  vpc_id      = data.aws_vpc.shared.id
-  ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
-  }
-  egress {
-    description = "allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_security_group" "sqlserver_db_sc" {
   name        = "sqlserver_security_group"
   description = "control access to the database"
