@@ -70,6 +70,13 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description     = "Allows each Tribunal ECS service to access RDS"
     security_groups = [aws_security_group.ecs_service.id]
   }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allow lambda access to rds"
+    security_groups = [aws_security_group.lambda_sg.id]
+  }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0

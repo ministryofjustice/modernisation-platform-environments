@@ -1,5 +1,78 @@
-use ftt
-go
+use transport;
+GO
+
+
+CREATE FUNCTION [dbo].[awsdms_fn_LsnSegmentToHexa] (@InputData VARBINARY(32)) RETURNS VARCHAR(64)
+AS
+  BEGIN
+    DECLARE  @HexDigits   	CHAR(16),
+             @OutputData      VARCHAR(64),
+             @i           	INT,
+             @InputDataLength INT
+
+    DECLARE  @ByteInfo  	INT,
+             @LeftNibble 	INT,
+             @RightNibble INT
+
+    SET @OutputData = ''
+
+    SET @i = 1
+
+    SET @InputDataLength = DATALENGTH(@InputData)
+
+    SET @HexDigits = '0123456789abcdef'
+
+    WHILE (@i <= @InputDataLength)
+      BEGIN
+        SET @ByteInfo = CONVERT(INT,SUBSTRING(@InputData,@i,1))
+        SET @LeftNibble= FLOOR(@ByteInfo / 16)
+        SET @RightNibble = @ByteInfo - (@LeftNibble* 16)
+        SET @OutputData = @OutputData + SUBSTRING(@HexDigits,@LeftNibble+ 1,1) + SUBSTRING(@HexDigits,@RightNibble + 1,1)
+        SET @i = @i + 1
+      END
+
+    RETURN @OutputData
+
+  END
+;
+GO
+
+        
+CREATE FUNCTION [dbo].[awsdms_fn_NumericLsnToHexa](@numeric25Lsn numeric(25,0)) returns varchar(32)
+ AS
+ BEGIN
+-- In order to avoid form sign overflow problems - declare the LSN segments 
+-- to be one 'type' larger than the intendent target type.
+-- For example, convert(smallint, convert(numeric(25,0),65535)) will fail 
+-- but convert(binary(2), convert(int,convert(numeric(25,0),65535))) will give the 
+-- expected result of 0xffff.
+
+declare @high4bytelsnSegment bigint,@mid4bytelsnSegment bigint,@low2bytelsnSegment int
+declare @highFactor bigint, @midFactor int
+
+declare @lsnLeftSeg	binary(4)
+declare @lsnMidSeg	binary(4)
+declare @lsnRightSeg	binary(2)
+
+declare	@hexaLsn	varchar(32)
+
+select @highFactor = 1000000000000000
+select @midFactor  = 100000
+
+select @high4bytelsnSegment = convert(bigint, floor(@numeric25Lsn / @highFactor))
+select @numeric25Lsn = @numeric25Lsn - convert(numeric(25,0), @high4bytelsnSegment) * @highFactor
+select @mid4bytelsnSegment = convert(bigint,floor(@numeric25Lsn / @midFactor ))
+select @numeric25Lsn = @numeric25Lsn - convert(numeric(25,0), @mid4bytelsnSegment) * @midFactor
+select @low2bytelsnSegment = convert(int, @numeric25Lsn)
+
+set	@lsnLeftSeg	= convert(binary(4), @high4bytelsnSegment)
+set	@lsnMidSeg	= convert(binary(4), @mid4bytelsnSegment)
+set   @lsnRightSeg	= convert(binary(2), @low2bytelsnSegment)
+
+return [dbo].[awsdms_fn_LsnSegmentToHexa](@lsnLeftSeg)+':'+[dbo].[awsdms_fn_LsnSegmentToHexa](@lsnMidSeg)+':'+[dbo].[awsdms_fn_LsnSegmentToHexa](@lsnRightSeg)
+END
+;
+GO
 
 create proc dbo.dt_addtosourcecontrol
     @vchSourceSafeINI varchar(255) = '',
@@ -38,7 +111,6 @@ select @iObjectCount = 0
     if @iReturn <> 0 GOTO E_OAError
 
 
-    /* Create Project in SS */
     exec @iReturn = sp_OAMethod @iObjectId,
                                 'AddProjectToSourceSafe',
                                 NULL,
@@ -57,11 +129,7 @@ select @iObjectCount = 0
 
     if @iReturn <> 0 GOTO E_OAError
 
-    /* Set Database Properties */
-
     begin tran SetProperties
-
-    /* add high level object */
 
     exec @iPropertyObjectId = dbo.dt_adduserobject_vcs 'VCSProjectID'
 
@@ -144,7 +212,6 @@ CleanUp:
     return
 
 E_General_Error:
-    /* this is an all or nothing.  No specific error messages */
     goto CleanUp
 
 E_OAError:
@@ -152,10 +219,8 @@ E_OAError:
     goto CleanUp
 
 
-go
-
-grant execute on dbo.dt_addtosourcecontrol to [public]
-go
+;
+GO
 
 create proc dbo.dt_addtosourcecontrol_u
     @vchSourceSafeINI nvarchar(255) = '',
@@ -194,7 +259,6 @@ select @iObjectCount = 0
     if @iReturn <> 0 GOTO E_OAError
 
 
-    /* Create Project in SS */
     exec @iReturn = sp_OAMethod @iObjectId,
                                 'AddProjectToSourceSafe',
                                 NULL,
@@ -213,11 +277,9 @@ select @iObjectCount = 0
 
     if @iReturn <> 0 GOTO E_OAError
 
-    /* Set Database Properties */
 
     begin tran SetProperties
 
-    /* add high level object */
 
     exec @iPropertyObjectId = dbo.dt_adduserobject_vcs 'VCSProjectID'
 
@@ -300,7 +362,6 @@ CleanUp:
     return
 
 E_General_Error:
-    /* this is an all or nothing.  No specific error messages */
     goto CleanUp
 
 E_OAError:
@@ -308,30 +369,20 @@ E_OAError:
     goto CleanUp
 
 
-go
+;
+GO
 
-grant execute on dbo.dt_addtosourcecontrol_u to [public]
-go
-
-/*
-**	Add an object to the dtproperties table
-*/
 create procedure dbo.dt_adduserobject
 as
 	set nocount on
-	/*
-	** Create the user object if it does not exist already
-	*/
 	begin transaction
 		insert dbo.dtproperties (property) VALUES ('DtgSchemaOBJECT')
 		update dbo.dtproperties set objectid=@@identity 
 			where id=@@identity and property='DtgSchemaOBJECT'
 	commit
 	return @@identity
-go
-
-grant execute on dbo.dt_adduserobject to [public]
-go
+;
+GO
 
 create procedure dbo.dt_adduserobject_vcs
     @vchProperty varchar(64)
@@ -341,9 +392,6 @@ as
 set nocount on
 
 declare @iReturn int
-    /*
-    ** Create the user object if it does not exist already
-    */
     begin transaction
         select @iReturn = objectid from dbo.dtproperties where property = @vchProperty
         if @iReturn IS NULL
@@ -357,10 +405,8 @@ declare @iReturn int
     return @iReturn
 
 
-go
-
-grant execute on dbo.dt_adduserobject_vcs to [public]
-go
+;
+GO
 
 create proc dbo.dt_checkinobject
     @chObjectType  char(4),
@@ -369,8 +415,8 @@ create proc dbo.dt_checkinobject
     @vchLoginName  varchar(255),
     @vchPassword   varchar(255)='',
     @iVCSFlags     int = 0,
-    @iActionFlag   int = 0,   /* 0 => AddFile, 1 => CheckIn */
-    @txStream1     Text = '', /* There is a bug that if items are NULL they do not pass to OLE servers */
+    @iActionFlag   int = 0,
+    @txStream1     Text = '',
     @txStream2     Text = '',
     @txStream3     Text = ''
 
@@ -405,12 +451,9 @@ select @iPropertyObjectId  = 0
     begin
         if @iActionFlag = 1
         begin
-            /* Procedure Can have up to three streams
-            Drop Stream, Create Stream, GRANT stream */
 
             begin tran compile_all
 
-            /* try to compile the streams */
             exec (@txStream1)
             if @@error <> 0 GOTO E_Compile_Fail
 
@@ -520,10 +563,8 @@ E_OAError:
     goto CleanUp
 
 
-go
-
-grant execute on dbo.dt_checkinobject to [public]
-go
+;
+GO
 
 create proc dbo.dt_checkinobject_u
     @chObjectType  char(4),
@@ -532,8 +573,8 @@ create proc dbo.dt_checkinobject_u
     @vchLoginName  nvarchar(255),
     @vchPassword   nvarchar(255)='',
     @iVCSFlags     int = 0,
-    @iActionFlag   int = 0,   /* 0 => AddFile, 1 => CheckIn */
-    @txStream1     Text = '', /* There is a bug that if items are NULL they do not pass to OLE servers */
+    @iActionFlag   int = 0,
+    @txStream1     Text = '',
     @txStream2     Text = '',
     @txStream3     Text = ''
 
@@ -568,12 +609,9 @@ select @iPropertyObjectId  = 0
     begin
         if @iActionFlag = 1
         begin
-            /* Procedure Can have up to three streams
-            Drop Stream, Create Stream, GRANT stream */
 
             begin tran compile_all
 
-            /* try to compile the streams */
             exec (@txStream1)
             if @@error <> 0 GOTO E_Compile_Fail
 
@@ -683,10 +721,8 @@ E_OAError:
     goto CleanUp
 
 
-go
-
-grant execute on dbo.dt_checkinobject_u to [public]
-go
+;
+GO
 
 create proc dbo.dt_checkoutobject
     @chObjectType  char(4),
@@ -695,7 +731,7 @@ create proc dbo.dt_checkoutobject
     @vchLoginName  varchar(255),
     @vchPassword   varchar(255),
     @iVCSFlags     int = 0,
-    @iActionFlag   int = 0/* 0 => Checkout, 1 => GetLatest, 2 => UndoCheckOut */
+    @iActionFlag   int = 0
 
 as
 
@@ -713,7 +749,6 @@ select @iReturnValue = 0
 
 declare @vchTempText varchar(255)
 
-/* this is for our strings */
 declare @iStreamObjectId int
 select @iStreamObjectId = 0
 
@@ -731,8 +766,6 @@ select @iStreamObjectId = 0
 
     if @chObjectType = 'PROC'
     begin
-        /* Procedure Can have up to three streams
-           Drop Stream, Create Stream, GRANT stream */
 
         exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
 
@@ -784,10 +817,8 @@ E_OAError:
     GOTO CleanUp
 
 
-go
-
-grant execute on dbo.dt_checkoutobject to [public]
-go
+;
+GO
 
 create proc dbo.dt_checkoutobject_u
     @chObjectType  char(4),
@@ -796,7 +827,7 @@ create proc dbo.dt_checkoutobject_u
     @vchLoginName  nvarchar(255),
     @vchPassword   nvarchar(255),
     @iVCSFlags     int = 0,
-    @iActionFlag   int = 0/* 0 => Checkout, 1 => GetLatest, 2 => UndoCheckOut */
+    @iActionFlag   int = 0
 
 as
 
@@ -814,7 +845,6 @@ select @iReturnValue = 0
 
 declare @vchTempText nvarchar(255)
 
-/* this is for our strings */
 declare @iStreamObjectId int
 select @iStreamObjectId = 0
 
@@ -832,8 +862,6 @@ select @iStreamObjectId = 0
 
     if @chObjectType = 'PROC'
     begin
-        /* Procedure Can have up to three streams
-           Drop Stream, Create Stream, GRANT stream */
 
         exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
 
@@ -885,10 +913,8 @@ E_OAError:
     GOTO CleanUp
 
 
-go
-
-grant execute on dbo.dt_checkoutobject_u to [public]
-go
+;
+GO
 
 CREATE PROCEDURE dbo.dt_displayoaerror
     @iObject int,
@@ -909,10 +935,8 @@ declare @vchDescription varchar(255)
 
     return
 
-go
-
-grant execute on dbo.dt_displayoaerror to [public]
-go
+;
+GO
 
 CREATE PROCEDURE dbo.dt_displayoaerror_u
     @iObject int,
@@ -933,17 +957,9 @@ declare @vchDescription nvarchar(255)
 
     return
 
-go
+;
+GO
 
-grant execute on dbo.dt_displayoaerror_u to [public]
-go
-
-/*
-**	Drop one or all the associated properties of an object or an attribute 
-**
-**	dt_dropproperties objid, null or '' -- drop all properties of the object itself
-**	dt_dropproperties objid, property -- drop the property
-*/
 create procedure dbo.dt_droppropertiesbyid
 	@id int,
 	@property varchar(64)
@@ -956,27 +972,17 @@ as
 		delete from dbo.dtproperties 
 			where objectid=@id and property=@property
 
-go
+;
+GO
 
-grant execute on dbo.dt_droppropertiesbyid to [public]
-go
-
-/*
-**	Drop an object from the dbo.dtproperties table
-*/
 create procedure dbo.dt_dropuserobjectbyid
 	@id int
 as
 	set nocount on
 	delete from dbo.dtproperties where objectid=@id
-go
+;
+GO
 
-grant execute on dbo.dt_dropuserobjectbyid to [public]
-go
-
-/* 
-**	Generate an ansi name that is unique in the dtproperties.value column 
-*/ 
 create procedure dbo.dt_generateansiname(@name varchar(255) output) 
 as 
 	declare @prologue varchar(20) 
@@ -1007,14 +1013,9 @@ TooMany:
  
 	set @name = 'DIAGRAM' 
 	goto Leave
-go
+;
+GO
 
-grant execute on dbo.dt_generateansiname to [public]
-go
-
-/*
-**	Retrieve the owner object(s) of a given property
-*/
 create procedure dbo.dt_getobjwithprop
 	@property varchar(30),
 	@value varchar(255)
@@ -1034,14 +1035,9 @@ as
 	else
 		select objectid id from dbo.dtproperties
 			where property=@property and value=@value
-go
+;
+GO
 
-grant execute on dbo.dt_getobjwithprop to [public]
-go
-
-/*
-**	Retrieve the owner object(s) of a given property
-*/
 create procedure dbo.dt_getobjwithprop_u
 	@property varchar(30),
 	@uvalue nvarchar(255)
@@ -1061,17 +1057,9 @@ as
 	else
 		select objectid id from dbo.dtproperties
 			where property=@property and uvalue=@uvalue
-go
+;
+GO
 
-grant execute on dbo.dt_getobjwithprop_u to [public]
-go
-
-/*
-**	Retrieve properties by id's
-**
-**	dt_getproperties objid, null or '' -- retrieve all properties of the object itself
-**	dt_getproperties objid, property -- retrieve the property specified
-*/
 create procedure dbo.dt_getpropertiesbyid
 	@id int,
 	@property varchar(64)
@@ -1086,17 +1074,9 @@ as
 		select property, version, value, lvalue
 			from dbo.dtproperties
 			where  @id=objectid and @property=property
-go
+;
+GO
 
-grant execute on dbo.dt_getpropertiesbyid to [public]
-go
-
-/*
-**	Retrieve properties by id's
-**
-**	dt_getproperties objid, null or '' -- retrieve all properties of the object itself
-**	dt_getproperties objid, property -- retrieve the property specified
-*/
 create procedure dbo.dt_getpropertiesbyid_u
 	@id int,
 	@property varchar(64)
@@ -1111,10 +1091,8 @@ as
 		select property, version, uvalue, lvalue
 			from dbo.dtproperties
 			where  @id=objectid and @property=property
-go
-
-grant execute on dbo.dt_getpropertiesbyid_u to [public]
-go
+;
+GO
 
 create procedure dbo.dt_getpropertiesbyid_vcs
     @id       int,
@@ -1131,10 +1109,8 @@ as
                 where @id=objectid and @property=property
                 )
 
-go
-
-grant execute on dbo.dt_getpropertiesbyid_vcs to [public]
-go
+;
+GO
 
 create procedure dbo.dt_getpropertiesbyid_vcs_u
     @id       int,
@@ -1151,15 +1127,13 @@ as
                 where @id=objectid and @property=property
                 )
 
-go
-
-grant execute on dbo.dt_getpropertiesbyid_vcs_u to [public]
-go
+;
+GO
 
 create proc dbo.dt_isundersourcecontrol
     @vchLoginName varchar(255) = '',
     @vchPassword  varchar(255) = '',
-    @iWhoToo      int = 0 /* 0 => Just check project; 1 => get list of objs */
+    @iWhoToo      int = 0
 
 as
 
@@ -1201,7 +1175,6 @@ declare @vchTempText varchar(255)
     if @iWhoToo = 1
     begin
 
-        /* Get List of Procs in the project */
         exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
         if @iReturn <> 0 GOTO E_OAError
 
@@ -1243,15 +1216,13 @@ E_OAError:
     goto CleanUp
 
 
-go
-
-grant execute on dbo.dt_isundersourcecontrol to [public]
-go
+;
+GO
 
 create proc dbo.dt_isundersourcecontrol_u
     @vchLoginName nvarchar(255) = '',
     @vchPassword  nvarchar(255) = '',
-    @iWhoToo      int = 0 /* 0 => Just check project; 1 => get list of objs */
+    @iWhoToo      int = 0
 
 as
 
@@ -1293,7 +1264,6 @@ as
     if @iWhoToo = 1
     begin
 
-        /* Get List of Procs in the project */
         exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
         if @iReturn <> 0 GOTO E_OAError
 
@@ -1335,10 +1305,8 @@ E_OAError:
     goto CleanUp
 
 
-go
-
-grant execute on dbo.dt_isundersourcecontrol_u to [public]
-go
+;
+GO
 
 create procedure dbo.dt_removefromsourcecontrol
 
@@ -1351,24 +1319,14 @@ as
 
     exec dbo.dt_droppropertiesbyid @iPropertyObjectId, null
 
-    /* -1 is returned by dt_droppopertiesbyid */
     if @@error <> 0 and @@error <> -1 return 1
 
     return 0
 
 
-go
+;
+GO
 
-grant execute on dbo.dt_removefromsourcecontrol to [public]
-go
-
-/*
-**	If the property already exists, reset the value; otherwise add property
-**		id -- the id in sysobjects of the object
-**		property -- the name of the property
-**		value -- the text value of the property
-**		lvalue -- the binary value of the property (image)
-*/
 create procedure dbo.dt_setpropertybyid
 	@id int,
 	@property varchar(64),
@@ -1396,18 +1354,9 @@ as
 			values (@property, @id, @value, @uvalue, @lvalue)
 	end
 
-go
+;
+GO
 
-grant execute on dbo.dt_setpropertybyid to [public]
-go
-
-/*
-**	If the property already exists, reset the value; otherwise add property
-**		id -- the id in sysobjects of the object
-**		property -- the name of the property
-**		uvalue -- the text value of the property
-**		lvalue -- the binary value of the property (image)
-*/
 create procedure dbo.dt_setpropertybyid_u
 	@id int,
 	@property varchar(64),
@@ -1452,10 +1401,8 @@ as
 		insert dbo.dtproperties (property, objectid, value, uvalue, lvalue)
 			values (@property, @id, @avalue, @uvalue, @lvalue)
 	end
-go
-
-grant execute on dbo.dt_setpropertybyid_u to [public]
-go
+;
+GO
 
 create proc dbo.dt_validateloginparams
     @vchLoginName  varchar(255),
@@ -1496,10 +1443,8 @@ E_OAError:
     GOTO CleanUp
 
 
-go
-
-grant execute on dbo.dt_validateloginparams to [public]
-go
+;
+GO
 
 create proc dbo.dt_validateloginparams_u
     @vchLoginName  nvarchar(255),
@@ -1540,10 +1485,8 @@ E_OAError:
     GOTO CleanUp
 
 
-go
-
-grant execute on dbo.dt_validateloginparams_u to [public]
-go
+;
+GO
 
 create proc dbo.dt_vcsenabled
 
@@ -1559,26 +1502,17 @@ select @VSSGUID = 'SQLVersionControl.VCS_SQL'
 
     declare @iReturn int
     exec @iReturn = sp_OACreate @VSSGUID, @iObjectId OUT
-    if @iReturn <> 0 raiserror('', 16, -1) /* Can't Load Helper DLLC */
+    if @iReturn <> 0 raiserror('', 16, -1)
 
 
-go
+;
+GO
 
-grant execute on dbo.dt_vcsenabled to [public]
-go
-
-/*
-**	This procedure returns the version number of the stored
-**    procedures used by the Microsoft Visual Database Tools.
-**    Current version is 7.0.00.
-*/
 create procedure dbo.dt_verstamp006
 as
 	select 7000
-go
-
-grant execute on dbo.dt_verstamp006 to [public]
-go
+;
+GO
 
 create proc dbo.dt_whocheckedout
         @chObjectType  char(4),
@@ -1644,10 +1578,8 @@ E_OAError:
     GOTO CleanUp
 
 
-go
-
-grant execute on dbo.dt_whocheckedout to [public]
-go
+;
+GO
 
 create proc dbo.dt_whocheckedout_u
         @chObjectType  char(4),
@@ -1713,12 +1645,8 @@ E_OAError:
     GOTO CleanUp
 
 
-go
-
-grant execute on dbo.dt_whocheckedout_u to [public]
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spAddCategory] 
@@ -1737,63 +1665,8 @@ VALUES
 	(
 		@description
 	)
-
-
-go
-
-
-
-
-CREATE PROCEDURE [dbo].[spAddCommissioner] 
-
-@Prefix varchar(100),
-@Surname varchar(300),
-@Suffix varchar(100)
-
-AS
-
-INSERT
-	Commissioner
-	(
-		prefix,
-		surname,
-		suffix
-	)
-
-VALUES
-	(
-		@Prefix,
-		@surname,
-		@suffix
-	)
-
-go
-
-
-
-CREATE PROCEDURE [dbo].[spAddCommissionerJudgmentMap] 
-
-@CommissionerID int,
-@JudgmentID int
-
-AS
-
-INSERT
-	CommissionerJudgmentMap
-	(
-		Commissioner_ID,
-		Judgment_ID
-	)
-	
-	VALUES
-	(
-		@CommissionerID,
-		@JudgmentID
-	)
-
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spAddJudgment] 
@@ -1807,11 +1680,7 @@ CREATE PROCEDURE [dbo].[spAddJudgment]
 @Respondent ntext,
 @Main_subcategory_id int,
 @Sec_subcategory_id int,
-@Headnote_summary ntext,
-@File_no_3 varchar(4),
-@Reported_no_1 varchar(3),
-@Reported_no_2 varchar(3),
-@Reported_no_3 varchar(2)
+@Headnote_summary ntext
 
 AS
 
@@ -1820,54 +1689,42 @@ DECLARE @Publication_datetime datetime
 IF @Is_published = 1 
 	SELECT @Publication_datetime = getdate()
 
+INSERT
+	Judgment
+	(
+		Is_published,
+		File_no_1,
+		File_no_2,
+		Decision_datetime,
+		Claimants,
+		Respondent,
+		Main_subcategory_id,
+		Sec_subcategory_id,
+		Headnote_summary,
+		Created_datetime,
+		Last_updatedtime,
+		Publication_datetime
+	)
 
-	INSERT
-		Judgment
-		(
-			Is_published,
-			File_no_1,
-			File_no_2,
-			Decision_datetime,
-			Claimants,
-			Respondent,
-			Main_subcategory_id,
-			Sec_subcategory_id,
-			Headnote_summary,
-			Created_datetime,
-			Last_updatedtime,
-			Publication_datetime,
-			File_no_3,
-			Reported_no_1,
-			Reported_no_2,
-			Reported_no_3
-		)
-	
-	VALUES
-		(
-			@Is_published,
-			@File_no_1,
-			@File_no_2,
-			@Decision_datetime,
-			@Claimants,
-			@Respondent,
-			@Main_subcategory_id,
-			@Sec_subcategory_id,
-			@Headnote_summary,
-			getdate(),
-			getdate(),
-			@Publication_datetime,
-			@File_no_3,
-			@Reported_no_1,
-			@Reported_no_2,
-			@Reported_no_3
-		)
-	
-	SELECT @Id = SCOPE_IDENTITY()
+VALUES
+	(
+		@Is_published,
+		@File_no_1,
+		@File_no_2,
+		@Decision_datetime,
+		@Claimants,
+		@Respondent,
+		@Main_subcategory_id,
+		@Sec_subcategory_id,
+		@Headnote_summary,
+		getdate(),
+		getdate(),
+		@Publication_datetime
+	)
 
-go
-
-
-
+SELECT @Id = SCOPE_IDENTITY()
+;
+GO
 
 CREATE PROCEDURE [dbo].[spAddSubCategory] 
 
@@ -1891,9 +1748,8 @@ VALUES
 		@description,
 		@num
 	)
-
-
-go
+;
+GO
 
 
 
@@ -1928,29 +1784,8 @@ VALUES
 
 SELECT @UserID = SCOPE_IDENTITY()
 
-go
-
-
-
-
-CREATE PROCEDURE [dbo].[spCountJudgmentsByCommissioner] 
-
-@Id int
-
-AS
-
-SELECT
-	COUNT(*) as num
-
-FROM
-	CommissionerJudgmentMap
-
-WHERE
-	commissioner_id = @Id
-
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spCountJudgmentsBySubCategory] 
@@ -1971,11 +1806,8 @@ WHERE
 	OR
 
 	sec_subcategory_id = @Id
-
-
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spCountSubCategoryByCategory] 
@@ -1992,11 +1824,8 @@ FROM
 
 WHERE
 	parent_num = @CategoryId
-
-
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spDeleteCategory] 
@@ -2010,44 +1839,8 @@ DELETE
 
 WHERE
 	Num = @Id
-
-
-go
-
-
-
-
-CREATE PROCEDURE [dbo].[spDeleteCommissioner] 
-
-@Id int
-
-AS
-
-DELETE
-	Commissioner
-
-WHERE
-	[Id] = @Id
-
-go
-
-
-
-CREATE PROCEDURE [dbo].[spDeleteCommissionerJudgmentMap] 
-
-@JudgmentID int
-
-AS
-
-DELETE
-	CommissionerJudgmentMap
-
-WHERE
-	Judgment_Id = @JudgmentID
-
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spDeleteSubCategory] 
@@ -2061,9 +1854,8 @@ DELETE
 
 WHERE
 	[Id] = @Id
-
-
-go
+;
+GO
 
 
 
@@ -2087,36 +1879,8 @@ IF @Count > 1
 			UserID = @UserID
 	END
 
-go
-
-
-
-
-
-CREATE PROCEDURE [dbo].[spGetAllDecisions] 
-
-AS
-
--- Main result set - ds.Tables(0)
-select j.id, j.decision_datetime as DecisionDate
-,j.file_no_1 + ' ' + j.file_no_2 + ' ' + j.file_no_3  as 'FileNumber'
-, c.[description] as Category
-, s.[description] as Subcategory
-, c2.[description] as SecondaryCategory
-,s2.[description] as SecondarySubcategory
-,j.claimants as Claimants
-, j.respondent as Respondent
-,cm.prefix + ' ' + cm.surname + ' ' + cm.suffix as Commissioner
-from judgment j
-inner join subcategory s on j.main_subcategory_id = s.id
-inner join category c on s.parent_num = c.num
-left join subcategory s2 on j.sec_subcategory_id = s2.id
-left join category c2 on s2.parent_num = c2.num
-left join commissionerjudgmentmap cjm on j.[id] = cjm.judgment_id
-left join commissioner cm on cjm.commissioner_id = cm.[id]
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spGetCategoryList] 
@@ -2126,44 +1890,8 @@ AS
 SELECT num, [description]
 FROM category
 ORDER BY num
-
-
-go
-
-
-
-CREATE PROCEDURE [dbo].[spGetCommissionerList] 
-
-AS
-
-select [id], prefix, surname, suffix
-from commissioner
-order by surname
-
-go
-
-
-
-CREATE PROCEDURE [dbo].[spGetCommissionerListSelected] 
-
-@DecisionId int
-
-AS
-
-select [id], prefix, surname, suffix, isnull(m.commid, 0) as commid
-from commissioner c 
-left join
-	(
-	select commissioner_id as commid
-	from commissionerjudgmentmap cjm
-	where judgment_id = @DecisionId
-	) as m
-on c.[id] = m.commid
-order by commid desc, c.surname
-
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spGetDecision] 
@@ -2172,27 +1900,16 @@ CREATE PROCEDURE [dbo].[spGetDecision]
 
 AS
 
--- Main result set - ds.Tables(0)
 select j.*, s.[description] as subcategory, s.[id] as subcatid, c.[description] as category, c.num as catid,
-	s2.[description] as secsubcategory, s2.[id] as secsubcatid, c2.[description] as seccategory, c2.num as seccatid,
-	j.file_no_1 + ' ' + j.file_no_2 + ' ' + j.file_no_3  as 'filenumber'
+	s2.[description] as secsubcategory, s2.[id] as secsubcatid, c2.[description] as seccategory, c2.num as seccatid 
 from judgment j
 inner join subcategory s on j.main_subcategory_id = s.id
 inner join category c on s.parent_num = c.num
 left join subcategory s2 on j.sec_subcategory_id = s2.id
 left join category c2 on s2.parent_num = c2.num
 where j.[id] = @DecisionId
-
--- Selected commissioners result set - ds.Tables(1)
-select cm.prefix, cm.surname, cm.suffix, cm.[id] as 'commissionerid',
-	cm.prefix + ' ' + cm.surname + ' ' + cm.suffix as 'commissioner'
-from judgment j
-left join commissionerjudgmentmap cjm on j.[id] = cjm.judgment_id
-left join commissioner cm on cjm.commissioner_id = cm.[id]
-where cjm.judgment_id = @DecisionId
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spGetDecisionPublished] 
@@ -2202,10 +1919,8 @@ CREATE PROCEDURE [dbo].[spGetDecisionPublished]
 
 AS
 
--- Main result set - ds.Tables(0)
 select j.*, s.[description] as subcategory, s.[id] as subcatid, c.[description] as category, c.num as catid,
-	s2.[description] as secsubcategory, s2.[id] as secsubcatid, c2.[description] as seccategory, c2.num as seccatid,
-	j.file_no_1 + ' ' + j.file_no_2 + ' ' + j.file_no_3  as 'filenumber'
+	s2.[description] as secsubcategory, s2.[id] as secsubcatid, c2.[description] as seccategory, c2.num as seccatid 
 from judgment j
 inner join subcategory s on j.main_subcategory_id = s.id
 inner join category c on s.parent_num = c.num
@@ -2213,17 +1928,8 @@ left join subcategory s2 on j.sec_subcategory_id = s2.id
 left join category c2 on s2.parent_num = c2.num
 where j.[id] = @DecisionId
 and is_published = @Is_Published
-
--- Selected commissioners result set - ds.Tables(1)
-select cm.prefix, cm.surname, cm.suffix, cm.[id] as 'commissionerid',
-	cm.prefix + ' ' + cm.surname + ' ' + cm.suffix as 'commissioner'
-from judgment j
-left join commissionerjudgmentmap cjm on j.[id] = cjm.judgment_id
-left join commissioner cm on cjm.commissioner_id = cm.[id]
-where cjm.judgment_id = @DecisionId
-go
-
-
+; 
+ GO
 
 
 CREATE PROCEDURE [dbo].[spGetSubCategoryList] 
@@ -2233,11 +1939,8 @@ AS
 SELECT [id], parent_num, num, [description]
 FROM subcategory
 ORDER BY parent_num, num
-
-
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spGetSubCategoryListByCategory] 
@@ -2251,9 +1954,8 @@ FROM subcategory s
 inner join category c on s.parent_num = c.num
 WHERE parent_num = @CategoryId
 ORDER BY s. num
-
-
-go
+;
+GO
 
 
 
@@ -2272,7 +1974,8 @@ FROM
 WHERE
 	UserID = @UserID
 
-go
+;
+GO
 
 
 
@@ -2286,9 +1989,8 @@ SELECT
 FROM
 	Users
 
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spLoginUser]
@@ -2309,11 +2011,8 @@ WHERE
 
 AND
 	[Password] = @Password
-
-
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spUpdateCategory] 
@@ -2331,57 +2030,8 @@ SET
 
 WHERE
 	num = @id
-
-
-go
-
-
-
-
-CREATE PROCEDURE [dbo].[spUpdateCommissioner] 
-
-@id int,
-@Prefix varchar(100),
-@Surname varchar(300),
-@Suffix varchar(100)
-
-AS
-
-UPDATE
-	Commissioner
-
-SET
-	prefix = @Prefix,
-	surname = @surname,
-	suffix = @suffix
-
-WHERE
-	[id] = @id
-
-go
-
-
-
-CREATE PROCEDURE [dbo].[spUpdateCommissionerJudgmentMap] 
-
-@CommissionerID int,
-@JudgmentID int
-
-AS
-
-UPDATE
-	CommissionerJudgmentMap
-
-SET
-	Commissioner_ID = @CommissionerID
-	
-WHERE
-	Judgment_ID = @JudgmentID
-
-
-go
-
-
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spUpdateJudgment] 
@@ -2395,11 +2045,7 @@ CREATE PROCEDURE [dbo].[spUpdateJudgment]
 @Respondent ntext,
 @Main_subcategory_id int,
 @Sec_subcategory_id int,
-@Headnote_summary ntext,
-@File_no_3 varchar(4),
-@Reported_no_1 varchar(3),
-@Reported_no_2 varchar(3),
-@Reported_no_3 varchar(2)
+@Headnote_summary ntext
 
 AS
 
@@ -2424,33 +2070,26 @@ IF @Is_published = 0
 		SELECT @Publication_datetime = NULL
 	END
 
+UPDATE
+	Judgment
 
-	UPDATE
-		Judgment
-	
-	SET
-		Is_Published = @Is_Published,
-		File_no_1 = @File_no_1,
-		File_no_2 = @File_no_2,
-		File_no_3 = @File_no_3,
-		Decision_datetime = @Decision_datetime,
-		Claimants = @Claimants,
-		Respondent = @Respondent,
-		Main_subcategory_id = @Main_subcategory_id,
-		Sec_subcategory_id = @Sec_subcategory_id,
-		Headnote_summary = @Headnote_summary,
-		Last_updatedtime = getdate(),
-		Publication_datetime = @Publication_datetime,
-		Reported_no_1 = @Reported_no_1,
-		Reported_no_2 = @Reported_no_2,
-		Reported_no_3 = @Reported_no_3
-	
-	WHERE
-		[Id] = @Id
+SET
+	Is_Published = @Is_Published,
+	File_no_1 = @File_no_1,
+	File_no_2 = @File_no_2,
+	Decision_datetime = @Decision_datetime,
+	Claimants = @Claimants,
+	Respondent = @Respondent,
+	Main_subcategory_id = @Main_subcategory_id,
+	Sec_subcategory_id = @Sec_subcategory_id,
+	Headnote_summary = @Headnote_summary,
+	Last_updatedtime = getdate(),
+	Publication_datetime = @Publication_datetime
 
-go
-
-
+WHERE
+	[Id] = @Id
+;
+GO
 
 
 CREATE PROCEDURE [dbo].[spUpdateSubCategory] 
@@ -2472,9 +2111,8 @@ SET
 
 WHERE
 	[id] = @id
-
-
-go
+;
+GO
 
 
 
@@ -2505,5 +2143,6 @@ IF @Password IS NOT NULL AND 0 < LEN(@Password)
 	SET [Password] = @Password
 	WHERE UserID = @UserID
 
-go
+;
+GO
 

@@ -1854,10 +1854,6 @@ IF @Is_published = 1
 
 go
 
-
-
-
-
 CREATE PROCEDURE [dbo].[spAddSubCategory] 
 
 @parent_num tinyint,

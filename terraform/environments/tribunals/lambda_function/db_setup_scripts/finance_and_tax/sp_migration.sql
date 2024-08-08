@@ -1,4 +1,4 @@
-use ossc
+use ftt
 go
 
 create proc dbo.dt_addtosourcecontrol
@@ -1720,6 +1720,7 @@ go
 
 
 
+
 CREATE PROCEDURE [dbo].[spAddCategory] 
 
 @description varchar(100)
@@ -1737,7 +1738,9 @@ VALUES
 		@description
 	)
 
+
 go
+
 
 
 
@@ -1763,7 +1766,9 @@ VALUES
 		@surname,
 		@suffix
 	)
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spAddCommissionerJudgmentMap] 
@@ -1785,6 +1790,7 @@ INSERT
 		@CommissionerID,
 		@JudgmentID
 	)
+
 go
 
 
@@ -1805,11 +1811,7 @@ CREATE PROCEDURE [dbo].[spAddJudgment]
 @File_no_3 varchar(4),
 @Reported_no_1 varchar(3),
 @Reported_no_2 varchar(3),
-@Reported_no_3 varchar(2),
-@NCN_year int,
-@NCN_code1 varchar(20),
-@NCN_citation int,
-@NCN_code2 varchar(20)
+@Reported_no_3 varchar(2)
 
 AS
 
@@ -1837,11 +1839,7 @@ IF @Is_published = 1
 			File_no_3,
 			Reported_no_1,
 			Reported_no_2,
-			Reported_no_3,
-			ncn_year,
-			ncn_code1,
-			ncn_citation,
-			ncn_code2
+			Reported_no_3
 		)
 	
 	VALUES
@@ -1861,18 +1859,12 @@ IF @Is_published = 1
 			@File_no_3,
 			@Reported_no_1,
 			@Reported_no_2,
-			@Reported_no_3,
-			@NCN_year,
-			@NCN_code1,
-			@NCN_citation,
-			@NCN_code2 
-
+			@Reported_no_3
 		)
 	
 	SELECT @Id = SCOPE_IDENTITY()
+
 go
-
-
 
 CREATE PROCEDURE [dbo].[spAddSubCategory] 
 
@@ -1897,7 +1889,9 @@ VALUES
 		@num
 	)
 
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spAddUser] 
@@ -1930,7 +1924,9 @@ VALUES
 	)
 
 SELECT @UserID = SCOPE_IDENTITY()
+
 go
+
 
 
 
@@ -1948,7 +1944,9 @@ FROM
 
 WHERE
 	commissioner_id = @Id
+
 go
+
 
 
 
@@ -1971,7 +1969,9 @@ WHERE
 
 	sec_subcategory_id = @Id
 
+
 go
+
 
 
 
@@ -1990,7 +1990,9 @@ FROM
 WHERE
 	parent_num = @CategoryId
 
+
 go
+
 
 
 
@@ -2006,7 +2008,9 @@ DELETE
 WHERE
 	Num = @Id
 
+
 go
+
 
 
 
@@ -2021,7 +2025,9 @@ DELETE
 
 WHERE
 	[Id] = @Id
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spDeleteCommissionerJudgmentMap] 
@@ -2035,7 +2041,9 @@ DELETE
 
 WHERE
 	Judgment_Id = @JudgmentID
+
 go
+
 
 
 
@@ -2051,7 +2059,9 @@ DELETE
 WHERE
 	[Id] = @Id
 
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spDeleteUser] 
@@ -2073,6 +2083,34 @@ IF @Count > 1
 		WHERE
 			UserID = @UserID
 	END
+
+go
+
+
+
+
+
+CREATE PROCEDURE [dbo].[spGetAllDecisions] 
+
+AS
+
+-- Main result set - ds.Tables(0)
+select j.id, j.decision_datetime as DecisionDate
+,j.file_no_1 + ' ' + j.file_no_2 + ' ' + j.file_no_3  as 'FileNumber'
+, c.[description] as Category
+, s.[description] as Subcategory
+, c2.[description] as SecondaryCategory
+,s2.[description] as SecondarySubcategory
+,j.claimants as Claimants
+, j.respondent as Respondent
+,cm.prefix + ' ' + cm.surname + ' ' + cm.suffix as Commissioner
+from judgment j
+inner join subcategory s on j.main_subcategory_id = s.id
+inner join category c on s.parent_num = c.num
+left join subcategory s2 on j.sec_subcategory_id = s2.id
+left join category c2 on s2.parent_num = c2.num
+left join commissionerjudgmentmap cjm on j.[id] = cjm.judgment_id
+left join commissioner cm on cjm.commissioner_id = cm.[id]
 go
 
 
@@ -2084,8 +2122,11 @@ AS
 
 SELECT num, [description]
 FROM category
-ORDER BY category.[description]
+ORDER BY num
+
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spGetCommissionerList] 
@@ -2095,7 +2136,9 @@ AS
 select [id], prefix, surname, suffix
 from commissioner
 order by surname
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spGetCommissionerListSelected] 
@@ -2114,7 +2157,9 @@ left join
 	) as m
 on c.[id] = m.commid
 order by commid desc, c.surname
+
 go
+
 
 
 
@@ -2157,9 +2202,7 @@ AS
 -- Main result set - ds.Tables(0)
 select j.*, s.[description] as subcategory, s.[id] as subcatid, c.[description] as category, c.num as catid,
 	s2.[description] as secsubcategory, s2.[id] as secsubcatid, c2.[description] as seccategory, c2.num as seccatid,
-	j.file_no_1 + ' ' + j.file_no_2 + ' ' + j.file_no_3  as 'filenumber',
-	cast( j.ncn_year as varchar(4)) + ' ' + j.ncn_code1 + ' ' + cast( j.ncn_citation as varchar(6)) + ' ' + j.ncn_code2 as ncn_number
-
+	j.file_no_1 + ' ' + j.file_no_2 + ' ' + j.file_no_3  as 'filenumber'
 from judgment j
 inner join subcategory s on j.main_subcategory_id = s.id
 inner join category c on s.parent_num = c.num
@@ -2179,6 +2222,7 @@ go
 
 
 
+
 CREATE PROCEDURE [dbo].[spGetSubCategoryList] 
 
 AS
@@ -2187,7 +2231,9 @@ SELECT [id], parent_num, num, [description]
 FROM subcategory
 ORDER BY parent_num, num
 
+
 go
+
 
 
 
@@ -2203,7 +2249,9 @@ inner join category c on s.parent_num = c.num
 WHERE parent_num = @CategoryId
 ORDER BY s. num
 
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spGetUser] 
@@ -2220,7 +2268,9 @@ FROM
 
 WHERE
 	UserID = @UserID
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spGetUserList] 
@@ -2232,7 +2282,9 @@ SELECT
 
 FROM
 	Users
+
 go
+
 
 
 
@@ -2255,7 +2307,9 @@ WHERE
 AND
 	[Password] = @Password
 
+
 go
+
 
 
 
@@ -2275,7 +2329,9 @@ SET
 WHERE
 	num = @id
 
+
 go
+
 
 
 
@@ -2298,7 +2354,9 @@ SET
 
 WHERE
 	[id] = @id
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spUpdateCommissionerJudgmentMap] 
@@ -2316,6 +2374,7 @@ SET
 	
 WHERE
 	Judgment_ID = @JudgmentID
+
 
 go
 
@@ -2337,11 +2396,8 @@ CREATE PROCEDURE [dbo].[spUpdateJudgment]
 @File_no_3 varchar(4),
 @Reported_no_1 varchar(3),
 @Reported_no_2 varchar(3),
-@Reported_no_3 varchar(2),
-@NCN_year int,
-@NCN_code1 varchar(20),
-@NCN_citation int,
-@NCN_code2 varchar(20)
+@Reported_no_3 varchar(2)
+
 AS
 
 DECLARE
@@ -2384,15 +2440,13 @@ IF @Is_published = 0
 		Publication_datetime = @Publication_datetime,
 		Reported_no_1 = @Reported_no_1,
 		Reported_no_2 = @Reported_no_2,
-		Reported_no_3 = @Reported_no_3,
-		ncn_year = @NCN_year,
-		ncn_code1= @NCN_code1,
-		ncn_citation = @NCN_citation,
-		ncn_code2 = @NCN_code2
+		Reported_no_3 = @Reported_no_3
 	
 	WHERE
 		[Id] = @Id
+
 go
+
 
 
 
@@ -2416,7 +2470,9 @@ SET
 WHERE
 	[id] = @id
 
+
 go
+
 
 
 CREATE PROCEDURE [dbo].[spUpdateUser] 
@@ -2445,5 +2501,6 @@ IF @Password IS NOT NULL AND 0 < LEN(@Password)
 	UPDATE Users
 	SET [Password] = @Password
 	WHERE UserID = @UserID
+
 go
 

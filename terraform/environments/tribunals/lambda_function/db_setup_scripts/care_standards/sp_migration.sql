@@ -1847,7 +1847,6 @@ CREATE PROCEDURE [dbo].[spSearchDecision]
 @ToDate datetime,
 @Appellant varchar(500),
 @Respondent varchar(500),
-@clerkName varchar(200),
 @Category varchar(150),
 @Year varchar(50),
 @caseNo varchar(50),
@@ -1857,9 +1856,11 @@ select * From Decision
 WHERE file_no_1 = @Prefix OR
 file_no_2 = @CaseNo OR
 file_no_3 = @Year OR
-clerkName LIKE '%@clerkName%' OR
-main_subcategory_id = @Category
-OR decision_datetime Between @FromDate AND @ToDate
+main_subcategory_id = @Category OR
+appellant LIKE '%' + @Appellant + '%' OR
+respondent LIKE '%' + @Respondent + '%' OR
+decision_datetime Between @FromDate AND @ToDate
+
 go
 
 Create PROC [spSearchDecisionPage]
