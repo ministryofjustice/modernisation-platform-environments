@@ -2,8 +2,7 @@
     "TargetMetadata": {
       "TargetSchema": "DELIUS_AUDIT_DMS_POOL",
       "SupportLobs": false,
-      "BatchApplyEnabled": true,  
-      "TaskRecoveryTableEnabled": true
+      "BatchApplyEnabled": true
     },
     "FullLoadSettings": {
       "TargetTablePrepMode": "DO_NOTHING",
