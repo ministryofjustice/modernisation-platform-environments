@@ -35,31 +35,33 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
 
       transition = [
         {
-          days          = 90
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 730
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
       }
 
       noncurrent_version_transition = [
         {
-          days          = 90
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
           storage_class = "GLACIER"
         }
       ]
 
       noncurrent_version_expiration = {
-        days = 730
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
       }
+
+      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
     }
   ]
 
@@ -128,31 +130,33 @@ module "s3-bucket-logging" {
 
       transition = [
         {
-          days          = 90
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 730
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
       }
 
       noncurrent_version_transition = [
         {
-          days          = 90
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
           storage_class = "GLACIER"
         }
       ]
 
       noncurrent_version_expiration = {
-        days = 730
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
       }
+
+      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
     }
   ]
 
@@ -218,31 +222,33 @@ module "s3-bucket-dbbackup" {
 
       transition = [
         {
-          days          = 90
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 730
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
       }
 
       noncurrent_version_transition = [
         {
-          days          = 90
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
           storage_class = "GLACIER"
         }
       ]
 
       noncurrent_version_expiration = {
-        days = 730
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
       }
+
+      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
     }
   ]
 
