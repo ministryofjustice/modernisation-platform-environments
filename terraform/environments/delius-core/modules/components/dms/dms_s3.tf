@@ -9,18 +9,17 @@ module "s3_bucket_dms_destination" {
     aws.bucket-replication = aws
   }
 
-  bucket_policy_v2 = [
-        for dms_s3_writer_role_arn in values(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns) : {
+  bucket_policy_v2 = [{
           effect     = "Allow"
-          Principal = {
-            AWS = dms_s3_writer_role_arn
+          principals = {
+            type = "AWS"
+            AWS = values(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns)
           }
           actions    = [
             "s3:PutObject",
             "s3:PutObjectAcl"
           ]
-        }
-  ]
+        }]
 
   lifecycle_rule = [
     {
