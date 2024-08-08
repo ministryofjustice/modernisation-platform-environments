@@ -127,9 +127,20 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
+data "aws_ecr_image" "my_image" { 
+	repository_name = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas" : null
+	image_tag = var.is_image ? "${var.function_name}-${var.production_dev}" : null
+}
+
+resource "null_resource" "force_deploy" { 
+	triggers = { 
+		image_digest = data.aws_ecr_image.my_image.image_digest 
+	}
+}
 
 resource "aws_lambda_function" "this" {
   #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
+  depends_on = [null_resource.force_deploy]
   # Zip File config
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
