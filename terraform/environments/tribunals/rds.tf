@@ -17,7 +17,7 @@ resource "aws_db_instance" "rdsdb" {
 
   multi_az               = false
   db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
-  vpc_security_group_ids = [aws_security_group.sqlserver_db_sc.id]
+  vpc_security_group_ids = [aws_security_group.test.id]
 
   tags = {
     Name = "tribunals"
@@ -29,7 +29,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
   subnet_ids = data.aws_subnets.shared-private.ids
 }
 
-resource "aws_security_group" "sqlserver_db_sc" {
+resource "aws_security_group" "test" {
   name        = "sqlserver_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
@@ -40,43 +40,6 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description = "Allows Github Actions to access RDS"
     cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
   }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows DMS to access RDS"
-    security_groups = [aws_security_group.vpc_dms_replication_instance_group.id]
-  }
-  ingress {
-    protocol    = "tcp"
-    description = "Allow PSQL traffic from bastion"
-    from_port   = 1433
-    to_port     = 1433
-    security_groups = [
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows ECS cluster to access RDS"
-    security_groups = [aws_security_group.cluster_ec2.id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allows each Tribunal ECS service to access RDS"
-    security_groups = [aws_security_group.ecs_service.id]
-  }
-  ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
-    description     = "Allow lambda access to rds"
-    security_groups = [aws_security_group.lambda_sg.id]
-  }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
@@ -85,6 +48,63 @@ resource "aws_security_group" "sqlserver_db_sc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+# resource "aws_security_group" "sqlserver_db_sc" {
+#   name        = "sqlserver_security_group"
+#   description = "control access to the database"
+#   vpc_id      = data.aws_vpc.shared.id
+#   ingress {
+#     from_port   = 1433
+#     to_port     = 1433
+#     protocol    = "tcp"
+#     description = "Allows Github Actions to access RDS"
+#     cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
+#   }
+#   ingress {
+#     from_port       = 1433
+#     to_port         = 1433
+#     protocol        = "tcp"
+#     description     = "Allows DMS to access RDS"
+#     security_groups = [aws_security_group.vpc_dms_replication_instance_group.id]
+#   }
+#   ingress {
+#     protocol    = "tcp"
+#     description = "Allow PSQL traffic from bastion"
+#     from_port   = 1433
+#     to_port     = 1433
+#     security_groups = [
+#       module.bastion_linux.bastion_security_group
+#     ]
+#   }
+#   ingress {
+#     from_port       = 1433
+#     to_port         = 1433
+#     protocol        = "tcp"
+#     description     = "Allows ECS cluster to access RDS"
+#     security_groups = [aws_security_group.cluster_ec2.id]
+#   }
+#   ingress {
+#     from_port       = 1433
+#     to_port         = 1433
+#     protocol        = "tcp"
+#     description     = "Allows each Tribunal ECS service to access RDS"
+#     security_groups = [aws_security_group.ecs_service.id]
+#   }
+#   ingress {
+#     from_port       = 1433
+#     to_port         = 1433
+#     protocol        = "tcp"
+#     description     = "Allow lambda access to rds"
+#     security_groups = [aws_security_group.lambda_sg.id]
+#   }
+#   egress {
+#     description = "allow all outbound traffic"
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
 data "http" "myip" {
   url = "http://ipinfo.io/json"
