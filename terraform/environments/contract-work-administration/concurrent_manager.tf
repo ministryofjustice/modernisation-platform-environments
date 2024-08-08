@@ -94,7 +94,6 @@ export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter 
 sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/applmgr/scripts/disk_space.sh
 
 cat <<EOT > /home/applmgr/applmgrcrontab.txt
-0 07 * * 1-5 /home/applmgr/scripts/purge_apache_logs.sh 60 >/tmp/purge_apache_logs.trc 2>&1
 0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} >/tmp/disk_space.trc 2>&1
 EOT
 chown applmgr:applmgr /home/applmgr/applmgrcrontab.txt
@@ -102,6 +101,7 @@ chmod 744 /home/applmgr/applmgrcrontab.txt
 su applmgr -c "crontab /home/applmgr/applmgrcrontab.txt"
 
 rm -rf /etc/cron.d/applmgr_cron*
+ln -s /bin/mail /bin/mailx
 
 ## Update the send mail url
 echo "Updating the sendmail config"

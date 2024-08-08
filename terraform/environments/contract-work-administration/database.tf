@@ -82,6 +82,10 @@ sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_u
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
+echo "Update Slack alert URL for Oracle scripts"
+export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+sed -i "s/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g" /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
+
 echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
@@ -112,6 +116,7 @@ chown oracle:oinstall /home/oracle/oraclecrontab.txt
 chmod 744 /home/oracle/oraclecrontab.txt
 su oracle -c "crontab /home/oracle/oraclecrontab.txt"
 chown -R oracle:oinstall /home/oracle/scripts
+ln -s /bin/mail /bin/mailx
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"

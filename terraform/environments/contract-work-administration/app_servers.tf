@@ -89,8 +89,8 @@ echo "Setting up crontab for applmgr"
 chown applmgr /home/applmgr/scripts/disk_space.sh
 chgrp oinstall /home/applmgr/scripts/disk_space.sh
 chmod 744 /home/applmgr/scripts/disk_space.sh
-
 export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/applmgr/scripts/disk_space.sh
 
 cat <<EOT > /home/applmgr/applmgrcrontab.txt
 0 07 * * 1-5 /home/applmgr/scripts/purge_apache_logs.sh 60 >/tmp/purge_apache_logs.trc 2>&1
@@ -99,6 +99,7 @@ EOT
 chown applmgr:applmgr /home/applmgr/applmgrcrontab.txt
 chmod 744 /home/applmgr/applmgrcrontab.txt
 su applmgr -c "crontab /home/applmgr/applmgrcrontab.txt"
+ln -s /bin/mail /bin/mailx
 
 
 ## Update the send mail url
