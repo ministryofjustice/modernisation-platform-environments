@@ -1,0 +1,69 @@
+{
+    "rules": [
+        {
+            "rule-type": "selection",
+            "rule-id": "1",
+            "rule-name": "select_locally_populated_audit",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION"
+            },
+            "rule-action": "include",
+            "filters": [
+                {
+                    "filter-type": "source",
+                    "column-name": "CLIENT_BUSINESS_INTERACT_CODE",
+                    "filter-conditions": [
+                        {
+                            "filter-operator": "null"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "2",
+            "rule-name": "add_client_db",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION"
+            },
+            "rule-action": "add-column",
+            "value": "CLIENT_DB",
+            "expression": "'${client_database}'",
+            "old-value": null,
+            "data-type": {
+                "type": "string",
+                "length": "20",
+                "scale": ""
+            }
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "3",
+            "rule-name": "rename_to_staging_schema",
+            "rule-target": "schema",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA"
+            },
+            "rule-action": "rename",
+            "value": "DELIUS_AUDIT_DMS_POOL",
+            "old-value": null
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "4",
+            "rule-name": "rename_to_staging_table",
+            "rule-target": "table",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION"
+            },
+            "rule-action": "rename",
+            "value": "DMS_AUDITED_INTERACTION",
+            "old-value": null
+        }
+    ]
+}
