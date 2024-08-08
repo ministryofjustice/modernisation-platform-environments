@@ -12,7 +12,7 @@ module "s3_bucket_dms_destination" {
   bucket_policy_v2 = [
         for dms_s3_writer_role_arn in values(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns) : {
           effect     = "Allow"
-          Principals = {
+          Principal = {
             AWS = dms_s3_writer_role_arn
           }
           actions    = [
