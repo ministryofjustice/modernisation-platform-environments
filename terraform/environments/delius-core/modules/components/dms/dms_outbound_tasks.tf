@@ -12,8 +12,8 @@ resource "aws_dms_replication_task" "audited_interaction_outbound_replication" {
   # and must be monitored independently.
   #
   table_mappings      = templatefile("templates/audited_interaction_table_mapping.tmpl",{
-                           client_database = "${upper(var.dms_config.audit_source_endpoint.read_database)}}"
-                           }) 
+                           client_database = local.delius_database_primary
+                        })
 
   replication_task_settings = file("files/audited_interaction_settings.json")
 
