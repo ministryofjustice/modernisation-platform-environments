@@ -128,7 +128,7 @@ tasks:
               if(Test-Path $EC2LaunchRunOncePath) {
                   Write-Output "EC2Launch .run-once file exists, previous steps completed"
                   Write-Output "Sending $name-ready-hook CONTINUE lifecycle action result"
-                  Set-ReadyHook $lifeCycleActionResult 'CONTINUE'
+                  Set-ReadyHook -lifeCycleActionResult 'CONTINUE'
                   break
               }
 
@@ -136,7 +136,7 @@ tasks:
               if ($elapsedTime.TotalMinutes -gt 15) {
                   Write-Output "EC2Launch .run-once file does not yet exist"
                   Write-Output "EC2Launch tasks have not completed within 15 minutes"
-                  Set-ReadyHook $lifeCycleActionResult 'ABANDON' 
+                  Set-ReadyHook -lifeCycleActionResult 'ABANDON' 
                   break
               }
 
