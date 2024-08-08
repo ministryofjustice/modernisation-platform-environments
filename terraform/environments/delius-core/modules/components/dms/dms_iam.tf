@@ -66,29 +66,29 @@ resource "aws_iam_role" "dms_s3_writer_role" {
   })
 }
 
-resource "aws_s3_bucket_policy" "dms_s3_bucket_policy" {
-  count  = length(keys(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns)) > 0 ? 1 : 0
-  bucket = module.s3_bucket_dms_destination.bucket.id
+# resource "aws_s3_bucket_policy" "dms_s3_bucket_policy" {
+#   count  = length(keys(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns)) > 0 ? 1 : 0
+#   bucket = module.s3_bucket_dms_destination.bucket.id
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      for dms_s3_writer_role_arn in values(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns) : {
-        Effect    = "Allow"
-        Principal = {
-          AWS = dms_s3_writer_role_arn
-        }
-        Action    = [
-          "s3:PutObject",
-          "s3:PutObjectAcl"
-        ]
-        Resource  = [
-          "${module.s3_bucket_dms_destination.bucket.arn}/*"
-        ]
-      }
-    ]
-  })
-}
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       for dms_s3_writer_role_arn in values(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns) : {
+#         Effect    = "Allow"
+#         Principal = {
+#           AWS = dms_s3_writer_role_arn
+#         }
+#         Action    = [
+#           "s3:PutObject",
+#           "s3:PutObjectAcl"
+#         ]
+#         Resource  = [
+#           "${module.s3_bucket_dms_destination.bucket.arn}/*"
+#         ]
+#       }
+#     ]
+#   })
+# }
 
 # data "aws_iam_policy_document" "dms_s3_writer_policy_data"  {
 #  statement {
