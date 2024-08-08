@@ -4,6 +4,10 @@ locals {
   oracle_port = "1521"
   dms_audit_username = "delius_audit_dms_pool"
   dms_s3_local_bucket_prefix = "${var.env_name}-dms-destination-bucket"
+
+  # If we are reading from a standby database it will have an S1 or S2 suffix - strip this off to get the name of the primary database
+  delius_database_primary = replace(upper(var.dms_config.audit_source_endpoint.read_database),"/S[1-2]$/","")
+
   # dms_s3_local_bucket_secret = "dms-s3-local-bucket"
   # dms_s3_local_bucket_secret_access_role = "dms-s3-local-bucket-secret-access-role"
   dms_repository_account_id = nonsensitive(try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null))
