@@ -93,7 +93,7 @@
       "instance_role_ftp": "ftp",
       "instance_role_mailrelay": "mailrelay",
       "instance_role_webgate": "webgate",
-      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 7,
+      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 730,
       "s3_lifecycle_days_expiration_noncurrent": 730,
       "s3_lifecycle_days_transition_current_glacier": 365,
