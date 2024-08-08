@@ -30,7 +30,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 }
 
 resource "aws_security_group" "test" {
-  name        = "sqlserver_security_group"
+  name        = "test"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
   ingress {
