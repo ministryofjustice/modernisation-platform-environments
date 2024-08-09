@@ -143,9 +143,10 @@ resource "aws_ecs_service" "ecs_service" {
 
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
+  task_definition                   = aws_ecs_task_definition.chaps_task_definition.family
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
+  force_new_deployment              = true
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.chaps.name
