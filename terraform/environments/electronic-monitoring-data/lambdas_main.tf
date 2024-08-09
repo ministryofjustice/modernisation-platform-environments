@@ -299,7 +299,7 @@ module "load_json_table_cadt" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   ecr_repo_name           = "create-a-data-task"
-  function_tag            = "v0.0.0-6c91e20"
+  function_tag            = "v0.0.0-b25f5d4"
   environment_variables = {
     DLT_PROJECT_DIR : "/tmp"
     DLT_DATA_DIR : "/tmp"
