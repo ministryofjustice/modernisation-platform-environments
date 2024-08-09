@@ -60,6 +60,31 @@ locals {
   }
 
   #----------------------------------------------------------------------------
+  # BUDDI
+  #----------------------------------------------------------------------------
+  buddi_ssh_keys = [
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIXoHoZO8V5tWMG9JRQtzkjPFEkVYKGP5cte0R9rkeeyGGUP6hUudKK9IsKaW6nn/4c+KMfZG8wyiSFYwzPuor86yjb8hH0q2dRClcPAS7FbAOu3rnBn+QBGzoP2ohJFUQ==",
+  ]
+  buddi_cidr_ipv4s = [
+    "81.179.159.7/32",
+  ]
+  buddi_cidr_ipv6s = []
+
+  sftp_account_buddi_test = {
+    name       = "test"
+    ssh_keys   = local.buddi_ssh_keys
+    cidr_ipv4s = local.buddi_cidr_ipv4s
+    cidr_ipv6s = local.buddi_cidr_ipv6s
+  }
+
+  sftp_account_buddi_live = {
+    name       = "buddi"
+    ssh_keys   = local.buddi_ssh_keys
+    cidr_ipv4s = local.buddi_cidr_ipv4s
+    cidr_ipv6s = local.buddi_cidr_ipv6s
+  }
+
+  #----------------------------------------------------------------------------
   # CIVICA
   #----------------------------------------------------------------------------
   civica_ssh_keys = [
@@ -83,7 +108,7 @@ locals {
     cidr_ipv4s = local.civica_cidr_ipv4s
     cidr_ipv6s = local.civica_cidr_ipv6s
   }
-
+  
   #----------------------------------------------------------------------------
   # G4S
   #----------------------------------------------------------------------------
