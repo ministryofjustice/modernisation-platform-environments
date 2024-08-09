@@ -92,7 +92,7 @@ resource "aws_lb_listener" "tribunals_lb" {
   load_balancer_arn = aws_lb.tribunals_lb.arn
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     type = "fixed-response"
@@ -119,4 +119,9 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
       values = ["*${each.key}.*"]
     }
   }
+}
+
+resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+  resource_arn = aws_lb.tribunals_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
 }
