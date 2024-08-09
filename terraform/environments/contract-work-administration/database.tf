@@ -110,7 +110,9 @@ cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
 EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
+
 echo "Setting up cron jobs"
+crontab -l > /home/oracle/oraclecrontab.txt
 echo "00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log" >> /home/oracle/oraclecrontab.txt
 
 chown oracle:oinstall /home/oracle/oraclecrontab.txt
