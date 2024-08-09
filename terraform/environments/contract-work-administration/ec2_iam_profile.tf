@@ -99,7 +99,7 @@ resource "aws_iam_policy" "cwa" {
                 "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-cw-custom.sh",
                 "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-prereqs.sh",
                 "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*-postbuild.sh",
-                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/app-disk-space-alert.sh"
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/disk-space-alert.sh"
             ]
         }
     ]
