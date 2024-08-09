@@ -13,7 +13,7 @@ resource "aws_lb_listener" "oem_app_internal" {
   port              = 443
   protocol          = "HTTPS"
 
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
@@ -27,7 +27,7 @@ resource "aws_lb_listener" "oem_app_3872_internal" {
   port              = 3872
   protocol          = "HTTPS"
 
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
@@ -41,7 +41,7 @@ resource "aws_lb_listener" "oem_app_4903_internal" {
   port              = 4903
   protocol          = "HTTPS"
 
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
@@ -55,7 +55,7 @@ resource "aws_lb_listener" "oem_app_7102_internal" {
   port              = 7102
   protocol          = "HTTPS"
 
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
@@ -69,7 +69,7 @@ resource "aws_lb_listener" "oem_app_7803_internal" {
   port              = 7803
   protocol          = "HTTPS"
 
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
