@@ -143,9 +143,10 @@ resource "aws_ecs_service" "ecs_service" {
 
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
+  task_definition                   = aws_ecs_task_definition.chaps_task_definition.family
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
+  force_new_deployment              = true
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.chaps.name
@@ -275,7 +276,7 @@ resource "aws_security_group" "cluster_ec2" {
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"] #local.application_data.accounts[local.environment].ami_image_id
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type = local.application_data.accounts[local.environment].instance_type
   key_name      = "${local.application_name}-ec2"
   ebs_optimized = true
@@ -534,9 +535,4 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
 resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
   name           = "${local.application_name}-log-stream"
   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
-}
-
-output "ami_id" {
-  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-  sensitive = true
 }
