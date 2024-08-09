@@ -85,7 +85,7 @@ sed -i '/^PS1=/d' /etc/bashrc
 printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
 
 echo "Setting up crontab for applmgr"
-/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-disk-space-alert.sh /home/applmgr/scripts/disk_space.sh
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/disk-space-alert.sh /home/applmgr/scripts/disk_space.sh
 chown applmgr /home/applmgr/scripts/disk_space.sh
 chgrp oinstall /home/applmgr/scripts/disk_space.sh
 chmod 744 /home/applmgr/scripts/disk_space.sh
@@ -151,16 +151,16 @@ resource "aws_s3_object" "app_postbuild_script" {
   source_hash = filemd5("./scripts/app-postbuild.sh")
 }
 
-resource "aws_s3_object" "app_disk_space_script" {
+resource "aws_s3_object" "disk_space_script" {
   bucket      = aws_s3_bucket.scripts.id
-  key         = "app-disk-space-alert.sh"
+  key         = "disk-space-alert.sh"
   source      = "./scripts/disk-space-alert.sh"
   source_hash = filemd5("./scripts/disk-space-alert.sh")
 }
 
 resource "time_sleep" "wait_app_userdata_scripts" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.app_custom_script, aws_s3_object.app_prereqs_script, aws_s3_object.app_postbuild_script, aws_s3_object.app_disk_space_script]
+  depends_on      = [aws_s3_object.app_custom_script, aws_s3_object.app_prereqs_script, aws_s3_object.app_postbuild_script, aws_s3_object.disk_space_script]
 }
 
 

@@ -83,8 +83,18 @@ sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/
 /etc/init.d/sendmail restart
 
 echo "Update Slack alert URL for Oracle scripts"
-export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
-sed -i "s/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g" /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
+
+export OLD_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name OLD_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+
+find /home/oracle/scripts -type f -name '*.sh' | xargs sed -i "s/$OLD_SLACK_ALERT_URL/$SLACK_ALERT_URL/g"
+
+sed -i "/export MAIL_ADDR/c\export MAIL_ADDR=\"$SLACK_ALERT_URL\""  /home/oracle/scripts/scan_alert.sh
+
+echo "Adding disk space script"
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/disk-space-alert.sh /home/oracle/scripts/disk_space.sh
+chmod 766 /home/applmgr/scripts/disk_space.sh
+sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/oracle/scripts/disk_space.sh
 
 echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -162,7 +172,7 @@ resource "aws_s3_object" "db_postbuild_script" {
 
 resource "time_sleep" "wait_db_userdata_scripts" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.db_custom_script, aws_s3_object.db_prereqs_script, aws_s3_object.db_postbuild_script]
+  depends_on      = [aws_s3_object.db_custom_script, aws_s3_object.db_prereqs_script, aws_s3_object.db_postbuild_script, aws_s3_object.disk_space_script]
 }
 
 ######################################
