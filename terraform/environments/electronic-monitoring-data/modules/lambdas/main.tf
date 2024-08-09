@@ -1,6 +1,6 @@
 locals {
   use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null)
-  function_uri = var.function_tag != null != null ? var.function_tag : (var.is_image ? "${var.function_name}-${var.production_dev}" : "")
+  function_uri = var.function_tag != null ? var.function_tag : (var.is_image ? "${var.function_name}-${var.production_dev}" : "")
 }
 
 resource "aws_sqs_queue" "lambda_dlq" {
