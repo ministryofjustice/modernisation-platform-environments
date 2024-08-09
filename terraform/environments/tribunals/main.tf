@@ -5,12 +5,11 @@ locals {
   source_db_url      = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
   source_db_user     = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
   source_db_password = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
-  waf_arn            = aws_wafv2_web_acl.tribunals_web_acl.arn
 }
 
 module "appeals" {
-  is_ftp_app = false
-  source     = "./modules/tribunal"
+  is_ftp_app                   = false
+  source                       = "./modules/tribunal"
   # The app_name needs to match the folder name in the volume
   app_name                     = "appeals"
   app_url                      = "administrativeappeals"
@@ -26,7 +25,6 @@ module "appeals" {
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
-  app_load_balancer            = aws_lb.tribunals_lb
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -44,7 +42,6 @@ module "appeals" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["appeals"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -68,7 +65,6 @@ module "ahmlr" {
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
-  app_load_balancer            = aws_lb.tribunals_lb
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -86,7 +82,6 @@ module "ahmlr" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["ahmlr"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -110,7 +105,6 @@ module "care_standards" {
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
-  app_load_balancer            = aws_lb.tribunals_lb
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -128,7 +122,6 @@ module "care_standards" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["care_standards"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -149,7 +142,6 @@ module "cicap" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = aws_lb.tribunals_lb
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -170,7 +162,6 @@ module "cicap" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "CaseFiles"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["cicap"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -191,7 +182,7 @@ module "employment_appeals" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = aws_lb.tribunals_lb
+  
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -212,7 +203,6 @@ module "employment_appeals" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Public/Upload"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["employment_appeals"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -233,7 +223,7 @@ module "finance_and_tax" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = aws_lb.tribunals_lb
+  
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -254,7 +244,6 @@ module "finance_and_tax" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["finance_and_tax"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -275,7 +264,7 @@ module "immigration_services" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = aws_lb.tribunals_lb
+  
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -296,7 +285,6 @@ module "immigration_services" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["immigration_services"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -317,7 +305,7 @@ module "information_tribunal" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = aws_lb.tribunals_lb
+  
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -338,7 +326,6 @@ module "information_tribunal" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "DBFiles"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["information_tribunal"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -359,7 +346,7 @@ module "lands_tribunal" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = aws_lb.tribunals_lb
+  
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -380,7 +367,6 @@ module "lands_tribunal" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["lands_tribunal"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -401,7 +387,7 @@ module "transport" {
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_load_balancer            = aws_lb.tribunals_lb
+  
   app_source_db_url            = local.source_db_url
   app_source_db_user           = local.source_db_user
   app_source_db_password       = local.source_db_password
@@ -422,7 +408,6 @@ module "transport" {
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
-  waf_arn                      = local.waf_arn
   target_group_attachment_port = var.services["transport"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
@@ -451,10 +436,8 @@ module "charity_tribunal_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["charity_tribunal_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["charity_tribunal_decisions"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -481,10 +464,8 @@ module "claims_management_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["claims_management_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["claims_management_decisions"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -511,10 +492,8 @@ module "consumer_credit_appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["consumer_credit_appeals"].port
   target_group_attachment_port_sftp = var.sftp_services["consumer_credit_appeals"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -541,10 +520,8 @@ module "estate_agent_appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["estate_agent_appeals"].port
   target_group_attachment_port_sftp = var.sftp_services["estate_agent_appeals"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -571,10 +548,8 @@ module "primary_health_lists" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["primary_health_lists"].port
   target_group_attachment_port_sftp = var.sftp_services["primary_health_lists"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -601,10 +576,8 @@ module "siac" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["siac"].port
   target_group_attachment_port_sftp = var.sftp_services["siac"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -631,10 +604,8 @@ module "sscs_venue_pages" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["sscs_venue_pages"].port
   target_group_attachment_port_sftp = var.sftp_services["sscs_venue_pages"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -661,10 +632,8 @@ module "tax_chancery_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["tax_chancery_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["tax_chancery_decisions"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -691,10 +660,8 @@ module "tax_tribunal_decisions" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["tax_tribunal_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["tax_tribunal_decisions"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
@@ -721,10 +688,8 @@ module "ftp_admin_appeals" {
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
   aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
-  waf_arn                           = local.waf_arn
   target_group_attachment_port      = var.services["ftp_admin_appeals"].port
   target_group_attachment_port_sftp = var.sftp_services["ftp_admin_appeals"].sftp_port
-  app_load_balancer                 = aws_lb.tribunals_lb
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }

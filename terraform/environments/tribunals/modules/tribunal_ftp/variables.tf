@@ -65,18 +65,12 @@ variable "is_ftp_app" {
   description = "Determines if it is an ftp app or not"
 }
 
-variable "waf_arn" {
-}
-
 variable "target_group_attachment_port" {
   description = "The port of the target group"
 }
 
 variable "target_group_attachment_port_sftp" {
   description = "The port of the target group for sftp"
-}
-
-variable "app_load_balancer" {
 }
 
 variable "target_group_arns" {
