@@ -2,7 +2,6 @@ resource "aws_dms_replication_instance" "tribunals_replication_instance" {
   allocated_storage           = 300
   apply_immediately           = true
   availability_zone           = "eu-west-2a"
-  engine_version              = "3.5.1"
   multi_az                    = false
   publicly_accessible         = true
   auto_minor_version_upgrade  = true
