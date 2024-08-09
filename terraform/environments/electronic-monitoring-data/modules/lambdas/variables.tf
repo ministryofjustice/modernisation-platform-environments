@@ -116,7 +116,7 @@ variable "ecr_repo_name" {
   description = "ECR repo in shared services acc"
   type = string
   nullable = false
-  default = "electronic-monitoring-lambda-functions"
+  default = "electronic-monitoring-data-lambdas"
 }
 
 variable "function_tag" {

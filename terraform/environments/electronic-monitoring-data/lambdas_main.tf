@@ -304,8 +304,8 @@ module "load_json_table_cadt" {
     DLT_PROJECT_DIR : "/tmp"
     DLT_DATA_DIR : "/tmp"
     DLT_PIPELINE_DIR : "/tmp"
-    JSON_BUCKET_NAME                         = "s3://${module.json-directory-structure-bucket.bucket.id}"
+    JSON_BUCKET_NAME                         = module.json-directory-structure-bucket.bucket.id
     STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${module.athena-s3-bucket.bucket.id}/output"
-    ATHENA_DUMP_BUCKET_NAME                  = "s3://${module.metadata-s3-bucket.bucket.id}/dlt_schemas"
+    ATHENA_DUMP_BUCKET_NAME                  = module.metadata-s3-bucket.bucket.id
   }
 }
