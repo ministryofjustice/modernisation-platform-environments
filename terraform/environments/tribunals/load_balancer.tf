@@ -92,7 +92,7 @@ resource "aws_lb_listener" "tribunals_lb" {
   load_balancer_arn = aws_lb.tribunals_lb.arn
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     type = "fixed-response"

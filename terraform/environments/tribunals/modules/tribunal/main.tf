@@ -153,19 +153,3 @@ module "app_ecs_task" {
   lb_tg_arn                 = var.target_group_arns["${local.module_name}"]
   sftp_lb_tg_arn            = ""
 }
-
-####################### Load Balancer #########################################
-
-module "ecs_loadbalancer" {
-  source                       = "../ecs_loadbalancer"
-  app_name                     = local.app
-  tags_common                  = var.tags
-  vpc_shared_id                = var.vpc_shared_id
-  application_data             = var.application_data
-  subnets_shared_public_ids    = var.subnets_shared_public_ids
-  aws_acm_certificate_external = var.aws_acm_certificate_external
-  is_ftp_app                   = var.is_ftp_app
-  waf_arn                      = var.waf_arn
-  target_group_attachment_port = var.target_group_attachment_port
-  app_load_balancer            = var.app_load_balancer
-}
