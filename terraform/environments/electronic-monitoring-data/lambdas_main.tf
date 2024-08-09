@@ -299,7 +299,7 @@ module "load_json_table_cadt" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   ecr_repo_name           = "create-a-data-task"
-  function_tag            = "v0.0.0-8b87987"
+  function_tag            = "v0.0.0-88afc02"
   environment_variables = {
     DLT_PROJECT_DIR : "/tmp"
     DLT_DATA_DIR : "/tmp"
@@ -307,5 +307,7 @@ module "load_json_table_cadt" {
     JSON_BUCKET_NAME                         = module.json-directory-structure-bucket.bucket.id
     STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${module.athena-s3-bucket.bucket.id}/output"
     ATHENA_DUMP_BUCKET_NAME                  = module.metadata-s3-bucket.bucket.id
+    pipeline_name                            = "g4s_atrium_unstructured"
+    environment                              = local.is-production ? "prod" : "dev"
   }
 }
