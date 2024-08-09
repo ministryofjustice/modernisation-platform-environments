@@ -2,6 +2,9 @@ locals {
   db_userdata = <<EOF
 #!/bin/bash
 
+echo "Cleaning up old configs"
+rm -rf /etc/cfn /etc/awslogs /tmp/cwlogs /run/cfn-init /home/oracle/fixalert /var/log/cfn*
+
 mkdir /userdata
 echo "Running prerequisite steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-prereqs.sh /userdata/prereqs.sh
@@ -93,7 +96,7 @@ sed -i "/export MAIL_ADDR/c\export MAIL_ADDR=\"$SLACK_ALERT_URL\""  /home/oracle
 
 echo "Adding disk space script"
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/disk-space-alert.sh /home/oracle/scripts/disk_space.sh
-chmod 766 /home/applmgr/scripts/disk_space.sh
+chmod 766 /home/oracle/scripts/disk_space.sh
 sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/oracle/scripts/disk_space.sh
 
 echo "Setting up AWS EBS backup"
