@@ -111,24 +111,13 @@ EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
 echo "Setting up cron jobs"
-cat <<EOT > /home/oracle/oraclecrontab.txt
-00 01 * * 0 /home/oracle/scripts/rman_backup.sh CWA /efs/cwa_rman > /tmp/rman_backup.log 2>&1
-00 07 * * 1-5 /home/oracle/scripts/freespace.sh >/home/oracle/scripts/log/freespace_CWA.trc 2>&1
-00 06 * * 1-5 /home/oracle/scripts/clean_trace_dump.sh 60 >/home/oracle/scripts/log/clean_trace_dump_cwa.trc 2>&1
-15 07 * * * /home/oracle/scripts/alert_rota.sh CWA 2>&1
-00 07 * * * /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/log/simple_cdc_check.log
-00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log
-00,15,30,45 07,08,09,10,11,12,13,14,15,16,17 * * 1-5 /home/oracle/scripts/scan_alert.sh >/home/oracle/scripts/log/scan_alert.log 2>&1
-00,30 07,08,09,10,11,12,13,14,15,16,17 * * 1-5  /home/oracle/scripts/mailer_check_1.sh >/tmp/check_workflow_mailer.trc  2>&1
-#00 07 * * * /home/oracle/scripts/space1.sh
-0,30 08-17 * * 1-5 /home/oracle/scripts/disk_space.sh DEV 94  >/tmp/disk_space.trc 2>&1
-00 07 * * * /home/oracle/scripts/tablespace1.sh
+echo "00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log" >> /home/oracle/oraclecrontab.txt
 
-EOT
 chown oracle:oinstall /home/oracle/oraclecrontab.txt
 chmod 744 /home/oracle/oraclecrontab.txt
 su oracle -c "crontab /home/oracle/oraclecrontab.txt"
 chown -R oracle:oinstall /home/oracle/scripts
+rm -rf /etc/cron.d/oracle_cron*
 ln -s /bin/mail /bin/mailx
 
 ## Remove SSH key allowed
