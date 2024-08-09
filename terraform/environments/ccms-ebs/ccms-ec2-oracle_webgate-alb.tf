@@ -28,7 +28,7 @@ resource "aws_lb_listener" "webgate_listener" {
   load_balancer_arn = aws_lb.webgate_lb[count.index].arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = local.cert_arn
 
   default_action {
@@ -88,7 +88,7 @@ resource "aws_lb_listener" "webgate_public_listener" {
   load_balancer_arn = aws_lb.webgate_public_lb.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = data.aws_acm_certificate.gandi_cert.arn
 
   default_action {
