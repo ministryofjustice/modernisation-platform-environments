@@ -2,6 +2,9 @@ locals {
   cm_userdata = <<EOF
 #!/bin/bash
 
+echo "Cleaning up old configs"
+rm -rf /etc/cfn /etc/awslogs /tmp/cwlogs /run/cfn-init /home/oracle/fixalert /var/log/cfn*
+
 mkdir /userdata
 echo "Running prerequisite steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-prereqs.sh /userdata/prereqs.sh

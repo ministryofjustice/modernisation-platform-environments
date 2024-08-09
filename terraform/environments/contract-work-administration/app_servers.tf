@@ -2,6 +2,9 @@ locals {
   app_userdata = <<EOF
 #!/bin/bash
 
+echo "Cleaning up old configs"
+rm -rf /etc/cfn /etc/awslogs /tmp/cwlogs /run/cfn-init /home/oracle/fixalert /var/log/cfn*
+
 mkdir /userdata
 echo "Running prerequisite steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-prereqs.sh /userdata/prereqs.sh
@@ -94,7 +97,7 @@ sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/applmgr/scripts/disk_space.s
 
 cat <<EOT > /home/applmgr/applmgrcrontab.txt
 0 07 * * 1-5 /home/applmgr/scripts/purge_apache_logs.sh 60 >/tmp/purge_apache_logs.trc 2>&1
-0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} $SLACK_ALERT_URL >/tmp/disk_space.trc 2>&1
+0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} >/tmp/disk_space.trc 2>&1
 EOT
 chown applmgr:applmgr /home/applmgr/applmgrcrontab.txt
 chmod 744 /home/applmgr/applmgrcrontab.txt
