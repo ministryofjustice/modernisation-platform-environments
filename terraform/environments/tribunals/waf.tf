@@ -184,8 +184,3 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
     }
   }
 }
-
-resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
-  resource_arn = aws_lb.tribunals_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
-}
