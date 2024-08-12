@@ -118,7 +118,7 @@ locals {
           initial_lifecycle_hooks = {
             "ready-hook" = {
               default_result       = "ABANDON"
-              heartbeat_timeout    = 3000
+              heartbeat_timeout    = 3600
               lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
             }
           }
