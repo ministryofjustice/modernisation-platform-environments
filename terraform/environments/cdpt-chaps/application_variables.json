@@ -1,4 +1,4 @@
-{ 
+{
   "accounts": {
     "development": {
       "db_instance_class": "db.t3.2xlarge",

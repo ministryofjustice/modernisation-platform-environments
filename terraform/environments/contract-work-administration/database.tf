@@ -189,7 +189,7 @@ resource "aws_instance" "database" {
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },
       local.tags,
-      { "Name" = "${local.application_name_short}-database-root"}
+      { "Name" = "${local.application_name_short}-database-root" }
     )
   }
 
