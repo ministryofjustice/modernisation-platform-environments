@@ -133,7 +133,7 @@ tasks:
               }
 
               $elapsedTime = (Get-Date) - $startTime
-              if ($elapsedTime.TotalMinutes -gt 60) {
+              if ($elapsedTime.TotalMinutes -gt 120) {
                   Write-Output "EC2Launch .run-once file does not yet exist"
                   Write-Output "EC2Launch tasks have not completed within 15 minutes"
                   Set-ReadyHook -lifeCycleActionResult 'ABANDON' 
