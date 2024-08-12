@@ -66,6 +66,35 @@ resource "aws_iam_role" "dms_s3_writer_role" {
   })
 }
 
+resource "aws_iam_policy" "dms_s3_bucket_writer_policy" {
+    count  = length(keys(local.dms_s3_cross_account_bucket_arns)) > 0 ? 1 : 0
+    name   = "dms-s3-bucket-writer-policy"
+    policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+        {
+        Effect    = "Allow"
+        Principal = {
+          AWS = aws_iam_role.dms_s3_writer_role.arn
+        }
+        Actions    = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:DeleteObject",
+          "s3:PutObjectTagging"         
+        ]
+        Resources = values(local.dms_s3_cross_account_bucket_arns)
+        }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "dms_s3_bucket_writer_policy_attachment" {
+  count      = length(keys(local.dms_s3_cross_account_bucket_arns)) > 0 ? 1 : 0
+  role       = aws_iam_role.dms_s3_writer_role.name
+  policy_arn = aws_iam_policy.dms_s3_bucket_writer_policy[0].arn
+}
+
 # resource "aws_s3_bucket_policy" "dms_s3_bucket_policy" {
 #   count  = length(keys(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns)) > 0 ? 1 : 0
 #   bucket = module.s3_bucket_dms_destination.bucket.id

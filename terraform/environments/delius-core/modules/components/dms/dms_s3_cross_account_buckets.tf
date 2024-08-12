@@ -9,10 +9,16 @@ data "terraform_remote_state" "get_dms_s3_bucket_info" {
 }
 
 locals {
-  dms_s3_bucket_list = [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_bucket_name,null) ]
+  dms_s3_bucket_name_list = [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_bucket_name,null) ]
 
   dms_s3_cross_account_bucket_names = merge([
-    for bucket_map in local.dms_s3_bucket_list : bucket_map
+    for bucket_map in local.dms_s3_bucket_name_list : bucket_map
+  ]...)
+
+  dms_s3_bucket_arn_list = [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_bucket_arn,null) ]
+
+  dms_s3_cross_account_bucket_arns = merge([
+    for bucket_map in local.dms_s3_bucket_arn_list : bucket_map
   ]...)
 
   dms_s3_existing_roles_list = [for account_name in var.delius_account_names : {
