@@ -96,7 +96,7 @@ module "metadata-s3-bucket" {
   }
 
   log_bucket = module.s3-logging-bucket.bucket.id
-  log_prefix = "metadata-store"
+  log_prefix = "metadata-store/"
 
   lifecycle_rule = [
     {
