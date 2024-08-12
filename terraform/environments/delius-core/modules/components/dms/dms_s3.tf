@@ -17,7 +17,9 @@ module "s3_bucket_dms_destination" {
           }
           actions    = [
             "s3:PutObject",
-            "s3:PutObjectAcl"
+            "s3:PutObjectAcl",
+            "s3:DeleteObject",
+            "s3:PutObjectTagging"
           ]
         }]
 
