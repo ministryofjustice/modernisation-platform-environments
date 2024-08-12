@@ -1,6 +1,7 @@
 locals {
 
   application_name = "electronic-monitoring-data"
+  application_name_shorthand = "em-data"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
