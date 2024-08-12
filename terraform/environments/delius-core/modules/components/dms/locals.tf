@@ -29,7 +29,7 @@ locals {
 
    dms_s3_bucket_info = {
        dms_s3_bucket_name = {(var.env_name) = module.s3_bucket_dms_destination.bucket.bucket}
-       dms_s3_bucket_arn = {(var.env_name) = module.s3_bucket_dms_destination.bucket.bucket}
+       dms_s3_bucket_arn = {(var.env_name) = module.s3_bucket_dms_destination.bucket.arn}
        dms_s3_cross_account_bucket_names = local.dms_s3_cross_account_bucket_names
        dms_s3_cross_account_bucket_arns = local.dms_s3_cross_account_bucket_arns
        dms_s3_role_arn = {(var.env_name) = aws_iam_role.dms_s3_writer_role.arn}
