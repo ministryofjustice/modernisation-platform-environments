@@ -97,6 +97,7 @@ tasks:
       - frequency: always
         type: powershell
         runAs: admin
+        detach: true
         content: |-
             # Run AWS ready hook script on completion of UserData tasks above
             $ErrorActionPreference = "Stop"
