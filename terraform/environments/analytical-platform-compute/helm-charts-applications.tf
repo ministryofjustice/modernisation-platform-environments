@@ -9,8 +9,8 @@ resource "helm_release" "ui" {
     templatefile(
       "${path.module}/src/helm/values/ui/values.yml.tftpl",
       {
-        ui_hostname = local.environment_configuration.ui_hostname
-        eks_role_arn = module.lake_formation_share_role.
+        ui_hostname  = local.environment_configuration.ui_hostname
+        eks_role_arn = module.lake_formation_share_role.iam_role_arn
       }
     )
   ]

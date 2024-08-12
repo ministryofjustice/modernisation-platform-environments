@@ -258,3 +258,26 @@ module "lake_formation_share_role" {
 
   tags = local.tags
 }
+
+
+module "analytical_platform_ui_service_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.41.0"
+
+  create_role = true
+
+  role_name_prefix = "analytical-platform-ui"
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["${kubernetes_namespace.ui.metadata[0].name}:ui"]
+    }
+  }
+  role_policy_arns = [module.analytical_platform_lake_formation_share_policy.arn]
+
+  tags = local.tags
+}
