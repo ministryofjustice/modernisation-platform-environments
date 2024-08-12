@@ -95,6 +95,9 @@ module "metadata-s3-bucket" {
     aws.bucket-replication = aws
   }
 
+  log_bucket = module.s3-logging-bucket.bucket.id
+  log_prefix = "metadata-store"
+
   lifecycle_rule = [
     {
       id      = "main"
