@@ -278,8 +278,8 @@ module "analytical_platform_ui_service_role" {
     }
   }
   role_policy_arns = {
-    "lake_formation_and_quicksight" = module.analytical_platform_lake_formation_share_policy.arn
+    "lake_formation_and_quicksight"      = module.analytical_platform_lake_formation_share_policy.arn
+    "lake_formation_cross_account_share" = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
   }
-
   tags = local.tags
 }

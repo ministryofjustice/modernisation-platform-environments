@@ -224,7 +224,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     condition {
       test     = "StringEquals"
       variable = "iam:AWSServiceName"
-      values = ["lakeformation.amazonaws.com"]
+      values   = ["lakeformation.amazonaws.com"]
     }
   }
   # Needed for creation of Lake Formation Service Role
