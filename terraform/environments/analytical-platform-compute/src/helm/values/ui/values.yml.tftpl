@@ -13,3 +13,6 @@ ingress:
     - secretName: ui-tls
       hosts:
         - ${ui_hostname}
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
