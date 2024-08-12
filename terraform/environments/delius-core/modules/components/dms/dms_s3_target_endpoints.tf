@@ -14,6 +14,7 @@ resource "aws_dms_endpoint" "dms_audit_target_endpoint_s3" {
        bucket_folder            = "${local.audit_source_primary}/audit"
        service_access_role_arn  = "arn:aws:iam::${local.delius_account_id}:role/${local.dms_s3_writer_role_name}"      
        timestamp_column_name    = "TIMESTAMP" 
+       ssl_mode                 = "require"
       }
    }
 
