@@ -137,7 +137,7 @@ data "aws_iam_policy_document" "mlflow" {
     ]
     resources = [
       "${module.mlflow_bucket.s3_bucket_arn}/*",
-      "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}"
+      "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}/*"
     ]
   }
 }
@@ -188,7 +188,11 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:DeregisterResource",
       "lakeformation:ListPermissions",
       "lakeformation:DescribeResource",
+<<<<<<< HEAD
 
+=======
+      "lakeformation:GetDataAccess",
+>>>>>>> 98f36ad5f4a2e501a7df60477d4f2a26cebd696f
     ]
     resources = [
       "arn:aws:lakeformation:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"
@@ -218,7 +222,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "iam:*",
       "sso-directory:*",
       "athena:*",
-      "s3:*"
+      "s3:*",
+      "quicksight:*"
     ]
     resources = [
       "*"

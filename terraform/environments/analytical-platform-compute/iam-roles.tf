@@ -251,7 +251,10 @@ module "lake_formation_share_role" {
     "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
   ]
 
-  trusted_role_arns = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-management-production"]}:root"]
+  trusted_role_arns = [
+    "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-management-production"]}:root",
+    "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:root"
+  ]
 
   tags = local.tags
 }

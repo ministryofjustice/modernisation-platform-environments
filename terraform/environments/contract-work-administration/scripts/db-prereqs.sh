@@ -24,7 +24,7 @@ mkdir /home/oracle/.ssh
 # SLACK_ALERT_ADDRESS=${pSlackAlertsChannelEmail}
 # export SLACK_ALERT_ADDRESS
 mkdir -p /repo
-chown -R oracle:dba /home/oracle
+chown -R oracle:oinstall /home/oracle
 
 mkdir -p /home/oracle/scripts/log
 chown -R oracle:oinstall /home/oracle/scripts/log

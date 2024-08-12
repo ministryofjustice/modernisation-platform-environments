@@ -59,11 +59,19 @@ do
 done
 
 echo "Updating /etc/rc.local file"
-## Note this will keep appending to the file, like the set up in LZ
-echo "Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
+cat <<EOT > etc/rc.local
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+touch /var/lock/subsys/local
+Xvfb :0 -screen 0 6x6x8 -pn -fp /usr/share/X11/fonts/misc -sp /root/SecurityPolicy &
 export DISPLAY=${local.appserver1_hostname}:0.0
 twm &
-xhost +" >> /etc/rc.local
+xhost +
+EOT
 
 echo "Running postbuild steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
@@ -174,12 +182,23 @@ resource "aws_instance" "app1" {
     http_tokens = "optional"
   }
 
+  root_block_device {
+    tags = merge(
+      { "instance-scheduling" = "skip-scheduling" },
+      local.tags,
+      { "Name" = "${local.application_name_short}-app1-root"}
+    )
+  }
+
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = local.appserver1_ec2_name },
     { "snapshot-with-daily-35-day-retention" = "yes" }
   )
+  
+  depends_on          = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
+
 }
 
 resource "aws_instance" "app2" {
@@ -195,12 +214,23 @@ resource "aws_instance" "app2" {
   #   user_data_base64            = base64encode(local.app_userdata)
   #   user_data_replace_on_change = true
 
+  root_block_device {
+    tags = merge(
+      { "instance-scheduling" = "skip-scheduling" },
+      local.tags,
+      { "Name" = "${local.application_name_short}-app2-root"}
+    )
+  }
+
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${upper(local.application_name_short)} App Instance 2" },
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
+
+  depends_on          = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
+
 }
 
 #################################
@@ -353,7 +383,7 @@ resource "aws_ebs_volume" "app1" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-app1" },
+    { "Name" = "${local.application_name_short}-app1-data" },
   )
 }
 
@@ -378,7 +408,7 @@ resource "aws_ebs_volume" "app2" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-app2" },
+    { "Name" = "${local.application_name_short}-app2-data" },
   )
 }
 
