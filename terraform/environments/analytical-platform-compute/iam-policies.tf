@@ -178,13 +178,13 @@ module "gha_mojas_airflow_iam_policy" {
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  # Checkov:skip=CKV_AWS_110: test policy for development
-  # Checkov:skip=CKV_AWS_107: test policy for development
-  # Checkov:skip=CKV_AWS_111: test policy for development
-  # Checkov:skip=CKV_AWS_356: test policy for development
-  # Checkov:skip=CKV_AWS_109: test policy for development
-  # Checkov:skip=CKV_AWS_108: test policy for development
-  # Checkov:skip=CKV2_AWS_40: test policy for development
+  #checkov:skip=CKV_AWS_110: test policy for development
+  #checkov:skip=CKV_AWS_107: test policy for development
+  #checkov:skip=CKV_AWS_111: test policy for development
+  #checkov:skip=CKV_AWS_356: test policy for development
+  #checkov:skip=CKV_AWS_109: test policy for development
+  #checkov:skip=CKV_AWS_108: test policy for development
+  #checkov:skip=CKV2_AWS_40: test policy for development
   statement {
     effect = "Allow"
     actions = [
