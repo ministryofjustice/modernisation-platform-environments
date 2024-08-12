@@ -6,7 +6,7 @@ locals {
   dms_s3_local_bucket_prefix = "${var.env_name}-dms-destination-bucket"
 
   # If we are reading from a standby database it will have an S1 or S2 suffix - strip this off to get the name of the primary database
-  delius_database_primary = replace(upper(var.dms_config.audit_source_endpoint.read_database),"/S[1-2]$/","")
+  audit_source_primary = try(replace(upper(var.dms_config.audit_source_endpoint.read_database),"/S[1-2]$/",""),null)
 
   # dms_s3_local_bucket_secret = "dms-s3-local-bucket"
   # dms_s3_local_bucket_secret_access_role = "dms-s3-local-bucket-secret-access-role"

@@ -11,7 +11,7 @@ resource "aws_dms_endpoint" "dms_audit_target_endpoint_s3" {
    engine_name                     = "s3"
    s3_settings {
        bucket_name              = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment]
-       bucket_folder            = "${local.delius_database_primary}/audit"
+       bucket_folder            = "${local.audit_source_primary}/audit"
        service_access_role_arn  = "arn:aws:iam::${local.delius_account_id}:role/${local.dms_s3_writer_role_name}"      
        timestamp_column_name    = "TIMESTAMP" 
       }
