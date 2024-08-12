@@ -83,7 +83,7 @@ resource "aws_iam_policy" "dms_s3_bucket_writer_policy" {
           "s3:DeleteObject",
           "s3:PutObjectTagging"         
         ]
-        Resources = values(local.dms_s3_cross_account_bucket_arns)
+        Resources = toset(values(local.dms_s3_cross_account_bucket_arns))
         }
     ]
   })
