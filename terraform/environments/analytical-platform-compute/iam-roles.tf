@@ -277,7 +277,9 @@ module "analytical_platform_ui_service_role" {
       namespace_service_accounts = ["${kubernetes_namespace.ui.metadata[0].name}:ui"]
     }
   }
-  role_policy_arns = [module.analytical_platform_lake_formation_share_policy.arn]
+  role_policy_arns = {
+    "lake_formation_and_quicksight" = module.analytical_platform_lake_formation_share_policy.arn
+  }
 
   tags = local.tags
 }
