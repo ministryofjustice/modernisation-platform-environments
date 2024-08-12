@@ -28,29 +28,29 @@
 #}
 
 module "buddi" {
- source = "./modules/landing_zone/"
+  source = "./modules/landing_zone/"
 
- supplier = "buddi"
+  supplier = "buddi"
 
- user_accounts = [
-   # Developer access.
-   local.sftp_account_dev,
+  user_accounts = [
+    # Developer access.
+    local.sftp_account_dev,
 
-   # Test account for supplier.
-   local.sftp_account_buddi_test,
+    # Test account for supplier.
+    local.sftp_account_buddi_test,
 
-   # Accounts for each system to be migrated.
-   local.sftp_account_buddi_live,
- ]
+    # Accounts for each system to be migrated.
+    local.sftp_account_buddi_live,
+  ]
 
- data_store_bucket = aws_s3_bucket.data_store
+  data_store_bucket = aws_s3_bucket.data_store
 
- account_id = data.aws_caller_identity.current.account_id
+  account_id = data.aws_caller_identity.current.account_id
 
- vpc_id     = data.aws_vpc.shared.id
- subnet_ids = [data.aws_subnet.public_subnets_b.id]
+  vpc_id     = data.aws_vpc.shared.id
+  subnet_ids = [data.aws_subnet.public_subnets_b.id]
 
- local_tags = local.tags
+  local_tags = local.tags
 }
 
 #module "civica" {
