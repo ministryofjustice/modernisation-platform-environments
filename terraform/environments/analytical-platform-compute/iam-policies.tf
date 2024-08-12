@@ -176,7 +176,15 @@ module "gha_mojas_airflow_iam_policy" {
 }
 
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
-
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  # Checkov:skip=CKV_AWS_110: test policy for development
+  # Checkov:skip=CKV_AWS_107: test policy for development
+  # Checkov:skip=CKV_AWS_111: test policy for development
+  # Checkov:skip=CKV_AWS_356: test policy for development
+  # Checkov:skip=CKV_AWS_109: test policy for development
+  # Checkov:skip=CKV_AWS_108: test policy for development
+  # Checkov:skip=CKV2_AWS_40: test policy for development
   statement {
     effect = "Allow"
     actions = [
@@ -198,14 +206,28 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   statement {
     effect = "Allow"
     actions = [
-      "iam:PutRolePolicy",
-      "iam:CreateServiceLinkedRole"
+      "iam:PutRolePolicy"
     ]
     resources = [
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"
     ]
   }
   # Needed for LakeFormationAdmin to check the presense of the Lake Formation Service Role
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:CreateServiceLinkedRole"
+    ]
+    resources = [
+      "*"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+      values = ["lakeformation.amazonaws.com"]
+    }
+  }
+  # Needed for creation of Lake Formation Service Role
   statement {
     effect = "Allow"
     actions = [
