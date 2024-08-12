@@ -186,7 +186,7 @@ resource "aws_instance" "app1" {
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },
       local.tags,
-      { "Name" = "${local.application_name_short}-app1-root"}
+      { "Name" = "${local.application_name_short}-app1-root" }
     )
   }
 
@@ -196,8 +196,8 @@ resource "aws_instance" "app1" {
     { "Name" = local.appserver1_ec2_name },
     { "snapshot-with-daily-35-day-retention" = "yes" }
   )
-  
-  depends_on          = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
+
+  depends_on = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
 
 }
 
@@ -218,7 +218,7 @@ resource "aws_instance" "app2" {
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },
       local.tags,
-      { "Name" = "${local.application_name_short}-app2-root"}
+      { "Name" = "${local.application_name_short}-app2-root" }
     )
   }
 
@@ -229,7 +229,7 @@ resource "aws_instance" "app2" {
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 
-  depends_on          = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
+  depends_on = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
 
 }
 

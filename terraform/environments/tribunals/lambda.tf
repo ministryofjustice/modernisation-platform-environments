@@ -147,11 +147,11 @@ resource "aws_lambda_function" "app_setup_db" {
 
   environment {
     variables = {
-      DB_URL        = aws_db_instance.rdsdb.address
-      USER_NAME     = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-      PASSWORD      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-      NEW_DB_NAME   = each.value.app_db_name
-      APP_FOLDER    = each.value.sql_setup_path
+      DB_URL      = aws_db_instance.rdsdb.address
+      USER_NAME   = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+      PASSWORD    = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+      NEW_DB_NAME = each.value.app_db_name
+      APP_FOLDER  = each.value.sql_setup_path
     }
   }
 
