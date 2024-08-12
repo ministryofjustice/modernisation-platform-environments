@@ -123,11 +123,14 @@ tasks:
 
             $startTime = Get-Date
 
+            New-Item -Path C:\Users\Administrator\Desktop -Name "EC2LaunchTasksNotCompleted.txt" -ItemType File -Force
+
             while ($true) {
           
               if(Test-Path $EC2LaunchRunOncePath) {
                   Write-Output "EC2Launch .run-once file exists, previous steps completed"
                   Write-Output "Sending $name-ready-hook CONTINUE lifecycle action result"
+                  Add-Content -Path C:\Users\Administrator\Desktop\EC2LaunchTasksNotCompleted.txt -Value "EC2Launch tasks completed at $(Get-Date) - sending ReadyHook CONTINUE"
                   Set-ReadyHook -lifeCycleActionResult 'CONTINUE'
                   break
               }
@@ -136,8 +139,8 @@ tasks:
               if ($elapsedTime.TotalMinutes -gt 100) {
                   Write-Output "EC2Launch .run-once file does not yet exist"
                   Write-Output "EC2Launch tasks have not completed within 120 minutes"
-                  New-Item -Path C:\Users\Administrator\Desktop -Name "EC2LaunchTasksNotCompleted.txt" -ItemType File -Force
-                  Add-Content -Path C:\Users\Administrator\Desktop\EC2LaunchTasksNotCompleted.txt -Value "EC2Launch tasks have not completed within 100 minutes"
+                  
+                  Add-Content -Path C:\Users\Administrator\Desktop\EC2LaunchTasksNotCompleted.txt -Value "EC2Launch tasks have not completed within 100 minutes at $(Get-Date)"
                   # Set-ReadyHook -lifeCycleActionResult 'ABANDON' 
                   break
               }
