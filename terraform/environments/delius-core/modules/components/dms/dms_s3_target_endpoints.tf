@@ -9,12 +9,12 @@ resource "aws_dms_endpoint" "dms_audit_target_endpoint_s3" {
    endpoint_id                     = "s3-staging-of-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
    endpoint_type                   = "target"
    engine_name                     = "s3"
+   ssl_mode                        = "require"
    s3_settings {
        bucket_name              = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment]
        bucket_folder            = "${local.audit_source_primary}/audit"
        service_access_role_arn  = "arn:aws:iam::${local.delius_account_id}:role/${local.dms_s3_writer_role_name}"      
        timestamp_column_name    = "TIMESTAMP" 
-       ssl_mode                 = "require"
       }
    }
 
