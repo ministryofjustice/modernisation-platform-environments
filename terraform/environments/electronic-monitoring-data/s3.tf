@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------
-# Env S3 bucket log bucket
+# Account S3 bucket log bucket
 # ------------------------------------------------------------------------
 
 module "s3-logging-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=cadab51"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
 
   bucket_prefix      = join("-", [local.application_name_shorthand, local.environment, "bucket-logs-"])
   versioning_enabled = true
@@ -74,7 +74,7 @@ module "s3-logging-bucket" {
 # ------------------------------------------------------------------------
 
 module "metadata-s3-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=cadab51"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
 
   bucket_prefix      = "metadata-store-"
   versioning_enabled = true
@@ -94,6 +94,9 @@ module "metadata-s3-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
+
+  log_bucket = module.s3-logging-bucket.bucket.id
+  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -154,8 +157,9 @@ resource "aws_s3_bucket_notification" "send_metadata_to_ap" {
 # ----------------------------------
 # Athena Query result storage bucket
 # ----------------------------------
+
 module "athena-s3-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=cadab51"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
 
   bucket_name        = join("-", ["aws-athena-query-results", local.env_account_id, "eu-west-2"])
   versioning_enabled = true
@@ -225,7 +229,7 @@ module "athena-s3-bucket" {
 # ----------------------------------
 
 module "unzipped-s3-data-store" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=cadab51"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
 
   bucket_prefix      = "unzipped-files-data-store-"
   versioning_enabled = true
@@ -245,6 +249,9 @@ module "unzipped-s3-data-store" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
+
+  log_bucket = module.s3-logging-bucket.bucket.id
+  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -290,23 +297,12 @@ module "unzipped-s3-data-store" {
   tags = local.tags
 }
 
-
-
-module "unzipped_store_log_bucket" {
-  source = "./modules/s3_log_bucket"
-
-  source_bucket = module.unzipped-s3-data-store.bucket
-  account_id    = data.aws_caller_identity.current.account_id
-  local_tags    = local.tags
-}
-
 # ------------------------------------------------------------------------
 # DMS Premigration Assessments bucket
 # ------------------------------------------------------------------------
 
-
 module "dms-premigrate-assess-store" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=cadab51"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
 
   bucket_prefix      = "dms-premigrate-assess-store-"
   versioning_enabled = true
@@ -319,165 +315,6 @@ module "dms-premigrate-assess-store" {
   replication_enabled = false
   # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
   # replication_region                       = "eu-west-2"
-  providers = {
-    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
-    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
-    # Platform team to add a new provider for the additional Region.
-    # Leave this provider block in even if you are not using replication
-    aws.bucket-replication = aws
-  }
-
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 60
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 120
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
-    }
-  ]
-
-  tags = local.tags
-}
-
-module "dms-premigrate-assess-store-logs" {
-  source = "./modules/s3_log_bucket"
-
-  source_bucket = module.dms-premigrate-assess-store.bucket
-  account_id    = data.aws_caller_identity.current.account_id
-  local_tags    = local.tags
-}
-
-# ------------------------------------------------------------------------
-# Unstructured directory structure as json bucket
-# ------------------------------------------------------------------------
-
-
-module "json-directory-structure-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=cadab51"
-
-  bucket_prefix      = "json-directory-structure-bucket-"
-  versioning_enabled = true
-
-  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
-  ownership_controls = "BucketOwnerEnforced"
-  acl                = "private"
-
-  # Refer to the below section "Replication" before enabling replication
-  replication_enabled = false
-  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
-  # replication_region                       = "eu-west-2"
-  providers = {
-    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
-    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
-    # Platform team to add a new provider for the additional Region.
-    # Leave this provider block in even if you are not using replication
-    aws.bucket-replication = aws
-  }
-
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 60
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 120
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
-    }
-  ]
-
-  tags = local.tags
-}
-
-module "json-directory-structure-bucket-logs" {
-  source = "./modules/s3_log_bucket"
-
-  source_bucket = module.json-directory-structure-bucket.bucket
-  account_id    = data.aws_caller_identity.current.account_id
-  local_tags    = local.tags
-}
-
-
-
-# ------------------------------------------------------------------------
-# testing Bucket
-# ------------------------------------------------------------------------
-
-module "data-store2-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=71132ac68fde5f545a66642159d780a36d69a89e"
-
-  bucket_prefix      = "testing-logs"
-  versioning_enabled = true
-
-  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
-  ownership_controls = "BucketOwnerEnforced"
-
-  # Refer to the below section "Replication" before enabling replication
-  replication_enabled = false
-  # Below two variables and providers configuration are only relevant if 'replication_enabled' is set to true
-  # replication_region                       = "eu-west-2"
-  # replication_role_arn                     = module.s3-bucket.role.arn
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
@@ -502,33 +339,106 @@ module "data-store2-bucket" {
 
       transition = [
         {
-          days          = 90
+          days          = 60
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = 90
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 730
+        days = 120
       }
 
       noncurrent_version_transition = [
         {
-          days          = 90
+          days          = 30
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = 90
           storage_class = "GLACIER"
         }
       ]
 
       noncurrent_version_expiration = {
-        days = 730
+        days = 365
       }
     }
   ]
 
-  tags = merge(local.tags)
+  tags = local.tags
+}
+
+# ------------------------------------------------------------------------
+# Unstructured directory structure as json bucket
+# ------------------------------------------------------------------------
+
+module "json-directory-structure-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+
+  bucket_prefix      = "json-directory-structure-bucket-"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+
+  log_bucket = module.s3-logging-bucket.bucket.id
+  log_partition_date_source = "EventTime"
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 60
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 90
+          storage_class = "GLACIER"
+        }
+      ]
+
+      expiration = {
+        days = 120
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 30
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 90
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 365
+      }
+    }
+  ]
+
+  tags = local.tags
 }
