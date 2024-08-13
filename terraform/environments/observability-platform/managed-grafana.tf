@@ -117,6 +117,11 @@ resource "grafana_data_source" "observability_platform_prometheus" {
   })
 }
 
+import {
+  to = grafana_data_source.observability_platform_prometheus
+  id = "TpO_FjNIk"
+}
+
 /* GitHub Source */
 resource "grafana_data_source" "github" {
   type = "grafana-github-datasource"
@@ -128,4 +133,9 @@ resource "grafana_data_source" "github" {
   secure_json_data_encoded = jsonencode({
     accessToken = data.aws_secretsmanager_secret_version.github_token.secret_string
   })
+}
+
+import {
+  to = grafana_data_source.github
+  id = "rGlSm31Iz"
 }
