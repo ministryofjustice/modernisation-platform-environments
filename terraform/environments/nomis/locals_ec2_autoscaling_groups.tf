@@ -58,6 +58,7 @@ locals {
           min_size          = 0
           reuse_on_scale_in = true
         }
+        # Comment these lines in when ready-hooks are going to be deployed
         # initial_lifecycle_hooks = {
         #   "ready-hook" = {
         #     default_result       = "ABANDON"
