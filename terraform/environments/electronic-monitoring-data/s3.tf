@@ -5,7 +5,7 @@
 module "s3-logging-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
 
-  bucket_prefix      = join("-", [local.application_name_shorthand, local.environment, "bucket-logs-"])
+  bucket_prefix      = "${local.application_name_shorthand}-${local.environment}-bucket-logs-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
