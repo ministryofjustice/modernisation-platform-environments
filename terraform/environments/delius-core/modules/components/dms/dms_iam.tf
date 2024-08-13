@@ -74,9 +74,6 @@ resource "aws_iam_policy" "dms_s3_bucket_writer_policy" {
     Statement = [
         {
         Effect    = "Allow"
-        Principal = {
-          AWS = aws_iam_role.dms_s3_writer_role.arn
-        }
         Action    = [
           "s3:PutObject",
           "s3:PutObjectAcl",
