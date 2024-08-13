@@ -6,7 +6,7 @@ terraform {
     }
     grafana = {
       source  = "grafana/grafana"
-      version = "2.5.0"
+      version = "~> 3.0"
     }
     http = {
       version = "~> 3.0"
