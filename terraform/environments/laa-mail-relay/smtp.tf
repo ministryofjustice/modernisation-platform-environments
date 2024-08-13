@@ -95,3 +95,12 @@ resource "aws_vpc_security_group_ingress_rule" "smtp_vpc" {
   to_port           = 25
 }
 
+# Domain A record for SMTP server
+resource "aws_route53_record" "smtp" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "laa-mail.${data.aws_route53_zone.external.name}"
+  type     = "A"
+  ttl      = "60"
+  records  = [aws_instance.smtp.private_ip]
+}
