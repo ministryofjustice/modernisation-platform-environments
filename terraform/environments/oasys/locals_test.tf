@@ -430,6 +430,7 @@ locals {
       "/oracle/database/T1ONRBDS" = local.secretsmanager_secrets.db
 
       "/oracle/database/T2OASYS"  = local.secretsmanager_secrets.db_oasys
+      "/oracle/database/T2OASYS2" = local.secretsmanager_secrets.db_oasys
       "/oracle/database/T2OASREP" = local.secretsmanager_secrets.db
       "/oracle/database/T2AZBIPI" = local.secretsmanager_secrets.db_bip
       "/oracle/database/T2BIPINF" = local.secretsmanager_secrets.db_bip
