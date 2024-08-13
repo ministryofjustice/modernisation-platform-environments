@@ -1,0 +1,6 @@
+---
+apiVersion: v2
+name: kyverno-configuration
+description: A Helm chart to deploy Kyverno's configuration
+type: application
+version: 0.0.1

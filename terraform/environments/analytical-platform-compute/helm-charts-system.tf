@@ -14,6 +14,20 @@ resource "helm_release" "kyverno" {
   ]
 }
 
+resource "helm_release" "kyverno_configuration" {
+  name      = "kyverno-configuration"
+  chart     = "./src/helm/charts/kyverno-configuration"
+  namespace = kubernetes_namespace.kyverno.metadata[0].name
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/kyverno-configuration/values.yml.tftpl",
+      {}
+    )
+  ]
+  depends_on = [helm_release.kyverno]
+}
+
 /* AWS Observability */
 /*
   There is an ongoing issue with aws-cloudwatch-metrics as it doesn't properly support IMDSv2 (https://github.com/aws/amazon-cloudwatch-agent/issues/1101)
