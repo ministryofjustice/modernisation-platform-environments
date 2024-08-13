@@ -41,6 +41,12 @@ module "managed_grafana" {
   tags = local.tags
 }
 
+resource "aws_grafana_workspace_service_account" "automation" {
+  name         = "automation"
+  grafana_role = "ADMIN"
+  workspace_id = module.managed_grafana.workspace_id
+}
+
 /* Slack Contact Points */
 module "contact_point_slack" {
   for_each = toset(local.all_slack_channels)
