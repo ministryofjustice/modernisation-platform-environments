@@ -58,13 +58,13 @@ locals {
           min_size          = 0
           reuse_on_scale_in = true
         }
-        initial_lifecycle_hooks = {
-          "ready-hook" = {
-            default_result       = "ABANDON"
-            heartbeat_timeout    = 2700 # 45 minutes
-            lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-          }
-        }        
+        # initial_lifecycle_hooks = {
+        #   "ready-hook" = {
+        #     default_result       = "ABANDON"
+        #     heartbeat_timeout    = 2700 # 45 minutes
+        #     lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+        #   }
+        # }        
       }
       autoscaling_schedules = {
         "scale_up"   = { recurrence = "0 6 * * Mon-Fri" }
@@ -82,7 +82,9 @@ locals {
         ]
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
-          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", {
+          # Swap this line with the one below when this is going to be implemented
+          # "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", { 
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {  
             branch = "main"
           }
         ))
