@@ -81,6 +81,13 @@ resource "aws_iam_policy" "dms_s3_bucket_writer_policy" {
           "s3:PutObjectTagging"         
         ]
         Resource = [for bucket in values(local.dms_s3_cross_account_bucket_arns) : "${bucket}/*"]
+        },
+        {
+        Effect    = "Allow"
+        Action    = [
+          "s3:ListBucket"
+        ]
+        Resource = [for bucket in values(local.dms_s3_cross_account_bucket_arns) : bucket
         }
     ]
   })
