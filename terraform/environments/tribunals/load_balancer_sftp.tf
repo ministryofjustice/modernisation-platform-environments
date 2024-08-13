@@ -42,11 +42,11 @@ resource "aws_iam_role" "flow_logs_role" {
     Version = "2012-10-17",
     Statement = [
       {
-        Action = "sts:AssumeRole",
         Effect = "Allow",
         Principal = {
           Service = "vpc-flow-logs.amazonaws.com"
-        }
+        },
+        Action = "sts:AssumeRole"
       }
     ]
   })
@@ -60,6 +60,7 @@ resource "aws_iam_role_policy" "flow_logs_policy" {
     Version = "2012-10-17",
     Statement = [
       {
+        Effect = "Allow",
         Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
@@ -67,7 +68,15 @@ resource "aws_iam_role_policy" "flow_logs_policy" {
           "logs:DescribeLogGroups",
           "logs:DescribeLogStreams"
         ],
-        Effect   = "Allow",
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ec2:CreateFlowLogs",
+          "ec2:DescribeFlowLogs",
+          "ec2:DeleteFlowLogs"
+        ],
         Resource = "*"
       }
     ]
