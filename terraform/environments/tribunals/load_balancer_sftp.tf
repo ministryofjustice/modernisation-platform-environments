@@ -35,68 +35,6 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   }
 }
 
-resource "aws_iam_role" "flow_logs_role" {
-  name = "flow-logs-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Service = "vpc-flow-logs.amazonaws.com"
-        },
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "flow_logs_policy" {
-  name   = "flow-logs-policy"
-  role   = aws_iam_role.flow_logs_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:DescribeLogGroups",
-          "logs:DescribeLogStreams"
-        ],
-        Resource = "*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "ec2:CreateFlowLogs",
-          "ec2:DescribeFlowLogs",
-          "ec2:DeleteFlowLogs"
-        ],
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-resource "aws_cloudwatch_log_group" "tribunals_lb_flow_log_group" {
-  name = "tribunals-lb-flow-logs"
-}
-
-resource "aws_flow_log" "tribunals_lb_flow_log" {
-  traffic_type          = "ALL"
-  vpc_id                = data.aws_vpc.shared.id
-  log_destination       = aws_cloudwatch_log_group.tribunals_lb_flow_log_group.arn
-  log_destination_type  = "cloud-watch-logs"
-  iam_role_arn          = aws_iam_role.flow_logs_role.arn
-
-  depends_on = [aws_security_group.tribunals_lb_sc_sftp]
-}
-
 resource "aws_lb_listener" "tribunals_lb_sftp" {
   for_each          = var.sftp_services
   load_balancer_arn = aws_lb.tribunals_lb_sftp.arn
