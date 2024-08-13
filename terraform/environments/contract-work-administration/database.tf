@@ -2,6 +2,9 @@ locals {
   db_userdata = <<EOF
 #!/bin/bash
 
+echo "Cleaning up old configs"
+rm -rf /etc/cfn /etc/awslogs /tmp/cwlogs /run/cfn-init /home/oracle/fixalert /var/log/cfn*
+
 mkdir /userdata
 echo "Running prerequisite steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-prereqs.sh /userdata/prereqs.sh
@@ -83,8 +86,18 @@ sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/
 /etc/init.d/sendmail restart
 
 echo "Update Slack alert URL for Oracle scripts"
-export DB_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name DB_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
-sed -i "s/DB_SLACK_ALERT_URL/$DB_SLACK_ALERT_URL/g" /home/oracle/scripts/rman_backup.sh /home/oracle/scripts/freespace.sh
+
+export OLD_SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name OLD_SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+
+find /home/oracle/scripts -type f -name '*.sh' | xargs sed -i "s/$OLD_SLACK_ALERT_URL/$SLACK_ALERT_URL/g"
+
+sed -i "/export MAIL_ADDR/c\export MAIL_ADDR=\"$SLACK_ALERT_URL\""  /home/oracle/scripts/scan_alert.sh
+
+echo "Adding disk space script"
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/disk-space-alert.sh /home/oracle/scripts/disk_space.sh
+chmod 766 /home/oracle/scripts/disk_space.sh
+sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/oracle/scripts/disk_space.sh
 
 echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -97,27 +110,17 @@ cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
 EOT
 chmod 744 /home/oracle/scripts/aws_ebs_backup.sh
 
-echo "Setting up cron jobs"
-cat <<EOT > /etc/cron.d/oracle_cron
-00 01 * * 0 /home/oracle/scripts/rman_backup.sh CWA /efs/cwa_rman > /tmp/rman_backup.log 2>&1
-00 07 * * 1-5 /home/oracle/scripts/freespace.sh >/home/oracle/scripts/log/freespace_CWA.trc 2>&1
-00 06 * * 1-5 /home/oracle/scripts/clean_trace_dump.sh 60 >/home/oracle/scripts/log/clean_trace_dump_cwa.trc 2>&1
-15 07 * * * /home/oracle/scripts/alert_rota.sh CWA 2>&1
-00 07 * * * /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/log/simple_cdc_check.log
-00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log
-00,15,30,45 07,08,09,10,11,12,13,14,15,16,17 * * 1-5 /home/oracle/scripts/scan_alert.sh >/home/oracle/scripts/log/scan_alert.log 2>&1
-00,30 07,08,09,10,11,12,13,14,15,16,17 * * 1-5  /home/oracle/scripts/mailer_check_1.sh >/tmp/check_workflow_mailer.trc  2>&1
-#00 07 * * * /home/oracle/scripts/space1.sh
-0,30 08-17 * * 1-5 /home/oracle/scripts/disk_space.sh DEV 94  >/tmp/disk_space.trc 2>&1
-00 07 * * * /home/oracle/scripts/tablespace1.sh
 
-EOT
-chmod 700 /etc/cron.d/oracle_cron
-/bin/cp -f /etc/cron.d/oracle_cron  /home/oracle/oraclecrontab.txt
+echo "Setting up cron jobs"
+su oracle -c "crontab -l > /home/oracle/oraclecrontab.txt"
+echo "00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log" >> /home/oracle/oraclecrontab.txt
+
 chown oracle:oinstall /home/oracle/oraclecrontab.txt
 chmod 744 /home/oracle/oraclecrontab.txt
 su oracle -c "crontab /home/oracle/oraclecrontab.txt"
-chown -R oracle:dba /home/oracle/scripts
+chown -R oracle:oinstall /home/oracle/scripts
+rm -rf /etc/cron.d/oracle_cron*
+ln -s /bin/mail /bin/mailx
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
@@ -163,7 +166,7 @@ resource "aws_s3_object" "db_postbuild_script" {
 
 resource "time_sleep" "wait_db_userdata_scripts" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.db_custom_script, aws_s3_object.db_prereqs_script, aws_s3_object.db_postbuild_script]
+  depends_on      = [aws_s3_object.db_custom_script, aws_s3_object.db_prereqs_script, aws_s3_object.db_postbuild_script, aws_s3_object.disk_space_script]
 }
 
 ######################################
@@ -180,7 +183,7 @@ resource "aws_instance" "database" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
   }
@@ -189,7 +192,7 @@ resource "aws_instance" "database" {
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },
       local.tags,
-      { "Name" = "${local.application_name_short}-database-root"}
+      { "Name" = "${local.application_name_short}-database-root" }
     )
   }
 

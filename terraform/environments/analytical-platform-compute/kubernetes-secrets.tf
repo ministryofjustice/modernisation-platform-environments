@@ -70,3 +70,5 @@ resource "kubernetes_secret" "ui_app_secrets" {
     secret_key  = random_password.ui_app_secrets.result
   }
 }
+
+

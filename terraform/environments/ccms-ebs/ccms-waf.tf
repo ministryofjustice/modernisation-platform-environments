@@ -28,8 +28,8 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
     "194.33.248.0/27",    // ARK Corsham Internet Egress Vodafone
     "20.49.214.199/32",   // Azure Landing Zone Egress
     "20.49.214.228/32",   // Azure Landing Zone Egress
-    "51.155.225.100/32",  // Jide Personal Access Temporarily
-    "82.12.34.69/32",     // Jide Personal Access Temporarily
+    "51.149.251.0/24",    // MoJO Pre-Production Account BYOIP CIDR range
+    "51.149.249.64/29",   // 10SC Model Office
     "10.26.59.0/25",      // DEV NLB Subnet eu-west-2a
     "10.26.59.128/25",    // DEV NLB Subnet eu-west-2b
     "10.26.60.0/25",      // DEV NLB Subnet eu-west-2c

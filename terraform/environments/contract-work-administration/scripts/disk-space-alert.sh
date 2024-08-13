@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]; then
+if [ $# -ne 2 ]; then
  echo "1st parameter is ENV, 2nd parameter is  % usage. 3rd parameter is the Slack URL to alert to"
 else
 
@@ -22,7 +22,7 @@ else
  done
 
  if [ $(wc -l <$MAILLOG ) -ne 0 ]; then
-   mailx -s "Attn! CWA $1 filesystem space alert on $(hostname) " $3 < $MAILLOG
+   mailx -s "Attn! CWA $1 filesystem space alert on $(hostname) " SLACK_ALERT_URL < $MAILLOG
  fi
  rm $MAILLOG
 fi

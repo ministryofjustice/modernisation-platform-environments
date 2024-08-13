@@ -32,7 +32,7 @@ locals {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
-    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
+    ssh = ["10.0.0.0/8"]
     https_internal = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       "10.0.0.0/8",
@@ -66,7 +66,7 @@ locals {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
-    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
+    ssh = ["10.0.0.0/8"]
     https_internal = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"

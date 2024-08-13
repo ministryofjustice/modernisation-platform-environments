@@ -1800,8 +1800,6 @@ VALUES
 SELECT @Id = SCOPE_IDENTITY()
 go
 
-
-
 CREATE PROCEDURE [dbo].[spAddSubCategory] 
 
 @parent_num tinyint,

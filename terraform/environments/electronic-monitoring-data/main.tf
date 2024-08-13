@@ -27,6 +27,32 @@
 #  local_tags = local.tags
 #}
 
+module "buddi" {
+  source = "./modules/landing_zone/"
+
+  supplier = "buddi"
+
+  user_accounts = [
+    # Developer access.
+    local.sftp_account_dev,
+
+    # Test account for supplier.
+    local.sftp_account_buddi_test,
+
+    # Accounts for each system to be migrated.
+    local.sftp_account_buddi_live,
+  ]
+
+  data_store_bucket = aws_s3_bucket.data_store
+
+  account_id = data.aws_caller_identity.current.account_id
+
+  vpc_id     = data.aws_vpc.shared.id
+  subnet_ids = [data.aws_subnet.public_subnets_b.id]
+
+  local_tags = local.tags
+}
+
 #module "civica" {
 #  source = "./modules/landing_zone/"
 #

@@ -2,6 +2,9 @@ locals {
   cm_userdata = <<EOF
 #!/bin/bash
 
+echo "Cleaning up old configs"
+rm -rf /etc/cfn /etc/awslogs /tmp/cwlogs /run/cfn-init /home/oracle/fixalert /var/log/cfn*
+
 mkdir /userdata
 echo "Running prerequisite steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-prereqs.sh /userdata/prereqs.sh
@@ -86,20 +89,22 @@ sed -i '/^PS1=/d' /etc/bashrc
 printf '\nPS1="($(cat /etc/cwaenv)) $PS1"\n' >> /etc/bashrc
 
 echo "Setting up crontab for applmgr"
-/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-disk-space-alert.sh /home/applmgr/scripts/disk_space.sh
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/disk-space-alert.sh /home/applmgr/scripts/disk_space.sh
 chown applmgr /home/applmgr/scripts/disk_space.sh
 chgrp oinstall /home/applmgr/scripts/disk_space.sh
 chmod 744 /home/applmgr/scripts/disk_space.sh
-
 export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/applmgr/scripts/disk_space.sh
 
 cat <<EOT > /home/applmgr/applmgrcrontab.txt
-0 07 * * 1-5 /home/applmgr/scripts/purge_apache_logs.sh 60 >/tmp/purge_apache_logs.trc 2>&1
-0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} $SLACK_ALERT_URL >/tmp/disk_space.trc 2>&1
+0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} >/tmp/disk_space.trc 2>&1
 EOT
 chown applmgr:applmgr /home/applmgr/applmgrcrontab.txt
 chmod 744 /home/applmgr/applmgrcrontab.txt
 su applmgr -c "crontab /home/applmgr/applmgrcrontab.txt"
+
+rm -rf /etc/cron.d/applmgr_cron*
+ln -s /bin/mail /bin/mailx
 
 ## Update the send mail url
 echo "Updating the sendmail config"
@@ -136,7 +141,7 @@ resource "aws_s3_object" "cm_custom_script" {
 
 resource "time_sleep" "wait_cm_custom_script" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.cm_custom_script, aws_s3_object.app_prereqs_script, aws_s3_object.app_postbuild_script, aws_s3_object.app_disk_space_script]
+  depends_on      = [aws_s3_object.cm_custom_script, aws_s3_object.app_prereqs_script, aws_s3_object.app_postbuild_script, aws_s3_object.disk_space_script]
 }
 
 ######################################
@@ -162,7 +167,7 @@ resource "aws_instance" "concurrent_manager" {
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },
       local.tags,
-      { "Name" = "${local.application_name_short}-concurrent-manager-root"}
+      { "Name" = "${local.application_name_short}-concurrent-manager-root" }
     )
   }
 
@@ -173,7 +178,7 @@ resource "aws_instance" "concurrent_manager" {
     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "no" } : { "snapshot-with-daily-35-day-retention" = "yes" }
   )
 
-  depends_on          = [time_sleep.wait_cm_custom_script] # This resource creation will be delayed to ensure object exists in the bucket
+  depends_on = [time_sleep.wait_cm_custom_script] # This resource creation will be delayed to ensure object exists in the bucket
 
 }
 

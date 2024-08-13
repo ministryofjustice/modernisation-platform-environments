@@ -27,7 +27,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
   load_balancer_arn = aws_lb.ebsapps_lb.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = data.aws_acm_certificate.gandi_cert.arn
 
   default_action {

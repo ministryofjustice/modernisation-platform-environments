@@ -42,9 +42,6 @@ variable "app_source_db_user" {
 variable "app_source_db_password" {
 }
 
-variable "app_load_balancer" {
-}
-
 variable "environment" {
 }
 
@@ -102,9 +99,6 @@ variable "documents_location" {
 
 variable "is_ftp_app" {
   description = "Determines if it is an ftp app or not"
-}
-
-variable "waf_arn" {
 }
 
 variable "target_group_attachment_port" {
