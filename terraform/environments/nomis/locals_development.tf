@@ -118,7 +118,7 @@ locals {
           initial_lifecycle_hooks = {
             "ready-hook" = {
               default_result       = "ABANDON"
-              heartbeat_timeout    = 7200
+              heartbeat_timeout    = 2700 # 45 minutes
               lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
             }
           }
@@ -128,7 +128,7 @@ locals {
         })
         config = merge(local.ec2_autoscaling_groups.client.config, {
           user_data_raw = base64encode(templatefile(
-          "templates/user-data-pwsh-ready-hook.yaml.tftpl", {
+          "templates/user-data-pwsh-asg-ready-hook.yaml.tftpl", {
             branch = "main"
             }
           ))
