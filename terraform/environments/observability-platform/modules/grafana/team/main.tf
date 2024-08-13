@@ -26,7 +26,7 @@ data "grafana_data_source" "cloudwatch" {
 resource "grafana_data_source_permission" "cloudwatch" {
   for_each = var.aws_accounts
 
-  datasource_uid = data.grafana_data_source.cloudwatch[each.key].id
+  datasource_uid = trimprefix(data.grafana_data_source.cloudwatch[each.key].id, "1:")
 
   permissions {
     team_id    = grafana_team.this.id
@@ -47,7 +47,7 @@ resource "grafana_data_source_permission" "xray" {
     for name, account in var.aws_accounts : name => account if account.xray_enabled
   }
 
-  datasource_uid = data.grafana_data_source.xray[each.key].id
+  datasource_uid = trimprefix(data.grafana_data_source.xray[each.key].id, "1:")
 
   permissions {
     team_id    = grafana_team.this.id
@@ -68,7 +68,7 @@ resource "grafana_data_source_permission" "amazon_prometheus" {
     for name, account in var.aws_accounts : name => account if account.amazon_prometheus_query_enabled
   }
 
-  datasource_uid = data.grafana_data_source.amazon_prometheus[each.key].id
+  datasource_uid = trimprefix(data.grafana_data_source.amazon_prometheus[each.key].id, "1:")
 
   permissions {
     team_id    = grafana_team.this.id
