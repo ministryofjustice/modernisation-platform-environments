@@ -36,5 +36,8 @@ locals {
        dms_s3_cross_account_existing_roles = local.dms_s3_cross_account_existing_roles
        dms_s3_writer_role_cross_account_arns = local.dms_s3_writer_role_cross_account_arns
        dms_s3_writer_account_ids = local.dms_s3_writer_account_ids
+       dms_s3_repository_environment = {(var.env_name) = try(var.dms_config.audit_target_endpoint.write_environment,null)}
+       dms_s3_cross_account_repository_environments = local.dms_s3_cross_account_repository_environments
+       dms_s3_cross_account_client_environments = local.dms_s3_cross_account_client_environments
    }    
 }

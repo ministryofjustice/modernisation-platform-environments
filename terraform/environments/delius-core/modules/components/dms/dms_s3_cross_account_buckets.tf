@@ -30,4 +30,15 @@ locals {
     for role_exists_map in local.dms_s3_existing_roles_list : role_exists_map
   ]...)  
 
+  dms_s3_repository_environment_list = [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_repository_environment,null) ]
+
+  dms_s3_cross_account_repository_environments = merge([
+    for delius_environment in local.dms_s3_repository_environment_list : delius_environment
+  ]...)
+
+  dms_s3_cross_account_client_environments = {
+     for delius_environment in compact(tolist(toset(values(local.dms_s3_cross_account_repository_environments)))) : 
+        delius_environment => [for k,v in local.dms_s3_cross_account_repository_environments : k if v == delius_environment ]
+  }
+
 }
