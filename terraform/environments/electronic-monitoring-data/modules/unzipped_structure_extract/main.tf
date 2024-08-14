@@ -5,7 +5,7 @@ locals {
 }
 
 module "this" {
-  source                  = "./modules/lambdas"
+  source                  = "../lambdas"
   function_name           = "load_${var.dataset_name}"
   is_image                = true
   role_name               = var.iam_role.name
