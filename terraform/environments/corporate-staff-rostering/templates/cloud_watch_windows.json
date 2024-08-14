@@ -77,7 +77,6 @@
       }
     },
     "append_dimensions": {
-      "ImageId": "${aws:ImageId}",
       "InstanceId": "${aws:InstanceId}",
       "AutoScalingGroupName": "${aws:AutoScalingGroupName}"
     },
