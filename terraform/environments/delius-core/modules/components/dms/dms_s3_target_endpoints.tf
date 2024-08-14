@@ -4,17 +4,15 @@
 
 # In client environments the dms_audit_source_endpoint.read_database must be defined
 # The endpoint for audit (AUDITED_INTERACTION) is the Delius database.
-resource "aws_dms_endpoint" "dms_audit_target_endpoint_s3" {
+resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
    count                           = try(var.dms_config.audit_target_endpoint.write_environment, null) == null ? 0 : (try(local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment], null) == null ? 0 : (local.dms_s3_bucket_info.dms_s3_cross_account_existing_roles[var.dms_config.audit_target_endpoint.write_environment] ? 1 : 0))
    endpoint_id                     = "s3-staging-of-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
    endpoint_type                   = "target"
-   engine_name                     = "s3"
-   s3_settings {
-       bucket_name              = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment]
-       bucket_folder            = "${local.audit_source_primary}/audit"
-       service_access_role_arn  = "arn:aws:iam::${local.delius_account_id}:role/${local.dms_s3_writer_role_name}"      
-       timestamp_column_name    = "TIMESTAMP" 
-      }
+   service_access_role_arn         = "arn:aws:iam::${local.delius_account_id}:role/${local.dms_s3_writer_role_name}"
+   bucket_name                     = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment]
+   bucket_folder                   = "${local.audit_source_primary}/audit"
+   timestamp_column_name           = "TIMESTAMP"
+   canned_acl_for_objects          = "bucket-owner-full-control"
    }
 
 
