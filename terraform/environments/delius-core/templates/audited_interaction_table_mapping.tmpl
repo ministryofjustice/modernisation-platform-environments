@@ -24,6 +24,30 @@
         {
             "rule-type": "transformation",
             "rule-id": "2",
+            "rule-name": "remove_client_db",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION"
+            },
+            "rule-action": "remove-column",
+            "value": "CLIENT_DB"
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "3",
+            "rule-name": "remove_client_business_interact_code",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION"
+            },
+            "rule-action": "remove-column",
+            "value": "CLIENT_BUSINESS_INTERACT_CODE"
+        },        
+        {
+            "rule-type": "transformation",
+            "rule-id": "4",
             "rule-name": "add_client_db",
             "rule-target": "column",
             "object-locator": {
@@ -33,37 +57,11 @@
             "rule-action": "add-column",
             "value": "CLIENT_DB",
             "expression": "'${client_database}'",
-            "old-value": null,
             "data-type": {
                 "type": "string",
                 "length": "20",
                 "scale": ""
             }
-        },
-        {
-            "rule-type": "transformation",
-            "rule-id": "3",
-            "rule-name": "rename_to_staging_schema",
-            "rule-target": "schema",
-            "object-locator": {
-                "schema-name": "DELIUS_APP_SCHEMA"
-            },
-            "rule-action": "rename",
-            "value": "DELIUS_AUDIT_DMS_POOL",
-            "old-value": null
-        },
-        {
-            "rule-type": "transformation",
-            "rule-id": "4",
-            "rule-name": "rename_to_staging_table",
-            "rule-target": "table",
-            "object-locator": {
-                "schema-name": "DELIUS_APP_SCHEMA",
-                "table-name": "AUDITED_INTERACTION"
-            },
-            "rule-action": "rename",
-            "value": "DMS_AUDITED_INTERACTION",
-            "old-value": null
         }
     ]
 }
