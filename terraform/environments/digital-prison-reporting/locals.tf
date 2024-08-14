@@ -258,7 +258,7 @@ locals {
   lambda_redshift_table_expiry_database_name          = module.datamart.cluster_database_name
   lambda_redshift_table_expiry_schedule_expression    = "rate(1 hour)"
   lambda_redshift_table_expiry_seconds                = "86400"
-  lambda_redshift_table_expiry_timeout_seconds        = 1800
+  lambda_redshift_table_expiry_timeout_seconds        = 900
   lambda_redshift_table_expiry_memory_size            = 1024
 
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
