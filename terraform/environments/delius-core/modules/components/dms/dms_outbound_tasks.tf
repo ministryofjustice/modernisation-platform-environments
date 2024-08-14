@@ -18,7 +18,7 @@ resource "aws_dms_replication_task" "audited_interaction_outbound_replication" {
   replication_task_settings = file("files/audited_interaction_settings.json")
 
   source_endpoint_arn      = aws_dms_endpoint.dms_audit_source_endpoint_db[0].endpoint_arn
-  target_endpoint_arn      = aws_dms_endpoint.dms_audit_target_endpoint_s3[0].endpoint_arn
+  target_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_target_endpoint_s3[0].endpoint_arn
   replication_instance_arn = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
 
   tags = merge(
