@@ -2,7 +2,7 @@ locals {
   db_userdata = <<-EOF
 #!/bin/bash
 
-# Disable requiretty
+# #Disable requiretty
 sed -i 's/^\(Defaults\s*requiretty\)/#\1/' /etc/sudoers
 
 # Redirect all output to a log file and enable debugging
