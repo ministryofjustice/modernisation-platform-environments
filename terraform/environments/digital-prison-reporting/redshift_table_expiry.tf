@@ -9,7 +9,8 @@ module "redshift_table_expiry_lambda" {
   runtime        = local.lambda_redshift_table_expiry_runtime
   policies       = local.lambda_redshift_table_expiry_policies
   tracing        = local.lambda_redshift_table_expiry_tracing
-  timeout        = 300
+  timeout        = local.lambda_redshift_table_expiry_timeout_seconds
+  memory_size    = local.lambda_redshift_table_expiry_memory_size
   lambda_trigger = false
 
   log_retention_in_days = local.lambda_log_retention_in_days
