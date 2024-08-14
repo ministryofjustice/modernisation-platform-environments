@@ -70,9 +70,10 @@ resource "aws_db_instance" "appdb1" {
   storage_encrypted               = true
   apply_immediately               = false
   # snapshot_identifier             = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.application_data.accounts[local.environment].mojfinrdssnapshotid)
-  kms_key_id        = data.aws_kms_key.rds_shared.arn
-  multi_az          = true
-  option_group_name = aws_db_option_group.mojfin.name
+  kms_key_id                      = data.aws_kms_key.rds_shared.arn
+  multi_az                        = true
+  option_group_name               = aws_db_option_group.mojfin.name
+  ca_cert_identifier              = local.ca_cert_identifier
 
   # restore_to_point_in_time {
   #   restore_time = "2023-07-04T14:54:00Z"
