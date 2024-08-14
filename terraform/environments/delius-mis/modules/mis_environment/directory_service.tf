@@ -91,7 +91,7 @@ resource "aws_security_group" "mis_ad_dns_resolver_security_group" {
 
   name        = "DNS resolver for ${local.domain_full_name}"
   description = "Security Group for DNS resolver requests relating to ${local.domain_full_name}"
-  vpc_id      = var.account_config.shared_vpc_cidr
+  vpc_id      = var.account_config.shared_vpc_id
 }
 
 resource "aws_security_group_rule" "mis_ad_dns_resolver_security_group_rule_egress" {
