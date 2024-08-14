@@ -591,8 +591,8 @@ data "aws_iam_policy_document" "unzip_single_file_s3_policy_document" {
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${module.json-directory-structure-bucket.bucket.arn}/*",
-      module.json-directory-structure-bucket.bucket.arn,
+      "${module.unzipped-s3-data-store.bucket.arn}/*",
+      module.unzipped-s3-data-store.bucket.arn,
       "${aws_s3_bucket.data_store.arn}/*",
       aws_s3_bucket.data_store.arn,
     ]
