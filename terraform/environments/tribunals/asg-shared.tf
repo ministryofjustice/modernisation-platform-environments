@@ -156,6 +156,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
 }
 
 # Create the Launch Template and assign the instance profile
+# Comment out the aws_launch_template and aws_autoscaling_group if you ever need to delete and recreate the ec2 instance
 # resource "aws_launch_template" "tribunals-all-lt" {
 #   name_prefix            = "tribunals-all"
 #   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
