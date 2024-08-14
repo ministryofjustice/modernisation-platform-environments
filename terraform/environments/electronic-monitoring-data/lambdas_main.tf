@@ -294,6 +294,8 @@ module "load_g4s_atrium_unstructured" {
   timeout                 = 900
   function_tag            = "v0.0.0-884806f"
   dataset_name            = "g4s_atrium_unstructured"
+  env_account_id          = local.env_account_id
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   json_bucket_name        = module.json-directory-structure-bucket.bucket.id
   athena_bucket_name      = module.athena-s3-bucket.bucket.id
