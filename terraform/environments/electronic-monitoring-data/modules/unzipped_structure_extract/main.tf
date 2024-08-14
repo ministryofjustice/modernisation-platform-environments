@@ -26,7 +26,7 @@ module "this" {
     ATHENA_DUMP_BUCKET_NAME                  = "s3://${var.athena_bucket_name}/output"
     pipeline_name                            = var.dataset_name
     environment                              = var.production_dev
-    SUPPLIER_NAME                            = SUPPLIER_NAME
-    SYSTEM_NAME                              = SYSTEM_NAME
+    SUPPLIER_NAME                            = local.SUPPLIER_NAME
+    SYSTEM_NAME                              = local.SYSTEM_NAME
   }
 }
