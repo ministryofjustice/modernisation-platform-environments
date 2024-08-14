@@ -484,20 +484,6 @@ module "em-data-store" {
 
       transition = [
         {
-          days          = 60
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 120
-      }
-
-      noncurrent_version_transition = [
-        {
           days          = 183
           storage_class = "STANDARD_IA"
           }, {
@@ -506,8 +492,22 @@ module "em-data-store" {
         }
       ]
 
+      expiration = {
+        days = 1000
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 30
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 90
+          storage_class = "GLACIER"
+        }
+      ]
+
       noncurrent_version_expiration = {
-        days = 365 * 6
+        days = 365
       }
     }
   ]
@@ -703,16 +703,16 @@ module "dms-target-store" {
 
       transition = [
         {
-          days          = 60
+          days          = 365
           storage_class = "STANDARD_IA"
           }, {
-          days          = 90
+          days          = 700
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 120
+        days = 1000
       }
 
       noncurrent_version_transition = [
