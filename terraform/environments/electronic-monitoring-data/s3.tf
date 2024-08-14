@@ -493,7 +493,7 @@ module "em-data-store" {
       ]
 
       expiration = {
-        days = 1000
+        days = 10004
       }
 
       noncurrent_version_transition = [
