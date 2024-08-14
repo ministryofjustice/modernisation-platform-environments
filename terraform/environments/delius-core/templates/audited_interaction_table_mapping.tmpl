@@ -29,9 +29,9 @@
             "object-locator": {
                 "schema-name": "DELIUS_APP_SCHEMA",
                 "table-name": "AUDITED_INTERACTION"
+                "column-name": "CLIENT_DB"
             },
-            "rule-action": "remove-column",
-            "value": "CLIENT_DB"
+            "rule-action": "remove-column"
         },
         {
             "rule-type": "transformation",
@@ -40,10 +40,10 @@
             "rule-target": "column",
             "object-locator": {
                 "schema-name": "DELIUS_APP_SCHEMA",
-                "table-name": "AUDITED_INTERACTION"
+                "table-name": "AUDITED_INTERACTION",
+                "column-name": "CLIENT_BUSINESS_INTERACT_CODE"
             },
-            "rule-action": "remove-column",
-            "value": "CLIENT_BUSINESS_INTERACT_CODE"
+            "rule-action": "remove-column"
         },        
         {
             "rule-type": "transformation",
