@@ -157,208 +157,217 @@ echo "---setup_file_systems"
 
 sudo yum install e2fsprogs
 
-# # Create Oracle DBF file file system (oradata)
-# sudo /sbin/mkfs.ext4 /dev/xvdf
-# mkdir -p /oracle/dbf
-# grep -qxF "/dev/xvdf /oracle/dbf ext4 defaults 0 0" /etc/fstab || echo "/dev/sdf /dev/xvdf ext4 defaults 0 0" >> /etc/fstab
-# sudo mount -t ext4 dev/xvdf /oracle/dbf
+# Remove unneeded lines from /etc/fstab copied from LZ
+sed -i '/s3fs#laa-software-library \/repo fuse allow_other,use_cache=\/tmp,endpoint=eu-west-2,uid=501,mp_umask=002,multireq_max=5,iam_role=LAA-EDW-development-AppEc2Role-1LQVTMTMA5QKT 0 0/d' /etc/fstab
+sed -i '/\/dev\/xvdm \/oracle\/dbf ext4 defaults 0 0/d' /etc/fstab
+sed -i '/\/dev\/xvdg \/stage ext4 defaults 0 0/d' /etc/fstab
+sed -i '/\/dev\/xvdk \/oracle\/ar ext4 defaults 0 0/d' /etc/fstab
+sed -i '/\/dev\/xvdi \/oracle\/software ext4 defaults 0 0/d' /etc/fstab
+sed -i '/\/dev\/xvdl \/oracle\/temp_undo ext4 defaults 0 0/d' /etc/fstab
+sed -i '/#fs-71a09680.efs.eu-west-2.amazonaws.com:\/ \/backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2/d' /etc/fstab
+sed -i '/10.202.1.34:\/ \/backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2/d' /etc/fstab
 
-# # Create stage (orahome) file system
-# sudo /sbin/mkfs.ext4 /dev/xvdg
-# mkdir -p /stage
-# chmod 777 /stage
-# grep -qxF "/dev/xvdg /stage ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdg /stage ext4 defaults 0 0" >> /etc/fstab
-# sudo mount -t ext4 /dev/xvdg /stage
 
-# # Create archive file system
-# sudo /sbin/mkfs.ext4 /dev/xvdh
-# mkdir -p /oracle/ar
-# grep -qxF "/dev/xvdh /oracle/ar ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
-# sudo mount -t ext4 /dev/xvdh /oracle/ar
+# Create Oracle DBF file file system (oradata)
+sudo /sbin/mkfs.ext4 /dev/xvdf
+mkdir -p /oracle/dbf
+grep -qxF "/dev/xvdf /oracle/dbf ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdf /oracle/dbf ext4 defaults 0 0" >> /etc/fstab
 
-# #Create oracle_software
-# sudo /sbin/mkfs.ext4 /dev/xvdi
-# mkdir --p /oracle/software
-# grep -qxF "/dev/xvdi /oracle/software ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdi /oracle/software ext4 defaults 0 0" >> /etc/fstab
-# sudo mount -t ext4 /dev/xvdi /oracle/software
+# Create stage (orahome) file system
+sudo /sbin/mkfs.ext4 /dev/xvdg
+mkdir -p /stage
+grep -qxF "/dev/xvdg /stage ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdg /stage ext4 defaults 0 0" >> /etc/fstab
 
-# #Create temp_undo (oraredo)
-# sudo /sbin/mkfs.ext4 /dev/xvdj
-# mkdir -p /oracle/temp_undo
-# grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
-# sudo mount -t ext4 /dev/xvdj /oracle/temp_undo
+# Create archive file system
+sudo /sbin/mkfs.ext4 /dev/xvdh
+mkdir -p /oracle/ar
+grep -qxF "/dev/xvdh /oracle/ar ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
 
-# #### setup_oracle_db_software
-# echo "---setup_oracle_db_software"
-# # Install wget / unzip
-# yum install -y unzip
+#Create oracle_software
+sudo /sbin/mkfs.ext4 /dev/xvdi
+mkdir --p /oracle/software
+grep -qxF "/dev/xvdi /oracle/software ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdi /oracle/software ext4 defaults 0 0" >> /etc/fstab
 
-# # Create DBA user (already created in image)
-# groupadd dba
-# groupadd oinstall
-# useradd -d /stage/oracle -g dba oracle
+#Create temp_undo (oraredo)
+sudo /sbin/mkfs.ext4 /dev/xvdj
+mkdir -p /oracle/temp_undo
+grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
 
-# #setup oracle user access
-# echo "---setup oracle user access"
-# cp -fr /home/ec2-user/.ssh /home/oracle/
-# chown -R oracle:dba /home/oracle/.ssh
+# Mount all file systems in fstab
+mount -a
+chmod 777 /stage
 
-# # # Create directories and set ownership
-# echo "---set ownership"
-# chown -R oracle:dba /oracle
+#### setup_oracle_db_software
+echo "---setup_oracle_db_software"
+# Install wget / unzip
+yum install -y unzip
 
-# # # Create swap space
-# echo "---Create swap space"
-# dd if=/dev/zero of=/swapfile bs=1024M count=9
-# chmod 600 /swapfile
-# mkswap /swapfile
-# swapon /swapfile
+# Create DBA user (already created in image)
+groupadd dba
+groupadd oinstall
+useradd -d /stage/oracle -g dba oracle
 
-# # Run Oracle installer
-# chmod 777 /run/cfn-init/db-install-10g.rsp
+#setup oracle user access
+echo "---setup oracle user access"
+cp -fr /home/ec2-user/.ssh /home/oracle/
+chown -R oracle:dba /home/oracle/.ssh
 
-# # Run installer and post install
-# export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
-# su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
+# # Create directories and set ownership
+echo "---set ownership"
+chown -R oracle:dba /oracle
 
-# /oracle/software/oraInventory/orainstRoot.sh -silent
-# /oracle/software/product/10.2.0/root.sh -silent
+# # Create swap space
+echo "---Create swap space"
+dd if=/dev/zero of=/swapfile bs=1024M count=9
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
 
-# # Update oracle login script
-# echo "export ORACLE_SID=EDW" >> /stage/oracle/.bash_profile
-# echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
-# echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
+# Run Oracle installer
+chmod 777 /run/cfn-init/db-install-10g.rsp
 
-# # patch the database to 10.2.0.4
-# chown oracle:dba /home/oracle/patchset.rsp
-# chmod 777 /home/oracle/patchset.rsp
-# su oracle -c "/stage/patches/10204/Disk1/runInstaller -silent -responseFile /home/oracle/patchset.rsp"
-# /oracle/software/product/10.2.0/root.sh -silent
+# Run installer and post install
+export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
+su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
 
-# # Create a blank database
-# chown oracle:dba /run/cfn-init/edw_warehouse.dbt
-# chmod 777 /run/cfn-init/edw_warehouse.dbt
+/oracle/software/oraInventory/orainstRoot.sh -silent
+/oracle/software/product/10.2.0/root.sh -silent
 
-# su oracle -l -c "dbca -silent -createDatabase -templateName /run/cfn-init/edw_warehouse.dbt -gdbname $APPNAME -sid $APPNAME -responseFile NO_VALUE -characterSet WE8ISO8859P1 -sysPassword '"$SECRET"' -systemPassword '"$SECRET"' -databaseType DATA_WAREHOUSING  -datafileDestination "/oracle/dbf/" -MEMORYPERCENTAGE 70"
+# Update oracle login script
+echo "export ORACLE_SID=EDW" >> /stage/oracle/.bash_profile
+echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
+echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
 
-# # create listener
-# chmod 777 /run/cfn-init/netca.rsp
-# su oracle -l -c "netca /silent /responseFile /run/cfn-init/netca.rsp"
-# su oracle -l -c "lsnrctl start"
+# patch the database to 10.2.0.4
+chown oracle:dba /home/oracle/patchset.rsp
+chmod 777 /home/oracle/patchset.rsp
+su oracle -c "/stage/patches/10204/Disk1/runInstaller -silent -responseFile /home/oracle/patchset.rsp"
+/oracle/software/product/10.2.0/root.sh -silent
 
-# mkdir -p /var/opt/oracle
-# chown oracle:dba /var/opt/oracle
-# chown -R oracle:dba /home/oracle/edwcreate
-# chmod -R 777 /home/oracle/edwcreate
-# chown oracle:dba /var/opt/oracle/passwds.sql
-# chmod 777 /var/opt/oracle/passwds.sql
-# su oracle -l -c "cp /home/oracle/edwcreate/tnsnames.ora /oracle/software/product/10.2.0/network/admin"
-# sed -i "s/tst/$ENV/g" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
-# sed -i "s/^\(define EDW_SYS=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
-# sed -i "s/^\(define EDW_SYSTEM=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
+# Create a blank database
+chown oracle:dba /run/cfn-init/edw_warehouse.dbt
+chmod 777 /run/cfn-init/edw_warehouse.dbt
 
-# chown -R oracle:dba /home/oracle/scripts/
-# chmod -R 700 /home/oracle/scripts/
-# chown oracle:dba /home/oracle
-# chmod -R 777 /home/oracle
+su oracle -l -c "dbca -silent -createDatabase -templateName /run/cfn-init/edw_warehouse.dbt -gdbname $APPNAME -sid $APPNAME -responseFile NO_VALUE -characterSet WE8ISO8859P1 -sysPassword '"$SECRET"' -systemPassword '"$SECRET"' -databaseType DATA_WAREHOUSING  -datafileDestination "/oracle/dbf/" -MEMORYPERCENTAGE 70"
 
-# #### Setup_owb
-# # Create directories for OWB setup (already created in ami)
-# mkdir -p /stage/owb/owb101
-# mkdir -p /stage/owb/owb104
-# mkdir -p /stage/owb/owb105
+# create listener
+chmod 777 /run/cfn-init/netca.rsp
+su oracle -l -c "netca /silent /responseFile /run/cfn-init/netca.rsp"
+su oracle -l -c "lsnrctl start"
 
-# # Set permissions for staging directory
-# chmod -R 777 /stage/owb/
+mkdir -p /var/opt/oracle
+chown oracle:dba /var/opt/oracle
+chown -R oracle:dba /home/oracle/edwcreate
+chmod -R 777 /home/oracle/edwcreate
+chown oracle:dba /var/opt/oracle/passwds.sql
+chmod 777 /var/opt/oracle/passwds.sql
+su oracle -l -c "cp /home/oracle/edwcreate/tnsnames.ora /oracle/software/product/10.2.0/network/admin"
+sed -i "s/tst/$ENV/g" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
+sed -i "s/^\(define EDW_SYS=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
+sed -i "s/^\(define EDW_SYSTEM=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
 
-# # Install OWB components
-# su oracle -l -c "/stage/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /stage/owb/owb.rsp"
-# /oracle/software/product/10.2.0_owb/root.sh -silent
+chown -R oracle:dba /home/oracle/scripts/
+chmod -R 700 /home/oracle/scripts/
+chown oracle:dba /home/oracle
+chmod -R 777 /home/oracle
 
-# su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb104.rsp"
-# /oracle/software/product/10.2.0_owb/root.sh -silent
+#### Setup_owb
+# Create directories for OWB setup (already created in ami)
+mkdir -p /stage/owb/owb101
+mkdir -p /stage/owb/owb104
+mkdir -p /stage/owb/owb105
 
-# su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
-# /oracle/software/product/10.2.0_owb/root.sh -silent
+# Set permissions for staging directory
+chmod -R 777 /stage/owb/
 
-# # configure environment
-# echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
+# Install OWB components
+su oracle -l -c "/stage/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /stage/owb/owb.rsp"
+/oracle/software/product/10.2.0_owb/root.sh -silent
 
-# #### setup_backups:
+su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb104.rsp"
+/oracle/software/product/10.2.0_owb/root.sh -silent
 
-# # setup efs backup mount point
-# mkdir -p /home/oracle/backup_logs/
-# mkdir -p /backups
-# sed -i '/10\.202\.1\.34:\/ \/backups/d' /etc/fstab
-# echo "$EFS.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# mount /backups
-# mkdir -p /backups/$APPNAME_RMAN
-# chmod 777 /backups/$APPNAME_RMAN
-# sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh
-# sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_full_backup.sh
-# chown -R oracle:dba /home/oracle/backup*
-# chmod -R 740 /home/oracle/backup*
+su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
+/oracle/software/product/10.2.0_owb/root.sh -silent
 
-# # Create /etc/cron.d/backup_cron with the cron jobs
-# cat <<EOC3 > /etc/cron.d/backup_cron
-# 0 */3 * * * oracle /home/oracle/backup_scripts/rman_arch_backup_v2_1.sh $APPNAME
-# 0 06 * * 01 oracle /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
-# 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
-# 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
-# EOC3
+# configure environment
+echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
 
-# chown root:root /etc/cron.d/backup_cron
-# chmod 644 /etc/cron.d/backup_cron
+#### setup_backups:
 
-# # Add backup_cron to crontab for oracle user
-# yes | cp -f /etc/cron.d/backup_cron /home/oracle/crecrontab.txt
-# chown oracle:dba /home/oracle/crecrontab.txt
-# chmod 744 /home/oracle/crecrontab.txt
-# su oracle -c "crontab /home/oracle/crecrontab.txt"
+# setup efs backup mount point
+mkdir -p /home/oracle/backup_logs/
+mkdir -p /backups
+sed -i '/10\.202\.1\.34:\/ \/backups/d' /etc/fstab
+echo "$EFS.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+mount /backups
+mkdir -p /backups/$APPNAME_RMAN
+chmod 777 /backups/$APPNAME_RMAN
+sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh
+sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_full_backup.sh
+chown -R oracle:dba /home/oracle/backup*
+chmod -R 740 /home/oracle/backup*
 
-# # Set permissions for CDC scripts
-# chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sh
-# chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
+# Create /etc/cron.d/backup_cron with the cron jobs
+cat <<EOC3 > /etc/cron.d/backup_cron
+0 */3 * * * oracle /home/oracle/backup_scripts/rman_arch_backup_v2_1.sh $APPNAME
+0 06 * * 01 oracle /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
+00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
+00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
+EOC3
 
-# chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sql
-# chmod 744 /home/oracle/scripts/cdc_simple_health_check.sql
+chown root:root /etc/cron.d/backup_cron
+chmod 644 /etc/cron.d/backup_cron
 
-# chown root:root /var/cw-custom.sh
-# chmod 700 /var/cw-custom.sh
+# Add backup_cron to crontab for oracle user
+yes | cp -f /etc/cron.d/backup_cron /home/oracle/crecrontab.txt
+chown oracle:dba /home/oracle/crecrontab.txt
+chmod 744 /home/oracle/crecrontab.txt
+su oracle -c "crontab /home/oracle/crecrontab.txt"
 
-# # Create /etc/cron.d/custom_cloudwatch_metrics with the cron job
-# cat <<EOC4 > /etc/cron.d/custom_cloudwatch_metrics
-# */1 * * * * root /var/cw-custom.sh
-# EOC4
+# Set permissions for CDC scripts
+chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sh
+chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
 
-# chown root:root /etc/cron.d/custom_cloudwatch_metrics
-# chmod 600 /etc/cron.d/custom_cloudwatch_metrics
+chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sql
+chmod 744 /home/oracle/scripts/cdc_simple_health_check.sql
 
-# # alert_rota.sh - set permissions
-# chown oracle:dba /home/oracle/scripts/alert_rota.sh
-# chmod 644 /home/oracle/scripts/alert_rota.sh
+chown root:root /var/cw-custom.sh
+chmod 700 /var/cw-custom.sh
 
-# # Create /etc/cron.d/oracle_rotation with the cron jobs
-# cat <<EOC5 > /etc/cron.d/oracle_rotation
-# 00 07 * * * oracle /home/oracle/scripts/alert_rota.sh $APPNAME
-# * */6 * * * oracle /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/logs/cdc_check.log
-# EOC5
+# Create /etc/cron.d/custom_cloudwatch_metrics with the cron job
+cat <<EOC4 > /etc/cron.d/custom_cloudwatch_metrics
+*/1 * * * * root /var/cw-custom.sh
+EOC4
 
-# chown root:root /etc/cron.d/oracle_rotation
-# chmod 644 /etc/cron.d/oracle_rotation
+chown root:root /etc/cron.d/custom_cloudwatch_metrics
+chmod 600 /etc/cron.d/custom_cloudwatch_metrics
 
-# # Add oracle_rotation to crontab for oracle user
-# cat /etc/cron.d/oracle_rotation >> /home/oracle/crecrontab.txt
-# chown oracle:dba /home/oracle/crecrontab.txt
-# chmod 777 /home/oracle/crecrontab.txt
-# su oracle -c "crontab /home/oracle/crecrontab.txt"
+# alert_rota.sh - set permissions
+chown oracle:dba /home/oracle/scripts/alert_rota.sh
+chmod 644 /home/oracle/scripts/alert_rota.sh
 
-# # Download CDC scripts from S3 and set permissions
-# chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sh
-# chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
+# Create /etc/cron.d/oracle_rotation with the cron jobs
+cat <<EOC5 > /etc/cron.d/oracle_rotation
+00 07 * * * oracle /home/oracle/scripts/alert_rota.sh $APPNAME
+* */6 * * * oracle /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/logs/cdc_check.log
+EOC5
 
-# chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sql
-# chmod 744 /home/oracle/scripts/cdc_simple_health_check.sql
+chown root:root /etc/cron.d/oracle_rotation
+chmod 644 /etc/cron.d/oracle_rotation
+
+# Add oracle_rotation to crontab for oracle user
+cat /etc/cron.d/oracle_rotation >> /home/oracle/crecrontab.txt
+chown oracle:dba /home/oracle/crecrontab.txt
+chmod 777 /home/oracle/crecrontab.txt
+su oracle -c "crontab /home/oracle/crecrontab.txt"
+
+# Download CDC scripts from S3 and set permissions
+chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sh
+chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
+
+chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sql
+chmod 744 /home/oracle/scripts/cdc_simple_health_check.sql
 
 EOF
 }
