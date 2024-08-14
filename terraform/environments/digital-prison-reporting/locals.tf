@@ -253,7 +253,7 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     aws_iam_policy.redshift_dataapi_cross_policy.arn,
   ]
-  lambda_redshift_table_expiry_secret_arn             = data.aws_secretsmanager_secret.datamart.arn
+  lambda_redshift_table_expiry_secret_arn             = module.datamart.credential_secret_arn
   lambda_redshift_table_expiry_cluster_id             = module.datamart.cluster_id
   lambda_redshift_table_expiry_database_name          = module.datamart.cluster_database_name
   lambda_redshift_table_expiry_schedule_expression    = "rate(1 hour)"

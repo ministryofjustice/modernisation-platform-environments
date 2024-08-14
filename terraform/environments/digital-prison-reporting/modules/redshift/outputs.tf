@@ -225,3 +225,8 @@ output "redshift_master_user" {
   description = "Master User"
   value       = aws_redshift_cluster.this[0].master_username
 }
+
+output "credential_secret_arn" {
+  description = "ARN of the RedShift cluster's secret containing credentials",
+  value       = aws_secretsmanager_secret.redshift_connection.arn
+}
