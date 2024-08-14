@@ -15,19 +15,6 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   name        = "tribunals-load-balancer-sg-sftp"
   description = "control access to the network load balancer for sftp"
   vpc_id      = data.aws_vpc.shared.id
-  ingress {
-    description = "allow DOM1 IP range on port 22"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [
-      "20.26.11.71/32", "20.26.11.108/32", "20.49.214.199/32",
-      "20.49.214.228/32", "51.149.249.0/29", "51.149.249.32/29",
-      "51.149.250.0/24", "128.77.75.64/26", "194.33.200.0/21",
-      "194.33.216.0/23", "194.33.218.0/24", "194.33.248.0/29",
-      "194.33.249.0/29"
-    ]
-  }
   dynamic "ingress" {
     for_each = var.sftp_services
     content {
@@ -78,9 +65,9 @@ resource "aws_lb_target_group" "tribunals_target_group_sftp" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment_sftp" {
-  for_each         = aws_lb_target_group.tribunals_target_group_sftp
-  target_group_arn = each.value.arn
-  target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
-  port             = each.value.port
-}
+# resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment_sftp" {
+#   for_each         = aws_lb_target_group.tribunals_target_group_sftp
+#   target_group_arn = each.value.arn
+#   target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
+#   port             = each.value.port
+# }
