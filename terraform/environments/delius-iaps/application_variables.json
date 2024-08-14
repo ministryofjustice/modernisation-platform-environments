@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "short_environment_name": "dev",
-      "db_engine_version": "19.0.0.0.ru-2023-04.rur-2023-04.r1",
+      "db_engine_version": "19.0.0.0.ru-2024-04.rur-2024-04.r1",
       "db_auto_minor_version_upgrade": "false",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "true",
@@ -27,10 +27,10 @@
     },
     "preproduction": {
       "short_environment_name": "preprod",
-      "db_engine_version": "19.0.0.0.ru-2023-04.rur-2023-04.r1",
+      "db_engine_version": "19.0.0.0.ru-2024-04.rur-2024-04.r1",
       "db_snapshot_identifier": "iaps-2023-09-19-03-06-refresh",
       "db_auto_minor_version_upgrade": "false",
-      "db_allow_major_version_upgrade": "false",
+      "db_allow_major_version_upgrade": "true",
       "db_apply_immediately": "true",
       "db_backup_window": "03:00-06:00",
       "db_backup_retention_period": "14",
