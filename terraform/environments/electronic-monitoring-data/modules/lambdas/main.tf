@@ -1,5 +1,6 @@
 locals {
   use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null)
+  function_uri = var.function_tag != null ? var.function_tag : (var.is_image ? "${var.function_name}-${var.production_dev}" : "")
 }
 
 resource "aws_sqs_queue" "lambda_dlq" {
@@ -137,7 +138,7 @@ resource "aws_lambda_function" "this" {
   source_code_hash = var.is_image ? null : var.source_code_hash
   runtime          = var.is_image ? null : var.runtime
   # Image config
-  image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/electronic-monitoring-data-lambdas:${var.function_name}-${var.production_dev}" : null
+  image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/${var.ecr_repo_name}:${local.function_uri}" : null
   package_type = var.is_image ? "Image" : null
   # Constants
   function_name = var.function_name
