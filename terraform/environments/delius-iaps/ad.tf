@@ -18,7 +18,7 @@ resource "aws_directory_service_directory" "active_directory" {
   type    = "MicrosoftAD"
   edition = "Standard"
 
-  password   = aws_secretsmanager_secret_version.ad_password.secret_string
+  password   = data.aws_secretsmanager_secret_version.ad_password.secret_string
   enable_sso = false
 
   vpc_settings {
