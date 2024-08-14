@@ -567,3 +567,55 @@ resource "aws_iam_role_policy_attachment" "load_json_table_lambda_sqs_queue_acce
   role       = aws_iam_role.load_json_table.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
+
+
+# ------------------------------------------
+# unzip fip
+# ------------------------------------------
+
+resource "aws_iam_role" "unzip_single_file" {
+  name               = "unzip_single_file"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "unzip_single_file_s3_policy_document" {
+  statement {
+    sid    = "S3PermissionsForLoadingJsonTable"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:GetObjectAttributes",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${module.json-directory-structure-bucket.bucket.arn}/*",
+      module.json-directory-structure-bucket.bucket.arn,
+      "${aws_s3_bucket.data_store.arn}/*",
+      aws_s3_bucket.data_store.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "unzip_single_file" {
+  name        = "unzip-single-file-s3-policy"
+  description = "Policy for Lambda to use S3 for lambda"
+  policy      = data.aws_iam_policy_document.unzip_single_file_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "unzip_single_file_s3_policy_policy_attachment" {
+  role       = aws_iam_role.unzip_single_file.name
+  policy_arn = aws_iam_policy.unzip_single_file.arn
+}
+
+resource "aws_iam_role_policy_attachment" "unzip_single_file_vpc_access_execution" {
+  role       = aws_iam_role.unzip_single_file.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "unzip_single_file_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.unzip_single_file.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
