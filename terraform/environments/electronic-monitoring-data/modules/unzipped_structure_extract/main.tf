@@ -1,5 +1,5 @@
 locals {
-  dataset_name_parts = split("_",  v)
+  dataset_name_parts = split("_",  var.dataset_name)
   SUPPLIER_NAME      = local.dataset_name_parts[0]
   SYSTEM_NAME        = join("_", slice(local.dataset_name_parts, 1, length(local.dataset_name_parts)))
 }
@@ -12,20 +12,20 @@ module "this" {
   role_arn                = var.iam_role.arn
   memory_size             = var.memory_size
   timeout                 = var.timeout
-  env_account_id          = local.env_account_id
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
+  env_account_id          = var.env_account_id
+  core_shared_services_id = var.core_shared_services_id
+  production_dev          = var.production_dev
   ecr_repo_name           = "create-a-data-task"
   function_tag            = var.function_tag
   environment_variables = {
     DLT_PROJECT_DIR : "/tmp"
     DLT_DATA_DIR : "/tmp"
     DLT_PIPELINE_DIR : "/tmp"
-    JSON_BUCKET_NAME                         = module.json-directory-structure-bucket.bucket.id
-    STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${module.athena-s3-bucket.bucket.id}/output"
-    ATHENA_DUMP_BUCKET_NAME                  = module.metadata-s3-bucket.bucket.id
+    JSON_BUCKET_NAME                         = var.json_bucket_name
+    STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${var.athena_bucket_name}/output"
+    ATHENA_DUMP_BUCKET_NAME                  = "s3://${var.athena_bucket_name}/output"
     pipeline_name                            = var.dataset_name
-    environment                              = local.is-production ? "prod" : "dev"
+    environment                              = var.production_dev
     SUPPLIER_NAME                            = SUPPLIER_NAME
     SYSTEM_NAME                              = SYSTEM_NAME
   }

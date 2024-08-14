@@ -27,3 +27,34 @@ variable "function_tag" {
     nullable = false
     default = "v0.0.0-884806f"
 }
+
+variable "env_account_id" {
+  description = "The account number of the aws account"
+  type        = number
+}
+
+variable "core_shared_services_id" {
+  description = "The account number of the core shared services account"
+  type        = number
+  default     = null
+  nullable    = true
+}
+
+variable "production_dev" {
+  description = "The environment the lambda is being deployed to"
+  type        = string
+  nullable    = true
+  default     = null
+}
+
+variable "json_bucket_name" {
+  description = "The bucket to pull json structure from"
+  type = string
+  nullable = false
+}
+
+variable "athena_bucket_name" {
+  description = "Bucket to dump query output into"
+  type = string
+  nullable = false
+}
