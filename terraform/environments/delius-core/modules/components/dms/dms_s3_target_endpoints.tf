@@ -24,6 +24,8 @@ resource "aws_dms_s3_endpoint" "dms_user_target_endpoint_s3" {
    service_access_role_arn         = aws_iam_role.dms_s3_writer_role.arn
    bucket_name                     = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[each.value]
    bucket_folder                   = "user"
+   cdc_path                        = "cdc"
+   preserve_transactions           = true
    timestamp_column_name           = "TIMESTAMP"
    canned_acl_for_objects          = "bucket-owner-full-control"
    }
