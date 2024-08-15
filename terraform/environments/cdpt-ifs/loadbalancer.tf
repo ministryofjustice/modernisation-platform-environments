@@ -89,7 +89,7 @@ module "lb_access_logs_enabled" {
   account_number             = local.environment_management.account_ids[terraform.workspace]
   region                     = "eu-west-2"
   enable_deletion_protection = false
-  idle_timeout               = 60
+  idle_timeout               = 180
   tags                       = { Name = "lb_module" }
 
 }
@@ -187,4 +187,5 @@ resource "aws_lb_listener" "https_listener" {
     target_group_arn = aws_lb_target_group.ifs_target_group.id
     type             = "forward"
   }
+
 }
