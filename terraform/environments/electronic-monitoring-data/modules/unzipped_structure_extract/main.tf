@@ -23,7 +23,7 @@ module "this" {
     DLT_PIPELINE_DIR : "/tmp"
     JSON_BUCKET_NAME                         = var.json_bucket_name
     STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${var.athena_bucket_name}/output"
-    ATHENA_DUMP_BUCKET_NAME                  = "s3://${var.athena_bucket_name}/output"
+    ATHENA_DUMP_BUCKET_NAME                  = var.athena_bucket_name
     pipeline_name                            = var.dataset_name
     environment                              = var.production_dev
     SUPPLIER_NAME                            = local.SUPPLIER_NAME
