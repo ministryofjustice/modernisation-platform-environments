@@ -279,7 +279,7 @@ locals {
           web-3637-80 = merge(local.lbs.private.instance_target_groups.web-80, {
             attachments = [
               { ec2_instance_name = "pd-cafm-w-36-b" },
-              { ec2_instance_name = "pd-cafm-w-37-a" },
+              # { ec2_instance_name = "pd-cafm-w-37-a" }, # removing temporarily for migration test
             ]
           })
           web-38-80 = merge(local.lbs.private.instance_target_groups.web-80, {
