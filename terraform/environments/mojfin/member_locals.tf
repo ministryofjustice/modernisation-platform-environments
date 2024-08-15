@@ -18,7 +18,7 @@ locals {
   engine_version             = "19.0.0.0.ru-2020-04.rur-2020-04.r1"
   username                   = "sysdba"
   backup_window              = "22:00-01:00"
-  maintenance_window         = "Mon:01:15-Mon:06:00"
+  maintenance_window         = "Fri:01:15-Fri:06:00"
   storage_type               = "gp2"
   rds_snapshot_name          = "laws3169-mojfin-migration-v1"
   deletion_production        = local.application_data.accounts[local.environment].deletion_protection
