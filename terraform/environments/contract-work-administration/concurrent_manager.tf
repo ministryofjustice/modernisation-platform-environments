@@ -108,9 +108,9 @@ ln -s /bin/mail /bin/mailx
 
 ## Update the send mail url
 echo "Updating the sendmail config"
-sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.cf
+sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${local.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.cf
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
-sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${aws_route53_record.smtp.name}/g' /etc/mail/sendmail.mc
+sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${local.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.mc
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
