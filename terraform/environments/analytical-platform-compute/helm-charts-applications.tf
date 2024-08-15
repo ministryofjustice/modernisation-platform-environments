@@ -2,7 +2,7 @@ resource "helm_release" "ui" {
   /* https://github.com/ministryofjustice/analytical-platform-ui */
   name       = "ui"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "0.1.3"
+  version    = "0.1.4"
   chart      = "analytical-platform-ui"
   namespace  = kubernetes_namespace.ui.metadata[0].name
   values = [
