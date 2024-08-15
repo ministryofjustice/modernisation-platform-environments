@@ -9,8 +9,11 @@ data "terraform_remote_state" "get_dms_s3_bucket_info" {
 }
 
 locals {
+
+  # Get a list of all the environment => bucket_name maps from all accounts
   dms_s3_bucket_name_list = [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_bucket_name,null) ]
 
+  # Merge all the maps in the list into a single map of environment => bucket_names
   dms_s3_cross_account_bucket_names = merge([
     for bucket_map in local.dms_s3_bucket_name_list : bucket_map
   ]...)
