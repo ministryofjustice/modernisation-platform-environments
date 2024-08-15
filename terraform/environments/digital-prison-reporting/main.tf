@@ -927,12 +927,15 @@ module "s3_artifacts_store" {
 
 # S3 Violation Zone Bucket, DPR-408
 module "s3_working_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-working-${local.environment}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
+  source                      = "./modules/s3_bucket"
+  create_s3                   = local.setup_buckets
+  name                        = "${local.project}-working-${local.environment}"
+  custom_kms_key              = local.s3_kms_arn
+  create_notification_queue   = false # For SQS Queue
+  enable_lifecycle            = true
+  enable_lifecycle_expiration = true
+  expiration_days             = 2
+  expiration_prefix           = "reports/"
 
   tags = merge(
     local.all_tags,
@@ -942,6 +945,7 @@ module "s3_working_bucket" {
     }
   )
 }
+
 ##########################
 # Data Domain Components # 
 ##########################
