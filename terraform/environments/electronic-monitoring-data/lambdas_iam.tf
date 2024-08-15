@@ -637,7 +637,7 @@ resource "aws_iam_role_policy_attachment" "get_zip_file_s3_policy_policy_attachm
 resource "aws_iam_policy" "list_data_store_bucket" {
   name        = "list-data-store-bucket-policy"
   description = "Policy for Lambda to list the data store S3 bucket"
-  policy      = data.aws_iam_policy_document.list_data_store_bucket_policy_document.json
+  policy      = data.aws_iam_policy_document.list_data_store_bucket_s3_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "list_data_store_bucket_policy_policy_attachment" {
