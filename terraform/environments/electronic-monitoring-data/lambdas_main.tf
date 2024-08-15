@@ -287,17 +287,17 @@ module "load_json_table" {
 # Load json data from S3 to Athena
 #-----------------------------------------------------------------------------------
 
-module "load_json_table_cadt" {
-  source                  = "./modules/lambdas"
-  function_name           = "load_json_table_cadt"
-  is_image                = true
-  role_name               = aws_iam_role.load_json_table.name
-  role_arn                = aws_iam_role.load_json_table.arn
+module "load_g4s_atrium_unstructured" {
+  source                  = "./modules/unzipped_structure_extract"
+  iam_role                = aws_iam_role.load_json_table
   memory_size             = 2048
   timeout                 = 900
+  function_tag            = "v0.0.0-c79d61f"
+  dataset_name            = "g4s_atrium_unstructured"
   env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
+<<<<<<< HEAD
   ecr_repo_name           = "create-a-data-task"
   function_tag            = "v0.0.0-670d05a"
   environment_variables = {
@@ -310,4 +310,8 @@ module "load_json_table_cadt" {
     pipeline_name                            = "g4s_atrium_unstructured"
     environment                              = local.is-production ? "prod" : "dev"
   }
+=======
+  json_bucket_name        = module.json-directory-structure-bucket.bucket.id
+  athena_bucket_name      = module.athena-s3-bucket.bucket.id
+>>>>>>> main
 }

@@ -1,14 +1,14 @@
-resource "aws_sesv2_email_identity" "cwa" {
+resource "aws_sesv2_email_identity" "postfix" {
   email_identity         = local.environment == "production" ? "tbc" : data.aws_route53_zone.external.name
-  configuration_set_name = local.environment == "production" ? aws_sesv2_configuration_set.cwa[0].configuration_set_name : null
+  configuration_set_name = local.environment == "production" ? aws_sesv2_configuration_set.postfix[0].configuration_set_name : null
   dkim_signing_attributes {
     next_signing_key_length = "RSA_1024_BIT"
   }
   tags = local.tags
 }
 
-resource "aws_sesv2_email_identity_policy" "cwa" {
-  email_identity = aws_sesv2_email_identity.cwa.email_identity
+resource "aws_sesv2_email_identity_policy" "postfix" {
+  email_identity = aws_sesv2_email_identity.postfix.email_identity
   policy_name    = "ssvc-ses-permission-${local.environment}"
 
   policy = <<EOF
@@ -35,10 +35,10 @@ resource "aws_route53_record" "ses_dkim" {
   provider = aws.core-vpc
   count    = 3
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${aws_sesv2_email_identity.cwa.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${data.aws_route53_zone.external.name}"
+  name     = "${aws_sesv2_email_identity.postfix.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${data.aws_route53_zone.external.name}"
   type     = "CNAME"
   ttl      = "600"
-  records  = ["${aws_sesv2_email_identity.cwa.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"]
+  records  = ["${aws_sesv2_email_identity.postfix.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"]
 }
 
 
@@ -55,7 +55,7 @@ resource "aws_route53_record" "ses_dmarc" {
 ### SMTP IAM User
 
 resource "aws_iam_user" "smtp" {
-  name = "smtp-${local.application_data.accounts[local.environment].env_short}"
+  name = "${local.application_name}-${local.application_data.accounts[local.environment].env_short}-user"
   tags = local.tags
 }
 
@@ -141,9 +141,9 @@ resource "aws_secretsmanager_secret" "smtp_sesrsa" {
 
 ## TODO Create Kinesis Data Firehose and IAM role for Production, then enable below to set event destination
 
-resource "aws_sesv2_configuration_set" "cwa" {
+resource "aws_sesv2_configuration_set" "postfix" {
   count                  = contains(["production"], local.environment) ? 1 : 0
-  configuration_set_name = "${local.environment}-configuration-set"
+  configuration_set_name = "${local.application_name}-configuration-set"
 
   delivery_options {
     tls_policy = "OPTIONAL"
@@ -156,8 +156,8 @@ resource "aws_sesv2_configuration_set" "cwa" {
   tags = local.tags
 }
 
-# resource "aws_sesv2_configuration_set_event_destination" "cwa" {
-#   configuration_set_name = aws_sesv2_configuration_set.cwa.configuration_set_name
+# resource "aws_sesv2_configuration_set_event_destination" "postfix" {
+#   configuration_set_name = aws_sesv2_configuration_set.postfix.configuration_set_name
 #   event_destination_name = "ses-reputation-events-firehose"
 
 #   event_destination {

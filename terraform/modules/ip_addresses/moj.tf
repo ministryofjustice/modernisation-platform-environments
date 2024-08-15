@@ -11,6 +11,9 @@ locals {
       "18.130.148.126/32",
       "35.176.148.126/32"
     ]
+    moj_aws_digital_macos_globalprotect_prisma = [
+      "128.77.75.64/26",
+    ]
 
     # for MOJ Official devices
     mojo_aws_globalprotect_vpc = "10.184.0.0/16"
@@ -81,6 +84,7 @@ locals {
     trusted_moj_digital_staff_public = flatten([
       local.moj_cidr.moj_digital_studio_office,
       local.moj_cidr.moj_aws_digital_macos_globalprotect_alpha,
+      local.moj_cidr.moj_aws_digital_macos_globalprotect_prisma,
       local.moj_cidr.mojo_aws_preprod_byoip_cidr,
       local.moj_cidr.mojo_aws_prod_byoip_cidr,
       local.moj_cidr.mojo_arkc_internet_egress_exponential_e,

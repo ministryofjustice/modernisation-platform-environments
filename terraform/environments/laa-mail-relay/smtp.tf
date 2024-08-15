@@ -18,12 +18,8 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 . /.nvm/nvm.sh
 nvm install node
 
-# export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
-# export LOGS="Postfix-EC2"
-# export APPNAME="${local.application_name_short}"
 export ENV="${local.application_data.accounts[local.environment].env_short}"
-# export ROLE="${local.application_name_short}"
-# export host="$ip4 $APPNAME-$ENV ${local.application_name_short}"
+
 
 echo "Updating hosts"
 PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
@@ -55,7 +51,6 @@ resource "aws_instance" "smtp" {
   vpc_security_group_ids = [aws_security_group.smtp.id]
   subnet_id              = data.aws_subnet.data_subnets_a.id
   iam_instance_profile   = aws_iam_instance_profile.smtp.id
-  #   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.smtp_userdata)
   user_data_replace_on_change = true
   metadata_options {
@@ -65,7 +60,7 @@ resource "aws_instance" "smtp" {
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
-    { "Name" = "${upper(local.application_name_short)} SMTP Server" }
+    { "Name" = "${local.application_name}-${local.environment}" }
   )
 }
 
@@ -74,13 +69,13 @@ resource "aws_instance" "smtp" {
 #################################
 
 resource "aws_security_group" "smtp" {
-  name        = "${local.application_name}-${local.environment}-smtp-security-group"
+  name        = "${local.application_name}-${local.environment}-security-group"
   description = "Security Group for SMTP server"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-smtp-security-group" }
+    { "Name" = "${local.application_name}-${local.environment}-security-group" }
   )
 
 }
@@ -100,3 +95,12 @@ resource "aws_vpc_security_group_ingress_rule" "smtp_vpc" {
   to_port           = 25
 }
 
+# Domain A record for SMTP server
+resource "aws_route53_record" "smtp" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "laa-mail.${data.aws_route53_zone.external.name}"
+  type     = "A"
+  ttl      = "60"
+  records  = [aws_instance.smtp.private_ip]
+}
