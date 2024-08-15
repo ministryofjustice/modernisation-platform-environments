@@ -30,6 +30,10 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
     "20.49.214.228/32",   // Azure Landing Zone Egress
     "51.149.251.0/24",    // MoJO Pre-Production Account BYOIP CIDR range
     "51.149.249.64/29",   // 10SC Model Office
+    "194.33.200.0/21",    // PRP DIA Sites
+    "194.33.216.0/23",    // PRP DIA Sites
+    "194.33.218.0/24",    // PRP DIA Sites
+    "128.77.75.64/26",    // Palo Alto Prisma Access Egress IP Addresses
     "10.26.59.0/25",      // DEV NLB Subnet eu-west-2a
     "10.26.59.128/25",    // DEV NLB Subnet eu-west-2b
     "10.26.60.0/25",      // DEV NLB Subnet eu-west-2c
