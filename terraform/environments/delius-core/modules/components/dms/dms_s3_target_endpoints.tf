@@ -21,7 +21,7 @@ resource "aws_dms_s3_endpoint" "dms_user_target_endpoint_s3" {
    for_each                        = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
    endpoint_id                     = "s3-staging-of-user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}-to-${each.value}"
    endpoint_type                   = "target"
-   service_access_role_arn         = local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns[each.value]
+   service_access_role_arn         = aws_iam_role.dms_s3_writer_role.arn
    bucket_name                     = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[each.value]
    bucket_folder                   = "user"
    timestamp_column_name           = "TIMESTAMP"
