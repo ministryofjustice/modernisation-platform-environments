@@ -1,3 +1,4 @@
+# Audit outbound replication only happens in client environments
 resource "aws_dms_replication_task" "audited_interaction_outbound_replication" {
   count               = try(var.dms_config.audit_source_endpoint.read_database, null) == null ? 0 : 1
   replication_task_id = "${var.env_name}-audited-interaction-replication-task-for-${lower(var.dms_config.audit_source_endpoint.read_database)}"
@@ -31,6 +32,39 @@ resource "aws_dms_replication_task" "audited_interaction_outbound_replication" {
     },
     {
       "audit-repository-environment" = "${var.dms_config.audit_target_endpoint.write_environment}"
+    },
+  )
+
+}
+
+# User outbound replication only happens in repository environments
+# This replicates records from the USER_ and PROBATION_AREA_USER tables
+resource "aws_dms_replication_task" "user_outbound_replication" {
+  for_each            = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
+  replication_task_id = "${var.env_name}-user-replication-task-for-${lower(var.dms_config.user_source_endpoint.read_database)}-to-${each.value}"
+  # We do not support a full load since this would require a cascading delete of multiple
+  # records; instead we only CDC user and probation records.  If this task is
+  # restarted we should set the restart time accordingly to pick up only changes
+  # to users and probation area records.
+  migration_type      = "cdc" 
+
+  table_mappings            = file("files/user__table_mapping.json")
+  replication_task_settings = file("files/user__settings.json")
+
+  source_endpoint_arn      = aws_dms_endpoint.dms_user_source_endpoint_db[0].endpoint_arn
+  target_endpoint_arn      = aws_dms_s3_endpoint.dms_user_target_endpoint_s3[each.value].endpoint_arn
+  replication_instance_arn = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
+
+  tags = merge(
+    var.tags,
+    {
+      "name" = "User Replication from ${var.env_name} to ${each.value}"
+    },
+    {
+      "audit-client-environment" = "${each.value}"
+    },
+    {
+      "audit-repository-environment" = "${var.env_name}"
     },
   )
 
