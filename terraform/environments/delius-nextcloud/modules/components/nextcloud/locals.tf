@@ -13,7 +13,10 @@ locals {
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
-  globalprotect_ips = module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_alpha
+  globalprotect_ips = concat(
+    module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_alpha,
+    module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_prisma,
+  )
   unilink_ips = [
     "194.75.210.216/29", # Unilink AOVPN
     "83.98.63.176/29",   # Unilink AOVPN
