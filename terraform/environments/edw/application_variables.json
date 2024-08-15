@@ -65,7 +65,7 @@
       "orahome_snapshot_id": "snap-076f7b759f1cbfa2b",
       "oraarch_snapshot_id": "snap-00dbc56ab1d6c9930",
       "software_snapshot_id": "snap-01e51c08b7e397fdc",
-      "oraredo_snapshot_id": "snap-0936e759e58c09af9"
+      "oraredo_snapshot_id": "snap-009149e0cce344121"
     },
     "test": {
       "example_var": "test-data"
