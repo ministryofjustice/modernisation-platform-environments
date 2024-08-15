@@ -22,6 +22,16 @@ module "s3_bucket_dms_destination" {
             "s3:PutObjectTagging",
             "s3:ListBucket"
           ]
+        },{
+          effect     = "Allow"
+          principals = {
+            type        = "AWS"
+            identifiers = [aws_iam_role.dms_s3_reader_role.arn]
+          }
+          actions    = [
+            "s3:GetObject",
+            "s3:ListBucket"
+          ]
         }]
 
   lifecycle_rule = [
