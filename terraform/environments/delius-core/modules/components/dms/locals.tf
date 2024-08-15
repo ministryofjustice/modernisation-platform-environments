@@ -15,7 +15,8 @@ locals {
   dms_s3_writer_account_ids = flatten(compact(concat(var.dms_config.client_account_ids,[local.dms_repository_account_id])))
   # We define an S3 writer role for each Delius environment (rather than for the account)
   dms_s3_writer_role_name = "${var.env_name}-dms-s3-writer-role"
-  
+  dms_s3_reader_role_name = "${var.env_name}-dms-s3-reader-role"
+
   dms_s3_writer_role_cross_account_arns = merge([for delius_account_name in var.delius_account_names : {
                                                for delius_environment_name in var.delius_environment_names : delius_environment_name => data.terraform_remote_state.get_dms_s3_bucket_info[delius_account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn[delius_environment_name] if contains(local.dms_s3_writer_account_ids,try(regex("arn:aws:iam::([0-9]+):.*",try(data.terraform_remote_state.get_dms_s3_bucket_info[delius_account_name].outputs.dms_s3_bucket_info.dms_s3_role_arn[delius_environment_name],""))[0],""))
                                             }
