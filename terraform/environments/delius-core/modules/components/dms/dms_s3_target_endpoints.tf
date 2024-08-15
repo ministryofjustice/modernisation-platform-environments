@@ -10,7 +10,7 @@ resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
    endpoint_type                   = "target"
    service_access_role_arn         = local.dms_s3_bucket_info.dms_s3_role_arn[var.env_name]
    bucket_name                     = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment]
-   bucket_folder                   = "${local.audit_source_primary}/audit"
+   bucket_folder                   = "audit/${local.audit_source_primary}"
    timestamp_column_name           = "TIMESTAMP"
    canned_acl_for_objects          = "bucket-owner-full-control"
    }
@@ -23,13 +23,10 @@ resource "aws_dms_s3_endpoint" "dms_user_target_endpoint_s3" {
    endpoint_type                   = "target"
    service_access_role_arn         = local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns[each.value]
    bucket_name                     = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[each.value]
-   bucket_folder                   = "${var.dms_config.user_source_endpoint.read_database}/user"
+   bucket_folder                   = "user"
    timestamp_column_name           = "TIMESTAMP"
    canned_acl_for_objects          = "bucket-owner-full-control"
    }
-
-
-
 
 # resource "aws_dms_endpoint" "dms_audit_target_endpoint_s3" {
 #    count                           = try(var.dms_config.audit_source_endpoint.read_database, null) == null ? 0 : 1
