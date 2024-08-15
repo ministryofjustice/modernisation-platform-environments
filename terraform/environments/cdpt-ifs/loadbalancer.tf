@@ -187,4 +187,6 @@ resource "aws_lb_listener" "https_listener" {
     target_group_arn = aws_lb_target_group.ifs_target_group.id
     type             = "forward"
   }
+
+  idle_timeout = 120
 }
