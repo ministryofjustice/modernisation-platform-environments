@@ -48,6 +48,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
       storage_class = "STANDARD_IA"
     }
   }
+
+  rule {
+    id     = "${var.name}-reports"
+    status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
+
+    filter {
+      prefix = var.expiration_prefix
+    }
+
+    expiration {
+      days = var.expiration_days
+    }
+  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {

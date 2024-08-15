@@ -58,6 +58,21 @@ variable "enable_lifecycle" {
   default     = false
 }
 
+variable "enable_lifecycle_expiration" {
+  description = "Enable item expiration - requires 'enable_lifecycle' to be enabled."
+  default     = false
+}
+
+variable "expiration_days" {
+  description = "Days to wait before deleting expired items."
+  default     = 90
+}
+
+variable "expiration_prefix" {
+  description = "Prefix to apply expiration to."
+  default     = "/"
+}
+
 variable "enable_versioning_config" {
   description = "Enable Versioning Config for S3 Storage, Default is Disabled"
   default     = "Disabled"
