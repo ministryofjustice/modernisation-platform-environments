@@ -43,8 +43,6 @@
       "database_diskspace_threshold": "95",
       "database_read_write_ops_threshold": "1100000",
       "database_oradata_queue_length_threshold": "3",
-      "smtp_ami_id": "ami-07c2c2bf769d5174d",
-      "smtp_instance_type": "t2.large",
       "old_mail_server_url": "mail.aws.dev.legalservices.gov.uk",
       "laa_mail_relay_url": "laa-mail.laa-development.modernisation-platform.service.justice.gov.uk",
       "old_domain_name": "dev.legalservices.gov.uk",
