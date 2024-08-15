@@ -58,7 +58,7 @@ variable "enable_lifecycle" {
   default     = false
 }
 
-variable "enable_expiration" {
+variable "enable_lifecycle_expiration" {
   description = "Enable item expiration - requires 'enable_lifecycle' to be enabled."
   default     = false
 }

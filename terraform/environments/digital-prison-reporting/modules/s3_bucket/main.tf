@@ -51,7 +51,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
 
   rule {
     id     = "${var.name}-reports"
-    status = var.enable_expiration ? "Enabled" : "Disabled"
+    status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
 
     filter {
       prefix = var.expiration_prefix
