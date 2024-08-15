@@ -292,26 +292,11 @@ module "load_g4s_atrium_unstructured" {
   iam_role                = aws_iam_role.load_json_table
   memory_size             = 2048
   timeout                 = 900
-  function_tag            = "v0.0.0-c79d61f"
+  function_tag            = "v0.0.0-670d05a"
   dataset_name            = "g4s_atrium_unstructured"
   env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
-<<<<<<< HEAD
-  ecr_repo_name           = "create-a-data-task"
-  function_tag            = "v0.0.0-670d05a"
-  environment_variables = {
-    DLT_PROJECT_DIR : "/tmp"
-    DLT_DATA_DIR : "/tmp"
-    DLT_PIPELINE_DIR : "/tmp"
-    JSON_BUCKET_NAME                         = module.json-directory-structure-bucket.bucket.id
-    STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = module.athena-s3-bucket.bucket.id
-    ATHENA_DUMP_BUCKET_NAME                  = module.athena-s3-bucket.bucket.id
-    pipeline_name                            = "g4s_atrium_unstructured"
-    environment                              = local.is-production ? "prod" : "dev"
-  }
-=======
   json_bucket_name        = module.json-directory-structure-bucket.bucket.id
   athena_bucket_name      = module.athena-s3-bucket.bucket.id
->>>>>>> main
 }
