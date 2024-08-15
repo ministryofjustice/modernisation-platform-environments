@@ -23,7 +23,19 @@ variable "pipeline_additional_policies" {
   default     = []
 }
 
-variable "dms_replication_task_arn" {}
+variable "glue_s3_data_deletion_job" {
+  description = "Name of glue job which deletes parquet files from s3 bucket(s)"
+  type        = string
+  default     = ""
+}
+
+variable "dms_replication_task_arn" {
+  type = string
+}
+
+variable "replication_task_id" {
+  type = string
+}
 
 variable "pipeline_notification_lambda_function" {
   description = "Pipeline Notification Lambda Name"
@@ -57,6 +69,54 @@ variable "s3_raw_bucket_id" {
 
 variable "s3_raw_archive_bucket_id" {
   description = "S3, RAW Archive Bucket ID"
+  type        = string
+  default     = ""
+}
+
+variable "s3_structured_bucket_id" {
+  description = "S3, Structured Bucket ID"
+  type        = string
+  default     = ""
+}
+
+variable "s3_curated_bucket_id" {
+  description = "S3, Curated Bucket ID"
+  type        = string
+  default     = ""
+}
+
+variable "s3_temp_reload_bucket_id" {
+  description = "S3 Bucket ID for the temporary location to store reload data"
+  type        = string
+  default     = ""
+}
+
+variable "glue_stop_glue_instance_job" {
+  description = "Name of job to stop the current running instance of the streaming job"
+  type        = string
+  default     = ""
+}
+
+variable "stop_dms_task_job" {
+  description = "Name of job to stop a running DMS task"
+  type        = string
+  default     = ""
+}
+
+variable "glue_trigger_activation_job" {
+  description = "Name of job to which activates/deactivates a glue trigger"
+  type        = string
+  default     = ""
+}
+
+variable "archive_job_trigger_name" {
+  description = "Name of the trigger for a glue trigger"
+  type        = string
+  default     = ""
+}
+
+variable "glue_archive_job" {
+  description = "Name of the glue job which archives the raw data"
   type        = string
   default     = ""
 }

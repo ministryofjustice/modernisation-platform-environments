@@ -134,15 +134,15 @@ module "reload_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Empty Structured and Curated Data"
+          "Next" : "Empty Raw, Structured and Curated Data"
         },
-        "Empty Structured and Curated Data" : {
+        "Empty Raw, Structured and Curated Data" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
-              "--dpr.file.deletion.buckets" : "${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+              "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
               "--dpr.config.key" : var.domain
             }
           },
