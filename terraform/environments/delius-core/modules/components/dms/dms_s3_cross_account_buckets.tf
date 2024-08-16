@@ -44,4 +44,10 @@ locals {
         delius_environment => [for k,v in local.dms_s3_cross_account_repository_environments : k if v == delius_environment ]
   }
 
+  dms_s3_audit_source_primary_database_list =  [for account_name in var.delius_account_names : try(data.terraform_remote_state.get_dms_s3_bucket_info[account_name].outputs.dms_s3_bucket_info.dms_s3_audit_source_primary_database,null) ]
+
+  dms_s3_cross_account_audit_source_databases = merge([
+    for database_map in local.dms_s3_audit_source_primary_database_list : database_map
+  ]...)
+
 }
