@@ -43,7 +43,7 @@
           {
             "ColumnName": "END_DATE",
             "ColumnType": "DATETIME",
-            "ColumnDateFormat": "YYYY-MM-dd HH:mi:ss",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
             "ColumnNullable": "true"
           },
           {
@@ -102,7 +102,7 @@
           {
             "ColumnName": "CREATED_DATETIME",
             "ColumnType": "DATETIME",
-            "ColumnDateFormat": "YYYY-MM-dd HH:mi:ss",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
             "ColumnNullable": "true"
           },
           {
@@ -113,13 +113,13 @@
           {
             "ColumnName": "LAST_UPDATED_DATETIME",
             "ColumnType": "DATETIME",
-            "ColumnDateFormat": "YYYY-MM-dd HH:mi:ss",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
             "ColumnNullable": "true"
           },
           {
             "ColumnName": "LAST_ACCESSED_DATETIME",
             "ColumnType": "DATETIME",
-            "ColumnDateFormat": "YYYY-MM-dd HH:mi:ss",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
             "ColumnNullable": "true"
           }
         ],
@@ -150,7 +150,7 @@
           {
             "ColumnName": "CREATED_DATETIME",
             "ColumnType": "DATETIME",
-            "ColumnDateFormat": "YYYY-MM-dd HH:mi:ss",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
             "ColumnNullable": "false"
           },
           {
@@ -161,7 +161,7 @@
           {
             "ColumnName": "LAST_UPDATED_DATETIME",
             "ColumnType": "DATETIME",
-            "ColumnDateFormat": "YYYY-MM-dd HH:mi:ss",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
             "ColumnNullable": "false"
           },
           {
