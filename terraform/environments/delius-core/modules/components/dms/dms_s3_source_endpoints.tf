@@ -10,3 +10,31 @@ resource "aws_dms_s3_endpoint" "dms_user_source_endpoint_s3" {
    external_table_definition       = file("files/user_external_table_definition.json")
    timestamp_column_name           = "TIMESTAMP"
 }
+
+# The Audit s3 source endpoint is only required in Repository environments.
+# One endpoint is required for each of the clients of that repository.
+# resource "aws_dms_s3_endpoint" "dms_audit_source_endpoint_s3" {
+#    for_each                        = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
+#    endpoint_id                     = "s3-staging-of-audit-data-from-${each.value}"
+#    endpoint_type                   = "source"
+#    service_access_role_arn         = aws_iam_role.dms_s3_reader_role.arn
+#    bucket_name                     = module.s3_bucket_dms_destination.bucket.bucket
+#    bucket_folder                   = "audit/${}"
+
+# }
+
+
+
+
+# resource "aws_dms_s3_endpoint" "dms_user_target_endpoint_s3" {
+#    for_each                        = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
+#    endpoint_id                     = "s3-staging-of-user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}-to-${each.value}"
+#    endpoint_type                   = "target"
+#    service_access_role_arn         = aws_iam_role.dms_s3_writer_role.arn
+#    bucket_name                     = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[each.value]
+#    bucket_folder                   = "user"
+#    cdc_path                        = "cdc"
+#    preserve_transactions           = true
+#    timestamp_column_name           = "TIMESTAMP"
+#    canned_acl_for_objects          = "bucket-owner-full-control"
+#    }

@@ -40,5 +40,7 @@ locals {
        dms_s3_repository_environment = {(var.env_name) = try(var.dms_config.audit_target_endpoint.write_environment,null)}
        dms_s3_cross_account_repository_environments = local.dms_s3_cross_account_repository_environments
        dms_s3_cross_account_client_environments = local.dms_s3_cross_account_client_environments
+       dms_s3_audit_source_primary_database = {(var.env_name) = local.audit_source_primary}
+       dms_s3_cross_account_audit_source_databases = local.dms_s3_cross_account_audit_source_databases
    }    
 }
