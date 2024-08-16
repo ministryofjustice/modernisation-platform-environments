@@ -75,6 +75,30 @@ locals {
           oracle-db-sid      = "T2OASYS" # for each env using azure DB will need to be OASPROD
         })
       })
+
+      t2-oasys-web-b = merge(local.ec2_autoscaling_groups.web, {
+        # For SAN project (OASYS replacement) requested by Howard Smith
+        # Autoscaling disabled as initially server will be configured manually
+        config = merge(local.ec2_autoscaling_groups.web.config, {
+          ami_name                  = "oasys_webserver_release_*"
+          availability_zone         = "eu-west-2b"
+          iam_resource_names_prefix = "ec2-web-t2"
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+            "Ec2T2WebPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
+          description        = "t2 oasys web"
+          oasys-environment  = "t2"
+          oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+          oracle-db-sid      = "T2OASYS2"
+        })
+      })
     }
 
     ec2_instances = {
@@ -294,6 +318,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2OASYS/apex-passwords*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2OASYS2/apex-passwords*",
             ]
           }
         ]
@@ -309,7 +334,7 @@ locals {
             certificate_names_or_arns = ["t2_oasys_cert"]
 
             rules = {
-              t2-web-http-8080 = {
+              t2-web-a-http-8080 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
@@ -322,6 +347,22 @@ locals {
                         "t2.oasys.service.justice.gov.uk",
                         "t2-a.oasys.service.justice.gov.uk",
                         "ords.t2.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              t2-web-b-http-8080 = {
+                priority = 150
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-oasys-web-b-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2-b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -356,7 +397,7 @@ locals {
             certificate_names_or_arns = ["t2_oasys_cert"]
 
             rules = {
-              t2-web-http-8080 = {
+              t2-web-a-http-8080 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
@@ -369,6 +410,22 @@ locals {
                         "t2-int.oasys.service.justice.gov.uk",
                         "t2-a-int.oasys.service.justice.gov.uk",
                         "t2-oasys.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              t2-web-b-http-8080 = {
+                priority = 150
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-oasys-web-b-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2-b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
