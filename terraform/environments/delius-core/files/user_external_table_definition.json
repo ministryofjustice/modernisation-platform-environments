@@ -7,13 +7,6 @@
         "TableOwner": "DELIUS_APP_SCHEMA",
         "TableColumns": [
           {
-            "ColumnName": "DMS_CDC_TIMESTAMP",
-            "ColumnType": "DATETIME",
-            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss.F",
-            "ColumnNullable": "false",
-            "ColumnScale": "6"
-          },
-          {
             "ColumnName": "USER_ID",
             "ColumnType": "INT8",
             "ColumnNullable": "false",
@@ -130,20 +123,13 @@
             "ColumnNullable": "true"
           }
         ],
-        "TableColumnsTotal": "22"
+        "TableColumnsTotal": "21"
       },
       {
         "TableName": "PROBATION_AREA_USER",
         "TablePath": "DELIUS_APP_SCHEMA/PROBATION_AREA_USER/",
         "TableOwner": "DELIUS_APP_SCHEMA",
         "TableColumns": [
-          {
-            "ColumnName": "DMS_CDC_TIMESTAMP",
-            "ColumnType": "DATETIME",
-            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss.F",
-            "ColumnNullable": "false",
-            "ColumnScale": "6"
-          },
           {
             "ColumnName": "USER_ID",
             "ColumnType": "INT8",
@@ -189,7 +175,7 @@
             "ColumnNullable": "true"
           }
         ],
-        "TableColumnsTotal": "9"
+        "TableColumnsTotal": "8"
       }
     ]
   }
