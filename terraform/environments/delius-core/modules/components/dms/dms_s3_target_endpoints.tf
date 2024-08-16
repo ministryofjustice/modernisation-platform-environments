@@ -11,6 +11,8 @@ resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
    service_access_role_arn         = local.dms_s3_bucket_info.dms_s3_role_arn[var.env_name]
    bucket_name                     = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment]
    bucket_folder                   = "audit/${local.audit_source_primary}"
+   cdc_path                        = "cdc"
+   preserve_transactions           = true
    timestamp_column_name           = "TIMESTAMP"
    canned_acl_for_objects          = "bucket-owner-full-control"
    }
