@@ -353,7 +353,7 @@ locals {
                 ]
               }
               t2-web-b-http-8080 = {
-                priority = 100
+                priority = 150
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-oasys-web-b-pb-http-8080"
