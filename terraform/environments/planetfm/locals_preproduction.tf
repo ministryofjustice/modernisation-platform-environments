@@ -149,6 +149,25 @@ locals {
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             rules = {
+              redirect = {
+                priority = 100
+                actions = [{
+                  type = "redirect"
+                  redirect = {
+                    host        = "cafmwebx.pp.planetfm.service.justice.gov.uk"
+                    port        = "443"
+                    protocol    = "HTTPS"
+                    status_code = "HTTP_302"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "pp-cafmwebx.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-45-80 = {
                 priority = 4580
                 actions = [{
@@ -159,7 +178,6 @@ locals {
                   host_header = {
                     values = [
                       "cafmwebx.pp.planetfm.service.justice.gov.uk",
-                      "pp-cafmwebx.az.justice.gov.uk",
                     ]
                   }
                 }]

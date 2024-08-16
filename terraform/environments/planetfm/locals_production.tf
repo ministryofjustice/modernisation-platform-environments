@@ -296,6 +296,25 @@ locals {
             ]
 
             rules = {
+              redirect = {
+                priority = 100
+                actions = [{
+                  type = "redirect"
+                  redirect = {
+                    host        = "cafmwebx2.planetfm.service.justice.gov.uk"
+                    port        = "443"
+                    protocol    = "HTTPS"
+                    status_code = "HTTP_302"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "cafmwebx2.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               web-3637-80 = {
                 priority = 3637
                 actions = [{
@@ -306,7 +325,6 @@ locals {
                   host_header = {
                     values = [
                       "cafmwebx2.planetfm.service.justice.gov.uk",
-                      "cafmwebx2.az.justice.gov.uk",
                     ]
                   }
                 }]
