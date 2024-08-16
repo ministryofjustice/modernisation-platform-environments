@@ -144,17 +144,6 @@ echo "---setup_file_systems"
 
 sudo yum install e2fsprogs
 
-# # Remove unneeded lines from /etc/fstab copied from LZ
-# sed -i '/s3fs#laa-software-library \/repo fuse allow_other,use_cache=\/tmp,endpoint=eu-west-2,uid=501,mp_umask=002,multireq_max=5,iam_role=LAA-EDW-development-AppEc2Role-1LQVTMTMA5QKT 0 0/d' /etc/fstab
-# sed -i '/\/dev\/xvdm \/oracle\/dbf ext4 defaults 0 0/d' /etc/fstab
-# sed -i '/\/dev\/xvdg \/stage ext4 defaults 0 0/d' /etc/fstab
-# sed -i '/\/dev\/xvdk \/oracle\/ar ext4 defaults 0 0/d' /etc/fstab
-# sed -i '/\/dev\/xvdi \/oracle\/software ext4 defaults 0 0/d' /etc/fstab
-# sed -i '/\/dev\/xvdl \/oracle\/temp_undo ext4 defaults 0 0/d' /etc/fstab
-# sed -i '/#fs-71a09680.efs.eu-west-2.amazonaws.com:\/ \/backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2/d' /etc/fstab
-# sed -i '/10.202.1.34:\/ \/backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2/d' /etc/fstab
-
-
 echo "Updating /etc/fstab file and mount"
 cat <<EOT > /etc/fstab
 /dev/VolGroup00/LogVol00	/	ext3	defaults	1 1
@@ -172,26 +161,12 @@ proc	/proc	proc	defaults	0 0
 $EFS.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
 EOT
 
-
-# # Create Oracle DBF file file system (oradata)
-# mkdir -p /oracle/dbf
-# grep -qxF "/dev/xvdf /oracle/dbf ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdf /oracle/dbf ext4 defaults 0 0" >> /etc/fstab
-
-# # Create stage (orahome) file system
-# mkdir -p /stage
-# grep -qxF "/dev/xvdg /stage ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdg /stage ext4 defaults 0 0" >> /etc/fstab
-
-# # Create archive file system
-# mkdir -p /oracle/ar
-# grep -qxF "/dev/xvdh /oracle/ar ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
-
-# #Create oracle_software
-# mkdir --p /oracle/software
-# grep -qxF "/dev/xvdi /oracle/software ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdi /oracle/software ext4 defaults 0 0" >> /etc/fstab
-
-# #Create temp_undo (oraredo)
-# mkdir -p /oracle/temp_undo
-# grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
+# Create file systems 
+mkdir -p /oracle/dbf
+mkdir -p /stage
+mkdir -p /oracle/ar
+mkdir --p /oracle/software
+mkdir -p /oracle/temp_undo
 
 # Mount all file systems in fstab
 mount -a
@@ -202,26 +177,54 @@ echo "---setup_oracle_db_software"
 # Install wget / unzip
 yum install -y unzip
 
-# Create DBA user (already created in image)
-groupadd dba
-groupadd oinstall
-useradd -d /stage/oracle -g dba oracle
+#### Create DBA user (only if it doesn't already exist)
+# Check if the dba group exists
+if ! getent group dba > /dev/null; then
+    echo "Creating group 'dba'..."
+    groupadd dba
+else
+    echo "Group 'dba' already exists."
+fi
+
+# Check if the oinstall group exists
+if ! getent group oinstall > /dev/null; then
+    echo "Creating group 'oinstall'..."
+    groupadd oinstall
+else
+    echo "Group 'oinstall' already exists."
+fi
+
+# Check if the oracle user exists
+if ! id -u oracle > /dev/null 2>&1; then
+    echo "Creating user 'oracle'..."
+    useradd -d /stage/oracle -g dba -G oinstall oracle
+else
+    echo "User 'oracle' already exists."
+fi
 
 #setup oracle user access
 echo "---setup oracle user access"
 cp -fr /home/ec2-user/.ssh /home/oracle/
 chown -R oracle:dba /home/oracle/.ssh
 
-# # Create directories and set ownership
+# Create directories and set ownership
 echo "---set ownership"
 chown -R oracle:dba /oracle
 
-# # Create swap space
-echo "---Create swap space"
-dd if=/dev/zero of=/swapfile bs=1024M count=9
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
+# Check if swap file already exists
+if [ ! -f /swapfile ]; then
+    echo "---Swap file does not exist. Creating swap space."
+    
+    # Create swap space
+    dd if=/dev/zero of=/swapfile bs=1024M count=9
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+    
+    echo "---Swap space created and activated."
+else
+    echo "---Swap file already exists. Skipping creation."
+fi
 
 # Run Oracle installer
 chmod 777 /run/cfn-init/db-install-10g.rsp
@@ -248,12 +251,45 @@ su oracle -c "/stage/patches/10204/Disk1/runInstaller -silent -responseFile /hom
 chown oracle:dba /run/cfn-init/edw_warehouse.dbt
 chmod 777 /run/cfn-init/edw_warehouse.dbt
 
-su oracle -l -c "dbca -silent -createDatabase -templateName /run/cfn-init/edw_warehouse.dbt -gdbname $APPNAME -sid $APPNAME -responseFile NO_VALUE -characterSet WE8ISO8859P1 -sysPassword '"$SECRET"' -systemPassword '"$SECRET"' -databaseType DATA_WAREHOUSING  -datafileDestination "/oracle/dbf/" -MEMORYPERCENTAGE 70"
+# Check if the Oracle SID is already running or if the database already exists
+if ! ps -ef | grep "[o]ra_pmon_$APPNAME" > /dev/null; then
+    echo "Database does not exist. Creating a new database..."
+    
+    su oracle -l -c "dbca -silent -createDatabase \
+        -templateName /run/cfn-init/edw_warehouse.dbt \
+        -gdbname $APPNAME \
+        -sid $APPNAME \
+        -responseFile NO_VALUE \
+        -characterSet WE8ISO8859P1 \
+        -sysPassword '"$SECRET"' \
+        -systemPassword '"$SECRET"' \
+        -databaseType DATA_WAREHOUSING \
+        -datafileDestination '/oracle/dbf/' \
+        -MEMORYPERCENTAGE 70"
+else
+    echo "Database with SID $APPNAME already exists. Skipping database creation."
+fi
 
-# create listener
-chmod 777 /run/cfn-init/netca.rsp
-su oracle -l -c "netca /silent /responseFile /run/cfn-init/netca.rsp"
-su oracle -l -c "lsnrctl start"
+# Check if the listener configuration file exists
+if [ ! -f "/run/cfn-init/netca.rsp" ]; then
+    echo "Listener response file does not exist. Skipping listener creation."
+else
+    # Check if the listener is already running
+    if ! su oracle -l -c "lsnrctl status" | grep -q "Listener" ; then
+        echo "Listener is not running. Creating listener and starting it..."
+
+        # Ensure the response file has correct permissions
+        chmod 777 /run/cfn-init/netca.rsp
+
+        # Create the listener
+        su oracle -l -c "netca /silent /responseFile /run/cfn-init/netca.rsp"
+
+        # Start the listener
+        su oracle -l -c "lsnrctl start"
+    else
+        echo "Listener is already running. Skipping listener creation and start."
+    fi
+fi
 
 mkdir -p /var/opt/oracle
 chown oracle:dba /var/opt/oracle
@@ -298,9 +334,6 @@ echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stag
 # setup efs backup mount point
 mkdir -p /home/oracle/backup_logs/
 mkdir -p /backups
-# sed -i '/10\.202\.1\.34:\/ \/backups/d' /etc/fstab
-# echo "$EFS.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-# mount /backups
 mkdir -p /backups/$APPNAME_RMAN
 chmod 777 /backups/$APPNAME_RMAN
 sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh
@@ -655,30 +688,6 @@ resource "aws_security_group" "edw_db_security_group" {
   )
 
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].edw_management_cidr]
-    description = "SSH access"
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
-    description = "SSH access"
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].edw_bastion_ssh_cidr]
-    description = "SSH access"
-  }
-
-  ingress {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
@@ -698,14 +707,6 @@ resource "aws_security_group" "edw_db_security_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = ["10.200.96.0/19"]
-    description = "RDS Ireland Workspace access"
-  }
-
-  ingress {
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
     cidr_blocks = ["10.200.32.0/19"]
     description = "RDS Appstream access"
   }
@@ -717,6 +718,24 @@ resource "aws_security_group" "edw_db_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "-"
   }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
+  security_group_id            = aws_security_group.edw_db_security_group.id
+  description                  = "SSH from the Bastion"
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
+  security_group_id            = aws_security_group.edw_db_security_group.id
+  description                  = "Allow Lambda SSH access for backup snapshots"
+  referenced_security_group_id = aws_security_group.backup_lambda.id
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
 }
 
 ###### DB DNS #######
