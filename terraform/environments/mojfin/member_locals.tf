@@ -22,6 +22,7 @@ locals {
   storage_type               = "gp2"
   rds_snapshot_name          = "laws3169-mojfin-migration-v1"
   deletion_production        = local.application_data.accounts[local.environment].deletion_protection
+  ca_cert_identifier         = "rds-ca-rsa4096-g1"
 
 
   # CloudWatch Alarms

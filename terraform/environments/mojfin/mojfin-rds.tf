@@ -73,6 +73,8 @@ resource "aws_db_instance" "appdb1" {
   kms_key_id        = data.aws_kms_key.rds_shared.arn
   multi_az          = true
   option_group_name = aws_db_option_group.mojfin.name
+  ca_cert_identifier = local.ca_cert_identifier
+  apply_immediately = true
 
   # restore_to_point_in_time {
   #   restore_time = "2023-07-04T14:54:00Z"
