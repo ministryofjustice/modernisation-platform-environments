@@ -130,7 +130,7 @@
             "ColumnNullable": "true"
           }
         ],
-        "TableColumnsTotal": "21"
+        "TableColumnsTotal": "22"
       },
       {
         "TableName": "PROBATION_AREA_USER",
