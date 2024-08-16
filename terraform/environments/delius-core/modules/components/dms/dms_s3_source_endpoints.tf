@@ -6,4 +6,5 @@ resource "aws_dms_s3_endpoint" "dms_user_source_endpoint_s3" {
    service_access_role_arn         = aws_iam_role.dms_s3_reader_role.arn
    bucket_name                     = module.s3_bucket_dms_destination.bucket.bucket
    bucket_folder                   = "user"
+   external_table_definition       = file("files/user_external_table_definition.json")
 }
