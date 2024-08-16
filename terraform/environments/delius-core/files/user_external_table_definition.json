@@ -1,0 +1,182 @@
+{
+    "TableCount": 2,
+    "Tables": [
+      {
+        "TableName": "USER_",
+        "TablePath": "DELIUS_APP_SCHEMA/USER_/",
+        "Table Owner": "DELIUS_APP_SCHEMA",
+        "TableColumns": [
+          {
+            "ColumnName": "USER_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false",
+            "ColumnIsPk": "true"
+          },
+          {
+            "ColumnName": "STAFF_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "PROVIDER_EMPLOYEE_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "SURNAME",
+            "ColumnType": "STRING",
+            "ColumnLength": "35",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "FORENAME",
+            "ColumnType": "STRING",
+            "ColumnLength": "35",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "FORENAME2",
+            "ColumnType": "STRING",
+            "ColumnLength": "35",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "END_DATE",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-DD HH:mi:ss",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "NOTES",
+            "ColumnType": "CLOB",
+            "ColumnLength": "2047",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "ROW_VERSION",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "DISTINGUISHED_NAME",
+            "ColumnType": "STRING",
+            "ColumnLength": "500",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "EXTERNAL_PROVIDER_EMPLOYEEFLAG",
+            "ColumnType": "STRING",
+            "ColumnLength": "1",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "EXTERNAL_PROVIDER_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "TRAINING_SESSION_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "PRIVATE",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "ORGANISATION_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "SC_PROVIDER_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "CREATED_BY_USER_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "CREATED_DATETIME",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-DD HH:mi:ss",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "LAST_UPDATED_USER_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "LAST_UPDATED_DATETIME",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-DD HH:mi:ss",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "LAST_ACCESSED_DATETIME",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-DD HH:mi:ss",
+            "ColumnNullable": "true"
+          }
+        ],
+        "TableColumnsTotal": "21"
+      },
+      {
+        "TableName": "PROBATION_AREA_USER",
+        "TablePath": "DELIUS_APP_SCHEMA/PROBATION_AREA_USER/",
+        "Table Owner": "DELIUS_APP_SCHEMA",
+        "TableColumns": [
+          {
+            "ColumnName": "USER_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false",
+            "ColumnIsPk": "true"
+          },
+          {
+            "ColumnName": "PROBATION_AREA_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false",
+            "ColumnIsPk": "true"
+          },
+          {
+            "ColumnName": "ROW_VERSION",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "CREATED_DATETIME",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-DD HH:mi:ss",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "CREATED_BY_USER_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "LAST_UPDATED_DATETIME",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-DD HH:mi:ss",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "LAST_UPDATED_USER_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "TRAINING_SESSION_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "true"
+          }
+        ],
+        "TableColumnsTotal": "8"
+      }
+    ]
+  }
+  
