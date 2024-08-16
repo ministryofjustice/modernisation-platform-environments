@@ -144,41 +144,54 @@ echo "---setup_file_systems"
 
 sudo yum install e2fsprogs
 
-# Remove unneeded lines from /etc/fstab copied from LZ
-sed -i '/s3fs#laa-software-library \/repo fuse allow_other,use_cache=\/tmp,endpoint=eu-west-2,uid=501,mp_umask=002,multireq_max=5,iam_role=LAA-EDW-development-AppEc2Role-1LQVTMTMA5QKT 0 0/d' /etc/fstab
-sed -i '/\/dev\/xvdm \/oracle\/dbf ext4 defaults 0 0/d' /etc/fstab
-sed -i '/\/dev\/xvdg \/stage ext4 defaults 0 0/d' /etc/fstab
-sed -i '/\/dev\/xvdk \/oracle\/ar ext4 defaults 0 0/d' /etc/fstab
-sed -i '/\/dev\/xvdi \/oracle\/software ext4 defaults 0 0/d' /etc/fstab
-sed -i '/\/dev\/xvdl \/oracle\/temp_undo ext4 defaults 0 0/d' /etc/fstab
-sed -i '/#fs-71a09680.efs.eu-west-2.amazonaws.com:\/ \/backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2/d' /etc/fstab
-sed -i '/10.202.1.34:\/ \/backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2/d' /etc/fstab
+# # Remove unneeded lines from /etc/fstab copied from LZ
+# sed -i '/s3fs#laa-software-library \/repo fuse allow_other,use_cache=\/tmp,endpoint=eu-west-2,uid=501,mp_umask=002,multireq_max=5,iam_role=LAA-EDW-development-AppEc2Role-1LQVTMTMA5QKT 0 0/d' /etc/fstab
+# sed -i '/\/dev\/xvdm \/oracle\/dbf ext4 defaults 0 0/d' /etc/fstab
+# sed -i '/\/dev\/xvdg \/stage ext4 defaults 0 0/d' /etc/fstab
+# sed -i '/\/dev\/xvdk \/oracle\/ar ext4 defaults 0 0/d' /etc/fstab
+# sed -i '/\/dev\/xvdi \/oracle\/software ext4 defaults 0 0/d' /etc/fstab
+# sed -i '/\/dev\/xvdl \/oracle\/temp_undo ext4 defaults 0 0/d' /etc/fstab
+# sed -i '/#fs-71a09680.efs.eu-west-2.amazonaws.com:\/ \/backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2/d' /etc/fstab
+# sed -i '/10.202.1.34:\/ \/backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2/d' /etc/fstab
 
 
-# Create Oracle DBF file file system (oradata)
-sudo /sbin/mkfs.ext4 /dev/xvdf
-mkdir -p /oracle/dbf
-grep -qxF "/dev/xvdf /oracle/dbf ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdf /oracle/dbf ext4 defaults 0 0" >> /etc/fstab
+echo "Updating /etc/fstab file and mount"
+cat <<EOT > /etc/fstab
+/dev/VolGroup00/LogVol00	/	ext3	defaults	1 1
+LABEL=/boot	/boot	ext3	defaults	1 2
+tmpfs	/dev/shm	tmpfs	defaults	0 0
+devpts	/dev/pts	devpts	gid=5,mode=620	0 0
+sysfs	/sys	sysfs	defaults	0 0
+proc	/proc	proc	defaults	0 0
+/dev/VolGroup00/LogVol01	swap	swap	defaults	0 0
+/dev/xvdf /oracle/dbf ext4 defaults 0 0
+/dev/xvdg /stage ext4 defaults 0 0
+/dev/xvdh /oracle/ar ext4 defaults 0 0
+/dev/xvdi /oracle/software ext4 defaults 0 0
+/dev/xvdj /oracle/temp_undo ext4 defaults 0 0
+$EFS.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
+EOT
 
-# Create stage (orahome) file system
-sudo /sbin/mkfs.ext4 /dev/xvdg
-mkdir -p /stage
-grep -qxF "/dev/xvdg /stage ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdg /stage ext4 defaults 0 0" >> /etc/fstab
 
-# Create archive file system
-sudo /sbin/mkfs.ext4 /dev/xvdh
-mkdir -p /oracle/ar
-grep -qxF "/dev/xvdh /oracle/ar ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
+# # Create Oracle DBF file file system (oradata)
+# mkdir -p /oracle/dbf
+# grep -qxF "/dev/xvdf /oracle/dbf ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdf /oracle/dbf ext4 defaults 0 0" >> /etc/fstab
 
-#Create oracle_software
-sudo /sbin/mkfs.ext4 /dev/xvdi
-mkdir --p /oracle/software
-grep -qxF "/dev/xvdi /oracle/software ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdi /oracle/software ext4 defaults 0 0" >> /etc/fstab
+# # Create stage (orahome) file system
+# mkdir -p /stage
+# grep -qxF "/dev/xvdg /stage ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdg /stage ext4 defaults 0 0" >> /etc/fstab
 
-#Create temp_undo (oraredo)
-sudo /sbin/mkfs.ext4 /dev/xvdj
-mkdir -p /oracle/temp_undo
-grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
+# # Create archive file system
+# mkdir -p /oracle/ar
+# grep -qxF "/dev/xvdh /oracle/ar ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdh /oracle/ar ext4 defaults 0 0" >> /etc/fstab
+
+# #Create oracle_software
+# mkdir --p /oracle/software
+# grep -qxF "/dev/xvdi /oracle/software ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdi /oracle/software ext4 defaults 0 0" >> /etc/fstab
+
+# #Create temp_undo (oraredo)
+# mkdir -p /oracle/temp_undo
+# grep -qxF "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" /etc/fstab || echo "/dev/xvdj /oracle/temp_undo ext4 defaults 0 0" >> /etc/fstab
 
 # Mount all file systems in fstab
 mount -a
@@ -285,9 +298,9 @@ echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stag
 # setup efs backup mount point
 mkdir -p /home/oracle/backup_logs/
 mkdir -p /backups
-sed -i '/10\.202\.1\.34:\/ \/backups/d' /etc/fstab
-echo "$EFS.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
-mount /backups
+# sed -i '/10\.202\.1\.34:\/ \/backups/d' /etc/fstab
+# echo "$EFS.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2" >> /etc/fstab
+# mount /backups
 mkdir -p /backups/$APPNAME_RMAN
 chmod 777 /backups/$APPNAME_RMAN
 sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh
