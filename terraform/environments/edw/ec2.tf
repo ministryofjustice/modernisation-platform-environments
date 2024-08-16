@@ -73,19 +73,6 @@ echo $host3 >>/etc/hosts
 echo $host4 >>/etc/hosts
 mkdir -p /stage/oracle/scripts
 
-# Make the variables persistent across sessions by appending them to /etc/profile.d/custom_env.sh
-cat <<EOL >> /etc/profile.d/custom_env.sh
-export LOGS="$LOGS"
-export APPNAME="$APPNAME"
-export ENV="$ENV"
-export REGION="$REGION"
-export EFS="$EFS"
-export host="$host"
-export host2="$host2"
-export host3="$host3"
-export host4="$host4"
-EOL
-
 # Disable firewall
 sudo /etc/init.d/iptables stop
 sudo /sbin/chkconfig iptables off
