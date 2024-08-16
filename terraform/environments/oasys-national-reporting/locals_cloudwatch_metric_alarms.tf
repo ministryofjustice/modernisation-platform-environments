@@ -12,7 +12,8 @@ locals {
         threshold           = 2 # CloudWatch agent runs 2 processes
         treat_missing_data  = "breaching"
         dimensions = {
-          exe = "amazon-cloudwatch-agent"
+          exe        = "amazon-cloudwatch-agent"
+          pid_finder = "native"
         }
       }
       ssm-agent-process-count = {
@@ -26,7 +27,8 @@ locals {
         threshold           = 2 # SSM agent runs 2 processes
         treat_missing_data  = "breaching"
         dimensions = {
-          exe = "ssm-agent"
+          exe        = "ssm-agent"
+          pid_finder = "native"
         }
       }
     }
@@ -42,7 +44,8 @@ locals {
         threshold           = 1
         treat_missing_data  = "breaching"
         dimensions = {
-          exe = "CMS"
+          exe        = "CMS"
+          pid_finder = "native"
         }
       }
       bods-svcmgr-process-count = {
@@ -56,7 +59,8 @@ locals {
         threshold           = 1
         treat_missing_data  = "breaching"
         dimensions = {
-          exe = "SvcMgr"
+          exe        = "SvcMgr"
+          pid_finder = "native"
         }
       }
     }
