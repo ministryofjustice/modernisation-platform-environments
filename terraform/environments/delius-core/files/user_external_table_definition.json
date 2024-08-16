@@ -4,7 +4,7 @@
       {
         "TableName": "USER_",
         "TablePath": "DELIUS_APP_SCHEMA/USER_/",
-        "Table Owner": "DELIUS_APP_SCHEMA",
+        "TableOwner": "DELIUS_APP_SCHEMA",
         "TableColumns": [
           {
             "ColumnName": "USER_ID",
@@ -128,7 +128,7 @@
       {
         "TableName": "PROBATION_AREA_USER",
         "TablePath": "DELIUS_APP_SCHEMA/PROBATION_AREA_USER/",
-        "Table Owner": "DELIUS_APP_SCHEMA",
+        "TableOwner": "DELIUS_APP_SCHEMA",
         "TableColumns": [
           {
             "ColumnName": "USER_ID",
