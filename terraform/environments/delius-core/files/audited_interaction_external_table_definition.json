@@ -1,8 +1,8 @@
 {
-    "TableCount": 2,
+    "TableCount": 1,
     "Tables": [
       {
-        "TableName": "USER_",
+        "TableName": "AUDITED_INTERACTION",
         "TablePath": "DELIUS_APP_SCHEMA/USER_/",
         "TableOwner": "DELIUS_APP_SCHEMA",
         "TableColumns": [
@@ -14,19 +14,21 @@
             "ColumnScale": "6"
           },
           {
-            "ColumnName": "USER_ID",
-            "ColumnType": "INT8",
-            "ColumnNullable": "false",
-            "ColumnIsPk": "true"
+            "ColumnName": "DATE_TIME",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
+            "ColumnNullable": "false"
           },
           {
-            "ColumnName": "STAFF_ID",
-            "ColumnType": "INT8",
-            "ColumnNullable": "true"
+            "ColumnName": "OUTCOME",
+            "ColumnType": "STRING",
+            "ColumnLength": "1",
+            "ColumnNullable": "false"
           },
           {
-            "ColumnName": "PROVIDER_EMPLOYEE_ID",
-            "ColumnType": "INT8",
+            "ColumnName": "INTERACTION_PARAMETERS",
+            "ColumnType": "STRING",
+            "ColumnLength": "4000",
             "ColumnNullable": "true"
           },
           {
@@ -56,7 +58,7 @@
           {
             "ColumnName": "NOTES",
             "ColumnType": "CLOB",
-            "ColumnLength": "32000",
+            "ColumnLength": "2047",
             "ColumnNullable": "true"
           },
           {
