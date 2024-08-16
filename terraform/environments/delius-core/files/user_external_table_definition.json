@@ -7,10 +7,10 @@
         "TableOwner": "DELIUS_APP_SCHEMA",
         "TableColumns": [
           {
-            "ColumnName": "USER_ID",
-            "ColumnType": "INT8",
-            "ColumnNullable": "false",
-            "ColumnIsPk": "true"
+            "ColumnName": "DMS_CDC_TIMESTAMP",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss.F",
+            "ColumnNullable": "false"
           },
           {
             "ColumnName": "STAFF_ID",
