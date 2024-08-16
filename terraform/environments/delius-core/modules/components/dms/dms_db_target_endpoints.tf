@@ -1,6 +1,6 @@
 # In client environments the dms_user_target_endpoint.write_database must be defined
 # The endpoint for user (USER_ and PROBATION_AREA_USER) is the Delius primary database.
-resource "aws_dms_endpoint" "dms_user_source_endpoint_db" {
+resource "aws_dms_endpoint" "dms_user_target_endpoint_db" {
    count                           = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
    database_name                   = var.dms_config.user_target_endpoint.write_database
    endpoint_id                     = "user-data-to-${lower(var.dms_config.user_target_endpoint.write_database)}"
