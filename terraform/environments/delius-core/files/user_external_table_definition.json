@@ -7,6 +7,13 @@
         "TableOwner": "DELIUS_APP_SCHEMA",
         "TableColumns": [
           {
+            "ColumnName": "DMS_CDC_TIMESTAMP",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss.F",
+            "ColumnNullable": "false",
+            "ColumnScale": "6"
+          },
+          {
             "ColumnName": "USER_ID",
             "ColumnType": "INT8",
             "ColumnNullable": "false",
@@ -131,6 +138,13 @@
         "TableOwner": "DELIUS_APP_SCHEMA",
         "TableColumns": [
           {
+            "ColumnName": "DMS_CDC_TIMESTAMP",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss.F",
+            "ColumnNullable": "false",
+            "ColumnScale": "6"
+          },
+          {
             "ColumnName": "USER_ID",
             "ColumnType": "INT8",
             "ColumnNullable": "false",
@@ -175,7 +189,7 @@
             "ColumnNullable": "true"
           }
         ],
-        "TableColumnsTotal": "8"
+        "TableColumnsTotal": "9"
       }
     ]
   }
