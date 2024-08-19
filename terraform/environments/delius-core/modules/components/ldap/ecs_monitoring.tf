@@ -76,7 +76,9 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
 
 resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
   name           = "ldap-${var.env_name}-error"
-  pattern        = "%err=[1-9][0-9]+%"
+  # Pattern to match errors but exclude err=32
+  pattern        = "[%]err=([1-9][0-9]+)[%] (?:(?!err=32).)*"
+
   log_group_name = aws_cloudwatch_log_group.ldap_ecs.name
 
   metric_transformation {
