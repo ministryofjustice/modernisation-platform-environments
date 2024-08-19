@@ -68,8 +68,13 @@ variable "expiration_days" {
   default     = 90
 }
 
-variable "expiration_prefix" {
-  description = "Prefix to apply expiration to."
+variable "expiration_prefix_redshift" {
+  description = "Directory Prefix where Redshift Async query results are stored to apply expiration to."
+  default     = "/"
+}
+
+variable "expiration_prefix_athena" {
+  description = "Directory Prefix where Athena Async query results are stored to apply expiration to."
   default     = "/"
 }
 
