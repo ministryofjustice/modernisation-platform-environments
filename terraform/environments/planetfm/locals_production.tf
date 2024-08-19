@@ -290,6 +290,25 @@ locals {
         }
 
         listeners = merge(local.lbs.private.listeners, {
+          http = merge(local.lbs.private.listeners.http, {
+            rules = {
+              # Temporary rule for investigation info prod migration issue
+              web-3637-80 = {
+                priority = 3637
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "web-3637-80"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "cafmwebx2.planetfm.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
           https = merge(local.lbs.private.listeners.https, {
             alarm_target_group_names = [
               "web-3637-80",
