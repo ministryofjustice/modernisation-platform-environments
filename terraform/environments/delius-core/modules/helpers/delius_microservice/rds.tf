@@ -124,7 +124,6 @@ resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
 
 data "aws_iam_policy_document" "rds_enhanced_monitoring" {
   count = var.create_rds ? 1 : (var.rds_monitoring_interval != null || var.rds_monitoring_interval != 0 ? 1 : 0)
-
   statement {
     actions = [
       "sts:AssumeRole",
