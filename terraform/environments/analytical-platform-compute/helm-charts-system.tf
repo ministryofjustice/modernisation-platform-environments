@@ -116,7 +116,7 @@ resource "helm_release" "cluster_autoscaler" {
 /* Karpenter */
 resource "helm_release" "karpenter_crd" {
   /* https://github.com/aws/karpenter-provider-aws/releases */
-  name       = "karpenter"
+  name       = "karpenter-crd"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter-crd"
   version    = "0.37.0"
