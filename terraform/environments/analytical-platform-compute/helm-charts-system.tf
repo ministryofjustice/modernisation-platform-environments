@@ -64,7 +64,10 @@ resource "helm_release" "aws_for_fluent_bit" {
 
 resource "helm_release" "amazon_prometheus_proxy" {
   /* https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack */
-  /* If you are upgrading this chart, check whether the CRD version needs updating */
+  /* 
+    If you are upgrading this chart, check whether the CRD version needs updating
+    https://github.com/prometheus-operator/prometheus-operator/releases
+  */
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"

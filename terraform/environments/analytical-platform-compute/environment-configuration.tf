@@ -17,7 +17,7 @@ locals {
   eks_cloudwatch_log_group_retention_in_days = 400
 
   /* Kube Prometheus Stack */
-  prometheus_operator_crd_version = "v0.75.1"
+  prometheus_operator_crd_version = "v0.76.0"
 
   /* Environment Configuration */
   environment_configuration = local.environment_configurations[local.environment]
