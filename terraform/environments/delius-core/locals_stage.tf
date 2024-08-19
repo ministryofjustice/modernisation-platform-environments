@@ -71,54 +71,6 @@ locals {
   }
 
   delius_microservices_configs_stage = {
-    gdpr_ui = {
-      image_tag      = "REPLACE"
-      container_port = 80
-    }
-
-    gdpr_api = {
-      image_tag                   = "REPLACE"
-      container_port              = 8080
-      create_rds                  = false
-      rds_engine                  = "postgres"
-      rds_engine_version          = "15"
-      rds_instance_class          = "db.t3.small"
-      rds_allocated_storage       = 30
-      rds_username                = "postgres"
-      rds_port                    = 5432
-      rds_license_model           = "postgresql-license"
-      rds_deletion_protection     = false
-      rds_skip_final_snapshot     = true
-      snapshot_identifier         = "REPLACE"
-      rds_backup_retention_period = 1
-      maintenance_window          = "Wed:21:00-Wed:23:00"
-      rds_backup_window           = "19:00-21:00"
-    }
-
-    merge_ui = {
-      image_tag      = "REPLACE"
-      container_port = 80
-    }
-
-    merge_api = {
-      image_tag                   = "REPLACE"
-      container_port              = 8080
-      create_rds                  = true
-      rds_engine                  = "postgres"
-      rds_engine_version          = "15"
-      rds_instance_class          = "db.t3.small"
-      rds_allocated_storage       = 20
-      rds_username                = "dbadmin"
-      rds_port                    = 5432
-      rds_license_model           = "postgresql-license"
-      rds_deletion_protection     = false
-      rds_skip_final_snapshot     = true
-      snapshot_identifier         = null
-      rds_backup_retention_period = 1
-      maintenance_window          = "Wed:21:00-Wed:23:00"
-      rds_backup_window           = "19:00-21:00"
-    }
-
     weblogic = {
       image_tag        = "5.7.6"
       container_port   = 8080
@@ -131,17 +83,6 @@ locals {
       container_port   = 8080
       container_memory = 2048
       container_cpu    = 1024
-    }
-
-    umt = {
-      image_tag                        = "5.7.6"
-      container_port                   = 8080
-      container_memory                 = 4096
-      container_cpu                    = 1024
-      elasticache_version              = "6.2"
-      elasticache_node_type            = "cache.t3.small"
-      elasticache_port                 = 6379
-      elasticache_parameter_group_name = "default.redis6.x"
     }
 
     pwm = {
