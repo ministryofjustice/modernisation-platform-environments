@@ -44,13 +44,13 @@ EOF
 ######################################
 
 resource "aws_instance" "smtp" {
-  ami                    = local.application_data.accounts[local.environment].smtp_ami_id
-  availability_zone      = "eu-west-2a"
-  instance_type          = local.application_data.accounts[local.environment].smtp_instance_type
-  monitoring             = true
-  vpc_security_group_ids = [aws_security_group.smtp.id]
-  subnet_id              = data.aws_subnet.data_subnets_a.id
-  iam_instance_profile   = aws_iam_instance_profile.smtp.id
+  ami                         = local.application_data.accounts[local.environment].smtp_ami_id
+  availability_zone           = "eu-west-2a"
+  instance_type               = local.application_data.accounts[local.environment].smtp_instance_type
+  monitoring                  = true
+  vpc_security_group_ids      = [aws_security_group.smtp.id]
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  iam_instance_profile        = aws_iam_instance_profile.smtp.id
   user_data_base64            = base64encode(local.smtp_userdata)
   user_data_replace_on_change = true
   metadata_options {

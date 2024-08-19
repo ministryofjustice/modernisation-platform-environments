@@ -114,14 +114,14 @@ variable "production_dev" {
 
 variable "ecr_repo_name" {
   description = "ECR repo in shared services acc"
-  type = string
-  nullable = false
-  default = "electronic-monitoring-data-lambdas"
+  type        = string
+  nullable    = false
+  default     = "electronic-monitoring-data-lambdas"
 }
 
 variable "function_tag" {
   description = "Custom tag in ECR repo"
-  type = string
-  nullable = true
-  default = null
+  type        = string
+  nullable    = true
+  default     = null
 }

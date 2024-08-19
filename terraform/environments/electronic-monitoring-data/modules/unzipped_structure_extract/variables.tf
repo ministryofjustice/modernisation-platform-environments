@@ -1,5 +1,5 @@
 variable "dataset_name" {
-  type    = string
+  type     = string
   nullable = false
 }
 
@@ -13,19 +13,19 @@ variable "iam_role" {
 }
 
 variable "memory_size" {
-    type = number
-    nullable = false
-    default = 240
+  type     = number
+  nullable = false
+  default  = 240
 }
 variable "timeout" {
-    type = number
-    nullable = false
-    default = 60
+  type     = number
+  nullable = false
+  default  = 60
 }
 variable "function_tag" {
-    type = string
-    nullable = false
-    default = "v0.0.0-884806f"
+  type     = string
+  nullable = false
+  default  = "v0.0.0-884806f"
 }
 
 variable "env_account_id" {
@@ -49,12 +49,12 @@ variable "production_dev" {
 
 variable "json_bucket_name" {
   description = "The bucket to pull json structure from"
-  type = string
-  nullable = false
+  type        = string
+  nullable    = false
 }
 
 variable "athena_bucket_name" {
   description = "Bucket to dump query output into"
-  type = string
-  nullable = false
+  type        = string
+  nullable    = false
 }

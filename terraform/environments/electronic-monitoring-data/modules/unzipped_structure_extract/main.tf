@@ -1,5 +1,5 @@
 locals {
-  dataset_name_parts = split("_",  var.dataset_name)
+  dataset_name_parts = split("_", var.dataset_name)
   SUPPLIER_NAME      = local.dataset_name_parts[0]
   SYSTEM_NAME        = join("_", slice(local.dataset_name_parts, 1, length(local.dataset_name_parts)))
 }

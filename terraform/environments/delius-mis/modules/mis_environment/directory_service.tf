@@ -1,33 +1,33 @@
 locals {
-    domain_full_name = "${var.app_name}-${var.env_name}.internal"
+  domain_full_name = "${var.app_name}-${var.env_name}.internal"
 }
 
 resource "aws_directory_service_directory" "mis_ad" {
-    name = local.domain_full_name
+  name = local.domain_full_name
 
-    description = "Microsoft AD for ${var.app_name}-${var.env_name}"
+  description = "Microsoft AD for ${var.app_name}-${var.env_name}"
 
-    type = "MicrosoftAD"
-    edition = "Standard"
+  type    = "MicrosoftAD"
+  edition = "Standard"
 
-    password = data.aws_secretsmanager_secret_version.ad_admin_password.secret_string
+  password = data.aws_secretsmanager_secret_version.ad_admin_password.secret_string
 
-    vpc_settings {
-        vpc_id = var.account_info.vpc_id
-        subnet_ids = slice(var.account_config.private_subnet_ids, 0, 2)
-    }
+  vpc_settings {
+    vpc_id     = var.account_info.vpc_id
+    subnet_ids = slice(var.account_config.private_subnet_ids, 0, 2)
+  }
 
-    tags = var.tags
+  tags = var.tags
 
-    lifecycle {
-        ignore_changes = [
-            password
-        ]
-    }
+  lifecycle {
+    ignore_changes = [
+      password
+    ]
+  }
 }
 
 resource "aws_secretsmanager_secret" "ad_admin_password" {
-  name = "${var.app_name}-${var.env_name}-ad-admin-password"
+  name                    = "${var.app_name}-${var.env_name}-ad-admin-password"
   recovery_window_in_days = 0
 
   tags = merge(
@@ -97,7 +97,7 @@ resource "aws_security_group" "mis_ad_dns_resolver_security_group" {
 resource "aws_security_group_rule" "mis_ad_dns_resolver_security_group_rule_egress" {
   provider = aws.core-vpc
 
-  for_each          = {
+  for_each = {
     tcp = "tcp"
     udp = "udp"
   }
