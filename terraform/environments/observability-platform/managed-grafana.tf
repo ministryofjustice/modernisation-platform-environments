@@ -9,7 +9,8 @@ module "managed_grafana" {
 
   name = local.application_name
 
-  license_type = "ENTERPRISE"
+  license_type    = "ENTERPRISE"
+  grafana_version = local.environment_configuration.grafana_version
 
   account_access_type       = "CURRENT_ACCOUNT"
   authentication_providers  = ["AWS_SSO"]
@@ -38,6 +39,12 @@ module "managed_grafana" {
   }
 
   tags = local.tags
+}
+
+resource "aws_grafana_workspace_service_account" "automation" {
+  name         = "automation"
+  grafana_role = "ADMIN"
+  workspace_id = module.managed_grafana.workspace_id
 }
 
 /* Slack Contact Points */
