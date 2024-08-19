@@ -279,7 +279,7 @@ locals {
           web-3637-80 = merge(local.lbs.private.instance_target_groups.web-80, {
             attachments = [
               { ec2_instance_name = "pd-cafm-w-36-b" },
-              # { ec2_instance_name = "pd-cafm-w-37-a" }, # removing temporarily for migration test
+              { ec2_instance_name = "pd-cafm-w-37-a" },
             ]
           })
           web-38-80 = merge(local.lbs.private.instance_target_groups.web-80, {
@@ -290,25 +290,6 @@ locals {
         }
 
         listeners = merge(local.lbs.private.listeners, {
-          http = merge(local.lbs.private.listeners.http, {
-            rules = {
-              # Temporary rule for investigation info prod migration issue
-              web-3637-80 = {
-                priority = 3637
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-3637-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmwebx2.planetfm.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          })
           https = merge(local.lbs.private.listeners.https, {
             alarm_target_group_names = [
               "web-3637-80",
