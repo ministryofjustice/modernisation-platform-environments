@@ -456,8 +456,8 @@ locals {
           { name = "pmis", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "pmis-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "pmis-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "pnomisapiro", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "pnomisapiro-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pnomisapiro", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pnomisapiro-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "pnomisapiro-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
