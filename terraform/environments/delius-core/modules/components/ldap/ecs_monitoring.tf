@@ -75,9 +75,8 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
 }
 
 resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
-  name           = "ldap-${var.env_name}-error"
-  # Pattern to match errors but exclude err=32
-  pattern        = "[%]err=([1-9][0-9]+)[%] (?:(?!err=32).)*"
+  name    = "ldap-${var.env_name}-error"
+  pattern = "%err=[1-9][0-9]+%"
 
   log_group_name = aws_cloudwatch_log_group.ldap_ecs.name
 
@@ -95,26 +94,11 @@ resource "aws_cloudwatch_metric_alarm" "high_error_volume" {
   namespace           = "ldapMetrics"
   metric_name         = "ErrorCount"
   statistic           = "Sum"
-  period              = "300"
+  period              = "600"
   evaluation_periods  = "1"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   threshold           = "10"
-  treat_missing_data  = "missing"
-  comparison_operator = "GreaterThanThreshold"
-}
-
-resource "aws_cloudwatch_metric_alarm" "warning_error_volume" {
-  alarm_name          = "ldap-${var.env_name}-warning-error-count"
-  alarm_description   = "Triggers alarm if there are more than 5 errors in the last 2 minutes"
-  namespace           = "ldapMetrics"
-  metric_name         = "ErrorCount"
-  statistic           = "Sum"
-  period              = "120"
-  evaluation_periods  = "1"
-  alarm_actions       = [var.sns_topic_arn]
-  ok_actions          = [var.sns_topic_arn]
-  threshold           = "5"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
 }
