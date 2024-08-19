@@ -23,5 +23,5 @@ locals {
     112, 113, 114, 118, 119, 120, 121, 122, 123, 4096,
     16654
   ]
-  formatted_error_codes = [for error_code in local.error_codes : "err=${error_code}\s"]
+  formatted_error_codes = [for error_code in local.error_codes : "err=${error_code}\\s"]
 }
