@@ -267,9 +267,9 @@ resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
     "EC2",
   ]
 
-  volume {
-    name = var.task_definition_volume
-  }
+  # volume {
+  #   name = var.task_definition_volume
+  # }
 
   container_definitions = var.task_definition
 
@@ -290,9 +290,9 @@ resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
     "EC2",
   ]
 
-  volume {
-    name = var.task_definition_volume
-  }
+  # volume {
+  #   name = var.task_definition_volume
+  # }
 
   container_definitions = var.task_definition
 

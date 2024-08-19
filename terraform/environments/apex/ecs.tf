@@ -18,8 +18,8 @@ module "apex-ecs" {
   ec2_desired_capacity       = local.application_data.accounts[local.environment].ec2_desired_capacity
   ec2_max_size               = local.application_data.accounts[local.environment].ec2_max_size
   ec2_min_size               = local.application_data.accounts[local.environment].ec2_min_size
-  task_definition_volume     = local.application_data.accounts[local.environment].task_definition_volume
-  network_mode               = local.application_data.accounts[local.environment].network_mode
+  # task_definition_volume     = local.application_data.accounts[local.environment].task_definition_volume
+  # network_mode               = local.application_data.accounts[local.environment].network_mode
   server_port                = local.application_data.accounts[local.environment].server_port
   app_count                  = local.application_data.accounts[local.environment].app_count
   ec2_ingress_rules          = local.ec2_ingress_rules
