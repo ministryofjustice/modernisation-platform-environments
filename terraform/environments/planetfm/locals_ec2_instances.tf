@@ -6,6 +6,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        locals.cloudwatch_metric_alarms.windows,
       )
       config = {
         ami_owner                     = "self"
@@ -88,6 +89,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        locals.cloudwatch_metric_alarms.windows,
       )
       config = {
         availability_zone             = "eu-west-2a"

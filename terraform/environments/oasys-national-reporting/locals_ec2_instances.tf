@@ -47,6 +47,10 @@ locals {
         server-type      = "OnrBods"
         update-ssm-agent = "patchgroup1"
       }
+      cloudwatch_metric_alarms = merge(
+        local.cloudwatch_metric_alarms.windows,
+        local.cloudwatch_metric_alarms.bods,
+      )
     }
 
     boe_app = {
@@ -194,6 +198,7 @@ locals {
         server-type            = "OnrClient"
         update-ssm-agent       = "patchgroup1"
       }
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.windows
     }
   }
 }
