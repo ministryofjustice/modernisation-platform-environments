@@ -85,7 +85,7 @@ locals {
         user_data_raw = base64encode(templatefile(
           # Swap this line with the one below when this is going to be implemented
           # "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", { 
-          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {  
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
             branch = "main"
           }
         ))
