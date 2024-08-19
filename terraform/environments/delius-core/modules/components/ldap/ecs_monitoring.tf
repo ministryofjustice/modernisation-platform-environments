@@ -74,9 +74,23 @@ resource "aws_cloudwatch_metric_alarm" "memory_over_threshold" {
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "log_error_filter" {
+resource "aws_cloudwatch_log_metric_filter" "log_error_filter_1" {
   name    = "ldap-${var.env_name}-error"
-  pattern = "%err=[1-9][0-9]+%"
+  pattern = "%err=[1-2][0-9]+%"
+
+  log_group_name = aws_cloudwatch_log_group.ldap_ecs.name
+
+  metric_transformation {
+    name          = "ErrorCount"
+    namespace     = "ldapMetrics"
+    value         = "1"
+    default_value = "0"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "log_error_filter_3" {
+  name    = "ldap-${var.env_name}-error"
+  pattern = "%${join("|", local.formatted_error_codes)}%"
 
   log_group_name = aws_cloudwatch_log_group.ldap_ecs.name
 
