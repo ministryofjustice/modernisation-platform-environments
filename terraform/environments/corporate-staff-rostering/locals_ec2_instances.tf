@@ -3,7 +3,10 @@ locals {
   ec2_instances = {
 
     app = {
-      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.app
+      cloudwatch_metric_alarms = merge(
+        local.cloudwatch_metric_alarms.windows,
+        local.cloudwatch_metric_alarms.app,
+      )
       config = {
         ami_owner                     = "self"
         availability_zone             = "eu-west-2a"
@@ -112,7 +115,10 @@ locals {
     }
 
     web = {
-      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
+      cloudwatch_metric_alarms = merge(
+        local.cloudwatch_metric_alarms.windows,
+        local.cloudwatch_metric_alarms.web,
+      )
       config = {
         ami_owner                     = "self"
         availability_zone             = "eu-west-2a"
