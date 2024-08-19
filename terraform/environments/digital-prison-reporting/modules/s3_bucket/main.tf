@@ -54,7 +54,20 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
     status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
 
     filter {
-      prefix = var.expiration_prefix
+      prefix = var.expiration_prefix_redshift
+    }
+
+    expiration {
+      days = var.expiration_days
+    }
+  }
+
+  rule {
+    id     = "${var.name}-dpr"
+    status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
+
+    filter {
+      prefix = var.expiration_prefix_athena
     }
 
     expiration {

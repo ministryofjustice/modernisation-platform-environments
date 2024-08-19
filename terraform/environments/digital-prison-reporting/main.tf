@@ -935,7 +935,8 @@ module "s3_working_bucket" {
   enable_lifecycle            = true
   enable_lifecycle_expiration = true
   expiration_days             = 2
-  expiration_prefix           = "reports/"
+  expiration_prefix_redshift  = "reports/"
+  expiration_prefix_athena    = "dpr/"
 
   tags = merge(
     local.all_tags,
