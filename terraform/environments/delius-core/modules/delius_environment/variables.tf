@@ -30,6 +30,7 @@ variable "ldap_config" {
     efs_backup_schedule         = string
     efs_backup_retention_period = string
     port                        = optional(number)
+    secure_port                 = optional(number)
   })
   default = {
     name                        = "default_name"
@@ -41,6 +42,7 @@ variable "ldap_config" {
     efs_backup_schedule         = "default_efs_backup_schedule"
     efs_backup_retention_period = "default_efs_backup_retention_period"
     port                        = 389
+    secure_port                 = 636
   }
 }
 

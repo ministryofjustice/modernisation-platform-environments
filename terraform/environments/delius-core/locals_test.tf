@@ -26,6 +26,7 @@ locals {
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
+    secure_port                 = 636
   }
 
 

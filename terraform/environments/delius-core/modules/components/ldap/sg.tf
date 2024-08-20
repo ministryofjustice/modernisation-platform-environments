@@ -29,12 +29,34 @@ resource "aws_security_group_rule" "ldap_nlb" {
   cidr_blocks       = [var.account_config.shared_vpc_cidr]
 }
 
+resource "aws_security_group_rule" "ldaps_nlb" {
+  for_each          = toset(["tcp", "udp"])
+  description       = "Allow inbound traffic from VPC"
+  type              = "ingress"
+  from_port         = var.ldap_config.secure_port
+  to_port           = var.ldap_config.secure_port
+  protocol          = each.value
+  security_group_id = aws_security_group.ldap.id
+  cidr_blocks       = [var.account_config.shared_vpc_cidr]
+}
+
 resource "aws_security_group_rule" "to_ldap_from_bastion" {
   for_each                 = toset(["tcp", "udp"])
   description              = "Allow inbound traffic from bastion"
   type                     = "ingress"
   from_port                = var.ldap_config.port
   to_port                  = var.ldap_config.port
+  protocol                 = each.value
+  security_group_id        = aws_security_group.ldap.id
+  source_security_group_id = var.bastion_sg_id
+}
+
+resource "aws_security_group_rule" "to_ldaps_from_bastion" {
+  for_each                 = toset(["tcp", "udp"])
+  description              = "Allow inbound traffic from bastion"
+  type                     = "ingress"
+  from_port                = var.ldap_config.secure_port
+  to_port                  = var.ldap_config.secure_port
   protocol                 = each.value
   security_group_id        = aws_security_group.ldap.id
   source_security_group_id = var.bastion_sg_id
@@ -51,12 +73,34 @@ resource "aws_security_group_rule" "allow_ldap_from_legacy_env" {
   cidr_blocks       = var.environment_config.migration_environment_private_cidr
 }
 
+resource "aws_security_group_rule" "allow_ldaps_from_legacy_env" {
+  for_each          = toset(["tcp", "udp"])
+  description       = "Allow inbound LDAP traffic from corresponding legacy VPC"
+  type              = "ingress"
+  from_port         = var.ldap_config.secure_port
+  to_port           = var.ldap_config.secure_port
+  protocol          = each.value
+  security_group_id = aws_security_group.ldap.id
+  cidr_blocks       = var.environment_config.migration_environment_private_cidr
+}
+
 resource "aws_security_group_rule" "allow_ldap_from_cp_env" {
   for_each          = toset(["tcp", "udp"])
   description       = "Allow inbound LDAP traffic from CP"
   type              = "ingress"
   from_port         = var.ldap_config.port
   to_port           = var.ldap_config.port
+  protocol          = each.value
+  security_group_id = aws_security_group.ldap.id
+  cidr_blocks       = [var.account_info.cp_cidr]
+}
+
+resource "aws_security_group_rule" "allow_ldaps_from_cp_env" {
+  for_each          = toset(["tcp", "udp"])
+  description       = "Allow inbound LDAP traffic from CP"
+  type              = "ingress"
+  from_port         = var.ldap_config.secure_port
+  to_port           = var.ldap_config.secure_port
   protocol          = each.value
   security_group_id = aws_security_group.ldap.id
   cidr_blocks       = [var.account_info.cp_cidr]
