@@ -68,8 +68,6 @@ locals {
       }
     })
 
-    cloudwatch_log_metric_filters = local.cloudwatch_app_log_metric_filters
-
     iam_policies = {
       CSRWebServerPolicy = {
         description = "Policy allowing access to instances via the Serial Console"
