@@ -82,6 +82,8 @@ locals {
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.github,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
