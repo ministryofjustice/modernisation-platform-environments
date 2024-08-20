@@ -567,3 +567,102 @@ resource "aws_iam_role_policy_attachment" "load_json_table_lambda_sqs_queue_acce
   role       = aws_iam_role.load_json_table.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
+
+
+# ------------------------------------------
+# unzip fip
+# ------------------------------------------
+
+resource "aws_iam_role" "unzip_single_file" {
+  name               = "unzip_single_file"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "place_unzipped_file_s3_policy_document" {
+  statement {
+    sid    = "S3PermissionsForDumpingUnzippedFile"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${module.unzipped-s3-data-store.bucket.arn}/*",
+      module.unzipped-s3-data-store.bucket.arn,
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "get_zip_file_s3_policy_document" {
+  statement {
+    sid    = "S3PermissionsForGettingZipFile"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectAttributes",
+    ]
+    resources = [
+      "${aws_s3_bucket.data_store.arn}/*.zip",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "list_data_store_bucket_s3_policy_document" {
+  statement {
+    sid    = "S3PermissionsForListingDataStore"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      aws_s3_bucket.data_store.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "get_zip_file_s3" {
+  name        = "get-zip-file-s3-policy"
+  description = "Policy for Lambda to get zip file from S3"
+  policy      = data.aws_iam_policy_document.get_zip_file_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "get_zip_file_s3_policy_policy_attachment" {
+  role       = aws_iam_role.unzip_single_file.name
+  policy_arn = aws_iam_policy.get_zip_file_s3.arn
+}
+
+resource "aws_iam_policy" "list_data_store_bucket" {
+  name        = "list-data-store-bucket-policy"
+  description = "Policy for Lambda to list the data store S3 bucket"
+  policy      = data.aws_iam_policy_document.list_data_store_bucket_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "list_data_store_bucket_policy_policy_attachment" {
+  role       = aws_iam_role.unzip_single_file.name
+  policy_arn = aws_iam_policy.list_data_store_bucket.arn
+}
+
+
+resource "aws_iam_policy" "place_unzip_single_file" {
+  name        = "place-unzip-single-file-s3-policy"
+  description = "Policy for Lambda to use S3 for lambda"
+  policy      = data.aws_iam_policy_document.place_unzipped_file_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "place_unzip_single_file_s3_policy_policy_attachment" {
+  role       = aws_iam_role.unzip_single_file.name
+  policy_arn = aws_iam_policy.place_unzip_single_file.arn
+}
+
+resource "aws_iam_role_policy_attachment" "unzip_single_file_vpc_access_execution" {
+  role       = aws_iam_role.unzip_single_file.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "unzip_single_file_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.unzip_single_file.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}

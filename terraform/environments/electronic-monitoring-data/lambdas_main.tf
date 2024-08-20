@@ -300,3 +300,24 @@ module "load_g4s_atrium_unstructured" {
   json_bucket_name        = module.json-directory-structure-bucket.bucket.id
   athena_bucket_name      = module.athena-s3-bucket.bucket.id
 }
+
+#-----------------------------------------------------------------------------------
+# Unzip single file
+#-----------------------------------------------------------------------------------
+
+module "unzip_single_file" {
+  source                  = "./modules/lambdas"
+  function_name           = "unzip_single_file"
+  is_image                = true
+  role_name               = aws_iam_role.unzip_single_file.name
+  role_arn                = aws_iam_role.unzip_single_file.arn
+  memory_size             = 2048
+  timeout                 = 900
+  env_account_id          = local.env_account_id
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    BUCKET_NAME = aws_s3_bucket.data_store.id
+    EXPORT_BUCKET_NAME = module.unzipped-s3-data-store.bucket.id
+  }
+}
