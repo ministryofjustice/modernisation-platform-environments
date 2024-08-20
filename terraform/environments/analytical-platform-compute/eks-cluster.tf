@@ -190,6 +190,7 @@ module "karpenter" {
   iam_role_policies = {
     KarpenterSQSKMSAccess = module.karpenter_sqs_kms_access_iam_policy.arn
   }
+  enable_v1_permissions = true
 
   node_iam_role_name = "karpenter"
   node_iam_role_additional_policies = {
