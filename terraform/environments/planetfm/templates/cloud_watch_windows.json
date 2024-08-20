@@ -101,8 +101,8 @@
             "read_bytes",
             "write_bytes"
           ]
-        },
-      ],
+        }
+      ]
     },
     "append_dimensions": {
       "InstanceId": "${aws:InstanceId}",
