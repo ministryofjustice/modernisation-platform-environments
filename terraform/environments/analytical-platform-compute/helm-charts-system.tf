@@ -114,12 +114,34 @@ resource "helm_release" "cluster_autoscaler" {
 }
 
 /* Karpenter */
+resource "helm_release" "karpenter_crd" {
+  /* https://github.com/aws/karpenter-provider-aws/releases */
+  name       = "karpenter-crd"
+  repository = "oci://public.ecr.aws/karpenter"
+  chart      = "karpenter-crd"
+  version    = "1.0.0"
+  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/karpenter-crd/values.yml.tftpl",
+      {
+        service_namespace = kubernetes_namespace.karpenter.metadata[0].name
+      }
+    )
+  ]
+  depends_on = [
+    aws_iam_service_linked_role.spot,
+    module.karpenter
+  ]
+}
+
 resource "helm_release" "karpenter" {
   /* https://github.com/aws/karpenter-provider-aws/releases */
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
-  version    = "0.37.0"
+  version    = "1.0.0"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -135,7 +157,8 @@ resource "helm_release" "karpenter" {
   ]
   depends_on = [
     aws_iam_service_linked_role.spot,
-    module.karpenter
+    module.karpenter,
+    helm_release.karpenter_crd
   ]
 }
 

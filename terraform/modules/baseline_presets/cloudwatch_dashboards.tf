@@ -1126,6 +1126,15 @@ locals {
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-peak-packets-per-second,
       ]
     }
+    custom = {
+      header_markdown = "## Custom Metrics"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ssm.ssm-command-invocation-status,
+        local.cloudwatch_dashboard_widgets.github.github-failed-workflow-runs,
+      ]
+    }
   }
 
   cloudwatch_dashboards = {
