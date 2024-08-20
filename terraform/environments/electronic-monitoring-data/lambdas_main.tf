@@ -292,7 +292,7 @@ module "load_g4s_atrium_unstructured" {
   iam_role                = aws_iam_role.load_json_table
   memory_size             = 2048
   timeout                 = 900
-  function_tag            = "v0.0.0-1a76974"
+  function_tag            = "v0.0.0-605c1f8"
   dataset_name            = "g4s_atrium_unstructured"
   env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
