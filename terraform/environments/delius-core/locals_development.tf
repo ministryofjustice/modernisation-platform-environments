@@ -102,6 +102,11 @@ locals {
       image_tag      = "2024-05-28.10054.9e25657"
       container_port = 80
     }
+
+    ldap = {
+      image_tag      = "6.0.3-latest"
+      container_port = 389
+    }
   }
 
   bastion_config_dev = {
