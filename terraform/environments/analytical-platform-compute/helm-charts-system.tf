@@ -119,7 +119,7 @@ resource "helm_release" "karpenter_crd" {
   name       = "karpenter-crd"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter-crd"
-  version    = "0.37.0"
+  version    = "1.0.0"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -141,7 +141,7 @@ resource "helm_release" "karpenter" {
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
-  version    = "0.37.0"
+  version    = "1.0.0"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
