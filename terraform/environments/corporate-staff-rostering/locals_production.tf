@@ -9,6 +9,8 @@ locals {
   # please keep resources in alphabetical order
   baseline_production = {
 
+    security_groups = local.security_groups
+
     ec2_instances = {
       pd-csr-db-a = merge(local.ec2_instances.db, {
         config = merge(local.ec2_instances.db.config, {

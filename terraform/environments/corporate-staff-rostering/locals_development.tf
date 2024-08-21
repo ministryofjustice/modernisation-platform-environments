@@ -11,8 +11,6 @@ locals {
   # please keep resources in alphabetical order
   baseline_development = {
 
-    security_groups = {}
-
     ec2_autoscaling_groups = {
       dev-base-ol85 = {
         autoscaling_group = {
