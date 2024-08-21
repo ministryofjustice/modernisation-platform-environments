@@ -1,7 +1,14 @@
 locals {
 
   baseline_presets_preproduction = {
-    options = {}
+    options = {
+      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
+      sns_topics = {
+        pagerduty_integrations = {
+          pagerduty = "planetfm-preproduction"
+        }
+      }
+    }
   }
 
   # please keep resources in alphabetical order
