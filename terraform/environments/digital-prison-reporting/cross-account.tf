@@ -8,7 +8,7 @@ resource "aws_iam_openid_connect_provider" "cluster" {
 }
 
 ## Role
-## CrossAccount DataAPI Cross Account Role, 
+## CrossAccount DataAPI Cross Account Role,
 # CrossAccount DataAPI Assume Policy
 data "aws_iam_policy_document" "dataapi_cross_assume" {
   statement {
@@ -89,3 +89,8 @@ resource "aws_iam_role_policy_attachment" "glue_catalog_readonly" {
   policy_arn = aws_iam_policy.glue_catalog_readonly.arn
 }
 
+# Lake Formation Data Access Attachement
+resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_data_access.arn
+}
