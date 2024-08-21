@@ -59,7 +59,6 @@
 /terraform/environments/pra-register @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dashboard-access @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
 /terraform/environments/sprinkler @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
-/terraform/environments/test-bugfix @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/tribunals @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
