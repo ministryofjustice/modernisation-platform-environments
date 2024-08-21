@@ -106,27 +106,27 @@ locals {
       }
       listeners = {
         http = {
-          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
+          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
           port                     = 80
           protocol                 = "TCP"
         }
         http-7770 = {
-          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
+          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
           port                     = 7770
           protocol                 = "TCP"
         }
         http-7771 = {
-          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
+          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
           port                     = 7771
           protocol                 = "TCP"
         }
         http-7780 = {
-          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
+          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
           port                     = 7780
           protocol                 = "TCP"
         }
         http-7781 = {
-          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["csr_pagerduty"].network_lb
+          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
           port                     = 7781
           protocol                 = "TCP"
         }

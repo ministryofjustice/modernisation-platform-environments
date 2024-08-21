@@ -2,10 +2,11 @@ locals {
 
   baseline_presets_production = {
     options = {
-      db_backup_lifecycle_rule = "rman_backup_one_month"
+      cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
+      db_backup_lifecycle_rule = "rman_backup_one_month"      
       sns_topics = {
         pagerduty_integrations = {
-          csr_pagerduty = "corporate-staff-rostering-production"
+          pagerduty = "corporate-staff-rostering-production"
         }
       }
     }
