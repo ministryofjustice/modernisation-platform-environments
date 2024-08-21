@@ -2,6 +2,11 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
+      sns_topics = {
+        pagerduty_integrations = {
+          csr_pagerduty = "corporate-staff-rostering-preproduction"
+        }
+      }
     }
   }
 
@@ -720,11 +725,6 @@ locals {
         secrets = {
           passwords = { description = "database passwords" }
         }
-      }
-    }
-    sns_topics = {
-      pagerduty_integrations = {
-        csr_pagerduty = "corporate-staff-rostering-preproduction"
       }
     }
   }

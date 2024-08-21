@@ -3,6 +3,11 @@ locals {
   baseline_presets_production = {
     options = {
       db_backup_lifecycle_rule = "rman_backup_one_month"
+      sns_topics = {
+        pagerduty_integrations = {
+          csr_pagerduty = "corporate-staff-rostering-production"
+        }
+      }
     }
   }
 
@@ -586,11 +591,6 @@ locals {
         secrets = {
           passwords = { description = "database passwords" }
         }
-      }
-    }
-    sns_topics = {
-      pagerduty_integrations = {
-        csr_pagerduty = "corporate-staff-rostering-production"
       }
     }
   }
