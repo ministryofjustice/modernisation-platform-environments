@@ -83,6 +83,6 @@ locals {
       }
     }
 
-    security_groups = local.security_groups
+    # security_groups = local.security_groups
   }
 }
