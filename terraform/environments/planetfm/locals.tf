@@ -40,12 +40,6 @@ locals {
       enable_s3_bucket                           = true
       enable_s3_software_bucket                  = true
       s3_iam_policies                            = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-
-      sns_topics = {
-        pagerduty_integrations = {
-          planetfm_pagerduty = "planetfm_alarms"
-        }
-      }
     }
   }
 
