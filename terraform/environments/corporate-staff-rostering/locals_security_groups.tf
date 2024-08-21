@@ -1,5 +1,7 @@
 locals {
-  security_group_cidrs_devtest = {
+
+  security_group_cidrs_dev = {}
+  security_group_cidrs_test = {
     core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
     ssh  = module.ip_addresses.azure_fixngo_cidrs.devtest
     enduserclient = [
@@ -66,8 +68,8 @@ locals {
     jumpservers = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
   }
   security_group_cidrs_by_environment = {
-    # development   = local.security_group_cidrs_devtest
-    test          = local.security_group_cidrs_devtest
+    development   = local.security_group_cidrs_dev
+    test          = local.security_group_cidrs_test
     preproduction = local.security_group_cidrs_preprod_prod
     production    = local.security_group_cidrs_preprod_prod
   }
