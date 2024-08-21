@@ -722,5 +722,10 @@ locals {
         }
       }
     }
+    sns_topics = {
+      pagerduty_integrations = {
+        csr_pagerduty = "corporate-staff-rostering-preproduction"
+      }
+    }
   }
 }
