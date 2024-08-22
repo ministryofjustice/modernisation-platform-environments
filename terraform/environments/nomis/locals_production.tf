@@ -25,8 +25,6 @@ locals {
       sns_topics = {
         pagerduty_integrations = {
           pagerduty                   = "nomis-production"
-          dba_pagerduty               = "hmpps_shef_dba_low_priority"
-          dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
         }
       }
     }

@@ -2,19 +2,19 @@ locals {
 
   cloudwatch_metric_alarms = {
     db = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_or_cwagent_stopped_linux,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
       local.environment == "production" ? {} : {
-        cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2["cpu-utilization-high"], {
+        cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2["cpu-utilization-high"], {
           evaluation_periods  = "480"
           datapoints_to_alarm = "480"
           threshold           = "95"
           alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 8 hours to allow for DB refreshes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326064583"
         })
-        cpu-iowait-high = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_cwagent_linux["cpu-iowait-high"], {
+        cpu-iowait-high = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux["cpu-iowait-high"], {
           evaluation_periods  = "480"
           datapoints_to_alarm = "480"
           threshold           = "40"
@@ -23,20 +23,20 @@ locals {
       },
     )
     db_connectivity_test = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2_instance_cwagent_collectd_connectivity_test,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_connectivity_test,
     )
     db_connected = merge(
       # DBAs have slack integration via OEM for this so don't include pagerduty integration
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
     )
     db_backup = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_oracle_db_backup,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
     )
     db_nomis_batch = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_textfile_monitoring
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring
     )
     db_misload = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_textfile_monitoring, {
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring, {
         misload-long-running = {
           comparison_operator = "GreaterThanOrEqualToThreshold"
           evaluation_periods  = "1"
@@ -58,27 +58,27 @@ locals {
     )
 
     web = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
     )
 
     xtag = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_or_cwagent_stopped_linux,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
     )
 
     # Does not contain ec2_instance_or_cwagent_stopped_linux block as these machines are off overnight
     # This avoids triggering an alarm for the DBS's
     xtag_t1_t2 = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2_instance_cwagent_collectd_service_status_os,
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].ec2_instance_cwagent_collectd_service_status_app,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
     )
   }
 }
