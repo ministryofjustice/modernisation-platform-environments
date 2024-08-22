@@ -1,17 +1,17 @@
 {
   "accounts": {
     "development": {
-      "ec2amiid": "ami-0a5b0804d9efdeed0",
+      "ec2amiid": "ami-0943b0fd81ea77525",
       "ec2instancetype": "t3.medium",
       "workspace_cidr": "10.200.0.0/20",
       "u01_orahome_size": "40",
-      "u01_orahome_snapshot": "snap-0dbe4e9eb3ae8c8e2",
+      "u01_orahome_snapshot": "snap-09df7fe5abcffd118",
       "u02_oradata_size": "100",
-      "u02_oradata_snapshot": "snap-08eb47b98646c0002",
+      "u02_oradata_snapshot": "snap-055e9fb8e4dc7aa54",
       "u03_redo_size": "50",
-      "u03_redo_snapshot": "snap-02864a98e6392f7ba",
+      "u03_redo_snapshot": "snap-029f0736f651fdbfe",
       "u04_arch_size": "50",
-      "u04_arch_snapshot": "snap-0bc63d7b569e9eb3b",
+      "u04_arch_snapshot": "snap-0596b76fc67ed7a45",
       "container_instance_type": "linux",
       "ami_image_id": "ami-0c1789b266d504ff3",
       "instance_type": "t3a.medium",
