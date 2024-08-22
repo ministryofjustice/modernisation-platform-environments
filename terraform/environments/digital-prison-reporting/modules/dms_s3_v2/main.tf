@@ -1,5 +1,7 @@
 ### DMS replication instance log group
 resource "aws_cloudwatch_log_group" "dms-instance-log-group" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+  
   count = var.setup_dms_instance ? 1 : 0
   name  = "dms-tasks-${var.name}-instance-${var.env}"
 
