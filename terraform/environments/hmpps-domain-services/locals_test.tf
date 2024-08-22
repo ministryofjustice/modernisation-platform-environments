@@ -4,7 +4,7 @@ locals {
     options = {
       sns_topics = {
         pagerduty_integrations = {
-          hmpps_domain_services_pagerduty = "hmpps_domain_services_nonprod_alarms"
+          pagerduty = "hmpps-domain-services-test"
         }
       }
     }
