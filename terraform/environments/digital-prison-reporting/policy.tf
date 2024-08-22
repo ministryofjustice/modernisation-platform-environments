@@ -735,6 +735,26 @@ resource "aws_iam_policy" "glue_catalog_readonly" {
   policy      = data.aws_iam_policy_document.glue_catalog_readonly.json
 }
 
+# LakeFormation Data Access
+# Policy Document
+
+data "aws_iam_policy_document" "lake_formation_data_access" {
+  statement {
+    actions = [
+      "lakeformation:GetDataAccess"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "lake_formation_data_access" {
+  name        = "${local.project}-lake-formation-data-access"
+  description = "LakeFormation Get Data Access Policy"
+  policy      = data.aws_iam_policy_document.lake_formation_data_access.json
+}
+
 # Analytical Platform Share Policy & Role
 
 data "aws_iam_policy_document" "analytical_platform_share_policy" {

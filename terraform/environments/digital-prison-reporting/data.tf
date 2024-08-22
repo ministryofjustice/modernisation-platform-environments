@@ -124,3 +124,9 @@ data "aws_secretsmanager_secret_version" "transfer_component_role_secret_version
 data "aws_iam_session_context" "current" {
   arn = data.aws_caller_identity.current.arn
 }
+
+# Retrieves role for data-engineers
+
+data "aws_iam_roles" "data_engineering_roles" {
+  name_regex = "AWSReservedSSO_modernisation-platform-data-eng.*"
+}
