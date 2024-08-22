@@ -17,14 +17,19 @@ reportsController:
     enabled: true
 
 config:
-  resourceFiltersExcludeNamespaces:
-    - kube-system
-    - amazon-guardduty
-    - aws-observability
-    - cluster-autoscaler
-    - karpenter
-    - external-dns
-    - cert-manager
-    - ingress-nginx
-    - external-secrets
-    - keda
+  webhooks:
+    - namespaceSelector:
+        matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kube-system
+            - amazon-guardduty # This is created by EKS
+            - aws-observability
+            - cluster-autoscaler
+            - karpenter
+            - external-dns
+            - cert-manager
+            - ingress-nginx
+            - external-secrets
+            - keda
