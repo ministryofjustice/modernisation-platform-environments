@@ -75,6 +75,7 @@ locals {
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
+  db_hostname = "db.${local.application_name}"
 
   database-instance-userdata = <<EOF
 #!/bin/bash
@@ -100,7 +101,7 @@ DIAG_ADR_ENABLED=on
 LISTENER =
   (DESCRIPTION_LIST =
     (DESCRIPTION =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = ${aws_route53_record.apex-db.fqdn})(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.db_hostname}.${data.aws_route53_zone.external.name})(PORT = 1521))
     )
   )
 SID_LIST_LISTENER =
@@ -121,7 +122,7 @@ cat <<EOT > /u01/app/oracle/product/12.1/network/admin/tnsnames.ora
 APEX=
   (DESCRIPTION =
     (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = ${aws_route53_record.apex-db.fqdn})(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.db_hostname}.${data.aws_route53_zone.external.name})(PORT = 1521))
     )
     (CONNECT_DATA =
       (SERVICE_NAME = APEX)

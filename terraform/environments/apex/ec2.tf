@@ -254,7 +254,7 @@ resource "aws_volume_attachment" "u04-arch" {
 resource "aws_route53_record" "apex-db" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "db.${local.application_name}.${data.aws_route53_zone.external.name}"
+  name     = "${local.db_hostname}.${data.aws_route53_zone.external.name}"
   type     = "A"
   ttl      = 900
   records  = [aws_instance.apex_db_instance.private_ip]
