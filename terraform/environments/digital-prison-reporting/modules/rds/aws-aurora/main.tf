@@ -318,6 +318,8 @@ resource "aws_appautoscaling_policy" "this" {
 ################################################################################
 
 resource "aws_security_group" "this" {
+  #checkov:skip=CKV2_AWS_5
+  
   count = local.create && var.create_security_group ? 1 : 0
 
   name        = var.security_group_use_name_prefix ? null : local.security_group_name

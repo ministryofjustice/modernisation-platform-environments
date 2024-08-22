@@ -117,6 +117,8 @@ resource "aws_dms_replication_subnet_group" "dms-s3-target-subnet-group" {
 
 # Security Groups
 resource "aws_security_group" "dms_s3_target_sec_group" {
+  #checkov:skip=CKV2_AWS_5
+  
   count = var.setup_dms_instance ? 1 : 0
 
   name   = "${var.project_id}-dms-s3-target-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"

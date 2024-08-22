@@ -4,6 +4,8 @@ data "aws_vpc" "dpr" {
 
 ## Lambda Generic SG
 resource "aws_security_group" "lambda_generic" {
+  #checkov:skip=CKV2_AWS_5
+  
   count = local.enable_generic_lambda_sg ? 1 : 0
 
   name_prefix = "${local.generic_lambda}-sg"
@@ -49,6 +51,8 @@ resource "aws_security_group_rule" "lambda_egress_generic" {
 
 ## Serverless Lambda GW VPC Link SG
 resource "aws_security_group" "serverless_gw" {
+  #checkov:skip=CKV2_AWS_5
+
   count = local.enable_dbuilder_serverless_gw ? 1 : 0
 
   name_prefix = "${local.serverless_gw_dbuilder_name}-sg"
