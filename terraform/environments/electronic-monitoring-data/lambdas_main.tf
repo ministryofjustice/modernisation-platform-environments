@@ -276,8 +276,8 @@ module "load_unstructured_structure" {
     DLT_PROJECT_DIR : "/tmp"
     DLT_DATA_DIR : "/tmp"
     DLT_PIPELINE_DIR : "/tmp"
-    JSON_BUCKET_NAME        = "s3://${module.json-directory-structure-bucket.bucket.id}"
-    ATHENA_DUMP_BUCKET_NAME = "s3://${module.athena-s3-bucket.bucket.id}/output"
+    JSON_BUCKET_NAME        = module.json-directory-structure-bucket.bucket.id
+    ATHENA_DUMP_BUCKET_NAME = module.athena-s3-bucket.bucket.id
   }
 }
 
