@@ -94,7 +94,6 @@ locals {
         })
         tags = merge(local.ec2_instances.db.tags, {
           ami                 = "pp-cafm-db-a"
-          app-config-status   = "pending"
           description         = "SQL Server"
           instance-scheduling = "skip-scheduling"
           pre-migration       = "PPFDW0030"
@@ -106,6 +105,9 @@ locals {
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-cafm-w-4-b"
           availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
+            "Ec2PpWebPolicy",
+          ])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -116,6 +118,7 @@ locals {
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-cafm-w-4-b"
+          cert-cn             = "*.pp.planetfm.service.justice.gov.uk"
           description         = "Web Portal Server"
           instance-scheduling = "skip-scheduling"
           pre-migration       = "PPFWW0004"
@@ -126,21 +129,51 @@ locals {
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-cafm-w-5-a"
           availability_zone = "eu-west-2a"
-        })
-        instance = merge(local.ec2_instances.web.instance, {
-          disable_api_termination = true
-          instance_type           = "t3.large"
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
+            "Ec2PpWebPolicy",
+          ])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
+        instance = merge(local.ec2_instances.web.instance, {
+          disable_api_termination = true
+          instance_type           = "t3.large"
+        })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-cafm-w-5-a"
+          cert-cn             = "*.pp.planetfm.service.justice.gov.uk"
           description         = "Migrated server PPFWW0005 Web Portal Server"
           instance-scheduling = "skip-scheduling"
           pre-migration       = "PPFWW0005"
         })
       })
+    }
+
+    iam_policies = {
+      Ec2PpWebPolicy = {
+        description = "Permissions required for POSH-ACME Route53 Plugin"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "route53:ListHostedZones",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "route53:GetHostedZone",
+              "route53:ListResourceRecordSets",
+              "route53:ChangeResourceRecordSets"
+            ]
+            resources = [
+              "arn:aws:route53:::hostedzone/*",
+            ]
+          },
+        ]
+      }
     }
 
     lbs = {

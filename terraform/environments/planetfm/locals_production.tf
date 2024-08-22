@@ -160,11 +160,10 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          app-config-status = "pending"
-          ami               = "pd-cafm-db-a"
-          description       = "SQL Server"
-          pre-migration     = "PDFDW0030"
-          update-ssm-agent  = "patchgroup1"
+          ami              = "pd-cafm-db-a"
+          description      = "SQL Server"
+          pre-migration    = "PDFDW0030"
+          update-ssm-agent = "patchgroup1"
         })
       })
 
@@ -193,11 +192,10 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          app-config-status = "pending"
-          ami               = "pd-cafm-db-b"
-          description       = "SQL resilient Server"
-          pre-migration     = "PDFDW0031"
-          update-ssm-agent  = "patchgroup2"
+          ami              = "pd-cafm-db-b"
+          description      = "SQL resilient Server"
+          pre-migration    = "PDFDW0031"
+          update-ssm-agent = "patchgroup2"
         })
       })
 
@@ -210,6 +208,9 @@ locals {
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-36-b"
           availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
+            "Ec2PdWebPolicy",
+          ])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -221,6 +222,7 @@ locals {
         })
         tags = {
           ami              = "pd-cafm-w-36-b"
+          cert-cn          = "*.planetfm.service.justice.gov.uk"
           description      = "CAFM Asset Management"
           pre-migration    = "PDFWW00036"
           update-ssm-agent = "patchgroup2"
@@ -235,6 +237,9 @@ locals {
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-37-a"
           availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
+            "Ec2PdWebPolicy",
+          ])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -245,9 +250,10 @@ locals {
           instance_type           = "t3.xlarge"
         })
         tags = {
-          pre-migration    = "PFWW00037"
-          description      = "CAFM Assessment Management"
           ami              = "pd-cafm-w-37-a"
+          cert-cn          = "*.planetfm.service.justice.gov.uk"
+          description      = "CAFM Assessment Management"
+          pre-migration    = "PFWW00037"
           update-ssm-agent = "patchgroup1"
         }
       })
@@ -260,6 +266,9 @@ locals {
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-38-b"
           availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
+            "Ec2PdWebPolicy",
+          ])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -271,11 +280,38 @@ locals {
         })
         tags = {
           ami              = "pd-cafm-w-38-b"
+          cert-cn          = "*.planetfm.service.justice.gov.uk"
           description      = "CAFM Web Training"
           pre-migration    = "PDFWW3QCP660001"
           update-ssm-agent = "patchgroup2"
         }
       })
+    }
+
+    iam_policies = {
+      Ec2PdWebPolicy = {
+        description = "Permissions required for POSH-ACME Route53 Plugin"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "route53:ListHostedZones",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "route53:GetHostedZone",
+              "route53:ListResourceRecordSets",
+              "route53:ChangeResourceRecordSets"
+            ]
+            resources = [
+              "arn:aws:route53:::hostedzone/*",
+            ]
+          },
+        ]
+      }
     }
 
     lbs = {
