@@ -124,7 +124,7 @@ module "glue_temp_refresh_job_establishment_living_unit" {
 
 # Glue Job, Domain Refresh movements/movements
 module "glue_temp_refresh_job_movements_movements" {
-  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings"
   
   source                 = "./modules/glue_job"
   create_job             = local.create_job
