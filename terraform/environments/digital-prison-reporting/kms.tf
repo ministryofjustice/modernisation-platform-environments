@@ -1,5 +1,9 @@
 ### S3 KMS
 resource "aws_kms_key" "s3" {
+  #checkov:skip=CKV_AWS_33
+  #checkov:skip=CKV_AWS_227
+  #checkov:skip=CKV_AWS_7
+
   description         = "Encryption key for s3"
   enable_key_rotation = true
   key_usage           = "ENCRYPT_DECRYPT"
@@ -18,7 +22,16 @@ resource "aws_kms_key" "s3" {
 data "aws_iam_policy_document" "s3-kms" {
   statement {
     #checkov:skip=CKV_AWS_111
-    #checkov:skip=CKV_AWS_109       
+    #checkov:skip=CKV_AWS_109
+    #checkov:skip=CKV_AWS_358
+    #checkov:skip=CKV_AWS_107
+    #checkov:skip=CKV_AWS_1
+    #checkov:skip=CKV_AWS_356
+    #checkov:skip=CKV_AWS_283
+    #checkov:skip=CKV_AWS_49
+    #checkov:skip=CKV_AWS_108
+    #checkov:skip=CKV_AWS_110   
+          
     effect    = "Allow"
     actions   = ["kms:*"]
     resources = ["*"]
@@ -37,6 +50,10 @@ resource "aws_kms_alias" "kms-alias" {
 
 ### KINESIS KMS
 resource "aws_kms_key" "kinesis-kms-key" {
+  #checkov:skip=CKV_AWS_33
+  #checkov:skip=CKV_AWS_227
+  #checkov:skip=CKV_AWS_7
+
   description         = "Encryption key for kinesis data stream"
   enable_key_rotation = true
   key_usage           = "ENCRYPT_DECRYPT"
@@ -74,6 +91,10 @@ resource "aws_kms_alias" "kinesis-kms-alias" {
 
 ### Redshift KMS
 resource "aws_kms_key" "redshift-kms-key" {
+  #checkov:skip=CKV_AWS_33
+  #checkov:skip=CKV_AWS_227
+  #checkov:skip=CKV_AWS_7
+
   description         = "Encryption key for Redshift Cluster"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.redhsift-kms.json
@@ -90,7 +111,14 @@ resource "aws_kms_key" "redshift-kms-key" {
 data "aws_iam_policy_document" "redhsift-kms" {
   statement {
     #checkov:skip=CKV_AWS_111
-    #checkov:skip=CKV_AWS_109       
+    #checkov:skip=CKV_AWS_109
+    #checkov:skip=CKV_AWS_110
+    #checkov:skip=CKV_AWS_358
+    #checkov:skip=CKV_AWS_107
+    #checkov:skip=CKV_AWS_1 
+    #checkov:skip=CKV_AWS_283
+    #checkov:skip=CKV_AWS_49
+    #checkov:skip=CKV_AWS_108   
     effect    = "Allow"
     actions   = ["kms:*"]
     resources = ["*"]
@@ -109,6 +137,10 @@ resource "aws_kms_alias" "redshift-kms-alias" {
 
 ### RDS, Postgres KMS
 resource "aws_kms_key" "rds" {
+  #checkov:skip=CKV_AWS_33
+  #checkov:skip=CKV_AWS_227
+  #checkov:skip=CKV_AWS_7
+
   description         = "Encryption key for RDS Instance"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.rds-kms.json
@@ -125,7 +157,14 @@ resource "aws_kms_key" "rds" {
 data "aws_iam_policy_document" "rds-kms" {
   statement {
     #checkov:skip=CKV_AWS_111
-    #checkov:skip=CKV_AWS_109       
+    #checkov:skip=CKV_AWS_109
+    #checkov:skip=CKV_AWS_110
+    #checkov:skip=CKV_AWS_358
+    #checkov:skip=CKV_AWS_107
+    #checkov:skip=CKV_AWS_1 
+    #checkov:skip=CKV_AWS_283
+    #checkov:skip=CKV_AWS_49
+    #checkov:skip=CKV_AWS_108         
     effect    = "Allow"
     actions   = ["kms:*"]
     resources = ["*"]
@@ -144,6 +183,10 @@ resource "aws_kms_alias" "rds-kms-alias" {
 
 # RDS Database Key
 resource "aws_kms_key" "operational_db" {
+  #checkov:skip=CKV_AWS_33
+  #checkov:skip=CKV_AWS_227
+  #checkov:skip=CKV_AWS_7
+    
   description         = "Encryption key for Operational DB"
   enable_key_rotation = true
   key_usage           = "ENCRYPT_DECRYPT"

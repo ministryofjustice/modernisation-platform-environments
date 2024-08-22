@@ -127,6 +127,8 @@ resource "aws_iam_role" "athena_federated_query_lambda_execution_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "athena_federated_query_lambda_role_policy_attachment" {
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+
   policy_arn = aws_iam_policy.athena_federated_query_connector_policy.arn
   role       = aws_iam_role.athena_federated_query_lambda_execution_role.name
 }

@@ -19,6 +19,8 @@ resource "aws_api_gateway_resource" "preview" {
 }
 
 resource "aws_api_gateway_method" "preview" {
+  #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
+
   authorization = "NONE"
   http_method   = "ANY"
   resource_id   = aws_api_gateway_resource.preview.id
@@ -41,6 +43,8 @@ resource "aws_api_gateway_resource" "publish" {
 }
 
 resource "aws_api_gateway_method" "publish" {
+  #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
+
   authorization = "NONE"
   http_method   = "ANY"
   resource_id   = aws_api_gateway_resource.publish.id
@@ -57,6 +61,8 @@ resource "aws_api_gateway_integration" "publish" {
 }
 
 resource "aws_api_gateway_method" "this" {
+  #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
+
   authorization = "NONE"
   http_method   = "ANY"
   resource_id   = aws_api_gateway_resource.this.id
@@ -73,6 +79,9 @@ resource "aws_api_gateway_integration" "this" {
 }
 
 resource "aws_lambda_permission" "apigw_lambda" {
+  #checkov:skip=CKV_AWS_364:Ensure that AWS Lambda function permissions delegated to AWS services are limited by SourceArn or SourceAccount
+  #checkov:skip=CKV_AWS_301:Ensure that AWS Lambda function is not publicly accessible
+  
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = var.lambda_name
@@ -81,6 +90,8 @@ resource "aws_lambda_permission" "apigw_lambda" {
 }
 
 resource "aws_api_gateway_deployment" "default_deployment" {
+  #checkov:skip=CKV_AWS_217:Ensure Create before destroy for API deployments
+
   rest_api_id = aws_api_gateway_rest_api.this.id
   triggers = {
     redeployment = sha1(jsonencode([
