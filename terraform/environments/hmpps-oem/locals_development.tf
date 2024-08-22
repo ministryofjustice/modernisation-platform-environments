@@ -6,8 +6,7 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
-          dba_pagerduty = "hmpps_shef_dba_non_prod"
-          dso_pagerduty = "nomis_nonprod_alarms"
+          pagerduty = "hmpps-oem-development"
         }
       }
     }
