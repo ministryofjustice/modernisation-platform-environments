@@ -1,4 +1,4 @@
-# tflint-ignore-file: terraform_required_version, terraform_required_providers
+# tflint-ignore-file: terraform_required_version, terraform_required_providers 
 
 # The Connector Lambda will use this policy to access everything it needs
 resource "aws_iam_policy" "athena_federated_query_connector_policy" {
