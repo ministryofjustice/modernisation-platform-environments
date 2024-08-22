@@ -88,12 +88,41 @@ locals {
       pp-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
+            "Ec2PpRdsPolicy",
+          ])
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description = "Remote Desktop Services for azure.hmpp.root domain"
           domain-name = "azure.hmpp.root"
         })
       })
+    }
+
+    iam_policies = {
+      Ec2PpRdsPolicy = {
+        description = "Permissions required for POSH-ACME Route53 Plugin"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "route53:ListHostedZones",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "route53:GetHostedZone",
+              "route53:ListResourceRecordSets",
+              "route53:ChangeResourceRecordSets"
+            ]
+            resources = [
+              "arn:aws:route53:::hostedzone/*",
+            ]
+          },
+        ]
+      }
     }
 
     lbs = {
