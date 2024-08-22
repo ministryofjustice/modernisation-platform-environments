@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "ec2amiid": "ami-0943b0fd81ea77525",
-      "ec2instancetype": "t3.medium",
+      "ec2instancetype": "t3.large",
       "workspace_cidr": "10.200.0.0/20",
       "u01_orahome_size": "40",
       "u01_orahome_snapshot": "snap-09df7fe5abcffd118",
