@@ -26,6 +26,7 @@ locals {
             branch = "main"
           })
         })
+        cloudwatch_metric_alarms = null
       })
 
       dev-boe-asg = merge(local.ec2_autoscaling_groups.boe_app, {
@@ -42,6 +43,7 @@ locals {
             branch = "main"
           })
         })
+        cloudwatch_metric_alarms = null
       })
 
       dev-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
@@ -53,6 +55,7 @@ locals {
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "t3.large"
         })
+        cloudwatch_metric_alarms = null
       })
     }
 
