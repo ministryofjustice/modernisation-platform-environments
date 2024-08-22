@@ -44,7 +44,7 @@ module "aurora_operational_db" {
     static = {
       identifier     = "operational-db-static-any-endpoint"
       type           = "ANY"
-      static_members = ["${local.name}"]
+      static_members = [local.name]
       tags           = { Endpoint = "Operational-DB-Any" }
     }
   }
