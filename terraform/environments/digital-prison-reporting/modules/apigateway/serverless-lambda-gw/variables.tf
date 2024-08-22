@@ -7,6 +7,7 @@ variable "region" {
 variable "account" {
   description = "AWS Account ID."
   default     = ""
+  type        = string
 }
 
 variable "enable_gateway" {
