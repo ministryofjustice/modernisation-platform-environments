@@ -1,3 +1,5 @@
+# tflint-ignore-file: terraform_required_version, terraform_required_providers
+
 resource "aws_api_gateway_rest_api" "this" {
   name = "${var.name}-rest-gw"
   endpoint_configuration {

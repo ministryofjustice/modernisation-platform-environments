@@ -1,3 +1,5 @@
+# tflint-ignore-file: terraform_required_version, terraform_required_providers
+
 locals {
   default_connection = { "default" = values(var.connection_strings)[0] }
   # Transform connection_strings to the format required by the connector environment properties and add a default
