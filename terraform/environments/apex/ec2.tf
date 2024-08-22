@@ -3,7 +3,6 @@ resource "aws_key_pair" "apex" {
   public_key = local.application_data.accounts[local.environment].apex_ec2_key
 }
 
-
 resource "aws_instance" "apex_db_instance" {
   ami                         = local.application_data.accounts[local.environment].ec2amiid
   associate_public_ip_address = false

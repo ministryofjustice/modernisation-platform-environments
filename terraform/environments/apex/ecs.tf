@@ -10,7 +10,6 @@ module "apex-ecs" {
   vpc_all                    = local.vpc_all
   app_name                   = local.application_name
   container_instance_type    = local.application_data.accounts[local.environment].container_instance_type
-  ami_image_id               = local.application_data.accounts[local.environment].ami_image_id
   instance_type              = local.application_data.accounts[local.environment].instance_type
   user_data                  = local.user_data
   key_name                   = local.application_data.accounts[local.environment].key_name

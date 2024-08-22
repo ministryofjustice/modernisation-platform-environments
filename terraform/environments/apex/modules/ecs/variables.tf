@@ -13,11 +13,6 @@ variable "subnet_set_name" {
   description = "The name of the subnet set associated with the account"
 }
 
-variable "ami_image_id" {
-  type        = string
-  description = "EC2 AMI image to run in the ECS cluster"
-}
-
 variable "instance_type" {
   type        = string
   description = "EC2 instance type to run in the ECS cluster"
