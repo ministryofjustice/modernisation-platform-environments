@@ -394,7 +394,7 @@ locals {
           https = merge(local.lbs.private.listeners.https, {
             alarm_target_group_names  = [] # don't enable as environments are powered up/down frequently
             certificate_names_or_arns = ["nomis_wildcard_cert"]
-            cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].lb
+            cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message

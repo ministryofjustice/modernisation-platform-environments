@@ -48,7 +48,7 @@ locals {
           threshold           = "14400"
           treat_missing_data  = "notBreaching"
           alarm_description   = "Triggers if misload process is taking longer than 4 hours, see https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615798942"
-          alarm_actions       = ["dba_pagerduty"]
+          alarm_actions       = ["pagerduty"]
           dimensions = {
             type          = "duration"
             type_instance = "misload_running"
