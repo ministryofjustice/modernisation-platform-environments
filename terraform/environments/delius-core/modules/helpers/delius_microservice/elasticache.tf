@@ -92,6 +92,7 @@ resource "aws_vpc_security_group_ingress_rule" "elasticache_to_ecs_service" {
 }
 
 resource "aws_elasticache_parameter_group" "this" {
+  count  = var.create_elasticache ? 1 : 0
   name   = "${var.name}-${var.env_name}"
   family = var.elasticache_parameter_group_family
 
