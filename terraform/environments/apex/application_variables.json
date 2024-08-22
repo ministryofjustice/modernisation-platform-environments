@@ -53,7 +53,7 @@
     },
     "test": {
       "ec2amiid": "ami-0f9852b626b9b57e7",
-      "ec2instancetype": "t3.medium",
+      "ec2instancetype": "t3.large",
       "workspace_cidr": "10.200.0.0/20",
       "u01_orahome_size": "20",
       "u01_orahome_snapshot": "snap-06c4e808d8156e7b3",

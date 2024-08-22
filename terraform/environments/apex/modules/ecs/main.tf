@@ -100,6 +100,7 @@ resource "aws_security_group" "cluster_ec2" {
 # so that the autoscaling group creates new ones using the new launch template
 
 data "aws_ssm_parameter" "ecs_optimized_ami" {
+  # This gets the recommended image of amzn2-ami-ecs-hvm-2.0.<date>-x86_64-ebs
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 }
 

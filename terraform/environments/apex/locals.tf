@@ -92,7 +92,44 @@ shutdown abort;
 startup;
 exit;
 EOF"
-sudo su - oracle -c "lsnrctl start"
+
+cat <<EOT > /u01/app/oracle/product/12.1/network/admin/listener.ora
+USE_SID_AS_SERVICE_LISTENER=ON
+DIAG_ADR_ENABLED=on
+
+LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ${aws_route53_record.apex-db.fqdn})(PORT = 1521))
+    )
+  )
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (SID_NAME = PLSExtProc)
+      (ORACLE_HOME = /u01/app/oracle/product/12.1)
+      (PROGRAM = extproc)
+    )
+    (SID_DESC =
+      (ORACLE_HOME =/u01/app/oracle/product/12.1)
+      (SID_NAME = APEX)
+    )
+  )
+EOT
+
+cat <<EOT > /u01/app/oracle/product/12.1/network/admin/tnsnames.ora
+APEX=
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ${aws_route53_record.apex-db.fqdn})(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = APEX)
+    )
+  )
+EOT
+
+sudo su - oracle -c "lsnrctl start LISTENER"
 
 cd /etc
 mkdir cloudwatch_agent
