@@ -35,6 +35,7 @@ resource "aws_glue_job" "glue_job" {
   worker_type            = var.worker_type
   number_of_workers      = var.number_of_workers
   execution_class        = var.execution_class
+  maintenance_window     = var.maintenance_window
   tags                   = local.tags
 
   command {
