@@ -123,6 +123,7 @@ locals {
         backup           = "false"
         component        = "web"
         os-type          = "Windows"
+        server-type      = "PlanetFMWeb"
         update-ssm-agent = "patchgroup1"
       }
     }
