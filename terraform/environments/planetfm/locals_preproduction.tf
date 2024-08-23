@@ -118,7 +118,6 @@ locals {
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-cafm-w-4-b"
-          cert-cn             = "cafmwebx.pp.planetfm.service.justice.gov.uk"
           description         = "Web Portal Server"
           instance-scheduling = "skip-scheduling"
           pre-migration       = "PPFWW0004"
@@ -142,7 +141,6 @@ locals {
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-cafm-w-5-a"
-          cert-cn             = "cafmwebx.pp.planetfm.service.justice.gov.uk"
           description         = "Migrated server PPFWW0005 Web Portal Server"
           instance-scheduling = "skip-scheduling"
           pre-migration       = "PPFWW0005"
