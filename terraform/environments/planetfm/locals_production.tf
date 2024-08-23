@@ -382,6 +382,16 @@ locals {
     }
 
     route53_zones = {
+      "cafmtrainweb.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" },
+        ]
+      }
+      "cafmwebx2.az.justice.gov.uk" = {
+        records = [
+          { name = "", type = "A", ttl = 300, records = ["10.40.15.201"] },
+        ]
+      }
       "planetfm.service.justice.gov.uk" = {
         records = [
           { name = "_a6a2b9e651b91ed3f1e906b4f1c3c317", type = "CNAME", ttl = 86400, records = ["_c4257165635a7b495df6c4fbd986c09f.mhbtsbpdnt.acm-validations.aws"] },
