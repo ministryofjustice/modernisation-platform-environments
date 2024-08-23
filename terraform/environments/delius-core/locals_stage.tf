@@ -51,15 +51,15 @@ locals {
       }
       data = {
         iops       = 3000
-        throughput = 125
+        throughput = 400
         type       = "gp3"
-        total_size = 500
+        total_size = 10000
       }
       flash = {
         iops       = 3000
-        throughput = 125
+        throughput = 400
         type       = "gp3"
-        total_size = 500
+        total_size = 1000
       }
     }
     ansible_user_data_config = {
