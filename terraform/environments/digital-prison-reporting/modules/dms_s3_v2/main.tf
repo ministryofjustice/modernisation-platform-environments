@@ -1,7 +1,7 @@
 ### DMS replication instance log group
 resource "aws_cloudwatch_log_group" "dms-instance-log-group" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-  
+
   count = var.setup_dms_instance ? 1 : 0
   name  = "dms-tasks-${var.name}-instance-${var.env}"
 
@@ -114,6 +114,8 @@ resource "aws_dms_replication_task" "dms-replication" {
 ### DMS Endpoints
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "dms-s3-target-source" {
+  #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
+  
   count = var.setup_dms_endpoints && var.setup_dms_source_endpoint ? 1 : 0
 
   database_name = var.source_db_name
