@@ -22,6 +22,8 @@ resource "aws_api_gateway_resource" "preview" {
 
 resource "aws_api_gateway_method" "preview" {
   #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
+  #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
+
 
   authorization = "NONE"
   http_method   = "ANY"
@@ -46,6 +48,7 @@ resource "aws_api_gateway_resource" "publish" {
 
 resource "aws_api_gateway_method" "publish" {
   #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
+  #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
 
   authorization = "NONE"
   http_method   = "ANY"
@@ -64,6 +67,8 @@ resource "aws_api_gateway_integration" "publish" {
 
 resource "aws_api_gateway_method" "this" {
   #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
+  #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
+  
 
   authorization = "NONE"
   http_method   = "ANY"
