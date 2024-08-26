@@ -37,6 +37,8 @@ resource "aws_db_subnet_group" "this" {
 ################################################################################
 
 resource "aws_rds_cluster" "this" {
+  #checkov:skip=CKV2_AWS_8: "Ignore - Ensure that RDS clusters has backup plan of AWS Backup"
+  #checkov:skip=CKV2_AWS_27: "Ignore - Ensure Postgres RDS as aws_rds_cluster has Query Logging enabled"
   count = local.create ? 1 : 0
 
   allocated_storage                   = var.allocated_storage

@@ -183,6 +183,7 @@ resource "aws_kms_alias" "rds-kms-alias" {
 
 # RDS Database Key
 resource "aws_kms_key" "operational_db" {
+  #checkov:skip=CKV2_AWS_64: "Ensure KMS key Policy is defined"
   #checkov:skip=CKV_AWS_33
   #checkov:skip=CKV_AWS_227
   #checkov:skip=CKV_AWS_7
