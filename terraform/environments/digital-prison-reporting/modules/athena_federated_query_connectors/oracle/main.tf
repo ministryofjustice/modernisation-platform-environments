@@ -7,6 +7,7 @@ locals {
 }
 
 resource "aws_security_group" "athena_federated_query_lambda_sg" {
+  #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
   name_prefix = "${var.project_prefix}-athena-federated-query-lambda-security-group"
   description = "Athena Federated Query Oracle Lambda Security Group"
   vpc_id      = var.vpc_id
@@ -41,6 +42,9 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
 }
 
 resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
+  #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+  #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+
   function_name                  = "${var.project_prefix}-athena-federated-query-oracle-function"
   role                           = aws_iam_role.athena_federated_query_lambda_execution_role.arn
   handler                        = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"

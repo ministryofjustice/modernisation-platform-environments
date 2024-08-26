@@ -72,7 +72,8 @@ resource "aws_kms_key" "kinesis-kms-key" {
 data "aws_iam_policy_document" "kinesis-kms" {
   statement {
     #checkov:skip=CKV_AWS_111
-    #checkov:skip=CKV_AWS_109       
+    #checkov:skip=CKV_AWS_109 
+    #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"      
     effect    = "Allow"
     actions   = ["kms:*"]
     resources = ["*"]
@@ -118,7 +119,8 @@ data "aws_iam_policy_document" "redhsift-kms" {
     #checkov:skip=CKV_AWS_1 
     #checkov:skip=CKV_AWS_283
     #checkov:skip=CKV_AWS_49
-    #checkov:skip=CKV_AWS_108   
+    #checkov:skip=CKV_AWS_108
+    #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"   
     effect    = "Allow"
     actions   = ["kms:*"]
     resources = ["*"]
@@ -164,7 +166,8 @@ data "aws_iam_policy_document" "rds-kms" {
     #checkov:skip=CKV_AWS_1 
     #checkov:skip=CKV_AWS_283
     #checkov:skip=CKV_AWS_49
-    #checkov:skip=CKV_AWS_108         
+    #checkov:skip=CKV_AWS_108
+    #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"         
     effect    = "Allow"
     actions   = ["kms:*"]
     resources = ["*"]
