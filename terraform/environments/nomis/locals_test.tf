@@ -36,7 +36,7 @@ locals {
       }
     }
 
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ebs
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.ebs
 
     ec2_autoscaling_groups = {
       # NOT-ACTIVE (blue deployment)
