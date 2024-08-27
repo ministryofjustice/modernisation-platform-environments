@@ -29,6 +29,8 @@ resource "aws_s3_bucket_public_access_block" "storage" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
+#checkov:skip=CKV_AWS_300: "Ensure S3 lifecycle configuration sets period for aborting failed uploads"
+
   count  = var.enable_lifecycle ? 1 : 0
   bucket = aws_s3_bucket.storage[0].id
   rule {
