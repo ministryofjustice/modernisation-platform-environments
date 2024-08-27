@@ -3,6 +3,7 @@
 # Nomis Source Secrets
 resource "aws_secretsmanager_secret" "nomis" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   name = "external/${local.project}-nomis-source-secrets"
 
@@ -29,6 +30,7 @@ resource "aws_secretsmanager_secret_version" "nomis" {
 # Nomis Source Secrets
 resource "aws_secretsmanager_secret" "bodmis" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   name = "external/${local.project}-bodmis-source-secret"
 
@@ -56,6 +58,7 @@ resource "aws_secretsmanager_secret_version" "bodmis" {
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "dps" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   for_each = toset(local.dps_domains_list)
   name     = "external/${local.project}-${each.value}-source-secrets"
@@ -86,6 +89,7 @@ resource "aws_secretsmanager_secret_version" "dps" {
 # Redshift Access Secrets
 resource "aws_secretsmanager_secret" "redshift" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   name = "dpr-redshift-sqlworkbench-${local.env}"
 
@@ -193,6 +197,7 @@ resource "aws_secretsmanager_secret_version" "biprws" {
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "biprws" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   count = local.enable_biprws_secrets ? 1 : 0
 
@@ -230,6 +235,7 @@ resource "aws_secretsmanager_secret_version" "cp_k8s_secrets" {
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "cp_k8s_secrets" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   count = local.enable_cp_k8s_secrets ? 1 : 0
 
@@ -267,6 +273,7 @@ resource "aws_secretsmanager_secret_version" "cp_bodmis_k8s_secrets" {
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "cp_bodmis_k8s_secrets" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   count = local.enable_cp_bodmis_k8s_secrets ? 1 : 0
 
@@ -302,6 +309,7 @@ resource "aws_secretsmanager_secret_version" "dbt_secrets" {
 
 resource "aws_secretsmanager_secret" "dbt_secrets" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   
   count = local.enable_dbt_k8s_secrets ? 1 : 0
 
@@ -329,6 +337,7 @@ resource "random_password" "operational_db_password" {
 
 resource "aws_secretsmanager_secret" "operational_db_secret" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   name        = "${local.project}-rds-operational-db-secret"
   description = "Secret for RDS master username and password"
@@ -355,6 +364,7 @@ resource "random_password" "transfer_component_role_password" {
 }
 
 resource "aws_secretsmanager_secret" "transfer_component_role_secret" {
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
 
   name        = "${local.project}-rds-transfer-component-role-secret"
