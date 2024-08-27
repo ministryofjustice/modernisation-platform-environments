@@ -1,5 +1,5 @@
 resource "aws_key_pair" "key_pair_wl" {
-  count      = local.is-production ? 0 : 1
+  count      = length(local.application_data.accounts[local.environment].ec2_oem_ami_id_wl) > 0 ? 1 : 0
   key_name   = lower(format("oem-ec2-key-wl-%s", local.environment))
   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJB1m1MUEKtff5y6RLEAm2f1v9g7TmqAyrk4svTBeqpK"
 
