@@ -952,6 +952,50 @@ locals {
         }
       }
     }
+    ssm = {
+      ssm-command-invocation-status = {
+        type = "metric"
+        properties = {
+          view    = "singleValue"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "SSM CommandInvocation Failures - Per Account"
+          stat    = "Maximum"
+          period  = 300
+          metrics = [
+            [{ "expression" : "REMOVE_EMPTY(SEARCH('{CustomMetrics, Account} FailedSSMCommandInvocations', 'Sum', 300))", "label" : "Failed Invocations - ", "id" : "q1" }]
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "failed invocations"
+            }
+          }
+        }
+      }
+    }
+    github = {
+      github-failed-workflow-runs = {
+        type = "metric"
+        properties = {
+          view    = "singleValue"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "GitHub Failed Workflow Runs - Per Repository"
+          stat    = "Maximum"
+          period  = 300
+          metrics = [
+            [{ "expression" : "REMOVE_EMPTY(SEARCH('{CustomMetrics, Repository} FailedGitHubWorkflowRuns', 'Sum', 300))", "label" : "Failed Runs - ", "id" : "q1" }]
+          ]
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "failed runs"
+            }
+          }
+        }
+      }
+    }
   }
 
   cloudwatch_dashboard_widget_groups = {
@@ -1080,6 +1124,15 @@ locals {
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-bytes,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-packets,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-peak-packets-per-second,
+      ]
+    }
+    custom = {
+      header_markdown = "## Custom Metrics"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ssm.ssm-command-invocation-status,
+        local.cloudwatch_dashboard_widgets.github.github-failed-workflow-runs,
       ]
     }
   }

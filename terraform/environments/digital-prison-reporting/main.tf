@@ -96,6 +96,8 @@ module "glue_reporting_hub_job" {
 
 # Glue Job, Reporting Hub Batch
 module "glue_reporting_hub_batch_job" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+  
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-batch-${local.env}"
@@ -927,12 +929,16 @@ module "s3_artifacts_store" {
 
 # S3 Violation Zone Bucket, DPR-408
 module "s3_working_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-working-${local.environment}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
+  source                      = "./modules/s3_bucket"
+  create_s3                   = local.setup_buckets
+  name                        = "${local.project}-working-${local.environment}"
+  custom_kms_key              = local.s3_kms_arn
+  create_notification_queue   = false # For SQS Queue
+  enable_lifecycle            = true
+  enable_lifecycle_expiration = true
+  expiration_days             = 2
+  expiration_prefix_redshift  = "reports/"
+  expiration_prefix_athena    = "dpr/"
 
   tags = merge(
     local.all_tags,
@@ -942,6 +948,7 @@ module "s3_working_bucket" {
     }
   )
 }
+
 ##########################
 # Data Domain Components # 
 ##########################

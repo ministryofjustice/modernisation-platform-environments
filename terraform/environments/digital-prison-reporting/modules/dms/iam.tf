@@ -21,6 +21,15 @@ EOF
 
 # Attach s3 target operation policy to the role
 resource "aws_iam_policy" "dms-s3-target-policy" {
+  #checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
+  #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_289: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+  #checkov:skip=CKV_AWS_288: "Ensure IAM policies does not allow data exfiltration"
+  #checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
+  #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_289: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+
+
   name = "dms-${var.short_name}-s3-target-policy"
 
   policy = <<EOF

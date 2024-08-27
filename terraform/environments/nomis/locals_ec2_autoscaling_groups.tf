@@ -85,7 +85,7 @@ locals {
         user_data_raw = base64encode(templatefile(
           # Swap this line with the one below when this is going to be implemented
           # "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", { 
-          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {  
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
             branch = "main"
           }
         ))
@@ -185,7 +185,7 @@ locals {
       }
       instance = {
         disable_api_termination      = false
-        instance_type                = "t3.medium"
+        instance_type                = "t3.large"
         key_name                     = "ec2-user"
         vpc_security_group_ids       = ["private-web"]
         metadata_options_http_tokens = "required"

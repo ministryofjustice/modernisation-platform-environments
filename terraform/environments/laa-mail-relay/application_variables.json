@@ -1,7 +1,10 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "env_short": "dev",
+      "smtp_ami_id": "ami-07c2c2bf769d5174d",
+      "smtp_instance_type": "t2.large",
+      "old_mail_server_url": "mail.aws.dev.legalservices.gov.uk"
     },
     "test": {
       "example_var": "test-data"

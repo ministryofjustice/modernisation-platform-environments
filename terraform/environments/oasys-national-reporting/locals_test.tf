@@ -2,6 +2,12 @@ locals {
 
   baseline_presets_test = {
     options = {
+      cloudwatch_metric_alarms_default_actions   = ["pagerduty"]
+      sns_topics = {
+        pagerduty_integrations = {
+          pagerduty = "oasys-national-reporting-test"
+        }
+      }
     }
   }
 
@@ -75,6 +81,7 @@ locals {
         tags = merge(local.ec2_autoscaling_groups.boe_web.tags, {
           oasys-national-reporting-environment = "t2"
         })
+        cloudwatch_metric_alarms = null
       })
 
       # IMPORTANT: this is just for testing at the moment
@@ -96,6 +103,7 @@ locals {
           ami                                  = "base_rhel_6_10"
           oasys-national-reporting-environment = "t2"
         })
+        cloudwatch_metric_alarms = null
       })
 
       # TODO: this is just for testing, remove when not needed
@@ -114,6 +122,7 @@ locals {
         tags = merge(local.ec2_autoscaling_groups.boe_app.tags, {
           oasys-national-reporting-environment = "t2"
         })
+        cloudwatch_metric_alarms = null
       })
 
       test-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
@@ -125,6 +134,7 @@ locals {
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
         })
+        cloudwatch_metric_alarms = null
       })
     }
 

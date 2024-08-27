@@ -8,6 +8,8 @@ resource "aws_s3_bucket" "storage" { # TBC "application_tf_state" should be gene
   #checkov:skip=CKV_AWS_18
   #checkov:skip=CKV_AWS_144
   #checkov:skip=CKV2_AWS_6
+  #checkov:skip=CKV_AWS_21:”Not all S3 bucket requires versioning enabaled"
+  
   bucket = var.name
 
   lifecycle {
@@ -46,6 +48,32 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
     transition {
       days          = 60
       storage_class = "STANDARD_IA"
+    }
+  }
+
+  rule {
+    id     = "${var.name}-reports"
+    status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
+
+    filter {
+      prefix = var.expiration_prefix_redshift
+    }
+
+    expiration {
+      days = var.expiration_days
+    }
+  }
+
+  rule {
+    id     = "${var.name}-dpr"
+    status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
+
+    filter {
+      prefix = var.expiration_prefix_athena
+    }
+
+    expiration {
+      days = var.expiration_days
     }
   }
 }

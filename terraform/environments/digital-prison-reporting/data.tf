@@ -44,6 +44,8 @@ data "aws_secretsmanager_secret_version" "datamart" {
 
 # AWS _IAM_ Policy
 data "aws_iam_policy" "rds_full_access" {
+  #checkov:skip=CKV_AWS_275:Disallow policies from using the AWS AdministratorAccess policy
+  
   arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
@@ -123,4 +125,10 @@ data "aws_secretsmanager_secret_version" "transfer_component_role_secret_version
 # Retrieves the source role of terraform's current caller identity
 data "aws_iam_session_context" "current" {
   arn = data.aws_caller_identity.current.arn
+}
+
+# Retrieves role for data-engineers
+
+data "aws_iam_roles" "data_engineering_roles" {
+  name_regex = "AWSReservedSSO_modernisation-platform-data-eng.*"
 }

@@ -24,9 +24,7 @@ locals {
       }
       sns_topics = {
         pagerduty_integrations = {
-          dso_pagerduty               = "nomis_alarms"
-          dba_pagerduty               = "hmpps_shef_dba_low_priority"
-          dba_high_priority_pagerduty = "hmpps_shef_dba_high_priority"
+          pagerduty                   = "nomis-production"
         }
       }
     }
@@ -456,9 +454,9 @@ locals {
           { name = "pmis", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "pmis-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "pmis-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-2-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "pnomisapiro", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "pnomisapiro-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
-          { name = "pnomisapiro-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pnomisapiro", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pnomisapiro-a", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+          { name = "pnomisapiro-b", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-b.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "maintenance", type = "A", lbs_map_key = "private" },

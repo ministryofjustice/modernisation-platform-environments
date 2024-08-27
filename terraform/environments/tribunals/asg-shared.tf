@@ -156,6 +156,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
 }
 
 # Create the Launch Template and assign the instance profile
+# Comment out the aws_launch_template and aws_autoscaling_group if you ever need to delete and recreate the ec2 instance
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix            = "tribunals-all"
   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
@@ -179,9 +180,9 @@ resource "aws_launch_template" "tribunals-all-lt" {
   network_interfaces {
     device_index                = 0
     security_groups             = [aws_security_group.cluster_ec2.id]
-    subnet_id                   = data.aws_subnet.private_subnets_a.id
+    subnet_id                   = data.aws_subnet.public_subnets_a.id
     delete_on_termination       = true
-    associate_public_ip_address = false
+    associate_public_ip_address = true
   }
 
   tag_specifications {
@@ -198,7 +199,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
 
 # # Finally, create the Auto scaling group for the launch template
 resource "aws_autoscaling_group" "tribunals-all-asg" {
-  vpc_zone_identifier = [data.aws_subnet.private_subnets_a.id]
+  vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
   desired_capacity    = 1
   max_size            = 1
   min_size            = 1

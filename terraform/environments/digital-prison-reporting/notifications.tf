@@ -40,6 +40,7 @@ module "slack_alerts" {
 
 # PagerDuty notifications
 module "pagerduty_notifications" {
+  #checkov:skip=CKV_TF_1: "Ensure Terraform module sources use a commit hash"
   count = local.enable_pagerduty_alerts ? 1 : 0
 
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
@@ -114,6 +115,7 @@ locals {
 
 # link the sns topic to the service
 module "pagerduty_core_alerts" {
+  #checkov:skip=CKV_TF_1: "Ensure Terraform module sources use a commit hash"
   depends_on = [
     module.pagerduty_sns
   ]

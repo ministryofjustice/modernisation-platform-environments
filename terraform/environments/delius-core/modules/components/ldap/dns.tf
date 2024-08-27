@@ -2,7 +2,7 @@ resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
   zone_id = var.account_config.route53_external_zone.zone_id
-  name    = "ldap.${var.account_config.dns_suffix}"
+  name    = "ldap.${var.env_name}.${var.account_config.dns_suffix}"
   type    = "CNAME"
   ttl     = "60"
   records = [module.nlb.dns_name]

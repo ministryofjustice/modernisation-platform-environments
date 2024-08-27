@@ -1,7 +1,14 @@
 locals {
 
   baseline_presets_preproduction = {
-    options = {}
+    options = {
+      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
+      sns_topics = {
+        pagerduty_integrations = {
+          pagerduty = "planetfm-preproduction"
+        }
+      }
+    }
   }
 
   # please keep resources in alphabetical order
@@ -87,7 +94,6 @@ locals {
         })
         tags = merge(local.ec2_instances.db.tags, {
           ami                 = "pp-cafm-db-a"
-          app-config-status   = "pending"
           description         = "SQL Server"
           instance-scheduling = "skip-scheduling"
           pre-migration       = "PPFDW0030"
@@ -99,6 +105,9 @@ locals {
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-cafm-w-4-b"
           availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
+            "Ec2PpWebPolicy",
+          ])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -119,14 +128,17 @@ locals {
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-cafm-w-5-a"
           availability_zone = "eu-west-2a"
-        })
-        instance = merge(local.ec2_instances.web.instance, {
-          disable_api_termination = true
-          instance_type           = "t3.large"
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
+            "Ec2PpWebPolicy",
+          ])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
+        instance = merge(local.ec2_instances.web.instance, {
+          disable_api_termination = true
+          instance_type           = "t3.large"
+        })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-cafm-w-5-a"
           description         = "Migrated server PPFWW0005 Web Portal Server"
@@ -134,6 +146,32 @@ locals {
           pre-migration       = "PPFWW0005"
         })
       })
+    }
+
+    iam_policies = {
+      Ec2PpWebPolicy = {
+        description = "Permissions required for POSH-ACME Route53 Plugin"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "route53:ListHostedZones",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "route53:GetHostedZone",
+              "route53:ListResourceRecordSets",
+              "route53:ChangeResourceRecordSets"
+            ]
+            resources = [
+              "arn:aws:route53:::hostedzone/*",
+            ]
+          },
+        ]
+      }
     }
 
     lbs = {
@@ -148,6 +186,15 @@ locals {
         }
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
+            default_action = {
+              type = "redirect"
+              redirect = {
+                host        = "cafmwebx.pp.planetfm.service.justice.gov.uk"
+                port        = "443"
+                protocol    = "HTTPS"
+                status_code = "HTTP_302"
+              }
+            }
             rules = {
               web-45-80 = {
                 priority = 4580
@@ -159,7 +206,6 @@ locals {
                   host_header = {
                     values = [
                       "cafmwebx.pp.planetfm.service.justice.gov.uk",
-                      "pp-cafmwebx.az.justice.gov.uk",
                     ]
                   }
                 }]

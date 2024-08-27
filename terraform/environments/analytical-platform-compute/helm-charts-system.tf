@@ -64,11 +64,14 @@ resource "helm_release" "aws_for_fluent_bit" {
 
 resource "helm_release" "amazon_prometheus_proxy" {
   /* https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack */
-  /* If you are upgrading this chart, check whether the CRD version needs updating */
+  /* 
+    If you are upgrading this chart, check whether the CRD version needs updating
+    https://github.com/prometheus-operator/prometheus-operator/releases
+  */
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "61.3.2"
+  version    = "61.9.0"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -111,12 +114,34 @@ resource "helm_release" "cluster_autoscaler" {
 }
 
 /* Karpenter */
+resource "helm_release" "karpenter_crd" {
+  /* https://github.com/aws/karpenter-provider-aws/releases */
+  name       = "karpenter-crd"
+  repository = "oci://public.ecr.aws/karpenter"
+  chart      = "karpenter-crd"
+  version    = "1.0.0"
+  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/karpenter-crd/values.yml.tftpl",
+      {
+        service_namespace = kubernetes_namespace.karpenter.metadata[0].name
+      }
+    )
+  ]
+  depends_on = [
+    aws_iam_service_linked_role.spot,
+    module.karpenter
+  ]
+}
+
 resource "helm_release" "karpenter" {
   /* https://github.com/aws/karpenter-provider-aws/releases */
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
-  version    = "0.37.0"
+  version    = "1.0.0"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -132,7 +157,8 @@ resource "helm_release" "karpenter" {
   ]
   depends_on = [
     aws_iam_service_linked_role.spot,
-    module.karpenter
+    module.karpenter,
+    helm_release.karpenter_crd
   ]
 }
 
@@ -183,7 +209,7 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.15.1"
+  version    = "v1.15.3"
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   values = [
     templatefile(
@@ -236,7 +262,7 @@ resource "helm_release" "ingress_nginx" {
   name       = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
-  version    = "4.11.1"
+  version    = "4.11.2"
   namespace  = kubernetes_namespace.ingress_nginx.metadata[0].name
   values = [
     templatefile(
@@ -257,7 +283,7 @@ resource "helm_release" "external_secrets" {
   name       = "external-secrets"
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
-  version    = "0.9.20"
+  version    = "0.10.0"
   namespace  = kubernetes_namespace.external_secrets.metadata[0].name
   values = [
     templatefile(
@@ -284,7 +310,7 @@ resource "helm_release" "keda" {
   name       = "keda"
   repository = "https://kedacore.github.io/charts"
   chart      = "keda"
-  version    = "2.14.2"
+  version    = "2.15.1"
   namespace  = kubernetes_namespace.keda.metadata[0].name
   values = [
     templatefile(

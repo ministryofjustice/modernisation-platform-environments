@@ -12,7 +12,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.318.0"
+  version    = "2.319.1"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -35,7 +35,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-dpr"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.318.0"
+  version    = "2.319.1"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -66,7 +66,7 @@ resource "helm_release" "actions_runner_mojas_airflow" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.318.0"
+  version    = "2.319.1"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -97,7 +97,7 @@ resource "helm_release" "actions_runner_mojas_airflow_create_a_pipeline" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow-create-a-pipeline"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.318.0"
+  version    = "2.319.1"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [

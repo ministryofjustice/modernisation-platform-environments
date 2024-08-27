@@ -70,7 +70,8 @@ locals {
           }
         }
       }
-      grafana_api_key_rotator_version = "1.0.5"
+      grafana_version                 = "10.4"
+      grafana_api_key_rotator_version = "1.0.10"
     }
     production = {
       tenant_configuration = {
@@ -141,7 +142,8 @@ locals {
           }
         }
       }
-      grafana_api_key_rotator_version = "1.0.5"
+      grafana_version                 = "10.4"
+      grafana_api_key_rotator_version = "1.0.10"
     }
   }
 }

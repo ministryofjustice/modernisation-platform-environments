@@ -23,8 +23,65 @@ module "data_ingestion_pipeline" {
   definition = jsonencode(
     {
       "Comment" : "Data Ingestion Pipeline Step Function",
-      "StartAt" : "Start DMS Replication Task",
+      "StartAt" : "Deactivate Archive Trigger",
       "States" : {
+        "Deactivate Archive Trigger" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_trigger_activation_job,
+            "Arguments" : {
+              "--dpr.glue.trigger.name" : var.archive_job_trigger_name,
+              "--dpr.glue.trigger.activate" : "false"
+            }
+          },
+          "Next" : "Stop Archive Job"
+        },
+        "Stop Archive Job" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_stop_glue_instance_job,
+            "Arguments" : {
+              "--dpr.stop.glue.instance.job.name" : var.glue_archive_job
+            }
+          },
+          "Next" : "Stop DMS Replication Task"
+        },
+        "Stop DMS Replication Task" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.stop_dms_task_job,
+            "Arguments" : {
+              "--dpr.dms.replication.task.id" : var.replication_task_id
+            }
+          },
+          "Next" : "Stop Glue Streaming Job"
+        },
+        "Stop Glue Streaming Job" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_stop_glue_instance_job,
+            "Arguments" : {
+              "--dpr.stop.glue.instance.job.name" : var.glue_reporting_hub_cdc_jobname
+            }
+          },
+          "Next" : "Empty All Data"
+        },
+        "Empty All Data" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_s3_data_deletion_job,
+            "Arguments" : {
+              "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id},${var.s3_temp_reload_bucket_id}",
+              "--dpr.config.key" : var.domain
+            }
+          },
+          "Next" : "Start DMS Replication Task"
+        },
         "Start DMS Replication Task" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
@@ -118,6 +175,18 @@ module "data_ingestion_pipeline" {
             "Arguments" : {
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
+            }
+          },
+          "Next" : "Reactivate Archive Trigger"
+        },
+        "Reactivate Archive Trigger" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_trigger_activation_job,
+            "Arguments" : {
+              "--dpr.glue.trigger.name" : var.archive_job_trigger_name,
+              "--dpr.glue.trigger.activate" : "true"
             }
           },
           "End" : true
