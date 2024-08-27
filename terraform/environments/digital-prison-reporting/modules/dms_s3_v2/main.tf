@@ -129,7 +129,7 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
   username      = var.source_app_username
 
   postgres_settings {
-    map_boolean_as_boolean = true
+    map_boolean_as_boolean = true 
   }
 
   extra_connection_attributes = var.extra_attributes
