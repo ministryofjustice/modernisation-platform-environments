@@ -547,13 +547,10 @@ resource "aws_instance" "edw_db_instance" {
   user_data_base64            = base64encode(local.db_userdata)
   user_data_replace_on_change = true
 
-
   root_block_device {
-    device_name = "/dev/sda1"
-    volume_size = local.application_data.accounts[local.environment].edw_root_volume_size
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_name}-root-volume" },
+      { "Name" = "${local.application_name}-root-volume" }
     )
   }
 
