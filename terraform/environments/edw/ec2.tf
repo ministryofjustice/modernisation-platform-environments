@@ -670,7 +670,7 @@ resource "aws_volume_attachment" "ArchiveVolume-attachment" {
 }
 
 
-####### DB Security Groups #######
+######## DB Security Groups #######
 
 resource "aws_security_group" "edw_db_security_group" {
   name        = "${local.application_name}-Security Group"
