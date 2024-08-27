@@ -11,7 +11,7 @@
       "edw_OratempVolumeSize": "250",
       "edw_root_volume_size": "60",
       "edw_OradataVolumeSize": "1296",
-      "edw_SoftwareVolumeSize": "1000",
+      "edw_SoftwareVolumeSize": "1200",
       "edw_ArchiveVolumeSize": "200",
       "edw_dns_extension": "aws.dev.legalservices.gov.uk",
       "edw_bucket_name": "laa-oracle-software",
