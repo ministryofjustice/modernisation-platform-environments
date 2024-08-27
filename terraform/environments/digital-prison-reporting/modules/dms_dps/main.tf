@@ -61,6 +61,8 @@ resource "aws_dms_replication_task" "dms-replication" {
 
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "source" {
+  #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
+
   count = var.setup_dms_instance ? 1 : 0
 
   database_name = var.source_db_name
@@ -84,6 +86,8 @@ resource "aws_dms_endpoint" "source" {
 
 # Create an endpoint for the target Kinesis
 resource "aws_dms_endpoint" "target" {
+  #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
+  
   count = var.setup_dms_instance ? 1 : 0
 
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_target_name}-target"

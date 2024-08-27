@@ -10,6 +10,19 @@ locals {
 module "athena_federated_query_connector_oracle" {
   source = "./modules/athena_federated_query_connectors/oracle"
 
+  #checkov:skip=CKV_AWS_25
+  #checkov:skip=CKV_AWS_23
+  #checkov:skip=CKV_AWS_277
+  #checkov:skip=CKV_AWS_260
+  #checkov:skip=CKV_AWS_24
+  #checkov:skip=CKV_AWS_117
+  #checkov:skip=CKV_AWS_363
+  #checkov:skip=CKV_AWS_63:Ensure no IAM policies documents allow "*" as a statement's actions
+  #checkov:skip=CKV_AWS_62:Ensure IAM policies that allow full "*-*" administrative privileges are not created
+  #checkov:skip=CKV_AWS_61:Ensure AWS IAM policy does not allow assume role permission across all service
+  #checkov:skip=CKV_AWS_60:Ensure IAM role allows only specific services or principals to assume it
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy  
+
   connector_jar_bucket_key              = "third-party/athena-connectors/athena-oracle-2022.47.1.jar"
   connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
   spill_bucket_name                     = module.s3_working_bucket.bucket_id

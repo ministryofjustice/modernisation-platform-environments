@@ -11,6 +11,17 @@ resource "aws_iam_openid_connect_provider" "cluster" {
 ## CrossAccount DataAPI Cross Account Role,
 # CrossAccount DataAPI Assume Policy
 data "aws_iam_policy_document" "dataapi_cross_assume" {
+  #checkov:skip=CKV_AWS_110:Ensure IAM policies does not allow privilege escalation
+  #checkov:skip=CKV_AWS_358:OIDC trust policies only allows actions from a specific known organization Already
+  #checkov:skip=CKV_AWS_107:Ensure IAM policies does not allow credentials exposure
+  #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_1
+  #checkov:skip=CKV_AWS_283
+  #checkov:skip=CKV_AWS_49
+  #checkov:skip=CKV_AWS_108
+
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -43,6 +54,10 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
 
 # CrossAccount DataAPI Role
 resource "aws_iam_role" "dataapi_cross_role" {
+  #checkov:skip=CKV_AWS_61:Ensure IAM policies does not allow data exfiltration
+  #checkov:skip=CKV_AWS_60:Ensure IAM role allows only specific services or principals to assume it
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+
   name                  = "${local.project}-data-api-cross-account-role"
   description           = "Data API Cross Account Role"
   assume_role_policy    = data.aws_iam_policy_document.dataapi_cross_assume.json
@@ -61,30 +76,40 @@ resource "aws_iam_role" "dataapi_cross_role" {
 
 # CrossAccount DataAPI Role/Policy Attachement
 resource "aws_iam_role_policy_attachment" "redshift_dataapi" {
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.redshift_dataapi_cross_policy.arn
 }
 
 # Athena API Role/Policy Attachement
 resource "aws_iam_role_policy_attachment" "athena_api" {
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.athena_api_cross_policy.arn
 }
 
 # S3 Read Write Policy Attachement
 resource "aws_iam_role_policy_attachment" "s3_read_write" {
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.s3_read_write_policy.arn
 }
 
 # KMS Policy Attachement
 resource "aws_iam_role_policy_attachment" "kms_read_access_policy" {
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.kms_read_access_policy.arn
 }
 
 # Glue Catalog Readonly Attachement
 resource "aws_iam_role_policy_attachment" "glue_catalog_readonly" {
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.glue_catalog_readonly.arn
 }

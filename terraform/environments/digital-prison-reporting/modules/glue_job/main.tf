@@ -199,6 +199,8 @@ resource "aws_iam_role_policy_attachment" "glue_policies" {
 }
 
 resource "aws_cloudwatch_log_group" "job" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+
   count = var.create_job ? 1 : 0
 
   name              = "/aws-glue/jobs/${var.name}"
@@ -207,6 +209,8 @@ resource "aws_cloudwatch_log_group" "job" {
 }
 
 resource "aws_cloudwatch_log_group" "sec_config" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+
   count = var.create_job ? 1 : 0
 
   name              = "/aws-glue/jobs/${var.short_name}-sec-config"
@@ -215,6 +219,8 @@ resource "aws_cloudwatch_log_group" "sec_config" {
 }
 
 resource "aws_cloudwatch_log_group" "sec_config_error" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+
   count = var.create_job ? 1 : 0
 
   name              = "/aws-glue/jobs/${var.short_name}-sec-config-role/${var.name}-glue-role/error"
@@ -223,6 +229,8 @@ resource "aws_cloudwatch_log_group" "sec_config_error" {
 }
 
 resource "aws_cloudwatch_log_group" "sec_config_output" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+
   count = var.create_job ? 1 : 0
 
   name              = "/aws-glue/jobs/${var.short_name}-sec-config-role/${var.name}-glue-role/output"
@@ -232,6 +240,8 @@ resource "aws_cloudwatch_log_group" "sec_config_output" {
 
 
 resource "aws_cloudwatch_log_group" "continuous_log" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+  
   count = var.create_job ? 1 : 0
 
   name              = "/aws-glue/jobs/${var.name}-${var.short_name}-sec-config"

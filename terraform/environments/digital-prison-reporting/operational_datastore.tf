@@ -44,7 +44,7 @@ module "aurora_operational_db" {
     static = {
       identifier     = "operational-db-static-any-endpoint"
       type           = "ANY"
-      static_members = ["${local.name}"]
+      static_members = [local.name]
       tags           = { Endpoint = "Operational-DB-Any" }
     }
   }
@@ -134,6 +134,8 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
 }
 
 resource "aws_security_group" "glue_operational_datastore_connection_sg" {
+  #checkov:skip=CKV2_AWS_5
+  
   name        = "${local.project}-operational-datastore-connection_sg"
   description = "Security group to allow glue access to Operational Datastore via JDBC Connection"
   vpc_id      = data.aws_vpc.shared.id

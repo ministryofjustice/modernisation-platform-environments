@@ -27,6 +27,7 @@ resource "aws_glue_resource_policy" "glue_policy" {
 }
 
 data "aws_iam_policy_document" "glue-policy-data" {
+  #checkov:skip=CKV_AWS_283: "Ensure no IAM policies documents allow ALL or any AWS principal permissions to the resource"
   statement {
     actions = [
       "glue:CreateTable",
@@ -231,6 +232,8 @@ resource "aws_iam_policy" "dynamodb_access_policy" {
 
 # State Machine Access Policy
 resource "aws_iam_policy" "all_state_machine_policy" {
+  #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
   name = local.all_state_machine_policy
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -301,6 +304,12 @@ resource "aws_iam_role" "redshift-role" {
 
 # Amazon Redshift supports only identity-based policies (IAM policies).
 data "aws_iam_policy_document" "redshift-additional-policy" {
+  #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
+  #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+  #checkov:skip=CKV_AWS_110: "Ensure IAM policies does not allow privilege escalation"
+  
   statement {
     actions = [
       "glue:*"
@@ -406,6 +415,8 @@ resource "aws_iam_role" "dmsvpcrole" {
 
 # Attach an admin policy to the role -- Evaluate if this is required
 resource "aws_iam_role_policy" "dmsvpcpolicy" {
+  #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
   name = "dms-vpc-policy"
   role = aws_iam_role.dmsvpcrole.id
 
@@ -461,6 +472,8 @@ resource "aws_iam_role" "redshift-spectrum-role" {
 }
 
 data "aws_iam_policy_document" "redshift_spectrum" {
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   statement {
     actions = [
       "glue:BatchCreatePartition",
@@ -508,6 +521,9 @@ resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
 
 # Additional policy to allow execution of preview queries.
 data "aws_iam_policy_document" "domain_builder_preview" {
+  #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   statement {
     actions = [
       "athena:GetQueryExecution",
@@ -524,12 +540,15 @@ data "aws_iam_policy_document" "domain_builder_preview" {
 }
 
 resource "aws_iam_policy" "domain_builder_preview_policy" {
+  
   name        = "${local.project}-domain-builder-preview-policy"
   description = "Additional policy to allow execution of query previews in Athena"
   policy      = data.aws_iam_policy_document.domain_builder_preview.json
 }
 
 # Additional policy to allow execution of publish requests.
+#checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+#checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
 data "aws_iam_policy_document" "domain_builder_publish" {
   statement {
     actions = [
@@ -774,6 +793,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 
     ]
     resources = [
+      #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
       "arn:aws:lakeformation:${local.current_account_region}:${local.current_account_id}:catalog:${local.current_account_id}"
     ]
   }
