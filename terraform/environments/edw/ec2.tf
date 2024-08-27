@@ -548,7 +548,7 @@ resource "aws_instance" "edw_db_instance" {
   user_data_replace_on_change = true
 
 
-  ebs_block_device {
+  root_block_device {
     device_name = "/dev/sda1"
     volume_size = local.application_data.accounts[local.environment].edw_root_volume_size
     tags = merge(
