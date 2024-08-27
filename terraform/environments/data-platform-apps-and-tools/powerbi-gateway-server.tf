@@ -13,7 +13,7 @@ data "aws_ami" "windows_server_2022" {
 }
 module "powerbi_gateway" {
   source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "v5.6.0"
+  version = "5.7.0"
 
   name = local.environment_configuration.powerbi_gateway_ec2.instance_name
   # ami                         = data.aws_ami.windows_server_2022.id
