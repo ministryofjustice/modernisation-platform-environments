@@ -16,7 +16,7 @@ resource "aws_instance" "oem_wl" {
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oem_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_wl
-  key_name                    = aws_key_pair.key_pair_wl[count.index].id
+  key_name                    = local.application_data.accounts[local.environment].ec2_oem_key_name_wl
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   user_data_replace_on_change = true
@@ -58,7 +58,7 @@ resource "aws_instance" "oem_wl" {
 }
 
 resource "aws_ebs_volume" "oem_wl_volume_swap" {
-  count             = local.is-production ? 0 : 1
+  count             = length(local.application_data.accounts[local.environment].ec2_oem_ami_id_wl) > 0 ? 1 : 0
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -77,14 +77,14 @@ resource "aws_ebs_volume" "oem_wl_volume_swap" {
 }
 
 resource "aws_volume_attachment" "oem_wl_volume_swap" {
-  count       = local.is-production ? 0 : 1
+  count       = length(local.application_data.accounts[local.environment].ec2_oem_ami_id_wl) > 0 ? 1 : 0
   instance_id = aws_instance.oem_wl[count.index].id
   volume_id   = aws_ebs_volume.oem_wl_volume_swap[count.index].id
   device_name = "/dev/sdb"
 }
 
 resource "aws_ebs_volume" "oem_wl_volume_opt_oem_app" {
-  count             = local.is-production ? 0 : 1
+  count             = length(local.application_data.accounts[local.environment].ec2_oem_ami_id_wl) > 0 ? 1 : 0
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -110,14 +110,14 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_app" {
 }
 
 resource "aws_volume_attachment" "oem_wl_volume_opt_oem_app" {
-  count       = local.is-production ? 0 : 1
+  count       = length(local.application_data.accounts[local.environment].ec2_oem_ami_id_wl) > 0 ? 1 : 0
   instance_id = aws_instance.oem_wl[count.index].id
   volume_id   = aws_ebs_volume.oem_wl_volume_opt_oem_app[count.index].id
   device_name = "/dev/sdc"
 }
 
 resource "aws_ebs_volume" "oem_wl_volume_opt_oem_inst" {
-  count             = local.is-production ? 0 : 1
+  count             = length(local.application_data.accounts[local.environment].ec2_oem_ami_id_wl) > 0 ? 1 : 0
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -143,7 +143,7 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_inst" {
 }
 
 resource "aws_volume_attachment" "oem_wl_volume_opt_oem_inst" {
-  count       = local.is-production ? 0 : 1
+  count       = length(local.application_data.accounts[local.environment].ec2_oem_ami_id_wl) > 0 ? 1 : 0
   instance_id = aws_instance.oem_wl[count.index].id
   volume_id   = aws_ebs_volume.oem_wl_volume_opt_oem_inst[count.index].id
   device_name = "/dev/sdd"
