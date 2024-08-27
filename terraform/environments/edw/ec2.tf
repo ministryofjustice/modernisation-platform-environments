@@ -581,6 +581,10 @@ resource "aws_ebs_volume" "orahomeVolume" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].orahome_snapshot_id # This is used for when data is being migrated
 
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
   tags = {
     Name = "${local.application_name}-orahome"
   }
@@ -599,6 +603,10 @@ resource "aws_ebs_volume" "oratempVolume" {
   type              = "gp3"
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].oraredo_snapshot_id # This is used for when data is being migrated
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
 
   tags = {
     Name = "${local.application_name}-oraredo"
@@ -619,6 +627,10 @@ resource "aws_ebs_volume" "oradataVolume" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].oradata_snapshot_id # This is used for when data is being migrated
 
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
   tags = {
     Name = "${local.application_name}-oradata"
   }
@@ -638,6 +650,10 @@ resource "aws_ebs_volume" "softwareVolume" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].software_snapshot_id # This is used for when data is being migrated
 
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
   tags = {
     Name = "${local.application_name}-software"
   }
@@ -656,6 +672,10 @@ resource "aws_ebs_volume" "ArchiveVolume" {
   type              = "gp3"
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].oraarch_snapshot_id # This is used for when data is being migrated
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
 
   tags = {
     Name                                               = "${local.application_name}-oraarch"
