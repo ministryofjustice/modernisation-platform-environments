@@ -517,7 +517,7 @@ EOF
 }
 
 
-####### DB Policy attachments #######
+####### DB Policy attachments ########
 
 resource "aws_iam_role_policy_attachment" "edw_cw_agent_policy_attachment" {
   role       = aws_iam_role.edw_ec2_role.name
