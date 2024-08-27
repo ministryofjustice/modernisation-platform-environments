@@ -105,9 +105,6 @@ locals {
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-cafm-w-4-b"
           availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
-            "Ec2PpWebPolicy",
-          ])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -128,9 +125,6 @@ locals {
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pp-cafm-w-5-a"
           availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
-            "Ec2PpWebPolicy",
-          ])
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
@@ -146,32 +140,6 @@ locals {
           pre-migration       = "PPFWW0005"
         })
       })
-    }
-
-    iam_policies = {
-      Ec2PpWebPolicy = {
-        description = "Permissions required for POSH-ACME Route53 Plugin"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "route53:ListHostedZones",
-            ]
-            resources = ["*"]
-          },
-          {
-            effect = "Allow"
-            actions = [
-              "route53:GetHostedZone",
-              "route53:ListResourceRecordSets",
-              "route53:ChangeResourceRecordSets"
-            ]
-            resources = [
-              "arn:aws:route53:::hostedzone/*",
-            ]
-          },
-        ]
-      }
     }
 
     lbs = {
