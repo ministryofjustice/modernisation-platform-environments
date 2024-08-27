@@ -215,7 +215,6 @@ module "domain_builder_gw_vpclink" {
 
 # Domain Builder API Gateway
 module "domain_builder_api_gateway" {
-  #checkov:skip=CCKV_AWS_59: "Ensure there is no open access to back-end resources through API"
   count = local.enable_dbuilder_serverless_gw == true ? 1 : 0
 
   source             = "./modules/apigateway/serverless-lambda-gw"
