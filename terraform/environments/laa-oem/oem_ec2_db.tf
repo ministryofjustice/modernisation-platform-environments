@@ -8,7 +8,7 @@ resource "aws_key_pair" "key_pair_db" {
 }
 
 resource "aws_instance" "oem_db" {
-  ami                         = data.aws_ami.ec2_laa_oem_db.id
+  ami                         = local.application_data.accounts[local.environment].ec2_oem_ami_id_db
   associate_public_ip_address = false
   availability_zone           = local.application_data.accounts[local.environment].ec2_zone
   ebs_optimized               = true

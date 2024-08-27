@@ -1,6 +1,9 @@
 {
   "accounts": {
     "development": {
+      "ec2_oem_ami_id_wl": "",
+      "ec2_oem_ami_id_app": "ami-05c1d7b2770fe7bc0",
+      "ec2_oem_ami_id_db": "ami-02a203da06f8e6bf8",
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "c5.2xlarge",
       "ec2_oem_instance_type_wl": "m5.xlarge",
@@ -9,6 +12,9 @@
       "key_name": "oem-ec2-key-development"
     },
     "test": {
+      "ec2_oem_ami_id_app": "ami-00a433d5bdf0bd23b",
+      "ec2_oem_ami_id_db": "ami-0383b69679d229ff9",
+      "ec2_oem_ami_id_wl": "ami-00a433d5bdf0bd23b",
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "c5.2xlarge",
       "ec2_oem_instance_type_wl": "m5.xlarge",
@@ -17,6 +23,7 @@
       "key_name": "oem-ec2-key-test"
     },
     "preproduction": {
+      "ec2_oem_ami_id_wl": "",
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "c5.2xlarge",
       "ec2_oem_instance_type_wl": "m5.xlarge",
@@ -25,6 +32,7 @@
       "key_name": "oem-ec2-key-preproduction"
     },
     "production": {
+      "ec2_oem_ami_id_wl": "",
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "c5.2xlarge",
       "ec2_oem_instance_type_wl": "m5.xlarge",
