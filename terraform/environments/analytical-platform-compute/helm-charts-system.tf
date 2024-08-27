@@ -79,7 +79,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
       {
         aws_region       = data.aws_region.current.name
         eks_role_arn     = module.amazon_prometheus_proxy_iam_role.iam_role_arn
-        amp_workspace_id = aws_prometheus_workspace.main.id
+        amp_workspace_id = module.managed_prometheus.workspace_id
       }
     )
   ]
