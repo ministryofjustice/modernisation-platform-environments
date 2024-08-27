@@ -29,7 +29,6 @@ locals {
         "ec2_instance_oracle_db_with_backup",
         "ec2_instance_textfile_monitoring",
       ]
-      cloudwatch_metric_alarms_default_actions    = ["dso_pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters  = ["hmpps-oem-${local.environment}"]
       cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
       db_backup_more_permissions                  = true
