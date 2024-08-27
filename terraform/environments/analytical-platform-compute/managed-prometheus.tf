@@ -16,5 +16,5 @@ module "managed_prometheus" {
 
 moved {
   from = aws_prometheus_workspace.main
-  to   = module.managed_prometheus.aws_prometheus_workspace.this
+  to   = module.managed_prometheus.aws_prometheus_workspace.this[0]
 }
