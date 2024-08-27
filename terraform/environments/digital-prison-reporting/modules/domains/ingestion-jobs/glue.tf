@@ -21,6 +21,7 @@ module "glue_reporting_hub_cdc_job" {
   worker_type                   = var.glue_cdc_job_worker_type
   number_of_workers             = var.glue_cdc_job_num_workers
   max_concurrent                = var.glue_cdc_max_concurrent
+  maintenance_window            = var.glue_cdc_maintenance_window
   region                        = var.account_region
   account                       = var.account_id
   log_group_retention_in_days   = var.glue_log_group_retention_in_days
