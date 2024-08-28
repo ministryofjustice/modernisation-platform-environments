@@ -96,6 +96,7 @@ locals {
     ldap = {
       image_tag      = "6.0.3-latest"
       container_port = 389
+      slapd_log_level = "stats"
     }
 
     pdf_creation = {
