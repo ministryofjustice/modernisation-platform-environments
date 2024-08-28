@@ -15,7 +15,7 @@ resource "aws_api_gateway_resource" "get_zipped_step_function_invoke" {
 
 resource "aws_api_gateway_method" "get_zipped_step_function_invoke" {
   rest_api_id   = aws_api_gateway_rest_api.get_zipped_file.id
-  resource_id   = aws_api_gateway_resource.get_zipped_file_resource.id
+  resource_id   = aws_api_gateway_resource.get_zipped_step_function_invoke.id
   http_method   = "POST"
   authorization = "NONE"
 }
