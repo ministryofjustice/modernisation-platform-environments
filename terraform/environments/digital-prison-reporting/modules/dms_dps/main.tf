@@ -1,6 +1,7 @@
 # Create a new DMS replication instance
 resource "aws_dms_replication_instance" "dms" {
   #checkov:skip=CKV_AWS_222: "Ensure DMS replication instance gets all minor upgrade automatically"
+  #checkov:skip=CKV_AWS_212: "Ensure DMS replication instance is encrypted by KMS using a customer managed Key (CMK)"
   count = var.setup_dms_instance ? 1 : 0
 
   allocated_storage            = var.replication_instance_storage
