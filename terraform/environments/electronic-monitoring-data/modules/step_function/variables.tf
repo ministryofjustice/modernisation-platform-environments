@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "iam_policies" {
-  type = set(object({
+  type = map(object({
     arn  = string
   }))
   nullable = false
