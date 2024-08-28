@@ -2,12 +2,14 @@ module "actions_runner_cache_efs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
   source  = "terraform-aws-modules/efs/aws"
   version = "1.6.3"
 
   name          = "actions-runner-cache"
   encrypted     = true
-  kms_key_arn   = module.actions_runner_cache_efs_kms.key_arn
+  kms_key_arn   = module.actions_runner_cache_efs_kms[0].key_arn
   attach_policy = false
 
   enable_backup_policy = true
