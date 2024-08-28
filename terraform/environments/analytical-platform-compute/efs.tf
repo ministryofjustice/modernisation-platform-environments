@@ -43,7 +43,7 @@ module "actions_runner_cache_efs" {
         creation_info = {
           owner_gid   = 10000
           owner_uid   = 10000
-          permissions = "755"
+          permissions = "775"
         }
       }
     }
