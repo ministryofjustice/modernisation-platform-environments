@@ -13,7 +13,7 @@ resource "kubernetes_persistent_volume_claim" "actions_runner_cache" {
       }
     }
     storage_class_name = "efs-sc"
-    volume_name        = kubernetes_persistent_volume.actions_runner_cache.metadata[0].name
+    volume_name        = kubernetes_persistent_volume.actions_runner_cache[0].metadata[0].name
   }
   wait_until_bound = false
 }
