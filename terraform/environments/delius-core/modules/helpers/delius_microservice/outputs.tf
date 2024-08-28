@@ -30,7 +30,3 @@ output "rds_endpoint" {
 output "rds_port" {
   value = var.create_rds ? aws_db_instance.this[0].port : null
 }
-
-output "nlb_fqdn" {
-  value = aws_route53_record.services_nlb_r53_record.fqdn
-}
