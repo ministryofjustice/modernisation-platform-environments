@@ -232,5 +232,5 @@ module "get_zipped_file" {
   name = "get_zipped_file"
   iam_policies = tomap({"trigger_unzip_lambda" = aws_iam_policy.trigger_unzip_lambda})
   env_account_id = local.env_account_id
-  variable_dictionary = {"unzip_file_arn": module.unzip_single_file.lambda_function_name}
+  variable_dictionary = tomap({"unzip_file_arn" = module.unzip_single_file.lambda_function_name})
 }
