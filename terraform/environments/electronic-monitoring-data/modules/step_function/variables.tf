@@ -3,12 +3,10 @@ variable "name" {
     nullable = false
 }
 
-variable "iam_role" {
-  type = object({
-    name = string
+variable "iam_policies" {
+  type = list(object({
     arn  = string
-    id   = string
-  })
+  }))
   nullable = false
 }
 

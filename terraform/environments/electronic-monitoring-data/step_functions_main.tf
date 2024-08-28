@@ -214,12 +214,23 @@ resource "aws_cloudwatch_log_group" "send_database_to_ap" {
   kms_key_id        = aws_kms_key.send_database_to_ap_step_functions_log_key.arn
 }
 
+data "aws_iam_policy_document" "trigger_unzip_lambda" {
+  statement {
+    effect = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [module.unzip_single_file.lambda_function_arn]
+  }
+}
 
+resource "aws_iam_policy" "trigger_unzip_lambda" {
+  name = "trigger_unzip_lambda"
+  policy = data.aws_iam_policy_document.trigger_unzip_lambda.json
+}
 
 module "get_zipped_file" {
   source = "modules/step_functions/"
   name = "get_zipped_file"
-  iam_role = aws_iam_role.get_zipped_file
+  iam_policies = [aws_iam_policy.trigger_unzip_lambda]
   env_account_id = local.env_account_id
   variable_dictionary = {"unzip_file_arn": module.unzip_single_file.lambda_function_name}
 }

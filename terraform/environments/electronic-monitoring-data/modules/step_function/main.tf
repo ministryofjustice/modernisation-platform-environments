@@ -1,7 +1,52 @@
 resource "aws_sfn_state_machine" "this" {
   name     = var.name
-  role_arn = var.iam_role.arn
+  role_arn = aws_iam_role.step_function_role.arn
   definition = jsondecode(templatefile("step_function_definitions/${var.name}.json.tmpl"), var.variable_dict)
+}
+
+resource "aws_iam_role" "step_function_role" {
+    name = "${var.name}_step_function_role"
+    assume_role_policy = data.aws_iam_policy_document.assume_step_function.json
+}
+
+resource "aws_iam_role_policy_attachment" "this_attachment" {
+    for_each = var.iam_policies
+
+    role       = aws_iam_role.step_function_role.name
+    policy_arn = each.value.arn
+}
+
+resource "aws_iam_role_policy_attachment" "base_perms_attached" {
+    role       = aws_iam_role.step_function_role.name
+    policy_arn = aws_iam_policy.step_function_base_permissions.arn
+}
+
+
+data "aws_iam_policy_document" "assume_step_function" {
+    statement {
+    effect = "Allow"
+    principals {
+        type        = "Service"
+        identifiers = ["states.amazonaws.com"]
+    }
+    actions   = ["sts:AssumeRole"]
+    }
+}
+
+data "aws_iam_policy_document" "step_function_base_permissions" {
+    statement {
+        effect = "Allow"
+        actions   = [
+            "sns:Publish",
+            "sqs:SendMessage"
+            ]
+        resources = ["*"]
+    }
+}
+
+resource "aws_iam_policy" "step_function_base_permissions" {
+    name = "step_function_base_permissions"
+    policy = data.aws_iam_policy_document.step_function_base_permissions.json
 }
 
 data "aws_iam_policy_document" "this_log_key_document" {
