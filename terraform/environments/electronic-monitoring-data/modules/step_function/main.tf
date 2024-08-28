@@ -82,7 +82,7 @@ data "aws_iam_policy_document" "this_log_key_document" {
 
 resource "aws_kms_key_policy" "kms_key_policy" {
     key_id = aws_kms_key.this_log_key.id
-    policy = data.aws_iam_policy_document.this_log_key_document
+    policy = data.aws_iam_policy_document.this_log_key_document.json
 }
 
 resource "aws_kms_key" "this_log_key" {
