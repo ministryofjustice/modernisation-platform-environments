@@ -24,7 +24,18 @@ resource "aws_ssm_parameter" "ldap_bind_password" {
     ]
   }
   tags = local.tags
+}
 
+resource "aws_ssm_parameter" "ldap_host" {
+  name  = format("/%s-%s/LDAP_HOST", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = var.tags
 }
 
 resource "aws_ssm_parameter" "ldap_admin_password" {
