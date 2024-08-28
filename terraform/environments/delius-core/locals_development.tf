@@ -93,6 +93,11 @@ locals {
       container_memory = 1024
     }
 
+    ldap = {
+      image_tag      = "6.0.3-latest"
+      container_port = 389
+    }
+
     pdf_creation = {
       image_tag      = "2021-06-24.995.8c1da2c"
       container_port = 8080
