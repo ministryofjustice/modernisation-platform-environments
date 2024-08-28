@@ -32,14 +32,14 @@ module "actions_runner_cache_efs" {
   }
 
   access_points = {
-    work = {
-      name = "work"
+    cache = {
+      name = "cache"
       posix_user = {
         gid = 10000
         uid = 10000
       }
       root_directory = {
-        path = "/work"
+        path = "/cache"
         creation_info = {
           owner_gid   = 10000
           owner_uid   = 10000
