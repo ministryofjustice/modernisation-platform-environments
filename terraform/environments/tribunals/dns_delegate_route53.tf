@@ -83,11 +83,11 @@ resource "aws_route53_record" "nginx_instances" {
   name    = local.nginx_records[count.index]
   type    = "A"
 
-  alias {
-    name                   = "tribunals-nginx-1184258455.eu-west-1.elb.amazonaws.com."
-    zone_id                = "Z32O12XQLNTSW2"
-    evaluate_target_health = false
-  }
+  #alias {
+  #  name                   = "tribunals-nginx-1184258455.eu-west-1.elb.amazonaws.com."
+  #  zone_id                = "Z32O12XQLNTSW2"
+  #  evaluate_target_health = false
+  #}
 }
 
 # 'A' records for tribunals www. URLs redirects to existing entries - subtract the "www."
@@ -98,11 +98,11 @@ resource "aws_route53_record" "www_instances" {
   name    = local.www_records[count.index]
   type    = "A"
 
-  alias {
-    name                   = substr(local.www_records[count.index], 4, -1)
-    zone_id                = local.production_zone_id
-    evaluate_target_health = false
-  }
+  #alias {
+  #  name                   = substr(local.www_records[count.index], 4, -1)
+  #  zone_id                = local.production_zone_id
+  #  evaluate_target_health = false
+  #}
 }
 
 # TXT validation record
