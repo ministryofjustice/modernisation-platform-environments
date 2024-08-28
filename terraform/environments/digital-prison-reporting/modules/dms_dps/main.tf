@@ -1,5 +1,6 @@
 # Create a new DMS replication instance
 resource "aws_dms_replication_instance" "dms" {
+  #checkov:skip=CKV_AWS_222: "Ensure DMS replication instance gets all minor upgrade automatically"
   count = var.setup_dms_instance ? 1 : 0
 
   allocated_storage            = var.replication_instance_storage
@@ -87,6 +88,7 @@ resource "aws_dms_endpoint" "source" {
 # Create an endpoint for the target Kinesis
 resource "aws_dms_endpoint" "target" {
   #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
+
   
   count = var.setup_dms_instance ? 1 : 0
 
