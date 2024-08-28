@@ -47,13 +47,15 @@ locals {
     "www.siac",
     "www"
   ]
+
+  production_zone_id = data.aws_route53_zone.production_zone.zone_id
 }
 
 # 'A' records for sftp services currently routed to the existing EC2 Tribunals instance in DSD account via static ip address
 resource "aws_route53_record" "ec2_instances" {
   count = local.is-production ? length(local.ec2_records) : 0
   provider = aws.core-network-services
-  zone_id = data.aws_route53_zone.production_zone.zone_id
+  zone_id = local.production_zone_id
   name    = local.ec2_records[count.index]
   type    = "A"
   ttl     = 300
@@ -64,7 +66,7 @@ resource "aws_route53_record" "ec2_instances" {
 resource "aws_route53_record" "afd_instances" {
   count = local.is-production ? length(local.afd_records) : 0
   provider = aws.core-network-services
-  zone_id = data.aws_route53_zone.production_zone.zone_id
+  zone_id = local.production_zone_id
   name    = local.afd_records[count.index]
   type    = "CNAME"
   ttl     = 300
@@ -77,7 +79,7 @@ resource "aws_route53_record" "afd_instances" {
 resource "aws_route53_record" "nginx_instances" {
   count = local.is-production ? length(local.nginx_records) : 0
   provider = aws.core-network-services
-  zone_id = data.aws_route53_zone.production_zone.zone_id
+  zone_id = local.production_zone_id
   name    = local.nginx_records[count.index]
   type    = "A"
 
@@ -92,13 +94,13 @@ resource "aws_route53_record" "nginx_instances" {
 resource "aws_route53_record" "www_instances" {
   count = local.is-production ? length(local.www_records) : 0
   provider = aws.core-network-services
-  zone_id = data.aws_route53_zone.production_zone.zone_id
+  zone_id = local.production_zone_id
   name    = local.www_records[count.index]
   type    = "A"
 
   alias {
     name                   = substr(local.www_records[count.index], 4, -1)
-    zone_id                = data.aws_route53_zone.production_zone.zone_id
+    zone_id                = local.production_zone_id
     evaluate_target_health = false
   }
 }
@@ -107,7 +109,7 @@ resource "aws_route53_record" "www_instances" {
 resource "aws_route53_record" "txt_instance" {
   count = local.is-production ? 1 : 0
   provider = aws.core-network-services
-  zone_id = data.aws_route53_zone.production_zone.zone_id
+  zone_id = local.production_zone_id
   name    = "_asvdns-5429b53c-d07b-4d04-83ea-9df3ff2bcdc0.tribunals.gov.uk"
   type    = "TXT"
   ttl     = 300
