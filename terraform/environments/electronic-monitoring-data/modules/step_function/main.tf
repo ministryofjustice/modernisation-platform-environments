@@ -1,7 +1,7 @@
 resource "aws_sfn_state_machine" "this" {
   name     = var.name
   role_arn = aws_iam_role.step_function_role.arn
-  definition = jsondecode(templatefile("step_function_definitions/${var.name}.json.tmpl"), var.variable_dictionary)
+  definition = jsondecode(templatefile("step_function_definitions/${var.name}.json.tmpl", var.variable_dictionary))
 }
 
 resource "aws_iam_role" "step_function_role" {
