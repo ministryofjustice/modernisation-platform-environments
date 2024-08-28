@@ -12,7 +12,7 @@ resource "kubernetes_persistent_volume" "actions_runner_cache" {
     persistent_volume_source {
       csi {
         driver        = "efs.csi.aws.com"
-        volume_handle = "${module.actions_runner_cache_efs.id}::${module.actions_runner_cache_efs.access_points["work"].id}"
+        volume_handle = "${module.actions_runner_cache_efs.id}::${module.actions_runner_cache_efs.access_points["cache"].id}"
       }
     }
   }
