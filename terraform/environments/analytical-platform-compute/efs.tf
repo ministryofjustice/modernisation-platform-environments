@@ -39,7 +39,7 @@ module "actions_runner_cache_efs" {
         uid = 10000
       }
       root_directory = {
-        path = "/airflow-dags"
+        path = "/work"
         creation_info = {
           owner_gid   = 10000
           owner_uid   = 10000
