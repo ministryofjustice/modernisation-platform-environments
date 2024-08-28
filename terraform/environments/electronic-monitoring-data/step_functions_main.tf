@@ -230,7 +230,7 @@ resource "aws_iam_policy" "trigger_unzip_lambda" {
 module "get_zipped_file" {
   source = "./modules/step_function"
   name = "get_zipped_file"
-  iam_policies = [aws_iam_policy.trigger_unzip_lambda]
+  iam_policies = tomap({"trigger_unzip_lambda" = aws_iam_policy.trigger_unzip_lambda})
   env_account_id = local.env_account_id
   variable_dictionary = {"unzip_file_arn": module.unzip_single_file.lambda_function_name}
 }
