@@ -48,4 +48,6 @@ module "actions_runner_cache_efs" {
       }
     }
   }
+
+  tags = local.tags
 }
