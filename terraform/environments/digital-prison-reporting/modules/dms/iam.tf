@@ -78,8 +78,8 @@ EOF
 
 # Attach an admin policy to the Operator role
 resource "aws_iam_policy" "dms-operator-s3-policy" {
-  #checkov:skip=CKV_AWS_290:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
-  
+  #checkov:skip=CKV_AWS_290:TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+
   name = "dms-${var.short_name}-operator-s3-target-policy"
 
   policy = <<EOF
