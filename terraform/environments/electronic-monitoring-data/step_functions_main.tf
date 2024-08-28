@@ -228,7 +228,7 @@ resource "aws_iam_policy" "trigger_unzip_lambda" {
 }
 
 module "get_zipped_file" {
-  source = "modules/step_functions/"
+  source = "./modules/step_function"
   name = "get_zipped_file"
   iam_policies = [aws_iam_policy.trigger_unzip_lambda]
   env_account_id = local.env_account_id
