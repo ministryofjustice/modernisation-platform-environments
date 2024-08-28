@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "trigger_step_function_policy" {
     statement {
         actions = ["states:StartExecution"]
         effect = "Allow"
-        resources = [aws_sfn_state_machine.state_machine.arn]
+        resources = [module.get_zipped_file.arn]
     }
 
 }
@@ -75,7 +75,7 @@ resource "aws_api_gateway_integration" "get_zipped_gateway_integration" {
     "application/json" = <<EOF
 {
   "input": "{ \\"file_name\\": \\"$input.json('$.file_name')\\", \\"zip_file_name\\": \\"$input.json('$.zip_file_name')\\" }",
-  "stateMachineArn": "${aws_sfn_state_machine.state_machine.arn}"
+  "stateMachineArn": "${module.get_zipped_file.arn}"
 }
 EOF
   }
