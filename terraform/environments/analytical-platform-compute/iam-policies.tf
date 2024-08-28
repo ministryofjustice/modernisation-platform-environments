@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "amazon_prometheus_proxy" {
       "aps:GetLabels",
       "aps:GetMetricMetadata"
     ]
-    resources = [aws_prometheus_workspace.main.arn]
+    resources = [module.managed_prometheus.workspace_arn]
   }
 }
 

@@ -1,7 +1,14 @@
 locals {
 
   baseline_presets_production = {
-    options = {}
+    options = {
+      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
+      sns_topics = {
+        pagerduty_integrations = {
+          pagerduty = "planetfm-production"
+        }
+      }
+    }
   }
 
   # please keep resources in alphabetical order
@@ -153,11 +160,10 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          app-config-status = "pending"
-          ami               = "pd-cafm-db-a"
-          description       = "SQL Server"
-          pre-migration     = "PDFDW0030"
-          update-ssm-agent  = "patchgroup1"
+          ami              = "pd-cafm-db-a"
+          description      = "SQL Server"
+          pre-migration    = "PDFDW0030"
+          update-ssm-agent = "patchgroup1"
         })
       })
 
@@ -186,11 +192,10 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          app-config-status = "pending"
-          ami               = "pd-cafm-db-b"
-          description       = "SQL resilient Server"
-          pre-migration     = "PDFDW0031"
-          update-ssm-agent  = "patchgroup2"
+          ami              = "pd-cafm-db-b"
+          description      = "SQL resilient Server"
+          pre-migration    = "PDFDW0031"
+          update-ssm-agent = "patchgroup2"
         })
       })
 
@@ -238,9 +243,9 @@ locals {
           instance_type           = "t3.xlarge"
         })
         tags = {
-          pre-migration    = "PFWW00037"
-          description      = "CAFM Assessment Management"
           ami              = "pd-cafm-w-37-a"
+          description      = "CAFM Assessment Management"
+          pre-migration    = "PFWW00037"
           update-ssm-agent = "patchgroup1"
         }
       })
@@ -342,6 +347,16 @@ locals {
     }
 
     route53_zones = {
+      "cafmtrainweb.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" },
+        ]
+      }
+      "cafmwebx2.az.justice.gov.uk" = {
+        records = [
+          { name = "", type = "A", ttl = 300, records = ["10.40.15.201"] },
+        ]
+      }
       "planetfm.service.justice.gov.uk" = {
         records = [
           { name = "_a6a2b9e651b91ed3f1e906b4f1c3c317", type = "CNAME", ttl = 86400, records = ["_c4257165635a7b495df6c4fbd986c09f.mhbtsbpdnt.acm-validations.aws"] },

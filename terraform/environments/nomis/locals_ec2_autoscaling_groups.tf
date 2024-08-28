@@ -185,7 +185,7 @@ locals {
       }
       instance = {
         disable_api_termination      = false
-        instance_type                = "t3.medium"
+        instance_type                = "t3.large"
         key_name                     = "ec2-user"
         vpc_security_group_ids       = ["private-web"]
         metadata_options_http_tokens = "required"

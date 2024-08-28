@@ -102,7 +102,8 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
-        subnet_name = "private"
+        secretsmanager_secrets_prefix = "ec2/"
+        subnet_name                   = "private"
       }
       instance = {
         disable_api_termination      = false
@@ -119,10 +120,17 @@ locals {
         create_internal_record = true
         create_external_record = true
       }
+      secretsmanager_secrets = {
+        web-cert = {
+          description             = "Certificate secrets used for IIS Web Binding"
+          recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
+        }
+      }
       tags = {
         backup           = "false"
         component        = "web"
         os-type          = "Windows"
+        server-type      = "PlanetFMWeb"
         update-ssm-agent = "patchgroup1"
       }
     }

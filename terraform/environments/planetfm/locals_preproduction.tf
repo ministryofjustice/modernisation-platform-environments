@@ -1,7 +1,14 @@
 locals {
 
   baseline_presets_preproduction = {
-    options = {}
+    options = {
+      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
+      sns_topics = {
+        pagerduty_integrations = {
+          pagerduty = "planetfm-preproduction"
+        }
+      }
+    }
   }
 
   # please keep resources in alphabetical order
@@ -87,7 +94,6 @@ locals {
         })
         tags = merge(local.ec2_instances.db.tags, {
           ami                 = "pp-cafm-db-a"
-          app-config-status   = "pending"
           description         = "SQL Server"
           instance-scheduling = "skip-scheduling"
           pre-migration       = "PPFDW0030"
@@ -120,13 +126,13 @@ locals {
           ami_name          = "pp-cafm-w-5-a"
           availability_zone = "eu-west-2a"
         })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+        }
         instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
           instance_type           = "t3.large"
         })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-        }
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-cafm-w-5-a"
           description         = "Migrated server PPFWW0005 Web Portal Server"

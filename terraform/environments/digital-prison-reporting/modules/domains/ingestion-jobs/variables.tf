@@ -267,6 +267,11 @@ variable "glue_cdc_max_concurrent" {
   description = "(Optional) The maximum number of concurrent runs allowed for a job."
 }
 
+variable "glue_cdc_maintenance_window" {
+  type        = string
+  description = "The maintenance window during which the glue job will be restarted"
+}
+
 variable "glue_cdc_create_role" {
   type        = bool
   default     = false

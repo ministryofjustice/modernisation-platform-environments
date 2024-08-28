@@ -10,9 +10,7 @@ locals {
       enable_observability_platform_monitoring = true
       sns_topics = {
         pagerduty_integrations = {
-          dso_pagerduty               = "nomis_nonprod_alarms"
-          dba_pagerduty               = "hmpps_shef_dba_non_prod"
-          dba_high_priority_pagerduty = "hmpps_shef_dba_non_prod"
+          pagerduty                   = "nomis-test"
         }
       }
     }
@@ -38,7 +36,7 @@ locals {
       }
     }
 
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso_pagerduty"].ebs
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.ebs
 
     ec2_autoscaling_groups = {
       # NOT-ACTIVE (blue deployment)

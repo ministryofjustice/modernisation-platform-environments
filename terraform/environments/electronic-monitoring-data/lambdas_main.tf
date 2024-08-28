@@ -261,9 +261,9 @@ module "output_file_structure_as_json_from_zip" {
 # Load data from S3 to Athena
 #-----------------------------------------------------------------------------------
 
-module "load_json_table" {
+module "load_unstructured_structure" {
   source                  = "./modules/lambdas"
-  function_name           = "load_json_table"
+  function_name           = "load_unstructured_structure"
   is_image                = true
   role_name               = aws_iam_role.load_json_table.name
   role_arn                = aws_iam_role.load_json_table.arn
@@ -276,9 +276,8 @@ module "load_json_table" {
     DLT_PROJECT_DIR : "/tmp"
     DLT_DATA_DIR : "/tmp"
     DLT_PIPELINE_DIR : "/tmp"
-    BUCKET_URI                               = "s3://${module.json-directory-structure-bucket.bucket.id}"
-    STANDARD_FILESYSTEM__QUERY_RESULT_BUCKET = "s3://${module.athena-s3-bucket.bucket.id}/output"
-    SCHEMA_PATH                              = "s3://${module.metadata-s3-bucket.bucket.id}/dlt_schemas"
+    JSON_BUCKET_NAME        = module.json-directory-structure-bucket.bucket.id
+    ATHENA_DUMP_BUCKET_NAME = module.athena-s3-bucket.bucket.id
   }
 }
 
@@ -292,7 +291,7 @@ module "load_g4s_atrium_unstructured" {
   iam_role                = aws_iam_role.load_json_table
   memory_size             = 2048
   timeout                 = 900
-  function_tag            = "v0.0.0-670d05a"
+  function_tag            = "v0.0.0-605c1f8"
   dataset_name            = "g4s_atrium_unstructured"
   env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]

@@ -46,11 +46,6 @@ locals {
       enable_s3_software_bucket                   = true
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
       software_bucket_name                        = "csr-software"
-      sns_topics = {
-        pagerduty_integrations = {
-          csr_pagerduty = "csr_alarms"
-        }
-      }
     }
   }
 
@@ -67,8 +62,6 @@ locals {
         retention_in_days = 30
       }
     })
-
-    cloudwatch_log_metric_filters = local.cloudwatch_app_log_metric_filters
 
     iam_policies = {
       CSRWebServerPolicy = {

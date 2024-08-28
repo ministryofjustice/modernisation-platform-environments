@@ -61,6 +61,7 @@ resource-types:
     - S3Object
     - SecretsManagerSecret
     - SecurityHub
+    - Transfer
     - WAFv2WebACL
 
 accounts:

@@ -198,6 +198,12 @@ variable "number_of_workers" {
   description = "(Optional) The number of workers of a defined workerType that are allocated when a job runs."
 }
 
+variable "maintenance_window" {
+  type        = string
+  default     = null
+  description = "(Optional) The maintenance window during which the glue job will be restarted"
+}
+
 
 variable "security_configuration" {
   type        = string

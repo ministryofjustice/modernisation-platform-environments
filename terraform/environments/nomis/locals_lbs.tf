@@ -26,7 +26,7 @@ locals {
         }
 
         https = {
-          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dba_pagerduty"].lb
+          cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.lb
           port                     = 443
           protocol                 = "HTTPS"
           ssl_policy               = "ELBSecurityPolicy-2016-08"
