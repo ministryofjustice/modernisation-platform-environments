@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "gateway_role_policy" {
         effect = "Allow"
         principals {
             type = "Service"
-            identifiers = "apigateway.amazonaws.com"
+            identifiers = ["apigateway.amazonaws.com"]
         }
     }
 }
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "gateway_role_policy" {
 
 resource "aws_iam_role" "get_zipped_gateway_role" {
   name = "get_zipped_gateway_role"
-  assume_role_policy = data.aws_iam_policy_document.get_zipped_gateway_role_policy.json
+  assume_role_policy = data.aws_iam_policy_document.gateway_role_policy.json
 }
 
 data "aws_iam_policy_document" "trigger_step_function_policy" {
