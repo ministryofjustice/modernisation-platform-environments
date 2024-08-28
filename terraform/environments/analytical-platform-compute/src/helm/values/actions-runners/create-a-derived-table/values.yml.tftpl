@@ -1,12 +1,10 @@
 ---
-ephemeral:
-  enabled: true
-  karpenter:
-    enabled: true
-    nodePool: "general-on-demand"
-  keda:
-    maxReplicaCount: 10
-    pollingInterval: 15
+github:
+  organisation: ${github_organisation}
+  repository: ${github_repository}
+  token: ${github_token}
+  runner:
+    labels: ${github_runner_labels}
 
 resources:
   requests:
@@ -15,13 +13,6 @@ resources:
   limits:
     cpu: 4
     memory: "32Gi"
-
-github:
-  organisation: ${github_organisation}
-  repository: ${github_repository}
-  token: ${github_token}
-  runner:
-    labels: ${github_runner_labels}
 
 serviceAccount:
   annotations:
