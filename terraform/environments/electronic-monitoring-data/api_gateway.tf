@@ -82,7 +82,7 @@ EOF
 }
 
 resource "aws_api_gateway_deployment" "deployment" {
-  rest_api_id = aws_api_gateway_rest_api.data_sharer.id
+  rest_api_id = aws_api_gateway_rest_api.get_zipped_file.id
 
   triggers = {
     # NOTE: The configuration below will satisfy ordering considerations,
