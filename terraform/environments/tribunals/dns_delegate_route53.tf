@@ -63,47 +63,47 @@ resource "aws_route53_record" "ec2_instances" {
 }
 
 # 'CNAME' records for all www legacy services which currently route through Azure Front Door
-resource "aws_route53_record" "afd_instances" {
-  count = local.is-production ? length(local.afd_records) : 0
-  provider = aws.core-network-services
-  zone_id = local.production_zone_id
-  name    = local.afd_records[count.index]
-  type    = "CNAME"
-  ttl     = 300
-  records = ["sdshmcts-prod-egd0dscwgwh0bpdq.z01.azurefd.net"]
-}
+#resource "aws_route53_record" "afd_instances" {
+#  count = local.is-production ? length(local.afd_records) : 0
+#  provider = aws.core-network-services
+#  zone_id = local.production_zone_id
+#  name    = local.afd_records[count.index]
+#  type    = "CNAME"
+#  ttl     = 300
+#  records = ["sdshmcts-prod-egd0dscwgwh0bpdq.z01.azurefd.net"]
+#}
 
 # 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
 # This includes the empty name for the root domain
 # The target ALB is in eu-west-1 zone which has a fixed zone id of "Z32O12XQLNTSW2"
-resource "aws_route53_record" "nginx_instances" {
-  count = local.is-production ? length(local.nginx_records) : 0
-  provider = aws.core-network-services
-  zone_id = local.production_zone_id
-  name    = local.nginx_records[count.index]
-  type    = "A"
+#resource "aws_route53_record" "nginx_instances" {
+#  count = local.is-production ? length(local.nginx_records) : 0
+#  provider = aws.core-network-services
+#  zone_id = local.production_zone_id
+#  name    = local.nginx_records[count.index]
+#  type    = "A"
 
   #alias {
   #  name                   = "tribunals-nginx-1184258455.eu-west-1.elb.amazonaws.com."
   #  zone_id                = "Z32O12XQLNTSW2"
   #  evaluate_target_health = false
   #}
-}
+#}
 
 # 'A' records for tribunals www. URLs redirects to existing entries - subtract the "www."
-resource "aws_route53_record" "www_instances" {
-  count = local.is-production ? length(local.www_records) : 0
-  provider = aws.core-network-services
-  zone_id = local.production_zone_id
-  name    = local.www_records[count.index]
-  type    = "A"
+#resource "aws_route53_record" "www_instances" {
+#  count = local.is-production ? length(local.www_records) : 0
+#  provider = aws.core-network-services
+#  zone_id = local.production_zone_id
+#  name    = local.www_records[count.index]
+#  type    = "A"
 
   #alias {
   #  name                   = substr(local.www_records[count.index], 4, -1)
   #  zone_id                = local.production_zone_id
   #  evaluate_target_health = false
   #}
-}
+#}
 
 # TXT validation record
 resource "aws_route53_record" "txt_instance" {
