@@ -1,30 +1,3 @@
-module "ldap" {
-
-  source = "../components/ldap"
-
-  providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws.bucket-replication
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
-  }
-
-  env_name           = var.env_name
-  account_config     = var.account_config
-  account_info       = var.account_info
-  environment_config = var.environment_config
-  ldap_config        = var.ldap_config
-
-  bastion_sg_id = module.bastion_linux.bastion_security_group
-
-  sns_topic_arn   = aws_sns_topic.delius_core_alarms.arn
-  ecs_cluster_arn = module.ecs.ecs_cluster_arn
-
-  platform_vars           = var.platform_vars
-  tags                    = local.tags
-  enable_platform_backups = var.enable_platform_backups
-}
-
 module "ldap_ecs" {
   source = "../helpers/delius_microservice"
 
@@ -43,9 +16,9 @@ module "ldap_ecs" {
   container_vars_env_specific = try(var.delius_microservice_configs.ldap.container_vars_env_specific, {})
 
   container_secrets_default      = {
-    "BIND_PASSWORD"         = module.ldap.delius_core_ldap_bind_password_arn,
-    "MIGRATION_S3_LOCATION" = module.ldap.delius_core_ldap_seed_uri_arn,
-    "RBAC_TAG"              = module.ldap.delius_core_ldap_rbac_version_arn
+    "BIND_PASSWORD"         = aws_ssm_parameter.ldap_bind_password.arn,
+    "MIGRATION_S3_LOCATION" = aws_ssm_parameter.ldap_seed_uri.arn,
+    "RBAC_TAG"              = aws_ssm_parameter.ldap_rbac_version.arn
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
