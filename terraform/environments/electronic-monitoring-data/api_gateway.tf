@@ -5,6 +5,10 @@
 resource "aws_api_gateway_rest_api" "get_zipped_file" {
   name        = "get_zipped_file"
   description = "API Gateway to trigger Step Function to get a unzipped file from zipped store"
+  
+ lifecycle {
+   create_before_destroy = true
+ }
 }
 
 resource "aws_api_gateway_resource" "get_zipped_step_function_invoke" {
@@ -16,8 +20,9 @@ resource "aws_api_gateway_resource" "get_zipped_step_function_invoke" {
 resource "aws_api_gateway_method" "get_zipped_step_function_invoke" {
   rest_api_id   = aws_api_gateway_rest_api.get_zipped_file.id
   resource_id   = aws_api_gateway_resource.get_zipped_step_function_invoke.id
-  http_method   = "POST"
-  authorization = "NONE"
+  http_method = "OPTIONS"
+  authorization    = "NONE"
+  api_key_required = true
 }
 
 # --------------------------------------------------------
@@ -103,4 +108,11 @@ resource "aws_api_gateway_deployment" "deployment" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_api_gateway_method_response" "response_200" {
+  rest_api_id = aws_api_gateway_rest_api.get_zipped_file.id
+  resource_id = aws_api_gateway_resource.get_zipped_step_function_invoke.id
+  http_method = aws_api_gateway_method.get_zipped_step_function_invoke.http_method
+  status_code = "200"
 }
