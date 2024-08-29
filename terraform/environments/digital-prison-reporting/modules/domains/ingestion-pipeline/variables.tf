@@ -133,6 +133,12 @@ variable "glue_hive_table_creation_jobname" {
   default     = ""
 }
 
+variable "glue_switch_prisons_hive_data_location_job" {
+  description = "Name of glue job to switch the prisons hive data location"
+  type        = string
+  default     = ""
+}
+
 variable "tags" {
   type        = map(string)
   default     = {}
