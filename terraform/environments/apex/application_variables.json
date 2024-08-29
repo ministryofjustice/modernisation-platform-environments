@@ -71,7 +71,7 @@
       "ec2_min_size": 1,
       "app_count": 1,
       "appscaling_min_capacity": 1,
-      "appscaling_max_capacity": 2,
+      "appscaling_max_capacity": 3,
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 30,
       "ec2_instance_warmup_period": 300,
