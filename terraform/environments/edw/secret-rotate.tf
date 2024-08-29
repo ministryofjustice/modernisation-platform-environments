@@ -10,20 +10,20 @@ resource "random_string" "db-master-pass-string" {
   special = true
 }
 
-resource "aws_secretsmanager_secret" "db-master-password" {
-  name        = "${local.application_name}/app/db-master-password"
+resource "aws_secretsmanager_secret" "db-master-password2" {
+  name        = "${local.application_name}/app/db-master-password2"
   description = "EDW DB EC2 Root Password"
 
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-db-master-password-"
+      Name = "${local.application_name}-db-master-password2-"
     }
   )
 }
 
 resource "aws_secretsmanager_secret_version" "edw_db_master_password_version" {
-  secret_id     = aws_secretsmanager_secret.db-master-password.id
+  secret_id     = aws_secretsmanager_secret.db-master-password2.id
   secret_string = random_string.db-master-pass-string.result
 }
 
