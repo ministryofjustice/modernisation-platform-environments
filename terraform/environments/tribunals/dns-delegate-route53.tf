@@ -44,8 +44,7 @@ locals {
     "www.consumercreditappeals",
     "www.estateagentappeals",
     "www.fhsaa",
-    "www.siac",
-    "www"
+    "www.siac"
   ]
 
   production_zone_id = data.aws_route53_zone.production_zone.zone_id
@@ -99,7 +98,21 @@ resource "aws_route53_record" "www_instances" {
   type    = "A"
 
   alias {
-    name                   = substr(local.www_records[count.index], 4, -1)
+    name                   = format("%s.tribunals.gov.uk",substr(local.www_records[count.index], 4, -1))
+    zone_id                = local.production_zone_id
+    evaluate_target_health = false
+  }
+}
+
+#  The root www resource record needs its own resource to avoid breaking the logic of using the substring in www_instances
+resource "aws_route53_record" "www_instances" {
+  provider = aws.core-network-services
+  zone_id = local.production_zone_id
+  name    = "www"
+  type    = "A"
+
+  alias {
+    name                   = "tribunals.gov.uk"
     zone_id                = local.production_zone_id
     evaluate_target_health = false
   }
