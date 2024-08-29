@@ -105,7 +105,7 @@ resource "aws_route53_record" "www_instances" {
 }
 
 #  The root www resource record needs its own resource to avoid breaking the logic of using the substring in www_instances
-resource "aws_route53_record" "www_instances" {
+resource "aws_route53_record" "www_root" {
   provider = aws.core-network-services
   zone_id = local.production_zone_id
   name    = "www"
