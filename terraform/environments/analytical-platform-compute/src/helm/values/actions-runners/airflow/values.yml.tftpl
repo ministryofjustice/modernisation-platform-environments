@@ -6,6 +6,10 @@ github:
   runner:
     labels: ${github_runner_labels}
 
+runner:
+  cache:
+    enabled: false
+
 serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: ${eks_role_arn}
