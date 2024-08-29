@@ -73,7 +73,7 @@
       "appscaling_min_capacity": 1,
       "appscaling_max_capacity": 2,
       "ecs_scaling_cpu_threshold": 80,
-      "ecs_scaling_mem_threshold": 80,
+      "ecs_scaling_mem_threshold": 30,
       "ec2_instance_warmup_period": 300,
       "container_memory_allocation": 1000,
       "region": "eu-west-2",
