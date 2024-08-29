@@ -251,6 +251,8 @@ resource "aws_cloudwatch_log_group" "continuous_log" {
 }
 
 resource "aws_glue_security_configuration" "sec_cfg" {
+  #checkov:skip=CKV_AWS_99: "Ensure Glue Security Configuration Encryption is enabled. TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+
   count = var.create_security_configuration && var.create_job ? 1 : 0
   name  = "${var.short_name}-sec-config"
 
