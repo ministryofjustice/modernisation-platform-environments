@@ -698,7 +698,7 @@ resource "aws_iam_policy" "unzipped_presigned_url_s3" {
   policy      = data.aws_iam_policy_document.get_unzipped_presigned_url_file_s3_policy_document.json
 }
 
-resource "aws_iam_role_policy_attachment" "get_zip_file_s3_policy_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_s3_policy_policy_attachment" {
   role       = aws_iam_role.unzipped_presigned_url.name
   policy_arn = aws_iam_policy.unzipped_presigned_url_s3.arn
 }
