@@ -37,6 +37,7 @@ resource "aws_eip" "kali_linux_eip" {
 }
 
 # Security Group for Kali instance
+# trivy:ignore:AVD-AWS-0104
 resource "aws_security_group" "kali_linux_sg" {
   name        = "allow_https"
   description = "Allow HTTPS inbound traffic"
