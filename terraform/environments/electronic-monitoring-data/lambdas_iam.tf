@@ -693,7 +693,7 @@ data "aws_iam_policy_document" "get_unzipped_presigned_url_file_s3_policy_docume
 
 
 resource "aws_iam_policy" "unzipped_presigned_url_s3" {
-  name        = "get-zip-file-s3-policy"
+  name        = "unzipped-presigned-url-s3-policy"
   description = "Policy for Lambda to create presigned url for unzipped file from S3"
   policy      = data.aws_iam_policy_document.get_unzipped_presigned_url_file_s3_policy_document.json
 }
