@@ -3,7 +3,7 @@ resource "aws_instance" "kali_linux" {
   ami                    = "ami-07c1b39b7b3d2525d"
   instance_type          = "t2.micro"
   subnet_id              = module.vpc.private_subnets.0
-  vpc_security_group_ids = [aws_security_group.allow_https.id]
+  vpc_security_group_ids = [aws_security_group.kali_linux_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
   ebs_optimized          = true
   metadata_options {
@@ -30,8 +30,14 @@ resource "aws_instance" "kali_linux" {
   }
 }
 
+# Create Elastic IP
+resource "aws_eip" "kali_linux_eip" {
+  instance = aws_instance.kali_linux.id
+  domain   = "vpc"
+}
+
 # Security Group for Kali instance
-resource "aws_security_group" "allow_https" {
+resource "aws_security_group" "kali_linux_sg" {
   name        = "allow_https"
   description = "Allow HTTPS inbound traffic"
   vpc_id      = module.vpc.vpc_id
@@ -49,7 +55,7 @@ resource "aws_security_group" "allow_https" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["10.0.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 

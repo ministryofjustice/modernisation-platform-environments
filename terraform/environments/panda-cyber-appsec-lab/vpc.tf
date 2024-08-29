@@ -101,3 +101,19 @@ resource "aws_security_group_rule" "allow_all_vpc" {
   to_port           = 65535
   type              = "ingress"
 }
+
+# Create Internet Gateway
+resource "aws_internet_gateway" "main" {
+  vpc_id = module.vpc.vpc_id
+
+  tags = {
+    Name = "${local.application_name}-${local.environment}-igw"
+  }
+}
+
+# Add a route for outbound traffic to reach the internet gateway
+resource "aws_route" "internet_access" {
+  route_table_id         = module.vpc.private_route_table_ids.0
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
+}
