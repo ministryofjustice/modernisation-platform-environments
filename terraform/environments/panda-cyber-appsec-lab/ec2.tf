@@ -1,11 +1,11 @@
 # Kali Linux Instance
 resource "aws_instance" "kali_linux" {
-  ami                  = "ami-07c1b39b7b3d2525d"
-  instance_type        = "t2.micro"
-  subnet_id            = module.vpc.private_subnets.0
-  security_groups      = ["aws_security_group.allow_https"]
-  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
-  ebs_optimized        = true
+  ami                    = "ami-07c1b39b7b3d2525d"
+  instance_type          = "t2.micro"
+  subnet_id              = module.vpc.private_subnets.0
+  vpc_security_group_ids = [aws_security_group.allow_https.id]
+  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
+  ebs_optimized          = true
   metadata_options {
     http_tokens = "required"
   }
@@ -14,6 +14,7 @@ resource "aws_instance" "kali_linux" {
   }
   ebs_block_device {
     device_name = "/dev/xvda"
+    volume_size = 5
     encrypted   = true
   }
   user_data = <<-EOF
@@ -44,7 +45,7 @@ resource "aws_security_group" "allow_https" {
   }
 
   egress {
-    description = "Allow all tarffic outbound"
+    description = "Allow all traffic outbound"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
