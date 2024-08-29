@@ -8,9 +8,18 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "${unzip_file_arn}"
+        "FunctionName": "${unzip_file_name}"
       },
-      "End": true
+      "Next": true
+    },
+    {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${pre_signed_url_lambda_name}"
+      },
     }
   }
 }
