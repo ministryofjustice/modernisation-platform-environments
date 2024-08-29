@@ -10,9 +10,9 @@
         "Payload.$": "$",
         "FunctionName": "${unzip_file_name}"
       },
-      "Next": true
+      "Next": "CreatePreSignedUrl"
     },
-    {
+    "CreatePreSignedUrl": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
@@ -20,6 +20,7 @@
         "Payload.$": "$",
         "FunctionName": "${pre_signed_url_lambda_name}"
       },
+      "End": true
     }
   }
 }
