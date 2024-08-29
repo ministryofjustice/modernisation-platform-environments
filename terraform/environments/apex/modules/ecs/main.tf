@@ -25,7 +25,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   desired_capacity    = var.ec2_desired_capacity
   max_size            = var.ec2_max_size
   min_size            = var.ec2_min_size
-  # protect_from_scale_in = true
+  protect_from_scale_in = true
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
@@ -99,9 +99,14 @@ resource "aws_security_group" "cluster_ec2" {
 # Note - when updating this you will need to manually terminate the EC2s
 # so that the autoscaling group creates new ones using the new launch template
 
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  # This gets the recommended image of amzn2-ami-ecs-hvm-2.0.<date>-x86_64-ebs
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
+}
+
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix            = "${var.app_name}-ec2-launch-template"
-  image_id               = var.ami_image_id
+  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type          = var.instance_type
   key_name               = var.key_name
   ebs_optimized          = true
@@ -267,9 +272,9 @@ resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
     "EC2",
   ]
 
-  volume {
-    name = var.task_definition_volume
-  }
+  # volume {
+  #   name = var.task_definition_volume
+  # }
 
   container_definitions = var.task_definition
 
@@ -290,9 +295,9 @@ resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
     "EC2",
   ]
 
-  volume {
-    name = var.task_definition_volume
-  }
+  # volume {
+  #   name = var.task_definition_volume
+  # }
 
   container_definitions = var.task_definition
 
