@@ -320,3 +320,23 @@ module "unzip_single_file" {
     EXPORT_BUCKET_NAME = module.unzipped-s3-data-store.bucket.id
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Create pre signed url
+#-----------------------------------------------------------------------------------
+
+module "unzipped_presigned_url" {
+  source                  = "./modules/lambdas"
+  function_name           = "unzipped_presigned_url"
+  is_image                = true
+  role_name               = aws_iam_role.unzipped_presigned_url.name
+  role_arn                = aws_iam_role.unzipped_presigned_url.arn
+  memory_size             = 2048
+  timeout                 = 900
+  env_account_id          = local.env_account_id
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+}
+
+
+
