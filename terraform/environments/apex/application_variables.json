@@ -69,7 +69,7 @@
       "ec2_desired_capacity": 1,
       "ec2_max_size": 2,
       "ec2_min_size": 1,
-      "app_count": 1,
+      "app_count": 2,
       "appscaling_min_capacity": 1,
       "appscaling_max_capacity": 3,
       "ecs_scaling_cpu_threshold": 80,
