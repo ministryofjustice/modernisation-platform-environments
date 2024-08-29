@@ -51,6 +51,33 @@ module "vpc_endpoints" {
         local.tags,
         { Name = format("%s-s3-vpc-endpoint", local.application_name) }
       )
+    },
+    ssm = {
+      service         = "ssm"
+      service_type    = "Interface"
+      route_table_ids = module.vpc.private_route_table_ids
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ssm-vpc-endpoint", local.application_name) }
+      )
+    },
+    ssm = {
+      service         = "ssmmessages"
+      service_type    = "Interface"
+      route_table_ids = module.vpc.private_route_table_ids
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ssmmessages-vpc-endpoint", local.application_name) }
+      )
+    },
+    ssm = {
+      service         = "ec2messages"
+      service_type    = "Interface"
+      route_table_ids = module.vpc.private_route_table_ids
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ec2messages-vpc-endpoint", local.application_name) }
+      )
     }
   }
 }

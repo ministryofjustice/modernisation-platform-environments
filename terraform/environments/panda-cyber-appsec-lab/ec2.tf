@@ -1,12 +1,8 @@
 resource "aws_instance" "kali_linux" {
   ami           = "ami-07c1b39b7b3d2525d"
   instance_type = "t2.micro"
- 
-  subnet_ids         = module.vpc.private_subnets
-  vpc_id             = module.vpc.vpc_id
-
-
-  user_data = <<-EOF
+  subnet_id     = module.vpc.private_subnets.0
+  user_data     = <<-EOF
               #!/bin/bash
               sudo apt update && sudo apt -y install software-properties-common
               sudo wget -q -O - https://archive.kali.org/archive-key.asc | sudo apt-key add -
@@ -19,9 +15,9 @@ resource "aws_instance" "kali_linux" {
   }
 }
 
-resource "aws_security_group" "allow_ssh" {
-  name        = "allow_ssh"
-  description = "Allow SSH inbound traffic"
+resource "aws_security_group" "allow_https" {
+  name        = "allow_https"
+  description = "Allow HTTPS inbound traffic"
   vpc_id      = module.vpc.vpc_id
 
   ingress {
@@ -38,5 +34,3 @@ resource "aws_security_group" "allow_ssh" {
     cidr_blocks = ["10.0.0.0/16"]
   }
 }
-
-
