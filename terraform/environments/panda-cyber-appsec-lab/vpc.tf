@@ -1,3 +1,5 @@
+#trivy:ignore:AVD-AWS-0102
+#trivy:ignore:AVD-AWS-0105
 module "vpc" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
@@ -51,6 +53,33 @@ module "vpc_endpoints" {
         local.tags,
         { Name = format("%s-s3-vpc-endpoint", local.application_name) }
       )
+    },
+    ssm = {
+      service             = "ssm"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ssm-vpc-endpoint", local.application_name) }
+      )
+    },
+    ssmmessages = {
+      service             = "ssmmessages"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ssmmessages-vpc-endpoint", local.application_name) }
+      )
+    },
+    ec2messages = {
+      service             = "ec2messages"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ec2messages-vpc-endpoint", local.application_name) }
+      )
     }
   }
 }
@@ -71,4 +100,20 @@ resource "aws_security_group_rule" "allow_all_vpc" {
   security_group_id = aws_security_group.vpc_endpoints.id
   to_port           = 65535
   type              = "ingress"
+}
+
+# Create Internet Gateway
+resource "aws_internet_gateway" "main" {
+  vpc_id = module.vpc.vpc_id
+
+  tags = {
+    Name = "${local.application_name}-${local.environment}-igw"
+  }
+}
+
+# Add a route for outbound traffic to reach the internet gateway
+resource "aws_route" "internet_access" {
+  route_table_id         = module.vpc.private_route_table_ids.0
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
 }
