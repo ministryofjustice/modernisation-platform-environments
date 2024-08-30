@@ -104,7 +104,7 @@ locals {
           description      = "For testing endpoint-monitoring role"
           component        = "test"
           os-type          = "Linux"
-          server-type      = "base-ol85"
+          server-type      = "hmpps-oem-endpoint-monitoring"
           update-ssm-agent = "patchgroup1"
         }
       }
