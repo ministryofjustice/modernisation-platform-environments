@@ -62,6 +62,52 @@ locals {
           update-ssm-agent = "patchgroup1"
         }
       }
+      dev-endpoint-ol85 = {
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 1
+          force_delete        = true
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        config = {
+          ami_name                  = "base_ol_8_5*"
+          iam_resource_names_prefix = "ec2-instance"
+          instance_profile_policies = [
+            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+            "EC2Default",
+            "EC2S3BucketWriteAndDeleteAccessPolicy",
+            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
+          ]
+          subnet_name = "private"
+        }
+        instance = {
+          disable_api_termination      = false
+          instance_type                = "t3.medium"
+          key_name                     = "ec2-user"
+          vpc_security_group_ids       = ["data-oem"]
+          metadata_options_http_tokens = "required"
+          monitoring                   = false
+        }
+        user_data_cloud_init = {
+          args = {
+            branch       = "TM/TM-411/run-endpoint-connection-checks-role"
+            ansible_args = "--tags ec2provision"
+          }
+          scripts = [ # paths are relative to templates/ dir
+            "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+            "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+            "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+          ]
+        }
+        tags = {
+          backup           = "false"
+          description      = "For testing monitoring role"
+          component        = "test"
+          os-type          = "Linux"
+          server-type      = "base-ol85"
+          update-ssm-agent = "patchgroup1"
+        }
+      }
     }
 
     ec2_instances = {
