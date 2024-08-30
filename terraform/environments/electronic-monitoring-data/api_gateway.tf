@@ -52,7 +52,6 @@ data "aws_iam_policy_document" "trigger_step_function_policy" {
         effect = "Allow"
         resources = [module.get_zipped_file.arn]
     }
-
 }
 
 resource "aws_iam_policy" "trigger_step_function_policy" {
