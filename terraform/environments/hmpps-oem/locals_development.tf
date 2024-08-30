@@ -101,7 +101,7 @@ locals {
         }
         tags = {
           backup           = "false"
-          description      = "For testing monitoring role"
+          description      = "For testing endpoint-monitoring role"
           component        = "test"
           os-type          = "Linux"
           server-type      = "base-ol85"
