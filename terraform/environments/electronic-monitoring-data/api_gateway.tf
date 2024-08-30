@@ -156,3 +156,12 @@ resource "aws_api_gateway_method_settings" "example" {
     throttling_rate_limit  = 50
   }
 }
+
+resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch_role_policy" {
+  role       = aws_iam_role.get_zipped_gateway_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
+
+resource "aws_api_gateway_account" "api_gateway_account" {
+  cloudwatch_role_arn = aws_iam_role.get_zipped_gateway_role.arn
+}
