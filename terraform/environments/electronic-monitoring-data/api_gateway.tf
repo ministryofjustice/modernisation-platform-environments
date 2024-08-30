@@ -115,3 +115,44 @@ resource "aws_api_gateway_method_response" "response_200" {
   http_method = aws_api_gateway_method.get_zipped_step_function_invoke.http_method
   status_code = "200"
 }
+
+resource "aws_api_gateway_usage_plan" "test_usage_plan" {
+  name = "BasicUsagePlan"
+  description = "Usage plan for basic access"
+  throttle_settings {
+    burst_limit = 100
+    rate_limit  = 50
+  }
+}
+
+resource "aws_api_gateway_api_key" "test_api_key" {
+  name        = "ExampleAPIKey"
+  description = "API key for John Doe"
+  enabled     = true
+}
+
+resource "aws_api_gateway_usage_plan_key" "test_usage_plan_key" {
+  key_id        = aws_api_gateway_api_key.test_api_key.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.test_usage_plan.id
+}
+
+resource "aws_api_gateway_stage" "test_stage" {
+  deployment_id = aws_api_gateway_deployment.deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.get_zipped_file.id
+  stage_name    = "test"
+  description   = "Test stage"
+}
+
+resource "aws_api_gateway_method_settings" "example" {
+  rest_api_id = aws_api_gateway_rest_api.get_zipped_file.id
+  stage_name  = aws_api_gateway_stage.test_stage.stage_name
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled = true
+    logging_level   = "INFO"
+    throttling_burst_limit = 100
+    throttling_rate_limit  = 50
+  }
+}
