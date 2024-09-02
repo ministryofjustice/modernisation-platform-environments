@@ -419,7 +419,7 @@ resource "aws_db_parameter_group" "this" {
 # Log groups will not be created if using a cluster identifier prefix
 resource "aws_cloudwatch_log_group" "this" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-  
+
   for_each = toset([for log in var.enabled_cloudwatch_logs_exports : log if local.create && var.create_cloudwatch_log_group && !var.cluster_use_name_prefix])
 
   name              = "/aws/rds/cluster/${var.name}/${each.value}"

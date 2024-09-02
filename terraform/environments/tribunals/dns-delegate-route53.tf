@@ -52,35 +52,35 @@ locals {
 
 # 'A' records for sftp services currently routed to the existing EC2 Tribunals instance in DSD account via static ip address
 resource "aws_route53_record" "ec2_instances" {
-  count = local.is-production ? length(local.ec2_records) : 0
+  count    = local.is-production ? length(local.ec2_records) : 0
   provider = aws.core-network-services
-  zone_id = local.production_zone_id
-  name    = local.ec2_records[count.index]
-  type    = "A"
-  ttl     = 300
-  records = ["34.243.192.28"]
+  zone_id  = local.production_zone_id
+  name     = local.ec2_records[count.index]
+  type     = "A"
+  ttl      = 300
+  records  = ["34.243.192.28"]
 }
 
 # 'CNAME' records for all www legacy services which currently route through Azure Front Door
 resource "aws_route53_record" "afd_instances" {
-  count = local.is-production ? length(local.afd_records) : 0
+  count    = local.is-production ? length(local.afd_records) : 0
   provider = aws.core-network-services
-  zone_id = local.production_zone_id
-  name    = local.afd_records[count.index]
-  type    = "CNAME"
-  ttl     = 300
-  records = ["sdshmcts-prod-egd0dscwgwh0bpdq.z01.azurefd.net"]
+  zone_id  = local.production_zone_id
+  name     = local.afd_records[count.index]
+  type     = "CNAME"
+  ttl      = 300
+  records  = ["sdshmcts-prod-egd0dscwgwh0bpdq.z01.azurefd.net"]
 }
 
 # 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
 # This includes the empty name for the root domain
 # The target ALB is in eu-west-1 zone which has a fixed zone id of "Z32O12XQLNTSW2"
 resource "aws_route53_record" "nginx_instances" {
-  count = local.is-production ? length(local.nginx_records) : 0
+  count    = local.is-production ? length(local.nginx_records) : 0
   provider = aws.core-network-services
-  zone_id = local.production_zone_id
-  name    = local.nginx_records[count.index]
-  type    = "A"
+  zone_id  = local.production_zone_id
+  name     = local.nginx_records[count.index]
+  type     = "A"
 
   alias {
     name                   = "tribunals-nginx-1184258455.eu-west-1.elb.amazonaws.com."
@@ -91,14 +91,14 @@ resource "aws_route53_record" "nginx_instances" {
 
 # 'A' records for tribunals www. URLs redirects to existing entries - subtract the "www."
 resource "aws_route53_record" "www_instances" {
-  count = local.is-production ? length(local.www_records) : 0
+  count    = local.is-production ? length(local.www_records) : 0
   provider = aws.core-network-services
-  zone_id = local.production_zone_id
-  name    = local.www_records[count.index]
-  type    = "A"
+  zone_id  = local.production_zone_id
+  name     = local.www_records[count.index]
+  type     = "A"
 
   alias {
-    name                   = format("%s.tribunals.gov.uk",substr(local.www_records[count.index], 4, -1))
+    name                   = format("%s.tribunals.gov.uk", substr(local.www_records[count.index], 4, -1))
     zone_id                = local.production_zone_id
     evaluate_target_health = false
   }
@@ -107,9 +107,9 @@ resource "aws_route53_record" "www_instances" {
 #  The root www resource record needs its own resource to avoid breaking the logic of using the substring in www_instances
 resource "aws_route53_record" "www_root" {
   provider = aws.core-network-services
-  zone_id = local.production_zone_id
-  name    = "www"
-  type    = "A"
+  zone_id  = local.production_zone_id
+  name     = "www"
+  type     = "A"
 
   alias {
     name                   = "tribunals.gov.uk"
@@ -120,11 +120,11 @@ resource "aws_route53_record" "www_root" {
 
 # TXT validation record
 resource "aws_route53_record" "txt_instance" {
-  count = local.is-production ? 1 : 0
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
-  zone_id = local.production_zone_id
-  name    = "_asvdns-5429b53c-d07b-4d04-83ea-9df3ff2bcdc0.tribunals.gov.uk"
-  type    = "TXT"
-  ttl     = 300
-  records = ["asvdns_7665450b-1d2a-41de-a8b7-c7a89c63c6b5"]
+  zone_id  = local.production_zone_id
+  name     = "_asvdns-5429b53c-d07b-4d04-83ea-9df3ff2bcdc0.tribunals.gov.uk"
+  type     = "TXT"
+  ttl      = 300
+  records  = ["asvdns_7665450b-1d2a-41de-a8b7-c7a89c63c6b5"]
 }

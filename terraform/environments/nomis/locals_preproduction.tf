@@ -13,7 +13,7 @@ locals {
       }
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty                   = "nomis-preproduction"
+          pagerduty = "nomis-preproduction"
         }
       }
     }

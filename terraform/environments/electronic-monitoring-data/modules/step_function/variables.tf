@@ -1,21 +1,21 @@
 variable "name" {
-    type = string
-    nullable = false
+  type     = string
+  nullable = false
 }
 
 variable "iam_policies" {
   type = map(object({
-    arn  = string
+    arn = string
   }))
   nullable = false
 }
 
 variable "env_account_id" {
-    type = string
-    nullable = false
+  type     = string
+  nullable = false
 }
 
 variable "variable_dictionary" {
-    type = map
-    nullable = false
+  type     = map(any)
+  nullable = false
 }

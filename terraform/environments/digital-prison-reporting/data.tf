@@ -45,7 +45,7 @@ data "aws_secretsmanager_secret_version" "datamart" {
 # AWS _IAM_ Policy
 data "aws_iam_policy" "rds_full_access" {
   #checkov:skip=CKV_AWS_275:Disallow policies from using the AWS AdministratorAccess policy
-  
+
   arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
