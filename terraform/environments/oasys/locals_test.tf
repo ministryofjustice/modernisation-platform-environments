@@ -3,7 +3,7 @@ locals {
   baseline_presets_test = {
     options = {
 
-      cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
+      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
       enable_observability_platform_monitoring = true
       sns_topics = {
         pagerduty_integrations = {

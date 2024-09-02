@@ -9,6 +9,16 @@ locals {
     ad-azure-dc-a  = "10.20.104.5"
     ad-azure-dc-b  = "10.20.106.5"
     ad-azure-rdlic = "10.20.108.6"
+
+    # Nat Endpoints Non-Live
+    non-live-eu-west-2a-nat = "13.43.9.198"
+    non-live-eu-west-2b-nat = "13.42.163.245"
+    non-live-eu-west-2c-nat = "18.132.208.127"
+
+    # Nat Endpoints Live
+    live-eu-west-2a-nat = "13.41.38.176"
+    live-eu-west-2b-nat = "3.8.81.175"
+    live-eu-west-2c-nat = "3.11.197.133"
   }
 
   mp_ips = {
@@ -44,6 +54,15 @@ locals {
       local.mp_cidr["ad-azure-dc-a"],
       local.mp_cidr["ad-azure-dc-b"],
     ]
+    non_live_eu_west_nat = [
+      local.mp_cidr["non-live-eu-west-2a-nat"],
+      local.mp_cidr["non-live-eu-west-2b-nat"],
+      local.mp_cidr["non-live-eu-west-2c-nat"],
+    ]
+    live_eu_west_nat = [
+      local.mp_cidr["live-eu-west-2a-nat"],
+      local.mp_cidr["live-eu-west-2b-nat"],
+      local.mp_cidr["live-eu-west-2c-nat"],
+    ]
   }
-
 }
