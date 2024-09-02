@@ -1,5 +1,6 @@
 # Kali Linux Instance
 resource "aws_instance" "kali_linux" {
+  #checkov:skip=CKV_AWS_88:instance requires internet access
   ami                         = "ami-0f398bcc12f72f967" // aws-marketplace/kali-last-snapshot-amd64-2024.2.0-804fcc46-63fc-4eb6-85a1-50e66d6c7215
   associate_public_ip_address = true
   instance_type               = "t2.micro"
