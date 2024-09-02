@@ -97,7 +97,7 @@ module "glue_reporting_hub_job" {
 # Glue Job, Reporting Hub Batch
 module "glue_reporting_hub_batch_job" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-  
+
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-batch-${local.env}"

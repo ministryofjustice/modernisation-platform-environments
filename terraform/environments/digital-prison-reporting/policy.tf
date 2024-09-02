@@ -309,7 +309,7 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
   #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   #checkov:skip=CKV_AWS_110: "Ensure IAM policies does not allow privilege escalation"
-  
+
   statement {
     actions = [
       "glue:*"
@@ -540,7 +540,7 @@ data "aws_iam_policy_document" "domain_builder_preview" {
 }
 
 resource "aws_iam_policy" "domain_builder_preview_policy" {
-  
+
   name        = "${local.project}-domain-builder-preview-policy"
   description = "Additional policy to allow execution of query previews in Athena"
   policy      = data.aws_iam_policy_document.domain_builder_preview.json

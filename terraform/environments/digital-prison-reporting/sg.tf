@@ -5,7 +5,7 @@ data "aws_vpc" "dpr" {
 ## Lambda Generic SG
 resource "aws_security_group" "lambda_generic" {
   #checkov:skip=CKV2_AWS_5
-  
+
   count = local.enable_generic_lambda_sg ? 1 : 0
 
   name_prefix = "${local.generic_lambda}-sg"
@@ -27,7 +27,7 @@ resource "aws_security_group" "lambda_generic" {
 }
 
 resource "aws_security_group_rule" "lambda_ingress_generic" {
-#checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
 
   count = local.enable_generic_lambda_sg ? 1 : 0
 

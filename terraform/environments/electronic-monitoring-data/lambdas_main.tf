@@ -316,7 +316,7 @@ module "unzip_single_file" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
-    BUCKET_NAME = aws_s3_bucket.data_store.id
+    BUCKET_NAME        = aws_s3_bucket.data_store.id
     EXPORT_BUCKET_NAME = module.unzipped-s3-data-store.bucket.id
   }
 }

@@ -18,7 +18,7 @@ resource "random_password" "random_string" {
 
 resource "aws_secretsmanager_secret" "secret" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
-  
+
   name                    = var.name == "" ? null : var.name
   name_prefix             = var.name == "" ? var.name_prefix : null
   description             = var.description

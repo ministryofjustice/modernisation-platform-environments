@@ -1,7 +1,7 @@
 # Create a new DMS replication instance
 resource "aws_dms_replication_instance" "dms-s3-target-instance" {
-#checkov:skip=CKV_AWS_222: "Ensure DMS replication instance gets all minor upgrade automatically"
-#checkov:skip=CKV_AWS_212: "Ensure DMS replication instance is encrypted by KMS using a customer managed Key (CMK)"
+  #checkov:skip=CKV_AWS_222: "Ensure DMS replication instance gets all minor upgrade automatically"
+  #checkov:skip=CKV_AWS_212: "Ensure DMS replication instance is encrypted by KMS using a customer managed Key (CMK)"
 
   count = var.setup_dms_instance ? 1 : 0
 
@@ -66,7 +66,7 @@ resource "aws_dms_replication_task" "dms-replication" {
 resource "aws_dms_endpoint" "dms-s3-target-source" {
   #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
   #checkov:skip=CKV_AWS_296: "Ensure DMS endpoint uses Customer Managed Key (CMK)"
-  
+
   count = var.setup_dms_instance ? 1 : 0
 
   database_name = var.source_db_name
