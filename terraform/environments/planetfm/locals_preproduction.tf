@@ -185,6 +185,11 @@ locals {
     }
 
     route53_zones = {
+      "pp-cafmwebx.az.justice.gov.uk" = {
+        records = [
+          { name = "", type = "CNAME", ttl = 3600, records = ["cafmwebx.pp.planetfm.service.justice.gov.uk"] },
+        ]
+      }
       "pp.planetfm.service.justice.gov.uk" = {
         records = [
           { name = "_658adffab7a58a4d5a86804a2b6eb2f7", type = "CNAME", ttl = 86400, records = ["_c649cb794d2fa2e1ac4d3f6fb4e1c8a7.mhbtsbpdnt.acm-validations.aws"] },
