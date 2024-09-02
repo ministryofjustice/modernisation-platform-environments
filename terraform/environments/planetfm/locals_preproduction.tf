@@ -143,6 +143,25 @@ locals {
     }
 
     lbs = {
+      pp-cafmwebx = merge(local.lbs.web, {
+        instance_target_groups = {
+          pp-cafmwebx-https = merge(local.lbs.web.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "pp-cafm-w-4-b" },
+              { ec2_instance_name = "pp-cafm-w-5-a" },
+            ]
+          })
+        }
+
+        listeners = {
+          https = merge(local.lbs.web.listeners.https, {
+            default_action = {
+              type              = "forward"
+              target_group_name = "pp-cafmwebx-https"
+            }
+          })
+        }
+      })
       private = merge(local.lbs.private, {
         instance_target_groups = {
           web-45-80 = merge(local.lbs.private.instance_target_groups.web-80, {
@@ -187,7 +206,7 @@ locals {
     route53_zones = {
       "pp-cafmwebx.az.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "", type = "A", lbs_map_key = "pp-cafmwebx" },
         ]
       }
       "pp.planetfm.service.justice.gov.uk" = {
