@@ -416,6 +416,23 @@ locals {
 
   analytical_platform_share = can(local.application_data.accounts[local.environment].analytical_platform_share) ? { for share in local.application_data.accounts[local.environment].analytical_platform_share : share.target_account_name => share } : {}
 
+  # Observability Platform
+  environment_configuration = local.environment_configurations[local.environment]
+  environment_configurations = {
+    development = {
+      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+    }
+    test = {
+      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+    }
+    preproduction = {
+      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+    }
+    production = {
+      observability_platform_account_id = local.environment_management.account_ids["observability-platform-production"]
+    }
+  }
+
 
   all_tags = merge(
     local.tags,
