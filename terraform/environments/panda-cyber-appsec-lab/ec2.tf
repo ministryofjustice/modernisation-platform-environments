@@ -1,11 +1,13 @@
 # Kali Linux Instance
 resource "aws_instance" "kali_linux" {
-  ami                    = "ami-07c1b39b7b3d2525d"
-  instance_type          = "t2.micro"
-  subnet_id              = module.vpc.private_subnets.0
-  vpc_security_group_ids = [aws_security_group.kali_linux_sg.id]
-  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
-  ebs_optimized          = true
+  #checkov:skip=CKV_AWS_88:instance requires internet access
+  ami                         = "ami-0f398bcc12f72f967" // aws-marketplace/kali-last-snapshot-amd64-2024.2.0-804fcc46-63fc-4eb6-85a1-50e66d6c7215
+  associate_public_ip_address = true
+  instance_type               = "t2.micro"
+  subnet_id                   = module.vpc.private_subnets.0
+  vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]
+  iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
+  ebs_optimized               = true
   metadata_options {
     http_tokens = "required"
   }
@@ -19,21 +21,27 @@ resource "aws_instance" "kali_linux" {
   }
   user_data = <<-EOF
               #!/bin/bash
-              sudo apt update && sudo apt -y install software-properties-common
-              sudo wget -q -O - https://archive.kali.org/archive-key.asc | sudo apt-key add -
-              sudo echo "deb http://http.kali.org/kali kali-rolling main non-free contrib" | sudo tee /etc/apt/sources.list.d/kali.list
-              sudo apt update && sudo apt -y install kali-linux-default
+              # Update and install dependencies
+              apt-get update
+              apt-get install -y wget
+
+              # Download the SSM agent
+              wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
+
+              # Install the agent
+              dpkg -i amazon-ssm-agent.deb
+
+              # Start the SSM service
+              systemctl enable amazon-ssm-agent
+              systemctl start amazon-ssm-agent
+
+              # Check the status
+              systemctl status amazon-ssm-agent
               EOF
 
   tags = {
     Name = "Terraform-Kali-Linux"
   }
-}
-
-# Create Elastic IP
-resource "aws_eip" "kali_linux_eip" {
-  instance = aws_instance.kali_linux.id
-  domain   = "vpc"
 }
 
 # Security Group for Kali instance
