@@ -1,3 +1,8 @@
+module "nginx" {
+  source = "./modules/nginx_ec2_pair"
+  nginx_lb_sg_id   = aws_security_group.nginx_lb_sg.id
+}
+
 resource "aws_lb" "nginx_lb" {
   name               = "tribunals-nginx"
   internal           = false

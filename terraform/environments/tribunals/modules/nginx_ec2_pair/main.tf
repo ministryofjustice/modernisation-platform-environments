@@ -4,6 +4,10 @@ output "instance_ids" {
   })
 }
 
+variable "nginx_lb_sg_id" {
+  type = string
+}
+
 resource "aws_instance" "nginx" {
   for_each = toset(["eu-west-2a", "eu-west-2b"])
 
@@ -32,7 +36,7 @@ resource "aws_security_group" "allow_ssm" {
     to_port     = 0
     protocol    = "-1"
     security_groups = [
-      aws_security_group.nginx_lb_sg.id
+      var.nginx_lb_sg_id
     ]
   }
 
