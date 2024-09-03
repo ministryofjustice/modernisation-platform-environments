@@ -215,7 +215,7 @@ locals {
           { name = "cafmtx", type = "CNAME", ttl = 3600, records = ["rdweb1.preproduction.hmpps-domain.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "cafmwebx", type = "A", lbs_map_key = "private" },
+          { name = "cafmwebx", type = "A", lbs_map_key = "pp-cafmwebx" },
         ]
       }
     }
