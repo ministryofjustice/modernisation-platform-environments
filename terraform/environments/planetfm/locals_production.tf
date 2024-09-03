@@ -277,6 +277,45 @@ locals {
     }
 
     lbs = {
+      cafmtrainweb = merge(local.lbs.web, {
+        instance_target_groups = {
+          cafmtrainweb-https = merge(local.lbs.web.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "pd-cafm-w-38-b" },
+            ]
+          })
+        }
+
+        listeners = {
+          https = merge(local.lbs.web.listeners.https, {
+            default_action = {
+              type              = "forward"
+              target_group_name = "cafmtrainweb-https"
+            }
+          })
+        }
+      })
+
+      cafmwebx2 = merge(local.lbs.web, {
+        instance_target_groups = {
+          cafmwebx2-https = merge(local.lbs.web.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "pd-cafm-w-36-b" },
+              { ec2_instance_name = "pd-cafm-w-37-a" },
+            ]
+          })
+        }
+
+        listeners = {
+          https = merge(local.lbs.web.listeners.https, {
+            default_action = {
+              type              = "forward"
+              target_group_name = "cafmwebx2-https"
+            }
+          })
+        }
+      })
+
       private = merge(local.lbs.private, {
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
 
