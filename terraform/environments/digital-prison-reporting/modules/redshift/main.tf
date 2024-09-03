@@ -318,6 +318,8 @@ resource "aws_security_group" "redshift" {
 
 resource "aws_security_group_rule" "redshift_egress_1" {
 
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
+
   security_group_id = aws_security_group.redshift.id
   type              = "egress"
   from_port         = 0

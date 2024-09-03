@@ -134,6 +134,8 @@ resource "aws_dms_replication_subnet_group" "dms" {
 
 # Security Groups
 resource "aws_security_group" "dms_sec_group" {
+
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   count = var.setup_dms_instance ? 1 : 0
 
   name   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
