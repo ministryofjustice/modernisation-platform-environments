@@ -697,6 +697,7 @@ module "ftp_admin_appeals" {
 resource "aws_security_group" "nginx_lb_sg" {
   name        = "nginx-lb-sg"
   description = "Allow all web access to nginx load balancer"
+  vpc_id      = data.aws_vpc.shared.id
 
   ingress {
     from_port   = 80
