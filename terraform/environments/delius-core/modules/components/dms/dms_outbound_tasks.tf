@@ -69,3 +69,37 @@ resource "aws_dms_replication_task" "user_outbound_replication" {
   )
 
 }
+
+# Business Interaction outbound replication only happens in client environments.
+# This replicates records from the BUSINESS_INTERACTION table. 
+# An additional column, CLIENT_DB, is added to distinguish the source database name.
+resource "aws_dms_replication_task" "business_interaction_outbound_replication" {
+  count               = try(var.dms_config.audit_source_endpoint.read_database, null) == null ? 0 : 1
+  replication_task_id = "${var.env_name}-business-interaction-outbound-replication-task-for-${lower(var.dms_config.audit_source_endpoint.read_database)}"
+  # As this is reference data we can simply reload if required (full-load-and-cdc)
+  migration_type      = "full-load-and-cdc" 
+
+  table_mappings            = file("templates/business_interaction_outbound_table_mapping.tmpl")
+  replication_task_settings = file("files/business_interaction_outbound_settings.json")
+
+  source_endpoint_arn      = aws_dms_endpoint.dms_audit_source_endpoint_db[0].endpoint_arn
+  target_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_target_endpoint_s3[0].endpoint_arn
+  replication_instance_arn = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
+
+  tags = merge(
+    var.tags,
+    {
+      "name" = "Business Interaction Replication from ${var.env_name} to ${var.dms_config.audit_target_endpoint.write_environment}"
+    },
+    {
+      "audit-client-environment" = "${var.env_name}"
+    },
+    {
+      "audit-repository-environment" = "${var.dms_config.audit_target_endpoint.write_environment}"
+    },
+  )
+
+}
+
+
+
