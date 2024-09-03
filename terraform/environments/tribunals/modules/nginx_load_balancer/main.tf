@@ -1,13 +1,8 @@
-module "nginx" {
-  source = "../nginx_ec2_pair"
-  nginx_lb_sg_id   = aws_security_group.nginx_lb_sg.id
-}
-
 resource "aws_lb" "nginx_lb" {
   name               = "tribunals-nginx"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.nginx_lb_sg.id]
+  security_groups    = [var.nginx_lb_sg_id]
   subnets            = data.aws_subnets.shared-public.ids
 }
 
@@ -23,6 +18,10 @@ resource "aws_lb_target_group" "nginx_lb_tg" {
 
 variable "nginx_instance_ids" {
   type = map(string)
+}
+
+variable "nginx_lb_sg_id" {
+  type = string
 }
 
 resource "aws_lb_target_group_attachment" "nginx_lb_tg_attachment" {
@@ -41,31 +40,5 @@ resource "aws_lb_listener" "nginx_lb_listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.nginx_lb_tg.arn
-  }
-}
-
-resource "aws_security_group" "nginx_lb_sg" {
-  name        = "nginx-lb-sg"
-  description = "Allow all web access to nginx load balancer"
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 }
