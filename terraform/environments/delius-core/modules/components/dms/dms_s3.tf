@@ -1,6 +1,6 @@
 module "s3_bucket_dms_destination" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.1.0"
 
   bucket_prefix      = "${var.env_name}-dms-destination-bucket"
   versioning_enabled = true
