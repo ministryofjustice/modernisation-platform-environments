@@ -388,7 +388,7 @@ locals {
     route53_zones = {
       "cafmtrainweb.az.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "", type = "A", lbs_map_key = "cafmtrainweb" },
         ]
       }
       "cafmwebx2.az.justice.gov.uk" = {
@@ -404,7 +404,7 @@ locals {
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1128.awsdns-13.org", "ns-2027.awsdns-61.co.uk", "ns-854.awsdns-42.net", "ns-90.awsdns-11.com"] },
         ]
         lb_alias_records = [
-          { name = "cafmtrainweb", type = "A", lbs_map_key = "private" },
+          { name = "cafmtrainweb", type = "A", lbs_map_key = "cafmtrainweb" },
           { name = "cafmwebx2", type = "A", lbs_map_key = "private" },
         ]
       }
