@@ -3,14 +3,14 @@ resource "aws_lb" "nginx_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [var.nginx_lb_sg_id]
-  subnets            = data.aws_subnets.shared-public.ids
+  subnets            = var.subnets_shared_public_ids
 }
 
 resource "aws_lb_target_group" "nginx_lb_tg" {
   name     = "tribunals-nginx"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = data.aws_vpc.shared.id
+  vpc_id   = var.vpc_shared_id
   health_check {
     matcher = "302"
   }
@@ -21,6 +21,14 @@ variable "nginx_instance_ids" {
 }
 
 variable "nginx_lb_sg_id" {
+  type = string
+}
+
+variable "subnets_shared_public_ids" {
+  type = string
+}
+
+variable "vpc_shared_id" {
   type = string
 }
 
