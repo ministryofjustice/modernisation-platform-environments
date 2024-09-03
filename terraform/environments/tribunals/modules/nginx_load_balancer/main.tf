@@ -25,7 +25,6 @@ variable "nginx_lb_sg_id" {
 }
 
 variable "subnets_shared_public_ids" {
-  type = string
 }
 
 variable "vpc_shared_id" {
