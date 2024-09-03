@@ -1,0 +1,45 @@
+output "instance_ids" {
+  value = tomap({
+    for k, inst in aws_instance.nginx : k => inst.id
+  })
+}
+
+resource "aws_instance" "nginx" {
+  for_each = toset(["eu-west-2a", "eu-west-2b"])
+
+  ami               = "ami-0fd8802f94ed1c969"
+  instance_type     = "t2.micro"
+  availability_zone = each.value
+  tags = {
+    Name = "tribunals-nginx-${each.value}"
+  }
+  vpc_security_group_ids = [aws_security_group.allow_ssm.id]
+  iam_instance_profile   = "AmazonSSMManagedInstanceCore"
+  user_data              = <<-EOF
+              #!/bin/bash
+              ${file("${path.module}/scripts/install-nginx.sh")}
+              ${file("${path.module}/scripts/add-symbolic-links.sh")}
+              ${file("${path.module}/scripts/restart-nginx.sh")}
+              EOF
+}
+
+resource "aws_security_group" "allow_ssm" {
+  name        = "allow_ssm"
+  description = "Allow SSM connection"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    security_groups = [
+      aws_security_group.nginx_lb_sg.id
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}

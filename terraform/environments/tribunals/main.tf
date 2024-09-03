@@ -693,3 +693,12 @@ module "ftp_admin_appeals" {
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
+
+module "nginx" {
+  source = "./modules/nginx_ec2_pair"
+}
+
+module "loadBalancer" {
+  source             = "./modules/nginx_load_balancer"
+  nginx_instance_ids = module.nginx.instance_ids
+}
