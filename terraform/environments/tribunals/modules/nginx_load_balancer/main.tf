@@ -1,5 +1,5 @@
 module "nginx" {
-  source = "./modules/nginx_ec2_pair"
+  source = "../nginx_ec2_pair"
   nginx_lb_sg_id   = aws_security_group.nginx_lb_sg.id
 }
 
