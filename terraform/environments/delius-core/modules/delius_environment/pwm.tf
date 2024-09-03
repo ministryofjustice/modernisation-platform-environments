@@ -80,7 +80,7 @@ module "pwm" {
   container_vars_default = {
     "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
       ldap_host_url      = "ldap://${module.ldap.nlb_dns_name}:${var.ldap_config.port}"
-      ldap_user          = nonsensitive(aws_ssm_parameter.ldap_principal.arn)
+      ldap_user          = nonsensitive(module.ldap.delius_core_ldap_principal_arn)
       pwm_url            = "https://pwm.${var.env_name}.${var.account_config.dns_suffix}"
       email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
       email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"

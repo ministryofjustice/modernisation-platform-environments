@@ -58,11 +58,6 @@ variable "ecs_cluster_arn" {
   type        = string
 }
 
-variable "task_role_arn" {
-  description = "The ARN of the task role"
-  type        = string
-}
-
 variable "sns_topic_arn" {
   description = "The ARN of the SNS topic"
   type        = string
