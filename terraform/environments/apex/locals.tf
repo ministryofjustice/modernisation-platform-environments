@@ -75,7 +75,7 @@ locals {
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
-  db_hostname = "db.${local.application_name}"
+  db_hostname          = "db.${local.application_name}"
 
   database-instance-userdata = <<EOF
 #!/bin/bash
@@ -139,6 +139,10 @@ wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-
 rpm -U ./amazon-cloudwatch-agent.rpm
 echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/etc/cloudwatch_agent/cloudwatch_agent_config.json
+
+
+mkdir /backups/APEX_RMAN
+chmod 777 /backups/APEX_RMAN
 
 EOF
 

@@ -10,7 +10,7 @@ locals {
       enable_observability_platform_monitoring = true
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty                   = "nomis-test"
+          pagerduty = "nomis-test"
         }
       }
     }

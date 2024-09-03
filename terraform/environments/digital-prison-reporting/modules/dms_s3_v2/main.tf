@@ -115,7 +115,7 @@ resource "aws_dms_replication_task" "dms-replication" {
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "dms-s3-target-source" {
   #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
-  
+
   count = var.setup_dms_endpoints && var.setup_dms_source_endpoint ? 1 : 0
 
   database_name = var.source_db_name

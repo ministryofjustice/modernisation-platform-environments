@@ -1,6 +1,6 @@
 resource "aws_secretsmanager_secret" "password" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
-  
+
   name = "${var.name}-password"
 }
 
@@ -38,7 +38,7 @@ resource "aws_db_subnet_group" "subnets" {
 resource "aws_db_instance" "default" {
   #checkov:skip=CKV2_AWS_30:”Query Logging is not required"
   #checkov:skip=CKV2_AWS_60: “Ignore -Ensure RDS instance with copy tags to snapshots is enabled"
-  
+
   count                   = var.enable_rds ? 1 : 0
   identifier              = var.name
   db_name                 = var.db_name

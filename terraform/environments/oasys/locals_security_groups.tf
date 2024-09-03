@@ -16,6 +16,9 @@ locals {
       module.ip_addresses.external_cidrs.cloud_platform,
       module.ip_addresses.azure_studio_hosting_public.devtest,
     ])
+    https_external_monitoring = flatten([
+      module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
+    ])
     oracle_db = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
@@ -44,6 +47,9 @@ locals {
       module.ip_addresses.external_cidrs.cloud_platform,
       module.ip_addresses.azure_studio_hosting_public.prod,
       "10.0.0.0/8"
+    ])
+    https_external_monitoring = flatten([
+      module.ip_addresses.mp_cidrs.live_eu_west_nat,
     ])
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -92,6 +98,9 @@ locals {
       module.ip_addresses.external_cidrs.dtv,
       module.ip_addresses.external_cidrs.nps_wales,
       module.ip_addresses.external_cidrs.dxw,
+    ])
+    https_external_monitoring = flatten([
+      module.ip_addresses.mp_cidrs.live_eu_west_nat,
     ])
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -191,6 +200,7 @@ locals {
           protocol    = "tcp"
           cidr_blocks = flatten([
             local.security_group_cidrs.https_external,
+            local.security_group_cidrs.https_external_monitoring,
           ])
         }
       }

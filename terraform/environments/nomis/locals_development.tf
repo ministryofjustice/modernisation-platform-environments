@@ -9,7 +9,7 @@ locals {
     options = {
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty                   = "nomis-development"
+          pagerduty = "nomis-development"
         }
       }
     }
