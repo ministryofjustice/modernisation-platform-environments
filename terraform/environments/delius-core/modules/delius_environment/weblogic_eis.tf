@@ -7,7 +7,7 @@ module "weblogic_eis" {
 
   container_vars_default = {
     "LDAP_PORT" : var.ldap_config.port,
-    "LDAP_HOST" : module.ldap.nlb_dns_name,
+    "LDAP_HOST" : aws_lb.delius_core_ancillary.dns_name,
     "AWS_XRAY_TRACING_NAME" : "weblogic-eis",
     "COOKIE_SECURE" : "true",
     "DELIUS_API_URL" : "todo",
