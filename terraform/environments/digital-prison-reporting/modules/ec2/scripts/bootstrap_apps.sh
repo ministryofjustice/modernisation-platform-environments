@@ -245,10 +245,14 @@ chmod 0755 $nomis_portforwarder_script; chmod 0755 $bodmis_portforwarder_script
 cat <<EOL > /etc/systemd/system/nomispf.service
 [Unit]
 Description=NOMIS PortForward Service
+StartLimitIntervalSec=300  # Increase interval for better fault tolerance
+StartLimitBurst=3          # Reduce burst to avoid frequent restarts in short time
 
 [Service]
 ExecStart=$nomis_portforwarder_script
-Restart=always
+Restart=on-failure      # Restart only on failure to avoid restarting on manual stops
+RestartSec=10           # Increase delay slightly to give time for underlying issues to be resolved
+TimeoutSec=30           # Add a timeout to gracefully handle any potential hanging
 
 [Install]
 WantedBy=multi-user.target
@@ -258,10 +262,14 @@ EOL
 cat <<EOL > /etc/systemd/system/bodmispf.service
 [Unit]
 Description=BODMIS PortForward Service
+StartLimitIntervalSec=300  # Increase interval for better fault tolerance
+StartLimitBurst=3          # Reduce burst to avoid frequent restarts in short time
 
 [Service]
 ExecStart=$bodmis_portforwarder_script
-Restart=always
+Restart=on-failure      # Restart only on failure to avoid restarting on manual stops
+RestartSec=10           # Increase delay slightly to give time for underlying issues to be resolved
+TimeoutSec=30           # Add a timeout to gracefully handle any potential hanging
 
 [Install]
 WantedBy=multi-user.target
