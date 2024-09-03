@@ -242,7 +242,7 @@ resource "aws_cloudwatch_log_group" "sec_config_output" {
 
 resource "aws_cloudwatch_log_group" "continuous_log" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-  
+
   count = var.create_job ? 1 : 0
 
   name              = "/aws-glue/jobs/${var.name}-${var.short_name}-sec-config"

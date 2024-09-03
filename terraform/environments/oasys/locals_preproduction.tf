@@ -2,11 +2,11 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
+
+      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
       sns_topics = {
         pagerduty_integrations = {
-          dso_pagerduty               = "oasys_alarms"
-          dba_pagerduty               = "hmpps_shef_dba_low_priority"
-          dba_high_priority_pagerduty = "hmpps_shef_dba_low_priority"
+          pagerduty = "oasys-preproduction"
         }
       }
     }

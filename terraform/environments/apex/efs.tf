@@ -59,6 +59,11 @@ resource "aws_security_group" "efs_product" {
   name        = "${local.application_name}-${local.environment}-efs-security-group"
   description = "Apex Product EFS Security Group"
   vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-efs-security-group" }
+  )
 }
 
 resource "aws_vpc_security_group_egress_rule" "efs_product_outbound" {

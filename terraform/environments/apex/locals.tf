@@ -75,6 +75,7 @@ locals {
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
+  db_hostname          = "db.${local.application_name}"
 
   database-instance-userdata = <<EOF
 #!/bin/bash
@@ -82,6 +83,8 @@ cd /tmp
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
+sudo sed -i '/laa-software-library/d' /etc/fstab
+sudo sed -i '/efs.eu-west-2/d' /etc/fstab
 echo "${aws_efs_file_system.efs.dns_name}:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport" >> /etc/fstab
 mount -a
 
@@ -90,7 +93,44 @@ shutdown abort;
 startup;
 exit;
 EOF"
-sudo su - oracle -c "lsnrctl start"
+
+cat <<EOT > /u01/app/oracle/product/12.1/network/admin/listener.ora
+USE_SID_AS_SERVICE_LISTENER=ON
+DIAG_ADR_ENABLED=on
+
+LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.db_hostname}.${data.aws_route53_zone.external.name})(PORT = 1521))
+    )
+  )
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (SID_NAME = PLSExtProc)
+      (ORACLE_HOME = /u01/app/oracle/product/12.1)
+      (PROGRAM = extproc)
+    )
+    (SID_DESC =
+      (ORACLE_HOME =/u01/app/oracle/product/12.1)
+      (SID_NAME = APEX)
+    )
+  )
+EOT
+
+cat <<EOT > /u01/app/oracle/product/12.1/network/admin/tnsnames.ora
+APEX=
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.db_hostname}.${data.aws_route53_zone.external.name})(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = APEX)
+    )
+  )
+EOT
+
+sudo su - oracle -c "lsnrctl start LISTENER"
 
 cd /etc
 mkdir cloudwatch_agent
@@ -99,6 +139,10 @@ wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-
 rpm -U ./amazon-cloudwatch-agent.rpm
 echo '${data.local_file.cloudwatch_agent.content}' > cloudwatch_agent_config.json
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/etc/cloudwatch_agent/cloudwatch_agent_config.json
+
+
+mkdir /backups/APEX_RMAN
+chmod 777 /backups/APEX_RMAN
 
 EOF
 

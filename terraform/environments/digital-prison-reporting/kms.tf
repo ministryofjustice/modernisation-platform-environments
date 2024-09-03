@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "s3-kms" {
     #checkov:skip=CKV_AWS_49
     #checkov:skip=CKV_AWS_108
     #checkov:skip=CKV_AWS_110   
-          
+
     effect    = "Allow"
     actions   = ["kms:*"]
     resources = ["*"]
@@ -190,7 +190,7 @@ resource "aws_kms_key" "operational_db" {
   #checkov:skip=CKV_AWS_33
   #checkov:skip=CKV_AWS_227
   #checkov:skip=CKV_AWS_7
-    
+
   description         = "Encryption key for Operational DB"
   enable_key_rotation = true
   key_usage           = "ENCRYPT_DECRYPT"

@@ -52,6 +52,29 @@ locals {
             }
           }
         },
+        "digital-prison-reporting" = {
+          "identity_centre_team" = "hmpps-digital-prison-reporting",
+          "aws_accounts" = {
+            "digital-prison-reporting-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+            },
+            "digital-prison-reporting-preproduction" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+            },
+            "digital-prison-reporting-test" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+            }
+          }
+        },
         "digital-studio-operations" = {
           "identity_centre_team" = "studio-webops"
           "aws_accounts" = {
@@ -102,6 +125,17 @@ locals {
               amazon_prometheus_query_enabled = true
               amazon_prometheus_workspace_id  = "ws-257796b7-4aa4-4c18-b906-6dd21e95d7b73e"
               xray_enabled                    = true
+            }
+          }
+        },
+        "digital-prison-reporting" = {
+          "identity_centre_team" = "hmpps-digital-prison-reporting",
+          "aws_accounts" = {
+            "digital-prison-reporting-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
             }
           }
         },

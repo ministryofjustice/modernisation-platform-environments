@@ -24,7 +24,7 @@ locals {
       }
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty                   = "nomis-production"
+          pagerduty = "nomis-production"
         }
       }
     }

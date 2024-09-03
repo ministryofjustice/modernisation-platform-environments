@@ -666,3 +666,50 @@ resource "aws_iam_role_policy_attachment" "unzip_single_file_lambda_sqs_queue_ac
   role       = aws_iam_role.unzip_single_file.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
+
+# ----------------------------
+# unzipped_presigned_url
+# ----------------------------
+
+resource "aws_iam_role" "unzipped_presigned_url" {
+  name               = "unzipped_presigned_url"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "get_unzipped_presigned_url_file_s3_policy_document" {
+  statement {
+    sid    = "S3PermissionsForDumpingUnzippedFile"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject"
+    ]
+    resources = [
+      "${module.unzipped-s3-data-store.bucket.arn}/*",
+      module.unzipped-s3-data-store.bucket.arn,
+    ]
+  }
+}
+
+
+resource "aws_iam_policy" "unzipped_presigned_url_s3" {
+  name        = "unzipped-presigned-url-s3-policy"
+  description = "Policy for Lambda to create presigned url for unzipped file from S3"
+  policy      = data.aws_iam_policy_document.get_unzipped_presigned_url_file_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_s3_policy_policy_attachment" {
+  role       = aws_iam_role.unzipped_presigned_url.name
+  policy_arn = aws_iam_policy.unzipped_presigned_url_s3.arn
+}
+
+
+resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_vpc_access_execution" {
+  role       = aws_iam_role.unzipped_presigned_url.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_lambda_sqs_queue_access_execution" {
+  role       = aws_iam_role.unzipped_presigned_url.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}

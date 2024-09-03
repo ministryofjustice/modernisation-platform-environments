@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "storage" { # TBC "application_tf_state" should be gene
   #checkov:skip=CKV_AWS_144
   #checkov:skip=CKV2_AWS_6
   #checkov:skip=CKV_AWS_21:”Not all S3 bucket requires versioning enabaled"
-  
+
   bucket = var.name
 
   lifecycle {

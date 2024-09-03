@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_log_group" "this" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-  
+
   count = var.enable_lambda ? 1 : 0
   name  = "/aws/lambda/${var.name}-function"
 

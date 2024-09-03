@@ -7,7 +7,7 @@ locals {
   glue_avro_registry           = split("/", module.glue_registry_avro.registry_name)
   shared_log4j_properties_path = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${aws_s3_object.glue_job_shared_custom_log4j_properties.key}"
   # We only want to enable write to Operational DataStore in the dev environment until it is available in all environments
-  glue_datahub_job_extra_dev_env_args = (local.environment == "development" ? {
+  glue_datahub_job_extra_dev_env_args = (local.environment == "development" || local.environment == "test" || local.environment == "preproduction" ? {
     "--dpr.operational.data.store.write.enabled"              = "true"
     "--dpr.operational.data.store.glue.connection.name"       = aws_glue_connection.glue_operational_datastore_connection.name
     "--dpr.operational.data.store.loading.schema.name"        = "loading"
@@ -97,7 +97,7 @@ module "glue_reporting_hub_job" {
 # Glue Job, Reporting Hub Batch
 module "glue_reporting_hub_batch_job" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-  
+
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-batch-${local.env}"

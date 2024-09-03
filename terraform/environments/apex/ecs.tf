@@ -6,20 +6,19 @@ module "apex-ecs" {
 
   source = "./modules/ecs"
 
-  subnet_set_name            = local.subnet_set_name
-  vpc_all                    = local.vpc_all
-  app_name                   = local.application_name
-  container_instance_type    = local.application_data.accounts[local.environment].container_instance_type
-  ami_image_id               = local.application_data.accounts[local.environment].ami_image_id
-  instance_type              = local.application_data.accounts[local.environment].instance_type
-  user_data                  = local.user_data
-  key_name                   = local.application_data.accounts[local.environment].key_name
-  task_definition            = local.task_definition
-  ec2_desired_capacity       = local.application_data.accounts[local.environment].ec2_desired_capacity
-  ec2_max_size               = local.application_data.accounts[local.environment].ec2_max_size
-  ec2_min_size               = local.application_data.accounts[local.environment].ec2_min_size
-  task_definition_volume     = local.application_data.accounts[local.environment].task_definition_volume
-  network_mode               = local.application_data.accounts[local.environment].network_mode
+  subnet_set_name         = local.subnet_set_name
+  vpc_all                 = local.vpc_all
+  app_name                = local.application_name
+  container_instance_type = local.application_data.accounts[local.environment].container_instance_type
+  instance_type           = local.application_data.accounts[local.environment].instance_type
+  user_data               = local.user_data
+  key_name                = local.application_data.accounts[local.environment].key_name
+  task_definition         = local.task_definition
+  ec2_desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
+  ec2_max_size            = local.application_data.accounts[local.environment].ec2_max_size
+  ec2_min_size            = local.application_data.accounts[local.environment].ec2_min_size
+  # task_definition_volume     = local.application_data.accounts[local.environment].task_definition_volume
+  # network_mode               = local.application_data.accounts[local.environment].network_mode
   server_port                = local.application_data.accounts[local.environment].server_port
   app_count                  = local.application_data.accounts[local.environment].app_count
   ec2_ingress_rules          = local.ec2_ingress_rules

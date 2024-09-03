@@ -310,7 +310,7 @@ resource "aws_secretsmanager_secret_version" "dbt_secrets" {
 resource "aws_secretsmanager_secret" "dbt_secrets" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  
+
   count = local.enable_dbt_k8s_secrets ? 1 : 0
 
   name = "external/analytics_platform/k8s_dbt_auth"

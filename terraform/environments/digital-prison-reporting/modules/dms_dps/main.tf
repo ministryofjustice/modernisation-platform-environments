@@ -91,10 +91,9 @@ resource "aws_dms_endpoint" "source" {
 # Create an endpoint for the target Kinesis
 resource "aws_dms_endpoint" "target" {
   #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
+
   #checkov:skip=CKV_AWS_296: "Ensure DMS endpoint uses Customer Managed Key (CMK).TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
 
-
-  
   count = var.setup_dms_instance ? 1 : 0
 
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_target_name}-target"
