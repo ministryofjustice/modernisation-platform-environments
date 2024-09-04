@@ -21,7 +21,7 @@ locals {
   baseline_presets_all_environments = {
     options = {
       cloudwatch_dashboard_default_widget_groups = [
-        "lb",
+        "network_lb",
         "ec2",
         "ec2_windows",
       ]
