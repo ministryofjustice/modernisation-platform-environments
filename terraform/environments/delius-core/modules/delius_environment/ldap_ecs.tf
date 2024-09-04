@@ -65,5 +65,22 @@ module "ldap_ecs" {
   frontend_lb_arn_suffix  = aws_lb.delius_core_ancillary.arn_suffix
   enable_platform_backups = var.enable_platform_backups
 
+  efs_volumes = [
+    {
+      host_path = null
+      name      = "delius-core-openldap"
+      efs_volume_configuration = [{
+        file_system_id          = var.ldap_config.efs_id
+        root_directory          = "/"
+        transit_encryption      = "ENABLED"
+        transit_encryption_port = 2049
+        authorization_config = [{
+          access_point_id = var.ldap_config.efs_access_point_id
+          iam             = "DISABLED"
+        }]
+      }]
+    }
+  ]
+
 }
 
