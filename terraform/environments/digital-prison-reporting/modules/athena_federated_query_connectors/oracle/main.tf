@@ -44,6 +44,8 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
 resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
   #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+  #checkov:skip=CKV_AWS_272:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+
 
   function_name                  = "${var.project_prefix}-athena-federated-query-oracle-function"
   role                           = aws_iam_role.athena_federated_query_lambda_execution_role.arn

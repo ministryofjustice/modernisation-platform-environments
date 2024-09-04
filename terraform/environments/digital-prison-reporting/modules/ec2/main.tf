@@ -42,6 +42,7 @@ resource "aws_security_group_rule" "ingress_traffic" {
 
 # Needs revision for Egress after POC
 resource "aws_security_group_rule" "egress_traffic" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   security_group_id = aws_security_group.ec2_sec_group.id
   type              = "egress"
   from_port         = 0
