@@ -12,10 +12,19 @@ variable "vpc_shared_id" {
   type = string
 }
 
+data "aws_ami" "latest_linux" {
+  most_recent = true
+  owners = ["099720109477"]
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
 resource "aws_instance" "nginx" {
   for_each = toset(["eu-west-2a", "eu-west-2b"])
 
-  ami               = "ami-0fd8802f94ed1c969"
+  ami               = data.aws_ami.latest_linux.id
   instance_type     = "t2.micro"
   availability_zone = each.value
   tags = {
