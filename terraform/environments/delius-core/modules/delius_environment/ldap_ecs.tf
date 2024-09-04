@@ -82,5 +82,11 @@ module "ldap_ecs" {
     }
   ]
 
+  mount_points = [{
+    sourceVolume  = "delius-core-openldap"
+    containerPath = "/var/lib/openldap/openldap-data"
+    readOnly      = false
+  }]
+
 }
 
