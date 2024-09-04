@@ -73,6 +73,8 @@ resource "aws_dms_replication_task" "user_outbound_replication" {
 # Business Interaction outbound replication only happens in client environments.
 # This replicates records from the BUSINESS_INTERACTION table. 
 # An additional column, CLIENT_DB, is added to distinguish the source database name.
+# NB: Since Auited Interaction is a CDC task and Business Interaction is a Full Load / CDC task
+#     these must be defined as separate replication tasks
 resource "aws_dms_replication_task" "business_interaction_outbound_replication" {
   count               = try(var.dms_config.audit_source_endpoint.read_database, null) == null ? 0 : 1
   replication_task_id = "${var.env_name}-business-interaction-outbound-replication-task-for-${lower(var.dms_config.audit_source_endpoint.read_database)}"
