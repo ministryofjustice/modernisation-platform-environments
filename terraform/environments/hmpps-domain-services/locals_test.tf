@@ -176,6 +176,20 @@ locals {
                   }
                 }]
               }
+              test-rdgw-2-http = {
+                priority = 150
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-win-2022-http"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -186,6 +200,7 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
+          { name = "rdgateway2", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
       }
