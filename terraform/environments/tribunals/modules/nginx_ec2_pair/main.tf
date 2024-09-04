@@ -28,7 +28,7 @@ resource "aws_instance" "nginx" {
   for_each = toset(["eu-west-2a", "eu-west-2b"])
 
   ami               = data.aws_ami.latest_linux.id
-  subnet_id         = var.aws_subnet.public_subnets_a_id
+  subnet_id         = var.public_subnets_a_id
   instance_type     = "t2.micro"
   availability_zone = each.value
   tags = {
