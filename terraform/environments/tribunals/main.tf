@@ -727,6 +727,7 @@ module "nginx" {
   vpc_shared_id       = data.aws_vpc.shared.id
   public_subnets_a_id = data.aws_subnet.public_subnets_a.id
   public_subnets_b_id = data.aws_subnet.public_subnets_b.id
+  environment         = local.environment
 }
 
 module "loadBalancer" {

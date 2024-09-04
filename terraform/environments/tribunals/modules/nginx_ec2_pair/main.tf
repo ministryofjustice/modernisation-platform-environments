@@ -18,6 +18,9 @@ variable "public_subnets_a_id" {
 variable "public_subnets_b_id" {
 }
 
+variable "environment" {
+}
+
 data "aws_ami" "latest_linux" {
   most_recent = true
   owners = ["amazon"]
@@ -42,18 +45,11 @@ resource "aws_instance" "nginx" {
   iam_instance_profile   = aws_iam_instance_profile.nginx_profile.name
   user_data              = <<-EOF
               #!/bin/bash
+              aws s3 cp s3://${aws_s3_bucket.nginx_config.id}/sites-available /etc/nginx/sites-available --recursive
               ${file("${path.module}/scripts/install-nginx.sh")}
               ${file("${path.module}/scripts/add-symbolic-links.sh")}
               ${file("${path.module}/scripts/restart-nginx.sh")}
               EOF
-  provisioner "file" {
-    source      = "modules/nginx_ec2_pair/sites-available"
-    destination = "/etc/nginx/sites-available"
-    connection {
-      host     = self.public_ip
-      type     = "ssm"
-    }
-  }
 }
 
 resource "aws_security_group" "allow_ssm" {
@@ -78,6 +74,22 @@ resource "aws_security_group" "allow_ssm" {
   }
 }
 
+resource "aws_s3_bucket" "nginx_config" {
+  bucket = "tribunals-nginx-config-files-${var.environment}"
+}
+
+resource "aws_s3_object" "sites_available" {
+  for_each = fileset("${path.module}/sites-available", "*")
+
+  bucket = aws_s3_bucket.nginx_config.id
+  key    = "sites-available/${each.value}"
+  source = "${path.module}/sites-available/${each.value}"
+}
+
+resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+  role       = aws_iam_role.nginx_role.name
+}
 
 resource "aws_iam_role" "nginx_role" {
   name = "nginx-ssm-role"
