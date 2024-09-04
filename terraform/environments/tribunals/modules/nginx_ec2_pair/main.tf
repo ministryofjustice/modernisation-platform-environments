@@ -52,7 +52,6 @@ resource "aws_instance" "nginx" {
     connection {
       host     = self.public_ip
       type     = "ssm"
-      role_arn = aws_iam_role.nginx_role.arn
     }
   }
 }
