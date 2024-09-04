@@ -308,80 +308,13 @@ locals {
 
         listeners = {
           https = merge(local.lbs.web.listeners.https, {
+            alarm_target_group_names = ["cafmwebx2-https"]
             default_action = {
               type              = "forward"
               target_group_name = "cafmwebx2-https"
             }
           })
         }
-      })
-
-      private = merge(local.lbs.private, {
-        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
-
-        instance_target_groups = {
-          web-3637-80 = merge(local.lbs.private.instance_target_groups.web-80, {
-            attachments = [
-              { ec2_instance_name = "pd-cafm-w-36-b" },
-              { ec2_instance_name = "pd-cafm-w-37-a" },
-            ]
-          })
-          web-38-80 = merge(local.lbs.private.instance_target_groups.web-80, {
-            attachments = [
-              { ec2_instance_name = "pd-cafm-w-38-b" },
-            ]
-          })
-        }
-
-        listeners = merge(local.lbs.private.listeners, {
-          https = merge(local.lbs.private.listeners.https, {
-            alarm_target_group_names = [
-              "web-3637-80",
-            ]
-
-            default_action = {
-              type = "redirect"
-              redirect = {
-                host        = "cafmwebx2.planetfm.service.justice.gov.uk"
-                port        = "443"
-                protocol    = "HTTPS"
-                status_code = "HTTP_302"
-              }
-            }
-
-            rules = {
-              web-3637-80 = {
-                priority = 3637
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-3637-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmwebx2.planetfm.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-38-80 = {
-                priority = 3880
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-38-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmtrainweb.planetfm.service.justice.gov.uk",
-                      "cafmtrainweb.az.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          })
-        })
       })
     }
 
