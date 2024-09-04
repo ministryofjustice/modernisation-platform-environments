@@ -45,8 +45,9 @@ resource "aws_instance" "nginx" {
   iam_instance_profile   = aws_iam_instance_profile.nginx_profile.name
   user_data              = <<-EOF
               #!/bin/bash
-              aws s3 cp s3://${aws_s3_bucket.nginx_config.id}/sites-available /etc/nginx/sites-available --recursive
               ${file("${path.module}/scripts/install-nginx.sh")}
+              aws s3 cp s3://${aws_s3_bucket.nginx_config.id}/sites-available /etc/nginx/sites-available --recursive
+              sudo mkdir -p /etc/nginx/sites-enabled
               ${file("${path.module}/scripts/add-symbolic-links.sh")}
               ${file("${path.module}/scripts/restart-nginx.sh")}
               EOF
