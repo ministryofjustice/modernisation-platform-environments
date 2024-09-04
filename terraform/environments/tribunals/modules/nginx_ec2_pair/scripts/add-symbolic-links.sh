@@ -1,8 +1,7 @@
 #!/bin/bash
-# Create directories if they do not exist
+echo "starting nginx symbolic links script"
 sudo mkdir -p /etc/nginx/sites-available
 sudo mkdir -p /etc/nginx/sites-enabled
-sudo rm /etc/nginx/sites-enabled/*
 sudo ln -s /etc/nginx/sites-available/adjudicationpanel.tribunals.gov.uk /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/administrativeappeals.tribunals.gov.uk /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/ahmlr.gov.uk /etc/nginx/sites-enabled/
