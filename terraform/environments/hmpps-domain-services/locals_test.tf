@@ -102,7 +102,9 @@ locals {
       test-rdgw-2-a = merge(local.ec2_autoscaling_groups.base_windows, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
           # clean up Computer and DNS entry from azure.noms.root domain before using
-          desired_capacity = 1
+          desired_capacity          = 1
+          wait_for_capacity_timeout = 0
+
           initial_lifecycle_hooks = {
             "ready-hook" = {
               default_result       = "ABANDON"
