@@ -79,7 +79,9 @@ resource "aws_dms_replication_task" "business_interaction_outbound_replication" 
   # As this is reference data we can simply reload if required (full-load-and-cdc)
   migration_type      = "full-load-and-cdc" 
 
-  table_mappings            = file("templates/business_interaction_outbound_table_mapping.tmpl")
+  table_mappings      = templatefile("templates/business_interaction_outbound_table_mapping.tmpl",{
+                           client_database = local.audit_source_primary
+                        })
   replication_task_settings = file("files/business_interaction_outbound_settings.json")
 
   source_endpoint_arn      = aws_dms_endpoint.dms_audit_source_endpoint_db[0].endpoint_arn
