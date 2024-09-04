@@ -24,6 +24,7 @@ resource "aws_instance" "kali_linux" {
               # Update and install dependencies
               apt-get update
               apt-get install -y wget
+              apt-get install -y kali-linux-default
 
               # Download the SSM agent
               wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
