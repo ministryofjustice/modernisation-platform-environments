@@ -15,6 +15,9 @@ variable "vpc_shared_id" {
 variable "public_subnets_a_id" {
 }
 
+variable "public_subnets_b_id" {
+}
+
 data "aws_ami" "latest_linux" {
   most_recent = true
   owners = ["amazon"]
@@ -28,14 +31,14 @@ resource "aws_instance" "nginx" {
   for_each = toset(["eu-west-2a", "eu-west-2b"])
 
   ami               = data.aws_ami.latest_linux.id
-  subnet_id         = var.public_subnets_a_id
+  subnet_id         = each.key == "eu-west-2a" ? var.public_subnets_a_id : var.public_subnets_b_id
   instance_type     = "t2.micro"
   availability_zone = each.value
   tags = {
     Name = "tribunals-nginx-${each.value}"
   }
   vpc_security_group_ids = [aws_security_group.allow_ssm.id]
-  iam_instance_profile   = "AmazonSSMManagedInstanceCore"
+  iam_instance_profile   = aws_iam_instance_profile.nginx_profile.name
   user_data              = <<-EOF
               #!/bin/bash
               ${file("${path.module}/scripts/install-nginx.sh")}
@@ -64,4 +67,32 @@ resource "aws_security_group" "allow_ssm" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+
+resource "aws_iam_role" "nginx_role" {
+  name = "nginx-ssm-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.nginx_role.name
+}
+
+resource "aws_iam_instance_profile" "nginx_profile" {
+  name = "nginx-ssm-profile"
+  role = aws_iam_role.nginx_role.name
 }
