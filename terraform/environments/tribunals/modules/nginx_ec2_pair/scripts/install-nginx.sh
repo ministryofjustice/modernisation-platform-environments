@@ -1,3 +1,3 @@
 #!/bin/bash
-sudo apt update -y &&
-sudo apt install -y nginx
+sudo yum update -y &&
+sudo amazon-linux-extras install nginx1 -y

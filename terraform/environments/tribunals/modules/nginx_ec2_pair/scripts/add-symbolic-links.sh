@@ -1,4 +1,7 @@
 #!/bin/bash
+# Create directories if they do not exist
+sudo mkdir -p /etc/nginx/sites-available
+sudo mkdir -p /etc/nginx/sites-enabled
 sudo rm /etc/nginx/sites-enabled/*
 sudo ln -s /etc/nginx/sites-available/adjudicationpanel.tribunals.gov.uk /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/administrativeappeals.tribunals.gov.uk /etc/nginx/sites-enabled/
