@@ -30,10 +30,11 @@ data "aws_ami" "latest_linux" {
 resource "aws_instance" "nginx" {
   for_each = toset(["eu-west-2a", "eu-west-2b"])
 
-  ami               = data.aws_ami.latest_linux.id
-  subnet_id         = each.key == "eu-west-2a" ? var.public_subnets_a_id : var.public_subnets_b_id
-  instance_type     = "t2.micro"
-  availability_zone = each.value
+  ami                         = data.aws_ami.latest_linux.id
+  associate_public_ip_address = true
+  subnet_id                   = each.key == "eu-west-2a" ? var.public_subnets_a_id : var.public_subnets_b_id
+  instance_type               = "t2.micro"
+  availability_zone           = each.value
   tags = {
     Name = "tribunals-nginx-${each.value}"
   }
@@ -48,6 +49,11 @@ resource "aws_instance" "nginx" {
   provisioner "file" {
     source      = "modules/nginx_ec2_pair/sites-available"
     destination = "/etc/nginx/sites-available"
+    connection {
+      host     = self.public_ip
+      type     = "ssm"
+      role_arn = aws_iam_role.nginx_role.arn
+    }
   }
 }
 
