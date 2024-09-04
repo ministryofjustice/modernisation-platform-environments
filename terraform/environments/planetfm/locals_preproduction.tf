@@ -162,45 +162,6 @@ locals {
           })
         }
       })
-      private = merge(local.lbs.private, {
-        instance_target_groups = {
-          web-45-80 = merge(local.lbs.private.instance_target_groups.web-80, {
-            attachments = [
-              { ec2_instance_name = "pp-cafm-w-4-b" },
-              { ec2_instance_name = "pp-cafm-w-5-a" },
-            ]
-          })
-        }
-        listeners = merge(local.lbs.private.listeners, {
-          https = merge(local.lbs.private.listeners.https, {
-            default_action = {
-              type = "redirect"
-              redirect = {
-                host        = "cafmwebx.pp.planetfm.service.justice.gov.uk"
-                port        = "443"
-                protocol    = "HTTPS"
-                status_code = "HTTP_302"
-              }
-            }
-            rules = {
-              web-45-80 = {
-                priority = 4580
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-45-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmwebx.pp.planetfm.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          })
-        })
-      })
     }
 
     route53_zones = {
