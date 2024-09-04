@@ -14,7 +14,7 @@ variable "vpc_shared_id" {
 
 data "aws_ami" "latest_linux" {
   most_recent = true
-  owners = ["099720109477"]
+  owners = ["amazon"]
   filter {
     name   = "name"
     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
