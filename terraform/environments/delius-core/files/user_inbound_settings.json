@@ -50,10 +50,6 @@
         {
           "Id": "TARGET_LOAD",
           "Severity": "LOGGER_SEVERITY_DEFAULT"
-        },
-        {
-          "Id": "SOURCE_CAPTURE",
-          "Severity": "LOGGER_SEVERITY_DETAILED_DEBUG"
         }
       ]
     }
