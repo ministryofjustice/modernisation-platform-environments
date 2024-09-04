@@ -216,7 +216,7 @@ locals {
                 priority = 150
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-win-2022-http"
+                  target_group_name = "test-rdgw-2-a-http"
                 }]
                 conditions = [{
                   host_header = {
