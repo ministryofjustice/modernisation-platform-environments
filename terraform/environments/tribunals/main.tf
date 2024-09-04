@@ -722,9 +722,10 @@ resource "aws_security_group" "nginx_lb_sg" {
 }
 
 module "nginx" {
-  source         = "./modules/nginx_ec2_pair"
-  nginx_lb_sg_id = aws_security_group.nginx_lb_sg.id
-  vpc_shared_id  = data.aws_vpc.shared.id
+  source              = "./modules/nginx_ec2_pair"
+  nginx_lb_sg_id      = aws_security_group.nginx_lb_sg.id
+  vpc_shared_id       = data.aws_vpc.shared.id
+  public_subnets_a_id = data.aws_subnet.public_subnets_a.id
 }
 
 module "loadBalancer" {

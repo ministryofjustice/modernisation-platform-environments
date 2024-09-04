@@ -12,6 +12,9 @@ variable "vpc_shared_id" {
   type = string
 }
 
+variable "public_subnets_a_id" {
+}
+
 data "aws_ami" "latest_linux" {
   most_recent = true
   owners = ["amazon"]
@@ -25,6 +28,7 @@ resource "aws_instance" "nginx" {
   for_each = toset(["eu-west-2a", "eu-west-2b"])
 
   ami               = data.aws_ami.latest_linux.id
+  subnet_id         = data.aws_subnet.public_subnets_a.id
   instance_type     = "t2.micro"
   availability_zone = each.value
   tags = {
