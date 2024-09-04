@@ -77,7 +77,7 @@ locals {
       test-win-2022 = merge(local.ec2_autoscaling_groups.base_windows, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
           # clean up Computer and DNS entry from azure.noms.root domain before using
-          desired_capacity = 1
+          desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
           ami_name = "hmpps_windows_server_2022_release_2024-*"
@@ -99,6 +99,42 @@ locals {
         tags = merge(local.ec2_autoscaling_groups.base_windows.tags, {
           description = "Windows Server 2022 instance for testing domain join and patching"
           domain-name = "azure.noms.root"
+        })
+      })
+
+      test-rdgw-2-a = merge(local.ec2_autoscaling_groups.base_windows, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
+          # clean up Computer and DNS entry from azure.noms.root domain before using
+          desired_capacity = 1
+          initial_lifecycle_hooks = {
+            "ready-hook" = {
+              default_result       = "ABANDON"
+              heartbeat_timeout    = 2700 # 45 minutes
+              lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+            }
+          }
+        })
+        config = merge(local.ec2_autoscaling_groups.base_windows.config, {
+          ami_name = "hmpps_windows_server_2022_release_2024-*"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", {
+              branch = "TM-153/remote-desktop-automation"
+            }
+          ))
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        instance = merge(local.ec2_autoscaling_groups.base_windows.instance, {
+          instance_type = "t3.large"
+        })
+        lb_target_groups = {
+          http = local.lbs.public.instance_target_groups.http
+        }
+        tags = merge(local.ec2_autoscaling_groups.base_windows.tags, {
+          description = "Windows Server 2022 instance for testing domain join and patching"
+          domain-name = "azure.noms.root"
+          server-type = "RDGateway"
         })
       })
     }
