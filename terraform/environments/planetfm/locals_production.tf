@@ -405,7 +405,7 @@ locals {
         ]
         lb_alias_records = [
           { name = "cafmtrainweb", type = "A", lbs_map_key = "cafmtrainweb" },
-          { name = "cafmwebx2", type = "A", lbs_map_key = "private" },
+          { name = "cafmwebx2", type = "A", lbs_map_key = "cafmwebx2" },
         ]
       }
     }
