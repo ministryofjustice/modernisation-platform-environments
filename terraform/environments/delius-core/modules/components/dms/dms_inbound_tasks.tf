@@ -28,29 +28,29 @@ resource "aws_dms_replication_task" "user_inbound_replication" {
 
 # Business Interaction inbound replication only happens in the repository environments.
 # There is one replication task for each for the feeder client environments.
-# resource "aws_dms_replication_task" "business_interaction_inbound_replication" {
-#   for_each            = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
-#   replication_task_id = "${var.env_name}-business-interaction-replication-task-from-${each.value}"
-#   migration_type      = "full-load-and-cdc" 
+resource "aws_dms_replication_task" "business_interaction_inbound_replication" {
+  for_each            = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
+  replication_task_id = "${var.env_name}-business-interaction-replication-task-from-${each.value}"
+  migration_type      = "full-load-and-cdc" 
 
-#   table_mappings            = file("files/business_interaction_inbound_table_mapping.json")
-#   replication_task_settings = file("files/business_interaction_inbound_settings.json")
+  table_mappings            = file("files/business_interaction_inbound_table_mapping.json")
+  replication_task_settings = file("files/business_interaction_inbound_settings.json")
  
-#   source_endpoint_arn      = aws_dms_endpoint.dms_audit_source_endpoint_s3[each.value].endpoint_arn
-#   target_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_target_endpoint_db[0].endpoint_arn
-#   replication_instance_arn = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
+  source_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_source_endpoint_s3[each.value].endpoint_arn
+  target_endpoint_arn      = aws_dms_endpoint.dms_audit_target_endpoint_db[0].endpoint_arn
+  replication_instance_arn = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
 
-#   tags = merge(
-#     var.tags,
-#     {
-#       "name" = "Business Interaction Replication from ${each.value} to ${var.env_name}"
-#     },
-#     {
-#       "audit-client-environment" = "${each.value}"
-#     },
-#     {
-#       "audit-repository-environment" = "${var.env_name}"
-#     },
-#   )
+  tags = merge(
+    var.tags,
+    {
+      "name" = "Business Interaction Replication from ${each.value} to ${var.env_name}"
+    },
+    {
+      "audit-client-environment" = "${each.value}"
+    },
+    {
+      "audit-repository-environment" = "${var.env_name}"
+    },
+  )
 
-# }
+}
