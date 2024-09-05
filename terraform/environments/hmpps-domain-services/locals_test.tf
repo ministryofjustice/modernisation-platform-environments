@@ -76,8 +76,9 @@ locals {
 
       test-win-2022 = merge(local.ec2_autoscaling_groups.base_windows, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 2
         })
+        autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
           ami_name = "hmpps_windows_server_2022_release_2024-*"
           user_data_raw = base64encode(templatefile(
