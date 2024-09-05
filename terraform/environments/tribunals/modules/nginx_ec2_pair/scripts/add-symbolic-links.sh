@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "starting nginx symbolic links script"
+sudo rm /etc/nginx/sites-enabled/*
 sudo ln -s /etc/nginx/sites-available/adjudicationpanel.tribunals.gov.uk /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/administrativeappeals.tribunals.gov.uk /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/ahmlr.gov.uk /etc/nginx/sites-enabled/

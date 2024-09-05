@@ -334,7 +334,7 @@ resource "aws_route53_record" "external_services" {
   type     = "A"
 
   alias {
-    name                   = "tribunals-nginx-1091703489.eu-west-2.elb.amazonaws.com"
+    name                   = module.loadBalancer.nginx_lb_arn
     zone_id                = "ZHURV8PSTC4K8"
     evaluate_target_health = true
   }
