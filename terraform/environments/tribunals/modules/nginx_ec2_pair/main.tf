@@ -45,36 +45,18 @@ resource "aws_instance" "nginx" {
   iam_instance_profile   = aws_iam_instance_profile.nginx_profile.name
     user_data = <<-EOF
               #!/bin/bash
-              exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
-              echo "Starting nginx setup"
 
-              echo "installing nginx"
+              echo "installing Nginx"
               sudo yum update -y &&
               sudo amazon-linux-extras install nginx1 -y
 
-              # Create necessary directories
               echo "Creating nginx directories"
               sudo mkdir -p /etc/nginx/sites-enabled || echo "Failed to create sites-enabled directory"
               sudo mkdir -p /etc/nginx/sites-available || echo "Failed to create sites-available directory"
 
-              # Check if directories were created
-              if [ -d "/etc/nginx/sites-enabled" ]; then
-                echo "sites-enabled directory exists"
-              else
-                echo "sites-enabled directory does not exist"
-              fi
-
-              if [ -d "/etc/nginx/sites-available" ]; then
-                echo "sites-available directory exists"
-              else
-                echo "sites-available directory does not exist"
-              fi
-
-              # Copy configuration files from S3
               echo "Copying files from S3"
               aws s3 cp s3://${aws_s3_bucket.nginx_config.id}/sites-available /etc/nginx/sites-available --recursive
 
-              # Run setup scripts
               echo "Running add-symbolic-links.sh"
               ${file("${path.module}/scripts/add-symbolic-links.sh")}
               echo "Running restart-nginx.sh"
