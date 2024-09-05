@@ -334,8 +334,8 @@ resource "aws_route53_record" "external_services" {
   type     = "A"
 
   alias {
-    name                   = aws_lb.tribunals_lb.dns_name
-    zone_id                = aws_lb.tribunals_lb.zone_id
+    name                   = "tribunals-nginx-265120376.eu-west-2.elb.amazonaws.com"
+    zone_id                = "ZHURV8PSTC4K8"
     evaluate_target_health = true
   }
 }
