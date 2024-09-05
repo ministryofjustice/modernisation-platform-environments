@@ -13,6 +13,7 @@ resource "aws_instance" "kali_linux" {
   }
   root_block_device {
     encrypted = true
+    volume_size = 60
   }
   ebs_block_device {
     device_name = "/dev/xvda"
