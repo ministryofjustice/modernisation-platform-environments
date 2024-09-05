@@ -736,4 +736,5 @@ module "loadBalancer" {
   nginx_instance_ids            = module.nginx.instance_ids
   subnets_shared_public_ids     = data.aws_subnets.shared-public.ids
   vpc_shared_id                 = data.aws_vpc.shared.id
+  external_acm_cert_arn         = aws_acm_certificate.external.arn
 }

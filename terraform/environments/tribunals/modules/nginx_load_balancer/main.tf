@@ -31,6 +31,10 @@ variable "vpc_shared_id" {
   type = string
 }
 
+variable "external_acm_cert_arn" {
+  type = string
+}
+
 resource "aws_lb_target_group_attachment" "nginx_lb_tg_attachment" {
   for_each         = var.nginx_instance_ids
 
@@ -51,9 +55,11 @@ resource "aws_lb_listener" "nginx_lb_listener" {
 }
 
 resource "aws_lb_listener" "nginx_lb_listener_https" {
+  certificate_arn   = var.external_acm_cert_arn
   load_balancer_arn = aws_lb.nginx_lb.arn
   port              = "443"
   protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     type             = "forward"
