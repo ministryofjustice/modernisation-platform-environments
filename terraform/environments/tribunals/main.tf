@@ -721,19 +721,19 @@ resource "aws_security_group" "nginx_lb_sg" {
   }
 }
 
-module "nginx" {
-  source              = "./modules/nginx_ec2_pair"
-  nginx_lb_sg_id      = aws_security_group.nginx_lb_sg.id
-  vpc_shared_id       = data.aws_vpc.shared.id
-  public_subnets_a_id = data.aws_subnet.public_subnets_a.id
-  public_subnets_b_id = data.aws_subnet.public_subnets_b.id
-  environment         = local.environment
-}
+# module "nginx" {
+#   source              = "./modules/nginx_ec2_pair"
+#   nginx_lb_sg_id      = aws_security_group.nginx_lb_sg.id
+#   vpc_shared_id       = data.aws_vpc.shared.id
+#   public_subnets_a_id = data.aws_subnet.public_subnets_a.id
+#   public_subnets_b_id = data.aws_subnet.public_subnets_b.id
+#   environment         = local.environment
+# }
 
-module "loadBalancer" {
-  source                        = "./modules/nginx_load_balancer"
-  nginx_lb_sg_id                = aws_security_group.nginx_lb_sg.id
-  nginx_instance_ids            = module.nginx.instance_ids
-  subnets_shared_public_ids     = data.aws_subnets.shared-public.ids
-  vpc_shared_id                 = data.aws_vpc.shared.id
-}
+# module "loadBalancer" {
+#   source                        = "./modules/nginx_load_balancer"
+#   nginx_lb_sg_id                = aws_security_group.nginx_lb_sg.id
+#   nginx_instance_ids            = module.nginx.instance_ids
+#   subnets_shared_public_ids     = data.aws_subnets.shared-public.ids
+#   vpc_shared_id                 = data.aws_vpc.shared.id
+# }
