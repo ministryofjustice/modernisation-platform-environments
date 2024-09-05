@@ -49,3 +49,14 @@ resource "aws_lb_listener" "nginx_lb_listener" {
     target_group_arn = aws_lb_target_group.nginx_lb_tg.arn
   }
 }
+
+resource "aws_lb_listener" "nginx_lb_listener_https" {
+  load_balancer_arn = aws_lb.nginx_lb.arn
+  port              = "443"
+  protocol          = "HTTPS"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.nginx_lb_tg.arn
+  }
+}
