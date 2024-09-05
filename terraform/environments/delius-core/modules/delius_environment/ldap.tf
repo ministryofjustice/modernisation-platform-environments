@@ -19,7 +19,6 @@ module "ldap" {
 
   sns_topic_arn   = aws_sns_topic.delius_core_alarms.arn
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
-  task_role_arn   = module.ldap_ecs.task_role_arn
 
   platform_vars           = var.platform_vars
   tags                    = local.tags
