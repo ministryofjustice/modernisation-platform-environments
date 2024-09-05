@@ -77,6 +77,7 @@ locals {
       test-win-2022 = merge(local.ec2_autoscaling_groups.base_windows, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
           desired_capacity = 2
+          max_size         = 2
         })
         autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
