@@ -17,7 +17,7 @@ resource "aws_lb_target_group" "nginx_lb_tg" {
 }
 
 output "nginx_lb_arn" {
-  value = aws_lb.nginx_lb.arn
+  value = aws_lb.nginx_lb.dns_name
 }
 
 variable "nginx_instance_ids" {
