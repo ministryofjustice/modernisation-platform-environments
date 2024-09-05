@@ -103,7 +103,7 @@ locals {
       })
 
       test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.rdgw.autoscaling_group, {
           desired_capacity = 1
         })
         config = merge(local.ec2_autoscaling_groups.rdgw.config, {
@@ -116,7 +116,7 @@ locals {
         instance = merge(local.ec2_autoscaling_groups.rdgw.instance, {
           instance_type = "t3.large"
         })
-        tags = merge(local.ec2_autoscaling_groups.base_windows.tags, {
+        tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
           description = "Windows Server 2022 instance for testing domain join and patching"
           domain-name = "azure.noms.root"
         })
