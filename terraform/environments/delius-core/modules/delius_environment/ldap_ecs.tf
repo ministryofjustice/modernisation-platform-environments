@@ -22,7 +22,7 @@ module "ldap_ecs" {
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
-  desired_count = 1
+  desired_count = 0
 
   container_port_config = [
     {
@@ -64,29 +64,6 @@ module "ldap_ecs" {
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_ancillary.arn_suffix
   enable_platform_backups = var.enable_platform_backups
-
-  efs_volumes = [
-    {
-      host_path = null
-      name      = "delius-core-openldap"
-      efs_volume_configuration = [{
-        file_system_id          = var.ldap_config.efs_id
-        root_directory          = "/"
-        transit_encryption      = "ENABLED"
-        transit_encryption_port = 2049
-        authorization_config = [{
-          access_point_id = var.ldap_config.efs_access_point_id
-          iam             = "DISABLED"
-        }]
-      }]
-    }
-  ]
-
-  mount_points = [{
-    sourceVolume  = "delius-core-openldap"
-    containerPath = "/var/lib/openldap/openldap-data"
-    readOnly      = false
-  }]
 
 }
 
