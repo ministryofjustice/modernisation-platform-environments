@@ -251,7 +251,7 @@ locals {
   lambda_redshift_table_expiry_jar_version    = "v0.0.12"
   lambda_redshift_table_expiry_code_s3_key = (
     local.env == "production" || local.env == "preproduction" 
-    ? "s3://dpr-artifact-store-production/build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}.rel-all.jar" 
+    ? "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}.rel-all.jar" 
     : "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}-all.jar"
   )
   lambda_redshift_table_expiry_policies = [
