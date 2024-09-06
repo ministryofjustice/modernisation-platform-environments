@@ -101,12 +101,10 @@ resource "aws_s3_object" "sites_available" {
   source = "${path.module}/sites-available/${each.value}"
 }
 
-resource "aws_s3_object" "nginx_configs" {
-  for_each = toset(["nginx.conf", "sites-available"])
-
+resource "aws_s3_object" "nginx_conf" {
   bucket = aws_s3_bucket.nginx_config.id
-  key    = each.key == "nginx.conf" ? "nginx.conf" : "sites-available/${each.value}"
-  source = each.key == "nginx.conf" ? "${path.module}/nginx.conf" : "${path.module}/sites-available/${each.value}"
+  key    = "nginx.conf"
+  source = "${path.module}/nginx.conf"
 }
 
 resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {
