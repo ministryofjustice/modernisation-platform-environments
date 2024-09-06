@@ -104,7 +104,7 @@ resource "aws_s3_object" "sites_available" {
 resource "aws_s3_object" "nginx_conf" {
   bucket = aws_s3_bucket.nginx_config.id
   key    = "nginx.conf"
-  source = "${path.module}/nginx.conf"
+  source = "${path.module}/nginx-conf/nginx.conf"
 }
 
 resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {
