@@ -326,19 +326,19 @@ locals {
 }
 
 // Create one Route 53 record for each entry in the list of tribunals (assigned in platform_locals.tf)
-resource "aws_route53_record" "external_services" {
-  for_each = var.services
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type     = "A"
+# resource "aws_route53_record" "external_services" {
+#   for_each = var.services
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   name     = "${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   type     = "A"
 
-  alias {
-    name                   = module.loadBalancer.nginx_lb_arn
-    zone_id                = "ZHURV8PSTC4K8"
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = module.loadBalancer.nginx_lb_arn
+#     zone_id                = "ZHURV8PSTC4K8"
+#     evaluate_target_health = true
+#   }
+# }
 
 resource "aws_route53_record" "sftp_external_services" {
   for_each        = var.sftp_services
