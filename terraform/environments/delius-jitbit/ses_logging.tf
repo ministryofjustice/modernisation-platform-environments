@@ -2,9 +2,9 @@
 # SES Logging
 #####################
 resource "aws_sns_topic" "jitbit_ses_destination_topic" {
-  name = format("%s-ses-destination-topic", local.application_name)
+  name              = format("%s-ses-destination-topic", local.application_name)
   kms_master_key_id = data.aws_kms_key.general_shared.arn
-  tags = local.tags
+  tags              = local.tags
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_destination" {

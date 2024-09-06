@@ -85,7 +85,6 @@ resource "aws_security_group_rule" "alb" {
 resource "aws_cloudwatch_log_group" "jitbit" {
   name              = format("%s-ecs", local.application_name)
   retention_in_days = 30
-  kms_key_id       = data.aws_kms_key.general_shared.arn
 }
 
 output "s3_bucket_app_deployment_name" {

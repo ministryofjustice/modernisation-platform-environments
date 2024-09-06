@@ -4,7 +4,7 @@ locals {
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "jitbit_alerting" {
-  name = "jitbit_alerting"
+  name              = "jitbit_alerting"
   kms_master_key_id = data.aws_kms_key.general_shared.arn
 }
 
