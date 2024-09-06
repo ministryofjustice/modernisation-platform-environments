@@ -1,8 +1,3 @@
-provider "aws" {
-  region = "eu-west-2"
-  alias  = "primary"
-}
-
 # Kali Linux Instance
 resource "aws_instance" "kali_linux" {
   #checkov:skip=CKV_AWS_88:instance requires internet access
@@ -110,7 +105,6 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
 
 # Create S3 bucket
 resource "aws_s3_bucket" "panda_cyber_bucket" {
-  provider = aws.primary
   bucket = "panda-cyber-keys"
   acl    = "private"
 
