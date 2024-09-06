@@ -2,7 +2,6 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
-      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "corporate-staff-rostering-preproduction"

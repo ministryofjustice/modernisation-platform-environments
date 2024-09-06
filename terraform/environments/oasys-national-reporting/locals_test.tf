@@ -2,7 +2,6 @@ locals {
 
   baseline_presets_test = {
     options = {
-      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "oasys-national-reporting-test"

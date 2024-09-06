@@ -2,7 +2,6 @@ locals {
 
   baseline_presets_production = {
     options = {
-      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "planetfm-production"
@@ -33,7 +32,7 @@ locals {
     }
 
     ec2_instances = {
-      # app servers 
+      # app servers
       pd-cafm-a-10-b = merge(local.ec2_instances.app, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.app.cloudwatch_metric_alarms,
