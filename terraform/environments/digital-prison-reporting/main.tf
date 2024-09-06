@@ -4,6 +4,7 @@
 ## Glue Job, Reporting Hub
 ## Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 locals {
+  nomis_port_forwarded_ip      = "10.26.24.201"
   glue_avro_registry           = split("/", module.glue_registry_avro.registry_name)
   shared_log4j_properties_path = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${aws_s3_object.glue_job_shared_custom_log4j_properties.key}"
   # We only want to enable write to Operational DataStore in the dev environment until it is available in all environments
@@ -1114,7 +1115,7 @@ module "ec2_kinesis_agent" {
   aws_region                  = local.account_region
   ec2_terminate_behavior      = "terminate"
   associate_public_ip_address = false
-  static_private_ip           = "10.26.24.201" # Used for Dev as a Secondary IP
+  static_private_ip           = local.static_nomis_ip # Used for Dev as a Secondary IP
   ebs_optimized               = true
   monitoring                  = true
   ebs_size                    = 20
