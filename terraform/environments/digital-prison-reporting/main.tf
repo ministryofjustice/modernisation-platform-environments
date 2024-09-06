@@ -1126,6 +1126,15 @@ module "ec2_kinesis_agent" {
   account = local.account_id
   env     = local.env
 
+  ec2_sec_rules_source_sec_group = {
+    "NOMIS_FROM_GLUE" = {
+      "from_port" = local.nomis_port,
+      "to_port" = local.nomis_port,
+      "protocol" = "TCP",
+      "source_security_group_id" = aws_security_group.glue_job_connection_sg.id
+    }
+  }
+
 
   tags = merge(
     local.all_tags,

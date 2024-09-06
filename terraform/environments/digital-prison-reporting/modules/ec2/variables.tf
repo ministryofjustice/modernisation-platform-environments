@@ -67,6 +67,10 @@ variable "ec2_sec_rules" {
   }
 }
 
+variable "ec2_sec_rules_source_sec_group" {
+  default = {}
+}
+
 variable "cidr" {
   description = "A list of security group IDs to associate with"
   type        = list(string)

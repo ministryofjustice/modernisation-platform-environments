@@ -17,7 +17,7 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
 
   physical_connection_requirements {
     availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
-    security_group_id_list = [aws_security_group.glue_glue_connection_sg.id]
+    security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
     subnet_id              = data.aws_subnet.private_subnets_a.id
   }
 }
@@ -36,12 +36,12 @@ resource "aws_glue_connection" "glue_nomis_connection" {
 
   physical_connection_requirements {
     availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
-    security_group_id_list = [aws_security_group.glue_glue_connection_sg.id]
+    security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
     subnet_id              = data.aws_subnet.private_subnets_a.id
   }
 }
 
-resource "aws_security_group" "glue_glue_connection_sg" {
+resource "aws_security_group" "glue_job_connection_sg" {
   #checkov:skip=CKV2_AWS_5
 
   name        = "${local.project}-glue-connection_sg"
