@@ -608,7 +608,10 @@ module "glue_s3_data_reconciliation_job" {
   region                      = local.account_region
   account                     = local.account_id
   log_group_retention_in_days = local.glue_log_retention_in_days
-  connections                 = [aws_glue_connection.glue_operational_datastore_connection.name]
+  connections                 = [
+    aws_glue_connection.glue_operational_datastore_connection.name,
+    aws_glue_connection.glue_nomis_connection.name
+  ]
   additional_secret_arns      = [
     aws_secretsmanager_secret.operational_db_secret.arn,
     aws_secretsmanager_secret.nomis.arn
