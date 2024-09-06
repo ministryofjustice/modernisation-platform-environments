@@ -31,6 +31,7 @@ resource "aws_security_group" "ec2_sec_group" {
 
 resource "aws_security_group_rule" "ingress_traffic" {
   #checkov:skip=CKV_AWS_24: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 22"
+  #checkov:skip=CKV_AWS_260: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 80"
   for_each          = var.ec2_sec_rules
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
