@@ -3,7 +3,7 @@
     "TargetSchema": "DELIUS_AUDIT_DMS_POOL",
     "SupportLobs": false,
     "BatchApplyEnabled": true,  
-    "TaskRecoveryTableEnabled": true
+    "TaskRecoveryTableEnabled": false
   },
   "FullLoadSettings": {
     "TargetTablePrepMode": "TRUNCATE_BEFORE_LOAD",
