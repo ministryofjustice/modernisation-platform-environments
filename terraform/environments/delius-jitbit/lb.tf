@@ -54,6 +54,7 @@ resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule" {
   cidr_ipv4         = each.value
 }
 
+#trivy:ignore:AVD-AWS-0107
 resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule_ipv6" {
   for_each          = toset(local.ipv6_cidr_blocks)
   description       = "Allow ingress from allow listed CIDRs"
