@@ -584,7 +584,7 @@ module "activate_glue_trigger_job" {
 }
 
 # Glue Job, Data Reconciliation Job
-module "glue_s3_data_deletion_job" {
+module "glue_s3_data_reconciliation_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-data-reconciliation-job-${local.env}"
