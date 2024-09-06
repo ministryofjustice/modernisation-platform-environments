@@ -619,7 +619,8 @@ module "glue_s3_data_reconciliation_job" {
   )
 
   arguments = {
-    "--extra-jars"                               = local.glue_jobs_latest_jar_location
+    "--extra-jars"                               = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.81-dev.3+DPR2-1117-data-reconciliation-nomis-current-state-counts.288fcb4-all.jar"
+#     "--extra-jars"                               = local.glue_jobs_latest_jar_location
     "--extra-files"                              = local.shared_log4j_properties_path
     "--class"                                    = "uk.gov.justice.digital.job.DataReconciliationJob"
     "--dpr.aws.region"                           = local.account_region
