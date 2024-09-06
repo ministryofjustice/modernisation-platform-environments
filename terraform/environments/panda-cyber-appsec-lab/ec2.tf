@@ -102,3 +102,21 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
   name = "SSMInstanceProfile"
   role = aws_iam_role.ssm_role.name
 }
+
+# Create S3 bucket
+resource "aws_s3_bucket" "panda_cyber_bucket" {
+  bucket = "panda-cyber-keys"
+  acl    = "private"
+  encrypt = true
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
+
+
