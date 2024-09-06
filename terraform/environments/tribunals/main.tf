@@ -725,7 +725,7 @@ resource "aws_security_group" "nginx_lb_sg" {
 module "nginx" {
   count               = local.is-production ? 1 : 0
   source              = "./modules/nginx_ec2_pair"
-  nginx_lb_sg_id      = aws_security_group.nginx_lb_sg.id
+  nginx_lb_sg_id      = aws_security_group.nginx_lb_sg[0].id
   vpc_shared_id       = data.aws_vpc.shared.id
   public_subnets_a_id = data.aws_subnet.public_subnets_a.id
   public_subnets_b_id = data.aws_subnet.public_subnets_b.id
@@ -735,7 +735,7 @@ module "nginx" {
 module "loadBalancer" {
   count                         = local.is-production ? 1 : 0
   source                        = "./modules/nginx_load_balancer"
-  nginx_lb_sg_id                = aws_security_group.nginx_lb_sg.id
+  nginx_lb_sg_id                = aws_security_group.nginx_lb_sg[0].id
   nginx_instance_ids            = module.nginx.instance_ids
   subnets_shared_public_ids     = data.aws_subnets.shared-public.ids
   vpc_shared_id                 = data.aws_vpc.shared.id
