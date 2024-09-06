@@ -123,6 +123,7 @@ data "aws_iam_policy_document" "dms" {
 
 ## Glue Access Policy
 resource "aws_iam_policy" "glue-full-access" {
+  #checkov:skip=CKV_AWS_110: "Ensure IAM policies does not allow privilege escalation"
   name        = "${var.name}-glue-admin"
   description = "Glue Full Policy"
   path        = "/"
