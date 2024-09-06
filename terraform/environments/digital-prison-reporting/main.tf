@@ -583,6 +583,60 @@ module "activate_glue_trigger_job" {
   }
 }
 
+# Glue Job, Data Reconciliation Job
+module "glue_s3_data_deletion_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-data-reconciliation-job-${local.env}"
+  short_name                    = "${local.project}-data-reconciliation-job"
+  command_type                  = "glueetl"
+  description                   = "Reconciles data across DataHub.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-data-reconciliation-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-data-reconciliation-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-data-reconciliation-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-1117"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                               = local.glue_jobs_latest_jar_location
+    "--extra-files"                              = local.shared_log4j_properties_path
+    "--class"                                    = "uk.gov.justice.digital.job.DataReconciliationJob"
+    "--dpr.aws.region"                           = local.account_region
+    "--dpr.config.s3.bucket"                     = module.s3_glue_job_bucket.bucket_id,
+    "--dpr.log.level"                            = local.glue_job_common_log_level
+    "--dpr.structured.s3.path"                   = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.curated.s3.path"                      = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.nomis.connection.details.secret.name" = aws_secretsmanager_secret.nomis.name
+    "--dpr.nomis.source.schema.name"             = "OMS_OWNER"
+  }
+
+  depends_on = [
+    module.s3_structured_bucket.bucket_id,
+    module.s3_curated_bucket.bucket_id
+  ]
+}
+
 # kinesis Data Stream Ingestor
 module "kinesis_stream_ingestor" {
   source                    = "./modules/kinesis_stream"
