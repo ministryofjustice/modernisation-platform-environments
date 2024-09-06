@@ -21,6 +21,6 @@ resource "aws_dms_s3_endpoint" "dms_audit_source_endpoint_s3" {
    bucket_name                     = module.s3_bucket_dms_destination.bucket.bucket
    bucket_folder                   = "audit/${local.dms_s3_cross_account_audit_source_databases[each.value]}"
    cdc_path                        = "cdc"
-   external_table_definition       = file("files/audited_interaction_external_table_definition.json")
+   external_table_definition       = file("files/audit_external_table_definition.json")
    timestamp_column_name           = "TIMESTAMP"
 }

@@ -1,5 +1,5 @@
 {
-    "TableCount": 1,
+    "TableCount": 2,
     "Tables": [
       {
         "TableName": "AUDITED_INTERACTION",
@@ -61,6 +61,63 @@
           }
         ],
         "TableColumnsTotal": "9"
+      },
+      {
+        "TableName": "BUSINESS_INTERACTION",
+        "TablePath": "DELIUS_APP_SCHEMA/BUSINESS_INTERACTION/",
+        "TableOwner": "DELIUS_APP_SCHEMA",
+        "TableColumns": [
+          {
+            "ColumnName": "DMS_CDC_TIMESTAMP",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss.F",
+            "ColumnNullable": "false",
+            "ColumnScale": "6"
+          },
+          {
+            "ColumnName": "BUSINESS_INTERACTION_ID",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false",
+            "ColumnIsPk": "true"
+          },
+          {
+            "ColumnName": "BUSINESS_INTERACTION_CODE",
+            "ColumnType": "STRING",
+            "ColumnLength": "20",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "DESCRIPTION",
+            "ColumnType": "STRING",
+            "ColumnLength": "500",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "ENABLED_DATE",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
+            "ColumnNullable": "true"
+          },
+          {
+            "ColumnName": "AUDIT_INTERACTION_PARAMETER",
+            "ColumnType": "DATETIME",
+            "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "ROW_VERSION",
+            "ColumnType": "INT8",
+            "ColumnNullable": "false"
+          },
+          {
+            "ColumnName": "CLIENT_DB",
+            "ColumnType": "STRING",
+            "ColumnLength": "20",
+            "ColumnNullable": "false",
+            "ColumnIsPk": "true"
+          }
+        ],
+        "TableColumnsTotal": "8"
       }
     ]
   }
