@@ -106,11 +106,11 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
 # Create S3 bucket
 resource "aws_s3_bucket" "panda_cyber_bucket" {
   bucket = "panda-cyber-keys"
-  versioning_configuration {
-+     status = "Enabled"
-+   }
   acl    = "private"
-  encrypt = true
+
+  versioning {
+    enabled = true
+  }
   
 
   server_side_encryption_configuration {
