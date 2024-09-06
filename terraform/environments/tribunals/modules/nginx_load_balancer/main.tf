@@ -20,6 +20,10 @@ output "nginx_lb_arn" {
   value = aws_lb.nginx_lb.dns_name
 }
 
+output "nginx_lb_zone_id" {
+  value = aws_lb.nginx_lb.zone_id
+}
+
 variable "nginx_instance_ids" {
   type = map(string)
 }

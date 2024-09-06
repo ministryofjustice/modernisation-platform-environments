@@ -695,6 +695,7 @@ module "ftp_admin_appeals" {
 }
 
 resource "aws_security_group" "nginx_lb_sg" {
+  count       = local.is-production ? 1 : 0
   name        = "nginx-lb-sg"
   description = "Allow all web access to nginx load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -722,6 +723,7 @@ resource "aws_security_group" "nginx_lb_sg" {
 }
 
 module "nginx" {
+  count               = local.is-production ? 1 : 0
   source              = "./modules/nginx_ec2_pair"
   nginx_lb_sg_id      = aws_security_group.nginx_lb_sg.id
   vpc_shared_id       = data.aws_vpc.shared.id
@@ -731,6 +733,7 @@ module "nginx" {
 }
 
 module "loadBalancer" {
+  count                         = local.is-production ? 1 : 0
   source                        = "./modules/nginx_load_balancer"
   nginx_lb_sg_id                = aws_security_group.nginx_lb_sg.id
   nginx_instance_ids            = module.nginx.instance_ids
