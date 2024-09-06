@@ -248,7 +248,11 @@ locals {
   lambda_redshift_table_expiry_tracing        = "Active"
   lambda_redshift_table_expiry_handler        = "uk.gov.justice.digital.lambda.RedShiftTableExpiryLambda::handleRequest"
   lambda_redshift_table_expiry_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  lambda_redshift_table_expiry_code_s3_key    = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-v0.0.12-all.jar"
+  lambda_redshift_table_expiry_jar_version    = "v0.0.12"
+  
+  lambda_redshift_table_expiry_code_s3_key = local.env == "production" 
+    ? "s3://dpr-artifact-store-production/build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}.rel-all.jar"
+    : "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}-all.jar"
   lambda_redshift_table_expiry_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     aws_iam_policy.redshift_dataapi_cross_policy.arn,
