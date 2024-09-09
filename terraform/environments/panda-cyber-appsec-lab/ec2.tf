@@ -12,7 +12,7 @@ resource "aws_instance" "kali_linux" {
     http_tokens = "required"
   }
   root_block_device {
-    encrypted = true
+    encrypted   = true
     volume_size = 60
   }
   ebs_block_device {
