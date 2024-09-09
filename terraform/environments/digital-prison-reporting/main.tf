@@ -638,6 +638,7 @@ module "glue_s3_data_reconciliation_job" {
     "--dpr.curated.s3.path"                      = "s3://${module.s3_curated_bucket.bucket_id}/"
     "--dpr.nomis.glue.connection.name"           = aws_glue_connection.glue_nomis_connection.name
     "--dpr.nomis.source.schema.name"             = "OMS_OWNER"
+    "--dpr.contract.registryName"                = module.s3_schema_registry_bucket.bucket_id
   })
 
   depends_on = [
