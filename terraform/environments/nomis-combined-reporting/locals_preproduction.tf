@@ -46,7 +46,6 @@ locals {
           nomis-combined-reporting-environment = "lsast"
           oracle-sids                          = "LSBIPSYS LSBIPAUD"
           instance-scheduling                  = "skip-scheduling"
-          server-type                          = "database"
         })
       })
 
@@ -67,7 +66,7 @@ locals {
           instance-scheduling                  = "skip-scheduling"
           node                                 = "1"
           nomis-combined-reporting-environment = "pp"
-          server-type                          = "management"
+          type                                 = "management"
         })
       })
 
@@ -88,7 +87,7 @@ locals {
           instance-scheduling                  = "skip-scheduling"
           node                                 = "2"
           nomis-combined-reporting-environment = "pp"
-          server-type                          = "management"
+          type                                 = "management"
         })
       })
 
@@ -109,7 +108,6 @@ locals {
           nomis-combined-reporting-environment = "pp"
           oracle-sids                          = "PPBIPSYS PPBIPAUD"
           instance-scheduling                  = "skip-scheduling"
-          server-type                          = "database"
         })
       })
 
@@ -129,7 +127,6 @@ locals {
           description                          = "PreProd Jumpserver and Client Tools"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
-          server-type                          = "client"
         })
       })
 
@@ -149,7 +146,6 @@ locals {
           description                          = "PreProd SAP BI Platform ETL installation and configurations"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
-          server-type                          = "etl"
         })
       })
 
@@ -190,7 +186,6 @@ locals {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
-          server-type                          = "web"
         })
       })
 
@@ -210,7 +205,6 @@ locals {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
-          server-type                          = "web"
         })
       })
 
@@ -230,7 +224,6 @@ locals {
           description                          = "PreProd SAP BI Platform web-tier admin installation and configurations"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
-          server-type                          = "web"
         })
       })
     }
