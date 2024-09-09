@@ -2,7 +2,7 @@
     "rules": [
         {
             "rule-type": "selection",
-            "rule-id": "aiitm1",
+            "rule-id": "401",
             "rule-name": "select_locally_populated_audit",
             "object-locator": {
                 "schema-name": "DELIUS_APP_SCHEMA",
@@ -12,7 +12,7 @@
         },
         {
             "rule-type": "transformation",
-            "rule-id": "aiitm2",
+            "rule-id": "402",
             "rule-name": "rename_to_staging_schema",
             "rule-target": "schema",
             "object-locator": {
@@ -24,7 +24,7 @@
         },
         {
             "rule-type": "transformation",
-            "rule-id": "aiitm3",
+            "rule-id": "403",
             "rule-name": "rename_to_staging_table",
             "rule-target": "table",
             "object-locator": {
