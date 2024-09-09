@@ -22,7 +22,7 @@ resource "aws_s3_bucket" "storage" { # TBC "application_tf_state" should be gene
 resource "aws_s3_bucket_public_access_block" "storage" {
 
   #checkov:skip=CKV_AWS_300:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
-  
+
   bucket = aws_s3_bucket.storage[0].id
 
   block_public_acls       = true

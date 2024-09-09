@@ -78,7 +78,7 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
   #checkov:skip=CKV_AWS_290:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
   #checkov:skip=CKV_AWS_355:"Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions.TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
 
-  
+
   name = "dms-${var.short_name}-operator-policy"
   role = aws_iam_role.dms-operator-role.id
 
