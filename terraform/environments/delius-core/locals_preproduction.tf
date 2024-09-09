@@ -99,6 +99,12 @@ locals {
       container_memory = 1024
     }
 
+    ldap = {
+      image_tag      = "replace_me"
+      container_port = 389
+      slapd_log_level = "replace_me"
+    }
+
     pdf_creation = {
       image_tag      = "5.7.6"
       container_port = 80
