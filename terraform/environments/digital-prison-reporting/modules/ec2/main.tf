@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "ingress_traffic" {
 }
 
 resource "aws_security_group_rule" "ingress_traffic_from_security_groups" {
-  for_each                 = var.ec2_sec_rules
+  for_each                 = var.ec2_sec_rules_source_sec_group
   description              = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port                = each.value.from_port
   protocol                 = each.value.protocol
