@@ -30,7 +30,7 @@ resource "aws_dms_replication_task" "user_inbound_replication" {
 # There is one replication task for each for the feeder client environments.
 resource "aws_dms_replication_task" "business_interaction_inbound_replication" {
   for_each            = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
-  replication_task_id = "${var.env_name}-business-interaction-replication-task-from-${each.value}"
+  replication_task_id = "${var.env_name}-business-interaction-inbound-replication-task-from-${each.value}"
   migration_type      = "full-load-and-cdc" 
 
   table_mappings            = file("files/business_interaction_inbound_table_mapping.json")
@@ -60,7 +60,7 @@ resource "aws_dms_replication_task" "business_interaction_inbound_replication" {
 # There is one replication task for each for the feeder client environments.
 resource "aws_dms_replication_task" "audited_interaction_inbound_replication" {
   for_each            = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
-  replication_task_id = "${var.env_name}-audited-interaction-replication-task-from-${each.value}"
+  replication_task_id = "${var.env_name}-audited-interaction-inbound-replication-task-from-${each.value}"
   migration_type      = "cdc" 
 
   table_mappings            = file("files/audited_interaction_inbound_table_mapping.json")
