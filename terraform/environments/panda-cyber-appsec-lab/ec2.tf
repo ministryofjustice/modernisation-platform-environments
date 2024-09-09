@@ -105,7 +105,7 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
 
 # Create S3 bucket
 module "s3-bucket" {
-    source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+    source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4e17731f72ef24b804207f55b182f49057e73ec9" #v8.1.0
 
   bucket_prefix                            = "panda-cyber-keys-bucket"
   versioning_enabled                       = true
