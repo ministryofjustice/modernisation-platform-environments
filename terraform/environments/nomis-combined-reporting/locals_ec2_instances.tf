@@ -49,7 +49,7 @@ locals {
         description            = "ncr bip mid-tier component"
         instance-access-policy = "full"
         os-type                = "Linux"
-        server-type            = "ncr-bip"
+        server-type            = "bip"
         update-ssm-agent       = "patchgroup1"
       }
     }
@@ -100,7 +100,7 @@ locals {
         backup                 = "false"
         instance-access-policy = "full"
         os-type                = "Linux"
-        server-type            = "ncr-web"
+        server-type            = "web"
         update-ssm-agent       = "patchgroup1"
       }
     }
@@ -147,7 +147,7 @@ locals {
         backup                 = "false"
         instance-access-policy = "full"
         os-type                = "Windows"
-        server-type            = "NcrBods"
+        server-type            = "bods"
         update-ssm-agent       = "patchgroup1"
       }
     }
@@ -207,7 +207,7 @@ locals {
       tags = {
         ami                  = "hmpps_ol_8_5_oracledb_19c"
         backup               = false
-        server-type          = "ncr-db"
+        server-type          = "db"
         os-type              = "Linux"
         licence-requirements = "Oracle Database"
         update-ssm-agent     = "patchgroup1"
@@ -247,7 +247,7 @@ locals {
         description            = "Windows Server 2012 R2 client testing for NART"
         instance-access-policy = "full"
         os-type                = "Windows"
-        server-type            = "OnrClient"
+        server-type            = "client"
         update-ssm-agent       = "patchgroup1"
       }
     }
