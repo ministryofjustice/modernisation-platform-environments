@@ -52,15 +52,9 @@
             "ColumnType": "STRING",
             "ColumnLength": "20",
             "ColumnNullable": "true"
-          },
-          {
-            "ColumnName": "CLIENT_BUSINESS_INTERACT_CODE",
-            "ColumnType": "STRING",
-            "ColumnLength": "20",
-            "ColumnNullable": "true"
           }
         ],
-        "TableColumnsTotal": "9"
+        "TableColumnsTotal": "8"
       },
       {
         "TableName": "BUSINESS_INTERACTION",
