@@ -43,6 +43,7 @@ locals {
           nomis-combined-reporting-environment = "t1"
           oracle-sids                          = "T1BIPSYS T1BIPAUD"
           instance-scheduling                  = "skip-scheduling"
+          server-type                          = "database"
         })
       })
 

@@ -46,7 +46,7 @@ locals {
           description                          = "Prod SAP BI Platform CMS installation and configurations"
           node                                 = "1"
           nomis-combined-reporting-environment = "pd"
-          type                                 = "management"
+          server-type                          = "management"
           application-software-state           = "installed"
         })
       })
@@ -68,7 +68,8 @@ locals {
           description                          = "Prod SAP BI Platform CMS installation and configurations"
           node                                 = "2"
           nomis-combined-reporting-environment = "pd"
-          type                                 = "management"
+          server-type                          = "management"
+          shutdown-order                       = "1"
           application-software-state           = "installed"
         })
       })
@@ -89,6 +90,7 @@ locals {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
           oracle-sids                          = "PDBIPSYS PDBIPAUD"
+          server-type                          = "database"
         })
       })
 
@@ -107,6 +109,7 @@ locals {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
           oracle-sids                          = "DRBIPSYS DRBIPAUD"
+          server-type                          = "database"
         })
       })
 
@@ -126,6 +129,7 @@ locals {
         tags = merge(local.ec2_autoscaling_groups.jumpserver.tags, {
           description                          = "Prod Jumpserver and Client Tools"
           nomis-combined-reporting-environment = "pd"
+          server-type                          = "client"
         })
       })
 
@@ -145,6 +149,7 @@ locals {
         tags = merge(local.ec2_instances.bods.tags, {
           description                          = "Prod SAP BI Platform ETL installation and configurations"
           nomis-combined-reporting-environment = "pd"
+          server-type                          = "processing"
         })
       })
 
@@ -184,7 +189,7 @@ locals {
           description                          = "Prod SAP BI Platform installation and configurations"
           node                                 = "3"
           nomis-combined-reporting-environment = "pd"
-          type                                 = "processing"
+          server-type                          = "processing"
           application-software-state           = "installed"
         })
       })
@@ -206,7 +211,7 @@ locals {
           description                          = "Prod SAP BI Platform installation and configurations"
           node                                 = "4"
           nomis-combined-reporting-environment = "pd"
-          type                                 = "processing"
+          server-type                          = "processing"
           application-software-state           = "installed"
         })
       })
@@ -228,7 +233,7 @@ locals {
           description                          = "Prod SAP BI Platform installation and configurations"
           node                                 = "5"
           nomis-combined-reporting-environment = "pd"
-          type                                 = "processing"
+          server-type                          = "processing"
           application-software-state           = "installed"
         })
       })
@@ -250,7 +255,7 @@ locals {
           description                          = "Prod SAP BI Platform installation and configurations"
           node                                 = "6"
           nomis-combined-reporting-environment = "pd"
-          type                                 = "processing"
+          server-type                          = "processing"
           application-software-state           = "installed"
         })
       })
@@ -272,6 +277,7 @@ locals {
           description                          = "Prod SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "pd"
           application-software-state           = "installed"
+          server-type                          = "web"
         })
       })
 
@@ -292,6 +298,7 @@ locals {
           description                          = "Prod SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "pd"
           application-software-state           = "installed"
+          server-type                          = "web"
         })
       })
 
@@ -312,6 +319,7 @@ locals {
           description                          = "Prod SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "pd"
           application-software-state           = "installed"
+          server-type                          = "web"
         })
       })
 
@@ -332,6 +340,7 @@ locals {
           description                          = "Prod SAP BI Platform web-tier installation and configurations"
           nomis-combined-reporting-environment = "pd"
           application-software-state           = "installed"
+          server-type                          = "web"
         })
       })
 
@@ -352,6 +361,7 @@ locals {
           description                          = "Prod SAP BI Platform web-tier admin installation and configurations"
           nomis-combined-reporting-environment = "pd"
           application-software-state           = "installed"
+          server-type                          = "web"
         })
       })
     }
