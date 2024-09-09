@@ -1,6 +1,6 @@
 locals {
   operational_db_jdbc_connection_string = "jdbc:postgresql://${module.aurora_operational_db.rds_cluster_endpoints["static"]}:${local.operational_db_port}/${local.operational_db_default_database}"
-  nomis_jdbc_connection_string          = "jdbc:oracle:thin:@${local.nomis_host}:${local.nomis_port}:${local.nomis_service_name}"
+  nomis_jdbc_connection_string          = "jdbc:oracle:thin:@${local.nomis_host}:${local.nomis_port}/${local.nomis_service_name}"
 }
 
 # Operational DataStore

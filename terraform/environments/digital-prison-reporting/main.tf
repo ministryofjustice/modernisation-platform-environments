@@ -627,7 +627,7 @@ module "glue_s3_data_reconciliation_job" {
   )
 
   arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
-    "--extra-jars"                               = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.81-dev.8+DPR2-1117-data-reconciliation-nomis-current-state-counts.44e4b99-all.jar"
+    "--extra-jars"                               = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.81-dev.10+DPR2-1117-data-reconciliation-nomis-current-state-counts.c184a76-all.jar"
 #     "--extra-jars"                               = local.glue_jobs_latest_jar_location
     "--extra-files"                              = local.shared_log4j_properties_path
     "--class"                                    = "uk.gov.justice.digital.job.DataReconciliationJob"
@@ -636,7 +636,7 @@ module "glue_s3_data_reconciliation_job" {
     "--dpr.log.level"                            = local.glue_job_common_log_level
     "--dpr.structured.s3.path"                   = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.curated.s3.path"                      = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.nomis.connection.details.secret.name" = aws_secretsmanager_secret.nomis.name
+    "--dpr.nomis.glue.connection.name"           = aws_glue_connection.glue_nomis_connection.name
     "--dpr.nomis.source.schema.name"             = "OMS_OWNER"
   })
 
