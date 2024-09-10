@@ -11,7 +11,7 @@ resource "aws_fsx_windows_file_system" "mis_share" {
   daily_automatic_backup_start_time = "03:00"
   deployment_type                   = "MULTI_AZ_1"
   preferred_subnet_id               = var.account_config.private_subnet_ids[0]
-  security_group_ids                = aws_security_group.fsx.id
+  security_group_ids                = [aws_security_group.fsx.id]
 
   tags = merge(
     local.tags,
@@ -49,7 +49,7 @@ resource "aws_vpc_security_group_ingress_rule" "fsx_smb_winrm_ingress" {
 
   description = "Allow ${each.key} traffic from the VPC CIDR to FSx"
 
-  cidr_ipv4   = [var.account_config.shared_vpc_cidr]
+  cidr_ipv4   = var.account_config.shared_vpc_cidr
   from_port   = each.value.from_port
   ip_protocol = "tcp"
   to_port     = each.value.to_port
@@ -65,7 +65,7 @@ resource "aws_vpc_security_group_egress_rule" "fsx_dns_egress" {
 
   description = "Allow DNS egress traffic from FSx"
 
-  cidr_ipv4   = [var.account_config.shared_vpc_cidr]
+  cidr_ipv4   = var.account_config.shared_vpc_cidr
   from_port   = 53
   ip_protocol = each.value
   to_port     = 53
