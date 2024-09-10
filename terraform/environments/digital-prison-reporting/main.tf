@@ -24,7 +24,7 @@ resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
 
 module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
-  create_job                    = local.create_job && local.create_glue_connection
+  create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
   short_name                    = "${local.project}-reporting-hub"
   description                   = local.description
@@ -48,7 +48,7 @@ module "glue_reporting_hub_job" {
   region                       = local.account_region
   account                      = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
-  connections                  = [aws_glue_connection.glue_operational_datastore_connection[0].name]
+  connections                  = local.create_glue_connection ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : []
   additional_secret_arns       = [aws_secretsmanager_secret.operational_db_secret.arn]
 
   tags = merge(
@@ -98,7 +98,7 @@ module "glue_reporting_hub_batch_job" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
 
   source                        = "./modules/glue_job"
-  create_job                    = local.create_job && local.create_glue_connection
+  create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-batch-${local.env}"
   short_name                    = "${local.project}-reporting-hub-batch"
   command_type                  = "glueetl"
@@ -119,7 +119,7 @@ module "glue_reporting_hub_batch_job" {
   region                        = local.account_region
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
-  connections                   = [aws_glue_connection.glue_operational_datastore_connection[0].name]
+  connections                   = local.create_glue_connection ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : []
   additional_secret_arns        = [aws_secretsmanager_secret.operational_db_secret.arn]
 
   tags = merge(
@@ -153,7 +153,7 @@ module "glue_reporting_hub_batch_job" {
 # Glue Job, Reporting Hub CDC
 module "glue_reporting_hub_cdc_job" {
   source                        = "./modules/glue_job"
-  create_job                    = local.create_job && local.create_glue_connection
+  create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-cdc-${local.env}"
   short_name                    = "${local.project}-reporting-hub-cdc"
   command_type                  = "gluestreaming"
@@ -175,7 +175,7 @@ module "glue_reporting_hub_cdc_job" {
   region                        = local.account_region
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
-  connections                   = [aws_glue_connection.glue_operational_datastore_connection[0].name]
+  connections                   = local.create_glue_connection ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : []
   additional_secret_arns        = [aws_secretsmanager_secret.operational_db_secret.arn]
 
   tags = merge(
