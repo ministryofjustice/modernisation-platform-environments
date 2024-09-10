@@ -1086,21 +1086,6 @@ module "glue_reconciliation_database" {
   aws_region     = local.account_region
 }
 
-#########################################
-# Data Domain Glue Connection (RedShift)
-module "glue_connection_redshift" {
-  source            = "./modules/glue_connection"
-  create_connection = local.create_glue_connection
-  name              = "${local.project}-glue-connect-redshift-${local.env}"
-  connection_url    = ""
-  description       = "Data Domain, Glue Connection to Redshift"
-  security_groups   = []
-  availability_zone = ""
-  subnet            = ""
-  password          = "" ## Needs to pull from Secrets Manager, #TD
-  username          = ""
-}
-
 # Ec2
 module "ec2_kinesis_agent" {
   source                      = "./modules/ec2"
