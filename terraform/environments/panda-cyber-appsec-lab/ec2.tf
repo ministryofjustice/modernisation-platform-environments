@@ -24,6 +24,7 @@ resource "aws_instance" "kali_linux" {
               #!/bin/bash
               # Update and install dependencies
               apt-get update
+              apt-get upgrade
               apt-get install -y wget
               
 
