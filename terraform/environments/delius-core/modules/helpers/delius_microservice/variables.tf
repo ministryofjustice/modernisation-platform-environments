@@ -502,8 +502,10 @@ variable "force_new_deployment" {
 variable "ecs_service_ingress_security_group_ids" {
   description = "Security group ids to allow ingress to the ECS service"
   type = list(object({
+    source_security_group_id     = optional(string, null)
     referenced_security_group_id = optional(string, null)
     cidr_ipv4                    = optional(string, null)
+    description                  = optional(string, null)
     port                         = number
     ip_protocol                  = string
   }))
@@ -516,6 +518,7 @@ variable "ecs_service_egress_security_group_ids" {
     referenced_security_group_id = optional(string, null)
     cidr_ipv4                    = optional(string, null)
     port                         = optional(number, null)
+    description                  = optional(string, null)
     ip_protocol                  = string
   }))
   default = []

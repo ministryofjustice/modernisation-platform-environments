@@ -88,5 +88,71 @@ module "ldap_ecs" {
     readOnly      = false
   }]
 
+  ecs_service_egress_security_group_ids = [
+    {
+      port        = 0
+      ip_protocol = "-1"
+      cidr_ipv4   = "0.0.0.0/0"
+      description = "Allow all outbound traffic to any IPv4 address"
+    }
+  ]
+
+  ecs_service_ingress_security_group_ids = [
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+      description = "Allow inbound traffic from VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+      description = "Allow inbound traffic from VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = module.bastion_linux.bastion_security_group
+      description = "Allow inbound traffic from bastion"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = module.bastion_linux.bastion_security_group
+      description = "Allow inbound traffic from bastion"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.environment_config.migration_environment_private_cidr[0]
+      description = "Allow inbound LDAP traffic from corresponding legacy VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.environment_config.migration_environment_private_cidr[0]
+      description = "Allow inbound LDAP traffic from corresponding legacy VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.account_info.cp_cidr
+      description = "Allow inbound LDAP traffic from CP"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.account_info.cp_cidr
+      description = "Allow inbound LDAP traffic from CP"
+    },
+    {
+      port                     = 2049
+      ip_protocol              = "tcp"
+      source_security_group_id = module.ldap.efs_sg_id
+      description              = "EFS ingress"
+    }
+  ]
+
 }
 
