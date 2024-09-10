@@ -67,6 +67,7 @@ locals {
           node                                 = "1"
           nomis-combined-reporting-environment = "pp"
           type                                 = "management"
+          shutdown-order                       = 3
         })
       })
 
@@ -88,6 +89,7 @@ locals {
           node                                 = "2"
           nomis-combined-reporting-environment = "pp"
           type                                 = "management"
+          shutdown-order                       = 2
         })
       })
 
@@ -167,6 +169,7 @@ locals {
           node                                 = "3"
           nomis-combined-reporting-environment = "pp"
           type                                 = "processing"
+          shutdown-order                       = 1
         })
       })
 
@@ -186,6 +189,7 @@ locals {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
+          shutdown-order                       = 4
         })
       })
 
@@ -205,6 +209,7 @@ locals {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
+          shutdown-order                       = 4
         })
       })
 
