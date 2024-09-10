@@ -67,6 +67,11 @@ variable "ec2_sec_rules" {
   }
 }
 
+variable "ec2_sec_rules_source_sec_group" {
+  description = "A Map of security group Rules that allows ingress from a specified security group"
+  default = {}
+}
+
 variable "cidr" {
   description = "A list of security group IDs to associate with"
   type        = list(string)
