@@ -110,6 +110,7 @@ module "s3-bucket" {
 
   bucket_prefix                            = "panda-cyber-keys-bucket"
   versioning_enabled                       = true
+  bucket_policy                            = [data.aws_iam_policy_document.bucket_policy.json]
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
@@ -170,6 +171,18 @@ module "s3-bucket" {
   tags                 = local.tags
 }
 
-
-
-
+data "aws_iam_policy_document" "bucket_policy" {
+  statement {
+    sid    = "s3Access"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${module.s3_bucket.bucket.arn}",
+      "${module.s3_bucket.bucket.arn}/*"
+    ]
+  }
+}
