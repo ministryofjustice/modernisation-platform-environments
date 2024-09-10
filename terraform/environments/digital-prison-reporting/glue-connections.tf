@@ -5,6 +5,7 @@ locals {
 
 # Operational DataStore
 resource "aws_glue_connection" "glue_operational_datastore_connection" {
+  count           = local.create_glue_connection ? 1 : 0
   name            = "${local.project}-operational-datastore-connection"
   connection_type = "JDBC"
 
@@ -23,6 +24,7 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
 
 # Nomis
 resource "aws_glue_connection" "glue_nomis_connection" {
+  count           = local.create_glue_connection ? 1 : 0
   name            = "${local.project}-nomis-connection"
   connection_type = "JDBC"
 
@@ -41,7 +43,6 @@ resource "aws_glue_connection" "glue_nomis_connection" {
 
 resource "aws_security_group" "glue_job_connection_sg" {
   #checkov:skip=CKV2_AWS_5
-
   name        = "${local.project}-glue-connection_sg"
   description = "Security group for glue jobs when using Glue Connections"
   vpc_id      = data.aws_vpc.shared.id
