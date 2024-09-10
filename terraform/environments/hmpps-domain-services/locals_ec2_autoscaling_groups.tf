@@ -196,7 +196,8 @@ locals {
         vpc_security_group_ids       = ["rds-ec2s"]
       }
       lb_target_groups = {
-        http = local.lbs.public.instance_target_groups.http
+        http  = local.lbs.public.instance_target_groups.http
+        https = local.lbs.public.instance_target_groups.https
       }
       tags = {
         backup           = "false"

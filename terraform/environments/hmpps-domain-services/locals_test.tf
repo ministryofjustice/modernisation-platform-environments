@@ -233,7 +233,7 @@ locals {
                 priority = 200
                 actions = [{
                   type              = "forward"
-                  target_group_name = "test-rds-2-a-http"
+                  target_group_name = "test-rds-2-a-https"
                 }]
                 conditions = [{
                   host_header = {
