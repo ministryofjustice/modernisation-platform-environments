@@ -100,74 +100,24 @@ locals {
         })
       })
 
-      test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.rdgw.autoscaling_group, {
-          desired_capacity = 1
-        })
-        config = merge(local.ec2_autoscaling_groups.rdgw.config, {
-          user_data_raw = base64encode(templatefile(
-            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", {
-              branch = "TM-153/remote-desktop-automation"
-            }
-          ))
-        })
-        instance = merge(local.ec2_autoscaling_groups.rdgw.instance, {
-          instance_type = "t3.large"
-        })
-        tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
-          domain-name = "azure.noms.root"
-        })
-      })
-
-      test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.rds.autoscaling_group, {
-          desired_capacity = 1
-        })
-        config = merge(local.ec2_autoscaling_groups.rds.config, {
-          user_data_raw = base64encode(templatefile(
-            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", {
-              branch = "TM-153/remote-desktop-automation"
-            }
-          ))
-        })
-        instance = merge(local.ec2_autoscaling_groups.rds.instance, {
-          instance_type = "t3.large"
-        })
-        tags = merge(local.ec2_autoscaling_groups.rds.tags, {
-          domain-name = "azure.noms.root"
-        })
-      })
-
-      test-rds-2-b = merge(local.ec2_autoscaling_groups.rds, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.rds.autoscaling_group, {
-          desired_capacity = 1
-        })
-        config = merge(local.ec2_autoscaling_groups.rds.config, {
-          user_data_raw = base64encode(templatefile(
-            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", {
-              branch = "TM-153/remote-desktop-automation"
-            }
-          ))
-        })
-        instance = merge(local.ec2_autoscaling_groups.rds.instance, {
-          instance_type = "t3.large"
-        })
-        tags = merge(local.ec2_autoscaling_groups.rds.tags, {
-          domain-name = "azure.noms.root"
-        })
-      })
+      # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
+      # test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
+      #   tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
+      #     domain-name = "azure.noms.root"
+      #   })
+      # }
+      # test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
+      #   tags = merge(local.ec2_autoscaling_groups.rds.tags, {
+      #     domain-name = "azure.noms.root"
+      #   })
+      # }
     }
 
     ec2_instances = {
+      # NOTE: next rebuild do this as an ASG
       test-rdgw-1-a = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = [
-            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-          ]
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.noms.root domain"
@@ -231,48 +181,6 @@ locals {
                   }
                 }]
               }
-              test-rdgw-2-http = {
-                priority = 150
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rdgw-2-a-http"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              test-rds-2-a-https = {
-                priority = 200
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rds-2-a-https"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdweb1.test.hmpps-domain.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              test-rds-2-b-https = {
-                priority = 250
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rds-2-b-https"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdweb2.test.hmpps-domain.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
             }
           })
         })
@@ -283,9 +191,6 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
-          { name = "rdgateway2", type = "A", lbs_map_key = "public" },
-          { name = "rdweb1", type = "A", lbs_map_key = "public" },
-          { name = "rdweb2", type = "A", lbs_map_key = "public" },
         ]
       }
     }
