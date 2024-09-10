@@ -91,9 +91,6 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
-        lb_target_groups = {
-          http = local.lbs.public.instance_target_groups.http
-        }
         instance = merge(local.ec2_autoscaling_groups.base_windows.instance, {
           instance_type = "t3.large"
         })
@@ -123,6 +120,25 @@ locals {
       })
 
       test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.rds.autoscaling_group, {
+          desired_capacity = 1
+        })
+        config = merge(local.ec2_autoscaling_groups.rds.config, {
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", {
+              branch = "TM-153/remote-desktop-automation"
+            }
+          ))
+        })
+        instance = merge(local.ec2_autoscaling_groups.rds.instance, {
+          instance_type = "t3.large"
+        })
+        tags = merge(local.ec2_autoscaling_groups.rds.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
+
+      test-rds-2-b = merge(local.ec2_autoscaling_groups.rds, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.rds.autoscaling_group, {
           desired_capacity = 1
         })
@@ -229,11 +245,25 @@ locals {
                   }
                 }]
               }
-              test-rds-2-https = {
+              test-rds-2-a-https = {
                 priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "test-rds-2-a-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb1.test.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rds-2-b-https = {
+                priority = 250
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rds-2-b-https"
                 }]
                 conditions = [{
                   host_header = {
