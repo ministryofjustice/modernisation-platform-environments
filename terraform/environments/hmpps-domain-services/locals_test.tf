@@ -78,7 +78,6 @@ locals {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
           desired_capacity = 0
         })
-        autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
           ami_name = "hmpps_windows_server_2022_release_2024-*"
         })
