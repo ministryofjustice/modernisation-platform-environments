@@ -78,6 +78,7 @@ resource "aws_vpc_security_group_egress_rule" "fsx_ad_egress" {
   for_each = {
     kerberos_tcp       = { from_port = 88, to_port = 88, protocol = "tcp" }
     kerberos_udp       = { from_port = 88, to_port = 88, protocol = "udp" }
+    smb                = { from_port = 445, to_port = 445, protocol = "tcp" }
     password_tcp       = { from_port = 464, to_port = 464, protocol = "tcp" }
     password_udp       = { from_port = 464, to_port = 464, protocol = "udp" }
     ldap_tcp           = { from_port = 389, to_port = 389, protocol = "tcp" }
