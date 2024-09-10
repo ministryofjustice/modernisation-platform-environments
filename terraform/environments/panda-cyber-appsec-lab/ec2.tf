@@ -114,8 +114,8 @@ resource "aws_iam_policy" "s3_access_policy" {
         ],
         Effect = "Allow",
         Resource = [
-          "${module.s3-bucket.bucket_arn}",
-          "${module.s3-bucket.bucket_arn}/*"
+          "${module.s3-bucket.bucket.arn}",
+          "${module.s3-bucket.bucket.arn}/*"
         ]
       }
     ]
@@ -212,8 +212,8 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
 
     resources = [
-      "${module.s3-bucket.bucket_arn}",
-      "${module.s3-bucket.bucket_arn}/*"
+      "${module.s3-bucket.bucket.arn}",
+      "${module.s3-bucket.bucket.arn}/*"
     ]
 
     principals {
@@ -224,6 +224,6 @@ data "aws_iam_policy_document" "bucket_policy" {
 }
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = module.s3-bucket.bucket_id
+  bucket = module.s3-bucket.bucket.id
   policy = data.aws_iam_policy_document.bucket_policy.json
 }
