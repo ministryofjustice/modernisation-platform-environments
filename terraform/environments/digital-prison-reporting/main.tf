@@ -6,10 +6,9 @@
 locals {
   glue_avro_registry           = split("/", module.glue_registry_avro.registry_name)
   shared_log4j_properties_path = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${aws_s3_object.glue_job_shared_custom_log4j_properties.key}"
-  # We only want to enable write to Operational DataStore in the dev environment until it is available in all environments
-  glue_datahub_job_extra_operational_datastore_args = (local.environment == "development" || local.environment == "test" || local.environment == "preproduction" ? {
+  glue_datahub_job_extra_operational_datastore_args = (local.create_glue_connection && local.enable_operational_datastore_job_access ? {
     "--dpr.operational.data.store.write.enabled"              = "true"
-    "--dpr.operational.data.store.glue.connection.name"       = aws_glue_connection.glue_operational_datastore_connection.name
+    "--dpr.operational.data.store.glue.connection.name"       = aws_glue_connection.glue_operational_datastore_connection[0].name
     "--dpr.operational.data.store.loading.schema.name"        = "loading"
     "--dpr.operational.data.store.tables.to.write.table.name" = "configuration.datahub_managed_tables"
     "--dpr.operational.data.store.jdbc.batch.size"            = 5000
@@ -25,7 +24,7 @@ resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
 
 module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
-  create_job                    = local.create_job
+  create_job                    = local.create_job && local.create_glue_connection
   name                          = "${local.project}-reporting-hub-${local.env}"
   short_name                    = "${local.project}-reporting-hub"
   description                   = local.description
@@ -49,7 +48,7 @@ module "glue_reporting_hub_job" {
   region                       = local.account_region
   account                      = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
-  connections                  = [aws_glue_connection.glue_operational_datastore_connection.name]
+  connections                  = [aws_glue_connection.glue_operational_datastore_connection[0].name]
   additional_secret_arns       = [aws_secretsmanager_secret.operational_db_secret.arn]
 
   tags = merge(
@@ -99,7 +98,7 @@ module "glue_reporting_hub_batch_job" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
 
   source                        = "./modules/glue_job"
-  create_job                    = local.create_job
+  create_job                    = local.create_job && local.create_glue_connection
   name                          = "${local.project}-reporting-hub-batch-${local.env}"
   short_name                    = "${local.project}-reporting-hub-batch"
   command_type                  = "glueetl"
@@ -120,7 +119,7 @@ module "glue_reporting_hub_batch_job" {
   region                        = local.account_region
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
-  connections                   = [aws_glue_connection.glue_operational_datastore_connection.name]
+  connections                   = [aws_glue_connection.glue_operational_datastore_connection[0].name]
   additional_secret_arns        = [aws_secretsmanager_secret.operational_db_secret.arn]
 
   tags = merge(
@@ -154,7 +153,7 @@ module "glue_reporting_hub_batch_job" {
 # Glue Job, Reporting Hub CDC
 module "glue_reporting_hub_cdc_job" {
   source                        = "./modules/glue_job"
-  create_job                    = local.create_job
+  create_job                    = local.create_job && local.create_glue_connection
   name                          = "${local.project}-reporting-hub-cdc-${local.env}"
   short_name                    = "${local.project}-reporting-hub-cdc"
   command_type                  = "gluestreaming"
@@ -176,7 +175,7 @@ module "glue_reporting_hub_cdc_job" {
   region                        = local.account_region
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
-  connections                   = [aws_glue_connection.glue_operational_datastore_connection.name]
+  connections                   = [aws_glue_connection.glue_operational_datastore_connection[0].name]
   additional_secret_arns        = [aws_secretsmanager_secret.operational_db_secret.arn]
 
   tags = merge(
@@ -586,7 +585,7 @@ module "activate_glue_trigger_job" {
 # Glue Job, Data Reconciliation Job
 module "glue_s3_data_reconciliation_job" {
   source                        = "./modules/glue_job"
-  create_job                    = local.create_job
+  create_job                    = local.create_job && local.create_glue_connection
   name                          = "${local.project}-data-reconciliation-job-${local.env}"
   short_name                    = "${local.project}-data-reconciliation-job"
   command_type                  = "glueetl"
@@ -608,10 +607,10 @@ module "glue_s3_data_reconciliation_job" {
   region                      = local.account_region
   account                     = local.account_id
   log_group_retention_in_days = local.glue_log_retention_in_days
-  connections                 = [
-    aws_glue_connection.glue_operational_datastore_connection.name,
-    aws_glue_connection.glue_nomis_connection.name
-  ]
+  connections                 = local.create_glue_connection ? [
+    aws_glue_connection.glue_operational_datastore_connection[0].name,
+    aws_glue_connection.glue_nomis_connection[0].name
+  ]: []
   additional_secret_arns      = [
     aws_secretsmanager_secret.operational_db_secret.arn,
     aws_secretsmanager_secret.nomis.arn
@@ -635,7 +634,7 @@ module "glue_s3_data_reconciliation_job" {
     "--dpr.log.level"                            = local.glue_job_common_log_level
     "--dpr.structured.s3.path"                   = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.curated.s3.path"                      = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.nomis.glue.connection.name"           = aws_glue_connection.glue_nomis_connection.name
+    "--dpr.nomis.glue.connection.name"           = aws_glue_connection.glue_nomis_connection[0].name
     "--dpr.nomis.source.schema.name"             = "OMS_OWNER"
     "--dpr.contract.registryName"                = module.s3_schema_registry_bucket.bucket_id
   })

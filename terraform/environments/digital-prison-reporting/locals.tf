@@ -38,6 +38,9 @@ locals {
 
   glue_job_common_log_level = local.application_data.accounts[local.environment].glue_job_common_log_level
 
+  # Flag for whether jobs that access the operational datastore have this feature turned on or not
+  enable_operational_datastore_job_access = local.application_data.accounts[local.environment].enable_operational_datastore_job_access
+
   kinesis_endpoint      = "https://kinesis.eu-west-2.amazonaws.com"
   cloud_platform_cidr   = "172.20.0.0/16"
   enable_dpr_cloudtrail = local.application_data.accounts[local.environment].enable_cloud_trail
