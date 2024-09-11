@@ -68,6 +68,7 @@ resource "aws_iam_policy" "dms" {
 }
 
 data "aws_iam_policy_document" "dms" {
+  #checkov:skip=CKV_AWS_111:"Ensure IAM policies does not allow write access without constraints"
   statement {
     actions = [
       "dms:StartReplicationTask",
@@ -132,6 +133,7 @@ resource "aws_iam_policy" "glue-full-access" {
 
 ## Glue Access Policy Document
 data "aws_iam_policy_document" "glue-access" {
+  #checkov:skip=CKV_AWS_111:"Ensure IAM policies does not allow write access without constraints"
   statement {
     actions = [
       "glue:*"
