@@ -37,13 +37,14 @@ module "ldap_ecs" {
 
   bastion_sg_id                      = module.bastion_linux.bastion_security_group
   tags                               = var.tags
-  microservice_lb                    = aws_lb.delius_core_ancillary
-  microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
+  #microservice_lb                    = aws_lb.delius_core_ancillary
+  #microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
   alb_listener_rule_host_header = "ldap.${var.env_name}.${var.account_config.dns_suffix}"
 
   platform_vars           = var.platform_vars
   container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-openldap-ecr-repo:${var.delius_microservice_configs.ldap.image_tag}"
   account_config          = var.account_config
+
   health_check = {
     command     = ["CMD-SHELL", "ldapsearch -x -H ldap://localhost:389 -b '' -s base '(objectclass=*)' namingContexts"]
     interval    = 30
