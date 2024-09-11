@@ -110,6 +110,14 @@ locals {
 
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
       })
+
+      dev-nomis-web19c-b = merge(local.ec2_autoscaling_groups.web19c, {
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+      })
     }
 
     ec2_instances = {
