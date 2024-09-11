@@ -1,18 +1,18 @@
 locals {
-  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
-    name   = dvo.resource_record_name
-    record = dvo.resource_record_value
-    type   = dvo.resource_record_type
-    }
-  }
-  domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_name_sub    = [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
-  domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
-  domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+  # domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+  #   name   = dvo.resource_record_name
+  #   record = dvo.resource_record_value
+  #   type   = dvo.resource_record_type
+  #   }
+  # }
+  # domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  # domain_name_sub    = [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  # domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  # domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  # domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  # domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
-  certificate_arn = aws_acm_certificate.external.arn
+  # certificate_arn = aws_acm_certificate.external.arn
 
   error_codes = [
     1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14,

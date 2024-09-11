@@ -25,6 +25,8 @@ locals {
     efs_provisioned_throughput  = null
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
+    efs_id                      = "fs-09e171610bb5c87c4"
+    efs_access_point_id         = "fsap-02598b3cfe2720697"
     port                        = 389
   }
 
@@ -91,6 +93,12 @@ locals {
       container_port   = 8080
       container_cpu    = 512
       container_memory = 1024
+    }
+
+    ldap = {
+      image_tag      = "6.0.3-latest"
+      container_port = 389
+      slapd_log_level = "stats"
     }
 
     pdf_creation = {
