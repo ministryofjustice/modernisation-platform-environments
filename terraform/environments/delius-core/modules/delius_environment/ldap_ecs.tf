@@ -110,18 +110,18 @@ module "ldap_ecs" {
       cidr_ipv4   = var.account_config.shared_vpc_cidr
       description = "Allow inbound traffic from VPC"
     },
-    # {
-    #   port        = var.ldap_config.port
-    #   ip_protocol = "tcp"
-    #   cidr_ipv4   = module.bastion_linux.bastion_security_group
-    #   description = "Allow inbound traffic from bastion"
-    # },
-    # {
-    #   port        = var.ldap_config.port
-    #   ip_protocol = "udp"
-    #   cidr_ipv4   = module.bastion_linux.bastion_security_group
-    #   description = "Allow inbound traffic from bastion"
-    # },
+    {
+      port                          = var.ldap_config.port
+      ip_protocol                   = "tcp"
+      referenced_security_group_id  = module.bastion_linux.bastion_security_group
+      description                   = "Allow inbound traffic from bastion"
+    },
+    {
+      port                           = var.ldap_config.port
+      ip_protocol                    = "udp"
+      referenced_security_group_id   = module.bastion_linux.bastion_security_group
+      description                    = "Allow inbound traffic from bastion"
+    },
     {
       port        = var.ldap_config.port
       ip_protocol = "tcp"
