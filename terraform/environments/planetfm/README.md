@@ -9,27 +9,37 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Last review date:**
 
-<!-- Adding the last date this page was reviewed, with any accompanying information -->
+11/09/2024
 
 ### **Description:**
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+PlanetFM is the facilities management system.
 
 ### **Service URLs:**
 
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
 
+https://cafmwebx2.az.justice.gov.uk/PlanetPortal
+
 ### **Incident response hours:**
 
 <!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+08:00 - 17:00 Monday -> Friday
 
 ### **Incident contact details:**
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
+End Users raised incident tickets via the usual MoJ channels, via their MoJo devices or the service desk.
+
+Slack channels for internal notifications of issues: #ask-digital-studio-ops
+
 ### **Service team contact:**
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
+
+Slack channel: #planet_aws
 
 ### **Hosting environment:**
 
@@ -42,22 +52,27 @@ Modernisation Platform
 ### **Other URLs:**
 
 <!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
+[PlanetFM Confluence Page](https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4727930938/Planet+FM+in+Modernisation+Platform)
 
 ### **Expected speed and frequency of releases:**
 
-<!-- How often are you able to release changes to your service, and how long do those changes take? -->
+Releases occur at least annually.
 
 ### **Automatic alerts:**
 
 <!-- List, briefly, problems (or types of problem) that will automatically alert your team when they occur. -->
+Automated alerts will arrive into the #planetfm_alarms slack channel.
+[Alarms Overview](https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289626807/Monitoring+and+Alerting)
 
 ### **Impact of an outage:**
 
 <!-- A short description of the risks if your service is down for an extended period of time. -->
+Prisons will not be able to log maintenance requests.
 
 ### **Out of hours response types:**
 
 <!-- Describe how incidents that page a person on call are responded to. How long are out-of-hours responders expected to spend trying to resolve issues before they stop working, put the service into maintenance mode, and hand the issue to in-hours support? -->
+There is no out of hours support.
 
 ### **Consumers of this service:**
 
@@ -70,6 +85,7 @@ Modernisation Platform
 ### **Restrictions on access:**
 
 <!-- Describe any conditions which restrict access to the service, such as if it’s IP-restricted or only accessible from a private network.-->
+Accessible externally from MoJo devices only.
 
 ### **How to resolve specific issues:**
 
