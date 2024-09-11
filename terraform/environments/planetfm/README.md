@@ -19,18 +19,21 @@ PlanetFM is the facilities management system.
 ### **Service URLs:**
 
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
-https://planetfm.service.justice.gov.uk (production)
+
+https://cafmwebx2.az.justice.gov.uk/PlanetPortal
 
 ### **Incident response hours:**
 
 <!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
-09:00 - 17:00 Monday -> Friday
+08:00 - 17:00 Monday -> Friday
 
 ### **Incident contact details:**
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
-Slack channels: #ask-digital-studio-ops or #planet_aws
+End Users raised incident tickets via the usual MoJ channels, via their MoJo devices or the service desk.
+
+Slack channels for internal notifications of issues: #ask-digital-studio-ops
 
 ### **Service team contact:**
 
@@ -49,23 +52,27 @@ Modernisation Platform
 ### **Other URLs:**
 
 <!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
+[PlanetFM Confluence Page](https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4727930938/Planet+FM+in+Modernisation+Platform)
 
 ### **Expected speed and frequency of releases:**
 
-It is a legacy system and is not expected to have any further releases.
+Releases occur at least annually.
 
 ### **Automatic alerts:**
 
 <!-- List, briefly, problems (or types of problem) that will automatically alert your team when they occur. -->
-Automated alerts will arrive into the #planetfm_alarms channel
+Automated alerts will arrive into the #planetfm_alarms slack channel.
+[Alarms Overview](https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289626807/Monitoring+and+Alerting)
 
 ### **Impact of an outage:**
 
 <!-- A short description of the risks if your service is down for an extended period of time. -->
+Prisons will not be able to log maintenance requests.
 
 ### **Out of hours response types:**
 
 <!-- Describe how incidents that page a person on call are responded to. How long are out-of-hours responders expected to spend trying to resolve issues before they stop working, put the service into maintenance mode, and hand the issue to in-hours support? -->
+There is no out of hours support.
 
 ### **Consumers of this service:**
 
@@ -78,6 +85,7 @@ Automated alerts will arrive into the #planetfm_alarms channel
 ### **Restrictions on access:**
 
 <!-- Describe any conditions which restrict access to the service, such as if it’s IP-restricted or only accessible from a private network.-->
+Accessible externally from MoJo devices only.
 
 ### **How to resolve specific issues:**
 
