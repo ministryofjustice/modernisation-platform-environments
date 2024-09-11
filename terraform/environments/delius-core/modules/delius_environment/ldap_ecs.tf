@@ -90,7 +90,6 @@ module "ldap_ecs" {
 
   ecs_service_egress_security_group_ids = [
     {
-      port        = 0
       ip_protocol = "-1"
       cidr_ipv4   = "0.0.0.0/0"
       description = "Allow all outbound traffic to any IPv4 address"
