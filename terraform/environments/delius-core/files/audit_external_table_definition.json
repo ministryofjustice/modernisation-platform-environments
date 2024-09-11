@@ -114,7 +114,7 @@
         "TableColumnsTotal": "8"
       },
       {
-        "TableName": "BUSINESS_INTERACTION",
+        "TableName": "AUDITED_INTERACTION_CHECKSUM",
         "TablePath": "DELIUS_AUDIT_DMS_POOL/AUDITED_INTERACTION_CHECKSUM/",
         "TableOwner": "DELIUS_AUDIT_DMS_POOL",
         "TableColumns": [
