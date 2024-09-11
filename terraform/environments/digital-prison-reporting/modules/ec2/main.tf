@@ -1,6 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 data "template_file" "user_data" {
+  # tflint-ignore-file: terraform_required_version, terraform_required_providers 
   template = file("${path.module}/scripts/bootstrap_apps.sh")
 
   vars = {
