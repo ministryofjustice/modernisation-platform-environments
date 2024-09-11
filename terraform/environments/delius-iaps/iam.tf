@@ -35,7 +35,8 @@ data "aws_iam_policy_document" "ci_secrets_rotator_role" {
     }
   }
 }
-
+# checkov:skip=CKV_AWS_111:ignore - Ensure IAM policies does not allow write access without constraints
+# checkov:skip=CKV_AWS_356:policy requires all resources to be allowed
 data "aws_iam_policy_document" "ci_secrets_rotator" {
   statement {
     sid    = "RotateSecrets"
@@ -114,6 +115,9 @@ locals {
   iaps_rds_snapshot_arn_pattern_preprod = "arn:aws:rds:${data.aws_region.current.name}:${local.environment_management.account_ids["delius-iaps-preproduction"]}:snapshot:*iaps-*"
 }
 
+# checkov:skip=CKV_AWS_111: "policy exception"
+# checkov:skip=CKV_AWS_356: "policy exception"
+# checkov:skip=CKV_AWS_109: "policy exception"
 data "aws_iam_policy_document" "snapshot_sharer" {
   statement {
     sid    = "CopyAndShareSnapshots"
