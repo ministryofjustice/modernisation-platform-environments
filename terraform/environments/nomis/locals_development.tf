@@ -116,6 +116,7 @@ locals {
           args = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init.args, {
             branch = "main"
           })
+        })
       })
     }
 
