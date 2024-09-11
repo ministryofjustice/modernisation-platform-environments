@@ -29,27 +29,6 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   role       = aws_iam_role.dms-vpc-role.name
 }
 
-# Create a Role to Allow any Audit Clients of this environment, or any Repository
-# for this environment to write to the DMS S3 bucket
-# resource "aws_iam_role" "dms_s3_writer_role" {
-#   count = length(local.dms_s3_writer_account_ids) > 0 ? 1 : 0
-#   name = local.dms_s3_writer_role_name
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       for principal in local.dms_s3_writer_account_ids:
-#       {
-#         Effect = "Allow",
-#         Principal = {
-#           AWS = "arn:aws:iam::${principal}:root"
-#         },
-#         Action = "sts:AssumeRole"
-#       }
-#     ]
-#   })
-# }
-
-
 resource "aws_iam_role" "dms_s3_writer_role" {
   name = local.dms_s3_writer_role_name
   assume_role_policy = jsonencode({
@@ -99,6 +78,9 @@ resource "aws_iam_role_policy_attachment" "dms_s3_bucket_writer_policy_attachmen
   policy_arn = aws_iam_policy.dms_s3_bucket_writer_policy[0].arn
 }
 
+
+# The following role is used to allow the DMS service to read from the S3 Staging Bucket,
+# And also to allow the name of the Repository Bucket to be found by the Client Account.
 resource "aws_iam_role" "dms_s3_reader_role" {
   name = local.dms_s3_reader_role_name
   assume_role_policy = jsonencode({
@@ -110,10 +92,20 @@ resource "aws_iam_role" "dms_s3_reader_role" {
           Service = "dms.amazonaws.com"
         }
         Action = "sts:AssumeRole"
+      },
+      {
+        Effect = "Allow"
+        Principals = {
+            type        = "AWS"
+            identifiers = "arn:aws:iam::${var.platform_vars.environment_management.account_ids["delius-core-${var.dms_config.audit_target_endpoint.write_environment}"]}"
+          }
+        Action = "sts:AssumeRole"
       }
     ]
   })
 }
+
+
 
 # The reader role only provides access to the local bucket, not those in other accounts
 resource "aws_iam_policy" "dms_s3_bucket_reader_policy" {
@@ -143,3 +135,5 @@ resource "aws_iam_role_policy_attachment" "dms_s3_bucket_reader_policy_attachmen
   role       = aws_iam_role.dms_s3_reader_role.name
   policy_arn = aws_iam_policy.dms_s3_bucket_reader_policy.arn
 }
+
+
