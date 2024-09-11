@@ -5,6 +5,7 @@ module "shield" {
     aws.modernisation-platform = aws.modernisation-platform
   }
   application_name = local.application_name
+  excluded_protections = ["aae73c82-0ce9-442a-89e4-13cab23f26e0"]
   resources = {
     citrix_alb = {
       action = "count"
@@ -19,10 +20,4 @@ module "shield" {
       "threshold" = "100"
     }
   }
-}
-
-import {
-  for_each = local.is-production ? { "build" = true } : {}
-  id = "06cebb43-c961-44f0-81e5-27f94e2159d4/FMManagedWebACLV2-shield_advanced_auto_remediate-1649415294385/REGIONAL"
-  to = module.shield["build"].aws_wafv2_web_acl.main
 }
