@@ -9,27 +9,34 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Last review date:**
 
-<!-- Adding the last date this page was reviewed, with any accompanying information -->
+11/09/2024
 
 ### **Description:**
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+PlanetFM is the facilities management system.
 
 ### **Service URLs:**
 
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
+https://planetfm.service.justice.gov.uk (production)
 
 ### **Incident response hours:**
 
 <!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+09:00 - 17:00 Monday -> Friday
 
 ### **Incident contact details:**
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
+Slack channels: #ask-digital-studio-ops or #planet_aws
+
 ### **Service team contact:**
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
+
+Slack channel: #planet_aws
 
 ### **Hosting environment:**
 
@@ -45,11 +52,12 @@ Modernisation Platform
 
 ### **Expected speed and frequency of releases:**
 
-<!-- How often are you able to release changes to your service, and how long do those changes take? -->
+It is a legacy system and is not expected to have any further releases.
 
 ### **Automatic alerts:**
 
 <!-- List, briefly, problems (or types of problem) that will automatically alert your team when they occur. -->
+Automated alerts will arrive into the #planetfm_alarms channel
 
 ### **Impact of an outage:**
 
