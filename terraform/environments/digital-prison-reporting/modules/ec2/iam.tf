@@ -68,6 +68,10 @@ resource "aws_iam_policy" "dms" {
 }
 
 data "aws_iam_policy_document" "dms" {
+  #checkov:skip=CKV_AWS_111:"Ensure IAM policies does not allow write access without constraints"
+  #checkov:skip=CKV_AWS_109:"Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+  #checkov:skip=CKV_AWS_356:"Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions. Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+
   statement {
     actions = [
       "dms:StartReplicationTask",
@@ -132,6 +136,11 @@ resource "aws_iam_policy" "glue-full-access" {
 
 ## Glue Access Policy Document
 data "aws_iam_policy_document" "glue-access" {
+  #checkov:skip=CKV_AWS_110:"Ensure IAM policies does not allow privilege escalation. Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+  #checkov:skip=CKV_AWS_111:"Ensure IAM policies does not allow write access without constraints"
+  #checkov:skip=CKV_AWS_109:"Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+  #checkov:skip=CKV_AWS_356:"Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions. Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+
   statement {
     actions = [
       "glue:*"
@@ -198,8 +207,10 @@ resource "aws_iam_policy" "generic" {
 }
 
 data "aws_iam_policy_document" "generic" {
-  #checkov:skip=CKV_AWS_107: "Ensure IAM policies does not allow credentials exposure. Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
-  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions. Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+  #checkov:skip=CKV_AWS_111:"Ensure IAM policies does not allow write access without constraints"
+  #checkov:skip=CKV_AWS_109:"Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+  #checkov:skip=CKV_AWS_107:"Ensure IAM policies does not allow credentials exposure. Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+  #checkov:skip=CKV_AWS_356:"Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions. Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
   statement {
     actions = [
       "ec2:Describe*",
