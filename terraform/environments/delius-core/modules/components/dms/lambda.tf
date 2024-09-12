@@ -2,7 +2,7 @@
 resource "aws_s3_object" "lambda_zip" {
   bucket = module.s3_bucket_dms_destination.bucket.bucket
   key    = "list_buckets.zip"
-  source = "list_buckets.zip"
+  source = "files/list_buckets.zip"
 }
 
 # Create Lambda Function
