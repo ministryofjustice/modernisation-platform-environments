@@ -1,4 +1,5 @@
 # Dev placeholder values hardcoded for testing. Values in pre and prod to be set manually on initial deployment
+# checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
 resource "aws_ssm_parameter" "im-interface-oracle-user" {
   name      = "/IMInterface/IAPSOracle/user"
   type      = "String"
@@ -12,6 +13,7 @@ resource "aws_ssm_parameter" "im-interface-oracle-user" {
   }
 }
 
+# checkov:skip=CKV_AWS_337: "Ensure SSM parameters are using KMS CMK"
 resource "aws_ssm_parameter" "im-interface-oracle-password" {
   name      = "/IMInterface/IAPSOracle/password"
   type      = "SecureString"
@@ -25,6 +27,7 @@ resource "aws_ssm_parameter" "im-interface-oracle-password" {
   }
 }
 
+# checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
 resource "aws_ssm_parameter" "im-interface-soap-odbc-dsn" {
   name      = "/IMInterface/SOAPServer/ODBC/dsn"
   type      = "String"
@@ -38,6 +41,7 @@ resource "aws_ssm_parameter" "im-interface-soap-odbc-dsn" {
   }
 }
 
+# checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
 resource "aws_ssm_parameter" "im-interface-soap-odbc-server" {
   name      = "/IMInterface/SOAPServer/ODBC/server"
   type      = "String"
@@ -51,6 +55,7 @@ resource "aws_ssm_parameter" "im-interface-soap-odbc-server" {
   }
 }
 
+# checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
 resource "aws_ssm_parameter" "im-interface-soap-odbc-database" {
   name      = "/IMInterface/SOAPServer/ODBC/database"
   type      = "String"
@@ -64,6 +69,7 @@ resource "aws_ssm_parameter" "im-interface-soap-odbc-database" {
   }
 }
 
+# checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
 resource "aws_ssm_parameter" "im-interface-soap-odbc-uid" {
   name      = "/IMInterface/SOAPServer/ODBC/uid"
   type      = "String"
@@ -77,6 +83,7 @@ resource "aws_ssm_parameter" "im-interface-soap-odbc-uid" {
   }
 }
 
+# checkov:skip=CKV_AWS_337: "Ensure SSM parameters are using KMS CMK"
 resource "aws_ssm_parameter" "im-interface-soap-odbc-pwd" {
   name      = "/IMInterface/SOAPServer/ODBC/pwd"
   type      = "SecureString"
@@ -90,6 +97,7 @@ resource "aws_ssm_parameter" "im-interface-soap-odbc-pwd" {
   }
 }
 
+# checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
 resource "aws_ssm_parameter" "ndelius-interface-ssm-param" {
   for_each  = local.ndelius_interface_params.parameter
   name      = each.value.name

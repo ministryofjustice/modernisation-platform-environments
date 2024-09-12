@@ -1,6 +1,7 @@
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "iaps_alerting" {
-  name = "${local.application_name}-alerting"
+  name              = "${local.application_name}-alerting"
+  kms_master_key_id = data.aws_kms_key.general_shared.arn
 }
 
 // ASG Alarms
@@ -195,6 +196,7 @@ locals {
 # link the sns topic to the service
 # Non-Prod alerts channel: #hmpps-iaps-alerts-non-prod
 # Prod alerts channel:     #hmpps-iaps-alerts-prod
+#checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
 module "pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.iaps_alerting

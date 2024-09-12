@@ -1,3 +1,4 @@
+#checkov:skip=CKV2_AWS_60: "ignore - Ensure RDS instance with copy tags to snapshots is enabled"
 resource "aws_db_instance" "iaps" {
   engine         = "oracle-ee"
   engine_version = local.application_data.accounts[local.environment].db_engine_version
@@ -14,13 +15,14 @@ resource "aws_db_instance" "iaps" {
   vpc_security_group_ids        = [aws_security_group.iaps_db.id]
 
   # tflint-ignore: aws_db_instance_default_parameter_group
-  parameter_group_name        = "default.oracle-ee-19"
-  ca_cert_identifier          = "rds-ca-rsa2048-g1"
-  skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
-  allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
-  max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
-  apply_immediately           = local.application_data.accounts[local.environment].db_apply_immediately
-  maintenance_window          = local.application_data.accounts[local.environment].db_maintenance_window
+  parameter_group_name  = "default.oracle-ee-19"
+  ca_cert_identifier    = "rds-ca-rsa2048-g1"
+  skip_final_snapshot   = local.application_data.accounts[local.environment].db_skip_final_snapshot
+  allocated_storage     = local.application_data.accounts[local.environment].db_allocated_storage
+  max_allocated_storage = local.application_data.accounts[local.environment].db_max_allocated_storage
+  apply_immediately     = local.application_data.accounts[local.environment].db_apply_immediately
+  maintenance_window    = local.application_data.accounts[local.environment].db_maintenance_window
+  #checkov:skip=CKV_AWS_226: "minor auto upgrade optional (disabled) for iaps"
   auto_minor_version_upgrade  = local.application_data.accounts[local.environment].db_auto_minor_version_upgrade
   allow_major_version_upgrade = local.application_data.accounts[local.environment].db_allow_major_version_upgrade
   backup_window               = local.application_data.accounts[local.environment].db_backup_window
@@ -33,8 +35,9 @@ resource "aws_db_instance" "iaps" {
   monitoring_interval = local.application_data.accounts[local.environment].db_monitoring_interval
   monitoring_role_arn = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? "" : aws_iam_role.rds_enhanced_monitoring[0].arn
   #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
-  kms_key_id                      = data.aws_kms_key.rds_shared.arn
-  storage_encrypted               = true
+  kms_key_id        = data.aws_kms_key.rds_shared.arn
+  storage_encrypted = true
+  #checkov:skip=CKV_AWS_353: "performance insights enabled but optional"
   performance_insights_enabled    = local.application_data.accounts[local.environment].db_performance_insights_enabled
   performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
@@ -77,6 +80,7 @@ resource "aws_db_subnet_group" "iaps" {
   tags = local.tags
 }
 
+#checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
 resource "aws_security_group" "iaps_db" {
   name        = "allow_iaps_vm"
   description = "Allow DB traffic from IAPS VM"

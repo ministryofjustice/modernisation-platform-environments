@@ -7,6 +7,7 @@ resource "random_string" "bucket_suffix" {
 }
 
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-block-public-acls  tfsec:ignore:aws-s3-block-public-policy  tfsec:ignore:aws-s3-ignore-public-acls  tfsec:ignore:aws-s3-no-public-buckets  tfsec:ignore:aws-s3-specify-public-access-block
+#trivy:ignore:avd-aws-0087 trivy:ignore:avd-aws-0089 trivy:ignore:avd-aws-0090 trivy:ignore:avd-aws-0091 trivy:ignore:avd-aws-0093
 resource "aws_s3_bucket" "this" {
   bucket_prefix = "moj-alb-citrix-access-logs-bucket"
 
@@ -14,6 +15,14 @@ resource "aws_s3_bucket" "this" {
     Environment = "Development"
     Name        = "S3 Access Logs for ALB"
   }
+}
+
+resource "aws_s3_bucket_public_access_block" "this" {
+  bucket = aws_s3_bucket.this.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
