@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "laa_oem_shared_s3" {
 }
 
 resource "aws_iam_policy" "laa_oem_shared_s3" {
-  description = "Policy to allow operations in ${aws_s3_bucket.laa_oem_shared.name}"
+  description = "Policy to allow operations in ${aws_s3_bucket.laa_oem_shared.id}"
   name        = "laa_oem_shared_s3-${local.environment}"
   policy      = data.aws_iam_policy_document.laa_oem_shared_s3.json
 }
