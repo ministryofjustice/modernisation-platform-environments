@@ -238,7 +238,7 @@ resource "aws_iam_policy" "assume_cross_account_policy" {
       {
         "Effect": "Allow",
         "Action": "sts:AssumeRole",
-        "Resource": "${var.env_name_to_dms_config_map[var.dms_config.audit_target_endpoint.write_environment].account_id}:role/${var.dms_config.audit_target_endpoint.write_environment}-dms-s3-lister-role"
+        "Resource": "arn:aws:iam::${var.env_name_to_dms_config_map[var.dms_config.audit_target_endpoint.write_environment].account_id}:role/${var.dms_config.audit_target_endpoint.write_environment}-dms-s3-lister-role"
       }
     ]
   })
