@@ -23,11 +23,11 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     reviewers:
       - "ministryofjustice/devcontainer-community"
   # Dependabot doesn't currently support wildcard or multiple directory declarations within
@@ -41,5 +41,5 @@ echo "Generating entry for ${folder}"
 echo "  - package-ecosystem: \"terraform\"" >> $dependabot_file
 echo "    directory: \"/${folder}\"" >> $dependabot_file
 echo "    schedule:" >> $dependabot_file
-echo "      interval: \"daily\"" >> $dependabot_file
+echo "      interval: \"weekly\"" >> $dependabot_file
 done
