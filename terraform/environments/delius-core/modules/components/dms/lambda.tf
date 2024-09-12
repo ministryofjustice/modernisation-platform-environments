@@ -1,11 +1,6 @@
-# S3 bucket to store Lambda deployment package
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = module.s3_bucket_dms_destination.bucket.bucket
-}
-
 # Upload Lambda deployment package to S3
 resource "aws_s3_object" "lambda_zip" {
-  bucket = aws_s3_bucket.lambda_bucket.bucket
+  bucket = module.s3_bucket_dms_destination.bucket.bucket
   key    = "list_buckets.zip"
   source = "list_buckets.zip"
 }
@@ -18,7 +13,7 @@ resource "aws_lambda_function" "list_s3_buckets" {
   runtime          = "python3.8"
 
   # Lambda deployment package location
-  s3_bucket        = aws_s3_bucket.lambda_bucket.bucket
+  s3_bucket        = module.s3_bucket_dms_destination.bucket.bucket
   s3_key           = aws_s3_object.lambda_zip.key
 }
 
