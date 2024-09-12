@@ -1,5 +1,6 @@
 # Legacy environment Log Archive bucket. Only needed in Production
 # NEC requested we retain logs from the start of this year
+# checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 module "s3-log-archive-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   count = local.environment == "production" ? 1 : 0
 

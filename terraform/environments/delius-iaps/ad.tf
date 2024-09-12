@@ -43,7 +43,8 @@ resource "aws_directory_service_directory" "active_directory" {
 ##
 # Set up logging for the Managed AD
 #
-#checkov:skip=CKV_AWS_158
+#checkov:skip=CKV_AWS_158: ignore CloudWatch Log Group is encrypted by KMS
+#checkov:skip=CKV_AWS_338: log groups retention policy not applicable
 resource "aws_cloudwatch_log_group" "active_directory" {
   name              = "/aws/directoryservice/${aws_directory_service_directory.active_directory.id}"
   retention_in_days = 14
