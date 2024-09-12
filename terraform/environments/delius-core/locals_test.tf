@@ -25,8 +25,8 @@ locals {
     efs_provisioned_throughput  = null
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
-    efs_id                      = "replace_this"
-    efs_access_point_id         = "replace_this"
+    efs_id                      = "fs-0c77af6b0b38ba359"
+    efs_access_point_id         = "fsap-0c08e8cb5ba77ed8a"
     port                        = 389
   }
 
