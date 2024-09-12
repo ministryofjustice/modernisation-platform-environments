@@ -212,3 +212,42 @@ resource "aws_iam_role_policy_attachment" "dms_s3_bucket_list_by_client_policy_a
   role       = aws_iam_role.dms_s3_bucket_list_by_client_role[0].name
   policy_arn = aws_iam_policy.dms_s3_bucket_list_by_client_policy[0].arn
 }
+
+# IAM Role for Lambda with AssumeRole policy
+resource "aws_iam_role" "lambda_execution_role" {
+  name = "lambda-execution-role"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }]
+  })
+}
+
+# Attach a policy that allows Lambda to assume roles in target accounts
+resource "aws_iam_policy" "assume_cross_account_policy" {
+  count              = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
+  name   = "AssumeCrossAccountPolicy"
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": "sts:AssumeRole",
+        "Resource": "${var.env_name_to_dms_config_map[var.dms_config.audit_target_endpoint.write_environment].account_id}:role/${var.dms_config.audit_target_endpoint.write_environment}-dms-s3-lister-role"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_assume_role_attachment" {
+  count              = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = aws_iam_policy.assume_cross_account_policy[0].arn
+}
+
+
