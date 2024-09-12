@@ -92,6 +92,11 @@ resource "aws_api_gateway_method_settings" "api_stage_settings" {
   }
 }
 
+# Associate the IAM Role with API Gateway Account Settings for CloudWatch logging
+resource "aws_api_gateway_account" "api_gateway_account" {
+  cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch_role.arn
+}
+
 # Use Terraform http data source to call the API and get bucket names
 # data "http" "lambda_output" {
 #   url = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets"
