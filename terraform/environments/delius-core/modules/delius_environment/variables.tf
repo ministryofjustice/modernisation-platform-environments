@@ -29,6 +29,8 @@ variable "ldap_config" {
     efs_provisioned_throughput  = string
     efs_backup_schedule         = string
     efs_backup_retention_period = string
+    efs_id                      = string
+    efs_access_point_id         = string
     port                        = optional(number)
   })
   default = {
@@ -40,6 +42,8 @@ variable "ldap_config" {
     efs_provisioned_throughput  = "default_efs_provisioned_throughput"
     efs_backup_schedule         = "default_efs_backup_schedule"
     efs_backup_retention_period = "default_efs_backup_retention_period"
+    efs_id                      = "default_efs_id"
+    efs_access_point_id         = "default_efs_access_point_id"
     port                        = 389
   }
 }
@@ -111,4 +115,9 @@ variable "delius_account_names" {
 variable "delius_environment_names" {
   description = "List of names of all of the delius-core environments"
   type        = list(string)
+}
+
+variable "env_name_to_dms_config_map" {
+  description = "Map of delius-core environments to DMS configurations"
+  type        = any
 }
