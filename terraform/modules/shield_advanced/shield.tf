@@ -90,7 +90,3 @@ resource "aws_wafv2_web_acl" "main" {
     }
   }
 }
-
-output "shield_protections_json" {
-  value = local.shield_protections_json
-}
