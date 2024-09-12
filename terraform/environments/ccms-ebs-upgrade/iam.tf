@@ -306,6 +306,6 @@ resource "aws_iam_policy" "ccms_ebs_shared_s3" {
 }
 
 resource "aws_iam_role_policy_attachment" "ccms_ebs_shared_s3" {
-  role       = aws_iam_role.role_stsassume_oem_base.name
+  role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.ccms_ebs_shared_s3.arn
 }
