@@ -28,6 +28,16 @@ resource "aws_api_gateway_rest_api" "lambda_api" {
   description = "API Gateway for listing S3 buckets via Lambda"
 }
 
+resource "aws_lambda_permission" "apigateway_invoke" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.list_s3_buckets.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  # Set the source ARN to the specific API Gateway REST API and stage
+  source_arn = "${aws_api_gateway_rest_api.lambda_api.execution_arn}/*/*"
+}
+
 # Create a resource in the API Gateway
 resource "aws_api_gateway_resource" "api_resource" {
   rest_api_id = aws_api_gateway_rest_api.lambda_api.id
