@@ -15,7 +15,7 @@ resource "aws_instance" "apex_db_instance" {
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   key_name                    = aws_key_pair.apex.key_name
   user_data_base64            = base64encode(local.database-instance-userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = local.application_data.accounts[local.environment].user_data_replace_on_change
 
 
   root_block_device {
