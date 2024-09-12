@@ -1,8 +1,8 @@
 # tflint-ignore-file: terraform_required_version, terraform_required_providers 
 
-
 variable "name" {
   description = "The EC2 Sec name."
+  type        = string
 }
 
 variable "env" {
@@ -23,7 +23,9 @@ variable "aws_region" {
   description = "AWS Region"
 }
 
-variable "ec2_terminate_behavior" {}
+variable "ec2_terminate_behavior" {
+  type        = string
+}
 
 variable "description" {
   type        = string
@@ -37,15 +39,22 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
-variable "vpc" {}
+variable "vpc" {
+  type        = string
+}
 
 variable "ec2_sec_rules" {
   description = "A Map of map of security group Rules to associate with"
+  type        = map(object({
+    from_port = number
+    to_port   = number
+    protocol  = string
+  }))
   default = {
     "TCP_80" = {
       "from_port" = 80,
-      "to_port" : 80,
-      "protocol" = "TCP"
+      "to_port"   = 80,
+      "protocol"  = "TCP"
     },
     "TCP_443" = {
       "from_port" = 443,
@@ -72,6 +81,12 @@ variable "ec2_sec_rules" {
 
 variable "ec2_sec_rules_source_sec_group" {
   description = "A Map of security group Rules that allows ingress from a specified security group"
+  type        = map(object({
+    from_port                = number
+    to_port                  = number
+    protocol                 = string
+    source_security_group_id = string
+  }))
   default = {}
 }
 
@@ -81,12 +96,17 @@ variable "cidr" {
   default     = null
 }
 
-variable "ec2_instance_type" {}
+variable "ec2_instance_type" {
+  type = string
+}
 
-variable "ami_image_id" {}
+variable "ami_image_id" {
+  type = string
+}
 
 variable "subnet_ids" {
   description = "subnet IDs to associate with"
+  type        = list(string)
   default     = null
 }
 
@@ -116,6 +136,7 @@ variable "iam_instance_profile" {
 
 variable "ebs_size" {
   description = "EBS Block Size"
+  type        = number
   default     = 20
 }
 
@@ -133,11 +154,13 @@ variable "ebs_delete_on_termination" {
 
 variable "region" {
   description = "Current AWS Region."
+  type        = string
   default     = "eu-west-2"
 }
 
 variable "account" {
   description = "AWS Account ID."
+  type        = string
   default     = ""
 }
 
@@ -149,4 +172,5 @@ variable "scale_down" {
 
 #variable "s3_policy_arn" {
 #  description = "S3 policy ARN, to be attached to Ec2 Instance Profile"
+#  type        = string
 #}
