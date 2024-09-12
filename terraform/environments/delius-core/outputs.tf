@@ -18,6 +18,12 @@ output "dms_client_account_ids" {
   sensitive = true
 }
 
+
+output "env_name_to_dms_config_map" {
+  value = local.env_name_to_dms_config_map
+  sensitive = true
+}
+
 output "delius_account_names" {
   value = local.delius_account_names
 }
@@ -27,3 +33,10 @@ output "delius_account_names" {
 output "aws_account_id" {
   value = data.aws_caller_identity.current.account_id
 }
+
+
+output "platform_vars" {
+  value = local.platform_vars
+  sensitive = true
+}
+
