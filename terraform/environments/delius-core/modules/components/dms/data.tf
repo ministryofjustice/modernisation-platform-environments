@@ -27,3 +27,4 @@ data "aws_secretsmanager_secret" "delius_core_application_passwords" {
 data "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
   secret_id = data.aws_secretsmanager_secret.delius_core_application_passwords.id
 }
+

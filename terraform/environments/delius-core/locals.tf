@@ -43,9 +43,10 @@ locals {
     "preprod" = merge({dms_config = local.dms_config_preprod}, {account_id = try(local.environment_management.account_ids["delius-core-preproduction"],null)})
     }
 
-
   # dms_client_account_ids_2 = [for delius_environment in keys(local.env_name_to_account_id_map) :
   #     key if try(local["dms_config_${delius_environment}.audit_target_endpoint.write_environment"],null) == local.environment] 
+
+
 
 
 }
