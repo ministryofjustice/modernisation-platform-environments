@@ -57,7 +57,6 @@ resource "aws_api_gateway_integration" "lambda_integration" {
 # Deploy the API Gateway
 resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = aws_api_gateway_rest_api.lambda_api.id
-  stage_name  = "prod"
   depends_on = [
         aws_api_gateway_method.get_method,
         aws_api_gateway_integration.lambda_integration
