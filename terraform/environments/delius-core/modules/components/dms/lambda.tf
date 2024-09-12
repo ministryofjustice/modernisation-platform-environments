@@ -9,7 +9,7 @@ resource "aws_s3_object" "lambda_zip" {
 resource "aws_lambda_function" "list_s3_buckets" {
   function_name    = "list_buckets"
   role             = aws_iam_role.lambda_execution_role.arn
-  handler          = "list_buckets_cross_account.lambda_handler"
+  handler          = "list_buckets.lambda_handler"
   runtime          = "python3.8"
 
   # Lambda deployment package location
