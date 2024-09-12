@@ -104,7 +104,12 @@ data "aws_iam_policy_document" "laa_oem_shared_s3" {
   statement {
     effect = "Allow"
     actions = [
+      "s3:CopyObject",
+      "s3:DeleteObject",
+      "s3:DeleteObjects",
       "s3:GetObject",
+      "s3:ListObjects",
+      "s3:ListObjectsV2",
       "s3:ListBucket",
       "s3:PutObject"
     ]
