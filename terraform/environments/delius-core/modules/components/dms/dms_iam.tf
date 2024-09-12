@@ -29,27 +29,6 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   role       = aws_iam_role.dms-vpc-role.name
 }
 
-# Create a Role to Allow any Audit Clients of this environment, or any Repository
-# for this environment to write to the DMS S3 bucket
-# resource "aws_iam_role" "dms_s3_writer_role" {
-#   count = length(local.dms_s3_writer_account_ids) > 0 ? 1 : 0
-#   name = local.dms_s3_writer_role_name
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       for principal in local.dms_s3_writer_account_ids:
-#       {
-#         Effect = "Allow",
-#         Principal = {
-#           AWS = "arn:aws:iam::${principal}:root"
-#         },
-#         Action = "sts:AssumeRole"
-#       }
-#     ]
-#   })
-# }
-
-
 resource "aws_iam_role" "dms_s3_writer_role" {
   name = local.dms_s3_writer_role_name
   assume_role_policy = jsonencode({
@@ -202,7 +181,7 @@ resource "aws_iam_role" "dms_s3_bucket_list_by_client_role" {
          Principal = {
             AWS = [for client_account_id in local.client_account_ids : "arn:aws:iam::${client_account_id}:root"]
          }
-         Action    = "sts:AssumeRole"
+         Action    = "s3:AssumeRole"
          }
      ]
    })
@@ -231,6 +210,3 @@ resource "aws_iam_role_policy_attachment" "dms_s3_bucket_list_by_client_policy_a
   role       = aws_iam_role.dms_s3_bucket_list_by_client_role[0].name
   policy_arn = aws_iam_policy.dms_s3_bucket_list_by_client_policy[0].arn
 }
-=======
-}
->>>>>>> parent of 68e286684 (Define environment name to DMS configuration mapping)
