@@ -19,6 +19,7 @@ resource "aws_lambda_function" "list_s3_buckets" {
   s3_key           = aws_s3_object.lambda_zip.key
    # Calculate the source_code_hash to force function replacement on package change
   source_code_hash = filebase64sha256("files/list_buckets.zip")
+  timeout          = 30
 }
 
 # Create an API Gateway REST API
@@ -61,6 +62,35 @@ resource "aws_api_gateway_deployment" "api_deployment" {
         aws_api_gateway_method.get_method,
         aws_api_gateway_integration.lambda_integration
       ]
+}
+
+
+resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
+  name              = "/aws/apigateway/access-logs"
+  retention_in_days = 30  # Set retention as needed
+}
+
+resource "aws_api_gateway_stage" "api_stage" {
+  stage_name    = "prod"
+  deployment_id = aws_api_gateway_deployment.api_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.lambda_api.id
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_gateway_access_logs.arn
+    format          = "$context.identity.sourceIp - $context.identity.caller [$context.requestTime] \"$context.httpMethod $context.resourcePath $context.protocol\" $context.status $context.responseLength $context.requestId"
+  }
+}
+
+resource "aws_api_gateway_method_settings" "api_stage_settings" {
+  rest_api_id = aws_api_gateway_rest_api.lambda_api.id
+  stage_name  = aws_api_gateway_stage.api_stage.stage_name
+  method_path = "*/*"
+
+  settings {
+    logging_level         = "INFO"   
+    metrics_enabled       = true
+    data_trace_enabled    = true
+  }
 }
 
 # Use Terraform http data source to call the API and get bucket names
