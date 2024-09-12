@@ -1,5 +1,5 @@
 resource "aws_ssm_document" "oracle_lms_cpuq" {
-  name            = "ServiceActions"
+  name            = "Oracle-lms_cpuq"
   document_type   = "Command"
   document_format = "YAML"
 
