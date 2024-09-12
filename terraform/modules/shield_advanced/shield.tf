@@ -23,7 +23,8 @@ locals {
 
   shield_protections = {
     for k, v in local.shield_protections_json : k => jsondecode(v)
-    if !(contains(var.excluded_protections, k))
+    if !(contains(var.excluded_protections, k)) &&
+       !can(regex("eipalloc", jsondecode(v)["ResourceArn"]))
   }
 }
 
@@ -88,4 +89,8 @@ resource "aws_wafv2_web_acl" "main" {
       }
     }
   }
+}
+
+output "shield_protections_json" {
+  value = local.shield_protections_json
 }
