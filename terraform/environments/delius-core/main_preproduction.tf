@@ -40,7 +40,6 @@ module "environment_stage" {
 
   delius_account_names = local.delius_account_names
   delius_environment_names = local.delius_environment_names
-  env_name_to_dms_config_map = local.env_name_to_dms_config_map
 }
 
 module "environment_preprod" {
@@ -80,5 +79,4 @@ module "environment_preprod" {
 
   delius_account_names = local.delius_account_names
   delius_environment_names = local.delius_environment_names
-  env_name_to_dms_config_map = local.env_name_to_dms_config_map
 }
