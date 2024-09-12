@@ -94,6 +94,6 @@ resource "aws_api_gateway_method_settings" "api_stage_settings" {
 }
 
 # Use Terraform http data source to call the API and get bucket names
-data "http" "lambda_output" {
-  url = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets"
-}
+# data "http" "lambda_output" {
+#   url = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets"
+# }
