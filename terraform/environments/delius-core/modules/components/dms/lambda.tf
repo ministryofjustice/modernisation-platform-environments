@@ -7,7 +7,7 @@ resource "aws_s3_object" "lambda_zip" {
 
 # Create Lambda Function
 resource "aws_lambda_function" "list_s3_buckets" {
-  function_name    = "list_s3_buckets_cross_account"
+  function_name    = "list_buckets"
   role             = aws_iam_role.lambda_execution_role.arn
   handler          = "list_buckets_cross_account.lambda_handler"
   runtime          = "python3.8"
