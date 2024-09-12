@@ -260,7 +260,7 @@ resource "aws_iam_role" "api_gateway_cloudwatch_role" {
       {
         "Effect": "Allow",
         "Principal": {
-          "Service": "apigateway.amazonaws.com"
+          "Service": ["apigateway.amazonaws.com","lambda.amazonaws.com"]
         },
         "Action": "sts:AssumeRole"
       }
@@ -278,9 +278,11 @@ resource "aws_iam_policy" "api_gateway_cloudwatch_policy" {
         "Action": [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
           "logs:PutLogEvents"
         ],
-        "Resource": "*"
+        "Resource": "arn:aws:logs:*"
       }
     ]
   })
