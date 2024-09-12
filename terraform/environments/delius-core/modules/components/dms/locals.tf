@@ -47,6 +47,6 @@ locals {
        dms_s3_audit_source_primary_database = {(var.env_name) = local.audit_source_primary}
        dms_s3_cross_account_audit_source_databases = local.dms_s3_cross_account_audit_source_databases
        client_account_ids = local.client_account_ids
-       # bucket_list = jsondecode(data.http.lambda_output.response_body)
+       bucket_list = jsondecode(data.http.lambda_output.response_body)
    }    
 }
