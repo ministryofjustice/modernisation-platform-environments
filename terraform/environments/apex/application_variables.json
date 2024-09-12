@@ -15,7 +15,7 @@
       "container_instance_type": "linux",
       "instance_type": "t3a.medium",
       "key_name": "",
-      "ec2_desired_capacity": 2,
+      "ec2_desired_capacity": 1,
       "ec2_max_size": 2,
       "ec2_min_size": 1,
       "task_definition_volume": "upload_volume",
