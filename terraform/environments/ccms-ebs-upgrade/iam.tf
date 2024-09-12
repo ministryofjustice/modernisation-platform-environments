@@ -276,3 +276,36 @@ resource "aws_iam_role_policy_attachment" "ec2_operations_policy_att" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.ec2_operations_policy.arn
 }
+
+# S3 shared bucket
+
+data "aws_iam_policy_document" "ccms_ebs_shared_s3" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:CopyObject",
+      "s3:DeleteObject",
+      "s3:DeleteObjects",
+      "s3:GetObject",
+      "s3:ListObjects",
+      "s3:ListObjectsV2",
+      "s3:ListBucket",
+      "s3:PutObject"
+    ]
+    resources = [
+      aws_s3_bucket.ccms_ebs_shared.arn,
+      "${aws_s3_bucket.ccms_ebs_shared.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "ccms_ebs_shared_s3" {
+  description = "Policy to allow operations in ${aws_s3_bucket.ccms_ebs_shared.id}"
+  name        = "ccms_ebs_shared_s3-${local.environment}"
+  policy      = data.aws_iam_policy_document.ccms_ebs_shared_s3.json
+}
+
+resource "aws_iam_role_policy_attachment" "ccms_ebs_shared_s3" {
+  role       = aws_iam_role.role_stsassume_oem_base.name
+  policy_arn = aws_iam_policy.ccms_ebs_shared_s3.arn
+}
