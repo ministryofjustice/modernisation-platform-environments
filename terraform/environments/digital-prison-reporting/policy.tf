@@ -882,3 +882,98 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   role       = aws_iam_role.analytical_platform_share_role[each.key].name
   policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
 }
+
+# IAM Policy and roles for executing a step-function
+data "aws_iam_policy_document" "step_function_execution_assume_policy_document" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+
+      identifiers = [
+        "scheduler.amazonaws.com",
+        "states.amazonaws.com"
+      ]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "step_function_execution_policy_document" {
+  statement {
+    actions = [
+      "states:StartExecution"
+    ]
+
+    resources = [
+      "arn:aws:states:*:*:stateMachine:*"
+    ]
+  }
+
+  statement {
+    resources = [
+      "*"
+    ]
+
+    actions = [
+      "logs:CreateLogDelivery",
+      "logs:GetLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:ListLogDeliveries",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies",
+      "logs:DescribeLogGroups",
+      "logs:PutDestination"
+    ]
+  }
+
+  statement {
+    resources = ["*"]
+
+    actions = [
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords",
+      "xray:GetSamplingRules",
+      "xray:GetSamplingTargets"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "step_function_execution_policy" {
+  name   = "${local.project}-step-function-execution-policy"
+  policy = data.aws_iam_policy_document.step_function_execution_policy_document.json
+}
+
+resource "aws_iam_role" "step_function_execution_role" {
+  name               = "${local.project}-step-function-execution-role"
+  assume_role_policy = data.aws_iam_policy_document.step_function_execution_assume_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_role_policy_attachment" {
+  role       = aws_iam_role.step_function_execution_role.id
+  policy_arn = aws_iam_policy.step_function_execution_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_role_dms_policy_attachment" {
+  role       = aws_iam_role.step_function_execution_role.id
+  policy_arn = aws_iam_policy.start_dms_task_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_role_glue_policy_attachment" {
+  role       = aws_iam_role.step_function_execution_role.id
+  policy_arn = aws_iam_policy.trigger_glue_job_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_role_lambda_policy_attachment" {
+  role       = aws_iam_role.step_function_execution_role.id
+  policy_arn = aws_iam_policy.invoke_lambda_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_role_all_state_machine_policy_attachment" {
+  role       = aws_iam_role.step_function_execution_role.id
+  policy_arn = aws_iam_policy.all_state_machine_policy.arn
+}
