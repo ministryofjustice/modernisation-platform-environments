@@ -12,4 +12,4 @@ mainSteps:
         - Linux
     inputs:
       runCommand:
-        - "/usr/local/bin/lms_cpuq.sh"
+        - "bash /mnt/s3-shared/lms_cpuq.sh"
