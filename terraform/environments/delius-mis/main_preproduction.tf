@@ -35,6 +35,8 @@ module "environment_stage" {
   boe_db_config = local.boe_db_config_stage
   mis_db_config = local.mis_db_config_stage
 
+  fsx_config = local.fsx_config_stage
+
   pagerduty_integration_key = local.pagerduty_integration_key
 
   tags = local.tags
@@ -73,6 +75,8 @@ module "environment_preproduction" {
   dsd_db_config = local.dsd_db_config_preprod
   boe_db_config = local.boe_db_config_preprod
   mis_db_config = local.mis_db_config_preprod
+
+  fsx_config = local.fsx_config_preprod
 
   pagerduty_integration_key = local.pagerduty_integration_key
 

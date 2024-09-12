@@ -15,7 +15,7 @@
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-information-system @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
-/terraform/environments/corporate-staff-rostering @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/corporate-staff-rostering @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-apps-and-tools @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/modernisation-platform
@@ -53,7 +53,7 @@
 /terraform/environments/operations-engineering @ministryofjustice/operations-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/panda-cyber-appsec-lab @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
-/terraform/environments/planetfm @ministryofjustice/csr-application-support @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/planetfm @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/portal @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/ppud @ministryofjustice/modernisation-platform @ministryofjustice/ppud-replacement-devs @ministryofjustice/modernisation-platform
 /terraform/environments/pra-register @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform

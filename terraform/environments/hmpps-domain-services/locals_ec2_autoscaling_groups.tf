@@ -94,5 +94,118 @@ locals {
         update-ssm-agent = "patchgroup1"
       }
     }
+
+    rdgw = {
+      autoscaling_group = {
+        desired_capacity          = 1
+        max_size                  = 1
+        force_delete              = true
+        vpc_zone_identifier       = module.environment.subnets["private"].ids
+        wait_for_capacity_timeout = 0
+
+        initial_lifecycle_hooks = {
+          "ready-hook" = {
+            default_result       = "ABANDON"
+            heartbeat_timeout    = 2700 # 45 minutes
+            lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+          }
+        }
+      }
+      config = {
+        ami_name                      = "hmpps_windows_server_2022_release_2024-*"
+        ebs_volumes_copy_all_from_ami = false
+        iam_resource_names_prefix     = "ec2-instance"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
+      }
+      ebs_volumes = {
+        "/dev/sda1" = { type = "gp3", size = 100 }
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "t3.medium"
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "required"
+        vpc_security_group_ids       = ["rds-ec2s"]
+      }
+      lb_target_groups = {
+        http = local.lbs.public.instance_target_groups.http
+      }
+      tags = {
+        backup           = "false"
+        description      = "Remote Desktop Gateway Windows Server 2022"
+        os-type          = "Windows"
+        server-type      = "RDGateway"
+        Patching         = "Yes"
+        update-ssm-agent = "patchgroup1"
+      }
+    }
+
+    rds = {
+      autoscaling_group = {
+        desired_capacity    = 1
+        max_size            = 1
+        force_delete        = true
+        vpc_zone_identifier = module.environment.subnets["private"].ids
+        #wait_for_capacity_timeout = 0
+
+        #initial_lifecycle_hooks = {
+        #  "ready-hook" = {
+        #    default_result       = "ABANDON"
+        #    heartbeat_timeout    = 2700 # 45 minutes
+        #    lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+        #  }
+        #}
+      }
+      config = {
+        ami_name                      = "hmpps_windows_server_2022_release_2024-*"
+        ebs_volumes_copy_all_from_ami = false
+        iam_resource_names_prefix     = "ec2-instance"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          #"../../modules/baseline_presets/ec2-user-data/user-data-pwsh-asg-ready-hook.yaml.tftpl", {
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
+      }
+      ebs_volumes = {
+        "/dev/sda1" = { type = "gp3", size = 100 }
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "t3.medium"
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "required"
+        vpc_security_group_ids       = ["rds-ec2s"]
+      }
+      lb_target_groups = {
+        https = local.lbs.public.instance_target_groups.https
+      }
+      tags = {
+        backup           = "false"
+        description      = "Remote Desktop Services Connection Broker and Web Windows Server 2022"
+        os-type          = "Windows"
+        server-type      = "RDServices"
+        Patching         = "Yes"
+        update-ssm-agent = "patchgroup1"
+      }
+    }
   }
 }

@@ -37,13 +37,14 @@ module "ldap_ecs" {
 
   bastion_sg_id                      = module.bastion_linux.bastion_security_group
   tags                               = var.tags
-  microservice_lb                    = aws_lb.delius_core_ancillary
-  microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
-  alb_listener_rule_host_header = "ldap.${var.env_name}.${var.account_config.dns_suffix}"
+  #microservice_lb                    = aws_lb.delius_core_ancillary
+  #microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
+  #alb_listener_rule_host_header = "ldap.${var.env_name}.${var.account_config.dns_suffix}"
 
   platform_vars           = var.platform_vars
   container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-openldap-ecr-repo:${var.delius_microservice_configs.ldap.image_tag}"
   account_config          = var.account_config
+
   health_check = {
     command     = ["CMD-SHELL", "ldapsearch -x -H ldap://localhost:389 -b '' -s base '(objectclass=*)' namingContexts"]
     interval    = 30
@@ -87,6 +88,71 @@ module "ldap_ecs" {
     containerPath = "/var/lib/openldap/openldap-data"
     readOnly      = false
   }]
+
+  ecs_service_egress_security_group_ids = [
+    {
+      ip_protocol = "-1"
+      cidr_ipv4   = "0.0.0.0/0"
+      description = "Allow all outbound traffic to any IPv4 address"
+    }
+  ]
+
+  ecs_service_ingress_security_group_ids = [
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+      description = "Allow inbound traffic from VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+      description = "Allow inbound traffic from VPC"
+    },
+    {
+      port                          = var.ldap_config.port
+      ip_protocol                   = "tcp"
+      referenced_security_group_id  = module.bastion_linux.bastion_security_group
+      description                   = "Allow inbound traffic from bastion"
+    },
+    {
+      port                           = var.ldap_config.port
+      ip_protocol                    = "udp"
+      referenced_security_group_id   = module.bastion_linux.bastion_security_group
+      description                    = "Allow inbound traffic from bastion"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.environment_config.migration_environment_private_cidr[0]
+      description = "Allow inbound LDAP traffic from corresponding legacy VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.environment_config.migration_environment_private_cidr[0]
+      description = "Allow inbound LDAP traffic from corresponding legacy VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.account_info.cp_cidr
+      description = "Allow inbound LDAP traffic from CP"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.account_info.cp_cidr
+      description = "Allow inbound LDAP traffic from CP"
+    },
+    {
+      port                         = 2049
+      ip_protocol                  = "tcp"
+      referenced_security_group_id = module.ldap.efs_sg_id
+      description                  = "EFS ingress"
+    }
+  ]
 
 }
 

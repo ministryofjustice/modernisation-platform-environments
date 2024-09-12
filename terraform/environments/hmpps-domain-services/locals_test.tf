@@ -76,7 +76,6 @@ locals {
 
       test-win-2022 = merge(local.ec2_autoscaling_groups.base_windows, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
-          # clean up Computer and DNS entry from azure.noms.root domain before using
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
@@ -93,18 +92,25 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
+
+      # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
+      # test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
+      #   tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
+      #     domain-name = "azure.noms.root"
+      #   })
+      # }
+      # test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
+      #   tags = merge(local.ec2_autoscaling_groups.rds.tags, {
+      #     domain-name = "azure.noms.root"
+      #   })
+      # }
     }
 
     ec2_instances = {
+      # NOTE: next rebuild do this as an ASG
       test-rdgw-1-a = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = [
-            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-          ]
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.noms.root domain"
@@ -178,7 +184,6 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
-          { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
       }
     }

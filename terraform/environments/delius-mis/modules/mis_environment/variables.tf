@@ -61,6 +61,10 @@ variable "mis_db_config" {
   type = any
 }
 
+variable "fsx_config" {
+  type = any
+}
+
 variable "deploy_oracle_stats" {
   description = "for deploying Oracle stats bucket"
   default     = true
