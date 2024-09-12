@@ -3,6 +3,8 @@ resource "aws_s3_object" "lambda_zip" {
   bucket = module.s3_bucket_dms_destination.bucket.bucket
   key    = "list_buckets.zip"
   source = "files/list_buckets.zip"
+  # Calculate Etag to force replacement if the zip file changes
+  etag   = filemd5("files/list_buckets.zip")
 }
 
 # Create Lambda Function
@@ -15,6 +17,8 @@ resource "aws_lambda_function" "list_s3_buckets" {
   # Lambda deployment package location
   s3_bucket        = module.s3_bucket_dms_destination.bucket.bucket
   s3_key           = aws_s3_object.lambda_zip.key
+   # Calculate the source_code_hash to force function replacement on package change
+  source_code_hash = filebase64sha256("files/list_buckets.zip")
 }
 
 # Create an API Gateway REST API
