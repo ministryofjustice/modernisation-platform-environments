@@ -1,4 +1,6 @@
- variable "name" {
+ # tflint-ignore-file: terraform_required_version, terraform_required_providers
+
+variable "name" {
   description = "The EC2 Sec name."
   type        = string
 }

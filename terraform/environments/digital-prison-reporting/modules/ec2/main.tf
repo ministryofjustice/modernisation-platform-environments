@@ -1,4 +1,4 @@
-# tflint-ignore-file: terraform_required_version, terraform_required_providers 
+# tflint-ignore-file: terraform_required_version, terraform_required_providers
 
 data "aws_caller_identity" "current" {}
 
