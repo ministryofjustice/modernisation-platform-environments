@@ -131,7 +131,7 @@ resource "aws_iam_role_policy_attachment" "dms_s3_bucket_reader_policy_attachmen
 # This 1st version is used in client environments to allow the corresponding repository environment to list the local buckets.
 resource "aws_iam_role" "dms_s3_bucket_list_by_repository_role" {
   count              = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
-  name               = local.dms_s3_repository_list_by_repository_role_name
+  name               = local.dms_s3_lister_role_name
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -174,7 +174,7 @@ resource "aws_iam_role_policy_attachment" "dms_s3_bucket_list_by_repository_poli
 # This 2nd version is used in repository environments to allow the corresponding client environments to list the local buckets.
 resource "aws_iam_role" "dms_s3_bucket_list_by_client_role" {
      count  = length(local.client_account_ids) > 0 ? 1 : 0
-     name   = "dms-s3-bucket-list-by-client-role"
+     name   = local.dms_s3_lister_role_name
      assume_role_policy = jsonencode({
      Version = "2012-10-17"
      Statement = [
