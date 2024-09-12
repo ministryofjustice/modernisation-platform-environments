@@ -99,3 +99,29 @@ resource "aws_iam_instance_profile" "iam_instace_profile_oem_base" {
     { Name = lower(format("IamProfile-%s-%s-OEM-Base", local.application_name, local.environment)) }
   )
 }
+
+data "aws_iam_policy_document" "laa_oem_shared_s3" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject"
+    ]
+    resources = [
+      aws_s3_bucket.laa_oem_shared.arn,
+      "${aws_s3_bucket.laa_oem_shared.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "laa_oem_shared_s3" {
+  description = "Policy to allow operations in ${aws_s3_bucket.laa_oem_shared.name}"
+  name        = "laa_oem_shared_s3-${local.environment}"
+  policy      = data.aws_iam_policy_document.laa_oem_shared_s3.json
+}
+
+resource "aws_iam_role_policy_attachment" "laa_oem_shared_s3" {
+  role       = aws_iam_role.role_stsassume_oem_base.name
+  policy_arn = aws_iam_policy.laa_oem_shared_s3.arn
+}
