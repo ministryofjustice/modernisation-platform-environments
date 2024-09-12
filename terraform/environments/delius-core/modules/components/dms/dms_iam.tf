@@ -183,7 +183,7 @@ resource "aws_iam_role" "dms_s3_bucket_list_by_client_role" {
          Principal = {
             AWS = [for client_account_id in local.client_account_ids : "arn:aws:iam::${client_account_id}:root"]
          }
-         Action    = "s3:AssumeRole"
+         Action    = "sts:AssumeRole"
          }
      ]
    })
