@@ -71,12 +71,12 @@ module "ldap_ecs" {
       host_path = null
       name      = "delius-core-openldap"
       efs_volume_configuration = [{
-        file_system_id          = var.ldap_config.efs_id
+        file_system_id          = module.ldap.efs_fs_id
         root_directory          = "/"
         transit_encryption      = "ENABLED"
         transit_encryption_port = 2049
         authorization_config = [{
-          access_point_id = var.ldap_config.efs_access_point_id
+          access_point_id = module.ldap.efs_access_point_id
           iam             = "DISABLED"
         }]
       }]
