@@ -78,6 +78,10 @@ resource "aws_api_gateway_stage" "api_stage" {
     destination_arn = aws_cloudwatch_log_group.api_gateway_access_logs.arn
     format          = "$context.identity.sourceIp - $context.identity.caller [$context.requestTime] \"$context.httpMethod $context.resourcePath $context.protocol\" $context.status $context.responseLength $context.requestId"
   }
+
+  depends_on = [
+    aws_api_gateway_account.api_gateway_account
+  ]
 }
 
 resource "aws_api_gateway_method_settings" "api_stage_settings" {
