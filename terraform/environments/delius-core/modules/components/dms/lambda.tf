@@ -119,6 +119,7 @@ resource "aws_api_gateway_account" "api_gateway_account" {
 
 # Use Terraform http data source to call the API and get bucket names
 data "http" "lambda_output" {
-  url = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets?target_account_id=${var.env_name_to_dms_config_map[var.dms_config.audit_target_endpoint.write_environment].account_id}&target_environment_name=${var.dms_config.audit_target_endpoint.write_environment}"
+  count      = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
+  url        = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets?target_account_id=${var.env_name_to_dms_config_map[var.dms_config.audit_target_endpoint.write_environment].account_id}&target_environment_name=${var.dms_config.audit_target_endpoint.write_environment}"
   depends_on = [aws_api_gateway_deployment.api_deployment]
 }

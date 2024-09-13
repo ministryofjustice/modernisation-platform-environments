@@ -32,10 +32,10 @@ locals {
     # account_id = try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null)
   }
 
-  bucket_json = jsondecode(data.http.lambda_output.response_body)
+  repository_bucket_json = try(jsondecode(data.http.lambda_output[0].response_body),jsondecode("{}"))
 
   repository_bucket_name = [
-    for bucket in local.bucket_json.Buckets : 
+    for bucket in local.repository_bucket_json.Buckets : 
         bucket if try(regex(".*dms-destination-bucket.*", bucket),null) != null
   ]
 
