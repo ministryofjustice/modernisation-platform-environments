@@ -30,7 +30,11 @@ locals {
     # account_id = try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null)
   }
 
-  
+
+  repository_bucket_name = [
+    for buckets in jsondecode(data.http.lambda_output.response_body) : 
+        buckets.BucketName if try(regex(".*dms-destination-bucket.*", buckets.BucketName),null) != null
+  ]
 
    dms_s3_bucket_info = {
        dms_s3_bucket_name = {(var.env_name) = module.s3_bucket_dms_destination.bucket.bucket}
@@ -47,6 +51,6 @@ locals {
        dms_s3_audit_source_primary_database = {(var.env_name) = local.audit_source_primary}
        dms_s3_cross_account_audit_source_databases = local.dms_s3_cross_account_audit_source_databases
        client_account_ids = local.client_account_ids
-       bucket_list = jsondecode(data.http.lambda_output.response_body)
+       bucket_name = local.repository_bucket_name
    }    
 }
