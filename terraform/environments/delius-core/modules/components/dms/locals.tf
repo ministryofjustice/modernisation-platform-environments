@@ -55,5 +55,6 @@ locals {
        dms_s3_cross_account_audit_source_databases = local.dms_s3_cross_account_audit_source_databases
        client_account_ids = local.client_account_ids
        bucket_name = local.repository_bucket_name
+       client_account_map = local.client_account_map
    }    
 }
