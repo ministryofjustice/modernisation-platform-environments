@@ -51,5 +51,4 @@ locals {
     cloudwatch_log_groups = local.ssm_doc_cloudwatch_log_groups
     security_groups       = local.security_groups
   }
-  
 }
