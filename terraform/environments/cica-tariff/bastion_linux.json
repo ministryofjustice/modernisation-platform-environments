@@ -1,0 +1,9 @@
+{
+  "keys": {
+    "development": {
+      "ed": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJa3flPvFH6LHw9VLhoAFFZl+ETpm5VO+X7qRkYyw1pU"
+    },
+    "preproduction": {},
+    "production": {}
+  }
+}
