@@ -3,17 +3,12 @@ locals {
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
     ])
-    https = flatten([
+    enduserclient_internal = flatten([
       "10.0.0.0/8",
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
     ])
-    # aks       = module.ip_addresses.azure_fixngo_cidrs.devtest
-    # boe_tools = module.ip_addresses.azure_fixngo_cidrs.devtest_tools
-    # domain_controllers = flatten([
-    #   module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers,
-    #   module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers,
-    # ])
-    # jumpservers = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
+    enduserclient_public = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
+    ])
     noms_core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
     oasys_db = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
@@ -25,17 +20,12 @@ locals {
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
     ])
-    https = flatten([
-      "10.0.0.0/8",
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+    enduserclient_internal = [
+      "10.0.0.0/8"
+    ]
+    enduserclient_public = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
     ])
-    # aks       = module.ip_addresses.azure_fixngo_cidrs.prod
-    # boe_tools = module.ip_addresses.azure_fixngo_cidrs.prod_tools
-    # domain_controllers = flatten([
-    #   module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers,
-    #   # module.ip_addresses.mp_cidrs.ad_fixngo_hmpp_domain_controllers, # hits rule limit, remove azure DCs first
-    # ])
-    # jumpservers = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
     noms_core = module.ip_addresses.azure_fixngo_cidrs.prod_core
     oasys_db = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
@@ -53,6 +43,41 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
+    public-lb = {
+      description = "Security group for public load-balancer"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http_lb = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public
+        }
+        https_lb = {
+          description = "Allow enduserclient https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
     lb = {
       description = "Security group for public subnet"
       ingress = {
@@ -69,7 +94,7 @@ locals {
           to_port         = 80
           protocol        = "tcp"
           security_groups = ["private-jumpserver"]
-          cidr_blocks     = local.security_group_cidrs.https
+          cidr_blocks     = local.security_group_cidrs.enduserclient_internal
         }
         https = {
           description     = "Allow https ingress"
@@ -77,17 +102,16 @@ locals {
           to_port         = 443
           protocol        = "tcp"
           security_groups = ["private-jumpserver"]
-          cidr_blocks     = local.security_group_cidrs.https
+          cidr_blocks     = local.security_group_cidrs.enduserclient_internal
         }
       }
       egress = {
         all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
@@ -101,6 +125,7 @@ locals {
           protocol    = -1
           self        = true
         }
+
         oracle_oem_web_3872 = {
           description     = "3872: oracle oem agent"
           from_port       = 3872
@@ -188,12 +213,32 @@ locals {
       description = "Security group for BODS servers"
       ingress = {
         all-from-self = {
-          description     = "Allow all ingress to self"
-          from_port       = 0
-          to_port         = 0
-          protocol        = -1
-          self            = true
-          security_groups = ["onr_db"]
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http_6400 = {
+          description     = "6400: boe cms"
+          from_port       = 6400
+          to_port         = 6400
+          protocol        = "TCP"
+          security_groups = ["private-jumpserver"]
+        }
+        http_6410_6500 = {
+          description     = "6410-6500: boe sia"
+          from_port       = 6410
+          to_port         = 6500
+          protocol        = "TCP"
+          security_groups = ["private-jumpserver"]
+        }
+        http_28080 = {
+          description     = "28080: bods tomcat http"
+          from_port       = 28080
+          to_port         = 28080
+          protocol        = "TCP"
+          security_groups = ["public-lb", "private-jumpserver"]
         }
       }
       egress = {
