@@ -1,3 +1,85 @@
+locals {
+
+  ec2_iops = distinct(flatten([
+    for ec2_key, ec2_value in module.ec2_instance : [
+      for ebs_key, ebs_value in ec2_value.aws_ebs_volume : ebs_value.iops
+    ]
+  ]))
+  ec2_volumes_with_id = {
+    for ec2_key, ec2_value in module.ec2_instance : ec2_key => {
+      for ebs_key, ebs_value in ec2_value.aws_ebs_volume : ebs_key => merge(ebs_value, {
+        metric_id   = join("_", ["vol", split("-", ebs_value.id)[1]])
+        metric_id_r = join("_", ["vol", split("-", ebs_value.id)[1], "r"])
+        metric_id_w = join("_", ["vol", split("-", ebs_value.id)[1], "w"])
+      })
+    }
+  }
+
+  ec2_cloudwatch_dashboards = {
+    "ebs-performance" = {
+      periodOverride = "auto"
+      start          = "-PT3H"
+      widget_groups = [
+        for iops in local.ec2_iops : {
+          header_markdown = "## ${iops} iops"
+          width           = 8
+          height          = 8
+          widgets = [
+            for ec2_key, ec2_value in local.ec2_volumes_with_id : {
+              view   = "timeSeries"
+              region = "eu-west-2"
+              title  = "${ec2_key} ${iops} iops"
+              stat   = "Sum"
+              annotations = {
+                horizontal = [{
+                  label = "Maximum"
+                  value = iops
+                  fill  = "above"
+                }]
+              }
+              #yAxis = {
+              #  left = {
+              #    showUnits = false,
+              #    label     = "unhealthy host count"
+              #  }
+              #}
+              metrics = flatten([
+                for ebs_key, ebs_value in ec2_value : [
+                  [{
+                    expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
+                    label      = "${ebs_value.id} ${ebs_value.tags.Name}"
+                    stat       = "Sum"
+                  }],
+                  [
+                    "AWS/EBS",
+                    "VolumeReadOps",
+                    "VolumeId",
+                    ebs_value.id,
+                    {
+                      id      = ebs_value.metric_id_r
+                      visible = false
+                    }
+                  ],
+                  [
+                    "AWS/EBS",
+                    "VolumeWriteOps",
+                    "VolumeId",
+                    ebs_value.id,
+                    {
+                      id      = ebs_value.metric_id_w
+                      visible = false
+                    }
+                  ],
+                ] if ebs_value.iops == iops
+              ])
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+
 module "ec2_instance" {
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
 

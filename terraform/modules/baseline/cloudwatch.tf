@@ -26,7 +26,7 @@ locals {
 }
 
 module "cloudwatch_dashboard" {
-  for_each = var.cloudwatch_dashboards
+  for_each = merge(var.cloudwatch_dashboards, local.ec2_cloudwatch_dashboards)
 
   source = "../../modules/cloudwatch_dashboard"
 
