@@ -60,7 +60,7 @@ module "s3_bucket_migration" {
       principals = {
         type = "AWS"
         identifiers = [
-          var.task_role_arn
+          module.ldap_ecs_policies.task_role.arn
         ]
       }
     }

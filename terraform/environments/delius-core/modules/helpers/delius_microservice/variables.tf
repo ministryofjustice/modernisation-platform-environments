@@ -203,7 +203,6 @@ variable "enable_platform_backups" {
 variable "db_ingress_security_groups" {
   description = "Additional RDS/elasticache ingress security groups"
   type        = list(string)
-  default     = []
 }
 
 variable "tags" {
@@ -251,7 +250,6 @@ variable "target_group_protocol_version" {
 variable "certificate_arn" {
   description = "The ARN of the certificate to use for the target group"
   type        = string
-  default     = null
 }
 
 variable "microservice_lb" {
@@ -373,7 +371,6 @@ variable "container_secrets_env_specific" {
 variable "alb_security_group_id" {
   description = "The security group ID of the ALB"
   type        = string
-  default     = null
 }
 
 variable "health_check_path" {
@@ -507,7 +504,6 @@ variable "ecs_service_ingress_security_group_ids" {
   type = list(object({
     referenced_security_group_id = optional(string, null)
     cidr_ipv4                    = optional(string, null)
-    description                  = optional(string, null)
     port                         = number
     ip_protocol                  = string
   }))
@@ -520,7 +516,6 @@ variable "ecs_service_egress_security_group_ids" {
     referenced_security_group_id = optional(string, null)
     cidr_ipv4                    = optional(string, null)
     port                         = optional(number, null)
-    description                  = optional(string, null)
     ip_protocol                  = string
   }))
   default = []
@@ -572,17 +567,10 @@ variable "sns_topic_arn" {
 variable "frontend_lb_arn_suffix" {
   description = "Used by alarms"
   type        = string
-  default     = ""
 }
 
 variable "extra_task_role_policies" {
   description = "A map of data \"aws_iam_policy_document\" objects, keyed by name, to attach to the task role"
-  type        = map(any)
-  default     = {}
-}
-
-variable "extra_task_exec_role_policies" {
-  description = "A map of data \"aws_iam_policy_document\" objects, keyed by name, to attach to the task exec role"
   type        = map(any)
   default     = {}
 }
