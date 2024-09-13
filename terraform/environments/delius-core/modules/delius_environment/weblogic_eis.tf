@@ -7,7 +7,7 @@ module "weblogic_eis" {
 
   container_vars_default = {
     "LDAP_PORT" : var.ldap_config.port,
-    "LDAP_HOST" : module.ldap.nlb_dns_name,
+    "LDAP_HOST" : aws_lb.delius_core_ancillary.dns_name,
     "AWS_XRAY_TRACING_NAME" : "weblogic-eis",
     "COOKIE_SECURE" : "true",
     "DELIUS_API_URL" : "todo",
@@ -43,8 +43,8 @@ module "weblogic_eis" {
   container_secrets_default = {
     "JDBC_URL" : aws_ssm_parameter.jdbc_url.arn,
     "JDBC_PASSWORD" : aws_ssm_parameter.jdbc_password.arn,
-    "LDAP_PRINCIPAL" : module.ldap.delius_core_ldap_principal_arn,
-    "LDAP_CREDENTIAL" : module.ldap.delius_core_ldap_bind_password_arn,
+    "LDAP_PRINCIPAL" : aws_ssm_parameter.ldap_principal.arn,
+    "LDAP_CREDENTIAL" : aws_ssm_parameter.ldap_bind_password.arn,
     "MERGE_SECRET" : data.aws_ssm_parameter.delius_core_merge_api_client_secret.arn,
     "PDFCREATION_SECRET" : data.aws_ssm_parameter.pdfcreation_secret.arn,
     "USERMANAGEMENT_SECRET" : data.aws_ssm_parameter.usermanagement_secret.arn

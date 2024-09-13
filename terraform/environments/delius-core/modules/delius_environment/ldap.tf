@@ -15,12 +15,9 @@ module "ldap" {
   environment_config = var.environment_config
   ldap_config        = var.ldap_config
 
-  bastion_sg_id = module.bastion_linux.bastion_security_group
-
-  sns_topic_arn   = aws_sns_topic.delius_core_alarms.arn
-  ecs_cluster_arn = module.ecs.ecs_cluster_arn
 
   platform_vars           = var.platform_vars
   tags                    = local.tags
   enable_platform_backups = var.enable_platform_backups
+  task_role_arn           = "arn:aws:iam::${var.account_info.id}:role/${var.env_name}-ldap-ecs-task"
 }

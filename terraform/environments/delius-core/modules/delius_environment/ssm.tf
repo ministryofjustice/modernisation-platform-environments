@@ -24,7 +24,18 @@ resource "aws_ssm_parameter" "ldap_bind_password" {
     ]
   }
   tags = local.tags
+}
 
+resource "aws_ssm_parameter" "ldap_host" {
+  name  = format("/%s-%s/LDAP_HOST", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = var.tags
 }
 
 resource "aws_ssm_parameter" "ldap_admin_password" {
@@ -37,6 +48,42 @@ resource "aws_ssm_parameter" "ldap_admin_password" {
     ]
   }
   tags = local.tags
+}
+
+resource "aws_ssm_parameter" "ldap_seed_uri" {
+  name  = format("/%s-%s/LDAP_SEED_URI", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ldap_principal" {
+  name  = format("/%s-%s/LDAP_PRINCIPAL", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ldap_rbac_version" {
+  name  = format("/%s-%s/LDAP_RBAC_VERSION", var.account_info.application_name, var.env_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = var.tags
 }
 
 resource "aws_ssm_parameter" "oasys_user" {
