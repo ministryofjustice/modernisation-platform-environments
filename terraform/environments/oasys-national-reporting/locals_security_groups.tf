@@ -98,8 +98,8 @@ locals {
         }
         https = {
           description     = "Allow https ingress"
-          from_port       = 80
-          to_port         = 80
+          from_port       = 443
+          to_port         = 443
           protocol        = "tcp"
           security_groups = ["private-jumpserver"]
           cidr_blocks     = local.security_group_cidrs.enduserclient_internal
