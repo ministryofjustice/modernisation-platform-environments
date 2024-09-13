@@ -34,10 +34,10 @@ locals {
 
   repository_bucket_json = try(jsondecode(data.http.lambda_output[0].response_body),jsondecode("{}"))
 
-  repository_bucket_name = [
+  repository_bucket_name = try([
     for bucket in local.repository_bucket_json.Buckets : 
         bucket if try(regex(".*dms-destination-bucket.*", bucket),null) != null
-  ]
+  ],[])
 
    dms_s3_bucket_info = {
        dms_s3_bucket_name = {(var.env_name) = module.s3_bucket_dms_destination.bucket.bucket}
