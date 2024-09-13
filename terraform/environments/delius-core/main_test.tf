@@ -36,5 +36,9 @@ module "environment_test" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = merge(local.dms_config_test, { client_account_arns = local.dms_client_account_arns })
+  dms_config = merge(local.dms_config_test, { client_account_ids = local.dms_client_account_ids })
+
+  delius_account_names = local.delius_account_names
+  delius_environment_names = local.delius_environment_names
+  env_name_to_dms_config_map = local.env_name_to_dms_config_map
 }
