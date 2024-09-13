@@ -98,6 +98,36 @@ resource "aws_iam_role_policy_attachment" "ssm_policy" {
   role       = aws_iam_role.ssm_role.name
 }
 
+# Attach an additional policy for S3 access
+resource "aws_iam_policy" "s3_access_policy" {
+  name        = "SSMInstanceS3AccessPolicy"
+  description = "Policy to allow EC2 to access the S3 bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        Effect = "Allow",
+        Resource = [
+          module.s3-bucket.bucket.arn,
+          "${module.s3-bucket.bucket.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+# Attach the policy to the existing SSM role
+resource "aws_iam_role_policy_attachment" "ssm_s3_access_policy" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = aws_iam_policy.s3_access_policy.arn
+}
+
 # Create the instance profile
 resource "aws_iam_instance_profile" "ssm_instance_profile" {
   name = "SSMInstanceProfile"
@@ -108,7 +138,7 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
 module "s3-bucket" {
     source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4e17731f72ef24b804207f55b182f49057e73ec9" #v8.1.0
 
-  bucket_prefix                            = "panda-cyber-keys-bucket"
+  bucket_prefix                            = "panda-cyber-bucket"
   versioning_enabled                       = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -168,6 +198,34 @@ module "s3-bucket" {
   ]
 
   tags                 = local.tags
+}
+
+data "aws_iam_policy_document" "bucket_policy" {
+  statement {
+    sid    = "s3Access"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      module.s3-bucket.bucket.arn,
+      "${module.s3-bucket.bucket.arn}/*"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.ssm_role.arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = module.s3-bucket.bucket.id
+  policy = data.aws_iam_policy_document.bucket_policy.json
 }
 
 
