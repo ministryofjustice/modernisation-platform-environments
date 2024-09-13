@@ -632,6 +632,7 @@ module "glue_s3_data_reconciliation_job" {
     "--dpr.aws.region"                 = local.account_region
     "--dpr.config.s3.bucket"           = module.s3_glue_job_bucket.bucket_id,
     "--dpr.log.level"                  = local.glue_job_common_log_level
+    "--dpr.raw.s3.path"                = "s3://${module.s3_raw_bucket.bucket_id}/"
     "--dpr.structured.s3.path"         = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.curated.s3.path"            = "s3://${module.s3_curated_bucket.bucket_id}/"
     "--dpr.nomis.glue.connection.name" = aws_glue_connection.glue_nomis_connection[0].name
