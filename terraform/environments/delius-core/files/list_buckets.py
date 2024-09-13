@@ -5,12 +5,13 @@ from botocore.exceptions import ClientError
 def lambda_handler(event, context):
     # Retrieve the target_account_id from query string parameters
     target_account_id = event.get('queryStringParameters', {}).get('target_account_id')
-    
-    if not target_account_id:
-        # Return an error response if target_account_id is not provided
+    target_environment_name = event.get('queryStringParameters', {}).get('target_environment_name')
+
+    if not target_account_id or not target_environment_name:
+        # Return an error response if target_account_id or target_environment_name is not provided
         return {
             'statusCode': 400,
-            'body': json.dumps({'error': 'target_account_id is required as a query parameter'})
+            'body': json.dumps({'error': 'target_account_id and target_environment_name are required as query parameters'})
         }
 
     # Initialize an empty list to store the bucket names
@@ -22,8 +23,8 @@ def lambda_handler(event, context):
     try:
         # Assume the cross-account role
         assumed_role = sts_client.assume_role(
-            RoleArn=f"arn:aws:iam::{target_account_id}:role/cross-account-s3-read-only-role",
-            RoleSessionName="CrossAccountS3AccessSession"
+            RoleArn=f"arn:aws:iam::{target_account_id}:role/{target_environment_name}-dms-s3-lister-role",
+            RoleSessionName="crossAccountS3AccessSession"
         )
         
         # Extract the temporary credentials from the assumed role

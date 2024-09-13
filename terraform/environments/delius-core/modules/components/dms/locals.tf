@@ -10,9 +10,11 @@ locals {
 
   dms_repository_account_id = nonsensitive(try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null))
 
-  # Create array of clients of this environment (where this environment is a repository)
-  client_account_ids = [for delius_environment in keys(var.env_name_to_dms_config_map):
-      var.env_name_to_dms_config_map[delius_environment].account_id if try(var.env_name_to_dms_config_map[delius_environment].dms_config.audit_target_endpoint.write_environment,null) == var.env_name]
+  # Create map of clients of this environment (where this environment is a repository)
+  client_account_map = {for delius_environment in keys(var.env_name_to_dms_config_map):
+      delius_environment => var.env_name_to_dms_config_map[delius_environment].account_id if try(var.env_name_to_dms_config_map[delius_environment].dms_config.audit_target_endpoint.write_environment,null) == var.env_name
+  } 
+  client_account_ids = values(local.client_account_map)
 
   dms_s3_writer_account_ids = flatten(compact(concat(local.client_account_ids,[local.dms_repository_account_id])))
   # We define an S3 writer role for each Delius environment (rather than for the account)
