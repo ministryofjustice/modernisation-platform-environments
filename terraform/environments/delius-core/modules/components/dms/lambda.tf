@@ -1,10 +1,16 @@
 # Upload Lambda deployment package to S3
+data "archive_file" "list_buckets_zip" {
+  type = "zip"
+  source_file = "files/list_buckets.py"
+  output_path = "files/list_buckets.zip"
+}
+
 resource "aws_s3_object" "lambda_zip" {
-  bucket = module.s3_bucket_dms_destination.bucket.bucket
-  key    = "list_buckets.zip"
-  source = "files/list_buckets.zip"
-  # Calculate Etag to force replacement if the zip file changes
-  etag   = filemd5("files/list_buckets.zip")
+  bucket        = module.s3_bucket_dms_destination.bucket.bucket
+  key           = "list_buckets.zip"
+  source        = data.archive_file.list_buckets_zip.output_path
+  # Calculate Source Hash to force replacement if the zip file changes
+  source_hash   = data.archive_file.list_buckets_zip.output_base64sha256
 }
 
 # Create Lambda Function
@@ -113,5 +119,5 @@ resource "aws_api_gateway_account" "api_gateway_account" {
 
 # Use Terraform http data source to call the API and get bucket names
 data "http" "lambda_output" {
-  url = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets"
+  url = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets?target_account_id=${var.env_name_to_dms_config_map[var.dms_config.audit_target_endpoint.write_environment].account_id}"
 }

@@ -5,6 +5,10 @@ terraform {
       version               = "~> 5.0"
       configuration_aliases = [aws.core-vpc, aws.core-network-services, aws.bucket-replication]
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.4"
+    }
   }
   required_version = ">= 1.0.1"
 }
