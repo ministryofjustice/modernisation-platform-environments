@@ -1,10 +1,8 @@
 module "ldap_ecs" {
   source = "../helpers/delius_microservice"
 
-  name                  = "ldap"
-  certificate_arn       = local.certificate_arn
-  alb_security_group_id = aws_security_group.ancillary_alb_security_group.id
-  env_name              = var.env_name
+  name     = "ldap"
+  env_name = var.env_name
 
   container_vars_default = {
     "LDAP_HOST"          = "0.0.0.0",
@@ -15,7 +13,7 @@ module "ldap_ecs" {
 
   container_vars_env_specific = try(var.delius_microservice_configs.ldap.container_vars_env_specific, {})
 
-  container_secrets_default      = {
+  container_secrets_default = {
     "BIND_PASSWORD"         = aws_ssm_parameter.ldap_bind_password.arn,
     "MIGRATION_S3_LOCATION" = aws_ssm_parameter.ldap_seed_uri.arn,
     "RBAC_TAG"              = aws_ssm_parameter.ldap_rbac_version.arn
@@ -31,19 +29,15 @@ module "ldap_ecs" {
     }
   ]
 
-  ecs_cluster_arn            = module.ecs.ecs_cluster_arn
-  db_ingress_security_groups = []
-  cluster_security_group_id  = aws_security_group.cluster.id
+  ecs_cluster_arn           = module.ecs.ecs_cluster_arn
+  cluster_security_group_id = aws_security_group.cluster.id
 
-  bastion_sg_id                      = module.bastion_linux.bastion_security_group
-  tags                               = var.tags
-  #microservice_lb                    = aws_lb.delius_core_ancillary
-  #microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
-  #alb_listener_rule_host_header = "ldap.${var.env_name}.${var.account_config.dns_suffix}"
+  bastion_sg_id = module.bastion_linux.bastion_security_group
+  tags          = var.tags
 
-  platform_vars           = var.platform_vars
-  container_image         = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-openldap-ecr-repo:${var.delius_microservice_configs.ldap.image_tag}"
-  account_config          = var.account_config
+  platform_vars   = var.platform_vars
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-openldap-ecr-repo:${var.delius_microservice_configs.ldap.image_tag}"
+  account_config  = var.account_config
 
   health_check = {
     command     = ["CMD-SHELL", "ldapsearch -x -H ldap://localhost:389 -b '' -s base '(objectclass=*)' namingContexts"]
@@ -52,18 +46,22 @@ module "ldap_ecs" {
     startPeriod = 60
     timeout     = 5
   }
-  account_info            = var.account_info
+  account_info = var.account_info
 
   ignore_changes_service_task_definition = false
+
+
+  extra_task_exec_role_policies = {
+    efs = data.aws_iam_policy_document.ldap_efs_access_policy
+  }
 
   providers = {
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
 
-  log_error_pattern       = "ERROR"
+  log_error_pattern       = "%${join("|", local.ldap_formatted_error_codes)}%"
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
-  frontend_lb_arn_suffix  = aws_lb.delius_core_ancillary.arn_suffix
   enable_platform_backups = var.enable_platform_backups
 
   efs_volumes = [
@@ -111,16 +109,16 @@ module "ldap_ecs" {
       description = "Allow inbound traffic from VPC"
     },
     {
-      port                          = var.ldap_config.port
-      ip_protocol                   = "tcp"
-      referenced_security_group_id  = module.bastion_linux.bastion_security_group
-      description                   = "Allow inbound traffic from bastion"
+      port                         = var.ldap_config.port
+      ip_protocol                  = "tcp"
+      referenced_security_group_id = module.bastion_linux.bastion_security_group
+      description                  = "Allow inbound traffic from bastion"
     },
     {
-      port                           = var.ldap_config.port
-      ip_protocol                    = "udp"
-      referenced_security_group_id   = module.bastion_linux.bastion_security_group
-      description                    = "Allow inbound traffic from bastion"
+      port                         = var.ldap_config.port
+      ip_protocol                  = "udp"
+      referenced_security_group_id = module.bastion_linux.bastion_security_group
+      description                  = "Allow inbound traffic from bastion"
     },
     {
       port        = var.ldap_config.port
@@ -153,6 +151,106 @@ module "ldap_ecs" {
       description                  = "EFS ingress"
     }
   ]
-
 }
 
+
+data "aws_iam_policy_document" "ldap_efs_access_policy" {
+  statement {
+    actions = [
+      "elasticfilesystem:ClientRootAccess",
+      "elasticfilesystem:ClientWrite",
+      "elasticfilesystem:ClientMount"
+    ]
+    resources = [
+      module.ldap.efs_fs_id
+    ]
+    effect = "Allow"
+  }
+}
+
+locals {
+  ldap_domain_types = { for dvo in aws_acm_certificate.ldap_external.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
+    }
+  }
+  ldap_domain_name_main   = [for k, v in local.ldap_domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  ldap_domain_name_sub    = [for k, v in local.ldap_domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  ldap_domain_record_main = [for k, v in local.ldap_domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  ldap_domain_record_sub  = [for k, v in local.ldap_domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  ldap_domain_type_main   = [for k, v in local.ldap_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  ldap_domain_type_sub    = [for k, v in local.ldap_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+
+  ldap_error_codes = [
+    1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14,
+    16, 17, 18, 19, 20, 21, 33, 34, 35, 36, 48, 49,
+    50, 51, 52, 53, 54, 60, 61, 64, 65, 66, 67, 68,
+    69, 70, 71, 76, 80, 81, 82, 83, 84, 85, 86, 87,
+    88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 100, 101,
+    112, 113, 114, 118, 119, 120, 121, 122, 123, 4096,
+    16654
+  ]
+  ldap_formatted_error_codes = [for error_code in local.ldap_error_codes : "err=${error_code}\\s"]
+}
+
+resource "aws_lb_listener" "ldaps" {
+  load_balancer_arn = module.ldap_ecs.nlb_arn
+  port              = 636
+  protocol          = "TLS"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = module.ldap_ecs.nlb_target_group_arn_map[389]
+  }
+
+  certificate_arn = aws_acm_certificate.ldap_external.arn
+}
+
+resource "aws_route53_record" "ldap_external" {
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = "ldap.${var.env_name}.${var.account_config.dns_suffix}"
+  type    = "CNAME"
+  ttl     = "60"
+  records = [module.ldap_ecs.nlb_arn]
+}
+
+resource "aws_route53_record" "ldap_external_validation" {
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = local.ldap_domain_name_main[0]
+  records         = local.ldap_domain_record_main
+  ttl             = 60
+  type            = local.ldap_domain_type_main[0]
+  zone_id         = var.account_config.route53_network_services_zone.zone_id
+}
+
+resource "aws_acm_certificate" "ldap_external" {
+  domain_name               = "modernisation-platform.service.justice.gov.uk"
+  validation_method         = "DNS"
+  subject_alternative_names = [aws_route53_record.ldap_external.name]
+  tags                      = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "ldap_external_validation_subdomain" {
+  provider = aws.core-vpc
+
+  allow_overwrite = true
+  name            = local.ldap_domain_name_sub[0]
+  records         = local.ldap_domain_record_sub
+  ttl             = 60
+  type            = local.ldap_domain_type_sub[0]
+  zone_id         = var.account_config.route53_external_zone.zone_id
+}
+
+resource "aws_acm_certificate_validation" "ldap_external" {
+  certificate_arn         = aws_acm_certificate.external.arn
+  validation_record_fqdns = [local.ldap_domain_name_main[0], local.ldap_domain_name_sub[0]]
+}
