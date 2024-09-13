@@ -373,7 +373,7 @@ variable "container_secrets_env_specific" {
 variable "alb_security_group_id" {
   description = "The security group ID of the ALB"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "health_check_path" {
