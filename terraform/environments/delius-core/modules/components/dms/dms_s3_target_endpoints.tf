@@ -5,11 +5,11 @@
 # In client environments the dms_audit_source_endpoint.read_database must be defined
 # The endpoint for audit (AUDITED_INTERACTION) is the Delius database.
 resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
-   count                           = try(var.dms_config.audit_target_endpoint.write_environment, null) == null ? 0 : (try(local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment], null) == null ? 0 : (local.dms_s3_bucket_info.dms_s3_cross_account_existing_roles[var.dms_config.audit_target_endpoint.write_environment] ? 1 : 0))
+   count                           = length(local.repository_account_map)
    endpoint_id                     = "s3-staging-of-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
    endpoint_type                   = "target"
    service_access_role_arn         = local.dms_s3_bucket_info.dms_s3_role_arn[var.env_name]
-   bucket_name                     = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[var.dms_config.audit_target_endpoint.write_environment]
+   bucket_name                     = local.bucket_map[var.dms_config.audit_target_endpoint.write_environment][0]
    bucket_folder                   = "audit/${local.audit_source_primary}"
    cdc_path                        = "cdc"
    preserve_transactions           = true
@@ -20,11 +20,11 @@ resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
 # In repository environments we must loop through all client environments which write to it, as we
 # will be pushing user updates to all of these.
 resource "aws_dms_s3_endpoint" "dms_user_target_endpoint_s3" {
-   for_each                        = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
+   for_each                        = local.client_account_map
    endpoint_id                     = "s3-staging-of-user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}-to-${each.value}"
    endpoint_type                   = "target"
    service_access_role_arn         = aws_iam_role.dms_s3_writer_role.arn
-   bucket_name                     = local.dms_s3_bucket_info.dms_s3_cross_account_bucket_names[each.value]
+   bucket_name                     = local.bucket_map[each.key][0]
    bucket_folder                   = "user"
    cdc_path                        = "cdc"
    preserve_transactions           = true

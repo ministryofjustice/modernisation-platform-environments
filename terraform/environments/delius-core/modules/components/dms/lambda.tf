@@ -120,8 +120,8 @@ resource "aws_api_gateway_account" "api_gateway_account" {
 }
 
 # Use Terraform http data source to call the API and get repository bucket names
-# data "http" "get_buckets_lambda_output" {
-#   for_each   = keys(local.bucket_list_target_map)
-#   url        = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets?target_account_id=${each.value}&target_environment_name=${each.key}"
-#   depends_on = [aws_api_gateway_deployment.api_deployment]
-# }
+data "http" "get_buckets_lambda_output" {
+  for_each   = local.bucket_list_target_map
+  url        = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets?target_account_id=${each.value}&target_environment_name=${each.key}"
+  depends_on = [aws_api_gateway_deployment.api_deployment]
+}

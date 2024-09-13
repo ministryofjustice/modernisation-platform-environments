@@ -9,11 +9,18 @@ module "s3_bucket_dms_destination" {
     aws.bucket-replication = aws
   }
 
+  # We set the bucket policy to allow writing from any of the following:
+  #   (1) The writer role in the repository used by this environment, if this environment is a client.
+  #   (2) The writer role in all clients feeding to this environment, if this environment is a repository.
+  #   (3) The writer role in this environment.
   bucket_policy_v2 = [{
           effect     = "Allow"
           principals = {
             type        = "AWS"
-            identifiers = flatten(concat(values(local.dms_s3_bucket_info.dms_s3_writer_role_cross_account_arns),[aws_iam_role.dms_s3_writer_role.arn]))
+            identifiers = flatten(concat(
+            [for k,v in local.repository_account_map : "arn:aws.iam::${v}:role/${k}-dms-s3-writer-role"],
+            [for k,v in local.client_account_map : "arn:aws.iam::${v}:role/${k}-dms-s3-writer-role"],
+            [aws_iam_role.dms_s3_writer_role.arn]))
           }
           actions    = [
             "s3:PutObject",

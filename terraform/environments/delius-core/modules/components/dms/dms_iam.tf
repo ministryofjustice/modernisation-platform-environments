@@ -46,7 +46,7 @@ resource "aws_iam_role" "dms_s3_writer_role" {
 }
 
 resource "aws_iam_policy" "dms_s3_bucket_writer_policy" {
-    count  = length(keys(local.dms_s3_cross_account_bucket_arns)) > 0 ? 1 : 0
+    count  = length(keys(local.bucket_map)) > 0 ? 1 : 0
     name   = "dms-s3-bucket-writer-policy"
     policy = jsonencode({
     Version = "2012-10-17"
@@ -59,21 +59,21 @@ resource "aws_iam_policy" "dms_s3_bucket_writer_policy" {
           "s3:DeleteObject",
           "s3:PutObjectTagging"         
         ]
-        Resource = [for bucket in values(local.dms_s3_cross_account_bucket_arns) : "${bucket}/*"]
+        Resource = concat([for bucket in values(local.bucket_map) : "arn:aws:s3:::${bucket[0]}/*"],["${module.s3_bucket_dms_destination.bucket.arn}/*"])
         },
         {
         Effect    = "Allow"
         Action    = [
           "s3:ListBucket"
         ]
-        Resource = [for bucket in values(local.dms_s3_cross_account_bucket_arns) : bucket]
+        Resource = concat([for bucket in values(local.bucket_map) : "arn:aws:s3:::${bucket[0]}"],[module.s3_bucket_dms_destination.bucket.arn])
         }
     ]
   })
 }
 
 resource "aws_iam_role_policy_attachment" "dms_s3_bucket_writer_policy_attachment" {
-  count      = length(keys(local.dms_s3_cross_account_bucket_arns)) > 0 ? 1 : 0
+  count      = length(keys(local.bucket_map)) > 0 ? 1 : 0
   role       = aws_iam_role.dms_s3_writer_role.name
   policy_arn = aws_iam_policy.dms_s3_bucket_writer_policy[0].arn
 }

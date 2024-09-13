@@ -12,14 +12,15 @@ resource "aws_dms_s3_endpoint" "dms_user_source_endpoint_s3" {
 }
 
 # The Audit s3 source endpoint is only required in Repository environments.
+# We name the bucket folder after the write database for the client, since this must always be the name of the client's primary database.
 # One endpoint is required for each of the clients of that repository.
 resource "aws_dms_s3_endpoint" "dms_audit_source_endpoint_s3" {
-   for_each                        = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
+   for_each                        = local.client_account_map
    endpoint_id                     = "s3-staging-of-audit-data-from-${each.value}"
    endpoint_type                   = "source"
    service_access_role_arn         = aws_iam_role.dms_s3_reader_role.arn
    bucket_name                     = module.s3_bucket_dms_destination.bucket.bucket
-   bucket_folder                   = "audit/${local.dms_s3_cross_account_audit_source_databases[each.value]}"
+   bucket_folder                   = "audit/${var.env_name_to_dms_config_map[each.key].dms_config.user_target_endpoint.write_database}"
    cdc_path                        = "cdc"
    external_table_definition       = file("files/audit_external_table_definition.json")
    timestamp_column_name           = "TIMESTAMP"

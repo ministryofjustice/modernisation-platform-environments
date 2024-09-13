@@ -29,24 +29,24 @@ resource "aws_dms_replication_task" "user_inbound_replication" {
 # Business Interaction inbound replication only happens in the repository environments.
 # There is one replication task for each for the feeder client environments.
 resource "aws_dms_replication_task" "business_interaction_inbound_replication" {
-  for_each            = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
-  replication_task_id = "${var.env_name}-business-interaction-inbound-replication-task-from-${each.value}"
+  for_each            = local.client_account_map
+  replication_task_id = "${var.env_name}-business-interaction-inbound-replication-task-from-${each.key}"
   migration_type      = "full-load-and-cdc" 
 
   table_mappings            = file("files/business_interaction_inbound_table_mapping.json")
   replication_task_settings = file("files/business_interaction_inbound_settings.json")
  
-  source_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_source_endpoint_s3[each.value].endpoint_arn
+  source_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_source_endpoint_s3[each.key].endpoint_arn
   target_endpoint_arn      = aws_dms_endpoint.dms_audit_target_endpoint_db[0].endpoint_arn
   replication_instance_arn = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
 
   tags = merge(
     var.tags,
     {
-      "name" = "Business Interaction Replication from ${each.value} to ${var.env_name}"
+      "name" = "Business Interaction Replication from ${each.key} to ${var.env_name}"
     },
     {
-      "audit-client-environment" = "${each.value}"
+      "audit-client-environment" = "${each.key}"
     },
     {
       "audit-repository-environment" = "${var.env_name}"
@@ -59,24 +59,24 @@ resource "aws_dms_replication_task" "business_interaction_inbound_replication" {
 # Audited Interaction inbound replication only happens in the repository environments.
 # There is one replication task for each for the feeder client environments.
 resource "aws_dms_replication_task" "audited_interaction_inbound_replication" {
-  for_each            = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
-  replication_task_id = "${var.env_name}-audited-interaction-inbound-replication-task-from-${each.value}"
+  for_each            = local.client_account_map
+  replication_task_id = "${var.env_name}-audited-interaction-inbound-replication-task-from-${each.key}"
   migration_type      = "cdc" 
 
   table_mappings            = file("files/audited_interaction_inbound_table_mapping.json")
   replication_task_settings = file("files/audited_interaction_inbound_settings.json")
  
-  source_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_source_endpoint_s3[each.value].endpoint_arn
+  source_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_source_endpoint_s3[each.key].endpoint_arn
   target_endpoint_arn      = aws_dms_endpoint.dms_audit_target_endpoint_db[0].endpoint_arn
   replication_instance_arn = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
 
   tags = merge(
     var.tags,
     {
-      "name" = "Audited Interaction Replication from ${each.value} to ${var.env_name}"
+      "name" = "Audited Interaction Replication from ${each.key} to ${var.env_name}"
     },
     {
-      "audit-client-environment" = "${each.value}"
+      "audit-client-environment" = "${each.key}"
     },
     {
       "audit-repository-environment" = "${var.env_name}"
@@ -88,24 +88,24 @@ resource "aws_dms_replication_task" "audited_interaction_inbound_replication" {
 # Audited Interaction Checksum inbound replication only happens in the repository environments.
 # There is one replication task for each for the feeder client environments.
 resource "aws_dms_replication_task" "audited_interaction_checksum_inbound_replication" {
-  for_each            = toset(try(local.dms_s3_cross_account_client_environments[var.env_name],[]))
-  replication_task_id = "${var.env_name}-audited-interaction-checksum-inbound-replication-task-from-${each.value}"
+  for_each            = local.client_account_map
+  replication_task_id = "${var.env_name}-audited-interaction-checksum-inbound-replication-task-from-${each.key}"
   migration_type      = "cdc" 
 
   table_mappings            = file("files/audited_interaction_checksum_inbound_table_mapping.json")
   replication_task_settings = file("files/audited_interaction_checksum_inbound_settings.json")
  
-  source_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_source_endpoint_s3[each.value].endpoint_arn
+  source_endpoint_arn      = aws_dms_s3_endpoint.dms_audit_source_endpoint_s3[each.key].endpoint_arn
   target_endpoint_arn      = aws_dms_endpoint.dms_audit_target_endpoint_db[0].endpoint_arn
   replication_instance_arn = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
 
   tags = merge(
     var.tags,
     {
-      "name" = "Audited Interaction Checksum Replication from ${each.value} to ${var.env_name}"
+      "name" = "Audited Interaction Checksum Replication from ${each.key} to ${var.env_name}"
     },
     {
-      "audit-client-environment" = "${each.value}"
+      "audit-client-environment" = "${each.key}"
     },
     {
       "audit-repository-environment" = "${var.env_name}"
