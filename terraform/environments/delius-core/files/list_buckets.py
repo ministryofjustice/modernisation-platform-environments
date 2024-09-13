@@ -42,12 +42,25 @@ def lambda_handler(event, context):
         response = s3_client.list_buckets()
         bucket_list = [bucket['Name'] for bucket in response['Buckets']]
     
+    # Because we cannot guarantee that the repository or client environments exist yet,
+    # we do not raise an error if we cannot access the remote account, but instead just
+    # return an empty list of buckets.  This is intended to remove a circular 
+    # dependency where we cannot create the client environment until the repository
+    # environment exists and vice versa.
     except ClientError as e:
-        # Handle errors and return the error message in the response
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': str(e), 'AccountId': target_account_id})
-        }
+        error_code = e.response['Error']['Code']
+        if error_code == 'AccessDenied' or error_code == 'NoSuchEntity':
+            # Return an empty list of buckets if the role does not exist or access is denied
+            return {
+                'statusCode': 200,
+                'body': json.dumps({'AccountId': target_account_id, 'Buckets': [], 'message': 'Role does not exist or access is denied'})
+            }
+        else:
+            # Handle other errors and return the error message in the response
+            return {
+                'statusCode': 500,
+                'body': json.dumps({'error': str(e), 'AccountId': target_account_id, 'EnvironmentName': target_environment_name})
+            }
 
     # Return the list of buckets in the target account
     return {

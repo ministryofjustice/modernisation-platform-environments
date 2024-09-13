@@ -34,8 +34,8 @@ locals {
 
 
   repository_bucket_name = [
-    for buckets in jsondecode(data.http.lambda_output.response_body) : 
-        buckets.BucketName if try(regex(".*dms-destination-bucket.*", buckets.BucketName),null) != null
+    for bucket in jsondecode(data.http.lambda_output.response_body.Buckets) : 
+        bucket if try(regex(".*dms-destination-bucket.*", bucket),null) != null
   ]
 
    dms_s3_bucket_info = {
