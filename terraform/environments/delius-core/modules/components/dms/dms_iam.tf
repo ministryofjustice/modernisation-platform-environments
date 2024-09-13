@@ -228,24 +228,24 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
-# Attach a policy that allows Lambda to assume roles in target accounts
+# Attach a policy that allows Lambda to assume roles in target accounts in order to list the buckets there
 resource "aws_iam_policy" "assume_cross_account_policy" {
-  count              = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
+  count  = length(keys(local.bucket_list_target_map)) == 0 ? 0 : 1
   name   = "AssumeCrossAccountPolicy"
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    Version = "2012-10-17"
+    Statement = [
       {
-        "Effect": "Allow",
-        "Action": "sts:AssumeRole",
-        "Resource": "arn:aws:iam::${var.env_name_to_dms_config_map[var.dms_config.audit_target_endpoint.write_environment].account_id}:role/${var.dms_config.audit_target_endpoint.write_environment}-dms-s3-lister-role"
-      }
+        Effect   = "Allow"
+        Action   = "sts:AssumeRole"
+        Resource = [for delius_environment in keys(local.bucket_list_target_map) : "arn:aws:iam::${var.env_name_to_dms_config_map[delius_environment].account_id}:role/${delius_environment}-dms-s3-lister-role"]
+      } 
     ]
   })
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_assume_role_attachment" {
-  count              = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
+  count      = length(keys(local.bucket_list_target_map)) == 0 ? 0 : 1
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = aws_iam_policy.assume_cross_account_policy[0].arn
 }

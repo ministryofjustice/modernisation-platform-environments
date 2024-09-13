@@ -10,12 +10,20 @@ locals {
 
   dms_repository_account_id = nonsensitive(try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null))
 
+  # Create map of repositories used by this environment (where this environment is a client)
+  repository_account_map = try(var.dms_config.audit_target_endpoint.write_environment, null) == null ? {} : {(var.dms_config.audit_target_endpoint.write_environment) = var.env_name_to_dms_config_map[var.dms_config.audit_target_endpoint.write_environment].account_id} 
+
   # Create map of clients of this environment (where this environment is a repository)
   client_account_map = {for delius_environment in keys(var.env_name_to_dms_config_map):
       delius_environment => var.env_name_to_dms_config_map[delius_environment].account_id if try(var.env_name_to_dms_config_map[delius_environment].dms_config.audit_target_endpoint.write_environment,null) == var.env_name
   } 
   client_account_ids = values(local.client_account_map)
-
+  
+  # The bucket_list_target_map is, for this environment, either the repository account or all client accounts.
+  # These will be mutually exclusive since a repository may not be a client. It provides a map
+  # of all possible accounts for which we need to retrieve the S3 bucket names for DMS.
+  bucket_list_target_map = merge(local.repository_account_map,local.client_account_map)
+  
   dms_s3_writer_account_ids = flatten(compact(concat(local.client_account_ids,[local.dms_repository_account_id])))
   # We define an S3 writer role for each Delius environment (rather than for the account)
   dms_s3_writer_role_name = "${var.env_name}-dms-s3-writer-role"
@@ -32,7 +40,7 @@ locals {
     # account_id = try(var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.dms_config.audit_target_endpoint.write_environment])],null)
   }
 
-  repository_bucket_json = try(jsondecode(data.http.lambda_output[0].response_body),jsondecode("{}"))
+  repository_bucket_json = try(jsondecode(data.http.repository_buckets_lambda_output[0].response_body),jsondecode("{}"))
 
   repository_bucket_name = try([
     for bucket in local.repository_bucket_json.Buckets : 
