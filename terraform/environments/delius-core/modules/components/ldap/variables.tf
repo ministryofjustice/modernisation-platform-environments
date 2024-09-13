@@ -25,16 +25,16 @@ variable "ldap_config" {
   type        = any
 }
 
+variable "enable_platform_backups" {
+  description = "Enable or disable Mod Platform centralised backups"
+  type        = bool
+  default     = null
+}
+
 variable "platform_vars" {
   type = object({
     environment_management = any
   })
-}
-
-variable "source_security_group_id" {
-  description = "sg of source"
-  type        = string
-  default     = null
 }
 
 variable "environment_config" {
@@ -42,28 +42,7 @@ variable "environment_config" {
   type        = any
 }
 
-variable "bastion_sg_id" {
-  description = "Security group id of the bastion"
-  type        = string
-}
-
-variable "enable_platform_backups" {
-  description = "Enable or disable Mod Platform centralised backups"
-  type        = bool
-  default     = null
-}
-
-variable "ecs_cluster_arn" {
-  description = "The ARN of the ECS cluster"
-  type        = string
-}
-
 variable "task_role_arn" {
   description = "The ARN of the task role"
-  type        = string
-}
-
-variable "sns_topic_arn" {
-  description = "The ARN of the SNS topic"
   type        = string
 }
