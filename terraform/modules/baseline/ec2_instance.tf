@@ -42,18 +42,18 @@ locals {
                 }
                 metrics = [
                   for ebs_key, ebs_value in ec2_value : concat(
-                    [{
-                      expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
-                      label      = "${ebs_value.id} ${ebs_value.tags.Name}"
-                      stat       = "Sum"
-                    }],
+                    #[{
+                    #  expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
+                    #  label      = "${ebs_value.id} ${ebs_value.tags.Name}"
+                    #  stat       = "Sum"
+                    #}],
                     ["AWS/EBS", "VolumeReadOps", "VolumeId", ebs_value.id, {
                       id      = ebs_value.metric_id_r
-                      visible = false
+                      visible = true
                     }],
                     ["AWS/EBS", "VolumeWriteOps", "VolumeId", ebs_value.id, {
                       id      = ebs_value.metric_id_w
-                      visible = false
+                      visible = true
                       }
                     ]
                   ) if ebs_value.iops == iops
