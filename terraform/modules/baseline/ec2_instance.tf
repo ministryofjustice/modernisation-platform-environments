@@ -40,8 +40,8 @@ locals {
                     fill  = "above"
                   }]
                 }
-                metrics = [
-                  for ebs_key, ebs_value in ec2_value : concat(
+                metrics = concat([
+                  for ebs_key, ebs_value in ec2_value : [
                     #[{
                     #  expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
                     #  label      = "${ebs_value.id} ${ebs_value.tags.Name}"
@@ -49,15 +49,16 @@ locals {
                     #}],
                     ["AWS/EBS", "VolumeReadOps", "VolumeId", ebs_value.id, {
                       id      = ebs_value.metric_id_r
+                      region  = "eu-west-2"
                       visible = true
                     }],
                     ["AWS/EBS", "VolumeWriteOps", "VolumeId", ebs_value.id, {
                       id      = ebs_value.metric_id_w
+                      region  = "eu-west-2"
                       visible = true
-                      }
-                    ]
-                  ) if ebs_value.iops == iops
-                ]
+                    }]
+                  ] if ebs_value.iops == iops
+                ]...)
               }
             }
           ]
