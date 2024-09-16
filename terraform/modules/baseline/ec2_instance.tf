@@ -45,7 +45,7 @@ locals {
                 #    label     = "unhealthy host count"
                 #  }
                 #}
-                metrics = flatten([
+                metrics = [
                   for ebs_key, ebs_value in ec2_value : [
                     #                  [{
                     #                    expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
@@ -62,18 +62,16 @@ locals {
                     #                      visible = false
                     #                    }
                     #                  ],
-                    [
-                      "AWS/EBS",
-                      "VolumeWriteOps",
-                      "VolumeId",
-                      ebs_value.id,
-                      {
-                        id      = ebs_value.metric_id_w
-                        visible = true
-                      }
-                    ],
+                    "AWS/EBS",
+                    "VolumeWriteOps",
+                    "VolumeId",
+                    ebs_value.id,
+                    {
+                      id      = ebs_value.metric_id_w
+                      visible = true
+                    }
                   ] if ebs_value.iops == iops
-                ])
+                ]
               }
             }
           ]
