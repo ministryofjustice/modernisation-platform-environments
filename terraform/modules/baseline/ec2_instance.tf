@@ -17,7 +17,7 @@ locals {
 
   ec2_cloudwatch_dashboards = {
     "ebs-performance" = {
-      periodOverride = "auto"
+      periodOverride = "inherit"
       start          = "-PT3H"
       widget_groups = [
         for iops in local.ec2_iops : {
@@ -29,9 +29,10 @@ locals {
               type = "metric"
               properties = {
                 view   = "timeSeries"
+                period = 60
                 region = "eu-west-2"
-                title  = "${ec2_key} ${iops} iops"
                 stat   = "Sum"
+                title  = "${ec2_key} ${iops} iops"
                 annotations = {
                   horizontal = [{
                     label = "Maximum"
@@ -39,38 +40,23 @@ locals {
                     fill  = "above"
                   }]
                 }
-                #yAxis = {
-                #  left = {
-                #    showUnits = false,
-                #    label     = "unhealthy host count"
-                #  }
-                #}
                 metrics = [
-                  for ebs_key, ebs_value in ec2_value : [
-                    #                  [{
-                    #                    expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
-                    #                    label      = "${ebs_value.id} ${ebs_value.tags.Name}"
-                    #                    stat       = "Sum"
-                    #                  }],
-                    #                  [
-                    #                    "AWS/EBS",
-                    #                    "VolumeReadOps",
-                    #                    "VolumeId",
-                    #                    ebs_value.id,
-                    #                    {
-                    #                      id      = ebs_value.metric_id_r
-                    #                      visible = false
-                    #                    }
-                    #                  ],
-                    "AWS/EBS",
-                    "VolumeWriteOps",
-                    "VolumeId",
-                    ebs_value.id,
-                    {
+                  for ebs_key, ebs_value in ec2_value : concat(
+                    [{
+                      expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
+                      label      = "${ebs_value.id} ${ebs_value.tags.Name}"
+                      stat       = "Sum"
+                    }],
+                    ["AWS/EBS", "VolumeReadOps", "VolumeId", ebs_value.id, {
+                      id      = ebs_value.metric_id_r
+                      visible = false
+                    }],
+                    ["AWS/EBS", "VolumeWriteOps", "VolumeId", ebs_value.id, {
                       id      = ebs_value.metric_id_w
-                      visible = true
-                    }
-                  ] if ebs_value.iops == iops
+                      visible = false
+                      }
+                    ]
+                  ) if ebs_value.iops == iops
                 ]
               }
             }
