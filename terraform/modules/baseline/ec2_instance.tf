@@ -1,8 +1,13 @@
 locals {
 
-  ec2_iops = distinct(flatten([
+  ebs_iops = distinct(flatten([
     for ec2_key, ec2_value in module.ec2_instance : [
       for ebs_key, ebs_value in ec2_value.aws_ebs_volume : ebs_value.iops
+    ]
+  ]))
+  ebs_throughput = distinct(flatten([
+    for ec2_key, ec2_value in module.ec2_instance : [
+      for ebs_key, ebs_value in ec2_value.aws_ebs_volume : ebs_value.throughput
     ]
   ]))
   ec2_volumes_with_id = {
@@ -19,8 +24,8 @@ locals {
     "ebs-performance" = {
       periodOverride = "inherit"
       start          = "-PT3H"
-      widget_groups = [
-        for iops in local.ec2_iops : {
+      widget_groups = concat([
+        for iops in local.ebs_iops : {
           header_markdown = "## ${iops} iops"
           width           = 8
           height          = 8
@@ -68,7 +73,56 @@ locals {
             }
           ]
         }
-      ]
+        ], [
+        for throughput in local.ebs_throughput : {
+          header_markdown = "## ${throughput} throughput"
+          width           = 8
+          height          = 8
+          widgets = [
+            for ec2_key, ec2_value in local.ec2_volumes_with_id : {
+              type = "metric"
+              properties = {
+                view   = "timeSeries"
+                period = 60
+                region = "eu-west-2"
+                stat   = "Sum"
+                title  = "${ec2_key} ${throughput} throughput"
+                annotations = {
+                  horizontal = [{
+                    label = "Maximum"
+                    value = throughput
+                    fill  = "above"
+                  }]
+                }
+                metrics = concat([
+                  for ebs_key, ebs_value in ec2_value : [
+                    [{
+                      expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
+                      id         = ebs_value.metric_id
+                      label      = "${ebs_value.id} ${ebs_value.tags.Name}"
+                      region     = "eu-west-2"
+                    }],
+                    ["AWS/EBS", "VolumeReadBytes", "VolumeId", ebs_value.id, {
+                      id      = ebs_value.metric_id_r
+                      period  = 60
+                      region  = "eu-west-2"
+                      stat    = "Sum"
+                      visible = false
+                    }],
+                    ["AWS/EBS", "VolumeWriteBytes", "VolumeId", ebs_value.id, {
+                      id      = ebs_value.metric_id_w
+                      period  = 60
+                      region  = "eu-west-2"
+                      stat    = "Sum"
+                      visible = false
+                    }]
+                  ] if ebs_value.throughput == throughput
+                ]...)
+              }
+            }
+          ]
+        }
+      ])
     }
   }
 }
