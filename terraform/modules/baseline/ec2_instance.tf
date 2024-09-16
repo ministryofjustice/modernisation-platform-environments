@@ -23,6 +23,7 @@ locals {
   ec2_cloudwatch_dashboards = {
     "ebs-performance" = {
       periodOverride = "inherit"
+      period         = "60"
       start          = "-PT3H"
       widget_groups = concat([
         for iops in local.ebs_iops : {
