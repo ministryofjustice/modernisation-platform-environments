@@ -22,7 +22,7 @@ resource "aws_dms_replication_task" "user_inbound_replication" {
       "audit-client-environment" = "${var.env_name}"
     },
     {
-      "audit-repository-environment" = "${var.dms_config.audit_target_endpoint.write_environment}"
+      "audit-repository-environment" = var.dms_config.audit_target_endpoint.write_environment
     },
   )
 
@@ -51,10 +51,10 @@ resource "aws_dms_replication_task" "business_interaction_inbound_replication" {
       "name" = "Business Interaction Replication from ${each.key} to ${var.env_name}"
     },
     {
-      "audit-client-environment" = "${each.key}"
+      "audit-client-environment" = each.key
     },
     {
-      "audit-repository-environment" = "${var.env_name}"
+      "audit-repository-environment" = var.env_name
     },
   )
 
@@ -84,10 +84,10 @@ resource "aws_dms_replication_task" "audited_interaction_inbound_replication" {
       "name" = "Audited Interaction Replication from ${each.key} to ${var.env_name}"
     },
     {
-      "audit-client-environment" = "${each.key}"
+      "audit-client-environment" = each.key
     },
     {
-      "audit-repository-environment" = "${var.env_name}"
+      "audit-repository-environment" = var.env_name
     },
   )
 
@@ -116,10 +116,10 @@ resource "aws_dms_replication_task" "audited_interaction_checksum_inbound_replic
       "name" = "Audited Interaction Checksum Replication from ${each.key} to ${var.env_name}"
     },
     {
-      "audit-client-environment" = "${each.key}"
+      "audit-client-environment" = each.key
     },
     {
-      "audit-repository-environment" = "${var.env_name}"
+      "audit-repository-environment" = var.env_name
     },
   )
 
