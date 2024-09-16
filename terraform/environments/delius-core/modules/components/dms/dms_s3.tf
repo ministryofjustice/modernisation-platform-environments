@@ -18,8 +18,8 @@ module "s3_bucket_dms_destination" {
           principals = {
             type        = "AWS"
             identifiers = flatten(concat(
-            [for k,v in local.repository_account_map : "arn:aws.iam::${v}:role/${k}-dms-s3-writer-role"],
-            [for k,v in local.client_account_map : "arn:aws.iam::${v}:role/${k}-dms-s3-writer-role"],
+            [for k,v in local.repository_account_map : "arn:aws:iam::${v}:role/${k}-dms-s3-writer-role"],
+            [for k,v in local.client_account_map : "arn:aws:iam::${v}:role/${k}-dms-s3-writer-role"],
             [aws_iam_role.dms_s3_writer_role.arn]))
           }
           actions    = [
