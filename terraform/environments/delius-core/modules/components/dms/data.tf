@@ -36,9 +36,6 @@ data "aws_secretsmanager_secrets" "dms_buckets" {
   }
 }
 
-locals {
-}
-
 data "aws_secretsmanager_secret_version" "dms_buckets" {
   for_each = local.s3_bucket_name_secret_arns == [] ? {} : { for secret_arn in local.s3_bucket_name_secret_arns : secret_arn => secret_arn }
   secret_id = each.value
