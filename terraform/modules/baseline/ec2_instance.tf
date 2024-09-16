@@ -43,7 +43,8 @@ locals {
                 metrics = concat([
                   for ebs_key, ebs_value in ec2_value : [
                     [{
-                      expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
+                      expression = "${ebs_value.metric_id_r}+${ebs_value.metric_id_w}"
+                      id         = ebs_value.metric_id
                       label      = "${ebs_value.id} ${ebs_value.tags.Name}"
                       region     = "eu-west-2"
                       stat       = "Sum"
