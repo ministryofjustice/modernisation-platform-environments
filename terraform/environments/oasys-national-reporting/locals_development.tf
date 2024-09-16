@@ -60,11 +60,6 @@ locals {
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "t3.large"
         })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bods.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bods.user_data_cloud_init.args, {
-            branch = "TM/TM-494/onr-bods-automation"
-          })
-        })
         cloudwatch_metric_alarms = null
       })
     }
