@@ -8,7 +8,7 @@ resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
    count                           = length(local.repository_account_map)
    endpoint_id                     = "s3-staging-of-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
    endpoint_type                   = "target"
-   service_access_role_arn         = local.dms_s3_bucket_info.dms_s3_role_arn[var.env_name]
+   service_access_role_arn         = aws_iam_role.dms_s3_writer_role.arn
    bucket_name                     = local.bucket_map[var.dms_config.audit_target_endpoint.write_environment][0]
    bucket_folder                   = "audit/${local.audit_source_primary}"
    cdc_path                        = "cdc"

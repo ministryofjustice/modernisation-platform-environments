@@ -1,3 +1,14 @@
+# We use an S3 bucket for staging DMS Replication data between different environments.
+# Within Modernisation Platform it is not possible for a DMS instance to have endpoints within
+# different accounts.  However it IS possible for S3 buckets to be readable/writeable from 
+# other accounts.
+# Therefore as a workaround we use S3 to stage DMS replication data between accounts.
+# A DMS Instance in a source account will have a source endpoint in the local account's database and 
+# a target endpoint on an S3 bucket in the target account.
+# A DMS Instance in a target account will have a target endpoint in the local account's S3
+# bucket and a target endpoint in the local account's database.
+# We share the S3 bucket to allow this data to be replicated between accounts.
+# Therefore each account must have a single S3 bucket used for staging during DMS replication.
 module "s3_bucket_dms_destination" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"

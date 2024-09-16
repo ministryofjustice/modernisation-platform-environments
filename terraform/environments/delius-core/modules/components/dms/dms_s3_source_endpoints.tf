@@ -16,7 +16,7 @@ resource "aws_dms_s3_endpoint" "dms_user_source_endpoint_s3" {
 # One endpoint is required for each of the clients of that repository.
 resource "aws_dms_s3_endpoint" "dms_audit_source_endpoint_s3" {
    for_each                        = local.client_account_map
-   endpoint_id                     = "s3-staging-of-audit-data-from-${each.value}"
+   endpoint_id                     = "s3-staging-of-audit-data-from-${each.key}"
    endpoint_type                   = "source"
    service_access_role_arn         = aws_iam_role.dms_s3_reader_role.arn
    bucket_name                     = module.s3_bucket_dms_destination.bucket.bucket

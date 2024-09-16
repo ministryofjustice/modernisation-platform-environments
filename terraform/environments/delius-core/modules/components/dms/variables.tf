@@ -66,16 +66,6 @@ variable "db_ec2_sg_id" {
   type        = string
 }
 
-variable "delius_account_names" {
-  description = "List of names of all of the delius-core AWS accounts"
-  type        = list(string)
-}
-
-variable "delius_environment_names" {
-  description = "List of names of all of the delius-core environments"
-  type        = list(string)
-}
-
 variable "env_name_to_dms_config_map" {
   description = "Map of delius-core environments to DMS configs"
   type        = any

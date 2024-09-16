@@ -1,4 +1,6 @@
-# User inbound replication only happens in client environments.
+# User inbound replication only happens in CLIENT environments.  This reads USER_ data from the local S3
+# bucket (source endpoint) into the local Delius database (target endpoint).
+# We only want to replication changes to the user data so this is a CDC task.
 resource "aws_dms_replication_task" "user_inbound_replication" {
   count               = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
   replication_task_id = "${var.env_name}-user-inbound-replication-task-from-${var.dms_config.audit_target_endpoint.write_environment}"
@@ -26,8 +28,11 @@ resource "aws_dms_replication_task" "user_inbound_replication" {
 
 }
 
-# Business Interaction inbound replication only happens in the repository environments.
+# Business Interaction inbound replication only happens in the REPOSITORY environments.
 # There is one replication task for each for the feeder client environments.
+# This reads BUSINESS_INTERACTION data from the local S3 bucket (source endpoint) to the local
+# Delius database (target endpoint).   Each client database has a different folder in S3.
+# Since BUSINESS_INTERACTION is a reference table we start replication with a FULL LOAD.
 resource "aws_dms_replication_task" "business_interaction_inbound_replication" {
   for_each            = local.client_account_map
   replication_task_id = "${var.env_name}-business-interaction-inbound-replication-task-from-${each.key}"
@@ -56,8 +61,11 @@ resource "aws_dms_replication_task" "business_interaction_inbound_replication" {
 }
 
 
-# Audited Interaction inbound replication only happens in the repository environments.
+# Audited Interaction inbound replication only happens in the REPOSITORY environments.
 # There is one replication task for each for the feeder client environments.
+# This reads AUDITED_INTERACTION data from the local S3 bucket (source endpoint) to the local
+# Delius database (target endpoint).   Each client database has a different folder in S3.
+# We only want to capture new audit records so this is a CDC task.
 resource "aws_dms_replication_task" "audited_interaction_inbound_replication" {
   for_each            = local.client_account_map
   replication_task_id = "${var.env_name}-audited-interaction-inbound-replication-task-from-${each.key}"
@@ -85,8 +93,11 @@ resource "aws_dms_replication_task" "audited_interaction_inbound_replication" {
 
 }
 
-# Audited Interaction Checksum inbound replication only happens in the repository environments.
+# Audited Interaction Checksum inbound replication only happens in the REPOSITORY environments.
 # There is one replication task for each for the feeder client environments.
+# This reads AUDITED_INTERACTION_CHECKSUM data from the local S3 bucket (source endpoint) to the local
+# Delius database (target endpoint).   Each client database has a different folder in S3.
+# We only want to capture new audit records so this is a CDC task.
 resource "aws_dms_replication_task" "audited_interaction_checksum_inbound_replication" {
   for_each            = local.client_account_map
   replication_task_id = "${var.env_name}-audited-interaction-checksum-inbound-replication-task-from-${each.key}"

@@ -36,10 +36,8 @@ module "environment_stage" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = merge(local.dms_config_stage, { client_account_ids = local.dms_client_account_ids })
+  dms_config = local.dms_config_stage
 
-  delius_account_names = local.delius_account_names
-  delius_environment_names = local.delius_environment_names
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
 }
 
@@ -76,9 +74,7 @@ module "environment_preprod" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = merge(local.dms_config_preprod, { client_account_ids = local.dms_client_account_ids })
+  dms_config = local.dms_config_preprod
 
-  delius_account_names = local.delius_account_names
-  delius_environment_names = local.delius_environment_names
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
 }

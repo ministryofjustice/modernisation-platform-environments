@@ -29,6 +29,8 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   role       = aws_iam_role.dms-vpc-role.name
 }
 
+# The following role, dms_s3_writer_role, allows the DMS service to write to the local S3 DMS bucket 
+# This is to allow data within the Delius database to be staged to flat files on S3.
 resource "aws_iam_role" "dms_s3_writer_role" {
   name = local.dms_s3_writer_role_name
   assume_role_policy = jsonencode({

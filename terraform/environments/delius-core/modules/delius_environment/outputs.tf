@@ -9,7 +9,3 @@ output "acm_domains" {
 output "oracle_db_server_names" {
   value = local.oracle_db_server_names
 }
-
-output "dms_s3_bucket_info" {
-  value = local.dms_s3_bucket_info
-}
