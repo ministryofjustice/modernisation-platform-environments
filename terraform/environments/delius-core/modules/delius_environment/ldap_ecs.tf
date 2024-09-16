@@ -162,7 +162,7 @@ data "aws_iam_policy_document" "ldap_efs_access_policy" {
       "elasticfilesystem:ClientMount"
     ]
     resources = [
-      module.ldap.efs_fs_id
+      module.ldap.efs_fs_arn
     ]
     effect = "Allow"
   }
