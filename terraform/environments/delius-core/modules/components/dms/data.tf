@@ -28,3 +28,13 @@ data "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
   secret_id = data.aws_secretsmanager_secret.delius_core_application_passwords.id
 }
 
+# This data source provides the names of all the secrets which contain the S3 bucket names used for
+# staging of DMS data in each environment, for all repository or client environments associated
+# with the current environment
+data "aws_secretsmanager_secrets" "dms_buckets" {
+  for_each = local.bucket_list_target_map
+  filter {
+    name = "name"
+    values = [ "${each.value}-dms-s3-bucket-name" ]
+  }
+}

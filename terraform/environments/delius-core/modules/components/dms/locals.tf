@@ -29,6 +29,12 @@ locals {
   dms_s3_reader_role_name = "${var.env_name}-dms-s3-reader-role"
   dms_s3_lister_role_name = "${var.env_name}-dms-s3-lister-role"
 
+  # Create array of all the ARNs for all the secrets which contain the names of all the buckets in
+  # target repository or client environments.   The secrets themselves will be in other accounts
+  # to which we have privileges to access.
+  s3_bucket_name_secret_arns = flatten([for k,v in data.aws_secretsmanager_secrets.dms_buckets :
+                                                  v.arns if v.arns != null])
+
   # bucket_json is the output of the Lambda function we use to list all of the buckets in the target AWS accounts.
   # The key is the delius_environment as we look up the list of buckets in all relevant environments:
   # 1. For clients we only look up the list of buckets in the associated repository environments.
