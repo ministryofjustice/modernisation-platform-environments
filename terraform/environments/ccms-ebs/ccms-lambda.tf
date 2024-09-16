@@ -52,7 +52,6 @@ resource "aws_lambda_function" "lambda_function" {
   timeout       = 120
 
   vpc_config {
-    vpc_id             = data.aws_vpc.shared.id
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
     security_group_ids = [aws_security_group.lambda_security_group.id]
   }
