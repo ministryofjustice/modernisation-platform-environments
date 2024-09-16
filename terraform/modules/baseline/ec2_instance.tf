@@ -26,52 +26,55 @@ locals {
           height          = 8
           widgets = [
             for ec2_key, ec2_value in local.ec2_volumes_with_id : {
-              view   = "timeSeries"
-              region = "eu-west-2"
-              title  = "${ec2_key} ${iops} iops"
-              stat   = "Sum"
-              annotations = {
-                horizontal = [{
-                  label = "Maximum"
-                  value = iops
-                  fill  = "above"
-                }]
+              type = "metric"
+              properties = {
+                view   = "timeSeries"
+                region = "eu-west-2"
+                title  = "${ec2_key} ${iops} iops"
+                stat   = "Sum"
+                annotations = {
+                  horizontal = [{
+                    label = "Maximum"
+                    value = iops
+                    fill  = "above"
+                  }]
+                }
+                #yAxis = {
+                #  left = {
+                #    showUnits = false,
+                #    label     = "unhealthy host count"
+                #  }
+                #}
+                metrics = flatten([
+                  for ebs_key, ebs_value in ec2_value : [
+                    #                  [{
+                    #                    expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
+                    #                    label      = "${ebs_value.id} ${ebs_value.tags.Name}"
+                    #                    stat       = "Sum"
+                    #                  }],
+                    #                  [
+                    #                    "AWS/EBS",
+                    #                    "VolumeReadOps",
+                    #                    "VolumeId",
+                    #                    ebs_value.id,
+                    #                    {
+                    #                      id      = ebs_value.metric_id_r
+                    #                      visible = false
+                    #                    }
+                    #                  ],
+                    [
+                      "AWS/EBS",
+                      "VolumeWriteOps",
+                      "VolumeId",
+                      ebs_value.id,
+                      {
+                        id      = ebs_value.metric_id_w
+                        visible = true
+                      }
+                    ],
+                  ] if ebs_value.iops == iops
+                ])
               }
-              #yAxis = {
-              #  left = {
-              #    showUnits = false,
-              #    label     = "unhealthy host count"
-              #  }
-              #}
-              metrics = flatten([
-                for ebs_key, ebs_value in ec2_value : [
-                  #                  [{
-                  #                    expression = "(${ebs_value.metric_id_r}+${ebs_value.metric_id_w})/60"
-                  #                    label      = "${ebs_value.id} ${ebs_value.tags.Name}"
-                  #                    stat       = "Sum"
-                  #                  }],
-                  #                  [
-                  #                    "AWS/EBS",
-                  #                    "VolumeReadOps",
-                  #                    "VolumeId",
-                  #                    ebs_value.id,
-                  #                    {
-                  #                      id      = ebs_value.metric_id_r
-                  #                      visible = false
-                  #                    }
-                  #                  ],
-                  [
-                    "AWS/EBS",
-                    "VolumeWriteOps",
-                    "VolumeId",
-                    ebs_value.id,
-                    {
-                      id      = ebs_value.metric_id_w
-                      visible = true
-                    }
-                  ],
-                ] if ebs_value.iops == iops
-              ])
             }
           ]
         }
