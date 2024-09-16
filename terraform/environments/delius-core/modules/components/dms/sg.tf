@@ -54,3 +54,15 @@ resource "aws_vpc_security_group_ingress_rule" "db_dms_conn_in" {
     { Name = "dms-in" }
   )
 }
+
+resource "aws_vpc_security_group_egress_rule" "dms_s3_conn_out" {
+  security_group_id            = aws_security_group.dms.id
+  description                  = "Allow outgoing communication between DMS and VPC S3 endpoint"
+  from_port                    = 443
+  to_port                      = 443
+  ip_protocol                  = "tcp"
+  prefix_list_id               = data.aws_prefix_list.s3.prefix_list_id
+  tags = merge(var.tags,
+    { Name = "s3-out" }
+  )
+}

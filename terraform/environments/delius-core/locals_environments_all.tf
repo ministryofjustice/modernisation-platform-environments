@@ -55,4 +55,10 @@ locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   integration_key_lookup     = local.is-production ? "delius_core_prod_alarms" : "delius_core_nonprod_alarms"
   pagerduty_integration_key  = local.pagerduty_integration_keys[local.integration_key_lookup]
+
+  delius_account_names = nonsensitive([
+      for key in local.all_mp_account_names : key
+      if can(regex("^${local.application_name}-",key))
+  ])
+
 }
