@@ -20,8 +20,8 @@ resource "aws_lambda_layer_version" "lambda_layer" {
 
 # SG for Lambda
 resource "aws_security_group" "lambda_security_group" {
-  name        = "${local.application_name}-${local.environment}-lambda-sg"
-  vpc_id      = data.aws_vpc.shared.id
+  name   = "${local.application_name}-${local.environment}-lambda-sg"
+  vpc_id = data.aws_vpc.shared.id
 
   ingress {
     from_port   = 1521
@@ -52,6 +52,7 @@ resource "aws_lambda_function" "lambda_function" {
   timeout       = 120
 
   vpc_config {
+    vpc_id             = data.aws_vpc.shared.id
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
     security_group_ids = [aws_security_group.lambda_security_group.id]
   }
