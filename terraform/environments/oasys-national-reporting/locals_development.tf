@@ -51,11 +51,11 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_instances.bods.config, {
-          # user_data_raw = base64encode(templatefile(
-          #   "../templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-          #     branch = "TM/TM-494/dev-asg-for-onr-bods-install-testing"
-          #   }
-          # ))
+          user_data_raw = base64encode(templatefile(
+            "../templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+              branch = "TM/TM-494/dev-asg-for-onr-bods-install-testing"
+            }
+          ))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "t3.large"
