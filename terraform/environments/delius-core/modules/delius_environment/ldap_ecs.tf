@@ -214,7 +214,7 @@ resource "aws_route53_record" "ldap_external" {
   name    = "ldap.${var.env_name}.${var.account_config.dns_suffix}"
   type    = "CNAME"
   ttl     = "60"
-  records = [module.ldap_ecs.nlb_arn]
+  records = [module.ldap_ecs.nlb_dns_name]
 }
 
 resource "aws_route53_record" "ldap_external_validation" {
