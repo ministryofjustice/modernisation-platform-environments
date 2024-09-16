@@ -21,7 +21,7 @@ locals {
   # The bucket_list_target_map is, for this environment, either the repository account or all client accounts.
   # These will be mutually exclusive since a repository may not be a client. It provides a map
   # of all possible accounts for which we need to retrieve the S3 bucket names for DMS.
-  bucket_list_target_map = merge(local.repository_account_map,local.client_account_map)
+  bucket_list_target_map = merge(local.repository_account_map, local.client_account_map)
   
   # dms_s3_writer_account_ids = flatten(compact(concat(local.client_account_ids,[local.dms_repository_account_id])))
   # We define an S3 writer role for each Delius environment (rather than for the account)
@@ -43,4 +43,6 @@ locals {
         [for bucket in details.Buckets : bucket if try(regex(".*dms-destination-bucket.*", bucket),null) != null] : null
      )
   }
+
+   s3_bucket_name_secret_arns = flatten([for k,v in data.aws_secretsmanager_secrets.dms_buckets : v.arns if v.arns != null])
 }

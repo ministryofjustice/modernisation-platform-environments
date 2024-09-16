@@ -145,3 +145,4 @@ data "http" "get_buckets_lambda_output" {
   url        = "https://${aws_api_gateway_rest_api.lambda_api.id}.execute-api.eu-west-2.amazonaws.com/prod/buckets?target_account_id=${each.value}&target_environment_name=${each.key}"
   depends_on = [aws_api_gateway_deployment.api_deployment]
 }
+

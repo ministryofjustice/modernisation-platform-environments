@@ -28,3 +28,18 @@ data "aws_secretsmanager_secret_version" "delius_core_application_passwords" {
   secret_id = data.aws_secretsmanager_secret.delius_core_application_passwords.id
 }
 
+data "aws_secretsmanager_secrets" "dms_buckets" {
+  for_each = local.bucket_list_target_map
+  filter {
+    name = "name"
+    values = [ "${each.value}-dms-s3-bucket-name" ]
+  }
+}
+
+locals {
+}
+
+data "aws_secretsmanager_secret_version" "dms_buckets" {
+  for_each = local.s3_bucket_name_secret_arns == [] ? {} : { for secret_arn in local.s3_bucket_name_secret_arns : secret_arn => secret_arn }
+  secret_id = each.value
+}
