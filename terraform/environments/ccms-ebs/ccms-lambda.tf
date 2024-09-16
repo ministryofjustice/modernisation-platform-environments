@@ -21,7 +21,7 @@ resource "aws_lambda_layer_version" "lambda_layer" {
 # SG for Lambda
 resource "aws_security_group" "lambda_security_group" {
   name        = "${local.application_name}-${local.environment}-lambda-sg"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.shared.id
 
   ingress {
     from_port   = 1521
