@@ -52,7 +52,7 @@ locals {
         })
         config = merge(local.ec2_instances.bods.config, {
           user_data_raw = base64encode(templatefile(
-            "../templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
               branch = "TM/TM-494/dev-asg-for-onr-bods-install-testing"
             }
           ))
