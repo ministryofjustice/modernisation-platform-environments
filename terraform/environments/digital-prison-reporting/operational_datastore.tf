@@ -1,6 +1,6 @@
 locals {
-  operational_db_port                   = 5432
-  operational_db_default_database       = "operational_db"
+  operational_db_port             = 5432
+  operational_db_default_database = "operational_db"
 
   name = "${local.project}-operational-db"
 

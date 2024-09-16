@@ -24,7 +24,7 @@ locals {
   shield_protections = {
     for k, v in local.shield_protections_json : k => jsondecode(v)
     if !(contains(var.excluded_protections, k)) &&
-       !can(regex("eipalloc", jsondecode(v)["ResourceArn"]))
+    !can(regex("eipalloc", jsondecode(v)["ResourceArn"]))
   }
 }
 
