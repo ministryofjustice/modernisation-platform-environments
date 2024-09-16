@@ -6,6 +6,7 @@ resource "aws_s3_object" "lambda_layer_s3" {
   source = "lambda/layer.zip"
 }
 
+# Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer" {
   layer_name               = "${local.application_name}-${local.environment}-payment-load-layer"
   s3_bucket                = aws_s3_bucket.lambda_payment_load.bucket
@@ -16,6 +17,27 @@ resource "aws_lambda_layer_version" "lambda_layer" {
 
   depends_on = [aws_s3_object.lambda_layer_s3]
 }
+
+# SG for Lambda
+resource "aws_security_group" "lambda_security_group" {
+  name        = "${local.application_name}-${local.environment}-lambda-sg"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 1521
+    to_port     = 1522
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 
 # Lambda Function
 resource "aws_lambda_function" "lambda_function" {
@@ -29,6 +51,10 @@ resource "aws_lambda_function" "lambda_function" {
   memory_size   = 128
   timeout       = 120
 
+  vpc_config {
+    subnet_ids         = data.aws_subnet.data_subnets_a.id
+    security_group_ids = [aws_security_group.lambda_security_group.id]
+  }
   environment {
     variables = {
       IS_PRODUCTION   = local.is-production ? "true" : "false"
