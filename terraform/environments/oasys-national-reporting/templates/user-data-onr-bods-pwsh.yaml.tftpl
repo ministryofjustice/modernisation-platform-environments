@@ -4,6 +4,22 @@
 # See C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch* for script output
 version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is running
 tasks:
+  - task: initializeVolume
+    inputs:
+        initialize: devices
+        devices:
+          - device: /dev/sdd
+            name: Temp
+            letter: D
+            partition: gpt
+          - device: /dev/sde
+            name: App
+            letter: E
+            partition: gpt
+          - device: /dev/sdf
+            name: Storage
+            letter: F
+            partition: gpt
   - task: executeScript
     inputs:
       - frequency: once
