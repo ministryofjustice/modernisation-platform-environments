@@ -22,6 +22,7 @@ resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
    lifecycle {
     ignore_changes = [certificate_arn]
    }
+   depends_on = [aws_dms_certificate.empty_oracle_wallet]
 }
 
 # In repository environments the dms_user_source_endpoint.read_database must be defined
@@ -44,4 +45,5 @@ resource "aws_dms_endpoint" "dms_user_source_endpoint_db" {
    lifecycle {
     ignore_changes = [certificate_arn]
    }
+   depends_on = [aws_dms_certificate.empty_oracle_wallet]
 }

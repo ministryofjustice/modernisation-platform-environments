@@ -14,10 +14,11 @@ resource "aws_dms_endpoint" "dms_user_target_endpoint_db" {
    # We initially use an empty wallet for encryption - a populated wallet will be added by DMS configuration
    ssl_mode                        = "verify-ca"
    certificate_arn                 = aws_dms_certificate.empty_oracle_wallet.certificate_arn
-  # Ignore subsequent replacement with a valid wallet
-  lifecycle {
-    ignore_changes = [certificate_arn]
-  }
+   # Ignore subsequent replacement with a valid wallet
+   lifecycle {
+      ignore_changes = [certificate_arn]
+   }
+   depends_on = [aws_dms_certificate.empty_oracle_wallet]
 }
 
 # In repository environments the end point for audit (AUDITED_INTERACTION, BUSINESS_INTERACTION) is the Delius primary database.
@@ -35,8 +36,9 @@ resource "aws_dms_endpoint" "dms_audit_target_endpoint_db" {
    # We initially use an empty wallet for encryption - a populated wallet will be added by DMS configuration
    ssl_mode                        = "verify-ca"
    certificate_arn                 = aws_dms_certificate.empty_oracle_wallet.certificate_arn
-  # Ignore subsequent replacement with a valid wallet
-  lifecycle {
-    ignore_changes = [certificate_arn]
-  }
+   # Ignore subsequent replacement with a valid wallet
+   lifecycle {
+      ignore_changes = [certificate_arn]
+   }
+   depends_on = [aws_dms_certificate.empty_oracle_wallet]
 }
