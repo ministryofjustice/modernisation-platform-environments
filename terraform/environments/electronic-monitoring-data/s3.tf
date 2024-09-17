@@ -1,3 +1,13 @@
+locals {
+  environment_map = {
+    "production"  = "prod"
+    "development" = "dev"
+  }
+  environment_shorthand = lookup(local.environment_map, local.environment)
+  
+  bucket_prefix = "emds-${local.environment_shorthand}"
+}
+
 # ------------------------------------------------------------------------
 # Account S3 bucket log bucket
 # ------------------------------------------------------------------------
@@ -5,7 +15,7 @@
 module "s3-logging-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix      = "${local.application_name_shorthand}-${local.environment}-bucket-logs-"
+  bucket_prefix      = "${local.bucket_prefix}-bucket-logs-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -68,7 +78,6 @@ module "s3-logging-bucket" {
   tags = merge(local.tags, { resource-type = "logging" })
 }
 
-
 # ------------------------------------------------------------------------
 # Metadata Store Bucket
 # ------------------------------------------------------------------------
@@ -76,7 +85,7 @@ module "s3-logging-bucket" {
 module "metadata-s3-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix      = "metadata-store-"
+  bucket_prefix      = "${local.bucket_prefix}-metadata-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -163,7 +172,7 @@ resource "aws_s3_bucket_notification" "send_metadata_to_ap" {
 module "athena-s3-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_name        = join("-", ["aws-athena-query-results", local.env_account_id, "eu-west-2"])
+  bucket_prefix      = "${local.bucket_prefix}-athena-query-results-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -233,7 +242,7 @@ module "athena-s3-bucket" {
 module "unzipped-s3-data-store" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix      = "unzipped-files-data-store-"
+  bucket_prefix      = "${local.bucket_prefix}-unzipped-files-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -308,7 +317,7 @@ module "unzipped-s3-data-store" {
 module "dms-premigrate-assess-store" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix      = "dms-premigrate-assess-store-"
+  bucket_prefix      = "${local.bucket_prefix}-dms-premigrate-assess-store-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -382,7 +391,7 @@ module "dms-premigrate-assess-store" {
 module "json-directory-structure-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix      = "json-directory-structure-bucket-"
+  bucket_prefix      = "${local.bucket_prefix}-json-directory-structure-bucket-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -453,7 +462,6 @@ module "json-directory-structure-bucket" {
 # Main store bucket
 # ------------------------------------------------------------------------
 
-
 module "em-data-store" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
   bucket_prefix = "em-data-store-"
@@ -494,13 +502,13 @@ module "em-data-store" {
           days          = 183
           storage_class = "STANDARD_IA"
           }, {
-          days          = 365
+          days          = 730
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 10004
+        days = 10000
       }
 
       noncurrent_version_transition = [
@@ -528,7 +536,7 @@ module "em-data-store" {
 module "dms-data-validation" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix = "dms-data-validation-"
+  bucket_prefix = "${local.bucket_prefix}-dms-data-validation-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -602,7 +610,7 @@ module "dms-data-validation" {
 module "glue-job-script-store" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix      = "glue-job-store-"
+  bucket_prefix      = "${local.bucket_prefix}-glue-job-store-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:

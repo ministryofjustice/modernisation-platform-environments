@@ -1,7 +1,6 @@
 locals {
 
   application_name = "electronic-monitoring-data"
-  application_name_shorthand = "em-data"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
@@ -24,6 +23,7 @@ locals {
   )
 
   environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
+
   vpc_name        = var.networking[0].business-unit
   subnet_set      = var.networking[0].set
   vpc_all         = "${local.vpc_name}-${local.environment}"
