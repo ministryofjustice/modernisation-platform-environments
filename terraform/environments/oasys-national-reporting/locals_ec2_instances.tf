@@ -71,9 +71,9 @@ locals {
       ebs_volumes = {
         # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
         "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-        "/dev/sdd"  = { type = "gp3", size = 128 } # /u01
-        "/dev/sde"  = { type = "gp3", size = 128 } # /u02
-        "/dev/sdf"  = { type = "gp3", size = 128 } # swap
+        "/dev/sdb"  = { type = "gp3", size = 128 } # /u01
+        "/dev/sdc"  = { type = "gp3", size = 128 } # /u02
+        "/dev/sds"  = { type = "gp3", size = 128 } # swap
       }
       instance = {
         disable_api_termination      = false
