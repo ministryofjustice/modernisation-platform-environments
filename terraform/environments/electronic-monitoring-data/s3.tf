@@ -280,32 +280,8 @@ module "s3-unzipped-files-bucket" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = 365
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 730
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
-        days = 1000
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 365
+        days = 7
       }
     }
   ]
@@ -430,30 +406,30 @@ module "s3-json-directory-structure-bucket" {
 
       transition = [
         {
-          days          = 60
+          days          = 365
           storage_class = "STANDARD_IA"
           }, {
-          days          = 90
+          days          = 730
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 120
+        days = 2190
       }
 
       noncurrent_version_transition = [
         {
-          days          = 30
+          days          = 365
           storage_class = "STANDARD_IA"
           }, {
-          days          = 90
+          days          = 730
           storage_class = "GLACIER"
         }
       ]
 
       noncurrent_version_expiration = {
-        days = 365
+        days = 2190
       }
     }
   ]
