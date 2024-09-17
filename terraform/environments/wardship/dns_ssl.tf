@@ -55,10 +55,23 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
 // Route53 DNS record for directing traffic to the service
 // Provider, zone and name dependent on production or non-production environment
+resource "aws_route53_record" "external-prod" {
+  provider = aws.core-network-services
+  zone_id = data.aws_route53_zone.application_zone.zone_id
+  name    = "wardship-agreements-register.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.wardship_lb.dns_name
+    zone_id                = aws_lb.wardship_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
 resource "aws_route53_record" "external" {
-  provider = local.is-production ? aws.core-network-services : aws.core-vpc
-  zone_id = local.is-production ? data.aws_route53_zone.application_zone.zone_id : data.aws_route53_zone.external.zone_id
-  name    = local.is-production ? "wardship-agreements-register.service.justice.gov.uk" : "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  provider = aws.core-vpc
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
