@@ -95,7 +95,7 @@ module "metadata-s3-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_bucket = module.s3-logging-bucket.bucket.id
+  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -250,7 +250,7 @@ module "unzipped-s3-data-store" {
     aws.bucket-replication = aws
   }
 
-  log_bucket = module.s3-logging-bucket.bucket.id
+  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -323,7 +323,7 @@ module "dms-premigrate-assess-store" {
     aws.bucket-replication = aws
   }
 
-  log_bucket = module.s3-logging-bucket.bucket.id
+  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -396,7 +396,7 @@ module "json-directory-structure-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_bucket = module.s3-logging-bucket.bucket.id
+  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -468,7 +468,7 @@ module "em-data-store" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_bucket = module.s3-logging-bucket.bucket.id
+  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -540,7 +540,7 @@ module "dms-data-validation" {
     aws.bucket-replication = aws
   }
 
-  log_bucket = module.s3-logging-bucket.bucket.id
+  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -613,7 +613,7 @@ module "glue-job-script-store" {
     aws.bucket-replication = aws
   }
 
-  log_bucket = module.s3-logging-bucket.bucket.id
+  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -687,7 +687,7 @@ module "dms-target-store" {
     aws.bucket-replication = aws
   }
 
-  log_bucket = module.s3-logging-bucket.bucket.id
+  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
