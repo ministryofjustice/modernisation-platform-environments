@@ -56,6 +56,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 // Route53 DNS record for directing traffic to the service
 // Provider, zone and name dependent on production or non-production environment
 resource "aws_route53_record" "external-prod" {
+  count = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id = data.aws_route53_zone.application_zone.zone_id
   name    = "wardship-agreements-register.service.justice.gov.uk"
@@ -69,6 +70,7 @@ resource "aws_route53_record" "external-prod" {
 }
 
 resource "aws_route53_record" "external" {
+  count = local.is-production ? 0 : 1
   provider = aws.core-vpc
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
