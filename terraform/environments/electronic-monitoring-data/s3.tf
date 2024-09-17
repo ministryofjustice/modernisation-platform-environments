@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------
 
 module "s3-logging-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "${local.application_name_shorthand}-${local.environment}-bucket-logs-"
   versioning_enabled = true
@@ -74,7 +74,7 @@ module "s3-logging-bucket" {
 # ------------------------------------------------------------------------
 
 module "metadata-s3-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "metadata-store-"
   versioning_enabled = true
@@ -159,7 +159,7 @@ resource "aws_s3_bucket_notification" "send_metadata_to_ap" {
 # ----------------------------------
 
 module "athena-s3-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_name        = join("-", ["aws-athena-query-results", local.env_account_id, "eu-west-2"])
   versioning_enabled = true
@@ -229,7 +229,7 @@ module "athena-s3-bucket" {
 # ----------------------------------
 
 module "unzipped-s3-data-store" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "unzipped-files-data-store-"
   versioning_enabled = true
@@ -302,7 +302,7 @@ module "unzipped-s3-data-store" {
 # ------------------------------------------------------------------------
 
 module "dms-premigrate-assess-store" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "dms-premigrate-assess-store-"
   versioning_enabled = true
@@ -375,7 +375,7 @@ module "dms-premigrate-assess-store" {
 # ------------------------------------------------------------------------
 
 module "json-directory-structure-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "json-directory-structure-bucket-"
   versioning_enabled = true
@@ -449,7 +449,7 @@ module "json-directory-structure-bucket" {
 
 
 module "em-data-store" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
   bucket_prefix = "em-data-store-"
   versioning_enabled = true
 
@@ -519,7 +519,7 @@ module "em-data-store" {
 # DMS data validation bucket
 # ------------------------------------------------------------------------
 module "dms-data-validation" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix = "dms-data-validation-"
   versioning_enabled = true
@@ -592,7 +592,7 @@ module "dms-data-validation" {
 # ------------------------------------------------------------------------
 
 module "glue-job-script-store" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "glue-job-store-"
   versioning_enabled = true
@@ -666,7 +666,7 @@ module "glue-job-script-store" {
 
 
 module "dms-target-store" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=67165cb"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix = "dms-rds-to-parquet-"
   versioning_enabled = true
