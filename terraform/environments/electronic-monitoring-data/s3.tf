@@ -105,8 +105,7 @@ module "metadata-s3-bucket" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/metadata-s3-bucket/"
-
+  log_prefix = "logs/${local.bucket_prefix}-metadata/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -191,6 +190,10 @@ module "athena-s3-bucket" {
     aws.bucket-replication = aws
   }
 
+  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
+  log_prefix = "logs/${local.bucket_prefix}-athena-query-results/"
+  log_partition_date_source = "EventTime"
+
   lifecycle_rule = [
     {
       id      = "main"
@@ -262,7 +265,7 @@ module "unzipped-s3-data-store" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/unzipped-s3-data-store/"
+  log_prefix = "logs/${local.bucket_prefix}-unzipped-files/"
 
   log_partition_date_source = "EventTime"
 
@@ -317,7 +320,7 @@ module "unzipped-s3-data-store" {
 module "dms-premigrate-assess-store" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix      = "${local.bucket_prefix}-dms-premigrate-assess-store-"
+  bucket_prefix      = "${local.bucket_prefix}-dms-premigrate-assess-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -337,7 +340,7 @@ module "dms-premigrate-assess-store" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/dms-premigrate-assess-store/"
+  log_prefix = "logs/${local.bucket_prefix}-dms-premigrate-assess/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -391,7 +394,7 @@ module "dms-premigrate-assess-store" {
 module "json-directory-structure-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix      = "${local.bucket_prefix}-json-directory-structure-bucket-"
+  bucket_prefix      = "${local.bucket_prefix}-json-directory-structure-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -411,7 +414,7 @@ module "json-directory-structure-bucket" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/json-directory-structure-bucket/"
+  log_prefix = "logs/${local.bucket_prefix}-json-directory-structure/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -464,7 +467,7 @@ module "json-directory-structure-bucket" {
 
 module "em-data-store" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
-  bucket_prefix = "em-data-store-"
+  bucket_prefix      = "${local.bucket_prefix}-data-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -483,7 +486,7 @@ module "em-data-store" {
     aws.bucket-replication = aws
   }
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/em-data-store/"
+  log_prefix = "logs/${local.bucket_prefix}-data/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -556,7 +559,7 @@ module "dms-data-validation" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/dms-data-validation/"
+  log_prefix = "logs/${local.bucket_prefix}-dms-data-validation/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -630,7 +633,7 @@ module "glue-job-script-store" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/glue-job-script-store/"
+  log_prefix = "logs/${local.bucket_prefix}-glue-job-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
