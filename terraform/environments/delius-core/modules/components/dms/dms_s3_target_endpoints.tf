@@ -9,7 +9,7 @@ resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
    endpoint_id                     = "s3-staging-of-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
    endpoint_type                   = "target"
    service_access_role_arn         = aws_iam_role.dms_s3_writer_role.arn
-   bucket_name                     = local.bucket_map[var.dms_config.audit_target_endpoint.write_environment][0]
+   bucket_name                     = local.bucket_map[var.dms_config.audit_target_endpoint.write_environment]
    bucket_folder                   = "audit/${local.audit_source_primary}"
    cdc_path                        = "cdc"
    preserve_transactions           = true
@@ -24,7 +24,7 @@ resource "aws_dms_s3_endpoint" "dms_user_target_endpoint_s3" {
    endpoint_id                     = "s3-staging-of-user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}-to-${each.value}"
    endpoint_type                   = "target"
    service_access_role_arn         = aws_iam_role.dms_s3_writer_role.arn
-   bucket_name                     = local.bucket_map[each.key][0]
+   bucket_name                     = local.bucket_map[each.key]
    bucket_folder                   = "user"
    cdc_path                        = "cdc"
    preserve_transactions           = true

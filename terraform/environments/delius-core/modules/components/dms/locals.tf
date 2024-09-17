@@ -3,8 +3,15 @@ locals {
   delius_account_id = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
   oracle_port = "1521"
   dms_audit_username = "delius_audit_dms_pool"
-  # Although the S3 buckets are non-determininistic they will have a known prefix
-  dms_s3_local_bucket_prefix = "${var.env_name}-dms-destination-bucket"
+  
+  # Although it is recommended to use bucket_prefix rather than bucket_name when creating an S3 bucket
+  # using the modernisation-platform-terraform-s3-bucket repo, this introduces significant complications
+  # in this use case since we need to know the names of the buckets in other accounts, and having
+  # a random suffix makes this difficult to acheive without a lot of extra code.  Therefore in this
+  # special case we go against the recommendation and use a fixed name for the bucket in each environment
+  # so that it can be templated and does not need to be looked up.
+  dms_s3_local_bucket_format = "delius-audit-dms-s3-staging-bucket"
+  dms_s3_local_bucket_name = "${var.env_name}-${local.dms_s3_local_bucket_format}"
 
   # If we are reading from a standby database it will have an S1 or S2 suffix - strip this off to get the name of the primary database
   audit_source_primary = try(replace(upper(var.dms_config.audit_source_endpoint.read_database),"/S[1-2]$/",""),null)
@@ -22,25 +29,15 @@ locals {
   # These will be mutually exclusive since a repository may not be a client. It provides a map
   # of all possible accounts for which we need to retrieve the S3 bucket names for DMS.
   bucket_list_target_map = merge(local.repository_account_map,local.client_account_map)
-  
+
+  bucket_map = {
+     for delius_environment in keys(local.bucket_list_target_map):
+        delius_environment => "${delius_environment}-${local.dms_s3_local_bucket_format}"
+  }
+
   # dms_s3_writer_account_ids = flatten(compact(concat(local.client_account_ids,[local.dms_repository_account_id])))
   # We define an S3 writer role for each Delius environment (rather than for the account)
   dms_s3_writer_role_name = "${var.env_name}-dms-s3-writer-role"
   dms_s3_reader_role_name = "${var.env_name}-dms-s3-reader-role"
-  dms_s3_lister_role_name = "${var.env_name}-dms-s3-lister-role"
 
-  # bucket_json is the output of the Lambda function we use to list all of the buckets in the target AWS accounts.
-  # The key is the delius_environment as we look up the list of buckets in all relevant environments:
-  # 1. For clients we only look up the list of buckets in the associated repository environments.
-  # 2. For repositories we look up the list of buckets in all of the associated client environments.
-  bucket_json = {for k,v in data.http.get_buckets_lambda_output : k => jsondecode(v.response_body)}
-
-  # We filter the bucket_json to only include buckets where the name matches the prefix used for DMS replication
-  bucket_map = {
-     for delius_environment, details in local.bucket_json :
-     delius_environment => (
-        length([for bucket in details.Buckets : bucket if try(regex(".*dms-destination-bucket.*", bucket),null) != null]) > 0 ?
-        [for bucket in details.Buckets : bucket if try(regex(".*dms-destination-bucket.*", bucket),null) != null] : null
-     )
-  }
 }

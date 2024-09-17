@@ -9,11 +9,14 @@
 # bucket and a target endpoint in the local account's database.
 # We share the S3 bucket to allow this data to be replicated between accounts.
 # Therefore each account must have a single S3 bucket used for staging during DMS replication.
+#
+# Note that we use a fixed bucket_name rather than the bucket_prefix since it is complicated
+# to identify the names of buckets in other accounts if they contain random suffixes
 module "s3_bucket_dms_destination" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
-  bucket_prefix      = local.dms_s3_local_bucket_prefix
+  bucket_name     = local.dms_s3_local_bucket_name
   versioning_enabled = false
 
   providers = {
