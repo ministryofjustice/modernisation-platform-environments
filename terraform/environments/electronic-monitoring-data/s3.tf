@@ -82,7 +82,7 @@ module "s3-logging-bucket" {
 # Metadata Store Bucket
 # ------------------------------------------------------------------------
 
-module "metadata-s3-bucket" {
+module "s3-metadata-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "${local.bucket_prefix}-metadata-"
@@ -152,8 +152,8 @@ module "metadata-s3-bucket" {
   tags = merge(local.tags, { Resource_Type = "metadata_store" })
 }
 
-resource "aws_s3_bucket_notification" "send_metadata_to_ap" {
-  bucket = module.metadata-s3-bucket.bucket.id
+resource "aws_s3_bucket_notification" "send_metadata_to_ap_lambda" {
+  bucket = module.s3-metadata-bucket.bucket.id
 
   lambda_function {
     id                  = "metadata_bucket_notification"
@@ -168,7 +168,7 @@ resource "aws_s3_bucket_notification" "send_metadata_to_ap" {
 # Athena Query result storage bucket
 # ----------------------------------
 
-module "athena-s3-bucket" {
+module "s3-athena-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "${local.bucket_prefix}-athena-query-results-"
@@ -242,7 +242,7 @@ module "athena-s3-bucket" {
 # Unzipped Data Store and log bucket
 # ----------------------------------
 
-module "unzipped-s3-data-store" {
+module "s3-unzipped-files-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "${local.bucket_prefix}-unzipped-files-"
@@ -317,7 +317,7 @@ module "unzipped-s3-data-store" {
 # DMS Premigration Assessments bucket
 # ------------------------------------------------------------------------
 
-module "dms-premigrate-assess-store" {
+module "s3-dms-premigrate-assess-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "${local.bucket_prefix}-dms-premigrate-assess-"
@@ -391,7 +391,7 @@ module "dms-premigrate-assess-store" {
 # Unstructured directory structure as json bucket
 # ------------------------------------------------------------------------
 
-module "json-directory-structure-bucket" {
+module "s3-json-directory-structure-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "${local.bucket_prefix}-json-directory-structure-"
@@ -465,7 +465,7 @@ module "json-directory-structure-bucket" {
 # Main store bucket
 # ------------------------------------------------------------------------
 
-module "em-data-store" {
+module "s3-data-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
   bucket_prefix      = "${local.bucket_prefix}-data-"
   versioning_enabled = true
@@ -536,7 +536,7 @@ module "em-data-store" {
 # ------------------------------------------------------------------------
 # DMS data validation bucket
 # ------------------------------------------------------------------------
-module "dms-data-validation" {
+module "s3-dms-data-validation-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix = "${local.bucket_prefix}-dms-data-validation-"
@@ -610,7 +610,7 @@ module "dms-data-validation" {
 # Glue job script store bucket
 # ------------------------------------------------------------------------
 
-module "glue-job-script-store" {
+module "s3-glue-job-script-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
   bucket_prefix      = "${local.bucket_prefix}-glue-job-store-"
@@ -685,10 +685,10 @@ module "glue-job-script-store" {
 # ------------------------------------------------------------------------
 
 
-module "dms-target-store" {
+module "s3-dms-target-store-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
 
-  bucket_prefix = "dms-rds-to-parquet-"
+  bucket_prefix = "${local.bucket_prefix}-dms-rds-to-parquet-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
