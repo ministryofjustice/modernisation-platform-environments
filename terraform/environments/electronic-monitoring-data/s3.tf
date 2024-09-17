@@ -152,17 +152,17 @@ module "s3-metadata-bucket" {
   tags = merge(local.tags, { Resource_Type = "metadata_store" })
 }
 
-resource "aws_s3_bucket_notification" "send_metadata_to_ap_lambda" {
-  bucket = module.s3-metadata-bucket.bucket.id
+# resource "aws_s3_bucket_notification" "send_metadata_to_ap_lambda" {
+#   bucket = module.s3-metadata-bucket.bucket.id
 
-  lambda_function {
-    id                  = "metadata_bucket_notification"
-    lambda_function_arn = module.send_metadata_to_ap.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-  }
+#   lambda_function {
+#     id                  = "metadata_bucket_notification"
+#     lambda_function_arn = module.send_metadata_to_ap.lambda_function_arn
+#     events              = ["s3:ObjectCreated:*"]
+#   }
 
-  depends_on = [aws_lambda_permission.send_metadata_to_ap]
-}
+#   depends_on = [aws_lambda_permission.send_metadata_to_ap]
+# }
 
 # ----------------------------------
 # Athena Query result storage bucket
