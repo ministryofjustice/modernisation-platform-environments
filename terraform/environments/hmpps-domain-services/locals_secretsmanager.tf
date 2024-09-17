@@ -15,6 +15,8 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.nomis-development}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-test}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-data-hub-test}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-development}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-test}:role/EC2HmppsDomainSecretsRole",
     ]
     preproduction = []
     production = [
@@ -31,6 +33,8 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.nomis-production}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-data-hub-preproduction}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-data-hub-production}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-preproduction}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-production}:role/EC2HmppsDomainSecretsRole",
     ]
   }
 
