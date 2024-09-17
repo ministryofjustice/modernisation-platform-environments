@@ -154,6 +154,9 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 100 }
           "/dev/sds"  = { type = "gp3", size = 100 }
         })
+        tags = merge(local.ec2_instances.bods.tags, {
+          domain-name = "azure.noms.root"
+        })
       })
 
       t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
@@ -193,6 +196,9 @@ locals {
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
           availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
         })
       })
     }
