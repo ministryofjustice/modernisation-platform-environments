@@ -15,6 +15,13 @@ resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
    server_name                     = join(".",[var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])
    port                            = local.oracle_port
    extra_connection_attributes     = "ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".",[var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])}:${local.oracle_port}/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
+   # We initially use an empty wallet for encryption - a populated wallet will be added by DMS configuration
+   ssl_mode                        = "verify-ca"
+   certificate_arn                 = aws_dms_certificate.empty_oracle_wallet.certificate_arn
+   # Ignore subsequent replacement with a valid wallet
+   lifecycle {
+    ignore_changes = [certificate_arn]
+   }
 }
 
 # In repository environments the dms_user_source_endpoint.read_database must be defined
@@ -30,4 +37,11 @@ resource "aws_dms_endpoint" "dms_user_source_endpoint_db" {
    server_name                     = join(".",[var.oracle_db_server_names[var.dms_config.user_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])
    port                            = local.oracle_port
    extra_connection_attributes     = "ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".",[var.oracle_db_server_names[var.dms_config.user_source_endpoint.read_host],var.account_config.route53_inner_zone_info.name])}:1521/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
+   # We initially use an empty wallet for encryption - a populated wallet will be added by DMS configuration
+   ssl_mode                        = "verify-ca"
+   certificate_arn                 = aws_dms_certificate.empty_oracle_wallet.certificate_arn
+   # Ignore subsequent replacement with a valid wallet
+   lifecycle {
+    ignore_changes = [certificate_arn]
+   }
 }
