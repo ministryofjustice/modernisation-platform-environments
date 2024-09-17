@@ -8,4 +8,7 @@
 resource "aws_dms_certificate" "empty_oracle_wallet" {
   certificate_id   = "empty-oracle-wallet"
   certificate_wallet  = file("files/empty_wallet_base64.txt")
+  lifecycle {
+    ignore_changes = [certificate_wallet]
+  }
 }
