@@ -251,6 +251,6 @@ resource "aws_route53_record" "ldap_external_validation_subdomain" {
 }
 
 resource "aws_acm_certificate_validation" "ldap_external" {
-  certificate_arn         = aws_acm_certificate.external.arn
+  certificate_arn         = aws_acm_certificate.ldap_external.arn
   validation_record_fqdns = [local.ldap_domain_name_main[0], local.ldap_domain_name_sub[0]]
 }
