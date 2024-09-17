@@ -96,7 +96,7 @@ module "metadata-s3-bucket" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  target_prefix = "logs/metadata-s3-bucket/"
+  log_prefix = "logs/metadata-s3-bucket/"
 
   log_partition_date_source = "EventTime"
 
@@ -253,7 +253,7 @@ module "unzipped-s3-data-store" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  target_prefix = "logs/unzipped-s3-data-store/"
+  log_prefix = "logs/unzipped-s3-data-store/"
 
   log_partition_date_source = "EventTime"
 
@@ -328,7 +328,7 @@ module "dms-premigrate-assess-store" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  target_prefix = "logs/dms-premigrate-assess-store/"
+  log_prefix = "logs/dms-premigrate-assess-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -402,7 +402,7 @@ module "json-directory-structure-bucket" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  target_prefix = "logs/json-directory-structure-bucket/"
+  log_prefix = "logs/json-directory-structure-bucket/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -475,7 +475,7 @@ module "em-data-store" {
     aws.bucket-replication = aws
   }
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  target_prefix = "logs/em-data-store/"
+  log_prefix = "logs/em-data-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -548,7 +548,7 @@ module "dms-data-validation" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  target_prefix = "logs/dms-data-validation/"
+  log_prefix = "logs/dms-data-validation/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -622,7 +622,7 @@ module "glue-job-script-store" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  target_prefix = "logs/glue-job-script-store/"
+  log_prefix = "logs/glue-job-script-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -697,7 +697,7 @@ module "dms-target-store" {
   }
 
   log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  target_prefix = "logs/dms-target-store/"
+  log_prefix = "logs/dms-target-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
