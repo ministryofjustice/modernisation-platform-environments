@@ -4,6 +4,9 @@ module "ldap_ecs" {
   name     = "ldap"
   env_name = var.env_name
 
+  container_cpu    = var.delius_microservice_configs.ldap.container_cpu
+  container_memory = var.delius_microservice_configs.ldap.container_memory
+
   container_vars_default = {
     "LDAP_HOST"          = "0.0.0.0",
     "SLAPD_LOG_LEVEL"    = var.delius_microservice_configs.ldap.slapd_log_level,
