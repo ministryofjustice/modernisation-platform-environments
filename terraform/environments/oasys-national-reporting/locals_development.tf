@@ -82,10 +82,7 @@ locals {
               "secretsmanager:ListSecrets",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-bods/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+              "arn:aws:secretsmanager:*:*:secret:/*",
             ]
           }
         ]
