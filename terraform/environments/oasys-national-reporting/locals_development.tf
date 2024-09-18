@@ -56,6 +56,9 @@ locals {
               branch = "TM/TM-494/onr-bods-automation"
             }
           ))
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "t3.large"
@@ -65,6 +68,27 @@ locals {
     }
 
     ec2_instances = {
+    }
+
+    iam_policies = {
+      Ec2SecretPolicy = {
+        description = "Permissions required for secret value access by instances"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-bods/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          }
+        ]
+      }
     }
 
     route53_zones = {
