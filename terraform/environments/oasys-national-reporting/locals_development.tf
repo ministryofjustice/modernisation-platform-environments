@@ -70,5 +70,12 @@ locals {
     route53_zones = {
       "development.reporting.oasys.service.justice.gov.uk" = {}
     }
+
+    # Just being used for local testing - delete later
+    secretsmanager_secrets = {
+      "/ec2/onr-bods/t2"         = local.secretsmanager_secrets.bods
+      "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
+      "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
+    }
   }
 }
