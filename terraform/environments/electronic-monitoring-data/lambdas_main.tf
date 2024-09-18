@@ -317,7 +317,7 @@ module "unzip_single_file" {
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
     BUCKET_NAME        = module.s3-data-bucket.bucket.id
-    EXPORT_BUCKET_NAME = module.unzipped-s3-data-store.bucket.id
+    EXPORT_BUCKET_NAME = module.s3-unzipped-files-bucket.bucket.id
   }
 }
 

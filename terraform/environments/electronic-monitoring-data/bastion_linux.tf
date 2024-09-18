@@ -134,7 +134,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
       "s3:ListBucket"
     ]
     resources = [
-      module.unzipped-s3-data-store.bucket.arn
+      module.s3-unzipped-files-bucket.bucket.arn
     ]
   }
   statement {
@@ -144,7 +144,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
       "s3:PutObject"
     ]
     resources = [
-      "${module.unzipped-s3-data-store.bucket.arn}/*"
+      "${module.s3-unzipped-files-bucket.bucket.arn}/*"
     ]
   }
 }
