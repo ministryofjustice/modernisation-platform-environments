@@ -110,12 +110,6 @@ module "ldap_ecs" {
     },
     {
       port                         = var.ldap_config.port
-      ip_protocol                  = "tcp"
-      referenced_security_group_id = module.bastion_linux.bastion_security_group
-      description                  = "Allow inbound traffic from bastion"
-    },
-    {
-      port                         = var.ldap_config.port
       ip_protocol                  = "udp"
       referenced_security_group_id = module.bastion_linux.bastion_security_group
       description                  = "Allow inbound traffic from bastion"
