@@ -64,6 +64,10 @@ locals {
           instance_type = "t3.large"
         })
         cloudwatch_metric_alarms = null
+        # only tagged like this for testing purposes
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+        })
       })
     }
 
@@ -79,10 +83,12 @@ locals {
             actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
-              "secretsmanager:ListSecrets",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-bods/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
         ]
