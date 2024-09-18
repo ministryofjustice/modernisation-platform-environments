@@ -277,7 +277,7 @@ module "load_unstructured_structure" {
     DLT_DATA_DIR : "/tmp"
     DLT_PIPELINE_DIR : "/tmp"
     JSON_BUCKET_NAME        = module.json-directory-structure-bucket.bucket.id
-    ATHENA_DUMP_BUCKET_NAME = module.athena-s3-bucket.bucket.id
+    ATHENA_DUMP_BUCKET_NAME = module.s3-athena-bucket.bucket.id
   }
 }
 
@@ -297,7 +297,7 @@ module "load_g4s_atrium_unstructured" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   json_bucket_name        = module.json-directory-structure-bucket.bucket.id
-  athena_bucket_name      = module.athena-s3-bucket.bucket.id
+  athena_bucket_name      = module.s3-athena-bucket.bucket.id
 }
 
 #-----------------------------------------------------------------------------------
