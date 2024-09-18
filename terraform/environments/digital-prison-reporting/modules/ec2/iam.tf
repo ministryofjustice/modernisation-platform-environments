@@ -1,4 +1,4 @@
-# tflint-ignore-file: terraform_required_version, terraform_required_providers
+# tflint-ignore-file: Terraform_required_version, terraform_required_providers
 
 resource "aws_iam_role" "kinesis-agent-instance-role" {
   name = "${var.name}-role"
