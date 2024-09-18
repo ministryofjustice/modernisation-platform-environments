@@ -443,8 +443,8 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${module.json-directory-structure-bucket.bucket.arn}/*",
-      module.json-directory-structure-bucket.bucket.arn
+      "${module.s3-json-directory-structure-bucket.bucket.arn}/*",
+      module.s3-json-directory-structure-bucket.bucket.arn
     ]
   }
 }
@@ -501,8 +501,8 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${module.json-directory-structure-bucket.bucket.arn}/*",
-      module.json-directory-structure-bucket.bucket.arn,
+      "${module.s3-json-directory-structure-bucket.bucket.arn}/*",
+      module.s3-json-directory-structure-bucket.bucket.arn,
       "${module.s3-athena-bucket.bucket.arn}/*",
       module.s3-athena-bucket.bucket.arn,
       module.metadata-s3-bucket.bucket.arn,

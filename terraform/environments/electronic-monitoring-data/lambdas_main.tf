@@ -252,7 +252,7 @@ module "output_file_structure_as_json_from_zip" {
   security_group_ids      = [aws_security_group.lambda_db_security_group.id]
   subnet_ids              = data.aws_subnets.shared-public.ids
   environment_variables = {
-    OUTPUT_BUCKET = module.json-directory-structure-bucket.bucket.id
+    OUTPUT_BUCKET = module.s3-json-directory-structure-bucket.bucket.id
     SOURCE_BUCKET = module.s3-data-bucket.bucket.id
   }
 }
@@ -276,7 +276,7 @@ module "load_unstructured_structure" {
     DLT_PROJECT_DIR : "/tmp"
     DLT_DATA_DIR : "/tmp"
     DLT_PIPELINE_DIR : "/tmp"
-    JSON_BUCKET_NAME        = module.json-directory-structure-bucket.bucket.id
+    JSON_BUCKET_NAME        = module.s3-json-directory-structure-bucket.bucket.id
     ATHENA_DUMP_BUCKET_NAME = module.s3-athena-bucket.bucket.id
   }
 }
@@ -296,7 +296,7 @@ module "load_g4s_atrium_unstructured" {
   env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
-  json_bucket_name        = module.json-directory-structure-bucket.bucket.id
+  json_bucket_name        = module.s3-json-directory-structure-bucket.bucket.id
   athena_bucket_name      = module.s3-athena-bucket.bucket.id
 }
 
