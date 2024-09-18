@@ -589,7 +589,7 @@ module "glue_s3_data_reconciliation_job" {
   name                          = "${local.project}-data-reconciliation-job-${local.env}"
   short_name                    = "${local.project}-data-reconciliation-job"
   command_type                  = "glueetl"
-  description                   = "Reconciles data across DataHub.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n"
+  description                   = "Reconciles data across DataHub.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.dms.replication.task.id: (Required) ID of the DMS replication task to reconcile against the raw zone"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-data-reconciliation-${local.env}/"
@@ -632,6 +632,8 @@ module "glue_s3_data_reconciliation_job" {
     "--dpr.aws.region"                 = local.account_region
     "--dpr.config.s3.bucket"           = module.s3_glue_job_bucket.bucket_id,
     "--dpr.log.level"                  = local.glue_job_common_log_level
+    "--dpr.raw.s3.path"                = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.raw.archive.s3.path"        = "s3://${module.s3_raw_archive_bucket.bucket_id}/"
     "--dpr.structured.s3.path"         = "s3://${module.s3_structured_bucket.bucket_id}/"
     "--dpr.curated.s3.path"            = "s3://${module.s3_curated_bucket.bucket_id}/"
     "--dpr.nomis.glue.connection.name" = aws_glue_connection.glue_nomis_connection[0].name
