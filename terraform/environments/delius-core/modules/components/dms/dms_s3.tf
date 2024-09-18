@@ -14,7 +14,7 @@
 # to identify the names of buckets in other accounts if they contain random suffixes
 module "s3_bucket_dms_destination" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.0"
 
   bucket_name     = local.dms_s3_local_bucket_name
   versioning_enabled = false
