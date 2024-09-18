@@ -58,6 +58,8 @@ resource "aws_security_group_rule" "ingress_traffic_from_security_groups" {
 # Needs revision for Egress after POC
 resource "aws_security_group_rule" "egress_traffic" {
   #checkov:skip=CKV_AWS_23:"Ensure every security group and rule has a description"
+  # tfsec:ignore:AVD-AWS-0097 - Ignoring the risk of allowing all egress traffic to public IPs
+
   security_group_id = aws_security_group.ec2_sec_group.id
   type              = "egress"
   from_port         = 0
