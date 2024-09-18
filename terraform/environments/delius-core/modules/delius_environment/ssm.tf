@@ -29,7 +29,7 @@ resource "aws_ssm_parameter" "ldap_bind_password" {
 resource "aws_ssm_parameter" "ldap_host" {
   name  = format("/%s-%s/LDAP_HOST", var.account_info.application_name, var.env_name)
   type  = "SecureString"
-  value = "INITIAL_VALUE_OVERRIDDEN"
+  value = module.ldap_ecs.nlb_dns_name
   lifecycle {
     ignore_changes = [
       value
