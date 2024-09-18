@@ -146,7 +146,7 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
       "s3:PutObjectAcl"
     ]
     resources = [
-      "${module.metadata-s3-bucket.bucket.arn}/*"
+      "${module.s3-metadata-bucket.bucket.arn}/*"
     ]
   }
   statement {
@@ -155,7 +155,7 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
       "s3:ListBucket"
     ]
     resources = [
-      module.metadata-s3-bucket.bucket.arn
+      module.s3-metadata-bucket.bucket.arn
     ]
   }
 }
@@ -214,7 +214,7 @@ data "aws_iam_policy_document" "get_meta_from_s3" {
       "s3:GetObject"
     ]
     resources = [
-      "${module.metadata-s3-bucket.bucket.arn}/*"
+      "${module.s3-metadata-bucket.bucket.arn}/*"
     ]
   }
   statement {
@@ -223,7 +223,7 @@ data "aws_iam_policy_document" "get_meta_from_s3" {
       "s3:ListBucket"
     ]
     resources = [
-      module.metadata-s3-bucket.bucket.arn
+      module.s3-metadata-bucket.bucket.arn
     ]
   }
 }
@@ -505,8 +505,8 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       module.s3-json-directory-structure-bucket.bucket.arn,
       "${module.s3-athena-bucket.bucket.arn}/*",
       module.s3-athena-bucket.bucket.arn,
-      module.metadata-s3-bucket.bucket.arn,
-      "${module.metadata-s3-bucket.bucket.arn}/*",
+      module.s3-metadata-bucket.bucket.arn,
+      "${module.s3-metadata-bucket.bucket.arn}/*",
     ]
   }
   statement {

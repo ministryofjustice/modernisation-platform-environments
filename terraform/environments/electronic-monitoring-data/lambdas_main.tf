@@ -35,7 +35,7 @@ module "get_metadata_from_rds_lambda" {
   subnet_ids         = data.aws_subnets.shared-public.ids
   environment_variables = {
     SECRET_NAME           = aws_secretsmanager_secret.db_glue_connection.name
-    METADATA_STORE_BUCKET = module.metadata-s3-bucket.bucket.id
+    METADATA_STORE_BUCKET = module.s3-metadata-bucket.bucket.id
   }
   env_account_id = local.env_account_id
 }
@@ -116,7 +116,7 @@ resource "aws_lambda_permission" "send_metadata_to_ap" {
   action        = "lambda:InvokeFunction"
   function_name = module.send_metadata_to_ap.lambda_function_arn
   principal     = "s3.amazonaws.com"
-  source_arn    = module.metadata-s3-bucket.bucket.arn
+  source_arn    = module.s3-metadata-bucket.bucket.arn
 }
 
 # ------------------------------------------------------
