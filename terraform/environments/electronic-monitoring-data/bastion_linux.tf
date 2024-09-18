@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "ec2_s3_policy" {
       "s3:ListBucket",
     ]
     resources = [
-      aws_s3_bucket.data_store.arn,
+      module.s3-data-bucket.bucket.arn,
     ]
   }
   statement {
@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "ec2_s3_policy" {
       "s3:GetObject",
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*",
+      "${module.s3-data-bucket.bucket.arn}/*",
     ]
   }
 }
@@ -114,7 +114,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
       "s3:ListBucket",
     ]
     resources = [
-      aws_s3_bucket.data_store.arn,
+      module.s3-data-bucket.bucket.arn,
     ]
   }
   statement {
@@ -124,7 +124,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
       "s3:GetObject",
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*",
+      "${module.s3-data-bucket.bucket.arn}/*",
     ]
   }
   statement {

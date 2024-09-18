@@ -1,91 +1,7 @@
-#------------------------------------------------------------------------------
-# S3 bucket for data store logs
-#------------------------------------------------------------------------------
 
-module "data_store_log_bucket" {
-  source = "./modules/s3_log_bucket"
-
-  source_bucket = aws_s3_bucket.data_store
-  account_id    = data.aws_caller_identity.current.account_id
-  local_tags    = local.tags
-}
-
-#------------------------------------------------------------------------------
-# S3 bucket for landed data (internal facing)
-#------------------------------------------------------------------------------
-
-resource "aws_s3_bucket" "data_store" {
-  bucket_prefix = "em-data-store-"
-
-  tags = local.tags
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "data_store" {
-  bucket                  = aws_s3_bucket.data_store.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_versioning" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_policy" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-  policy = data.aws_iam_policy_document.data_store.json
-}
-
-data "aws_iam_policy_document" "data_store" {
-  statement {
-    sid = "EnforceTLSv12orHigher"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    effect  = "Deny"
-    actions = ["s3:*"]
-    resources = [
-      aws_s3_bucket.data_store.arn,
-      "${aws_s3_bucket.data_store.arn}/*"
-    ]
-    condition {
-      test     = "NumericLessThan"
-      variable = "s3:TlsVersion"
-      values   = [1.2]
-    }
-  }
-}
-
-resource "aws_s3_bucket_logging" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-
-  target_bucket = module.data_store_log_bucket.bucket_id
-  target_prefix = "log/"
-
-  target_object_key_format {
-    partitioned_prefix {
-      partition_date_source = "EventTime"
-    }
-  }
-}
 
 resource "aws_s3_bucket_notification" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
+  bucket = module.s3-data-bucket.bucket.id
 
   # Only for copy events as those are events triggered by data being copied
   # from landing bucket.
@@ -97,17 +13,17 @@ resource "aws_s3_bucket_notification" "data_store" {
   }
 
   # Only for copy events as those are events triggered by data being copied
-  # from landing bucket.
-  # lambda_function {
-  #   lambda_function_arn = aws_lambda_function.summarise_zip_lambda.arn
-  #   events              = [
-  #     "s3:ObjectCreated:*"
-  #   ]
-  # }
+  #  from landing bucket.
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.summarise_zip_lambda.arn
+    events              = [
+      "s3:ObjectCreated:*"
+    ]
+  }
 
   depends_on = [
     aws_lambda_permission.s3_allow_calculate_checksum_lambda,
-    # aws_lambda_permission.s3_allow_summarise_zip_lambda,
+    aws_lambda_permission.s3_allow_summarise_zip_lambda,
   ]
 }
 
@@ -165,7 +81,7 @@ data "aws_iam_policy_document" "calculate_checksum_lambda" {
       "s3:GetObjectVersionAttributes",
       "s3:ListBucket"
     ]
-    resources = ["${aws_s3_bucket.data_store.arn}/*"]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
   }
 }
 
@@ -180,7 +96,7 @@ resource "aws_lambda_permission" "s3_allow_calculate_checksum_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.calculate_checksum_lambda.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.data_store.arn
+  source_arn    = module.s3-data-bucket.bucket.arn
 }
 
 #------------------------------------------------------------------------------
@@ -221,7 +137,7 @@ data "aws_iam_policy_document" "summarise_zip_lambda" {
       "s3:PutObject",
       "s3:ListBucket"
     ]
-    resources = ["${aws_s3_bucket.data_store.arn}/*"]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
   }
 }
 
@@ -236,5 +152,5 @@ resource "aws_lambda_permission" "s3_allow_summarise_zip_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.summarise_zip_lambda.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.data_store.arn
+  source_arn    = module.s3-data-bucket.bucket.arn
 }

@@ -253,7 +253,7 @@ module "output_file_structure_as_json_from_zip" {
   subnet_ids              = data.aws_subnets.shared-public.ids
   environment_variables = {
     OUTPUT_BUCKET = module.json-directory-structure-bucket.bucket.id
-    SOURCE_BUCKET = aws_s3_bucket.data_store.id
+    SOURCE_BUCKET = module.s3-data-bucket.bucket.id
   }
 }
 
@@ -316,7 +316,7 @@ module "unzip_single_file" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
-    BUCKET_NAME        = aws_s3_bucket.data_store.id
+    BUCKET_NAME        = module.s3-data-bucket.bucket.id
     EXPORT_BUCKET_NAME = module.unzipped-s3-data-store.bucket.id
   }
 }

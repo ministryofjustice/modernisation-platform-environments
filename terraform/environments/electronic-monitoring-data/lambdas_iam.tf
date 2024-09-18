@@ -430,8 +430,8 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*",
-      aws_s3_bucket.data_store.arn
+      "${module.s3-data-bucket.bucket.arn}/*",
+      module.s3-data-bucket.bucket.arn
     ]
   }
   statement {
@@ -475,7 +475,7 @@ resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zi
   action        = "lambda:InvokeFunction"
   function_name = module.output_file_structure_as_json_from_zip.lambda_function_arn
   principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.data_store.arn
+  source_arn    = module.s3-data-bucket.bucket.arn
 }
 
 
@@ -604,7 +604,7 @@ data "aws_iam_policy_document" "get_zip_file_s3_policy_document" {
       "s3:GetObjectAttributes",
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*.zip",
+      "${module.s3-data-bucket.bucket.arn}/*.zip",
     ]
   }
 }
@@ -618,7 +618,7 @@ data "aws_iam_policy_document" "list_data_store_bucket_s3_policy_document" {
       "s3:GetBucketLocation",
     ]
     resources = [
-      aws_s3_bucket.data_store.arn,
+      module.s3-data-bucket.bucket.arn,
     ]
   }
 }
