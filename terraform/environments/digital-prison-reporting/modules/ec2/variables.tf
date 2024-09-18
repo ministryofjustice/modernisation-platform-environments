@@ -106,7 +106,7 @@ variable "ami_image_id" {
 
 variable "subnet_ids" {
   description = "subnet IDs to associate with"
-  type        = list(string)
+  type        = string
   default     = null
 }
 
