@@ -79,6 +79,7 @@ locals {
             actions = [
               "secretsmanager:GetSecretValue",
               "secretsmanager:PutSecretValue",
+              "secretsmanager:ListSecrets",
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
