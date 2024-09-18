@@ -27,6 +27,61 @@ locals {
       }
     }
 
+    ec2_autoscaling_groups = {
+      pp-ncr-test = {
+        autoscaling_group = {
+          desired_capacity    = 1
+          max_size            = 1
+          force_delete        = true
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        config = {
+          ami_name                  = "base_rhel_8_5_*"
+          iam_resource_names_prefix = "ec2-bip"
+          instance_profile_policies = [
+            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+            "EC2Default",
+            "EC2S3BucketWriteAndDeleteAccessPolicy",
+            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+            "Ec2PPReportingPolicy",
+          ]
+          subnet_name = "private"
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { type = "gp3", size = 100 }
+          "/dev/sdc" = { type = "gp3", size = 100 }
+          "/dev/sds" = { type = "gp3", size = 100 }
+        }
+        instance = {
+          disable_api_termination      = false
+          instance_type                = "t3.large"
+          key_name                     = "ec2-user"
+          vpc_security_group_ids       = ["bip"]
+          metadata_options_http_tokens = "required"
+        }
+        user_data_cloud_init = {
+          args = {
+            branch       = "ncr/TM-503/preprod-bip-fixes"
+            ansible_args = "--tags ec2provision"
+          }
+          scripts = [ # paths are relative to templates/ dir
+            "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+            "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+            "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+          ]
+        }
+        tags = {
+          backup                               = "false"
+          component                            = "test"
+          description                          = "Preprod build testing"
+          os-type                              = "Linux"
+          nomis-combined-reporting-environment = "pp"
+          server-type                          = "ncr-bip"
+          update-ssm-agent                     = "patchgroup1"
+        }
+      }
+    }
+
     ec2_instances = {
 
       ls-ncr-db-1-a = merge(local.ec2_instances.db, {

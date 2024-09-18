@@ -154,6 +154,9 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 100 }
           "/dev/sds"  = { type = "gp3", size = 100 }
         })
+        tags = merge(local.ec2_instances.bods.tags, {
+          domain-name = "azure.noms.root"
+        })
       })
 
       t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
@@ -194,6 +197,9 @@ locals {
           ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
           availability_zone = "eu-west-2a"
         })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
+        })
       })
     }
 
@@ -219,6 +225,37 @@ locals {
     }
 
     lbs = {
+      public = merge(local.lbs.public, {
+        instance_target_groups = {
+          t2-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
+            attachments = [
+              { ec2_instance_name = "t2-onr-bods-1-a" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              t2-onr-bods-http28080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-onr-bods-http28080"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2-bods.test.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
+
       private = {
         enable_cross_zone_load_balancing = true
         enable_delete_protection         = false
@@ -323,7 +360,11 @@ locals {
     }
 
     route53_zones = {
-      "test.reporting.oasys.service.justice.gov.uk" = {}
+      "test.reporting.oasys.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "t2-bods", type = "A", lbs_map_key = "public" }
+        ],
+      }
     }
 
     secretsmanager_secrets = {

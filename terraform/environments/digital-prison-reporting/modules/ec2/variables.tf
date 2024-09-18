@@ -87,7 +87,7 @@ variable "ec2_sec_rules_source_sec_group" {
     protocol                 = string
     source_security_group_id = string
   }))
-  default = {}
+  default     = {}
 }
 
 variable "cidr" {

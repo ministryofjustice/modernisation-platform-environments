@@ -607,11 +607,11 @@ module "glue_s3_data_reconciliation_job" {
   region                      = local.account_region
   account                     = local.account_id
   log_group_retention_in_days = local.glue_log_retention_in_days
-  connections                 = local.create_glue_connection ? [
+  connections = local.create_glue_connection ? [
     aws_glue_connection.glue_operational_datastore_connection[0].name,
     aws_glue_connection.glue_nomis_connection[0].name
-  ]: []
-  additional_secret_arns      = [
+  ] : []
+  additional_secret_arns = [
     aws_secretsmanager_secret.operational_db_secret.arn,
     aws_secretsmanager_secret.nomis.arn
   ]
@@ -626,17 +626,17 @@ module "glue_s3_data_reconciliation_job" {
   )
 
   arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
-    "--extra-jars"                               = local.glue_jobs_latest_jar_location
-    "--extra-files"                              = local.shared_log4j_properties_path
-    "--class"                                    = "uk.gov.justice.digital.job.DataReconciliationJob"
-    "--dpr.aws.region"                           = local.account_region
-    "--dpr.config.s3.bucket"                     = module.s3_glue_job_bucket.bucket_id,
-    "--dpr.log.level"                            = local.glue_job_common_log_level
-    "--dpr.structured.s3.path"                   = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.curated.s3.path"                      = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.nomis.glue.connection.name"           = aws_glue_connection.glue_nomis_connection[0].name
-    "--dpr.nomis.source.schema.name"             = "OMS_OWNER"
-    "--dpr.contract.registryName"                = module.s3_schema_registry_bucket.bucket_id
+    "--extra-jars"                     = local.glue_jobs_latest_jar_location
+    "--extra-files"                    = local.shared_log4j_properties_path
+    "--class"                          = "uk.gov.justice.digital.job.DataReconciliationJob"
+    "--dpr.aws.region"                 = local.account_region
+    "--dpr.config.s3.bucket"           = module.s3_glue_job_bucket.bucket_id,
+    "--dpr.log.level"                  = local.glue_job_common_log_level
+    "--dpr.structured.s3.path"         = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.curated.s3.path"            = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.nomis.glue.connection.name" = aws_glue_connection.glue_nomis_connection[0].name
+    "--dpr.nomis.source.schema.name"   = "OMS_OWNER"
+    "--dpr.contract.registryName"      = module.s3_schema_registry_bucket.bucket_id
   })
 
   depends_on = [
@@ -1112,9 +1112,9 @@ module "ec2_kinesis_agent" {
 
   ec2_sec_rules_source_sec_group = {
     "NOMIS_FROM_GLUE" = {
-      "from_port" = local.nomis_port,
-      "to_port" = local.nomis_port,
-      "protocol" = "TCP",
+      "from_port"                = local.nomis_port,
+      "to_port"                  = local.nomis_port,
+      "protocol"                 = "TCP",
       "source_security_group_id" = aws_security_group.glue_job_connection_sg.id
     }
   }

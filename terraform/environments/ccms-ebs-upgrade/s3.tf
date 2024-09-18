@@ -276,3 +276,7 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
     resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
 }
+
+resource "aws_s3_bucket" "ccms_ebs_shared" {
+  bucket = "${local.application_name}-${local.environment}-shared"
+}

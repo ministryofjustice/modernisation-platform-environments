@@ -99,3 +99,8 @@ variable "db_suffix" {
   type        = string
   default     = "db"
 }
+
+variable "env_name_to_dms_config_map" {
+  description = "Map of delius-core environments to DMS configurations"
+  type        = any
+}
