@@ -48,7 +48,7 @@ locals {
 
       dev-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         config = merge(local.ec2_instances.bods.config, {
           user_data_raw = base64encode(templatefile(
