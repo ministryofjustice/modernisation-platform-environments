@@ -101,7 +101,7 @@ module "s3_bucket_migration" {
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.0"
 
   bucket_prefix      = "ldap-${var.env_name}-deployment-state"
   versioning_enabled = true
