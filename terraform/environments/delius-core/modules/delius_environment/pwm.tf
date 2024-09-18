@@ -79,8 +79,8 @@ module "pwm" {
 
   container_vars_default = {
     "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
-      ldap_host_url      = "ldap://${module.ldap.nlb_dns_name}:${var.ldap_config.port}"
-      ldap_user          = nonsensitive(module.ldap.delius_core_ldap_principal_arn)
+      ldap_host_url      = "ldap://ldap.${var.env_name}.${var.account_config.dns_suffix}:${var.ldap_config.port}"
+      ldap_user          = nonsensitive(aws_ssm_parameter.ldap_principal.arn)
       pwm_url            = "https://pwm.${var.env_name}.${var.account_config.dns_suffix}"
       email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
       email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
@@ -89,7 +89,7 @@ module "pwm" {
     "JAVA_OPTS"    = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
   }
   container_vars_env_specific            = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
-  ignore_changes_service_task_definition = true
+  ignore_changes_service_task_definition = false
 
   providers = {
     aws.core-vpc              = aws.core-vpc

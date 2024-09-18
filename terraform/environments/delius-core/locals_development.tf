@@ -97,6 +97,8 @@ locals {
       image_tag      = "6.0.3-latest"
       container_port = 389
       slapd_log_level = "stats"
+      container_cpu    = 512
+      container_memory = 1024
     }
 
     pdf_creation = {
