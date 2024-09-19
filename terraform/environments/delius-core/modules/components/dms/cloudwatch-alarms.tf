@@ -50,7 +50,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
-    ReplicationTaskIdentifier = split(":", each.value)[length(split(":", each.value)) - 1]
+    ReplicationTaskIdentifier = split(":", each.key)[length(split(":", each.key)) - 1]
   }
   tags = var.tags
 }
@@ -72,7 +72,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
-    ReplicationTaskIdentifier = split(":", each.value)[length(split(":", each.value)) - 1]
+    ReplicationTaskIdentifier = split(":", each.key)[length(split(":", each.key)) - 1]
   }
   tags = var.tags
 }
