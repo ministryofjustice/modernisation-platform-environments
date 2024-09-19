@@ -75,3 +75,14 @@ resource "aws_lambda_function" "lambda_function" {
 
   depends_on = [aws_lambda_layer_version.lambda_layer]
 }
+
+
+resource "aws_s3_bucket_notification" "lambda_trigger" {
+  bucket = aws_s3_bucket.lambda_payment_load.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.lambda_function.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".xlsx"
+  }
+}
