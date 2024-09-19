@@ -354,4 +354,6 @@ resource "aws_acm_certificate_validation" "ldap_external" {
 
 resource "aws_cloudwatch_log_group" "ldap_automation" {
   name = "/ecs/ldap-automation-${var.env_name}"
+  retention_in_days = 7
+  tags              = var.tags
 }
