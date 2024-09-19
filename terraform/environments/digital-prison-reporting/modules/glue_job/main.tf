@@ -120,6 +120,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
+      "dms:DescribeTableStatistics",
       "dms:DescribeReplicationTasks",
       "dms:StopReplicationTask"
     ]

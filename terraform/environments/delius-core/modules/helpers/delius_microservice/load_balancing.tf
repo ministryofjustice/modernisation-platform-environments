@@ -157,3 +157,25 @@ resource "aws_route53_record" "services_nlb_r53_record" {
     zone_id                = aws_lb.delius_microservices.zone_id
   }
 }
+
+resource "aws_vpc_security_group_ingress_rule" "nlb_custom_rules" {
+  for_each                     = { for index, rule in var.nlb_ingress_security_group_ids : index => rule }
+  security_group_id            = aws_security_group.delius_microservices_service_nlb.id
+  description                  = "custom rule"
+  from_port                    = each.value.port
+  to_port                      = each.value.port
+  ip_protocol                  = each.value.ip_protocol
+  cidr_ipv4                    = each.value.cidr_ipv4
+  referenced_security_group_id = each.value.referenced_security_group_id
+}
+
+resource "aws_vpc_security_group_egress_rule" "nlb_custom_rules" {
+  for_each                     = { for index, rule in var.nlb_egress_security_group_ids : index => rule }
+  security_group_id            = aws_security_group.delius_microservices_service_nlb.id
+  description                  = "custom rule"
+  from_port                    = each.value.port
+  to_port                      = each.value.port
+  ip_protocol                  = each.value.ip_protocol
+  cidr_ipv4                    = each.value.cidr_ipv4
+  referenced_security_group_id = each.value.referenced_security_group_id
+}

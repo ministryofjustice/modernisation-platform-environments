@@ -5,7 +5,7 @@ module "replay_pipeline" {
   enable_step_function = var.setup_replay_pipeline
   step_function_name   = var.replay_pipeline
 
-  additional_policies = var.pipeline_additional_policies
+  step_function_execution_role_arn = var.step_function_execution_role_arn
 
   definition = jsonencode(
     {
