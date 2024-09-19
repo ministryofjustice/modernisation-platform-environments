@@ -135,5 +135,6 @@ locals {
     user_target_endpoint = {
       write_database = "STGNDA"
     }
+    is-production = local.is-production
   }
 }

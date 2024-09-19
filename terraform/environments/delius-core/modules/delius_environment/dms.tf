@@ -13,10 +13,11 @@ module "dms" {
   env_name_to_dms_config_map                = var.env_name_to_dms_config_map
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws
-    aws.core-network-services = aws
+    aws                        = aws
+    aws.bucket-replication     = aws
+    aws.core-vpc               = aws
+    aws.core-network-services  = aws
+    aws.modernisation-platform = aws.modernisation-platform
   }
 }
 
