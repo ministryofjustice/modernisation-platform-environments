@@ -28,7 +28,7 @@ resource "aws_security_group" "lambda_generic" {
 
 resource "aws_security_group_rule" "lambda_ingress_generic" {
   #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
-
+  
   count = local.enable_generic_lambda_sg ? 1 : 0
 
   cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
