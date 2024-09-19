@@ -91,7 +91,7 @@ resource "aws_lb" "delius_microservices" {
   name                       = "${var.name}-${var.env_name}-service-nlb"
   internal                   = true
   load_balancer_type         = "network"
-  security_groups            = concat([aws_security_group.delius_microservices_service_nlb.id], var.extra_nlb_security_groups)
+  security_groups            = [aws_security_group.delius_microservices_service_nlb.id]
   subnets                    = var.account_config.private_subnet_ids
   enable_deletion_protection = false
   tags                       = var.tags
