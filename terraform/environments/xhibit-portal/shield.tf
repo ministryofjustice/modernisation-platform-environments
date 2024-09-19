@@ -1,3 +1,8 @@
+# Retrieve the protection ID of the ingestion-lb protection, so it can be excluded
+data "aws_shield_protection" "ingestion_lb" {
+  resource_arn = aws_elb.ingestion_lb.arn
+}
+
 module "shield" {
   source   = "../../modules/shield_advanced"
   for_each = local.is-production ? { "build" = true } : {}
@@ -5,7 +10,7 @@ module "shield" {
     aws.modernisation-platform = aws.modernisation-platform
   }
   application_name = local.application_name
-  excluded_protections = ["aec0eb6a-62b1-4433-a854-77fb8b275db5"]
+  excluded_protections = [data.aws_shield_protection.ingestion_lb.id]
   resources = {
     prtg_lb = {
       action = "block"
