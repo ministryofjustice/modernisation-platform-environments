@@ -120,13 +120,13 @@ module "ldap_ecs" {
     {
       port        = var.ldap_config.port
       ip_protocol = "tcp"
-      cidr_ipv4   = var.environment_config.migration_environment_private_cidr[0]
+      cidr_ipv4   = var.environment_config.migration_environment_vpc_cidr
       description = "Allow inbound LDAP traffic from corresponding legacy VPC"
     },
     {
       port        = var.ldap_config.port
       ip_protocol = "udp"
-      cidr_ipv4   = var.environment_config.migration_environment_private_cidr[0]
+      cidr_ipv4   = var.environment_config.migration_environment_vpc_cidr
       description = "Allow inbound LDAP traffic from corresponding legacy VPC"
     },
     {
