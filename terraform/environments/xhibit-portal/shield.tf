@@ -5,6 +5,7 @@ module "shield" {
     aws.modernisation-platform = aws.modernisation-platform
   }
   application_name = local.application_name
+  excluded_protections = ["aec0eb6a-62b1-4433-a854-77fb8b275db5"]
   resources = {
     prtg_lb = {
       action = "block"
@@ -23,10 +24,4 @@ module "shield" {
       "threshold" = "1000"
     }
   }
-}
-
-import {
-  for_each = local.is-production ? { "build" = true } : {}
-  id       = "8fef055b-19dd-49f8-8056-212c928d0793/FMManagedWebACLV2-shield_advanced_auto_remediate-1654790638664/REGIONAL"
-  to       = module.shield["build"].aws_wafv2_web_acl.main
 }
