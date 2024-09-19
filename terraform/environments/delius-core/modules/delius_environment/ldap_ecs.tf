@@ -351,3 +351,7 @@ resource "aws_acm_certificate_validation" "ldap_external" {
   certificate_arn         = aws_acm_certificate.ldap_external.arn
   validation_record_fqdns = [local.ldap_domain_name_main[0], local.ldap_domain_name_sub[0]]
 }
+
+resource "aws_cloudwatch_log_group" "ldap_automation" {
+  name = "/ecs/ldap-automation-${var.env_name}"
+}
