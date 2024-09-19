@@ -32,6 +32,13 @@ module "ldap_ecs" {
     }
   ]
 
+  system_controls = [
+    {
+      namespace = "net.ipv4.tcp_keepalive_time"
+      value     = "300"
+    }
+  ]
+
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
   cluster_security_group_id = aws_security_group.cluster.id
 
