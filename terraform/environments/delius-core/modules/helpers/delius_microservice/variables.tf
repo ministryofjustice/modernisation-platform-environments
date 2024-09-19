@@ -598,3 +598,33 @@ variable "health_check" {
   })
   default = null
 }
+
+variable "nlb_ingress_security_group_ids" {
+  description = "Security group ids to allow ingress to the ECS service"
+  type = list(object({
+    referenced_security_group_id = optional(string, null)
+    cidr_ipv4                    = optional(string, null)
+    description                  = optional(string, null)
+    port                         = number
+    ip_protocol                  = string
+  }))
+  default = []
+}
+
+variable "nlb_egress_security_group_ids" {
+  description = "Security group ids to allow egress from the ECS service"
+  type = list(object({
+    referenced_security_group_id = optional(string, null)
+    cidr_ipv4                    = optional(string, null)
+    port                         = optional(number, null)
+    description                  = optional(string, null)
+    ip_protocol                  = string
+  }))
+  default = []
+}
+
+variable "system_controls" {
+  description = "The system controls for the container"
+  type        = list
+  default = []
+}

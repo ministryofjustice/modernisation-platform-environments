@@ -22,6 +22,7 @@ module "container_definition" {
       "awslogs-stream-prefix" = "${var.env_name}-${var.name}"
     }
   }
+  system_controls = var.system_controls
 }
 
 module "ecs_policies" {
