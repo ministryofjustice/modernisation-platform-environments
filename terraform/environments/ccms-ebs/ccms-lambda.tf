@@ -76,6 +76,13 @@ resource "aws_lambda_function" "lambda_function" {
   depends_on = [aws_lambda_layer_version.lambda_layer]
 }
 
+resource "aws_lambda_permission" "allow_bucket" {
+  statement_id  = "AllowExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_function.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.lambda_payment_load.arn
+}
 
 resource "aws_s3_bucket_notification" "lambda_trigger" {
   bucket = aws_s3_bucket.lambda_payment_load.id
