@@ -30,6 +30,7 @@ module "cdc_stop_pipeline" {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {
               "--dpr.orchestration.wait.interval.seconds" : "60"
+              "--dpr.orchestration.max.attempts" : "120"
             }
           },
           "Next" : "Stop Glue Streaming Job"

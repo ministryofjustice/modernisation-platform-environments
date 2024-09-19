@@ -32,6 +32,13 @@ module "ldap_ecs" {
     }
   ]
 
+  system_controls = [
+    {
+      namespace = "net.ipv4.tcp_keepalive_time"
+      value     = "300"
+    }
+  ]
+
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
   cluster_security_group_id = aws_security_group.cluster.id
 
@@ -97,6 +104,99 @@ module "ldap_ecs" {
       description = "Allow all outbound traffic to any IPv4 address"
     }
   ]
+  
+  nlb_ingress_security_group_ids = [
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+      description = "Allow inbound traffic from VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+      description = "Allow inbound traffic from VPC"
+    },
+    {
+      port                         = var.ldap_config.port
+      ip_protocol                  = "udp"
+      referenced_security_group_id = module.bastion_linux.bastion_security_group
+      description                  = "Allow inbound traffic from bastion"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.environment_config.migration_environment_vpc_cidr
+      description = "Allow inbound LDAP traffic from corresponding legacy VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.environment_config.migration_environment_vpc_cidr
+      description = "Allow inbound LDAP traffic from corresponding legacy VPC"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.account_info.cp_cidr
+      description = "Allow inbound LDAP traffic from CP"
+    },
+    {
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.account_info.cp_cidr
+      description = "Allow inbound LDAP traffic from CP"
+    },
+    {
+      port                         = 2049
+      ip_protocol                  = "tcp"
+      referenced_security_group_id = module.ldap.efs_sg_id
+      description                  = "EFS ingress"
+    },
+    {
+      port        = var.ldap_config.tls_port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+      description = "Allow inbound traffic from VPC"
+    },
+    {
+      port        = var.ldap_config.tls_port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+      description = "Allow inbound traffic from VPC"
+    },
+    {
+      port                         = var.ldap_config.tls_port
+      ip_protocol                  = "udp"
+      referenced_security_group_id = module.bastion_linux.bastion_security_group
+      description                  = "Allow inbound traffic from bastion"
+    },
+    {
+      port        = var.ldap_config.tls_port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.environment_config.migration_environment_vpc_cidr
+      description = "Allow inbound LDAP traffic from corresponding legacy VPC"
+    },
+    {
+      port        = var.ldap_config.tls_port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.environment_config.migration_environment_vpc_cidr
+      description = "Allow inbound LDAP traffic from corresponding legacy VPC"
+    },
+    {
+      port        = var.ldap_config.tls_port
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.account_info.cp_cidr
+      description = "Allow inbound LDAP traffic from CP"
+    },
+    {
+      port        = var.ldap_config.tls_port
+      ip_protocol = "udp"
+      cidr_ipv4   = var.account_info.cp_cidr
+      description = "Allow inbound LDAP traffic from CP"
+    },
+  ]
 
   ecs_service_ingress_security_group_ids = [
     {
@@ -120,13 +220,13 @@ module "ldap_ecs" {
     {
       port        = var.ldap_config.port
       ip_protocol = "tcp"
-      cidr_ipv4   = var.environment_config.migration_environment_private_cidr[0]
+      cidr_ipv4   = var.environment_config.migration_environment_vpc_cidr
       description = "Allow inbound LDAP traffic from corresponding legacy VPC"
     },
     {
       port        = var.ldap_config.port
       ip_protocol = "udp"
-      cidr_ipv4   = var.environment_config.migration_environment_private_cidr[0]
+      cidr_ipv4   = var.environment_config.migration_environment_vpc_cidr
       description = "Allow inbound LDAP traffic from corresponding legacy VPC"
     },
     {
