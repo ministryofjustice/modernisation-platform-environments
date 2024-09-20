@@ -135,6 +135,7 @@ locals {
     user_target_endpoint = {
       write_database = "PRENDA"
     }
+    is-production = local.is-production
   }
 
 }

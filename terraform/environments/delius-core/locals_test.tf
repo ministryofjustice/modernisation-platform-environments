@@ -134,5 +134,6 @@ locals {
       read_database = "TSTNDA"
     }
     user_target_endpoint = {}
+    is-production = local.is-production
   }
 }

@@ -9,10 +9,11 @@ module "environment_test" {
   count  = local.is-test ? 1 : 0
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws                        = aws
+    aws.bucket-replication     = aws
+    aws.core-vpc               = aws.core-vpc
+    aws.core-network-services  = aws.core-network-services
+    aws.modernisation-platform = aws.modernisation-platform
   }
 
   env_name      = "test"
