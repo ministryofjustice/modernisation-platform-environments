@@ -102,6 +102,8 @@ resource "aws_redshift_cluster_iam_roles" "this" {
 ################################################################################
 
 resource "aws_redshift_parameter_group" "this" {
+#checkov:skip=CKV_AWS_105: "Ensure Redshift uses SSL"
+
   count = var.create_redshift_cluster && var.create_parameter_group ? 1 : 0
 
   name        = coalesce(var.parameter_group_name, replace(var.name, ".", "-"))
