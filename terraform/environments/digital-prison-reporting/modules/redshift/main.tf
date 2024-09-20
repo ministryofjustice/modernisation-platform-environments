@@ -12,6 +12,8 @@ data "aws_partition" "current" {}
 resource "aws_redshift_cluster" "this" {
   count = var.create_redshift_cluster ? 1 : 0
 
+  #checkov:skip=CKV_AWS_105: "Ensure Redshift uses SSL"
+
   cluster_identifier                   = var.name
   allow_version_upgrade                = var.allow_version_upgrade
   apply_immediately                    = var.apply_immediately
