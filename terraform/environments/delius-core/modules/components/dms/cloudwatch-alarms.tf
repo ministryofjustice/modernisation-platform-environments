@@ -41,7 +41,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   statistic           = "Average"
   metric_name         = "CDCLatencySource"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 10
+  threshold           = 1
   evaluation_periods  = 2
   period              = 30
   actions_enabled     = true
@@ -63,7 +63,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   statistic           = "Average"
   metric_name         = "CDCLatencyTarget"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 10
+  threshold           = 1
   evaluation_periods  = 2
   period              = 30
   actions_enabled     = true
