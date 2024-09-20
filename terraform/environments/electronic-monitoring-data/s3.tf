@@ -13,7 +13,7 @@ locals {
 # ------------------------------------------------------------------------
 
 module "s3-logging-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-bucket-logs-"
   versioning_enabled = true
@@ -83,7 +83,7 @@ module "s3-logging-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-metadata-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-metadata-"
   versioning_enabled = true
@@ -103,8 +103,11 @@ module "s3-metadata-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
   log_prefix = "logs/${local.bucket_prefix}-metadata/"
   log_partition_date_source = "EventTime"
 
@@ -169,7 +172,7 @@ module "s3-metadata-bucket" {
 # ----------------------------------
 
 module "s3-athena-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-athena-query-results-"
   versioning_enabled = true
@@ -190,8 +193,11 @@ module "s3-athena-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-athena-query-results/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })  log_prefix = "logs/${local.bucket_prefix}-athena-query-results/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -243,7 +249,7 @@ module "s3-athena-bucket" {
 # ----------------------------------
 
 module "s3-unzipped-files-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-unzipped-files-"
   versioning_enabled = true
@@ -264,8 +270,11 @@ module "s3-unzipped-files-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-unzipped-files/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })  log_prefix = "logs/${local.bucket_prefix}-unzipped-files/"
 
   log_partition_date_source = "EventTime"
 
@@ -294,7 +303,7 @@ module "s3-unzipped-files-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-dms-premigrate-assess-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-dms-premigrate-assess-"
   versioning_enabled = true
@@ -315,8 +324,11 @@ module "s3-dms-premigrate-assess-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-dms-premigrate-assess/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })  log_prefix = "logs/${local.bucket_prefix}-dms-premigrate-assess/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -368,7 +380,7 @@ module "s3-dms-premigrate-assess-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-json-directory-structure-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-json-directory-structure-"
   versioning_enabled = true
@@ -389,8 +401,11 @@ module "s3-json-directory-structure-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-json-directory-structure/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })  log_prefix = "logs/${local.bucket_prefix}-json-directory-structure/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -442,7 +457,7 @@ module "s3-json-directory-structure-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-data-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
   bucket_prefix      = "${local.bucket_prefix}-data-"
   versioning_enabled = true
 
@@ -461,8 +476,11 @@ module "s3-data-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-data/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })  log_prefix = "logs/${local.bucket_prefix}-data/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -513,7 +531,7 @@ module "s3-data-bucket" {
 # DMS data validation bucket
 # ------------------------------------------------------------------------
 module "s3-dms-data-validation-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix = "${local.bucket_prefix}-dms-data-validation-"
   versioning_enabled = true
@@ -534,8 +552,11 @@ module "s3-dms-data-validation-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-dms-data-validation/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })  log_prefix = "logs/${local.bucket_prefix}-dms-data-validation/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -587,7 +608,7 @@ module "s3-dms-data-validation-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-glue-job-script-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-glue-job-store-"
   versioning_enabled = true
@@ -608,8 +629,11 @@ module "s3-glue-job-script-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-glue-job-store/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })  log_prefix = "logs/${local.bucket_prefix}-glue-job-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -662,7 +686,7 @@ module "s3-glue-job-script-bucket" {
 
 
 module "s3-dms-target-store-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix = "${local.bucket_prefix}-dms-rds-to-parquet-"
   versioning_enabled = true
@@ -683,8 +707,11 @@ module "s3-dms-target-store-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/dms-target-store/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })  log_prefix = "logs/dms-target-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
