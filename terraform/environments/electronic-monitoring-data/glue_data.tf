@@ -9,27 +9,6 @@ data "aws_iam_policy_document" "glue_assume_role" {
   }
 }
 
-data "aws_iam_policy_document" "dms_dv_parquet_s3_bucket" {
-  statement {
-    sid = "EnforceTLSv12orHigher"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    effect  = "Deny"
-    actions = ["s3:*"]
-    resources = [
-      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*"
-    ]
-    condition {
-      test     = "NumericLessThan"
-      variable = "s3:TlsVersion"
-      values   = [1.2]
-    }
-  }
-}
-
 data "aws_iam_policy_document" "dms_dv_s3_iam_policy_document" {
   statement {
     effect = "Allow"
@@ -42,8 +21,8 @@ data "aws_iam_policy_document" "dms_dv_s3_iam_policy_document" {
       module.s3-dms-target-store-bucket.bucket.arn,
       "${module.s3-glue-job-script-bucket.bucket.arn}/*",
       module.s3-glue-job-script-bucket.bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
-      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn
+      "${module.s3-dms-data-validation-bucket.bucket.arn}/*",
+      module.s3-dms-data-validation-bucket.bucket.arn
     ]
   }
   statement {
@@ -54,8 +33,8 @@ data "aws_iam_policy_document" "dms_dv_s3_iam_policy_document" {
       "s3:ListBucket"
     ]
     resources = [
-      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
+      module.s3-dms-data-validation-bucket.bucket.arn,
+      "${module.s3-dms-data-validation-bucket.bucket.arn}/*",
       module.s3-glue-job-script-bucket.bucket.arn,
       "${module.s3-glue-job-script-bucket.bucket.arn}/*",
     ]
@@ -74,8 +53,8 @@ data "aws_iam_policy_document" "glue_mig_and_val_s3_iam_policy_document" {
       module.s3-dms-target-store-bucket.bucket.arn,
       "${module.s3-glue-job-script-bucket.bucket.arn}/*",
       module.s3-glue-job-script-bucket.bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
-      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn
+      "${module.s3-dms-data-validation-bucket.bucket.arn}/*",
+      module.s3-dms-data-validation-bucket.bucket.arn
     ]
   }
   statement {
@@ -88,8 +67,8 @@ data "aws_iam_policy_document" "glue_mig_and_val_s3_iam_policy_document" {
     resources = [
       "${module.s3-dms-target-store-bucket.bucket.arn}/*",
       module.s3-dms-target-store-bucket.bucket.arn,
-      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
+      module.s3-dms-data-validation-bucket.bucket.arn,
+      "${module.s3-dms-data-validation-bucket.bucket.arn}/*",
       module.s3-glue-job-script-bucket.bucket.arn,
       "${module.s3-glue-job-script-bucket.bucket.arn}/*",
     ]

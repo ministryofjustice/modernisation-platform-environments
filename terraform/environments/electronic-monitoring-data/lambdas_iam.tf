@@ -395,8 +395,8 @@ data "aws_iam_policy_document" "get_log_s3_files" {
       "s3:DeleteObject"
     ]
     resources = [
-      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*"
+      module.s3-dms-data-validation-bucket.bucket.arn,
+      "${module.s3-dms-data-validation-bucket.bucket.arn}/*"
     ]
   }
 }
