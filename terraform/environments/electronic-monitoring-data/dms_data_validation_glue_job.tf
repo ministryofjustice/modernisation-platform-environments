@@ -135,7 +135,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--read_partition_size_mb"            = 128
     "--max_table_size_mb"                 = 4000
     "--parquet_tbl_folder_if_different"   = ""
-    "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--parquet_src_bucket_name"           = module.s3-dms-target-store-bucket.bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
     "--glue_catalog_tbl_name"             = "glue_df_output"
@@ -195,7 +195,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v4d" {
     "--rds_db_tbl_pkeys_col_list"         = ""
     "--rds_df_trim_str_columns"           = "false"
     "--rds_df_trim_micro_sec_ts_col_list" = ""
-    "--parquet_src_bucket_name"           = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--parquet_src_bucket_name"           = module.s3-dms-target-store-bucket.bucket.id
     "--parquet_output_bucket_name"        = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
     "--glue_catalog_tbl_name"             = "glue_df_output"
@@ -262,7 +262,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--validation_only_run"                  = "false"
     "--rds_df_filter_year"                   = 0
     "--rds_df_filter_month"                  = 0
-    "--rds_to_parquet_output_s3_bucket"      = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--rds_to_parquet_output_s3_bucket"      = module.s3-dms-target-store-bucket.bucket.id
     "--dv_parquet_output_s3_bucket"          = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
     "--glue_catalog_db_name"                 = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
     "--glue_catalog_tbl_name"                = "glue_df_output"
@@ -321,7 +321,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
     "--rename_migrated_prq_tbl_folder"   = ""
     "--year_partition_bool"              = "false"
     "--month_partition_bool"             = "false"
-    "--rds_to_parquet_output_s3_bucket"  = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--rds_to_parquet_output_s3_bucket"  = module.s3-dms-target-store-bucket.bucket.id
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.rds_to_s3_parquet_migration.name}"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
@@ -374,8 +374,8 @@ resource "aws_glue_job" "resizing_parquet_files" {
     "--year_bool_partition"              = "true"
     "--month_bool_partition"             = "true"
     "--day_bool_partition"               = "false"
-    "--s3_prq_read_bucket_name"          = aws_s3_bucket.dms_target_ep_s3_bucket.id
-    "--s3_prq_write_bucket_name"         = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    "--s3_prq_read_bucket_name"          = module.s3-dms-target-store-bucket.bucket.id
+    "--s3_prq_write_bucket_name"         = module.s3-dms-target-store-bucket.bucket.id
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.resizing_parquet_files.name}"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"

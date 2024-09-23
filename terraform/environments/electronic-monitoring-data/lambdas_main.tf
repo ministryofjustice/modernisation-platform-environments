@@ -75,7 +75,7 @@ module "create_athena_table" {
   subnet_ids         = data.aws_subnets.shared-public.ids
   env_account_id     = local.env_account_id
   environment_variables = {
-    S3_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    S3_BUCKET_NAME = module.s3-dms-target-store-bucket.bucket.id
   }
 }
 
@@ -146,7 +146,7 @@ module "get_file_keys_for_table" {
   subnet_ids         = data.aws_subnets.shared-public.ids
   env_account_id     = local.env_account_id
   environment_variables = {
-    PARQUET_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    PARQUET_BUCKET_NAME = module.s3-dms-target-store-bucket.bucket.id
   }
 }
 

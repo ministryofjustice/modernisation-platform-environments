@@ -32,6 +32,7 @@ resource "aws_s3_bucket_notification" "data_store" {
 #------------------------------------------------------------------------------
 
 variable "checksum_algorithm" {
+  type        = string
   description = "Select Checksum Algorithm. Default and recommended choice is SHA256, however CRC32, CRC32C, SHA1 are also available."
   default     = "SHA256"
 }
