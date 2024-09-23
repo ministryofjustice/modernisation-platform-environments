@@ -34,12 +34,12 @@ resource "aws_security_group" "dms_ri_security_group" {
   )
 }
 
-resource "aws_vpc_security_group_rule" "dms_tcp_outbound" {
+resource "aws_security_group_rule" "dms_tcp_outbound" {
   for_each          = toset(var.sqlserver_https_ports)
   type              = "egress"
   security_group_id = aws_security_group.dms_ri_security_group.id
   cidr_blocks       = data.aws_ip_ranges.s3_ranges.cidr_blocks
-  ip_protocol       = "tcp"
+  protocol       = "tcp"
   from_port         = each.value
   to_port           = each.value
   description       = "DMS Terraform"
@@ -80,12 +80,12 @@ resource "aws_security_group" "glue_rds_conn_security_group" {
   )
 }
 
-resource "aws_vpc_security_group_rule" "glue_rds_conn_outbound" {
+resource "aws_security_group_rule" "glue_rds_conn_outbound" {
   for_each          = toset(var.sqlserver_https_ports)
   type              = "egress"
   security_group_id = aws_security_group.glue_rds_conn_security_group.id
   cidr_blocks       = data.aws_ip_ranges.london_glue.cidr_blocks
-  ip_protocol       = "tcp"
+  protocol       = "tcp"
   from_port         = each.value
   to_port           = each.value
   description       = "Required ports open for Glue-RDS-Connection"
