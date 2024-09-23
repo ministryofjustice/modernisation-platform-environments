@@ -143,7 +143,7 @@ module "ui_rds" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.8.0"
+  version = "6.9.0"
 
   identifier = "ui"
 
