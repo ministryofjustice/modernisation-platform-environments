@@ -110,5 +110,3 @@ resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_db_inbound" {
   to_port                      = 1433
   description                  = "Required ports open for Glue-RDS-Connection"
 }
-
-# ---------------------------------------------------------------------------
