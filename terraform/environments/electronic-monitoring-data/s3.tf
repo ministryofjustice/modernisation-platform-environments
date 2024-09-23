@@ -578,6 +578,7 @@ module "s3-fms-landing-bucket" {
       expiration = {
         days = 7
       }
+    }
   ]
 
   tags = local.tags
@@ -629,6 +630,7 @@ module "s3-mdss-landing-bucket" {
       expiration = {
         days = 7
       }
+    }
   ]
 
   tags = local.tags
