@@ -20,6 +20,10 @@ tasks:
             name: Storage
             letter: F
             partition: gpt
+  - task: setHostname
+    inputs:
+      hostName: "${hostname}"
+      reboot: true
   - task: executeScript
     inputs:
       - frequency: once
