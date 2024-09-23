@@ -48,7 +48,7 @@ resource "aws_glue_connection" "glue_nomis_connection" {
 # DPS Activities
 resource "aws_glue_connection" "glue_dps_activities_connection" {
   count           = local.create_glue_connection ? 1 : 0
-  name            = "${local.project}-dps-actvities-connection"
+  name            = "${local.project}-dps-activities-connection"
   connection_type = "JDBC"
 
   connection_properties = {
