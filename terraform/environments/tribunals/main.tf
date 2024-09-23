@@ -732,7 +732,7 @@ module "nginx" {
   environment         = local.environment
 }
 
-module "loadBalancer" {
+module "nginx_load_balancer" {
   count                         = local.is-production ? 1 : 0
   source                        = "./modules/nginx_load_balancer"
   nginx_lb_sg_id                = aws_security_group.nginx_lb_sg[0].id
