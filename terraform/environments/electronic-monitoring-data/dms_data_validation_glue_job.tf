@@ -1,39 +1,3 @@
-resource "aws_s3_bucket" "dms_dv_parquet_s3_bucket" {
-  bucket_prefix = "dms-data-validation-"
-
-  tags = merge(
-    local.tags,
-    {
-      Resource_Type = "S3 Bucket for Athena Parquet Tables",
-    }
-  )
-}
-
-resource "aws_s3_bucket_public_access_block" "dms_dv_parquet_s3_bucket" {
-  bucket                  = module.s3-dms-data-validation-bucket.bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "dms_dv_parquet_s3_bucket" {
-  bucket = module.s3-dms-data-validation-bucket.bucket.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "dms_dv_parquet_s3_bucket" {
-  bucket = module.s3-dms-data-validation-bucket.bucket.id
-  policy = data.aws_iam_policy_document.dms_dv_parquet_s3_bucket.json
-}
-
-# -------------------------------------------------------------------
-
 resource "aws_s3_object" "dms_dv_rds_and_s3_parquet_write_v2" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_rds_and_s3_parquet_write_v2.py"
