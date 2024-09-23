@@ -1,7 +1,13 @@
 -- Check if the CaseDetails table exists
 IF OBJECT_ID('dbo.CaseDetails', 'U') IS NOT NULL
 BEGIN
-    -- Step 1: Drop the primary key constraint if it exists
+    -- Step 1: Add a new identity column
+    ALTER TABLE CaseDetails ADD NewId BIGINT;
+
+    -- Step 2: Update the new identity column with the values from the existing primary key column
+    UPDATE CaseDetails SET NewId = CaseID;
+
+    -- Step 3: Drop the primary key constraint if it exists
     DECLARE @ConstraintName NVARCHAR(255);
 
     -- Retrieve the primary key constraint name
@@ -17,13 +23,7 @@ BEGIN
         EXEC sp_executesql @SQL;
     END
 
-    -- Step 2: Add a new identity column
-    ALTER TABLE CaseDetails ADD NewId BIGINT IDENTITY(1,1);
-
-    -- Step 3: Drop the old CaseID column
-    ALTER TABLE CaseDetails DROP COLUMN CaseID;
-
-    -- Step 4: Rename the new identity column to id
+    -- Step 4: Rename the new identity column to CaseID
     EXEC sp_rename 'CaseDetails.NewId', 'CaseID', 'COLUMN';
 
     -- Step 5: Recreate the primary key constraint
@@ -34,7 +34,13 @@ go
 -- Check if the Users table exists
 IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL
 BEGIN
-    -- Step 1: Drop the primary key constraint if it exists
+    -- Step 1: Add a new identity column
+    ALTER TABLE Users ADD NewId BIGINT;
+
+    -- Step 2: Update the new identity column with the values from the existing primary key column
+    UPDATE Users SET NewId = UserID;
+
+    -- Step 3: Drop the primary key constraint if it exists
     DECLARE @ConstraintName NVARCHAR(255);
 
     -- Retrieve the primary key constraint name
@@ -50,13 +56,7 @@ BEGIN
         EXEC sp_executesql @SQL;
     END
 
-    -- Step 2: Add a new identity column
-    ALTER TABLE Users ADD NewId BIGINT IDENTITY(1,1);
-
-    -- Step 3: Drop the old id column
-    ALTER TABLE Users DROP COLUMN UserID;
-
-    -- Step 4: Rename the new identity column to id
+    -- Step 4: Rename the new identity column to UserID
     EXEC sp_rename 'Users.NewId', 'UserID', 'COLUMN';
 
     -- Step 5: Recreate the primary key constraint
@@ -67,7 +67,13 @@ go
 -- Check if the keywords table exists
 IF OBJECT_ID('dbo.keywords', 'U') IS NOT NULL
 BEGIN
-    -- Step 1: Drop the primary key constraint if it exists
+    -- Step 1: Add a new identity column
+    ALTER TABLE keywords ADD NewId BIGINT;
+
+    -- Step 2: Update the new identity column with the values from the existing primary key column
+    UPDATE keywords SET NewId = KeywordID;
+
+    -- Step 3: Drop the primary key constraint if it exists
     DECLARE @ConstraintName NVARCHAR(255);
 
     -- Retrieve the primary key constraint name
@@ -83,13 +89,7 @@ BEGIN
         EXEC sp_executesql @SQL;
     END
 
-    -- Step 2: Add a new identity column
-    ALTER TABLE keywords ADD NewId BIGINT IDENTITY(1,1);
-
-    -- Step 3: Drop the old KeywordID column
-    ALTER TABLE keywords DROP COLUMN KeywordID;
-
-    -- Step 4: Rename the new identity column to id
+    -- Step 4: Rename the new identity column to KeywordID
     EXEC sp_rename 'keywords.NewId', 'KeywordID', 'COLUMN';
 
     -- Step 5: Recreate the primary key constraint
@@ -100,7 +100,13 @@ go
 -- Check if the Schemes table exists
 IF OBJECT_ID('dbo.Schemes', 'U') IS NOT NULL
 BEGIN
-    -- Step 1: Drop the primary key constraint if it exists
+    -- Step 1: Add a new identity column
+    ALTER TABLE Schemes ADD NewId BIGINT;
+
+    -- Step 2: Update the new identity column with the values from the existing primary key column
+    UPDATE Schemes SET NewId = SchemeID;
+
+    -- Step 3: Drop the primary key constraint if it exists
     DECLARE @ConstraintName NVARCHAR(255);
 
     -- Retrieve the primary key constraint name
@@ -116,13 +122,7 @@ BEGIN
         EXEC sp_executesql @SQL;
     END
 
-    -- Step 2: Add a new identity column
-    ALTER TABLE Schemes ADD NewId BIGINT IDENTITY(1,1);
-
-    -- Step 3: Drop the old SchemeID column
-    ALTER TABLE Schemes DROP COLUMN SchemeID;
-
-    -- Step 4: Rename the new identity column to id
+    -- Step 4: Rename the new identity column to SchemeID
     EXEC sp_rename 'Schemes.NewId', 'SchemeID', 'COLUMN';
 
     -- Step 5: Recreate the primary key constraint
