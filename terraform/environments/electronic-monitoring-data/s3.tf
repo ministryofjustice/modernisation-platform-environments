@@ -6,6 +6,12 @@ locals {
   environment_shorthand = lookup(local.environment_map, local.environment)
 
   bucket_prefix = "emds-${local.environment_shorthand}"
+
+  live_feed_levels = {
+    1 = "general"
+    2 = "special"
+    3 = "home office"
+  }
 }
 
 # ------------------------------------------------------------------------
@@ -538,7 +544,10 @@ module "s3-data-bucket" {
 
 module "s3-fms-landing-bucket" {
   source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-  bucket_prefix      = "${local.bucket_prefix}-land-fms-"
+
+  for_each = local.live_feed_levels
+
+  bucket_prefix      = "${local.bucket_prefix}-land-fms-${each.key}-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -561,7 +570,7 @@ module "s3-fms-landing-bucket" {
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
   })
-  log_prefix                = "logs/${local.bucket_prefix}-land-fms/"
+  log_prefix                = "logs/${local.bucket_prefix}-land-fms-${each.key}/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -581,7 +590,10 @@ module "s3-fms-landing-bucket" {
     }
   ]
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    { type = each.value }
+  )
 }
 
 # ------------------------------------------------------------------------
@@ -590,7 +602,10 @@ module "s3-fms-landing-bucket" {
 
 module "s3-mdss-landing-bucket" {
   source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-  bucket_prefix      = "${local.bucket_prefix}-land-mdss-"
+
+  for_each = local.live_feed_levels
+
+  bucket_prefix      = "${local.bucket_prefix}-land-mdss-${each.key}-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -613,7 +628,7 @@ module "s3-mdss-landing-bucket" {
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
   })
-  log_prefix                = "logs/${local.bucket_prefix}-land-mdss/"
+  log_prefix                = "logs/${local.bucket_prefix}-land-mdss-${each.key}/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -633,7 +648,10 @@ module "s3-mdss-landing-bucket" {
     }
   ]
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    { type = each.value }
+  )
 }
 
 # ------------------------------------------------------------------------
