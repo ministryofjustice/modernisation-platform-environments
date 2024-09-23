@@ -25,6 +25,14 @@ def compare_buckets(original_bucket: str, new_bucket: str):
         print("Buckets are the same")
     else:
         print(f"Buckets are different: {str(bucket_tags_diff)}")
+        for key in bucket_tags_diff:
+            if (key in original_bucket_tags) and (key in new_bucket_tags):
+                print(f"Original: {original_bucket_tags[key]}")
+                print(f"New: {new_bucket_tags[key]}")
+            elif (key in original_bucket_tags) and (key not in new_bucket_tags):
+                print(f"{key} not in new bucket")
+            elif (key not in original_bucket_tags) and (key in new_bucket_tags):
+                print(f"{key} not in original bucket")
 
 
 if __name__ == "__main__":
