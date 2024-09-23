@@ -124,7 +124,7 @@ locals {
         cloudwatch_metric_alarms = null
       })
 
-      t2-test-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
+      t2-tst-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
           desired_capacity = 0
         })
