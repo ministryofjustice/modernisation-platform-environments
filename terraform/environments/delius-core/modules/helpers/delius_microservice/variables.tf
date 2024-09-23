@@ -625,6 +625,6 @@ variable "nlb_egress_security_group_ids" {
 
 variable "system_controls" {
   description = "The system controls for the container"
-  type        = list
-  default = []
+  type        = list(any)
+  default     = []
 }

@@ -5,33 +5,33 @@ resource "aws_sns_topic" "dms_alerting" {
 }
 
 locals {
-    aws_dms_replication_tasks = merge(
-      try(var.dms_config.user_target_endpoint.write_database, null) == null ? {} : {
-            (aws_dms_replication_task.user_inbound_replication[0].replication_task_arn) = aws_dms_replication_task.user_inbound_replication[0].replication_task_id
-      },
-      {for k in keys(local.client_account_map) :
-            (aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_arn) => aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_id
-      },
-      {for k in keys(local.client_account_map) :
-            (aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_arn) => aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_id
-      },
-      {for k in keys(local.client_account_map) :
-            (aws_dms_replication_task.audited_interaction_checksum_inbound_replication[k].replication_task_arn) => aws_dms_replication_task.audited_interaction_checksum_inbound_replication[k].replication_task_id
-      },    
-      try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
-            (aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_arn) = aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id
-      },
-      {for k in keys(local.client_account_map) :
-            (aws_dms_replication_task.user_outbound_replication[k].replication_task_arn) => aws_dms_replication_task.user_outbound_replication[k].replication_task_id
-      },
-      try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
-            (aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_arn) = aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_id
-      },    
-      try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
-            (aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_arn) = aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_id
-      },   
-    )
-}   
+  aws_dms_replication_tasks = merge(
+    try(var.dms_config.user_target_endpoint.write_database, null) == null ? {} : {
+      (aws_dms_replication_task.user_inbound_replication[0].replication_task_arn) = aws_dms_replication_task.user_inbound_replication[0].replication_task_id
+    },
+    { for k in keys(local.client_account_map) :
+      (aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_arn) => aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_id
+    },
+    { for k in keys(local.client_account_map) :
+      (aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_arn) => aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_id
+    },
+    { for k in keys(local.client_account_map) :
+      (aws_dms_replication_task.audited_interaction_checksum_inbound_replication[k].replication_task_arn) => aws_dms_replication_task.audited_interaction_checksum_inbound_replication[k].replication_task_id
+    },
+    try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
+      (aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_arn) = aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id
+    },
+    { for k in keys(local.client_account_map) :
+      (aws_dms_replication_task.user_outbound_replication[k].replication_task_arn) => aws_dms_replication_task.user_outbound_replication[k].replication_task_id
+    },
+    try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
+      (aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_arn) = aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_id
+    },
+    try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
+      (aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_arn) = aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_id
+    },
+  )
+}
 
 resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   for_each            = local.aws_dms_replication_tasks

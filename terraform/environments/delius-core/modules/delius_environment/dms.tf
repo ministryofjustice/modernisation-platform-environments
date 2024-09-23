@@ -27,5 +27,5 @@ locals {
     standbydb1 = try(module.oracle_db_standby[0].oracle_db_server_name, "none"),
     standbydb2 = try(module.oracle_db_standby[1].oracle_db_server_name, "none")
   }
-  
+
 }

@@ -20,9 +20,9 @@ resource "aws_lambda_layer_version" "lambda_layer" {
 
 # SG for Lambda
 resource "aws_security_group" "lambda_security_group" {
-  name   = "${local.application_name}-${local.environment}-lambda-sg"
+  name        = "${local.application_name}-${local.environment}-lambda-sg"
   description = "SG traffic control for Payment Load Lambda"
-  vpc_id = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared.id
 
   ingress {
     from_port   = 1521

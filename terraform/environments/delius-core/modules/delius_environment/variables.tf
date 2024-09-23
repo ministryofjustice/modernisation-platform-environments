@@ -42,7 +42,7 @@ variable "ldap_config" {
     efs_backup_schedule         = "default_efs_backup_schedule"
     efs_backup_retention_period = "default_efs_backup_retention_period"
     port                        = 389
-    tls_port = 636
+    tls_port                    = 636
   }
 }
 
