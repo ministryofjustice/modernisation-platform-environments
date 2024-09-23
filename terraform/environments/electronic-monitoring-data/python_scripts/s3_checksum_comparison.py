@@ -1,3 +1,6 @@
+"""exec into your aws account, run python3 
+   python_scripts/s3_checksum_comparison.py bucket1 bucket2 to compare between buckets 1 and 2"""
+
 import boto3
 import typer
 
