@@ -20,10 +20,10 @@ def get_etags_all_objects(bucket_name: str):
 def compare_buckets(original_bucket: str, new_bucket: str):
     original_bucket_tags = get_etags_all_objects(original_bucket)
     new_bucket_tags = get_etags_all_objects(new_bucket)
-    if original_bucket_tags == new_bucket_tags:
+    bucket_tags_diff = set(original_bucket_tags) ^ set(new_bucket_tags)
+    if original_bucket_tags == new_bucket_tags or len(bucket_tags_diff) == 0:
         print("Buckets are the same")
     else:
-        bucket_tags_diff = set(original_bucket_tags) ^ set(new_bucket_tags)
         print(f"Buckets are different: {str(bucket_tags_diff)}")
 
 
