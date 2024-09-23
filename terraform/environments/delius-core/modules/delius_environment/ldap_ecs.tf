@@ -104,7 +104,7 @@ module "ldap_ecs" {
       description = "Allow all outbound traffic to any IPv4 address"
     }
   ]
-  
+
   nlb_ingress_security_group_ids = [
     {
       port        = var.ldap_config.port
@@ -353,7 +353,7 @@ resource "aws_acm_certificate_validation" "ldap_external" {
 }
 
 resource "aws_cloudwatch_log_group" "ldap_automation" {
-  name = "/ecs/ldap-automation-${var.env_name}"
+  name              = "/ecs/ldap-automation-${var.env_name}"
   retention_in_days = 7
   tags              = var.tags
 }

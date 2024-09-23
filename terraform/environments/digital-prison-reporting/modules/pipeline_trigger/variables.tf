@@ -21,8 +21,8 @@ variable "time_window_mode" {
 }
 
 variable "maximum_window_in_minutes" {
-  type = number
-  default = null
+  type        = number
+  default     = null
   description = "(Optional) The maximum time window in minutes"
 }
 

@@ -48,28 +48,28 @@ resource "aws_iam_role" "dms_s3_writer_role" {
 }
 
 resource "aws_iam_policy" "dms_s3_bucket_writer_policy" {
-    count  = length(keys(local.bucket_map)) > 0 ? 1 : 0
-    name   = "dms-s3-bucket-writer-policy"
-    policy = jsonencode({
+  count = length(keys(local.bucket_map)) > 0 ? 1 : 0
+  name  = "dms-s3-bucket-writer-policy"
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-        {
-        Effect    = "Allow"
-        Action    = [
+      {
+        Effect = "Allow"
+        Action = [
           "s3:PutObject",
           "s3:PutObjectAcl",
           "s3:DeleteObject",
-          "s3:PutObjectTagging"         
+          "s3:PutObjectTagging"
         ]
-        Resource = concat([for bucket in values(local.bucket_map) : "arn:aws:s3:::${bucket}/*"],["${module.s3_bucket_dms_destination.bucket.arn}/*"])
-        },
-        {
-        Effect    = "Allow"
-        Action    = [
+        Resource = concat([for bucket in values(local.bucket_map) : "arn:aws:s3:::${bucket}/*"], ["${module.s3_bucket_dms_destination.bucket.arn}/*"])
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "s3:ListBucket"
         ]
-        Resource = concat([for bucket in values(local.bucket_map) : "arn:aws:s3:::${bucket}"],[module.s3_bucket_dms_destination.bucket.arn])
-        }
+        Resource = concat([for bucket in values(local.bucket_map) : "arn:aws:s3:::${bucket}"], [module.s3_bucket_dms_destination.bucket.arn])
+      }
     ]
   })
 }
@@ -101,24 +101,24 @@ resource "aws_iam_role" "dms_s3_reader_role" {
 
 # The reader role only provides access to the local bucket, not those in other accounts
 resource "aws_iam_policy" "dms_s3_bucket_reader_policy" {
-    name   = "dms-s3-bucket-reader-policy"
-    policy = jsonencode({
+  name = "dms-s3-bucket-reader-policy"
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-        {
-        Effect    = "Allow"
-        Action    = [
+      {
+        Effect = "Allow"
+        Action = [
           "s3:GetObject"
         ]
         Resource = ["${module.s3_bucket_dms_destination.bucket.arn}/*"]
-        },
-        {
-        Effect    = "Allow"
-        Action    = [
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "s3:ListBucket"
         ]
         Resource = [module.s3_bucket_dms_destination.bucket.arn]
-        }
+      }
     ]
   })
 }

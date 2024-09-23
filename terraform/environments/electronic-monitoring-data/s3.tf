@@ -4,7 +4,7 @@ locals {
     "development" = "dev"
   }
   environment_shorthand = lookup(local.environment_map, local.environment)
-  
+
   bucket_prefix = "emds-${local.environment_shorthand}"
 }
 
@@ -108,7 +108,7 @@ module "s3-metadata-bucket" {
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
   })
-  log_prefix = "logs/${local.bucket_prefix}-metadata/"
+  log_prefix                = "logs/${local.bucket_prefix}-metadata/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -197,8 +197,8 @@ module "s3-athena-bucket" {
     "log_bucket_name" : module.s3-logging-bucket.bucket.id,
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })  
-  log_prefix = "logs/${local.bucket_prefix}-athena-query-results/"
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-athena-query-results/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -275,7 +275,7 @@ module "s3-unzipped-files-bucket" {
     "log_bucket_name" : module.s3-logging-bucket.bucket.id,
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })  
+  })
   log_prefix = "logs/${local.bucket_prefix}-unzipped-files/"
 
   log_partition_date_source = "EventTime"
@@ -330,8 +330,8 @@ module "s3-dms-premigrate-assess-bucket" {
     "log_bucket_name" : module.s3-logging-bucket.bucket.id,
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })  
-  log_prefix = "logs/${local.bucket_prefix}-dms-premigrate-assess/"
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-dms-premigrate-assess/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -408,8 +408,8 @@ module "s3-json-directory-structure-bucket" {
     "log_bucket_name" : module.s3-logging-bucket.bucket.id,
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })  
-  log_prefix = "logs/${local.bucket_prefix}-json-directory-structure/"
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-json-directory-structure/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -461,7 +461,7 @@ module "s3-json-directory-structure-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-data-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
   bucket_prefix      = "${local.bucket_prefix}-data-"
   versioning_enabled = true
 
@@ -484,8 +484,8 @@ module "s3-data-bucket" {
     "log_bucket_name" : module.s3-logging-bucket.bucket.id,
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })  
-  log_prefix = "logs/${local.bucket_prefix}-data/"
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-data/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -538,7 +538,7 @@ module "s3-data-bucket" {
 module "s3-dms-data-validation-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
-  bucket_prefix = "${local.bucket_prefix}-dms-data-validation-"
+  bucket_prefix      = "${local.bucket_prefix}-dms-data-validation-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -561,8 +561,8 @@ module "s3-dms-data-validation-bucket" {
     "log_bucket_name" : module.s3-logging-bucket.bucket.id,
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  }) 
-  log_prefix = "logs/${local.bucket_prefix}-dms-data-validation/"
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-dms-data-validation/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -639,8 +639,8 @@ module "s3-glue-job-script-bucket" {
     "log_bucket_name" : module.s3-logging-bucket.bucket.id,
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })  
-  log_prefix = "logs/${local.bucket_prefix}-glue-job-store/"
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-glue-job-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -695,7 +695,7 @@ module "s3-glue-job-script-bucket" {
 module "s3-dms-target-store-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
-  bucket_prefix = "${local.bucket_prefix}-dms-rds-to-parquet-"
+  bucket_prefix      = "${local.bucket_prefix}-dms-rds-to-parquet-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -718,8 +718,8 @@ module "s3-dms-target-store-bucket" {
     "log_bucket_name" : module.s3-logging-bucket.bucket.id,
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })  
-  log_prefix = "logs/dms-target-store/"
+  })
+  log_prefix                = "logs/dms-target-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [

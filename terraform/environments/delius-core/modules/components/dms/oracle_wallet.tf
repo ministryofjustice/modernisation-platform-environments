@@ -6,8 +6,8 @@
 # We use base64 encoding of the originally binary wallet
 # (base64 -i cwallet.sso -o empty_wallet_base64.txt)
 resource "aws_dms_certificate" "empty_oracle_wallet" {
-  certificate_id   = "empty-oracle-wallet"
-  certificate_wallet  = file("files/empty_wallet_base64.txt")
+  certificate_id     = "empty-oracle-wallet"
+  certificate_wallet = file("files/empty_wallet_base64.txt")
   lifecycle {
     ignore_changes = [certificate_wallet]
   }

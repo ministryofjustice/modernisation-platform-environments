@@ -19,20 +19,20 @@ module "apex-ecs" {
   ec2_min_size            = local.application_data.accounts[local.environment].ec2_min_size
   # task_definition_volume     = local.application_data.accounts[local.environment].task_definition_volume
   # network_mode               = local.application_data.accounts[local.environment].network_mode
-  server_port                = local.application_data.accounts[local.environment].server_port
-  app_count                  = local.application_data.accounts[local.environment].app_count
-  ec2_ingress_rules          = local.ec2_ingress_rules
-  ec2_egress_rules           = local.ec2_egress_rules
-  lb_tg_arn                  = module.alb.target_group_arn
-  tags_common                = local.tags
-  appscaling_min_capacity    = local.application_data.accounts[local.environment].appscaling_min_capacity
-  appscaling_max_capacity    = local.application_data.accounts[local.environment].appscaling_max_capacity
-  ecs_scaling_cpu_threshold  = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
-  ecs_scaling_mem_threshold  = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-  ecs_target_capacity        = local.ecs_target_capacity
-  ec2_instance_warmup_period = local.application_data.accounts[local.environment].ec2_instance_warmup_period
-  log_group_kms_key          = aws_kms_key.cloudwatch_logs_key.arn
-  environment                = local.environment
-  database_admin_password_arn  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
+  server_port                 = local.application_data.accounts[local.environment].server_port
+  app_count                   = local.application_data.accounts[local.environment].app_count
+  ec2_ingress_rules           = local.ec2_ingress_rules
+  ec2_egress_rules            = local.ec2_egress_rules
+  lb_tg_arn                   = module.alb.target_group_arn
+  tags_common                 = local.tags
+  appscaling_min_capacity     = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity     = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold   = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold   = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  ecs_target_capacity         = local.ecs_target_capacity
+  ec2_instance_warmup_period  = local.application_data.accounts[local.environment].ec2_instance_warmup_period
+  log_group_kms_key           = aws_kms_key.cloudwatch_logs_key.arn
+  environment                 = local.environment
+  database_admin_password_arn = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
 
 }
