@@ -1,6 +1,10 @@
 locals {
   operational_db_jdbc_connection_string = "jdbc:postgresql://${module.aurora_operational_db.rds_cluster_endpoints["static"]}:${local.operational_db_port}/${local.operational_db_default_database}"
   nomis_jdbc_connection_string          = "jdbc:oracle:thin:@${local.nomis_host}:${local.nomis_port}/${local.nomis_service_name}"
+  dps_activities_endpoint               = jsondecode(data.aws_secretsmanager_secret_version.dps_activities.secret_string)["endpoint"]
+  dps_activities_port                   = jsondecode(data.aws_secretsmanager_secret_version.dps_activities.secret_string)["port"]
+  dps_activities_database               = jsondecode(data.aws_secretsmanager_secret_version.dps_activities.secret_string)["db_name"]
+  dps_activities_connection_string      = "jdbc:postgresql://${local.dps_activities_endpoint}:${local.dps_activities_port}/${local.dps_activities_database}"
 }
 
 # Operational DataStore
@@ -32,6 +36,25 @@ resource "aws_glue_connection" "glue_nomis_connection" {
     JDBC_CONNECTION_URL    = local.nomis_jdbc_connection_string
     JDBC_DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver"
     SECRET_ID              = data.aws_secretsmanager_secret.nomis.name
+  }
+
+  physical_connection_requirements {
+    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
+    subnet_id              = data.aws_subnet.private_subnets_a.id
+  }
+}
+
+# DPS Activities
+resource "aws_glue_connection" "glue_dps_activities_connection" {
+  count           = local.create_glue_connection ? 1 : 0
+  name            = "${local.project}-dps-actvities-connection"
+  connection_type = "JDBC"
+
+  connection_properties = {
+    JDBC_CONNECTION_URL    = local.dps_activities_connection_string
+    JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
+    SECRET_ID              = data.aws_secretsmanager_secret.dps_activities.name
   }
 
   physical_connection_requirements {

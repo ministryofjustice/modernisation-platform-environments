@@ -42,6 +42,19 @@ data "aws_secretsmanager_secret_version" "datamart" {
   depends_on = [aws_secretsmanager_secret.redshift]
 }
 
+# Source DPS Activities Secrets
+data "aws_secretsmanager_secret" "dps_activities" {
+  name = "external/dpr-dps-activities-source-secrets"
+
+  depends_on = [aws_secretsmanager_secret_version.dps]
+}
+
+data "aws_secretsmanager_secret_version" "dps_activities" {
+  secret_id = data.aws_secretsmanager_secret.dps_activities.id
+
+  depends_on = [aws_secretsmanager_secret.dps]
+}
+
 # AWS _IAM_ Policy
 data "aws_iam_policy" "rds_full_access" {
   #checkov:skip=CKV_AWS_275:Disallow policies from using the AWS AdministratorAccess policy
