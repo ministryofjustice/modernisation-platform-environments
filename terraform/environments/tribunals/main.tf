@@ -693,3 +693,51 @@ module "ftp_admin_appeals" {
   target_group_arns                 = local.target_group_arns
   target_group_arns_sftp            = local.target_group_arns_sftp
 }
+
+resource "aws_security_group" "nginx_lb_sg" {
+  count       = local.is-production ? 1 : 0
+  name        = "nginx-lb-sg"
+  description = "Allow all web access to nginx load balancer"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+module "nginx" {
+  count               = local.is-production ? 1 : 0
+  source              = "./modules/nginx_ec2_pair"
+  nginx_lb_sg_id      = aws_security_group.nginx_lb_sg[0].id
+  vpc_shared_id       = data.aws_vpc.shared.id
+  public_subnets_a_id = data.aws_subnet.public_subnets_a.id
+  public_subnets_b_id = data.aws_subnet.public_subnets_b.id
+  environment         = local.environment
+}
+
+module "nginx_load_balancer" {
+  count                         = local.is-production ? 1 : 0
+  source                        = "./modules/nginx_load_balancer"
+  nginx_lb_sg_id                = aws_security_group.nginx_lb_sg[0].id
+  nginx_instance_ids            = module.nginx[0].instance_ids
+  subnets_shared_public_ids     = data.aws_subnets.shared-public.ids
+  vpc_shared_id                 = data.aws_vpc.shared.id
+  external_acm_cert_arn         = aws_acm_certificate.external.arn
+}

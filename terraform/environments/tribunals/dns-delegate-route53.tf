@@ -83,8 +83,8 @@ resource "aws_route53_record" "nginx_instances" {
   type     = "A"
 
   alias {
-    name                   = "tribunals-nginx-1184258455.eu-west-1.elb.amazonaws.com."
-    zone_id                = "Z32O12XQLNTSW2"
+    name                   = module.nginx_load_balancer[0].nginx_lb_arn
+    zone_id                = module.nginx_load_balancer[0].nginx_lb_zone_id
     evaluate_target_health = false
   }
 }
@@ -106,6 +106,7 @@ resource "aws_route53_record" "www_instances" {
 
 #  The root www resource record needs its own resource to avoid breaking the logic of using the substring in www_instances
 resource "aws_route53_record" "www_root" {
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id  = local.production_zone_id
   name     = "www"
@@ -118,7 +119,7 @@ resource "aws_route53_record" "www_root" {
   }
 }
 
-# TXT validation record
+# TXT validation records
 resource "aws_route53_record" "txt_instance" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
@@ -127,4 +128,14 @@ resource "aws_route53_record" "txt_instance" {
   type     = "TXT"
   ttl      = 300
   records  = ["asvdns_7665450b-1d2a-41de-a8b7-c7a89c63c6b5"]
+}
+
+resource "aws_route53_record" "txt_instance_2" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = local.production_zone_id
+  name     = "_dmarc.tribunals.gov.uk"
+  type     = "TXT"
+  ttl      = 300
+  records  = ["v=DMARC1\\;p=reject\\;sp=reject\\;rua=mailto:dmarc-rua@dmarc.service.gov.uk\\;"]
 }
