@@ -38,7 +38,7 @@ resource "aws_security_group_rule" "dms_tcp_outbound" {
   for_each          = toset(var.sqlserver_https_ports)
   type              = "egress"
   security_group_id = aws_security_group.dms_ri_security_group.id
-  cidr_blocks       = data.aws_ip_ranges.s3_ranges.cidr_blocks
+  cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
   protocol       = "tcp"
   from_port         = each.value
   to_port           = each.value
