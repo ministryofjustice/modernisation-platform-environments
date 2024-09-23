@@ -34,47 +34,43 @@ resource "aws_s3_bucket_policy" "dms_dv_parquet_s3_bucket" {
 
 # -------------------------------------------------------------------
 
-resource "aws_s3_bucket" "dms_dv_glue_job_s3_bucket" {
-  bucket_prefix = "glue-jobs-py-scripts-"
-}
-
 resource "aws_s3_object" "dms_dv_rds_and_s3_parquet_write_v2" {
-  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_rds_and_s3_parquet_write_v2.py"
   source = "glue-job/dms_dv_rds_and_s3_parquet_write_v2.py"
   etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v2.py")
 }
 
 resource "aws_s3_object" "dms_dv_rds_and_s3_parquet_write_v4d" {
-  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_rds_and_s3_parquet_write_v4d.py"
   source = "glue-job/dms_dv_rds_and_s3_parquet_write_v4d.py"
   etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v4d.py")
 }
 
 resource "aws_s3_object" "rds_to_s3_parquet_migration_monthly" {
-  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "rds_to_s3_parquet_migration_monthly.py"
   source = "glue-job/rds_to_s3_parquet_migration_monthly.py"
   etag   = filemd5("glue-job/rds_to_s3_parquet_migration_monthly.py")
 }
 
 resource "aws_s3_object" "rds_to_s3_parquet_migration" {
-  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "rds_to_s3_parquet_migration.py"
   source = "glue-job/rds_to_s3_parquet_migration.py"
   etag   = filemd5("glue-job/rds_to_s3_parquet_migration.py")
 }
 
 resource "aws_s3_object" "resizing_parquet_files" {
-  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "resizing_parquet_files.py"
   source = "glue-job/resizing_parquet_files.py"
   etag   = filemd5("glue-job/resizing_parquet_files.py")
 }
 
 resource "aws_s3_object" "create_or_replace_dv_table" {
-  bucket = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+  bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "create_or_replace_dv_table.py"
   source = "glue-job/create_or_replace_dv_table.py"
   etag   = filemd5("glue-job/create_or_replace_dv_table.py")
@@ -124,7 +120,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
   worker_type       = "G.1X"
   number_of_workers = 8
   default_arguments = {
-    "--script_bucket_name"                = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--script_bucket_name"                = module.s3-glue-job-script-bucket.bucket.id
     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
     "--rds_sqlserver_db"                  = ""
@@ -159,7 +155,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_parquet_write_v2.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_and_s3_parquet_write_v2.py"
   }
 
   tags = merge(
@@ -174,7 +170,7 @@ EOF
 
 # "--enable-spark-ui"                   = "false"
 # "--spark-ui-event-logs-path"          = "false"
-# "--spark-event-logs-path"             = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/spark_logs/"
+# "--spark-event-logs-path"             = "s3://${module.s3-glue-job-script-bucket.bucket.id}/spark_logs/"
 
 
 resource "aws_glue_job" "dms_dv_glue_job_v4d" {
@@ -185,7 +181,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v4d" {
   worker_type       = "G.2X"
   number_of_workers = 5
   default_arguments = {
-    "--script_bucket_name"                = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--script_bucket_name"                = module.s3-glue-job-script-bucket.bucket.id
     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
     "--prq_leftanti_join_rds"             = "false"
@@ -220,7 +216,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/dms_dv_rds_and_s3_parquet_write_v4d.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_and_s3_parquet_write_v4d.py"
   }
 
   tags = merge(
@@ -241,7 +237,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
   worker_type       = "G.1X"
   number_of_workers = 5
   default_arguments = {
-    "--script_bucket_name"                   = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--script_bucket_name"                   = module.s3-glue-job-script-bucket.bucket.id
     "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                           = aws_db_instance.database_2022.password
     "--rds_sqlserver_db"                     = ""
@@ -287,7 +283,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/rds_to_s3_parquet_migration.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_migration.py"
   }
 
   tags = merge(
@@ -309,7 +305,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
   worker_type       = "G.1X"
   number_of_workers = 5
   default_arguments = {
-    "--script_bucket_name"               = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
     "--rds_sqlserver_db"                 = ""
@@ -342,7 +338,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/rds_to_s3_parquet_migration_monthly.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_migration_monthly.py"
   }
 
   tags = merge(
@@ -363,7 +359,7 @@ resource "aws_glue_job" "resizing_parquet_files" {
   worker_type       = "G.1X"
   number_of_workers = 5
   default_arguments = {
-    "--script_bucket_name"               = aws_s3_bucket.dms_dv_glue_job_s3_bucket.id
+    "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
     "--s3_prq_read_db_folder"            = ""
     "--s3_prq_read_db_schema_folder"     = "dbo"
     "--s3_prq_read_table_folder"         = ""
@@ -397,7 +393,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/resizing_parquet_files.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/resizing_parquet_files.py"
   }
 
   tags = merge(
@@ -428,7 +424,7 @@ resource "aws_glue_job" "catalog_dv_table_glue_job" {
   }
   command {
     python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.dms_dv_glue_job_s3_bucket.id}/create_or_replace_dv_table.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/create_or_replace_dv_table.py"
   }
 
   tags = merge(
