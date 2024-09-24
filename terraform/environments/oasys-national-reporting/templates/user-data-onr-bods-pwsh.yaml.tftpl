@@ -7,16 +7,6 @@ tasks:
   - task: initializeVolume
     inputs:
         initialize: all
-        devices:
-          - name: Temp
-            letter: D
-            partition: gpt
-          - name: Storage
-            letter: F
-            partition: gpt
-          - name: App
-            letter: E
-            partition: gpt
   - task: executeScript
     inputs:
       - frequency: once
