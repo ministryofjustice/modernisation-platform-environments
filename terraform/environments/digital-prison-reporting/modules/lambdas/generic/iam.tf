@@ -14,6 +14,8 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 }
 
 data "aws_iam_policy_document" "lambda_execution" {
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions. TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+  
   statement {
     resources = [
       "arn:aws:logs:eu-west-2:*:*"
