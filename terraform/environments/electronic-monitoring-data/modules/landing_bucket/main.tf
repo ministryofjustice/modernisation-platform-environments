@@ -76,15 +76,8 @@ locals {
 
 resource "aws_iam_role" "supplier_put_access" {
   name = "supplier-put-${var.data_feed}-${var.order_type}-landing-bucket"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect    = "Allow",
-        Action    = "sts:AssumeRole",
-        Principal = { "AWS" : "arn:aws:iam::${local.supplier_account_id}:root" }
-    }]
-  })
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  managed_policy_arns = [aws_iam_policy.supplier_put_access.arn]
 
   tags = merge(
     var.local_tags,
@@ -93,9 +86,14 @@ resource "aws_iam_role" "supplier_put_access" {
   )
 }
 
-resource "aws_iam_role_policy_attachment" "supplier_put_access" {
-  role       = aws_iam_role.supplier_put_access.name
-  policy_arn = aws_iam_policy.supplier_put_access.arn
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.supplier_account_id}:root"]
+    }
+  }
 }
 
 resource "aws_iam_policy" "supplier_put_access" {
