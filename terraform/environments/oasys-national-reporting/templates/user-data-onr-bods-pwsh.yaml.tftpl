@@ -8,22 +8,18 @@ tasks:
     inputs:
         initialize: devices
         devices:
-          - device: xvdg
+          - device: /dev/xvdg
             name: Temp
             letter: D
             partition: gpt
-          - device: xvdj
+          - device: /dev/xvdj
             name: App
             letter: E
             partition: gpt
-          - device: xvdi
+          - device: /dev/xvdi
             name: Storage
             letter: F
             partition: gpt
-  - task: setHostName
-    inputs:
-      hostName: "${hostname}"
-      reboot: true
   - task: executeScript
     inputs:
       - frequency: once
