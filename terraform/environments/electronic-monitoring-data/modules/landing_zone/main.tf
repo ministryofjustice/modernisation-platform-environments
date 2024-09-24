@@ -35,7 +35,7 @@ module "landing-bucket" {
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
     # Platform team to add a new provider for the additional Region.
     # Leave this provider block in even if you are not using replication
-    aws.bucket-replication = var.provider
+    aws.bucket-replication = var.default_provider
   }
   versioning_enabled  = false
   lifecycle_rule      = [
