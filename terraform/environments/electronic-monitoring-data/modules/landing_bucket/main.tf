@@ -8,7 +8,7 @@ terraform {
   required_version = "~> 1.0"
 }
 
-module "this" {
+module "this-bucket" {
   source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${var.local_bucket_prefix}-land-${var.data_feed}-${var.order_type}-"
@@ -62,8 +62,8 @@ module "this" {
 }
 
 resource "aws_s3_bucket_policy" "supplier_put_access" {
-  bucket = module.this.bucket.id
-  policy = data.aws_iam_policy_document.allow_access_from_another_account.json
+  bucket = module.this-bucket.bucket.id
+  policy = data.aws_iam_policy_document.supplier_put_access.json
 }
 
 data "aws_iam_policy_document" "supplier_put_access" {
@@ -78,7 +78,7 @@ data "aws_iam_policy_document" "supplier_put_access" {
     ]
 
     resources = [
-      "${module.this.bucket.arn}/*",
+      "${module.this-bucket.bucket.arn}/*",
     ]
   }
 }

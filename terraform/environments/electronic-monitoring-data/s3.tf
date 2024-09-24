@@ -552,6 +552,10 @@ module "s3-fms-general-landing-bucket" {
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
   supplier_account_id = 123
+
+  providers = {
+    aws = aws
+  }
 }
 
 module "s3-fms-specials-landing-bucket" {
@@ -563,6 +567,10 @@ module "s3-fms-specials-landing-bucket" {
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"
   supplier_account_id = 123
+
+  providers = {
+    aws = aws
+  }
 }
 
 # ------------------------------------------------------------------------
@@ -578,6 +586,10 @@ module "s3-mdss-general-landing-bucket" {
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
   supplier_account_id = 123
+
+  providers = {
+    aws = aws
+  }
 }
 
 module "s3-mdss-ho-landing-bucket" {
@@ -589,6 +601,10 @@ module "s3-mdss-ho-landing-bucket" {
   logging_bucket = module.s3-logging-bucket
   order_type = "ho"
   supplier_account_id = 123
+
+  providers = {
+    aws = aws
+  }
 }
 
 module "s3-mdss-specials-landing-bucket" {
@@ -600,6 +616,10 @@ module "s3-mdss-specials-landing-bucket" {
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"
   supplier_account_id = 123
+
+  providers = {
+    aws = aws
+  }
 }
 
 # ------------------------------------------------------------------------
