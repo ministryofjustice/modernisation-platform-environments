@@ -4,27 +4,17 @@ resource "aws_s3_bucket_notification" "data_store" {
   bucket = module.s3-data-bucket.bucket.id
 
   # Only for copy events as those are events triggered by data being copied
-  # from landing bucket.
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.calculate_checksum_lambda.arn
-    events = [
-      "s3:ObjectCreated:*"
-    ]
-  }
-
-  # Only for copy events as those are events triggered by data being copied
   #  from landing bucket.
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.summarise_zip_lambda.arn
+  topic {
+    topic_arn = aws_sns_topic.s3_events.arn
     events              = [
       "s3:ObjectCreated:*"
     ]
   }
+}
 
-  depends_on = [
-    aws_lambda_permission.s3_allow_calculate_checksum_lambda,
-    aws_lambda_permission.s3_allow_summarise_zip_lambda,
-  ]
+resource "aws_sns_topic" "s3_events" {
+  name = "${module.s3-data-bucket.bucket.id}-object-created-topic"
 }
 
 #------------------------------------------------------------------------------
@@ -92,12 +82,9 @@ resource "aws_iam_role_policy" "calculate_checksum_lambda" {
   policy = data.aws_iam_policy_document.calculate_checksum_lambda.json
 }
 
-resource "aws_lambda_permission" "s3_allow_calculate_checksum_lambda" {
-  statement_id  = "AllowCalculateChecksumExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.calculate_checksum_lambda.arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-data-bucket.bucket.arn
+resource "aws_lambda_event_source_mapping" "checksum_lambda" {
+  event_source_arn = aws_sns_topic.s3_events.arn
+  function_name    = aws_lambda_function.calculate_checksum_lambda.arn
 }
 
 #------------------------------------------------------------------------------
@@ -148,10 +135,7 @@ resource "aws_iam_role_policy" "summarise_zip_lambda" {
   policy = data.aws_iam_policy_document.summarise_zip_lambda.json
 }
 
-resource "aws_lambda_permission" "s3_allow_summarise_zip_lambda" {
-  statement_id  = "AllowSummariseZipExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.summarise_zip_lambda.arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-data-bucket.bucket.arn
+resource "aws_lambda_event_source_mapping" "zip_lambda" {
+  event_source_arn = aws_sns_topic.s3_events.arn
+  function_name    = aws_lambda_function.summarise_zip_lambda.arn
 }
