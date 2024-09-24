@@ -19,19 +19,24 @@ resource "aws_sns_topic" "s3_events" {
 
 resource "aws_sns_topic_policy" "s3_events_policy" {
   arn = aws_sns_topic.s3_events.arn
-  policy = statement {
-    effect = "Allow"
-    principals {
-      "s3.amazonaws.com"
-    }
-    actions = ["SNS:Publish"]
-    resources = [aws_sns_topic.s3_events.arn]
-    condition {
-      test = "ArnLike"
-      variable = "aws:SourceArn" 
-      values = [module.s3-data-bucket.bucket.arn]
-    }
-  }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "s3.amazonaws.com"
+        }
+        Action   = "SNS:Publish"
+        Resource = aws_sns_topic.s3_events.arn
+        Condition = {
+          ArnLike = {
+            "aws:SourceArn" = module.s3-data-bucket.bucket.arn
+          }
+        }
+      }
+    ]
+  })
 }
 
 #------------------------------------------------------------------------------
