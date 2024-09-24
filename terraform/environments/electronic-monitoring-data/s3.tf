@@ -492,167 +492,63 @@ module "s3-data-bucket" {
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
   })
-  log_prefix                = "logs/${local.bucket_prefix}-data/"
-  log_partition_date_source = "EventTime"
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
+# ------------------------------------------------------------------------
+# Landing buckets FMS
+# ------------------------------------------------------------------------
 
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
+module "s3-fms-general-landing-bucket" {
+  source = "./modules/landing_zone/"
 
-      transition = [
-        {
-          days          = 183
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 730
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 10000
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
-    }
-  ]
-
-  tags = local.tags
+  data_feed = "fms"
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "general"
+  supplier_account_id = 123
 }
 
-# ------------------------------------------------------------------------
-# Landing bucket FMS
-# ------------------------------------------------------------------------
+module "s3-fms-specials-landing-bucket" {
+  source = "./modules/landing_zone/"
 
-module "s3-fms-landing-bucket" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
-  for_each = local.live_feed_levels
-
-  bucket_prefix      = "${local.bucket_prefix}-land-fms-${each.key}-"
-  versioning_enabled = true
-
-  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
-  ownership_controls = "BucketOwnerEnforced"
-  acl                = "private"
-
-  # Refer to the below section "Replication" before enabling replication
-  replication_enabled = false
-  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
-  # replication_region                       = "eu-west-2"
-  providers = {
-    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
-    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
-    # Platform team to add a new provider for the additional Region.
-    # Leave this provider block in even if you are not using replication
-    aws.bucket-replication = aws
-  }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-land-fms-${each.key}/"
-  log_partition_date_source = "EventTime"
-
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      expiration = {
-        days = 7
-      }
-    }
-  ]
-
-  tags = merge(
-    local.tags,
-    { type = each.value }
-  )
+  data_feed = "fms"
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "specials"
+  supplier_account_id = 123
 }
 
 # ------------------------------------------------------------------------
 # Landing bucket MDSS
 # ------------------------------------------------------------------------
 
-module "s3-mdss-landing-bucket" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+module "s3-mdss-general-landing-bucket" {
+  source = "./modules/landing_zone/"
 
-  for_each = local.live_feed_levels
+  data_feed = "mdss"
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "general"
+  supplier_account_id = 123
+}
 
-  bucket_prefix      = "${local.bucket_prefix}-land-mdss-${each.key}-"
-  versioning_enabled = true
+module "s3-mdss-ho-landing-bucket" {
+  source = "./modules/landing_zone/"
 
-  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
-  ownership_controls = "BucketOwnerEnforced"
-  acl                = "private"
+  data_feed = "mdss"
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "ho"
+  supplier_account_id = 123
+}
 
-  # Refer to the below section "Replication" before enabling replication
-  replication_enabled = false
-  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
-  # replication_region                       = "eu-west-2"
-  providers = {
-    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
-    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
-    # Platform team to add a new provider for the additional Region.
-    # Leave this provider block in even if you are not using replication
-    aws.bucket-replication = aws
-  }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-land-mdss-${each.key}/"
-  log_partition_date_source = "EventTime"
+module "s3-mdss-specials-landing-bucket" {
+  source = "./modules/landing_zone/"
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      expiration = {
-        days = 7
-      }
-    }
-  ]
-
-  tags = merge(
-    local.tags,
-    { type = each.value }
-  )
+  data_feed = "mdss"
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "specials"
+  supplier_account_id = 123
 }
 
 # ------------------------------------------------------------------------
