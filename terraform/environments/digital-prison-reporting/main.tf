@@ -611,10 +611,10 @@ module "glue_s3_data_reconciliation_job" {
     aws_glue_connection.glue_operational_datastore_connection[0].name,
     aws_glue_connection.glue_nomis_connection[0].name
   ], aws_glue_connection.glue_dps_connection[*].name) : []
-  additional_secret_arns = merge([
+  additional_secret_arns = concat([
     aws_secretsmanager_secret.operational_db_secret.arn,
     aws_secretsmanager_secret.nomis.arn
-  ], tolist(aws_secretsmanager_secret.dps[*].arn))
+  ], aws_secretsmanager_secret.dps[*].arn)
 
   tags = merge(
     local.all_tags,
