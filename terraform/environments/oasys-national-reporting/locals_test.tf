@@ -181,11 +181,11 @@ locals {
               hostname = "t2-onr-bods-1-b" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
             }
           ))
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
         })
-        instance = merge(local.ec2_autoscaling_groups.bods.instance, {
+        instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
         cloudwatch_metric_alarms = null
@@ -206,11 +206,11 @@ locals {
       #         hostname = "t2-onr-bods-2-a" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
       #       }
       #     ))
-      #     instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
       #       "Ec2SecretPolicy",
       #     ])
       #   })
-      #   instance = merge(local.ec2_autoscaling_groups.bods.instance, {
+      #   instance = merge(local.ec2_instances.bods.instance, {
       #     instance_type = "m4.xlarge"
       #   })
       #   cloudwatch_metric_alarms = null
