@@ -492,6 +492,51 @@ module "s3-data-bucket" {
     "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
     "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
   })
+  log_prefix                = "logs/${local.bucket_prefix}-data/"
+  log_partition_date_source = "EventTime"
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 183
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 730
+          storage_class = "GLACIER"
+        }
+      ]
+
+      expiration = {
+        days = 10000
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 30
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 90
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 365
+      }
+    }
+  ]
+
+  tags = local.tags
 }
 
 # ------------------------------------------------------------------------
