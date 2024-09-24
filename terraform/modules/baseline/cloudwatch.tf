@@ -26,12 +26,13 @@ locals {
 }
 
 module "cloudwatch_dashboard" {
-  for_each = merge(var.cloudwatch_dashboards, local.ec2_cloudwatch_dashboards)
+  for_each = var.cloudwatch_dashboards
 
   source = "../../modules/cloudwatch_dashboard"
 
   dashboard_name = each.key
   accountId      = lookup(each.value, "account_name", null) == null ? null : var.environment.account_ids[lookup(each.value, "account_name", null)]
+  ec2_instances  = module.ec2_instance
   periodOverride = lookup(each.value, "periodOverride", null)
   start          = lookup(each.value, "start", null)
   widget_groups  = lookup(each.value, "widget_groups", [])

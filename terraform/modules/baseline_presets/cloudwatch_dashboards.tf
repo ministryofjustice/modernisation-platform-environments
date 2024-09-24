@@ -16,17 +16,13 @@ locals {
       cpu-utilization-high = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2.cpu-utilization-high.threshold
-        expression      = ""
-        metric          = ""
+        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"CPUUtilization\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 cpu-utilization-high"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"CPUUtilization\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }]
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -38,15 +34,13 @@ locals {
       instance-status-check-failed = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"StatusCheckFailed_Instance\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 instance-status-check-failed"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"StatusCheckFailed_Instance\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -58,15 +52,13 @@ locals {
       system-status-check-failed = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"StatusCheckFailed_System\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 system-status-check-failed"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"StatusCheckFailed_System\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -81,15 +73,13 @@ locals {
       free-disk-space-low = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_windows.free-disk-space-low.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"DISK_FREE\"','Minimum'),MIN,ASC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Windows free-disk-space-low"
           stat    = "Minimum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"DISK_FREE\"','Minimum'),MIN,ASC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -101,15 +91,13 @@ locals {
       high-memory-usage = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_windows.high-memory-usage.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"Memory % Committed Bytes In Use\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Windows high-memory-usage"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"Memory % Committed Bytes In Use\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -124,15 +112,13 @@ locals {
       free-disk-space-low = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_linux.free-disk-space-low.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Linux free-disk-space-low"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -144,15 +130,13 @@ locals {
       high-memory-usage = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_linux.high-memory-usage.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"mem_used_percent\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Linux high-memory-usage"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"mem_used_percent\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -164,15 +148,13 @@ locals {
       cpu-iowait-high = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_linux.cpu-iowait-high.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"cpu_usage_iowait\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Linux cpu-iowait-high"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"cpu_usage_iowait\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -186,15 +168,13 @@ locals {
       free-disk-space-low = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_linux.free-disk-space-low.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,device,fstype,name,path,server_type} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Instance Linux free-disk-space-low"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,device,fstype,name,path,server_type} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -208,15 +188,13 @@ locals {
       free-disk-space-low = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_linux.free-disk-space-low.threshold
+        expression      = "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,device,fstype,name,path,server_type} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Autoscaling Group free-disk-space-low"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,device,fstype,name,path,server_type} MetricName=\"disk_used_percent\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -231,15 +209,13 @@ locals {
       service-status-error-os-layer = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_service_status_os_value\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 Instance service-status-error-os-layer"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_service_status_os_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -253,15 +229,13 @@ locals {
       service-status-error-os-layer = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,type,type_instance} MetricName=\"collectd_service_status_os_value\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 Autoscaling Group service-status-error-os-layer"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,type,type_instance} MetricName=\"collectd_service_status_os_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -275,15 +249,13 @@ locals {
       service-status-error-app-layer = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_service_status_app_value\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 Instance service-status-error-app-layer"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_service_status_app_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -297,15 +269,13 @@ locals {
       service-status-error-app-layer = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,type,type_instance} MetricName=\"collectd_service_status_app_value\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 Autoscaling Group service-status-error-app-layer"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,type,type_instance} MetricName=\"collectd_service_status_app_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -319,15 +289,13 @@ locals {
       connectivity-test-all-failed = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_connectivity_test_value\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 Instance connectivity-test-all-failed"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_connectivity_test_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -341,15 +309,13 @@ locals {
       textfile-monitoring-metric-error = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_value\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 Instance textfile-monitoring-metric-error"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -361,15 +327,13 @@ locals {
       textfile-monitoring-metric-not-updated = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_seconds\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Instance textfile-monitoring-metric-not-updated"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_seconds\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -384,15 +348,13 @@ locals {
       oracle-db-disconnected = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_oracle_db_connected_value\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 oracle-db-disconnected"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_oracle_db_connected_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -406,15 +368,13 @@ locals {
       oracle-db-rman-backup-error = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_rman_backup_value\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 oracle-db-rman-backup-error"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_rman_backup_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -426,15 +386,13 @@ locals {
       oracle-db-rman-backup-did-not-run = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_rman_backup_seconds\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 oracle-db-rman-backup-did-not-run"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_rman_backup_seconds\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -448,15 +406,13 @@ locals {
       filesystems-check-error = {
         type            = "metric"
         alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_filesystems_check_value\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 Instance filesystems-check-error"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_filesystems_check_value\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -468,15 +424,13 @@ locals {
       filesystems-check-metric-not-updated = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_filesystems_check_seconds\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Instance filesystems-check-metric-not-updated"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_filesystems_check_seconds\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -489,16 +443,14 @@ locals {
 
     lb = {
       load-balancer-requests = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"RequestCount\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "ALB load-balancer-requests"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"RequestCount\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -508,16 +460,14 @@ locals {
         }
       }
       load-balancer-http-4XXs = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"HTTPCode_ELB_4XX_Count\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "ALB load-balancer-http-4XXs"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"HTTPCode_ELB_4XX_Count\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -527,16 +477,14 @@ locals {
         }
       }
       load-balancer-http-5XXs = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"HTTPCode_ELB_5XX_Count\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "ALB load-balancer-http-5XXs"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"HTTPCode_ELB_5XX_Count\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -546,16 +494,14 @@ locals {
         }
       }
       load-balancer-target-group-requests = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"RequestCount\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "ALB load-balancer-target-group-requests"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"RequestCount\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -565,16 +511,14 @@ locals {
         }
       }
       load-balancer-target-group-http-4XXs = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"HTTPCode_Target_4XX_Count\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "ALB load-balancer-target-group-http-4XXs"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"HTTPCode_Target_4XX_Count\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -584,16 +528,14 @@ locals {
         }
       }
       load-balancer-target-group-http-5XXs = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"HTTPCode_Target_5XX_Count\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "ALB load-balancer-target-group-http-5XXs"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"HTTPCode_Target_5XX_Count\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -603,16 +545,14 @@ locals {
         }
       }
       load-balancer-active-connections = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"ActiveConnectionCount\"','Average'),AVG,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "ALB load-balancer-active-connections"
           stat    = "Average"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"ActiveConnectionCount\"','Average'),AVG,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -622,16 +562,14 @@ locals {
         }
       }
       load-balancer-new-connections = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"NewConnectionCount\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "ALB load-balancer-new-connections"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"NewConnectionCount\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -641,16 +579,14 @@ locals {
         }
       }
       load-balancer-target-connection-errors = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"TargetConnectionErrorCount\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "ALB load-balancer-target-connection-errors"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"TargetConnectionErrorCount\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -661,6 +597,7 @@ locals {
       }
       unhealthy-load-balancer-host = {
         type            = "metric"
+        expression      = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"UnHealthyHostCount\"','Maximum'),MAX,DESC)"
         alarm_threshold = local.cloudwatch_metric_alarms.lb.unhealthy-load-balancer-host.threshold
         properties = {
           view    = "timeSeries"
@@ -668,9 +605,6 @@ locals {
           region  = "eu-west-2"
           title   = "ALB unhealthy-load-balancer-host"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"UnHealthyHostCount\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -680,16 +614,14 @@ locals {
         }
       }
       load-balancer-target-response-time = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"TargetResponseTime\"','Average'),AVG,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "load-balancer-target-response-time"
           stat    = "Average"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"TargetResponseTime\"','Average'),AVG,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -702,16 +634,14 @@ locals {
 
     network_lb = {
       load-balancer-unhealthy-host-count = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,TargetGroup} MetricName=\"UnHealthyHostCount\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "NLB unhealthy-host-count"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,TargetGroup} MetricName=\"UnHealthyHostCount\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -721,16 +651,14 @@ locals {
         }
       }
       load-balancer-active-flow-count = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ActiveFlowCount\"','Average'),AVG,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "NLB active-flow-count"
           stat    = "Average"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ActiveFlowCount\"','Average'),AVG,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -740,16 +668,14 @@ locals {
         }
       }
       load-balancer-new-flow-count = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"NewFlowCount\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "NLB new-flow-count"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"NewFlowCount\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -759,16 +685,14 @@ locals {
         }
       }
       load-balancer-peak-packets-per-second = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"PeakPacketsPerSecond\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "NLB peak-packets-per-second"
           stat    = "Maximum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"PeakPacketsPerSecond\"','Maximum'),MAX,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -778,16 +702,14 @@ locals {
         }
       }
       load-balancer-processed-bytes = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedBytes\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "NLB processed-bytes"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedBytes\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
@@ -797,16 +719,14 @@ locals {
         }
       }
       load-balancer-processed-packets = {
-        type = "metric"
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedPackets\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "NLB processed-packets"
           stat    = "Sum"
-          metrics = [
-            [{ "expression" : "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedPackets\"','Sum'),SUM,DESC)", "label" : "", "id" : "q1" }],
-          ]
           yAxis = {
             left = {
               showUnits = false,
