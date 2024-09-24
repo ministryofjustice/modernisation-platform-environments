@@ -547,6 +547,7 @@ module "s3-fms-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
   data_feed = "fms"
+  local_bucket_prefix = local.bucket_prefix
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
@@ -557,6 +558,7 @@ module "s3-fms-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
   data_feed = "fms"
+  local_bucket_prefix = local.bucket_prefix
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"
@@ -571,6 +573,7 @@ module "s3-mdss-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
   data_feed = "mdss"
+  local_bucket_prefix = local.bucket_prefix
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
@@ -581,6 +584,7 @@ module "s3-mdss-ho-landing-bucket" {
   source = "./modules/landing_bucket/"
 
   data_feed = "mdss"
+  local_bucket_prefix = local.bucket_prefix
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "ho"
@@ -591,6 +595,7 @@ module "s3-mdss-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
   data_feed = "mdss"
+  local_bucket_prefix = local.bucket_prefix
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"

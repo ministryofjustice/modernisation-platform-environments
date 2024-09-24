@@ -1,7 +1,7 @@
 module "this" {
   source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
-  bucket_prefix      = "${local.bucket_prefix}-land-${var.data_feed}-${var.order_type}-"
+  bucket_prefix      = "${var.local_bucket_prefix}-land-${var.data_feed}-${var.order_type}-"
   versioning_enabled = false
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -24,7 +24,7 @@ module "this" {
     "log_bucket_arn" : var.logging_bucket.bucket.arn,
     "log_bucket_policy" : var.logging_bucket.bucket_policy.policy,
   })
-  log_prefix                = "logs/${local.bucket_prefix}-land-${var.data_feed}-${var.order_type}/"
+  log_prefix                = "logs/${var.local_bucket_prefix}-land-${var.data_feed}-${var.order_type}/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
