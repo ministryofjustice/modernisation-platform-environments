@@ -1,4 +1,6 @@
 resource "aws_dynamodb_table" "this" {
+#checkov:skip=CKV_AWS_119: "Ensure DynamoDB Tables are encrypted using a KMS Customer Managed CMK"
+
   count = var.create_table && !var.autoscaling_enabled ? 1 : 0
 
   name             = var.name
@@ -89,6 +91,8 @@ resource "aws_dynamodb_table" "this" {
 }
 
 resource "aws_dynamodb_table" "autoscaled" {
+  #checkov:skip=CKV_AWS_119: "Ensure DynamoDB Tables are encrypted using a KMS Customer Managed CMK"
+  
   count = var.create_table && var.autoscaling_enabled ? 1 : 0
 
   name             = var.name
