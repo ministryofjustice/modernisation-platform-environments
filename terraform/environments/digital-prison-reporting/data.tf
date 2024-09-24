@@ -47,7 +47,7 @@ data "aws_secretsmanager_secret" "dps" {
   for_each = toset(local.dps_domains_list)
   name     = "external/${local.project}-${each.value}-source-secrets"
 
-  depends_on = [aws_secretsmanager_secret_version.dps[each.value]]
+  depends_on = [aws_secretsmanager_secret_version.dps]
 }
 
 data "aws_secretsmanager_secret_version" "dps" {
@@ -55,7 +55,7 @@ data "aws_secretsmanager_secret_version" "dps" {
 
   secret_id = data.aws_secretsmanager_secret.dps[each.value].id
 
-  depends_on = [aws_secretsmanager_secret.dps[each.value]]
+  depends_on = [aws_secretsmanager_secret.dps]
 }
 
 # AWS _IAM_ Policy
