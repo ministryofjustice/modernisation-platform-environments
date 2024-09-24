@@ -23,9 +23,13 @@ locals {
     "financeandtax.decisions",
     "immigrationservices.decisions",
     "informationrights.decisions",
-    "landregistrationdivision.decisions",
+    "landregistrationdivision.decisions", 
     "landschamber.decisions",
     "transportappeals.decisions"
+  ]
+
+  afd_records_migrated = [
+    "cicap.decisions"
   ]
 
   nginx_records = [
@@ -70,6 +74,17 @@ resource "aws_route53_record" "afd_instances" {
   type     = "CNAME"
   ttl      = 300
   records  = ["sdshmcts-prod-egd0dscwgwh0bpdq.z01.azurefd.net"]
+}
+
+# 'CNAME' records for all www legacy services which have been migrated to the Modernisation Platform
+resource "aws_route53_record" "afd_instances_migrated" {
+  count    = local.is-production ? length(local.afd_records_migrated) : 0
+  provider = aws.core-network-services
+  zone_id  = local.production_zone_id
+  name     = local.afd_records_migrated[count.index]
+  type     = "CNAME"
+  ttl      = 300
+  records  = [aws_lb.tribunals_lb.dns_name]
 }
 
 # 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
