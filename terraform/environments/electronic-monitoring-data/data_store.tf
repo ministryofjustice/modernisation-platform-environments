@@ -15,29 +15,30 @@ resource "aws_s3_bucket_notification" "data_store" {
 
 resource "aws_sns_topic" "s3_events" {
   name = "${module.s3-data-bucket.bucket.id}-object-created-topic"
+  policy = data.aws_iam_policy_document.sns_policy.json
 }
 
-resource "aws_sns_topic_policy" "s3_events_policy" {
-  arn = aws_sns_topic.s3_events.arn
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "s3.amazonaws.com"
-        }
-        Action   = "SNS:Publish"
-        Resource = aws_sns_topic.s3_events.arn
-        Condition = {
-          ArnLike = {
-            "aws:SourceArn" = module.s3-data-bucket.bucket.arn
-          }
-        }
-      }
-    ]
-  })
+# Define the IAM policy document for the SNS topic policy
+data "aws_iam_policy_document" "sns_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions   = ["SNS:Publish"]
+    resources = [aws_sns_topic.s3_events.arn]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [module.s3-data-bucket.bucket.arn]
+    }
+  }
 }
+
 
 #------------------------------------------------------------------------------
 # S3 lambda function to calculate data store file checksums
