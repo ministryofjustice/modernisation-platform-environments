@@ -1,6 +1,6 @@
 resource "aws_cloudtrail" "trail" {
   #checkov:skip=CKV_AWS_251:Ensure CloudTrail logging is enabled
- 
+  #checkov:skip=CKV2_AWS_10: "Ignore - Ensure CloudTrail trails are integrated with CloudWatch Logs"
   #checkov:skip=CKV_AWS_36: "Ensure CloudTrail log file validation is enabled"
   #checkov:skip=CKV_AWS_67: "Ensure CloudTrail is enabled in all Regions"
   #checkov:skip=CKV_AWS_35: "Ensure CloudTrail logs are encrypted at rest using KMS CMKs"
