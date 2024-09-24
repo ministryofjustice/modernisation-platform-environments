@@ -1,21 +1,21 @@
 locals {
   operational_db_jdbc_connection_string = "jdbc:postgresql://${module.aurora_operational_db.rds_cluster_endpoints["static"]}:${local.operational_db_port}/${local.operational_db_default_database}"
   nomis_jdbc_connection_string          = "jdbc:oracle:thin:@${local.nomis_host}:${local.nomis_port}/${local.nomis_service_name}"
-  dps_activities_endpoint               = [
+  dps_endpoint                          = [
     for item in toset(local.dps_domains_list) :
     jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["endpoint"]
   ]
-  dps_activities_port                   = [
+  dps_port = [
     for item in toset(local.dps_domains_list) :
     jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["port"]
   ]
-  dps_activities_database               = [
+  dps_database = [
     for item in toset(local.dps_domains_list) :
     jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["db_name"]
   ]
-  dps_connection_strings                = [
+  dps_connection_string = [
     for item in toset(local.dps_domains_list) :
-    "jdbc:postgresql://${local.dps_activities_endpoint[item]}:${local.dps_activities_port[item]}/${local.dps_activities_database[item]}"
+    "jdbc:postgresql://${local.dps_endpoint[item]}:${local.dps_port[item]}/${local.dps_database[item]}"
   ]
 }
 
@@ -57,14 +57,14 @@ resource "aws_glue_connection" "glue_nomis_connection" {
   }
 }
 
-# DPS Activities
+# All DPS connections
 resource "aws_glue_connection" "glue_dps_connection" {
   for_each        = local.create_glue_connection ? toset(local.dps_domains_list) : []
   name            = "${local.project}-${each.value}-connection"
   connection_type = "JDBC"
 
   connection_properties = {
-    JDBC_CONNECTION_URL    = local.dps_connection_strings[item]
+    JDBC_CONNECTION_URL    = local.dps_connection_string[each.value]
     JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
     SECRET_ID              = aws_secretsmanager_secret.dps[each.value].name
   }
