@@ -74,18 +74,33 @@ locals {
   supplier_account_id = jsondecode(data.aws_secretsmanager_secret_version.supplier_account_id.secret_string)["account_id"]
 }
 
-resource "aws_s3_bucket_policy" "supplier_put_access" {
-  bucket = module.this-bucket.bucket.id
-  policy = data.aws_iam_policy_document.supplier_put_access.json
+resource "aws_iam_role" "supplier_put_access" {
+  name = "supplier-put-${var.data_feed}-${var.order_type}-landing-bucket"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Action    = "sts:AssumeRole",
+        Principal = { "AWS" : "arn:aws:iam::${local.supplier_account_id}:root" }
+    }]
+  })
+
+  tags = merge(
+    var.local_tags,
+    { type = var.order_type },
+    { data_feed = var.data_feed }
+  )
+}
+
+resource "aws_iam_policy_attachment" "supplier_put_access" {
+  name       = "put-s3-${var.data_feed}-${var.order_type}-policy"
+  roles      = ["${aws_iam_role.supplier_put_access.name}"]
+  policy_arn = aws_iam_policy.supplier_put_access.arn
 }
 
 data "aws_iam_policy_document" "supplier_put_access" {
   statement {
-    principals {
-      type        = "AWS"
-      identifiers = [local.supplier_account_id]
-    }
-
     actions = [
       "s3:PutObject",
     ]
