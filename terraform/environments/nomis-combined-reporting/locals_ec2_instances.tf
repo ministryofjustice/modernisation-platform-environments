@@ -49,7 +49,111 @@ locals {
         description            = "ncr bip mid-tier component"
         instance-access-policy = "full"
         os-type                = "Linux"
-        server-type            = "ncr-bip"
+        server-type            = "ncr-bip-app"
+        update-ssm-agent       = "patchgroup1"
+      }
+    }
+
+    bip_cms = {
+      config = {
+        ami_name                  = "base_rhel_8_5_*"
+        iam_resource_names_prefix = "ec2-bip"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name = "private"
+      }
+      ebs_volumes = {
+        "/dev/sdb" = { type = "gp3", size = 100 }
+        "/dev/sdc" = { type = "gp3", size = 100 }
+        "/dev/sds" = { type = "gp3", size = 100 }
+      }
+      instance = {
+        disable_api_termination = false
+        instance_type           = "t3.large"
+        key_name                = "ec2-user"
+        vpc_security_group_ids  = ["bip"]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
+      }
+      route53_records = {
+        create_internal_record = true
+        create_external_record = true
+      }
+      user_data_cloud_init = {
+        args = {
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
+        }
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+        ]
+      }
+      tags = {
+        ami                    = "base_rhel_8_5"
+        backup                 = "false"
+        description            = "ncr bip CMS"
+        instance-access-policy = "full"
+        os-type                = "Linux"
+        server-type            = "ncr-bip-cms"
+        update-ssm-agent       = "patchgroup1"
+      }
+    }
+
+    bip_webadmin = {
+      config = {
+        ami_name                  = "base_rhel_8_5_*"
+        iam_resource_names_prefix = "ec2-web"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name = "private"
+      }
+      ebs_volumes = {
+        "/dev/sdb" = { type = "gp3", size = 100 }
+        "/dev/sdc" = { type = "gp3", size = 100 }
+        "/dev/sds" = { type = "gp3", size = 100 }
+      }
+      instance = {
+        disable_api_termination = false
+        instance_type           = "t3.large"
+        key_name                = "ec2-user"
+        vpc_security_group_ids  = ["web"]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
+      }
+      route53_records = {
+        create_internal_record = true
+        create_external_record = true
+      }
+      user_data_cloud_init = {
+        args = {
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
+        }
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+        ]
+      }
+      tags = {
+        ami                    = "base_rhel_8_5"
+        backup                 = "false"
+        description            = "ncr bip web for CMS"
+        instance-access-policy = "full"
+        os-type                = "Linux"
+        server-type            = "ncr-webadmin"
         update-ssm-agent       = "patchgroup1"
       }
     }

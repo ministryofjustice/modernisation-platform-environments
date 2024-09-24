@@ -1,10 +1,14 @@
 locals {
-
   security_group_cidrs_devtest = {
-    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
-    https = flatten([
+    http7xxx = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
+    enduserclient_internal = flatten([
       "10.0.0.0/8",
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+    ])
+    enduserclient_public = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -14,17 +18,19 @@ locals {
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
     ])
   }
 
   security_group_cidrs_preprod_prod = {
-    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
-    https = flatten([
-      "10.0.0.0/8",
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+    http7xxx = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
+    enduserclient_internal = [
+      "10.0.0.0/8"
+    ]
+    enduserclient_public = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -34,9 +40,6 @@ locals {
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
     ])
   }
 
@@ -64,14 +67,50 @@ locals {
           from_port   = 80
           to_port     = 80
           protocol    = "tcp"
-          cidr_blocks = local.security_group_cidrs.https
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
         }
         https = {
           description = "Allow https ingress"
           from_port   = 443
           to_port     = 443
           protocol    = "tcp"
-          cidr_blocks = local.security_group_cidrs.https
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+    public-lb = {
+      description = "Security group for public load balancer"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public
+        }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public
         }
       }
       egress = {
