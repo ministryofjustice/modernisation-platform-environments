@@ -7,12 +7,6 @@ locals {
   environment_shorthand = lookup(local.environment_map, local.environment)
 
   bucket_prefix = "emds-${local.environment_shorthand}"
-
-  live_feed_levels = {
-    1 = "general"
-    2 = "special"
-    3 = "home office"
-  }
 }
 
 # ------------------------------------------------------------------------
@@ -551,7 +545,6 @@ module "s3-fms-general-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
-  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws
@@ -566,7 +559,6 @@ module "s3-fms-specials-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"
-  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws
@@ -585,7 +577,6 @@ module "s3-mdss-general-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
-  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws
@@ -600,7 +591,6 @@ module "s3-mdss-ho-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "ho"
-  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws
@@ -615,7 +605,6 @@ module "s3-mdss-specials-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"
-  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws

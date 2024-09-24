@@ -61,6 +61,19 @@ module "this-bucket" {
   )
 }
 
+resource "aws_secretsmanager_secret" "supplier_account_id" {
+  name        = "${var.data_feed}-${var.order_type}-supplier-account"
+  description = "AWS Account ID for cross-account S3 access for the ${var.data_feed} ${var.order_type} data"
+}
+
+data "aws_secretsmanager_secret_version" "supplier_account_id" {
+  secret_id = aws_secretsmanager_secret.supplier_account_id.id
+}
+
+locals {
+  supplier_account_id = jsondecode(data.aws_secretsmanager_secret_version.supplier_account_id.secret_string)["account_id"]
+}
+
 resource "aws_s3_bucket_policy" "supplier_put_access" {
   bucket = module.this-bucket.bucket.id
   policy = data.aws_iam_policy_document.supplier_put_access.json
@@ -70,7 +83,7 @@ data "aws_iam_policy_document" "supplier_put_access" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = [var.supplier_account_id]
+      identifiers = [local.supplier_account_id]
     }
 
     actions = [

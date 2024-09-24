@@ -20,8 +20,3 @@ variable "order_type" {
   description = "An integer relating to the order type"
   type        = string
 }
-
-variable "supplier_account_id" {
-  description = "The AWS account number for supplier"
-  type        = string
-}
