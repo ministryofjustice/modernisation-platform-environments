@@ -110,11 +110,6 @@ resource "aws_iam_role_policy" "calculate_checksum_lambda" {
   policy = data.aws_iam_policy_document.calculate_checksum_lambda.json
 }
 
-resource "aws_lambda_event_source_mapping" "checksum_lambda" {
-  event_source_arn = aws_sns_topic.s3_events.arn
-  function_name    = aws_lambda_function.calculate_checksum_lambda.arn
-}
-
 resource "aws_lambda_permission" "allow_sns_invoke_checksum_lambda" {
   statement_id  = "AllowSNSInvokeChecksum"
   action        = "lambda:InvokeFunction"
@@ -187,10 +182,6 @@ resource "aws_lambda_permission" "allow_sns_invoke_zip_lambda" {
   source_arn    = aws_sns_topic.s3_events.arn
 }
 
-resource "aws_lambda_event_source_mapping" "zip_lambda" {
-  event_source_arn = aws_sns_topic.s3_events.arn
-  function_name    = aws_lambda_function.summarise_zip_lambda.arn
-}
 
 resource "aws_sns_topic_subscription" "zip_lambda_subscription" {
   topic_arn = aws_sns_topic.s3_events.arn
