@@ -551,7 +551,7 @@ module "s3-fms-general-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
-  supplier_account_id = 123
+  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws
@@ -566,7 +566,7 @@ module "s3-fms-specials-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"
-  supplier_account_id = 123
+  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws
@@ -585,7 +585,7 @@ module "s3-mdss-general-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
-  supplier_account_id = 123
+  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws
@@ -600,7 +600,7 @@ module "s3-mdss-ho-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "ho"
-  supplier_account_id = 123
+  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws
@@ -615,7 +615,7 @@ module "s3-mdss-specials-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"
-  supplier_account_id = 123
+  supplier_account_id = "000000000000"
 
   providers = {
     aws = aws
