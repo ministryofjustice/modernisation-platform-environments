@@ -98,7 +98,7 @@ resource "aws_iam_role_policy_attachment" "supplier_put_access" {
   policy_arn = aws_iam_policy.supplier_put_access.arn
 }
 
-resource "aws_iam_policy" "policy" {
+resource "aws_iam_policy" "supplier_put_access" {
   name        = "put-s3-${var.data_feed}-${var.order_type}-policy"
   description = "Give put access to the ${var.data_feed}-${var.order_type} landing bucket"
   policy      = data.aws_iam_policy_document.supplier_put_access.json
