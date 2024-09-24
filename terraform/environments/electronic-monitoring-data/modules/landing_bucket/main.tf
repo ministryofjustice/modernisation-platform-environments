@@ -93,10 +93,15 @@ resource "aws_iam_role" "supplier_put_access" {
   )
 }
 
-resource "aws_iam_policy_attachment" "supplier_put_access" {
-  name       = "put-s3-${var.data_feed}-${var.order_type}-policy"
-  roles      = ["${aws_iam_role.supplier_put_access.name}"]
+resource "aws_iam_role_policy_attachment" "supplier_put_access" {
+  role       = aws_iam_role.supplier_put_access.name
   policy_arn = aws_iam_policy.supplier_put_access.arn
+}
+
+resource "aws_iam_policy" "policy" {
+  name        = "put-s3-${var.data_feed}-${var.order_type}-policy"
+  description = "Give put access to the ${var.data_feed}-${var.order_type} landing bucket"
+  policy      = data.aws_iam_policy_document.supplier_put_access.json
 }
 
 data "aws_iam_policy_document" "supplier_put_access" {
