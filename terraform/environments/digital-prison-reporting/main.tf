@@ -614,7 +614,7 @@ module "glue_s3_data_reconciliation_job" {
   additional_secret_arns = concat([
     aws_secretsmanager_secret.operational_db_secret.arn,
     aws_secretsmanager_secret.nomis.arn
-  ], aws_secretsmanager_secret.dps[*].arn)
+  ], data.aws_secretsmanager_secret.dps[*].arn)
 
   tags = merge(
     local.all_tags,
