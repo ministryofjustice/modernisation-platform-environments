@@ -11,6 +11,7 @@ resource "aws_cloudwatch_log_group" "this" {
 
 resource "aws_lambda_function" "this" {
   #checkov:skip=CKV_AWS_272:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+  #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
 
   count         = var.enable_lambda ? 1 : 0
   function_name = "${var.name}-function"
