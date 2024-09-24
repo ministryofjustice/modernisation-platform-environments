@@ -1,6 +1,7 @@
 locals {
   environment_map = {
     "production"  = "prod"
+    "test"        = "test"
     "development" = "dev"
   }
   environment_shorthand = lookup(local.environment_map, local.environment)
