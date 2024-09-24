@@ -607,16 +607,14 @@ module "glue_s3_data_reconciliation_job" {
   region                      = local.account_region
   account                     = local.account_id
   log_group_retention_in_days = local.glue_log_retention_in_days
-  connections = local.create_glue_connection ? [
+  connections = local.create_glue_connection ? merge([
     aws_glue_connection.glue_operational_datastore_connection[0].name,
-    aws_glue_connection.glue_nomis_connection[0].name,
-    aws_glue_connection.glue_dps_activities_connection[0].name
-  ] : []
-  additional_secret_arns = [
+    aws_glue_connection.glue_nomis_connection[0].name
+  ], aws_glue_connection.glue_dps_connection[*].name) : []
+  additional_secret_arns = merge([
     aws_secretsmanager_secret.operational_db_secret.arn,
-    aws_secretsmanager_secret.nomis.arn,
-    data.aws_secretsmanager_secret.dps_activities.arn
-  ]
+    aws_secretsmanager_secret.nomis.arn
+  ], aws_secretsmanager_secret.dps[*].arn)
 
   tags = merge(
     local.all_tags,

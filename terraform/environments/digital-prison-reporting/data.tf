@@ -42,17 +42,20 @@ data "aws_secretsmanager_secret_version" "datamart" {
   depends_on = [aws_secretsmanager_secret.redshift]
 }
 
-# Source DPS Activities Secrets
-data "aws_secretsmanager_secret" "dps_activities" {
-  name = "external/dpr-dps-activities-source-secrets"
+# Source DPS Secrets
+data "aws_secretsmanager_secret" "dps" {
+  for_each = toset(local.dps_domains_list)
+  name     = "external/${local.project}-${each.value}-source-secrets"
 
-  depends_on = [aws_secretsmanager_secret_version.dps]
+  depends_on = [aws_secretsmanager_secret_version.dps[each.value]]
 }
 
-data "aws_secretsmanager_secret_version" "dps_activities" {
-  secret_id = data.aws_secretsmanager_secret.dps_activities.id
+data "aws_secretsmanager_secret_version" "dps" {
+  for_each = toset(local.dps_domains_list)
 
-  depends_on = [aws_secretsmanager_secret.dps]
+  secret_id = data.aws_secretsmanager_secret.dps[each.value].id
+
+  depends_on = [aws_secretsmanager_secret.dps[each.value]]
 }
 
 # AWS _IAM_ Policy
