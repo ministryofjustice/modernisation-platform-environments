@@ -45,57 +45,6 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
-
-      # t1-ncr-web-1-a = merge(local.ec2_instances.bip_web, {
-      #   cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web
-      #   config = merge(local.ec2_instances.bip_web.config, {
-      #     instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-      #       "Ec2T1ReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_web.instance, {
-      #     vpc_security_group_ids = ["web"]
-      #   })
-      #   tags = merge(local.ec2_instances.bip_web.tags, {
-      #     description                          = "For testing SAP BI Platform Web-Tier installation and configurations"
-      #     nomis-combined-reporting-environment = "t1"
-      #     type                                 = "processing"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
-
-      # t1-ncr-cms-1-a = merge(local.ec2_instances.bip_app, {
-      #   cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app
-      #   config = merge(local.ec2_instances.bip_app.config, {
-      #     instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
-      #       "Ec2T1ReportingPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_web.instance, {
-      #     vpc_security_group_ids = ["bip"]
-      #   })
-      #   tags = merge(local.ec2_instances.bip_app.tags, {
-      #     description                          = "For testing SAP BI Platform Mid-Tier installation and configurations"
-      #     nomis-combined-reporting-environment = "t1"
-      #     node                                 = "1"
-      #     type                                 = "management"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
-
-      # t1-ncr-etl-1-a = merge(local.ec2_instances.bods, {
-      #   cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bods
-      #   config = merge(local.ec2_instances.bods.config, {
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-      #       "Ec2T1ReportingPolicy",
-      #     ])
-      #   })
-      #   tags = merge(local.ec2_instances.bods.tags, {
-      #     description                          = "For testing SAP BI Platform ETL installation and configurations"
-      #     nomis-combined-reporting-environment = "t1"
-      #     instance-scheduling                  = "skip-scheduling"
-      #   })
-      # })
     }
 
     iam_policies = {
