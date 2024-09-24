@@ -17,6 +17,23 @@ resource "aws_sns_topic" "s3_events" {
   name = "${module.s3-data-bucket.bucket.id}-object-created-topic"
 }
 
+resource "aws_sns_topic_policy" "s3_events_policy" {
+  arn = aws_sns_topic.s3_events.arn
+  policy = statement {
+    effect = "Allow"
+    principals {
+      "s3.amazonaws.com"
+    }
+    actions = ["SNS:Publish"]
+    resources = [aws_sns_topic.s3_events.arn]
+    condition {
+      test = "ArnLike"
+      variable = "aws:SourceArn" 
+      values = [module.s3-data-bucket.bucket.arn]
+    }
+  }
+}
+
 #------------------------------------------------------------------------------
 # S3 lambda function to calculate data store file checksums
 #------------------------------------------------------------------------------
@@ -87,6 +104,22 @@ resource "aws_lambda_event_source_mapping" "checksum_lambda" {
   function_name    = aws_lambda_function.calculate_checksum_lambda.arn
 }
 
+resource "aws_lambda_permission" "allow_sns_invoke_checksum_lambda" {
+  statement_id  = "AllowSNSInvokeChecksum"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.calculate_checksum_lambda.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.s3_events.arn
+}
+
+resource "aws_sns_topic_subscription" "checksum_lambda_subscription" {
+  topic_arn = aws_sns_topic.s3_events.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.calculate_checksum_lambda.arn
+
+  depends_on = [aws_lambda_permission.allow_sns_invoke_checksum_lambda]
+}
+
 #------------------------------------------------------------------------------
 # S3 lambda function to perform zip file summary
 #------------------------------------------------------------------------------
@@ -135,7 +168,23 @@ resource "aws_iam_role_policy" "summarise_zip_lambda" {
   policy = data.aws_iam_policy_document.summarise_zip_lambda.json
 }
 
+resource "aws_lambda_permission" "allow_sns_invoke_zip_lambda" {
+  statement_id  = "AllowSNSInvokeZip"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.summarise_zip_lambda.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.s3_events.arn
+}
+
 resource "aws_lambda_event_source_mapping" "zip_lambda" {
   event_source_arn = aws_sns_topic.s3_events.arn
   function_name    = aws_lambda_function.summarise_zip_lambda.arn
+}
+
+resource "aws_sns_topic_subscription" "zip_lambda_subscription" {
+  topic_arn = aws_sns_topic.s3_events.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.summarise_zip_lambda.arn
+
+  depends_on = [aws_lambda_permission.allow_sns_invoke_zip_lambda]
 }
