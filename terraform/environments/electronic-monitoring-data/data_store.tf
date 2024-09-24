@@ -1,6 +1,7 @@
 
 
 resource "aws_s3_bucket_notification" "data_store" {
+  depends_on = [aws_sns_topic_policy.s3_events_policy]
   bucket = module.s3-data-bucket.bucket.id
 
   # Only for copy events as those are events triggered by data being copied
@@ -15,7 +16,6 @@ resource "aws_s3_bucket_notification" "data_store" {
 
 resource "aws_sns_topic" "s3_events" {
   name = "${module.s3-data-bucket.bucket.id}-object-created-topic"
-  policy = data.aws_iam_policy_document.sns_policy.json
 }
 
 # Define the IAM policy document for the SNS topic policy
@@ -39,6 +39,11 @@ data "aws_iam_policy_document" "sns_policy" {
   }
 }
 
+# Apply the policy to the SNS topic
+resource "aws_sns_topic_policy" "s3_events_policy" {
+  arn    = aws_sns_topic.s3_events.arn
+  policy = data.aws_iam_policy_document.sns_policy.json
+}
 
 #------------------------------------------------------------------------------
 # S3 lambda function to calculate data store file checksums
