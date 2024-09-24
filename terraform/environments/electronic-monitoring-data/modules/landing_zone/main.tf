@@ -11,6 +11,8 @@ data "aws_iam_policy_document" "transfer_assume_role" {
   }
 }
 
+
+
 #------------------------------------------------------------------------------
 # S3 bucket for landing Supplier data
 #
@@ -35,7 +37,7 @@ module "landing-bucket" {
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
     # Platform team to add a new provider for the additional Region.
     # Leave this provider block in even if you are not using replication
-    aws.bucket-replication = var.default_provider
+    aws.bucket-replication = aws
   }
   versioning_enabled  = false
   lifecycle_rule      = [

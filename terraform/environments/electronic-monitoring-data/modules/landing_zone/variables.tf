@@ -35,6 +35,3 @@ variable "vpc_id" {
   description = "The vpc used for the SFTP server"
 }
 
-variable "default_provider" {
-  description = "The provider to pass to the module"
-}

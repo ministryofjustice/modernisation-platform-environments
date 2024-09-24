@@ -49,8 +49,9 @@ module "buddi" {
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
-  default_provider   = aws
-
+  providers = {
+    aws = aws
+  }
   local_tags = local.tags
 }
 
@@ -113,9 +114,12 @@ module "g4s" {
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
-  default_provider   = aws
+  providers = {
+    aws = aws
+  }
 
   local_tags = local.tags
+
 }
 
 data "aws_caller_identity" "current_acct_id" {}
