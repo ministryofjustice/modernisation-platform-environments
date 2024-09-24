@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 2.7.0"
+    }
+  }
+}
+
 module "this" {
   source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
