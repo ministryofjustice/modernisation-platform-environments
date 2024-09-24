@@ -193,6 +193,7 @@ locals {
           oasys-national-reporting-environment = "t2"
           # domain-name = "azure.noms.root" NOTE: not joined to the domain yet
         })
+        cloudwatch_metric_alarms = {}
       })
 
       # not needed yet
@@ -217,6 +218,7 @@ locals {
       #     oasys-national-reporting-environment = "t2"
       #     # domain-name = "azure.noms.root" NOTE: not joined to the domain yet
       #   })
+      # cloudwatch_metric_alarms = {}
       # })
 
       t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
