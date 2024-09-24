@@ -499,7 +499,7 @@ module "s3-data-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-fms-general-landing-bucket" {
-  source = "./modulbucket/"
+  source = "./modules/landing_bucket/"
 
   data_feed = "fms"
   local_tags = local.tags
