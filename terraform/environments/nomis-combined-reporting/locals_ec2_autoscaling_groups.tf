@@ -37,9 +37,31 @@ locals {
         force_delete        = true
         vpc_zone_identifier = module.environment.subnets["private"].ids
       }
-      config               = local.ec2_instances.bip_webadmin.config
-      ebs_volumes          = local.ec2_instances.bip_webadmin.ebs_volumes
-      instance             = local.ec2_instances.bip_webadmin.instance
+      config      = local.ec2_instances.bip_webadmin.config
+      ebs_volumes = local.ec2_instances.bip_webadmin.ebs_volumes
+      instance    = local.ec2_instances.bip_webadmin.instance
+
+      lb_target_groups = {
+        http-7010 = {
+          port     = 7010
+          protocol = "HTTP"
+          health_check = {
+            enabled             = true
+            healthy_threshold   = 3
+            interval            = 30
+            matcher             = "200-399"
+            path                = "/"
+            port                = 7010
+            timeout             = 5
+            unhealthy_threshold = 5
+          }
+          stickiness = {
+            enabled = true
+            type    = "lb_cookie"
+          }
+        }
+      }
+
       user_data_cloud_init = local.ec2_instances.bip_webadmin.user_data_cloud_init
       tags                 = local.ec2_instances.bip_webadmin.tags
     }
@@ -51,9 +73,31 @@ locals {
         force_delete        = true
         vpc_zone_identifier = module.environment.subnets["private"].ids
       }
-      config               = local.ec2_instances.bip_web.config
-      ebs_volumes          = local.ec2_instances.bip_web.ebs_volumes
-      instance             = local.ec2_instances.bip_web.instance
+      config      = local.ec2_instances.bip_web.config
+      ebs_volumes = local.ec2_instances.bip_web.ebs_volumes
+      instance    = local.ec2_instances.bip_web.instance
+
+      lb_target_groups = {
+        http-7777 = {
+          port     = 7777
+          protocol = "HTTP"
+          health_check = {
+            enabled             = true
+            healthy_threshold   = 3
+            interval            = 30
+            matcher             = "200-399"
+            path                = "/"
+            port                = 7777
+            timeout             = 5
+            unhealthy_threshold = 5
+          }
+          stickiness = {
+            enabled = true
+            type    = "lb_cookie"
+          }
+        }
+      }
+
       user_data_cloud_init = local.ec2_instances.bip_web.user_data_cloud_init
       tags                 = local.ec2_instances.bip_web.tags
     }
