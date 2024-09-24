@@ -463,7 +463,7 @@ locals {
           { name = "admin", type = "CNAME", ttl = "3600", records = ["pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "", type = "A", lbs_map_key = "private" }, # preproduction.reporting.nomis.service.justice.gov.uk
+          { name = "", type = "A", lbs_map_key = "private" },
           { name = "webadmin", type = "A", lbs_map_key = "public" },
           { name = "web", type = "A", lbs_map_key = "private" },
         ]
