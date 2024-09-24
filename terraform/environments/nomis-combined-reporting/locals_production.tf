@@ -113,7 +113,7 @@ locals {
         instance_target_groups = {
           pd-ncr-web = merge(local.lbs.private.instance_target_groups.web, {
             attachments = [
-              { ec2_instance_name = "pd-ncr-web-1-a" },
+              # { ec2_instance_name = "pd-ncr-web-1-a" },
               # add more instances here when deployed
             ]
           })
