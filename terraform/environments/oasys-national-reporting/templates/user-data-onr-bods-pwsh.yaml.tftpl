@@ -6,19 +6,16 @@ version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is r
 tasks:
   - task: initializeVolume
     inputs:
-        initialize: devices
+        initialize: all
         devices:
-          - device: /dev/xvdg
-            name: Temp
+          - name: Temp
             letter: D
             partition: gpt
-          - device: /dev/xvdj
-            name: App
-            letter: E
-            partition: gpt
-          - device: /dev/xvdi
-            name: Storage
+          - name: Storage
             letter: F
+            partition: gpt
+          - name: App
+            letter: E
             partition: gpt
   - task: executeScript
     inputs:
