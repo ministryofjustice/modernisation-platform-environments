@@ -1,3 +1,13 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 2.7.0"
+    }
+  }
+}
+
+
 data "aws_iam_policy_document" "transfer_assume_role" {
   statement {
     effect = "Allow"
@@ -276,7 +286,7 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
       "s3:GetObject",
       "s3:GetObjectTagging"
     ]
-    resources = ["${aws_s3_bucket.landing_bucket.arn}/*"]
+    resources = ["${module.landing-bucket.bucket.arn}/*"]
   }
   statement {
     sid    = "AllowCopyWriteDestination"
@@ -294,7 +304,7 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
       "s3:ListBucket"
     ]
     resources = [
-      aws_s3_bucket.landing_bucket.arn,
+      module.landing-bucket.bucket.arn,
       var.data_store_bucket.arn
     ]
   }
@@ -307,7 +317,7 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
     ]
     resources = [
       "${var.data_store_bucket.arn}/*",
-      "${aws_s3_bucket.landing_bucket.arn}/*",
+      "${module.landing-bucket.bucket.arn}/*",
     ]
     # condition {}
   }
@@ -318,7 +328,7 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
       "s3:DeleteObject",
       "s3:DeleteObjectVersion"
     ]
-    resources = ["${aws_s3_bucket.landing_bucket.arn}/*"]
+    resources = ["${module.landing-bucket.bucket.arn}/*"]
   }
 }
 
@@ -339,7 +349,7 @@ module "landing_zone_users" {
 
   for_each = { for idx, item in var.user_accounts : idx => item }
 
-  landing_bucket  = aws_s3_bucket.landing_bucket
+  landing_bucket  = module.landing-bucket.bucket
   local_tags      = var.local_tags
   ssh_keys        = each.value.ssh_keys
   supplier        = var.supplier
