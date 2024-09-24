@@ -665,7 +665,7 @@ locals {
           })
           http-7770 = merge(local.lbs.rxy.listeners.http-7770, {
             alarm_target_group_names = ["pp-csr-w-34-7770"]
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
+            cloudwatch_metric_alarms = {}
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7770"
@@ -673,7 +673,7 @@ locals {
           })
           http-7771 = merge(local.lbs.rxy.listeners.http-7771, {
             alarm_target_group_names = ["pp-csr-w-34-7771"]
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
+            cloudwatch_metric_alarms = {}
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7771"
@@ -681,7 +681,7 @@ locals {
           })
           http-7780 = merge(local.lbs.rxy.listeners.http-7780, {
             alarm_target_group_names = ["pp-csr-w-34-7780"]
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
+            cloudwatch_metric_alarms = {}
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7780"
@@ -689,7 +689,7 @@ locals {
           })
           http-7781 = merge(local.lbs.rxy.listeners.http-7781, {
             alarm_target_group_names = ["pp-csr-w-34-7781"]
-            cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.network_lb
+            cloudwatch_metric_alarms = {}
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7781"

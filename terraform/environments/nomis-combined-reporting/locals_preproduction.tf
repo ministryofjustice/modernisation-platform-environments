@@ -122,6 +122,7 @@ locals {
           node                                 = "1"
           nomis-combined-reporting-environment = "pp"
           type                                 = "management"
+          server-type                          = "ncr-bip"
           shutdown-order                       = 3
         })
       })
@@ -143,6 +144,7 @@ locals {
           instance-scheduling                  = "skip-scheduling"
           node                                 = "2"
           nomis-combined-reporting-environment = "pp"
+          server-type                          = "ncr-bip"
           type                                 = "management"
           shutdown-order                       = 2
         })
@@ -223,6 +225,7 @@ locals {
           instance-scheduling                  = "skip-scheduling"
           node                                 = "3"
           nomis-combined-reporting-environment = "pp"
+          server-type                          = "ncr-bip"
           type                                 = "processing"
           shutdown-order                       = 1
         })

@@ -124,16 +124,28 @@ locals {
         cloudwatch_metric_alarms = null
       })
 
-      test-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
+      t2-tst-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
           desired_capacity = 0
         })
-        config = merge(local.ec2_autoscaling_groups.bods.config, {
+        config = merge(local.ec2_instances.bods.config, {
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+              branch   = "TM/TM-494/ips-install"
+              hostname = "t2-tst-bods-asg" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
+            }
+          ))
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
         })
         cloudwatch_metric_alarms = null
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+        })
       })
     }
 

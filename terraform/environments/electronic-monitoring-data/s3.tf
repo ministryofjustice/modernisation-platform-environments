@@ -1,11 +1,18 @@
 locals {
   environment_map = {
     "production"  = "prod"
+    "test"        = "test"
     "development" = "dev"
   }
   environment_shorthand = lookup(local.environment_map, local.environment)
-  
+
   bucket_prefix = "emds-${local.environment_shorthand}"
+
+  live_feed_levels = {
+    1 = "general"
+    2 = "special"
+    3 = "home office"
+  }
 }
 
 # ------------------------------------------------------------------------
@@ -13,7 +20,7 @@ locals {
 # ------------------------------------------------------------------------
 
 module "s3-logging-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-bucket-logs-"
   versioning_enabled = true
@@ -83,7 +90,7 @@ module "s3-logging-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-metadata-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-metadata-"
   versioning_enabled = true
@@ -103,9 +110,12 @@ module "s3-metadata-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-metadata/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-metadata/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -169,7 +179,7 @@ module "s3-metadata-bucket" {
 # ----------------------------------
 
 module "s3-athena-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-athena-query-results-"
   versioning_enabled = true
@@ -190,8 +200,12 @@ module "s3-athena-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-athena-query-results/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-athena-query-results/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -243,7 +257,7 @@ module "s3-athena-bucket" {
 # ----------------------------------
 
 module "s3-unzipped-files-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-unzipped-files-"
   versioning_enabled = true
@@ -264,7 +278,11 @@ module "s3-unzipped-files-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
   log_prefix = "logs/${local.bucket_prefix}-unzipped-files/"
 
   log_partition_date_source = "EventTime"
@@ -294,7 +312,7 @@ module "s3-unzipped-files-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-dms-premigrate-assess-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-dms-premigrate-assess-"
   versioning_enabled = true
@@ -315,8 +333,12 @@ module "s3-dms-premigrate-assess-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-dms-premigrate-assess/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-dms-premigrate-assess/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -368,7 +390,7 @@ module "s3-dms-premigrate-assess-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-json-directory-structure-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-json-directory-structure-"
   versioning_enabled = true
@@ -389,8 +411,12 @@ module "s3-json-directory-structure-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-json-directory-structure/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-json-directory-structure/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -442,7 +468,7 @@ module "s3-json-directory-structure-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-data-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
   bucket_prefix      = "${local.bucket_prefix}-data-"
   versioning_enabled = true
 
@@ -461,8 +487,12 @@ module "s3-data-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-data/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-data/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -510,12 +540,128 @@ module "s3-data-bucket" {
 }
 
 # ------------------------------------------------------------------------
+# Landing bucket FMS
+# ------------------------------------------------------------------------
+
+module "s3-fms-landing-bucket" {
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+
+  for_each = local.live_feed_levels
+
+  bucket_prefix      = "${local.bucket_prefix}-land-fms-${each.key}-"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-land-fms-${each.key}/"
+  log_partition_date_source = "EventTime"
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 7
+      }
+    }
+  ]
+
+  tags = merge(
+    local.tags,
+    { type = each.value }
+  )
+}
+
+# ------------------------------------------------------------------------
+# Landing bucket MDSS
+# ------------------------------------------------------------------------
+
+module "s3-mdss-landing-bucket" {
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+
+  for_each = local.live_feed_levels
+
+  bucket_prefix      = "${local.bucket_prefix}-land-mdss-${each.key}-"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-land-mdss-${each.key}/"
+  log_partition_date_source = "EventTime"
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 7
+      }
+    }
+  ]
+
+  tags = merge(
+    local.tags,
+    { type = each.value }
+  )
+}
+
+# ------------------------------------------------------------------------
 # DMS data validation bucket
 # ------------------------------------------------------------------------
 module "s3-dms-data-validation-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
-  bucket_prefix = "${local.bucket_prefix}-dms-data-validation-"
+  bucket_prefix      = "${local.bucket_prefix}-dms-data-validation-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -534,8 +680,12 @@ module "s3-dms-data-validation-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-dms-data-validation/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-dms-data-validation/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -587,7 +737,7 @@ module "s3-dms-data-validation-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-glue-job-script-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${local.bucket_prefix}-glue-job-store-"
   versioning_enabled = true
@@ -608,8 +758,12 @@ module "s3-glue-job-script-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/${local.bucket_prefix}-glue-job-store/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/${local.bucket_prefix}-glue-job-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -662,9 +816,9 @@ module "s3-glue-job-script-bucket" {
 
 
 module "s3-dms-target-store-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
-  bucket_prefix = "${local.bucket_prefix}-dms-rds-to-parquet-"
+  bucket_prefix      = "${local.bucket_prefix}-dms-rds-to-parquet-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -683,8 +837,12 @@ module "s3-dms-target-store-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({"main_logging_bucket": module.s3-logging-bucket.bucket})
-  log_prefix = "logs/dms-target-store/"
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/dms-target-store/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -730,3 +888,4 @@ module "s3-dms-target-store-bucket" {
 
   tags = local.tags
 }
+

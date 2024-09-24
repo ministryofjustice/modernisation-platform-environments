@@ -30,6 +30,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_service_to_db" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "alb_to_ecs_service" {
+  count                        = var.alb_security_group_id == null ? 0 : 1
   security_group_id            = aws_security_group.ecs_service.id
   description                  = "load balancer to ecs service"
   from_port                    = var.container_port_config[0].containerPort
@@ -78,13 +79,14 @@ resource "aws_vpc_security_group_ingress_rule" "nlb_to_ecs_service" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "custom_rules" {
-  for_each          = { for index, rule in var.ecs_service_ingress_security_group_ids : index => rule }
-  security_group_id = aws_security_group.ecs_service.id
-  description       = "custom rule"
-  from_port         = each.value.port
-  to_port           = each.value.port
-  ip_protocol       = each.value.ip_protocol
-  cidr_ipv4         = each.value.cidr_ipv4
+  for_each                     = { for index, rule in var.ecs_service_ingress_security_group_ids : index => rule }
+  security_group_id            = aws_security_group.ecs_service.id
+  description                  = "custom rule"
+  from_port                    = each.value.port
+  to_port                      = each.value.port
+  ip_protocol                  = each.value.ip_protocol
+  cidr_ipv4                    = each.value.cidr_ipv4
+  referenced_security_group_id = each.value.referenced_security_group_id
 }
 
 resource "aws_vpc_security_group_egress_rule" "custom_rules" {

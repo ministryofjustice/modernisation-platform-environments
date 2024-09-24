@@ -21,8 +21,10 @@ locals {
         ))
       }
       ebs_volumes = {
-        # FIXME: ebs_volumes list is NOT YET CORRECT and will need to change
         "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+        "/dev/xvdd" = { type = "gp3", size = 128 } # D:/ Temp
+        "/dev/xvde" = { type = "gp3", size = 128 } # E:/ App
+        "/dev/xvdf" = { type = "gp3", size = 700 } # F:/ Storage
       }
       instance = {
         disable_api_termination      = false

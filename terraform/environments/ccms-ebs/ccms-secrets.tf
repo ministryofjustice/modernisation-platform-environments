@@ -17,3 +17,14 @@ resource "aws_secretsmanager_secret" "secret_ses_smtp_credentials" {
     { Name = "ses-smtp-credentials-${local.environment}" }
   )
 }
+
+# Secret for Payment Load
+
+resource "aws_secretsmanager_secret" "secret_lambda_s3" {
+  name        = "db-${local.environment}-credentials"
+  description = "AWS credentials for lambda to connect to the db"
+
+  tags = merge(local.tags,
+    { Name = "db-${local.environment}-credentials" }
+  )
+}

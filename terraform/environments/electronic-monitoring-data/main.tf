@@ -1,6 +1,7 @@
 #module "capita" {
 #  source = "./modules/landing_zone/"
-#
+#  count = local.is-production ? 1 : 0
+#  
 #  supplier = "capita"
 #
 #  user_accounts = [
@@ -29,6 +30,7 @@
 
 module "buddi" {
   source = "./modules/landing_zone/"
+  count = local.is-production ? 1 : 0
 
   supplier = "buddi"
 
@@ -57,6 +59,7 @@ module "buddi" {
 
 #module "civica" {
 #  source = "./modules/landing_zone/"
+#  count = local.is-production ? 1 : 0
 #
 #  supplier = "civica"
 #
@@ -83,6 +86,7 @@ module "buddi" {
 
 module "g4s" {
   source = "./modules/landing_zone/"
+  count = local.is-production ? 1 : 0
 
   supplier = "g4s"
 

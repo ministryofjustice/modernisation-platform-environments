@@ -16,7 +16,7 @@ module "s3_bucket_dms_destination" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
-  bucket_name     = local.dms_s3_local_bucket_name
+  bucket_name        = local.dms_s3_local_bucket_name
   versioning_enabled = false
 
   providers = {
@@ -28,32 +28,32 @@ module "s3_bucket_dms_destination" {
   #   (2) The writer role in all clients feeding to this environment, if this environment is a repository.
   #   (3) The writer role in this environment.
   bucket_policy_v2 = [{
-          effect     = "Allow"
-          principals = {
-            type        = "AWS"
-            identifiers = flatten(concat(
-            [for k,v in local.repository_account_map : "arn:aws:iam::${v}:role/${k}-dms-s3-writer-role"],
-            [for k,v in local.client_account_map : "arn:aws:iam::${v}:role/${k}-dms-s3-writer-role"],
-            [aws_iam_role.dms_s3_writer_role.arn]))
-          }
-          actions    = [
-            "s3:PutObject",
-            "s3:PutObjectAcl",
-            "s3:DeleteObject",
-            "s3:PutObjectTagging",
-            "s3:ListBucket"
-          ]
-        },{
-          effect     = "Allow"
-          principals = {
-            type        = "AWS"
-            identifiers = [aws_iam_role.dms_s3_reader_role.arn]
-          }
-          actions    = [
-            "s3:GetObject",
-            "s3:ListBucket"
-          ]
-        }]
+    effect = "Allow"
+    principals = {
+      type = "AWS"
+      identifiers = flatten(concat(
+        [for k, v in local.repository_account_map : "arn:aws:iam::${v}:role/${k}-dms-s3-writer-role"],
+        [for k, v in local.client_account_map : "arn:aws:iam::${v}:role/${k}-dms-s3-writer-role"],
+      [aws_iam_role.dms_s3_writer_role.arn]))
+    }
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject",
+      "s3:PutObjectTagging",
+      "s3:ListBucket"
+    ]
+    }, {
+    effect = "Allow"
+    principals = {
+      type        = "AWS"
+      identifiers = [aws_iam_role.dms_s3_reader_role.arn]
+    }
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket"
+    ]
+  }]
 
   lifecycle_rule = [
     {

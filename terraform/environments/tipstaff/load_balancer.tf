@@ -295,7 +295,7 @@ resource "aws_lb_listener" "tipstaff_lb" {
   depends_on = [
     aws_acm_certificate.external
   ]
-  certificate_arn   = local.is-production ? aws_acm_certificate.external_prod[0].arn : aws_acm_certificate.external.arn
+  certificate_arn   = local.is-production ? aws_acm_certificate.external.arn : aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.tipstaff_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
