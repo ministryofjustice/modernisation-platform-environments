@@ -1077,7 +1077,7 @@ module "glue_prisons_database" {
   aws_region     = local.account_region
 }
 
-# Glue Database Catalog for Reconciliation
+# Glue Database Catalog for Reconciliation 
 module "glue_reconciliation_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
