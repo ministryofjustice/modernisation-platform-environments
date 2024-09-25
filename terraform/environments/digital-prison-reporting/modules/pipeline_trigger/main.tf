@@ -1,6 +1,7 @@
 resource "aws_scheduler_schedule" "schedule" {
   count = var.create_pipeline_schedule ? 1 : 0
 
+  state = var.enable_pipeline_schedule ? "ENABLED" : "DISABLED"
   name        = var.pipeline_name
   description = var.description
   flexible_time_window {
