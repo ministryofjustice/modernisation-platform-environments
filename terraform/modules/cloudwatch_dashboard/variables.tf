@@ -41,6 +41,11 @@ variable "widget_groups" {
   #       name = string
   #       value = string
   #     })))
+  #   }))
+  #   add_ebs_widgets = optional(object({
+  #     iops = bool                          # add additional widgets showing EBS IOPS vs configured max
+  #     throughput = bool                    # add additional widgets showing EBS thoughput vs configured max
+  #   }))
   #   widgets         = list(any)            # as per https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html
   #   NOTE: widget can also use following fields for module only
   #     expression      = "" # automatically create metrics[] with expression
