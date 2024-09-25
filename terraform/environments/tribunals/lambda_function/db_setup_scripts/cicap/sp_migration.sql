@@ -1660,3 +1660,99 @@ WHERE
 	[KeywordID] = @KeywordID
 go
 
+USE [CICAP]
+GO
+/****** Object:  Schema [CICAPUser]    Script Date: 09/25/2024 15:26:52 ******/
+-- CREATE SCHEMA [CICAPUser] AUTHORIZATION [CICAPUser]
+-- GO
+/****** Object:  Table [dbo].[Users]    Script Date: 09/25/2024 15:26:52 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Users](
+	[UserID] [int] IDENTITY(1,1) NOT NULL,
+	[FirstName] [varchar](250) NULL,
+	[LastName] [varchar](250) NULL,
+	[UserName] [varchar](250) NULL,
+	[Password] [varchar](250) NULL,
+	[Disabled] [bit] NULL,
+ CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Schemes]    Script Date: 09/25/2024 15:26:52 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Schemes](
+	[SchemeID] [int] IDENTITY(1,1) NOT NULL,
+	[SchemeDesc] [varchar](300) NULL,
+	[Disabled] [bit] NULL,
+ CONSTRAINT [PK_Schemes] PRIMARY KEY CLUSTERED 
+(
+	[SchemeID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[keywords]    Script Date: 09/25/2024 15:26:52 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[keywords](
+	[KeywordID] [int] IDENTITY(1,1) NOT NULL,
+	[Keyword] [varchar](500) NULL,
+	[Disabled] [bit] NULL,
+ CONSTRAINT [PK_keywords] PRIMARY KEY CLUSTERED 
+(
+	[KeywordID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[CaseDetails]    Script Date: 09/25/2024 15:26:52 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[CaseDetails](
+	[CaseID] [bigint] IDENTITY(1,1) NOT NULL,
+	[Citation1] [varchar](50) NULL,
+	[Citation2] [varchar](50) NULL,
+	[Citation3] [varchar](50) NULL,
+	[Citation4] [varchar](50) NULL,
+	[DecisionDate] [datetime] NULL,
+	[CaseName] [varchar](500) NULL,
+	[Scheme] [int] NULL,
+	[ParaNumber] [varchar](50) NULL,
+	[Keywords] [ntext] NULL,
+	[Summary] [ntext] NULL,
+	[Disabled] [bit] NULL,
+ CONSTRAINT [PK_Case] PRIMARY KEY CLUSTERED 
+(
+	[CaseID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+
+SET IDENTITY_INSERT dbo.CaseDetails ON;
+GO

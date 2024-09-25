@@ -23,6 +23,17 @@ def lambda_handler(event, context):
     cursor = conn.cursor()
     cursor.execute(f"use [{new_db_name}]")
 
+    # Executing SQL script from file
+    script_path = f".{app_folder}/post_migration.sql"
+    with open(script_path, 'r') as file:
+        script = file.read()
+        # Split the script by the full keyword 'GO' (case-insensitive)
+        statements = re.split(r'\bGO\b', script, flags=re.IGNORECASE)
+        for statement in statements:
+            if statement.strip():
+                cursor.execute(statement)
+                conn.commit()
+
     # Insert legacy apps admin user into the database
     if (new_db_name == 'eat'):
         cursor.execute(
@@ -35,16 +46,7 @@ def lambda_handler(event, context):
             (100, admin_username, admin_password, 'DTS Legacy Apps', 'Team Login')
         )
 
-    # Executing SQL script from file
-    script_path = f".{app_folder}/post_migration.sql"
-    with open(script_path, 'r') as file:
-        script = file.read()
-        # Split the script by the full keyword 'GO' (case-insensitive)
-        statements = re.split(r'\bGO\b', script, flags=re.IGNORECASE)
-        for statement in statements:
-            if statement.strip():
-                cursor.execute(statement)
-                conn.commit()
+    cursor.execute("SET IDENTITY_INSERT dbo.Users OFF;")
 
     # Closing the connection
     cursor.close()
