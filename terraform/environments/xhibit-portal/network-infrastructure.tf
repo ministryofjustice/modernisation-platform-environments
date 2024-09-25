@@ -434,7 +434,7 @@ resource "aws_security_group_rule" "portal-http-from-waf-lb" {
   depends_on               = [aws_security_group.waf_lb, aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from WAF LB"
   from_port                = 80
   to_port                  = 80
   protocol                 = "TCP"
@@ -445,7 +445,7 @@ resource "aws_security_group_rule" "portal-http-to-waf-lb" {
   depends_on               = [aws_security_group.waf_lb, aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic to WAF LB"
   from_port                = 80
   to_port                  = 80
   protocol                 = "TCP"
@@ -477,7 +477,7 @@ resource "aws_security_group_rule" "ingestion-lb-http-from-ingestion-server" {
   depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.ingestion_lb.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from ingestion server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -488,7 +488,7 @@ resource "aws_security_group_rule" "ingestion-lb-http-to-ingestion-server" {
   depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.ingestion_lb.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic to ingestion server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -499,7 +499,7 @@ resource "aws_security_group_rule" "ingestion-server-http-from-ingestion-lb" {
   depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.ingestion_server.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from ingestion LB"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -510,7 +510,7 @@ resource "aws_security_group_rule" "ingestion-server-http-to-ingestion-lb" {
   depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.ingestion_server.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic to ingestion LB"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -521,7 +521,7 @@ resource "aws_security_group_rule" "app-all-from-self" {
   depends_on        = [aws_security_group.app_servers]
   security_group_id = aws_security_group.app_servers.id
   type              = "ingress"
-  description       = "allow all traffic from DB"
+  description       = "allow all traffic from local server"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
@@ -532,7 +532,7 @@ resource "aws_security_group_rule" "app-all-to-self" {
   depends_on        = [aws_security_group.app_servers]
   security_group_id = aws_security_group.app_servers.id
   type              = "egress"
-  description       = "allow all traffic from DB"
+  description       = "allow all traffic to local server"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
@@ -543,7 +543,7 @@ resource "aws_security_group_rule" "app-all-from-ingestion" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from ingestion server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -554,7 +554,7 @@ resource "aws_security_group_rule" "ingestion-all-from-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.ingestion_server.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from app"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -565,7 +565,7 @@ resource "aws_security_group_rule" "app-all-to-ingestion" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from ingestion server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -576,7 +576,7 @@ resource "aws_security_group_rule" "ingestion-all-to-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.ingestion_server.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic to ingestion server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -587,7 +587,7 @@ resource "aws_security_group_rule" "exchange-all-from-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic to Exchange server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -598,7 +598,7 @@ resource "aws_security_group_rule" "exchange-all-to-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from Exchange server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -609,7 +609,7 @@ resource "aws_security_group_rule" "sms-all-from-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic to SMS server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -620,7 +620,7 @@ resource "aws_security_group_rule" "sms-all-to-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from SMS server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -631,7 +631,7 @@ resource "aws_security_group_rule" "app-all-from-portal" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from portal server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -642,7 +642,7 @@ resource "aws_security_group_rule" "portal-all-from-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic from app"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -653,7 +653,7 @@ resource "aws_security_group_rule" "app-all-to-portal" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic to portal server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -664,7 +664,7 @@ resource "aws_security_group_rule" "portal-all-to-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all traffic to app"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
