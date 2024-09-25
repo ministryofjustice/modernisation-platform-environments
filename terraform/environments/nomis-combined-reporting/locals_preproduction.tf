@@ -28,58 +28,69 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      pp-ncr-test = {
-        autoscaling_group = {
-          desired_capacity    = 1
-          max_size            = 1
-          force_delete        = true
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        config = {
-          ami_name                  = "base_rhel_8_5_*"
-          iam_resource_names_prefix = "ec2-bip"
-          instance_profile_policies = [
-            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+      pp-ncr-app = merge(local.ec2_autoscaling_groups.bip_app, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_app.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_app.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_app.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
-          ]
-          subnet_name = "private"
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { type = "gp3", size = 100 }
-          "/dev/sdc" = { type = "gp3", size = 100 }
-          "/dev/sds" = { type = "gp3", size = 100 }
-        }
-        instance = {
-          disable_api_termination      = false
-          instance_type                = "t3.large"
-          key_name                     = "ec2-user"
-          vpc_security_group_ids       = ["bip"]
-          metadata_options_http_tokens = "required"
-        }
-        user_data_cloud_init = {
-          args = {
-            branch       = "ncr/TM-503/preprod-bip-fixes"
-            ansible_args = "--tags ec2provision"
-          }
-          scripts = [ # paths are relative to templates/ dir
-            "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
-            "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
-            "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
-          ]
-        }
-        tags = {
-          backup                               = "false"
-          component                            = "test"
-          description                          = "Preprod build testing"
-          os-type                              = "Linux"
-          nomis-combined-reporting-environment = "pp"
-          server-type                          = "ncr-bip"
-          update-ssm-agent                     = "patchgroup1"
-        }
-      }
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init.args, {
+            branch = "ncr/TM-503/preprod-bip-fixes"
+          })
+        })
+      })
+
+      pp-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_cms.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
+            branch = "ncr/TM-503/preprod-bip-fixes"
+          })
+        })
+      })
+
+      pp-ncr-webadmin = merge(local.ec2_autoscaling_groups.bip_webadmin, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_webadmin.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_webadmin.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_webadmin.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init.args, {
+            branch = "ncr/TM-503/preprod-bip-fixes"
+          })
+        })
+      })
+
+      pp-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_web.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
+            branch = "ncr/TM-503/preprod-bip-fixes"
+          })
+        })
+      })
     }
 
     ec2_instances = {
@@ -399,6 +410,44 @@ locals {
           })
         })
       })
+
+      public = merge(local.lbs.public, {
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              webadmin = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-ncr-webadmin-http-7010"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "webadmin.preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-ncr-web-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "web.preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
     }
 
     route53_zones = {
@@ -414,7 +463,9 @@ locals {
           { name = "admin", type = "CNAME", ttl = "3600", records = ["pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "", type = "A", lbs_map_key = "private" }, # preproduction.reporting.nomis.service.justice.gov.uk
+          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "webadmin", type = "A", lbs_map_key = "public" },
+          { name = "web", type = "A", lbs_map_key = "private" },
         ]
       }
     }
