@@ -42,6 +42,9 @@ locals {
             branch = "ncr/TM-503/preprod-bip-fixes"
           })
         })
+        tags = merge(local.ec2_autoscaling_groups.bip_app.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
       })
 
       pp-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
@@ -57,6 +60,9 @@ locals {
           args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
             branch = "ncr/TM-503/preprod-bip-fixes"
           })
+        })
+        tags = merge(local.ec2_autoscaling_groups.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pp"
         })
       })
 
@@ -74,6 +80,9 @@ locals {
             branch = "ncr/TM-503/preprod-bip-fixes"
           })
         })
+        tags = merge(local.ec2_autoscaling_groups.bip_webadmin.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
       })
 
       pp-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
@@ -89,6 +98,9 @@ locals {
           args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
             branch = "ncr/TM-503/preprod-bip-fixes"
           })
+        })
+        tags = merge(local.ec2_autoscaling_groups.bip_web.tags, {
+          nomis-combined-reporting-environment = "pp"
         })
       })
     }
