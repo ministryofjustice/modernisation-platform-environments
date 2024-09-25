@@ -22,49 +22,59 @@ locals {
     }
   ]
 
+  widget_groups = [
+    for i in range(length(var.widget_groups)) : merge(var.widget_groups[i], {
+      widgets = concat(
+        var.widget_groups[i].widgets,
+        local.widget_groups_ebs_widgets_iops[i],
+        local.widget_groups_ebs_widgets_throughput[i],
+      )
+    })
+  ]
+
   widget_group_header_height = [
-    for widget_group in var.widget_groups : lookup(widget_group, "header_markdown", null) == null ? 0 : 1
+    for widget_group in local.widget_groups : lookup(widget_group, "header_markdown", null) == null ? 0 : 1
   ]
   widget_group_widgets_height = [
-    for widget_group in var.widget_groups : widget_group.height * floor((length(widget_group.widgets) + 1) / (24 / widget_group.width))
+    for widget_group in local.widget_groups : widget_group.height * floor((length(widget_group.widgets) + 1) / (24 / widget_group.width))
   ]
   widget_group_height = [
-    for i in range(length(var.widget_groups)) : local.widget_group_header_height[i] + local.widget_group_widgets_height[i]
+    for i in range(length(local.widget_groups)) : local.widget_group_header_height[i] + local.widget_group_widgets_height[i]
   ]
   widget_group_y = [
-    for i in range(length(var.widget_groups)) : i == 0 ? 0 : sum(slice(local.widget_group_height, 0, i))
+    for i in range(length(local.widget_groups)) : i == 0 ? 0 : sum(slice(local.widget_group_height, 0, i))
   ]
 
   # add header widget and calculate x, y positions
   widgets_pos = flatten([
-    for i in range(length(var.widget_groups)) : [
-      lookup(var.widget_groups[i], "header_markdown", null) == null ? [] : [{
+    for i in range(length(local.widget_groups)) : [
+      lookup(local.widget_groups[i], "header_markdown", null) == null ? [] : [{
         type   = "text"
         width  = 24
         height = 1
         x      = 0
         y      = local.widget_group_y[i]
         properties = {
-          markdown   = var.widget_groups[i].header_markdown
+          markdown   = local.widget_groups[i].header_markdown
           background = "solid"
         }
       }],
       [
-        for j in range(length(var.widget_groups[i].widgets)) : merge(
+        for j in range(length(local.widget_groups[i].widgets)) : merge(
           {
-            width  = var.widget_groups[i].width
-            height = var.widget_groups[i].height
-            x      = j * var.widget_groups[i].width % 24
-            y      = (floor(j * var.widget_groups[i].width / 24) * var.widget_groups[i].height) + local.widget_group_y[i] + local.widget_group_header_height[i]
+            width  = local.widget_groups[i].width
+            height = local.widget_groups[i].height
+            x      = j * local.widget_groups[i].width % 24
+            y      = (floor(j * local.widget_groups[i].width / 24) * local.widget_groups[i].height) + local.widget_group_y[i] + local.widget_group_header_height[i]
           },
-          try(strcontains(var.widget_groups[i].widgets[j].expression, "InstanceId"), false) ? local.widget_groups_search_filter_ec2[i] : {},
-          var.widget_groups[i].widgets[j],
+          try(strcontains(local.widget_groups[i].widgets[j].expression, "InstanceId"), false) ? local.widget_groups_search_filter_ec2[i] : {},
+          local.widget_groups[i].widgets[j],
           var.accountId == null ? {} : {
-            properties = merge(var.widget_groups[i].widgets[j].properties, {
+            properties = merge(local.widget_groups[i].widgets[j].properties, {
               accountId = var.accountId
             })
           }
-        ) if var.widget_groups[i].widgets[j] != null
+        ) if local.widget_groups[i].widgets[j] != null
       ]
     ]
   ])

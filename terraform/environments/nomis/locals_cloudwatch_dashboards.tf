@@ -48,6 +48,10 @@ locals {
       header_markdown = "## EC2 Oracle Database"
       width           = 8
       height          = 8
+      add_ebs_widgets = {
+        iops       = true
+        throughput = true
+      }
       search_filter = {
         ec2_tag = [
           { tag_name = "server-type", tag_value = "nomis-db" },
