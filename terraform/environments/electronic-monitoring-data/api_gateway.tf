@@ -108,6 +108,10 @@ resource "aws_api_gateway_deployment" "deployment" {
   lifecycle {
     create_before_destroy = true
   }
+  depends_on = [
+    aws_api_gateway_integration.get_zipped_step_function_invoke,
+    aws_api_gateway_method.get_zipped_step_function_invoke
+  ]
 }
 
 resource "aws_api_gateway_method_response" "response_200" {
@@ -121,7 +125,7 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
   rest_api_id = aws_api_gateway_rest_api.get_zipped_file.id
   resource_id = aws_api_gateway_resource.get_zipped_step_function_invoke.id
   http_method = aws_api_gateway_method.get_zipped_step_function_invoke.http_method
-  status_code = "200"
+  status_code = aws_api_gateway_method_response.response_200.status_code
   
   response_templates = {
     "application/json" = ""
