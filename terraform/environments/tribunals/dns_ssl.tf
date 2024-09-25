@@ -1,8 +1,8 @@
 resource "aws_acm_certificate" "external" {
-  domain_name = local.is-production ? "decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain_name = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = [local.is-production ? "decisions.tribunals.gov.uk" : "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? null : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
