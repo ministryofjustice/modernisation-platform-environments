@@ -336,10 +336,10 @@ locals {
 
 // Create one Route 53 record for each entry in the services variable list of tribunals
 resource "aws_route53_record" "external_services" {
-  count    = local.is-production ? 0 : length(var.services)
+  for_each = local.is-production ? {} : var.services
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${var.services[count.index].name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name     = "${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
 
   alias {
@@ -350,11 +350,11 @@ resource "aws_route53_record" "external_services" {
 }
 
 resource "aws_route53_record" "sftp_external_services" {
-  count           = local.is-production ? 0 : length(var.sftp_services)
+  for_each        = local.is-production ? {} : var.sftp_services
   allow_overwrite = true
   provider        = aws.core-vpc
   zone_id         = data.aws_route53_zone.external.zone_id
-  name            = "sftp.${var.sftp_services[count.index].name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name            = "sftp.${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60
@@ -362,10 +362,10 @@ resource "aws_route53_record" "sftp_external_services" {
 
 // PROD Records
 resource "aws_route53_record" "external_services_prod" {
-  count    = local.is-production ? length(var.services) : 0
+  for_each = local.is-production ? var.services : {}
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.production_zone.zone_id
-  name     = "${var.services[count.index].name_prefix}.decisions.tribunals.gov.uk"
+  name     = "${each.value.name_prefix}.decisions.tribunals.gov.uk"
   type     = "A"
 
   alias {
@@ -376,11 +376,11 @@ resource "aws_route53_record" "external_services_prod" {
 }
 
 resource "aws_route53_record" "sftp_external_services_prod" {
-  count           = local.is-production ? length(var.sftp_services) : 0
+  for_each        = local.is-production ? var.sftp_services : {}
   allow_overwrite = true
   provider        = aws.core-vpc
   zone_id         = data.aws_route53_zone.production_zone.zone_id
-  name            = "sftp.${var.sftp_services[count.index].name_prefix}.decisions.tribunals.gov.uk"
+  name            = "sftp.${each.value.name_prefix}.decisions.tribunals.gov.uk"
   type            = "CNAME"
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60
