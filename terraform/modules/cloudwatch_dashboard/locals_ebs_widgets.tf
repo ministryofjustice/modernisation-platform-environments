@@ -52,7 +52,7 @@ locals {
           metrics = concat([
             for ebs_value in local.widget_groups_ebs_volumes[i] : [
               [{
-                expression = "(${ebs_value.metric_id_r}/PERIOD(${ebs_value.metric_id_r})+${ebs_value.metric_id_w}/PERIOD(${ebs_value.metric_id_r}))/1048576"
+                expression = "${ebs_value.metric_id_r}/PERIOD(${ebs_value.metric_id_r})+${ebs_value.metric_id_w}/PERIOD(${ebs_value.metric_id_w})"
                 id         = ebs_value.metric_id
                 label      = "${ebs_value.id} ${ebs_value.tags.Name}"
                 region     = "eu-west-2"
@@ -98,7 +98,7 @@ locals {
           metrics = concat([
             for ebs_value in local.widget_groups_ebs_volumes[i] : [
               [{
-                expression = "${ebs_value.metric_id_r}/PERIOD(${ebs_value.metric_id_r})+${ebs_value.metric_id_w}/PERIOD(${ebs_value.metric_id_w})"
+                expression = "(${ebs_value.metric_id_r}/PERIOD(${ebs_value.metric_id_r})+${ebs_value.metric_id_w}/PERIOD(${ebs_value.metric_id_r}))/1048576"
                 id         = ebs_value.metric_id
                 label      = "${ebs_value.id} ${ebs_value.tags.Name}"
                 region     = "eu-west-2"
