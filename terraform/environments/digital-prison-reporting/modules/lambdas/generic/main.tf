@@ -10,7 +10,7 @@ resource "aws_cloudwatch_log_group" "this" {
 }
 
 resource "aws_lambda_function" "this" {
-  #checkov:skip=CKV_AWS_272: TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+  #checkov:skip=CKV_AWS_272: "TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
   #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
   #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
