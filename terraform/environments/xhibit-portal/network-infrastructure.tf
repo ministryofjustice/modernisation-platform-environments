@@ -434,7 +434,7 @@ resource "aws_security_group_rule" "portal-http-from-waf-lb" {
   depends_on               = [aws_security_group.waf_lb, aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
   type                     = "ingress"
-  description              = "allow HHTP traffic from WAF LB"
+  description              = "allow HTTP traffic from WAF LB"
   from_port                = 80
   to_port                  = 80
   protocol                 = "TCP"
