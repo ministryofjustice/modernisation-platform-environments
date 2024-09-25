@@ -96,7 +96,7 @@ resource "helm_release" "cluster_autoscaler" {
   name       = "cluster-autoscaler"
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  version    = "9.37.0"
+  version    = "9.40.0"
   namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
 
   values = [
@@ -283,7 +283,7 @@ resource "helm_release" "external_secrets" {
   name       = "external-secrets"
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
-  version    = "0.10.3"
+  version    = "0.10.4"
   namespace  = kubernetes_namespace.external_secrets.metadata[0].name
   values = [
     templatefile(

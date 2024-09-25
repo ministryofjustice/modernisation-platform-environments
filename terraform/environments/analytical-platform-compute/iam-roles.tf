@@ -1,4 +1,4 @@
-module "vpc_cni_iam_role" {
+5.44.1module "vpc_cni_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 

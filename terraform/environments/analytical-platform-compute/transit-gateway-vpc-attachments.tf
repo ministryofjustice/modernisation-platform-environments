@@ -5,8 +5,3 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "moj_tgw" {
 
   tags = local.tags
 }
-
-moved {
-  from = aws_ec2_transit_gateway_vpc_attachment.pttp
-  to   = aws_ec2_transit_gateway_vpc_attachment.moj_tgw
-}
