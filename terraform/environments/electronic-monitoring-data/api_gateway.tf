@@ -131,3 +131,9 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
     "application/json" = ""
   }
 }
+
+resource "aws_api_gateway_stage" "dev_stage" {
+  stage_name    = "dev"
+  rest_api_id   = aws_api_gateway_rest_api.get_zipped_file.id
+  deployment_id = aws_api_gateway_deployment.deployment.id
+}
