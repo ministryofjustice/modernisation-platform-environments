@@ -1,5 +1,27 @@
 locals {
 
+  widget_groups_search_filter_ec2_ids = [
+    for widget_group in var.widget_groups : distinct(flatten([
+      try(widget_group.search_filter.ec2_instance, []),
+      [
+        for ec2_filter in try(widget_group.search_filter.ec2_tag, []) : [
+          for ec2_key, ec2_value in var.ec2_instances :
+          ec2_value.aws_instance.id if try(ec2_value.aws_instance.tags_all[ec2_filter.tag_name] == ec2_filter.tag_value, false)
+        ]
+      ],
+    ]))
+  ]
+  widget_groups_search_filter_ec2 = [
+    for i in range(length(var.widget_groups)) : length(local.widget_groups_search_filter_ec2_ids[i]) == 0 ? {} : {
+      search_filter = join("", [
+        try(var.widget_groups[i].search_filter.negate, false) ? "NOT " : "",
+        "InstanceId=(",
+        join(" OR ", local.widget_groups_search_filter_ec2_ids[i]),
+        ")",
+      ])
+    }
+  ]
+
   widget_group_header_height = [
     for widget_group in var.widget_groups : lookup(widget_group, "header_markdown", null) == null ? 0 : 1
   ]
@@ -14,7 +36,7 @@ locals {
   ]
 
   # add header widget and calculate x, y positions
-  widgets = flatten([
+  widgets_pos = flatten([
     for i in range(length(var.widget_groups)) : [
       lookup(var.widget_groups[i], "header_markdown", null) == null ? [] : [{
         type   = "text"
@@ -35,6 +57,7 @@ locals {
             x      = j * var.widget_groups[i].width % 24
             y      = (floor(j * var.widget_groups[i].width / 24) * var.widget_groups[i].height) + local.widget_group_y[i] + local.widget_group_header_height[i]
           },
+          try(strcontains(var.widget_groups[i].widgets[j].expression, "InstanceId"), false) ? local.widget_groups_search_filter_ec2[i] : {},
           var.widget_groups[i].widgets[j],
           var.accountId == null ? {} : {
             properties = merge(var.widget_groups[i].widgets[j].properties, {
@@ -45,6 +68,38 @@ locals {
       ]
     ]
   ])
+
+  widgets = [
+    for widget in local.widgets_pos : {
+      type   = widget.type
+      width  = widget.width
+      height = widget.height
+      x      = widget.x
+      y      = widget.y
+      properties = merge(
+        widget.properties,
+        lookup(widget, "expression", null) == null ? {} : {
+          metrics = [[{
+            expression = lookup(widget, "search_filter", null) == null ? widget.expression : replace(widget.expression, "MetricName=", "${widget.search_filter} MetricName=")
+            label      = ""
+            id         = "q1"
+          }]]
+        },
+        lookup(widget, "alarm_threshold", null) == null ? {} : {
+          # AWS provider not allowing this for some reason
+          #annotations = {
+          #  horizontal = [
+          #    {
+          #      label = "Alarm Threshold"
+          #      value = widget.alarm_threshold
+          #      fill  = lookup(widget, "alarm_fill", "above")
+          #    }
+          #  ]
+          #}
+        },
+      )
+    }
+  ]
 }
 
 resource "aws_cloudwatch_dashboard" "this" {

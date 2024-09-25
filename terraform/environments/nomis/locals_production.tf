@@ -8,16 +8,6 @@ locals {
 
   baseline_presets_production = {
     options = {
-      cloudwatch_dashboard_default_widget_groups = [
-        "lb",
-        "ec2",
-        "ec2_linux",
-        "ec2_autoscaling_group_linux",
-        "ec2_instance_linux",
-        "ec2_instance_oracle_db_with_backup",
-        "ec2_instance_textfile_monitoring_with_connectivity_test",
-        "ec2_windows",
-      ]
       cloudwatch_log_groups_retention_in_days = 90
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
@@ -48,6 +38,20 @@ locals {
         tags = {
           description = "wildcard cert for nomis production domains"
         }
+      }
+    }
+
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.connectivity,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.xtag,
+          local.cloudwatch_dashboard_widget_groups.asg,
+        ]
       }
     }
 

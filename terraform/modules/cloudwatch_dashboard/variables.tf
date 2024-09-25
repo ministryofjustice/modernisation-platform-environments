@@ -21,14 +21,32 @@ variable "start" {
   default     = null
 }
 
+variable "ec2_instances" {
+  description = "A map of existing modernisation-platform-terraform-ec2-instance resources. Required if using search filtering or iops/throughput widgets"
+  # tflint-ignore: terraform_typed_variables
+  default = {}
+}
+
 variable "widget_groups" {
   description = "list of objects defining a group of widgets. Automatically include a text widget if header_markdown defined. See README.md"
   # tflint-ignore: terraform_typed_variables
-  # type = list(object({  
+  # type = list(object({
   #   header_markdown = optional(string)     # include a header text widget if set
   #   width           = number               # width of each widget, must be divisor of 24
   #   height          = number               # height of each widget
+  #   search_filter   = optional(object({    # optionally apply filter to each 'expression' widget
+  #     negate        = bool                 # negate the filter, e.g. add NOT to the expression
+  #     ec2_instance = optional(list(string)) # provide list of EC2 InstanceIds
+  #     ec2_tag      = optional(list(object({ # select EC2s with given tag name and value
+  #       name = string
+  #       value = string
+  #     })))
   #   widgets         = list(any)            # as per https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html
+  #   NOTE: widget can also use following fields for module only
+  #     expression      = "" # automatically create metrics[] with expression
+  #     search_filter   = "" # additional search filter, e.g. InstanceId=(i-05a8b662eb6a6a5f6 OR i-065e9f701ab8fda22)
+  #                                                           NOT InstanceId=(i-05a8b662eb6a6a5f6 OR i-065e9f701ab8fda22)
+  #     alarm_threshold = number # automatically create horizontal annotation (if supported)
   # }))
   default = []
 }
