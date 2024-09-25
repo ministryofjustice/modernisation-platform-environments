@@ -339,7 +339,7 @@ resource "aws_route53_record" "external_services" {
   count    = local.is-production ? 0 : length(var.services)
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "${var.services[count.index]}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name     = "${var.services[count.index].name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
 
   alias {
@@ -354,7 +354,7 @@ resource "aws_route53_record" "sftp_external_services" {
   allow_overwrite = true
   provider        = aws.core-vpc
   zone_id         = data.aws_route53_zone.external.zone_id
-  name            = "sftp.${var.sftp_services[count.index]}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name            = "sftp.${var.sftp_services[count.index].name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "CNAME"
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60
@@ -365,7 +365,7 @@ resource "aws_route53_record" "external_services_prod" {
   count    = local.is-production ? length(var.services) : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.production_zone.zone_id
-  name     = "${var.services[count.index]}.decisions.tribunals.gov.uk"
+  name     = "${var.services[count.index].name_prefix}.decisions.tribunals.gov.uk"
   type     = "A"
 
   alias {
@@ -380,7 +380,7 @@ resource "aws_route53_record" "sftp_external_services_prod" {
   allow_overwrite = true
   provider        = aws.core-vpc
   zone_id         = data.aws_route53_zone.production_zone.zone_id
-  name            = "sftp.${var.sftp_services[count.index]}.decisions.tribunals.gov.uk"
+  name            = "sftp.${var.sftp_services[count.index].name_prefix}.decisions.tribunals.gov.uk"
   type            = "CNAME"
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60
