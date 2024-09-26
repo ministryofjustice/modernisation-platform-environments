@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "get_s3_output" {
       "s3:ListObjects"
     ]
     resources = [
-      "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*"
+      "${module.s3-dms-target-store-bucket.bucket.arn}/*"
     ]
   }
   statement {
@@ -92,7 +92,7 @@ data "aws_iam_policy_document" "get_s3_output" {
       "s3:ListBucket"
     ]
     resources = [
-      aws_s3_bucket.dms_target_ep_s3_bucket.arn
+      module.s3-dms-target-store-bucket.bucket.arn
     ]
   }
 }
@@ -146,7 +146,7 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
       "s3:PutObjectAcl"
     ]
     resources = [
-      "${module.metadata-s3-bucket.bucket.arn}/*"
+      "${module.s3-metadata-bucket.bucket.arn}/*"
     ]
   }
   statement {
@@ -155,7 +155,7 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
       "s3:ListBucket"
     ]
     resources = [
-      module.metadata-s3-bucket.bucket.arn
+      module.s3-metadata-bucket.bucket.arn
     ]
   }
 }
@@ -214,7 +214,7 @@ data "aws_iam_policy_document" "get_meta_from_s3" {
       "s3:GetObject"
     ]
     resources = [
-      "${module.metadata-s3-bucket.bucket.arn}/*"
+      "${module.s3-metadata-bucket.bucket.arn}/*"
     ]
   }
   statement {
@@ -223,7 +223,7 @@ data "aws_iam_policy_document" "get_meta_from_s3" {
       "s3:ListBucket"
     ]
     resources = [
-      module.metadata-s3-bucket.bucket.arn
+      module.s3-metadata-bucket.bucket.arn
     ]
   }
 }
@@ -283,8 +283,8 @@ data "aws_iam_policy_document" "get_parquet_files" {
       "s3:ListBucket",
     ]
     resources = [
-      aws_s3_bucket.dms_target_ep_s3_bucket.arn,
-      "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*",
+      module.s3-dms-target-store-bucket.bucket.arn,
+      "${module.s3-dms-target-store-bucket.bucket.arn}/*",
     ]
   }
   statement {
@@ -357,7 +357,7 @@ data "aws_iam_policy_document" "list_target_s3_bucket" {
   statement {
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.dms_target_ep_s3_bucket.arn]
+    resources = [module.s3-dms-target-store-bucket.bucket.arn]
   }
 }
 
@@ -395,8 +395,8 @@ data "aws_iam_policy_document" "get_log_s3_files" {
       "s3:DeleteObject"
     ]
     resources = [
-      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*"
+      module.s3-dms-data-validation-bucket.bucket.arn,
+      "${module.s3-dms-data-validation-bucket.bucket.arn}/*"
     ]
   }
 }
@@ -430,8 +430,8 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*",
-      aws_s3_bucket.data_store.arn
+      "${module.s3-data-bucket.bucket.arn}/*",
+      module.s3-data-bucket.bucket.arn
     ]
   }
   statement {
@@ -443,8 +443,8 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${module.json-directory-structure-bucket.bucket.arn}/*",
-      module.json-directory-structure-bucket.bucket.arn
+      "${module.s3-json-directory-structure-bucket.bucket.arn}/*",
+      module.s3-json-directory-structure-bucket.bucket.arn
     ]
   }
 }
@@ -475,7 +475,7 @@ resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zi
   action        = "lambda:InvokeFunction"
   function_name = module.output_file_structure_as_json_from_zip.lambda_function_arn
   principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.data_store.arn
+  source_arn    = module.s3-data-bucket.bucket.arn
 }
 
 
@@ -501,12 +501,12 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${module.json-directory-structure-bucket.bucket.arn}/*",
-      module.json-directory-structure-bucket.bucket.arn,
-      "${module.athena-s3-bucket.bucket.arn}/*",
-      module.athena-s3-bucket.bucket.arn,
-      module.metadata-s3-bucket.bucket.arn,
-      "${module.metadata-s3-bucket.bucket.arn}/*",
+      "${module.s3-json-directory-structure-bucket.bucket.arn}/*",
+      module.s3-json-directory-structure-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      module.s3-athena-bucket.bucket.arn,
+      module.s3-metadata-bucket.bucket.arn,
+      "${module.s3-metadata-bucket.bucket.arn}/*",
     ]
   }
   statement {
@@ -589,8 +589,8 @@ data "aws_iam_policy_document" "place_unzipped_file_s3_policy_document" {
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${module.unzipped-s3-data-store.bucket.arn}/*",
-      module.unzipped-s3-data-store.bucket.arn,
+      "${module.s3-unzipped-files-bucket.bucket.arn}/*",
+      module.s3-unzipped-files-bucket.bucket.arn,
     ]
   }
 }
@@ -604,7 +604,7 @@ data "aws_iam_policy_document" "get_zip_file_s3_policy_document" {
       "s3:GetObjectAttributes",
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*.zip",
+      "${module.s3-data-bucket.bucket.arn}/*.zip",
     ]
   }
 }
@@ -618,7 +618,7 @@ data "aws_iam_policy_document" "list_data_store_bucket_s3_policy_document" {
       "s3:GetBucketLocation",
     ]
     resources = [
-      aws_s3_bucket.data_store.arn,
+      module.s3-data-bucket.bucket.arn,
     ]
   }
 }
@@ -685,8 +685,8 @@ data "aws_iam_policy_document" "get_unzipped_presigned_url_file_s3_policy_docume
       "s3:GetObject"
     ]
     resources = [
-      "${module.unzipped-s3-data-store.bucket.arn}/*",
-      module.unzipped-s3-data-store.bucket.arn,
+      "${module.s3-unzipped-files-bucket.bucket.arn}/*",
+      module.s3-unzipped-files-bucket.bucket.arn,
     ]
   }
 }

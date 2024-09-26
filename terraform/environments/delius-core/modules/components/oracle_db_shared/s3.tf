@@ -200,6 +200,17 @@ resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
 }
 
 
+# encrypting s3 bucket with our shared key (trivy scan)
+resource "aws_s3_bucket_server_side_encryption_configuration" "oracledb_backups_inventory" {
+  bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = var.account_config.kms_keys.general_shared
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
 resource "aws_s3_bucket_versioning" "s3_bucket_oracledb_backups_inventory" {
 
   bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id

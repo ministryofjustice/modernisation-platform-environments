@@ -126,7 +126,6 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
   resource_id = aws_api_gateway_resource.get_zipped_step_function_invoke.id
   http_method = aws_api_gateway_method.get_zipped_step_function_invoke.http_method
   status_code = aws_api_gateway_method_response.response_200.status_code
-  
   response_templates = {
     "application/json" = ""
   }
@@ -137,3 +136,4 @@ resource "aws_api_gateway_stage" "dev_stage" {
   rest_api_id   = aws_api_gateway_rest_api.get_zipped_file.id
   deployment_id = aws_api_gateway_deployment.deployment.id
 }
+

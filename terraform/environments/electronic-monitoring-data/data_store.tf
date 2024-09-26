@@ -1,114 +1,48 @@
-#------------------------------------------------------------------------------
-# S3 bucket for data store logs
-#------------------------------------------------------------------------------
 
-module "data_store_log_bucket" {
-  source = "./modules/s3_log_bucket"
-
-  source_bucket = aws_s3_bucket.data_store
-  account_id    = data.aws_caller_identity.current.account_id
-  local_tags    = local.tags
-}
-
-#------------------------------------------------------------------------------
-# S3 bucket for landed data (internal facing)
-#------------------------------------------------------------------------------
-
-resource "aws_s3_bucket" "data_store" {
-  bucket_prefix = "em-data-store-"
-
-  tags = local.tags
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "data_store" {
-  bucket                  = aws_s3_bucket.data_store.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_versioning" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_policy" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-  policy = data.aws_iam_policy_document.data_store.json
-}
-
-data "aws_iam_policy_document" "data_store" {
-  statement {
-    sid = "EnforceTLSv12orHigher"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    effect  = "Deny"
-    actions = ["s3:*"]
-    resources = [
-      aws_s3_bucket.data_store.arn,
-      "${aws_s3_bucket.data_store.arn}/*"
-    ]
-    condition {
-      test     = "NumericLessThan"
-      variable = "s3:TlsVersion"
-      values   = [1.2]
-    }
-  }
-}
-
-resource "aws_s3_bucket_logging" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-
-  target_bucket = module.data_store_log_bucket.bucket_id
-  target_prefix = "log/"
-
-  target_object_key_format {
-    partitioned_prefix {
-      partition_date_source = "EventTime"
-    }
-  }
-}
 
 resource "aws_s3_bucket_notification" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
+  depends_on = [aws_sns_topic_policy.s3_events_policy]
+  bucket = module.s3-data-bucket.bucket.id
 
   # Only for copy events as those are events triggered by data being copied
-  # from landing bucket.
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.calculate_checksum_lambda.arn
-    events = [
+  #  from landing bucket.
+  topic {
+    topic_arn = aws_sns_topic.s3_events.arn
+    events              = [
       "s3:ObjectCreated:*"
     ]
   }
+}
 
-  # Only for copy events as those are events triggered by data being copied
-  # from landing bucket.
-  # lambda_function {
-  #   lambda_function_arn = aws_lambda_function.summarise_zip_lambda.arn
-  #   events              = [
-  #     "s3:ObjectCreated:*"
-  #   ]
-  # }
+resource "aws_sns_topic" "s3_events" {
+  name = "${module.s3-data-bucket.bucket.id}-object-created-topic"
+}
 
-  depends_on = [
-    aws_lambda_permission.s3_allow_calculate_checksum_lambda,
-    # aws_lambda_permission.s3_allow_summarise_zip_lambda,
-  ]
+# Define the IAM policy document for the SNS topic policy
+data "aws_iam_policy_document" "sns_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions   = ["SNS:Publish"]
+    resources = [aws_sns_topic.s3_events.arn]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [module.s3-data-bucket.bucket.arn]
+    }
+  }
+}
+
+# Apply the policy to the SNS topic
+resource "aws_sns_topic_policy" "s3_events_policy" {
+  arn    = aws_sns_topic.s3_events.arn
+  policy = data.aws_iam_policy_document.sns_policy.json
 }
 
 #------------------------------------------------------------------------------
@@ -128,84 +62,13 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-resource "aws_iam_role" "replication" {
-  name               = "data-store-replication-role"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-}
-
-
-data "aws_iam_policy_document" "replication" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:GetReplicationConfiguration",
-      "s3:ListBucket",
-    ]
-
-    resources = [aws_s3_bucket.data_store.arn]
-  }
-
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:GetObjectVersionForReplication",
-      "s3:GetObjectVersionAcl",
-      "s3:GetObjectVersionTagging",
-    ]
-
-    resources = ["${aws_s3_bucket.data_store.arn}/*"]
-  }
-
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:ReplicateObject",
-      "s3:ReplicateDelete",
-      "s3:ReplicateTags",
-    ]
-
-    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
-  }
-}
-
-resource "aws_iam_policy" "replication" {
-  name   = "data-store-replication-policy"
-  policy = data.aws_iam_policy_document.replication.json
-}
-
-resource "aws_iam_role_policy_attachment" "replication" {
-  role       = aws_iam_role.replication.name
-  policy_arn = aws_iam_policy.replication.arn
-}
-
-
-resource "aws_s3_bucket_replication_configuration" "replication" {
-  provider = aws
-  # Must have bucket versioning enabled first
-  depends_on = [aws_s3_bucket_versioning.data_store]
-
-  role   = aws_iam_role.replication.arn
-  bucket = aws_s3_bucket.data_store.id
-
-  rule {
-    id = "whole_bucket"
-
-    status = "Enabled"
-
-    destination {
-      bucket        = module.s3-data-bucket.bucket.arn
-    }
-  }
-}
 
 #------------------------------------------------------------------------------
 # S3 lambda function to calculate data store file checksums
 #------------------------------------------------------------------------------
 
 variable "checksum_algorithm" {
+  type        = string
   description = "Select Checksum Algorithm. Default and recommended choice is SHA256, however CRC32, CRC32C, SHA1 are also available."
   default     = "SHA256"
 }
@@ -255,7 +118,7 @@ data "aws_iam_policy_document" "calculate_checksum_lambda" {
       "s3:GetObjectVersionAttributes",
       "s3:ListBucket"
     ]
-    resources = ["${aws_s3_bucket.data_store.arn}/*"]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
   }
 }
 
@@ -265,12 +128,20 @@ resource "aws_iam_role_policy" "calculate_checksum_lambda" {
   policy = data.aws_iam_policy_document.calculate_checksum_lambda.json
 }
 
-resource "aws_lambda_permission" "s3_allow_calculate_checksum_lambda" {
-  statement_id  = "AllowCalculateChecksumExecutionFromS3Bucket"
+resource "aws_lambda_permission" "allow_sns_invoke_checksum_lambda" {
+  statement_id  = "AllowSNSInvokeChecksum"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.calculate_checksum_lambda.arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.data_store.arn
+  function_name = aws_lambda_function.calculate_checksum_lambda.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.s3_events.arn
+}
+
+resource "aws_sns_topic_subscription" "checksum_lambda_subscription" {
+  topic_arn = aws_sns_topic.s3_events.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.calculate_checksum_lambda.arn
+
+  depends_on = [aws_lambda_permission.allow_sns_invoke_checksum_lambda]
 }
 
 #------------------------------------------------------------------------------
@@ -311,7 +182,7 @@ data "aws_iam_policy_document" "summarise_zip_lambda" {
       "s3:PutObject",
       "s3:ListBucket"
     ]
-    resources = ["${aws_s3_bucket.data_store.arn}/*"]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
   }
 }
 
@@ -321,10 +192,19 @@ resource "aws_iam_role_policy" "summarise_zip_lambda" {
   policy = data.aws_iam_policy_document.summarise_zip_lambda.json
 }
 
-resource "aws_lambda_permission" "s3_allow_summarise_zip_lambda" {
-  statement_id  = "AllowSummariseZipExecutionFromS3Bucket"
+resource "aws_lambda_permission" "allow_sns_invoke_zip_lambda" {
+  statement_id  = "AllowSNSInvokeZip"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.summarise_zip_lambda.arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.data_store.arn
+  function_name = aws_lambda_function.summarise_zip_lambda.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.s3_events.arn
+}
+
+
+resource "aws_sns_topic_subscription" "zip_lambda_subscription" {
+  topic_arn = aws_sns_topic.s3_events.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.summarise_zip_lambda.arn
+
+  depends_on = [aws_lambda_permission.allow_sns_invoke_zip_lambda]
 }
