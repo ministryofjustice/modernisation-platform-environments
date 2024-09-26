@@ -1,5 +1,0 @@
-SET IDENTITY_INSERT dbo.CaseDetails OFF;
-GO
-
-SET IDENTITY_INSERT dbo.Users ON;
-GO
