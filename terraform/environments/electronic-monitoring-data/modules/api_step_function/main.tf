@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "trigger_step_function_policy" {
 }
 
 resource "aws_iam_policy" "trigger_step_function_policy" {
-  name        = "trigger-${var.step_function.id}-step-function-policy"
+  name        = "trigger-${replace(var.step_function.id, "_", "-")}-step-function-policy"
   description = "Policy to trigger ${var.step_function.id} Step Function"
   policy      = data.aws_iam_policy_document.trigger_step_function_policy.json
 }
@@ -242,7 +242,7 @@ resource "aws_cloudwatch_log_group" "api_gateway_logs" {
 
 resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch_role_policy" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
-  role       = aws_iam_role.api_gateway_role[each.key].arn
+  role       = aws_iam_role.api_gateway_role.arn
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
