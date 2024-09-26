@@ -49,6 +49,9 @@ resource "aws_dms_replication_task" "migration-task" {
       ApplyErrorUpdatePolicy     = "LOG_ERROR"
       ApplyErrorEscalationCount  = 0
       ApplyErrorEscalationPolicy = "LOG_ERROR"
+    },
+    Logging = {
+      EnableLogging = true
     }
   })
 
@@ -66,5 +69,4 @@ resource "aws_dms_replication_task" "migration-task" {
       }
     ]
   })
-
 }
