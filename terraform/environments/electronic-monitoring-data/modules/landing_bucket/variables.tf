@@ -5,6 +5,7 @@ variable "data_feed" {
 
 variable "local_bucket_prefix" {
   description = "The predefined local.bucket_prefix"
+  type        = string
 }
 
 variable "local_tags" {
@@ -14,7 +15,6 @@ variable "local_tags" {
 
 variable "logging_bucket" {
   description = "Bucket to use for logging"
-  type        = string
 }
 
 variable "order_type" {
