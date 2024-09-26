@@ -101,7 +101,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.get_zipped_step_function_invoke,
       aws_api_gateway_method.get_zipped_step_function_invoke,
       aws_api_gateway_integration.get_zipped_step_function_invoke,
-      aws_api_gateway_method_response.integration_response_200, 
+      aws_api_gateway_method_response.response_200, 
     ]))
   }
 
