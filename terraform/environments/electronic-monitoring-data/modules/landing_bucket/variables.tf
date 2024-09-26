@@ -5,7 +5,6 @@ variable "data_feed" {
 
 variable "local_bucket_prefix" {
   description = "The predefined local.bucket_prefix"
-  type        = string
 }
 
 variable "local_tags" {
