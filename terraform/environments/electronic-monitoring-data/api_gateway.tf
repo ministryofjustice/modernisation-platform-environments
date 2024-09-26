@@ -124,13 +124,12 @@ resource "aws_api_gateway_usage_plan" "test_usage_plan" {
     burst_limit = 100
     rate_limit  = 50
   }
+  api_stages {
+    api_id = aws_api_gateway_rest_api.get_zipped_file.id
+    stage  = aws_api_gateway_stage.test_stage.stage_name
+  }
 }
 
-resource "aws_api_gateway_stage" "dev_stage" {
-  stage_name    = "dev"
-  rest_api_id   = aws_api_gateway_rest_api.get_zipped_file.id
-  deployment_id = aws_api_gateway_deployment.deployment.id
-}
 
 resource "aws_api_gateway_api_key" "test_api_key" {
   name        = "ExampleAPIKey"
