@@ -114,7 +114,7 @@ resource "aws_api_gateway_method_response" "response_200" {
   rest_api_id = aws_api_gateway_rest_api.get_zipped_file.id
   resource_id = aws_api_gateway_resource.get_zipped_step_function_invoke.id
   http_method = aws_api_gateway_method.get_zipped_step_function_invoke.http_method
-  status_code = aws_api_gateway_method_response.response_200.status_code
+  status_code = "200"
 }
 
 resource "aws_api_gateway_usage_plan" "test_usage_plan" {
