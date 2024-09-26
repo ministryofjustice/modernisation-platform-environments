@@ -41,7 +41,7 @@ variable "api_key_required" {
 variable "stages" {
   description = "Stage settings"
   type        = list(
-    map(
+    object(
         {
             stage_name = string,
             stage_description = string, 
@@ -52,4 +52,16 @@ variable "stages" {
         }
         )
     )
+}
+
+variable "schema" {
+    description = "The expected schema of the API"
+    type = object({
+        type = string
+        properties = map(object({
+        type = string
+        }))
+        required = list(string)
+    })
+
 }

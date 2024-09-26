@@ -23,6 +23,28 @@ resource "aws_api_gateway_method" "method" {
   http_method      = var.http_method
   authorization    = var.authorization
   api_key_required = var.api_key_required
+  request_validator_id = aws_api_gateway_request_validator.request_validator.id
+    request_models = {
+    "application/json" = aws_api_gateway_model.example_model.name
+  }
+}
+
+# --------------------------------------------------------
+# API Validator
+# --------------------------------------------------------
+
+resource "aws_api_gateway_request_validator" "request_validator" {
+    rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+    name        = "${var.api_name}RequestValidator"
+    validate_request_body = true
+    validate_request_parameters = true
+}
+
+resource "aws_api_gateway_model" "example_model" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  name        = "${var.api_name}ExampleModel"
+  content_type = "application/json"
+  schema = jsonencode(var.schema)
 }
 
 # --------------------------------------------------------

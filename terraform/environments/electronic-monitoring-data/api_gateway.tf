@@ -16,4 +16,11 @@ module "get_zipped_file_api" {
 
     }
   ]
+  schema = {
+    type = "object"
+    properties = {
+      file_name = { type = "string" }
+      zip_file_name = { type = "string" }
+    }
+  }
 }
