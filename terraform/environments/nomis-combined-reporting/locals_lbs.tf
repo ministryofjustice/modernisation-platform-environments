@@ -74,26 +74,6 @@ locals {
       security_groups                  = ["public-lb"]
       subnets                          = module.environment.subnets["private"].ids
 
-      instance_target_groups = {
-        web = {
-          port     = 7777
-          protocol = "HTTP"
-          health_check = {
-            enabled             = true
-            healthy_threshold   = 3
-            interval            = 30
-            matcher             = "200-399"
-            path                = "/"
-            port                = 7777
-            timeout             = 5
-            unhealthy_threshold = 5
-          }
-          stickiness = {
-            enabled = true
-            type    = "lb_cookie"
-          }
-        }
-      }
       listeners = {
         http = {
           port     = 80

@@ -205,7 +205,7 @@ data "aws_iam_policy_document" "rds_data_store_access" {
       "s3:GetBucketLocation",
     ]
     resources = [
-      aws_s3_bucket.data_store.arn,
+      module.s3-data-bucket.bucket.arn,
     ]
   }
   statement {
@@ -219,7 +219,7 @@ data "aws_iam_policy_document" "rds_data_store_access" {
       "s3:AbortMultipartUpload",
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*",
+      "${module.s3-data-bucket.bucket.arn}/*",
     ]
   }
 }
