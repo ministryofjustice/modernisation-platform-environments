@@ -8,6 +8,8 @@ terraform {
   required_version = "~> 1.0"
 }
 
+data "aws_caller_identity" "current" {}
+
 module "this-bucket" {
   source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
@@ -61,23 +63,16 @@ module "this-bucket" {
   )
 }
 
-resource "aws_secretsmanager_secret" "supplier_account_id" {
-  name        = "${var.data_feed}-${var.order_type}-supplier-account"
-  description = "AWS Account ID for cross-account S3 access for the ${var.data_feed} ${var.order_type} data"
+#tfsec:ignore:aws-iam-no-user-attached-policies
+resource "aws_iam_user" "supplier" {
+  name = "${var.local_bucket_prefix}-${var.data_feed}-${var.order_type}"
+  tags = var.local_tags
 }
 
-data "aws_secretsmanager_secret_version" "supplier_account_id" {
-  secret_id = aws_secretsmanager_secret.supplier_account_id.id
-}
-
-locals {
-  supplier_account_id = jsondecode(data.aws_secretsmanager_secret_version.supplier_account_id.secret_string)["account_id"]
-}
-
-resource "aws_iam_role" "supplier_put_access" {
+resource "aws_iam_role" "supplier_data_access" {
   name = "supplier-put-${var.data_feed}-${var.order_type}-landing-bucket"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
-  managed_policy_arns = [aws_iam_policy.supplier_put_access.arn]
+  managed_policy_arns = [aws_iam_policy.supplier_data_access.arn]
 
   tags = merge(
     var.local_tags,
@@ -91,21 +86,37 @@ data "aws_iam_policy_document" "assume_role" {
     actions = ["sts:AssumeRole"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.supplier_account_id}:root"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${aws_iam_user.supplier.name}"]
     }
   }
 }
 
-resource "aws_iam_policy" "supplier_put_access" {
+resource "aws_iam_policy" "supplier_data_access" {
   name        = "put-s3-${var.data_feed}-${var.order_type}-policy"
   description = "Give put access to the ${var.data_feed}-${var.order_type} landing bucket"
-  policy      = data.aws_iam_policy_document.supplier_put_access.json
+  policy      = data.aws_iam_policy_document.supplier_data_access.json
 }
 
-data "aws_iam_policy_document" "supplier_put_access" {
+data "aws_iam_policy_document" "supplier_data_access" {
+  # Source bucket access
   statement {
     actions = [
-      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetObject",
+      "s3:GetObjectTagging",
+      "s3:GetObjectVersion",
+      "s3:GetObjectVersionTagging"
+    ]
+
+    resources = [
+      "arn:aws:s3:::awsexamplesourcebucket",
+      "arn:aws:s3:::awsexamplesourcebucket/*"
+    ]
+  }
+  # Destination bucket access
+  statement {
+    actions = [
+      "s3:PutObject"
     ]
 
     resources = [
