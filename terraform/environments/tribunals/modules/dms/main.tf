@@ -76,10 +76,11 @@ resource "aws_dms_replication_task" "migration-task" {
 }
 
 resource "aws_cloudwatch_log_group" "dms_log_group" {
-  name = "dms-logs"
+  name = "dms-logs-${var.target_database_name}"
 }
 
 resource "aws_cloudwatch_log_stream" "dms_log_stream" {
+  depends_on     = [aws_cloudwatch_log_group.dms_log_group]
   name           = "dms-log-stream"
   log_group_name = aws_cloudwatch_log_group.dms_log_group.name
 }
