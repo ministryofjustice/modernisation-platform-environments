@@ -5,6 +5,7 @@
 locals {
   environment_config_preprod = {
     migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/22"]
+    migration_environment_vpc_cidr         = "10.160.0.0/20"
     migration_environment_db_cidr          = ["10.160.44.0/24", "10.160.45.0/24", "10.160.46.0/25"]
     migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"
