@@ -192,7 +192,7 @@ resource "aws_api_gateway_usage_plan" "usage_plan" {
   }
   api_stages {
     api_id = aws_api_gateway_rest_api.api_gateway.id
-    stage  = aws_api_gateway_stage.stages[each.key].stage_name
+    stage  = aws_api_gateway_stage.stage[each.key].stage_name
   }
 }
 
@@ -215,7 +215,7 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
 resource "aws_api_gateway_method_settings" "example" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  stage_name  = aws_api_gateway_stage.stages[each.key].stage_name
+  stage_name  = aws_api_gateway_stage.stage[each.key].stage_name
   method_path = "*/*"
 
   settings {
@@ -268,7 +268,7 @@ resource "aws_iam_role_policy" "cloudwatch" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
   name   = "cloudwatch log for group ${aws_cloudwatch_log_group.api_gateway_logs[each.key].arn}"
   role   = aws_iam_role.api_gateway_role.id
-  policy = data.aws_iam_policy_document[each.key].cloudwatch.json
+  policy = data.aws_iam_policy_document.cloudwatch[each.key].json
 }
 
 resource "aws_api_gateway_account" "api_gateway_account" {

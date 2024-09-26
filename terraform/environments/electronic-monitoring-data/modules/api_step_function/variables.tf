@@ -56,12 +56,6 @@ variable "stages" {
 
 variable "schema" {
     description = "The expected schema of the API"
-    type = object({
-        type = string
-        properties = map(object({
-        type = string
-        }))
-        required = list(string)
-    })
+    type = any
 
 }

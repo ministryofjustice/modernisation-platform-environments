@@ -22,5 +22,6 @@ module "get_zipped_file_api" {
       file_name = { type = "string" }
       zip_file_name = { type = "string" }
     }
+    required = ["file_name", "zip_file_name"]
   }
 }
