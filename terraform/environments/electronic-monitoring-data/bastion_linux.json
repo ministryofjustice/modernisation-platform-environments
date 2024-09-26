@@ -8,6 +8,9 @@
     },
     "production": {
       "mattprice": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEiltWt3w24iTeybMTXYLNiS8WusBqTw929Q4kMtFwuA"
+    },
+    "test": {
+      "mattprice": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEiltWt3w24iTeybMTXYLNiS8WusBqTw929Q4kMtFwuA"
     }
   }
 }
