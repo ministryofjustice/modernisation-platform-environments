@@ -15,14 +15,23 @@ variable "local_tags" {
 
 variable "logging_bucket" {
   description = "Bucket to use for logging"
+  type = object({
+    bucket = object({
+      id  = string
+      arn = string
+    })
+    bucket_policy = object({
+      policy = string
+    })
+  })
 }
 
 variable "order_type" {
-  description = "An integer relating to the order type"
+  description = "The name of the order type data"
   type        = string
 }
 
 variable "supplier_bucket" {
-  description = "The name of the bucket containing data to be sent"
+  description = "The name of the supplier bucket containing data to be sent"
   type        = string
 }
