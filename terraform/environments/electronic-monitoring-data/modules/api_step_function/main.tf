@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "trigger_step_function_policy" {
 }
 
 resource "aws_iam_policy" "trigger_step_function_policy" {
-  name   = "trigger-${substr(replace(replace(var.step_function.id, "_", "-"), " ", "-"), 0, 50)}-step-function-policy"
+  name   = "trigger-${substr(replace(replace(replace(replace(var.step_function.id, ":", "-"), "/", "-"), "_", "-"), "arn", ""), 0, 50)}-policy"
   policy      = data.aws_iam_policy_document.trigger_step_function_policy.json
 }
 
