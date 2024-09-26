@@ -408,9 +408,9 @@ EOF
 
 ####### IAM role #######
 
-resource "aws_iam_role" "edw_ec2_role" { 
-  name = "${local.application_name}-ec2-instance-role"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]    
+resource "aws_iam_role" "edw_ec2_role" {
+  name                = "${local.application_name}-ec2-instance-role"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
   tags = merge(
     local.tags,
     {
@@ -724,30 +724,30 @@ resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "RDS_Appstream" {
-  security_group_id            = aws_security_group.edw_db_security_group.id
-  description                  = "RDS Appstream access"
-  cidr_ipv4                    = "10.200.32.0/19"
-  from_port                    = 1521
-  ip_protocol                  = "tcp"
-  to_port                      = 1521
+  security_group_id = aws_security_group.edw_db_security_group.id
+  description       = "RDS Appstream access"
+  cidr_ipv4         = "10.200.32.0/19"
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
 }
 
 resource "aws_vpc_security_group_ingress_rule" "RDS_workstream" {
-  security_group_id            = aws_security_group.edw_db_security_group.id
-  description                  = "RDS Workspace access"
-  cidr_ipv4                    = local.application_data.accounts[local.environment].edw_management_cidr
-  from_port                    = 1521
-  ip_protocol                  = "tcp"
-  to_port                      = 1521
+  security_group_id = aws_security_group.edw_db_security_group.id
+  description       = "RDS Workspace access"
+  cidr_ipv4         = local.application_data.accounts[local.environment].edw_management_cidr
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
 }
 
 resource "aws_vpc_security_group_ingress_rule" "RDS_env" {
-  security_group_id            = aws_security_group.edw_db_security_group.id
-  description                  = "RDS env access"
-  cidr_ipv4                    = data.aws_vpc.shared.cidr_block
-  from_port                    = 1521
-  ip_protocol                  = "tcp"
-  to_port                      = 1521
+  security_group_id = aws_security_group.edw_db_security_group.id
+  description       = "RDS env access"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
 }
 
 resource "aws_vpc_security_group_egress_rule" "all_out" {

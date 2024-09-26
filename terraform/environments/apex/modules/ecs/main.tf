@@ -20,11 +20,11 @@ data "aws_subnets" "shared-private" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
-  vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
-  name                = "${var.app_name}-cluster-scaling-group"
-  desired_capacity    = var.ec2_desired_capacity
-  max_size            = var.ec2_max_size
-  min_size            = var.ec2_min_size
+  vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
+  name                  = "${var.app_name}-cluster-scaling-group"
+  desired_capacity      = var.ec2_desired_capacity
+  max_size              = var.ec2_max_size
+  min_size              = var.ec2_min_size
   protect_from_scale_in = true
 
   launch_template {
@@ -346,7 +346,7 @@ resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no
       "Action": [
         "ssm:GetParameters"
       ],
-      "Resource": ["${var.database_tad_password_arn}"]
+      "Resource": ["${var.database_admin_password_arn}"]
     }
   ]
 }

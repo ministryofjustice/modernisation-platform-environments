@@ -1,6 +1,7 @@
 #module "capita" {
 #  source = "./modules/landing_zone/"
-#
+#  count = local.is-production ? 1 : 0
+#  
 #  supplier = "capita"
 #
 #  user_accounts = [
@@ -17,7 +18,7 @@
 #    # local.sftp_account_capita_test,
 #  ]
 #
-#  data_store_bucket = aws_s3_bucket.data_store
+#  data_store_bucket = module.s3-data-bucket.bucket
 #
 #  account_id = data.aws_caller_identity.current.account_id
 #
@@ -29,6 +30,7 @@
 
 module "buddi" {
   source = "./modules/landing_zone/"
+  count = local.is-production ? 1 : 0
 
   supplier = "buddi"
 
@@ -43,18 +45,21 @@ module "buddi" {
     local.sftp_account_buddi_live,
   ]
 
-  data_store_bucket = aws_s3_bucket.data_store
+  data_store_bucket = module.s3-data-bucket.bucket
 
   account_id = data.aws_caller_identity.current.account_id
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
-
+  providers = {
+    aws = aws
+  }
   local_tags = local.tags
 }
 
 #module "civica" {
 #  source = "./modules/landing_zone/"
+#  count = local.is-production ? 1 : 0
 #
 #  supplier = "civica"
 #
@@ -69,7 +74,7 @@ module "buddi" {
 #    # local.sftp_account_civica_orca,
 #  ]
 #
-#  data_store_bucket = aws_s3_bucket.data_store
+#  data_store_bucket = module.s3-data-bucket.bucket
 #
 #  account_id = data.aws_caller_identity.current.account_id
 #
@@ -81,6 +86,7 @@ module "buddi" {
 
 module "g4s" {
   source = "./modules/landing_zone/"
+  count = local.is-production ? 1 : 0
 
   supplier = "g4s"
 
@@ -106,14 +112,18 @@ module "g4s" {
     local.sftp_account_g4s_x_drive,
   ]
 
-  data_store_bucket = aws_s3_bucket.data_store
+  data_store_bucket = module.s3-data-bucket.bucket
 
   account_id = data.aws_caller_identity.current.account_id
 
   vpc_id     = data.aws_vpc.shared.id
   subnet_ids = [data.aws_subnet.public_subnets_b.id]
+  providers = {
+    aws = aws
+  }
 
   local_tags = local.tags
+
 }
 
 data "aws_caller_identity" "current_acct_id" {}

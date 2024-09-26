@@ -2,8 +2,8 @@ resource "aws_efs_file_system" "edw" {
 
   performance_mode = "maxIO"
   throughput_mode  = "bursting"
-  encrypted  = "true"
-  kms_key_id = aws_kms_key.efs.arn
+  encrypted        = "true"
+  kms_key_id       = aws_kms_key.efs.arn
 
   lifecycle_policy {
     transition_to_ia = "AFTER_90_DAYS"

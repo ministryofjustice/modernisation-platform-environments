@@ -30,6 +30,7 @@ variable "ldap_config" {
     efs_backup_schedule         = string
     efs_backup_retention_period = string
     port                        = optional(number)
+    tls_port                    = optional(number)
   })
   default = {
     name                        = "default_name"
@@ -41,6 +42,7 @@ variable "ldap_config" {
     efs_backup_schedule         = "default_efs_backup_schedule"
     efs_backup_retention_period = "default_efs_backup_retention_period"
     port                        = 389
+    tls_port                    = 636
   }
 }
 
@@ -98,4 +100,9 @@ variable "db_suffix" {
   description = "identifier to append to name e.g. dsd, boe"
   type        = string
   default     = "db"
+}
+
+variable "env_name_to_dms_config_map" {
+  description = "Map of delius-core environments to DMS configurations"
+  type        = any
 }

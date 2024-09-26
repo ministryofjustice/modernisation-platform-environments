@@ -224,6 +224,31 @@ resource "aws_volume_attachment" "backup_clone_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
+resource "aws_ebs_volume" "backup_prod" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  count             = length(local.application_data.accounts[local.environment].ebs_backup_prod_snapshot_id) > 0 ? 1 : 0
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
+  type              = local.application_data.accounts[local.environment].ebs_type_ebsdb_backup
+  snapshot_id       = length(local.application_data.accounts[local.environment].ebs_backup_prod_snapshot_id) > 0 ? local.application_data.accounts[local.environment].ebs_backup_prod_snapshot_id : null
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup-prod")) },
+    { device-name = "/dev/sdy" }
+  )
+}
+
+resource "aws_volume_attachment" "backup_prod_att" {
+  count       = length(local.application_data.accounts[local.environment].ebs_backup_prod_snapshot_id) > 0 ? 1 : 0
+  device_name = "/dev/sdy"
+  volume_id   = aws_ebs_volume.backup_prod[0].id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
 resource "aws_ebs_volume" "redoB" {
   lifecycle {
     ignore_changes = [kms_key_id]

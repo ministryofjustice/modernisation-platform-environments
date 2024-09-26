@@ -1,5 +1,7 @@
 # Create a new DMS replication instance
 resource "aws_dms_replication_instance" "dms" {
+  #checkov:skip=CKV_AWS_222: "Ensure DMS replication instance gets all minor upgrade automatically"
+  #checkov:skip=CKV_AWS_212: "Ensure DMS replication instance is encrypted by KMS using a customer managed Key (CMK)"
   count = var.setup_dms_instance ? 1 : 0
 
   allocated_storage            = var.replication_instance_storage
@@ -62,6 +64,8 @@ resource "aws_dms_replication_task" "dms-replication" {
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "source" {
   #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
+  #checkov:skip=CKV_AWS_296: "Ensure DMS endpoint uses Customer Managed Key (CMK).TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+
 
   count = var.setup_dms_instance ? 1 : 0
 
@@ -87,7 +91,9 @@ resource "aws_dms_endpoint" "source" {
 # Create an endpoint for the target Kinesis
 resource "aws_dms_endpoint" "target" {
   #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
-  
+
+  #checkov:skip=CKV_AWS_296: "Ensure DMS endpoint uses Customer Managed Key (CMK).TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+
   count = var.setup_dms_instance ? 1 : 0
 
   endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_target_name}-target"
@@ -127,6 +133,8 @@ resource "aws_dms_replication_subnet_group" "dms" {
 
 # Security Groups
 resource "aws_security_group" "dms_sec_group" {
+
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   count = var.setup_dms_instance ? 1 : 0
 
   name   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"

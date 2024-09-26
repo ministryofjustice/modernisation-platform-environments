@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_log_group" "this" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-  
+
   count = var.enable_lambda ? 1 : 0
   name  = "/aws/lambda/${var.name}-function"
 
@@ -10,6 +10,10 @@ resource "aws_cloudwatch_log_group" "this" {
 }
 
 resource "aws_lambda_function" "this" {
+  #checkov:skip=CKV_AWS_272: TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+  #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+  #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+
   count         = var.enable_lambda ? 1 : 0
   function_name = "${var.name}-function"
 

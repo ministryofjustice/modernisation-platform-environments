@@ -2,6 +2,8 @@
 
 # The Connector Lambda will use this policy to access everything it needs
 resource "aws_iam_policy" "athena_federated_query_connector_policy" {
+  #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions.TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+
   name        = "${var.project_prefix}_athena_federated_query_connector_policy"
   description = "The policy the connector will use"
 

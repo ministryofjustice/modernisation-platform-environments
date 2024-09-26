@@ -39,8 +39,12 @@ locals {
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
+      "/dev/sdd" = { label = "data" }            # DATA
       "/dev/sde" = { label = "data" }            # DATA
-      "/dev/sdf" = { label = "flash" }           # FLASH
+      "/dev/sdf" = { label = "data" }            # DATA
+      "/dev/sdg" = { label = "data" }            # DATA
+      "/dev/sdh" = { label = "data" }            # DATA
+      "/dev/sdi" = { label = "flash" }           # FLASH
       "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {
@@ -51,15 +55,15 @@ locals {
       }
       data = {
         iops       = 3000
-        throughput = 125
+        throughput = 400
         type       = "gp3"
-        total_size = 500
+        total_size = 10000
       }
       flash = {
         iops       = 3000
-        throughput = 125
+        throughput = 400
         type       = "gp3"
-        total_size = 500
+        total_size = 1000
       }
     }
     ansible_user_data_config = {
@@ -90,6 +94,12 @@ locals {
       container_port   = 8080
       container_cpu    = 512
       container_memory = 1024
+    }
+
+    ldap = {
+      image_tag       = "replace_me"
+      container_port  = 389
+      slapd_log_level = "replace_me"
     }
 
     pdf_creation = {
@@ -125,5 +135,6 @@ locals {
     user_target_endpoint = {
       write_database = "STGNDA"
     }
+    is-production = local.is-production
   }
 }

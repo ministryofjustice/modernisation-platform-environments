@@ -216,7 +216,7 @@ resource "aws_cloudwatch_log_group" "send_database_to_ap" {
 
 data "aws_iam_policy_document" "trigger_unzip_lambda" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["lambda:InvokeFunction"]
     resources = [
       module.unzip_single_file.lambda_function_arn,
@@ -226,18 +226,18 @@ data "aws_iam_policy_document" "trigger_unzip_lambda" {
 }
 
 resource "aws_iam_policy" "trigger_unzip_lambda" {
-  name = "trigger_unzip_lambda"
+  name   = "trigger_unzip_lambda"
   policy = data.aws_iam_policy_document.trigger_unzip_lambda.json
 }
 
 module "get_zipped_file" {
-  source = "./modules/step_function"
-  name = "get_zipped_file"
-  iam_policies = tomap({"trigger_unzip_lambda" = aws_iam_policy.trigger_unzip_lambda})
+  source         = "./modules/step_function"
+  name           = "get_zipped_file"
+  iam_policies   = tomap({ "trigger_unzip_lambda" = aws_iam_policy.trigger_unzip_lambda })
   env_account_id = local.env_account_id
   variable_dictionary = tomap(
     {
-      "unzip_file_name" = module.unzip_single_file.lambda_function_name, 
+      "unzip_file_name"            = module.unzip_single_file.lambda_function_name,
       "pre_signed_url_lambda_name" = module.unzipped_presigned_url.lambda_function_name
     }
   )

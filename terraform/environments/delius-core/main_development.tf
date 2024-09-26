@@ -8,10 +8,11 @@ module "environment_dev" {
   count  = local.is-development ? 1 : 0
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws                        = aws
+    aws.bucket-replication     = aws
+    aws.core-vpc               = aws.core-vpc
+    aws.core-network-services  = aws.core-network-services
+    aws.modernisation-platform = aws.modernisation-platform
   }
 
   env_name      = "dev"
@@ -35,6 +36,8 @@ module "environment_dev" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = merge(local.dms_config_dev, { client_account_arns = local.dms_client_account_arns })
+  dms_config = local.dms_config_dev
+
+  env_name_to_dms_config_map = local.env_name_to_dms_config_map
 
 }

@@ -9,10 +9,11 @@ module "environment_stage" {
   count  = local.is-preproduction ? 1 : 0
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws                        = aws
+    aws.bucket-replication     = aws
+    aws.core-vpc               = aws.core-vpc
+    aws.core-network-services  = aws.core-network-services
+    aws.modernisation-platform = aws.modernisation-platform
   }
 
   env_name      = "stage"
@@ -36,7 +37,9 @@ module "environment_stage" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = merge(local.dms_config_stage, { client_account_arns = local.dms_client_account_arns })
+  dms_config = local.dms_config_stage
+
+  env_name_to_dms_config_map = local.env_name_to_dms_config_map
 }
 
 module "environment_preprod" {
@@ -45,10 +48,11 @@ module "environment_preprod" {
   count  = local.is-preproduction ? 1 : 0
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws                        = aws
+    aws.bucket-replication     = aws
+    aws.core-vpc               = aws.core-vpc
+    aws.core-network-services  = aws.core-network-services
+    aws.modernisation-platform = aws.modernisation-platform
   }
 
   env_name      = "preprod"
@@ -72,5 +76,7 @@ module "environment_preprod" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = merge(local.dms_config_preprod, { client_account_arns = local.dms_client_account_arns })
+  dms_config = local.dms_config_preprod
+
+  env_name_to_dms_config_map = local.env_name_to_dms_config_map
 }

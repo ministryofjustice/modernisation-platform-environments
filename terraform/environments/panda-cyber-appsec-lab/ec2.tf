@@ -1,16 +1,19 @@
 # Kali Linux Instance
 resource "aws_instance" "kali_linux" {
-  ami                    = "ami-07c1b39b7b3d2525d"
-  instance_type          = "t2.micro"
-  subnet_id              = module.vpc.private_subnets.0
-  vpc_security_group_ids = [aws_security_group.kali_linux_sg.id]
-  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
-  ebs_optimized          = true
+  #checkov:skip=CKV_AWS_88:instance requires internet access
+  ami                         = "ami-0f398bcc12f72f967" // aws-marketplace/kali-last-snapshot-amd64-2024.2.0-804fcc46-63fc-4eb6-85a1-50e66d6c7215
+  associate_public_ip_address = true
+  instance_type               = "t2.micro"
+  subnet_id                   = module.vpc.private_subnets.0
+  vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]
+  iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
+  ebs_optimized               = true
   metadata_options {
     http_tokens = "required"
   }
   root_block_device {
-    encrypted = true
+    encrypted   = true
+    volume_size = 60
   }
   ebs_block_device {
     device_name = "/dev/xvda"
@@ -19,21 +22,32 @@ resource "aws_instance" "kali_linux" {
   }
   user_data = <<-EOF
               #!/bin/bash
-              sudo apt update && sudo apt -y install software-properties-common
-              sudo wget -q -O - https://archive.kali.org/archive-key.asc | sudo apt-key add -
-              sudo echo "deb http://http.kali.org/kali kali-rolling main non-free contrib" | sudo tee /etc/apt/sources.list.d/kali.list
-              sudo apt update && sudo apt -y install kali-linux-default
+              # Update and install dependencies
+              apt-get update
+              apt-get upgrade
+              apt-get install -y wget
+              
+
+              # Download the SSM agent
+              wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
+
+              # Install the agent
+              dpkg -i amazon-ssm-agent.deb
+
+              # Start the SSM service
+              systemctl enable amazon-ssm-agent
+              systemctl start amazon-ssm-agent
+
+              # Check the status
+              systemctl status amazon-ssm-agent
+
+              # Install kali-linux-default tools
+              apt-get install -y kali-linux-default
               EOF
 
   tags = {
     Name = "Terraform-Kali-Linux"
   }
-}
-
-# Create Elastic IP
-resource "aws_eip" "kali_linux_eip" {
-  instance = aws_instance.kali_linux.id
-  domain   = "vpc"
 }
 
 # Security Group for Kali instance
@@ -84,8 +98,136 @@ resource "aws_iam_role_policy_attachment" "ssm_policy" {
   role       = aws_iam_role.ssm_role.name
 }
 
+# Attach an additional policy for S3 access
+resource "aws_iam_policy" "s3_access_policy" {
+  name        = "SSMInstanceS3AccessPolicy"
+  description = "Policy to allow EC2 to access the S3 bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        Effect = "Allow",
+        Resource = [
+          module.s3-bucket.bucket.arn,
+          "${module.s3-bucket.bucket.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+# Attach the policy to the existing SSM role
+resource "aws_iam_role_policy_attachment" "ssm_s3_access_policy" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = aws_iam_policy.s3_access_policy.arn
+}
+
 # Create the instance profile
 resource "aws_iam_instance_profile" "ssm_instance_profile" {
   name = "SSMInstanceProfile"
   role = aws_iam_role.ssm_role.name
 }
+
+# Create S3 bucket
+module "s3-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4e17731f72ef24b804207f55b182f49057e73ec9" #v8.1.0
+
+  bucket_prefix      = "panda-cyber-bucket"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "bucket_policy" {
+  statement {
+    sid    = "s3Access"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      module.s3-bucket.bucket.arn,
+      "${module.s3-bucket.bucket.arn}/*"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.ssm_role.arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = module.s3-bucket.bucket.id
+  policy = data.aws_iam_policy_document.bucket_policy.json
+}
+
+
+
+

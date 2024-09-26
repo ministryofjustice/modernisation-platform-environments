@@ -1,15 +1,14 @@
 ###############################################
 # Glue Jobs, Reusable Module: /modules/glue_job
-###############################################
+############################################### 
 ## Glue Job, Reporting Hub
 ## Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 locals {
   glue_avro_registry           = split("/", module.glue_registry_avro.registry_name)
   shared_log4j_properties_path = "s3://${aws_s3_object.glue_job_shared_custom_log4j_properties.bucket}/${aws_s3_object.glue_job_shared_custom_log4j_properties.key}"
-  # We only want to enable write to Operational DataStore in the dev environment until it is available in all environments
-  glue_datahub_job_extra_dev_env_args = (local.environment == "development" || local.environment == "test" || local.environment == "preproduction" ? {
+  glue_datahub_job_extra_operational_datastore_args = (local.create_glue_connection && local.enable_operational_datastore_job_access ? {
     "--dpr.operational.data.store.write.enabled"              = "true"
-    "--dpr.operational.data.store.glue.connection.name"       = aws_glue_connection.glue_operational_datastore_connection.name
+    "--dpr.operational.data.store.glue.connection.name"       = aws_glue_connection.glue_operational_datastore_connection[0].name
     "--dpr.operational.data.store.loading.schema.name"        = "loading"
     "--dpr.operational.data.store.tables.to.write.table.name" = "configuration.datahub_managed_tables"
     "--dpr.operational.data.store.jdbc.batch.size"            = 5000
@@ -49,7 +48,7 @@ module "glue_reporting_hub_job" {
   region                       = local.account_region
   account                      = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
-  connections                  = [aws_glue_connection.glue_operational_datastore_connection.name]
+  connections                  = local.create_glue_connection ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : []
   additional_secret_arns       = [aws_secretsmanager_secret.operational_db_secret.arn]
 
   tags = merge(
@@ -61,7 +60,7 @@ module "glue_reporting_hub_job" {
     }
   )
 
-  arguments = merge(local.glue_datahub_job_extra_dev_env_args, {
+  arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--job-bookmark-option"                 = "job-bookmark-disable"
@@ -97,7 +96,7 @@ module "glue_reporting_hub_job" {
 # Glue Job, Reporting Hub Batch
 module "glue_reporting_hub_batch_job" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-  
+
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-batch-${local.env}"
@@ -120,7 +119,7 @@ module "glue_reporting_hub_batch_job" {
   region                        = local.account_region
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
-  connections                   = [aws_glue_connection.glue_operational_datastore_connection.name]
+  connections                   = local.create_glue_connection ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : []
   additional_secret_arns        = [aws_secretsmanager_secret.operational_db_secret.arn]
 
   tags = merge(
@@ -131,7 +130,7 @@ module "glue_reporting_hub_batch_job" {
     }
   )
 
-  arguments = merge(local.glue_datahub_job_extra_dev_env_args, {
+  arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
@@ -176,7 +175,7 @@ module "glue_reporting_hub_cdc_job" {
   region                        = local.account_region
   account                       = local.account_id
   log_group_retention_in_days   = local.glue_log_retention_in_days
-  connections                   = [aws_glue_connection.glue_operational_datastore_connection.name]
+  connections                   = local.create_glue_connection ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : []
   additional_secret_arns        = [aws_secretsmanager_secret.operational_db_secret.arn]
 
   tags = merge(
@@ -187,7 +186,7 @@ module "glue_reporting_hub_cdc_job" {
     }
   )
 
-  arguments = merge(local.glue_datahub_job_extra_dev_env_args, {
+  arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
     "--extra-jars"                          = local.glue_jobs_latest_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--job-bookmark-option"                 = "job-bookmark-disable"
@@ -581,6 +580,74 @@ module "activate_glue_trigger_job" {
     "--dpr.aws.region" = local.account_region
     "--dpr.log.level"  = local.glue_job_common_log_level
   }
+}
+
+# Glue Job, Data Reconciliation Job
+module "glue_s3_data_reconciliation_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job && local.create_glue_connection
+  name                          = "${local.project}-data-reconciliation-job-${local.env}"
+  short_name                    = "${local.project}-data-reconciliation-job"
+  command_type                  = "glueetl"
+  description                   = "Reconciles data across DataHub.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.dms.replication.task.id: (Required) ID of the DMS replication task to reconcile against the raw zone\n--dpr.reconciliation.checks.to.run: (Optional) Allows restricting the set of checks that will be run"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-data-reconciliation-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-data-reconciliation-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
+  connections = local.create_glue_connection ? concat([
+    aws_glue_connection.glue_operational_datastore_connection[0].name,
+    aws_glue_connection.glue_nomis_connection[0].name
+  ], values(aws_glue_connection.glue_dps_connection)[*].name) : []
+  additional_secret_arns = concat([
+    aws_secretsmanager_secret.operational_db_secret.arn,
+    aws_secretsmanager_secret.nomis.arn
+  ], values(aws_secretsmanager_secret.dps)[*].arn)
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-data-reconciliation-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-1117"
+    }
+  )
+
+  arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
+    "--extra-jars"                                                = local.glue_jobs_latest_jar_location
+    "--extra-files"                                               = local.shared_log4j_properties_path
+    "--class"                                                     = "uk.gov.justice.digital.job.DataReconciliationJob"
+    "--dpr.aws.region"                                            = local.account_region
+    "--dpr.config.s3.bucket"                                      = module.s3_glue_job_bucket.bucket_id
+    "--dpr.log.level"                                             = local.glue_job_common_log_level
+    "--dpr.raw.s3.path"                                           = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.raw.archive.s3.path"                                   = "s3://${module.s3_raw_archive_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"                                    = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.curated.s3.path"                                       = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.contract.registryName"                                 = module.s3_schema_registry_bucket.bucket_id
+    # dpr.reconciliation.datasource properties can be modified to configure
+    # the job for either Nomis, a DPS database or some other data store
+    "--dpr.reconciliation.datasource.glue.connection.name"        = aws_glue_connection.glue_nomis_connection[0].name
+    "--dpr.reconciliation.datasource.source.schema.name"          = "OMS_OWNER"
+    "--dpr.reconciliation.datasource.should.uppercase.tablenames" = "true"
+  })
+
+  depends_on = [
+    module.s3_structured_bucket.bucket_id,
+    module.s3_curated_bucket.bucket_id
+  ]
 }
 
 # kinesis Data Stream Ingestor
@@ -1013,7 +1080,7 @@ module "glue_prisons_database" {
   aws_region     = local.account_region
 }
 
-# Glue Database Catalog for Reconciliation
+# Glue Database Catalog for Reconciliation 
 module "glue_reconciliation_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
@@ -1021,21 +1088,6 @@ module "glue_reconciliation_database" {
   description    = "Glue Data Catalog - Reconciliation"
   aws_account_id = local.account_id
   aws_region     = local.account_region
-}
-
-#########################################
-# Data Domain Glue Connection (RedShift)
-module "glue_connection_redshift" {
-  source            = "./modules/glue_connection"
-  create_connection = local.create_glue_connection
-  name              = "${local.project}-glue-connect-redshift-${local.env}"
-  connection_url    = ""
-  description       = "Data Domain, Glue Connection to Redshift"
-  security_groups   = []
-  availability_zone = ""
-  subnet            = ""
-  password          = "" ## Needs to pull from Secrets Manager, #TD
-  username          = ""
 }
 
 # Ec2
@@ -1062,6 +1114,15 @@ module "ec2_kinesis_agent" {
   region  = local.account_region
   account = local.account_id
   env     = local.env
+
+  ec2_sec_rules_source_sec_group = {
+    "NOMIS_FROM_GLUE" = {
+      "from_port"                = local.nomis_port,
+      "to_port"                  = local.nomis_port,
+      "protocol"                 = "TCP",
+      "source_security_group_id" = aws_security_group.glue_job_connection_sg.id
+    }
+  }
 
 
   tags = merge(

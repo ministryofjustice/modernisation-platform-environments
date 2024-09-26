@@ -21,11 +21,11 @@ locals {
   baseline_presets_all_environments = {
     options = {
       cloudwatch_dashboard_default_widget_groups = [
-        "lb",
+        "network_lb",
         "ec2",
         "ec2_windows",
       ]
-      cloudwatch_metric_alarms_default_actions   = ["planetfm_pagerduty"]
+      cloudwatch_metric_alarms_default_actions   = ["pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
       cloudwatch_metric_oam_links                = ["hmpps-oem-${local.environment}"]
       enable_backup_plan_daily_and_weekly        = true

@@ -97,7 +97,7 @@ resource "aws_key_pair" "ec2-user" {
   )
 }
 
-#checkov:skip=CKV2_AWS_5
+#checkov:skip=CKV2_AWS_5: "Ensure that Security Groups are attached to another resource"
 resource "aws_security_group" "iaps" {
   name        = lower(format("%s-%s", local.application_name, local.environment))
   description = "Controls access to IAPS EC2 instance"
@@ -218,6 +218,7 @@ data "aws_iam_policy_document" "ssm_least_privilege_policy" {
 
     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
     #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
+    #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
@@ -238,6 +239,7 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
 ##
 # Resources - Create ASG and launch template using module
 ##
+# checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 module "ec2_iaps_server" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v2.0.0"
 
@@ -270,10 +272,12 @@ module "ec2_iaps_server" {
 ##
 # Set up cloud watch log groups (referenced by the cloud watch agent to send events to log streams in the group)
 ##
+# checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
 resource "aws_cloudwatch_log_group" "cloudwatch_agent_log_groups" {
   for_each          = toset(local.cloudwatch_agent_log_group_names)
   name              = "/iaps/${each.key}"
   retention_in_days = local.application_data.accounts[local.environment].cloudwatch_agent_log_group_retention_period
+
   tags = merge(
     local.ec2_tags,
     {

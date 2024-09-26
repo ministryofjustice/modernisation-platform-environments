@@ -2,7 +2,6 @@ locals {
 
   baseline_presets_production = {
     options = {
-      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "planetfm-production"
@@ -33,7 +32,7 @@ locals {
     }
 
     ec2_instances = {
-      # app servers 
+      # app servers
       pd-cafm-a-10-b = merge(local.ec2_instances.app, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.app.cloudwatch_metric_alarms,
@@ -203,7 +202,19 @@ locals {
       pd-cafm-w-36-b = merge(local.ec2_instances.web, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.web.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows, {
+            "cpu-utilization-high" = {
+              alarm_description   = "CPU Utilization is above 75% or above for 15 minutes"
+              comparison_operator = "GreaterThanOrEqualToThreshold"
+              evaluation_periods  = "15"
+              datapoints_to_alarm = "15"
+              metric_name         = "CPUUtilization"
+              namespace           = "AWS/EC2"
+              period              = "60"
+              statistic           = "Maximum"
+              threshold           = "75"
+            }
+          }
         )
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-36-b"
@@ -228,7 +239,19 @@ locals {
       pd-cafm-w-37-a = merge(local.ec2_instances.web, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.web.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows, {
+            "cpu-utilization-high" = {
+              alarm_description   = "CPU Utilization is above 75% or above for 15 minutes"
+              comparison_operator = "GreaterThanOrEqualToThreshold"
+              evaluation_periods  = "15"
+              datapoints_to_alarm = "15"
+              metric_name         = "CPUUtilization"
+              namespace           = "AWS/EC2"
+              period              = "60"
+              statistic           = "Maximum"
+              threshold           = "75"
+            }
+          }
         )
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-37-a"
@@ -277,84 +300,56 @@ locals {
     }
 
     lbs = {
-      private = merge(local.lbs.private, {
-        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
-
+      cafmtrainweb = merge(local.lbs.web, {
         instance_target_groups = {
-          web-3637-80 = merge(local.lbs.private.instance_target_groups.web-80, {
-            attachments = [
-              { ec2_instance_name = "pd-cafm-w-36-b" },
-              { ec2_instance_name = "pd-cafm-w-37-a" },
-            ]
-          })
-          web-38-80 = merge(local.lbs.private.instance_target_groups.web-80, {
+          cafmtrainweb-https = merge(local.lbs.web.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "pd-cafm-w-38-b" },
             ]
           })
         }
 
-        listeners = merge(local.lbs.private.listeners, {
-          https = merge(local.lbs.private.listeners.https, {
-            alarm_target_group_names = [
-              "web-3637-80",
-            ]
-
+        listeners = {
+          https = merge(local.lbs.web.listeners.https, {
             default_action = {
-              type = "redirect"
-              redirect = {
-                host        = "cafmwebx2.planetfm.service.justice.gov.uk"
-                port        = "443"
-                protocol    = "HTTPS"
-                status_code = "HTTP_302"
-              }
-            }
-
-            rules = {
-              web-3637-80 = {
-                priority = 3637
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-3637-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmwebx2.planetfm.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              web-38-80 = {
-                priority = 3880
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-38-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmtrainweb.planetfm.service.justice.gov.uk",
-                      "cafmtrainweb.az.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              type              = "forward"
+              target_group_name = "cafmtrainweb-https"
             }
           })
-        })
+        }
+      })
+
+      cafmwebx2 = merge(local.lbs.web, {
+        instance_target_groups = {
+          cafmwebx2-https = merge(local.lbs.web.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "pd-cafm-w-36-b" },
+              { ec2_instance_name = "pd-cafm-w-37-a" },
+            ]
+          })
+        }
+
+        listeners = {
+          https = merge(local.lbs.web.listeners.https, {
+            alarm_target_group_names = ["cafmwebx2-https"]
+            default_action = {
+              type              = "forward"
+              target_group_name = "cafmwebx2-https"
+            }
+          })
+        }
       })
     }
 
     route53_zones = {
       "cafmtrainweb.az.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "", type = "A", lbs_map_key = "cafmtrainweb" },
         ]
       }
       "cafmwebx2.az.justice.gov.uk" = {
-        records = [
-          { name = "", type = "A", ttl = 300, records = ["10.40.15.201"] },
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "cafmwebx2" },
         ]
       }
       "planetfm.service.justice.gov.uk" = {
@@ -365,8 +360,8 @@ locals {
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1128.awsdns-13.org", "ns-2027.awsdns-61.co.uk", "ns-854.awsdns-42.net", "ns-90.awsdns-11.com"] },
         ]
         lb_alias_records = [
-          { name = "cafmtrainweb", type = "A", lbs_map_key = "private" },
-          { name = "cafmwebx2", type = "A", lbs_map_key = "private" },
+          { name = "cafmtrainweb", type = "A", lbs_map_key = "cafmtrainweb" },
+          { name = "cafmwebx2", type = "A", lbs_map_key = "cafmwebx2" },
         ]
       }
     }

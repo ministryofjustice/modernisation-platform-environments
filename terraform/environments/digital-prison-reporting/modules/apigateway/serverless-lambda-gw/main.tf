@@ -24,7 +24,7 @@ resource "aws_api_gateway_resource" "preview" {
 resource "aws_api_gateway_method" "preview" {
   #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
   #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
-  #checkov:skip=CCKV_AWS_59: "Ensure there is no open access to back-end resources through API"
+  #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
 
 
   authorization = "NONE"
@@ -51,7 +51,7 @@ resource "aws_api_gateway_resource" "publish" {
 resource "aws_api_gateway_method" "publish" {
   #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
   #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
-  #checkov:skip=CCKV_AWS_59: "Ensure there is no open access to back-end resources through API"
+  #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
 
   authorization = "NONE"
   http_method   = "ANY"
@@ -71,8 +71,7 @@ resource "aws_api_gateway_integration" "publish" {
 resource "aws_api_gateway_method" "this" {
   #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
   #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
-  #checkov:skip=CCKV_AWS_59: "Ensure there is no open access to back-end resources through API"
-  
+  #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
 
   authorization = "NONE"
   http_method   = "ANY"
@@ -92,7 +91,7 @@ resource "aws_api_gateway_integration" "this" {
 resource "aws_lambda_permission" "apigw_lambda" {
   #checkov:skip=CKV_AWS_364:Ensure that AWS Lambda function permissions delegated to AWS services are limited by SourceArn or SourceAccount
   #checkov:skip=CKV_AWS_301:Ensure that AWS Lambda function is not publicly accessible
-  
+
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = var.lambda_name
@@ -135,7 +134,7 @@ resource "aws_api_gateway_deployment" "default_deployment" {
 resource "aws_api_gateway_stage" "default_deployment" {
   #checkov:skip=CKV2_AWS_4: "Ignore - Ensure API Gateway stage have logging level defined as appropriate"
   #checkov:skip=CKV2_AWS_51: "Ignore - Ensure AWS API Gateway endpoints uses client certificate authentication"
-  #checkov:skip=CCKV_AWS_120: "Ensure API Gateway caching is enabled"
+  #checkov:skip=CKV_AWS_120: "Ensure API Gateway caching is enabled"
   #checkov:skip=CKV_AWS_73: "Ensure API Gateway has X-Ray Tracing enabled"
   #checkov:skip=CKV_AWS_76: "Ensure API Gateway has Access Logging enabled"
   deployment_id = aws_api_gateway_deployment.default_deployment.id

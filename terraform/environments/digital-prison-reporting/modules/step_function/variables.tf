@@ -19,6 +19,12 @@ variable "step_function_name" {
   type        = string
 }
 
+variable "step_function_log_retention_in_days" {
+  description = "(Optional) The log retention in days for the step-function."
+  default     = 7
+  type        = string
+}
+
 variable "dms_task_time_out" {
   description = "(Optional) The duration after which the DMS load step is deemed to have failed."
   default     = 86400 # 24 hours
@@ -29,14 +35,13 @@ variable "definition" {
   description = "(Required) The definition of the step function"
 }
 
-variable "additional_policies" {
-  description = "(Optional) The list of Policies used for this Step Function."
-  type        = list(any)
-  default     = []
-}
-
 variable "tags" {
   type        = map(string)
   default     = {}
   description = "(Optional) Key-value map of resource tags."
+}
+
+variable "step_function_execution_role_arn" {
+  type        = string
+  description = "The ARN of the step function execution role"
 }

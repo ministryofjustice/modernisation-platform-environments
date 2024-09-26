@@ -6,6 +6,7 @@ locals {
 
   environment_config_dev = {
     migration_environment_private_cidr     = ["10.162.32.0/22", "10.162.36.0/22", "10.162.40.0/22"]
+    migration_environment_vpc_cidr         = "10.162.32.0/20"
     migration_environment_db_cidr          = ["10.162.44.0/24", "10.162.45.0/24", "10.162.46.0/25"]
     migration_environment_full_name        = "dmd-mis-dev"
     migration_environment_abbreviated_name = "dmd"
@@ -26,6 +27,7 @@ locals {
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
+    tls_port                    = 636
   }
 
   db_config_dev = {
@@ -93,6 +95,14 @@ locals {
       container_memory = 1024
     }
 
+    ldap = {
+      image_tag        = "6.0.3-latest"
+      container_port   = 389
+      slapd_log_level  = "stats"
+      container_cpu    = 512
+      container_memory = 1024
+    }
+
     pdf_creation = {
       image_tag      = "2021-06-24.995.8c1da2c"
       container_port = 8080
@@ -127,5 +137,6 @@ locals {
     user_target_endpoint = {
       write_database = "DMDNDA"
     }
+    is-production = local.is-production
   }
 }

@@ -10,7 +10,6 @@ locals {
       )
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2024-01-16T09-48-13.663Z"
-        availability_zone             = "eu-west-2a"
         ebs_volumes_copy_all_from_ami = false
         iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies = [
@@ -32,9 +31,6 @@ locals {
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["rds-ec2s"]
-        tags = {
-          backup-plan = "daily-and-weekly"
-        }
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
@@ -42,7 +38,7 @@ locals {
       tags = {
         backup           = "false"
         os-type          = "Windows"
-        server-type      = "HmppsRDGateway"
+        server-type      = "RDGateway"
         update-ssm-agent = "patchgroup1"
       }
     }
@@ -56,7 +52,6 @@ locals {
       )
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2024-01-16T09-48-13.663Z"
-        availability_zone             = "eu-west-2a"
         ebs_volumes_copy_all_from_ami = false
         iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies = [
@@ -78,9 +73,6 @@ locals {
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["rds-ec2s"]
-        tags = {
-          backup-plan = "daily-and-weekly"
-        }
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
@@ -88,7 +80,7 @@ locals {
       tags = {
         backup           = "false"
         os-type          = "Windows"
-        server-type      = "HmppsRDServices"
+        server-type      = "RDServices"
         update-ssm-agent = "patchgroup1"
       }
     }

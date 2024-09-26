@@ -1,0 +1,26 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "30",
+      "rule-name": "select_probation_area_user",
+      "object-locator": {
+        "schema-name": "DELIUS_APP_SCHEMA",
+        "table-name": "PROBATION_AREA_USER"
+      },
+      "rule-action": "include",
+      "filters": []
+    },
+    {
+      "rule-type": "selection",
+      "rule-id": "31",
+      "rule-name": "select_user_",
+      "object-locator": {
+        "schema-name": "DELIUS_APP_SCHEMA",
+        "table-name": "USER_"
+      },
+      "rule-action": "include",
+      "filters": []
+    }
+  ]
+}

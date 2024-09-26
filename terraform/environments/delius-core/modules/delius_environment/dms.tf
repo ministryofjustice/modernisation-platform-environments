@@ -10,12 +10,14 @@ module "dms" {
   database_application_passwords_secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
   oracle_db_server_names                    = local.oracle_db_server_names
   db_ec2_sg_id                              = module.oracle_db_shared.db_ec2_sg_id
+  env_name_to_dms_config_map                = var.env_name_to_dms_config_map
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws
-    aws.core-network-services = aws
+    aws                        = aws
+    aws.bucket-replication     = aws
+    aws.core-vpc               = aws
+    aws.core-network-services  = aws
+    aws.modernisation-platform = aws.modernisation-platform
   }
 }
 

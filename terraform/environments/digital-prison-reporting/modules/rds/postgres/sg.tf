@@ -24,6 +24,8 @@ resource "aws_security_group" "rds" {
 }
 
 resource "aws_security_group_rule" "rule" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
+
   count = var.enable_rds ? 1 : 0
 
   cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]

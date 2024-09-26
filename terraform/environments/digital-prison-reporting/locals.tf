@@ -38,6 +38,9 @@ locals {
 
   glue_job_common_log_level = local.application_data.accounts[local.environment].glue_job_common_log_level
 
+  # Flag for whether jobs that access the operational datastore have this feature turned on or not
+  enable_operational_datastore_job_access = local.application_data.accounts[local.environment].enable_operational_datastore_job_access
+
   kinesis_endpoint      = "https://kinesis.eu-west-2.amazonaws.com"
   cloud_platform_cidr   = "172.20.0.0/16"
   enable_dpr_cloudtrail = local.application_data.accounts[local.environment].enable_cloud_trail
@@ -248,8 +251,14 @@ locals {
   lambda_redshift_table_expiry_tracing        = "Active"
   lambda_redshift_table_expiry_handler        = "uk.gov.justice.digital.lambda.RedShiftTableExpiryLambda::handleRequest"
   lambda_redshift_table_expiry_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  lambda_redshift_table_expiry_code_s3_key    = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-v0.0.12-all.jar"
+  lambda_redshift_table_expiry_jar_version    = "v0.0.12"
+  lambda_redshift_table_expiry_code_s3_key = (
+    local.env == "production" || local.env == "preproduction"
+    ? "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}.rel-all.jar"
+    : "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}-all.jar"
+  )
   lambda_redshift_table_expiry_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     aws_iam_policy.redshift_dataapi_cross_policy.arn,
   ]
@@ -415,6 +424,23 @@ locals {
   }
 
   analytical_platform_share = can(local.application_data.accounts[local.environment].analytical_platform_share) ? { for share in local.application_data.accounts[local.environment].analytical_platform_share : share.target_account_name => share } : {}
+
+  # Observability Platform
+  environment_configuration = local.environment_configurations[local.environment]
+  environment_configurations = {
+    development = {
+      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+    }
+    test = {
+      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+    }
+    preproduction = {
+      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+    }
+    production = {
+      observability_platform_account_id = local.environment_management.account_ids["observability-platform-production"]
+    }
+  }
 
 
   all_tags = merge(

@@ -2,7 +2,6 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
-      cloudwatch_metric_alarms_default_actions = ["pagerduty"]
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "planetfm-preproduction"
@@ -143,55 +142,40 @@ locals {
     }
 
     lbs = {
-      private = merge(local.lbs.private, {
+      pp-cafmwebx = merge(local.lbs.web, {
         instance_target_groups = {
-          web-45-80 = merge(local.lbs.private.instance_target_groups.web-80, {
+          pp-cafmwebx-https = merge(local.lbs.web.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "pp-cafm-w-4-b" },
               { ec2_instance_name = "pp-cafm-w-5-a" },
             ]
           })
         }
-        listeners = merge(local.lbs.private.listeners, {
-          https = merge(local.lbs.private.listeners.https, {
+
+        listeners = {
+          https = merge(local.lbs.web.listeners.https, {
             default_action = {
-              type = "redirect"
-              redirect = {
-                host        = "cafmwebx.pp.planetfm.service.justice.gov.uk"
-                port        = "443"
-                protocol    = "HTTPS"
-                status_code = "HTTP_302"
-              }
-            }
-            rules = {
-              web-45-80 = {
-                priority = 4580
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "web-45-80"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "cafmwebx.pp.planetfm.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              type              = "forward"
+              target_group_name = "pp-cafmwebx-https"
             }
           })
-        })
+        }
       })
     }
 
     route53_zones = {
+      "pp-cafmwebx.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "pp-cafmwebx" },
+        ]
+      }
       "pp.planetfm.service.justice.gov.uk" = {
         records = [
           { name = "_658adffab7a58a4d5a86804a2b6eb2f7", type = "CNAME", ttl = 86400, records = ["_c649cb794d2fa2e1ac4d3f6fb4e1c8a7.mhbtsbpdnt.acm-validations.aws"] },
           { name = "cafmtx", type = "CNAME", ttl = 3600, records = ["rdweb1.preproduction.hmpps-domain.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "cafmwebx", type = "A", lbs_map_key = "private" },
+          { name = "cafmwebx", type = "A", lbs_map_key = "pp-cafmwebx" },
         ]
       }
     }

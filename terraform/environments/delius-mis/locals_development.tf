@@ -256,4 +256,8 @@ locals {
     }
   })
 
+  fsx_config_dev = {
+    storage_capacity     = 100
+    throughtput_capacity = 16
+  }
 }

@@ -2,7 +2,6 @@ locals {
 
   baseline_presets_test = {
     options = {
-      cloudwatch_metric_alarms_default_actions   = ["pagerduty"]
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "oasys-national-reporting-test"
@@ -125,16 +124,28 @@ locals {
         cloudwatch_metric_alarms = null
       })
 
-      test-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
+      t2-tst-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
           desired_capacity = 0
         })
-        config = merge(local.ec2_autoscaling_groups.bods.config, {
+        config = merge(local.ec2_instances.bods.config, {
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+              branch   = "TM/TM-494/ips-install"
+              hostname = "t2-tst-bods-asg" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
+            }
+          ))
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
         })
         cloudwatch_metric_alarms = null
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+        })
       })
     }
 
@@ -154,6 +165,9 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 100 }
           "/dev/sdc"  = { type = "gp3", size = 100 }
           "/dev/sds"  = { type = "gp3", size = 100 }
+        })
+        tags = merge(local.ec2_instances.bods.tags, {
+          domain-name = "azure.noms.root"
         })
       })
 
@@ -195,6 +209,9 @@ locals {
           ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
           availability_zone = "eu-west-2a"
         })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
+        })
       })
     }
 
@@ -220,6 +237,37 @@ locals {
     }
 
     lbs = {
+      public = merge(local.lbs.public, {
+        instance_target_groups = {
+          t2-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
+            attachments = [
+              { ec2_instance_name = "t2-onr-bods-1-a" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              t2-onr-bods-http28080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-onr-bods-http28080"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2-bods.test.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
+
       private = {
         enable_cross_zone_load_balancing = true
         enable_delete_protection         = false
@@ -324,7 +372,11 @@ locals {
     }
 
     route53_zones = {
-      "test.reporting.oasys.service.justice.gov.uk" = {}
+      "test.reporting.oasys.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "t2-bods", type = "A", lbs_map_key = "public" }
+        ],
+      }
     }
 
     secretsmanager_secrets = {

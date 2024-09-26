@@ -27,6 +27,84 @@ locals {
       }
     }
 
+    ec2_autoscaling_groups = {
+      pp-ncr-app = merge(local.ec2_autoscaling_groups.bip_app, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_app.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_app.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_app.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init.args, {
+            branch = "ncr/TM-503/preprod-bip-fixes"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.bip_app.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+
+      pp-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_cms.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
+            branch = "ncr/TM-503/preprod-bip-fixes"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+
+      pp-ncr-webadmin = merge(local.ec2_autoscaling_groups.bip_webadmin, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_webadmin.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_webadmin.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_webadmin.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init.args, {
+            branch = "ncr/TM-503/preprod-bip-fixes"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.bip_webadmin.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+
+      pp-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_web.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
+            branch = "ncr/TM-503/preprod-bip-fixes"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.bip_web.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+    }
+
     ec2_instances = {
 
       ls-ncr-db-1-a = merge(local.ec2_instances.db, {
@@ -67,6 +145,8 @@ locals {
           node                                 = "1"
           nomis-combined-reporting-environment = "pp"
           type                                 = "management"
+          server-type                          = "ncr-bip"
+          shutdown-order                       = 3
         })
       })
 
@@ -87,7 +167,9 @@ locals {
           instance-scheduling                  = "skip-scheduling"
           node                                 = "2"
           nomis-combined-reporting-environment = "pp"
+          server-type                          = "ncr-bip"
           type                                 = "management"
+          shutdown-order                       = 2
         })
       })
 
@@ -166,7 +248,9 @@ locals {
           instance-scheduling                  = "skip-scheduling"
           node                                 = "3"
           nomis-combined-reporting-environment = "pp"
+          server-type                          = "ncr-bip"
           type                                 = "processing"
+          shutdown-order                       = 1
         })
       })
 
@@ -186,6 +270,7 @@ locals {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
+          shutdown-order                       = 4
         })
       })
 
@@ -205,6 +290,7 @@ locals {
           description                          = "PreProd SAP BI Platform web-tier installation and configurations"
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
+          shutdown-order                       = 4
         })
       })
 
@@ -336,6 +422,44 @@ locals {
           })
         })
       })
+
+      public = merge(local.lbs.public, {
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              webadmin = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-ncr-webadmin-http-7010"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "webadmin.preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-ncr-web-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "web.preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
     }
 
     route53_zones = {
@@ -351,7 +475,9 @@ locals {
           { name = "admin", type = "CNAME", ttl = "3600", records = ["pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "", type = "A", lbs_map_key = "private" }, # preproduction.reporting.nomis.service.justice.gov.uk
+          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "webadmin", type = "A", lbs_map_key = "public" },
+          { name = "web", type = "A", lbs_map_key = "private" },
         ]
       }
     }

@@ -21,6 +21,7 @@ locals {
   baseline_presets_all_environments = {
     options = {
       cloudwatch_dashboard_default_widget_groups = [
+        "custom",
         "network_lb",
         "lb",
         "ec2",
@@ -31,7 +32,7 @@ locals {
         "ec2_instance_textfile_monitoring",
         "ec2_windows",
       ]
-      # cloudwatch_metric_alarms_default_actions = ["pagerduty"] # disabled to prevent duplication on cross-account alarms
+      cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
       enable_ec2_cloud_watch_agent                = true
@@ -161,7 +162,7 @@ locals {
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
         ]

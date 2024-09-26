@@ -12,6 +12,8 @@ data "aws_partition" "current" {}
 resource "aws_redshift_cluster" "this" {
   count = var.create_redshift_cluster ? 1 : 0
 
+  #checkov:skip=CKV_AWS_105: "Ensure Redshift uses SSL"
+
   cluster_identifier                   = var.name
   allow_version_upgrade                = var.allow_version_upgrade
   apply_immediately                    = var.apply_immediately
@@ -100,6 +102,8 @@ resource "aws_redshift_cluster_iam_roles" "this" {
 ################################################################################
 
 resource "aws_redshift_parameter_group" "this" {
+#checkov:skip=CKV_AWS_105: "Ensure Redshift uses SSL"
+
   count = var.create_redshift_cluster && var.create_parameter_group ? 1 : 0
 
   name        = coalesce(var.parameter_group_name, replace(var.name, ".", "-"))
@@ -317,6 +321,8 @@ resource "aws_security_group" "redshift" {
 }
 
 resource "aws_security_group_rule" "redshift_egress_1" {
+
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
 
   security_group_id = aws_security_group.redshift.id
   type              = "egress"

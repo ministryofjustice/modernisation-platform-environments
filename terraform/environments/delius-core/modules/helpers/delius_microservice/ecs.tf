@@ -22,14 +22,16 @@ module "container_definition" {
       "awslogs-stream-prefix" = "${var.env_name}-${var.name}"
     }
   }
+  system_controls = var.system_controls
 }
 
 module "ecs_policies" {
-  source                   = "../ecs_policies"
-  env_name                 = var.env_name
-  service_name             = var.name
-  tags                     = var.tags
-  extra_task_role_policies = var.extra_task_role_policies
+  source                        = "../ecs_policies"
+  env_name                      = var.env_name
+  service_name                  = var.name
+  tags                          = var.tags
+  extra_task_role_policies      = var.extra_task_role_policies
+  extra_task_exec_role_policies = var.extra_task_exec_role_policies
 }
 
 module "ecs_service" {
