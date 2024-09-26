@@ -101,7 +101,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.get_zipped_step_function_invoke,
       aws_api_gateway_method.get_zipped_step_function_invoke,
       aws_api_gateway_integration.get_zipped_step_function_invoke,
-      aws_api_gateway_integration_response.integration_response_200, 
+      aws_api_gateway_method_response.integration_response_200, 
     ]))
   }
 
@@ -114,7 +114,7 @@ resource "aws_api_gateway_method_response" "response_200" {
   rest_api_id = aws_api_gateway_rest_api.get_zipped_file.id
   resource_id = aws_api_gateway_resource.get_zipped_step_function_invoke.id
   http_method = aws_api_gateway_method.get_zipped_step_function_invoke.http_method
-  status_code = "200"
+  status_code = aws_api_gateway_method_response.response_200.status_code
 }
 
 resource "aws_api_gateway_usage_plan" "test_usage_plan" {
@@ -126,9 +126,15 @@ resource "aws_api_gateway_usage_plan" "test_usage_plan" {
   }
 }
 
+resource "aws_api_gateway_stage" "dev_stage" {
+  stage_name    = "dev"
+  rest_api_id   = aws_api_gateway_rest_api.get_zipped_file.id
+  deployment_id = aws_api_gateway_deployment.deployment.id
+}
+
 resource "aws_api_gateway_api_key" "test_api_key" {
   name        = "ExampleAPIKey"
-  description = "API key for John Doe"
+  description = "API key for matt heery"
   enabled     = true
 }
 
