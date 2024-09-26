@@ -49,8 +49,6 @@ locals {
       }
     }
 
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.ebs
-
     ec2_autoscaling_groups = {
       # NOT-ACTIVE (blue deployment)
       t1-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
