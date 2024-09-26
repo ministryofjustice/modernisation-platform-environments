@@ -270,7 +270,7 @@ resource "aws_iam_role_policy" "cloudwatch" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
   name   = "cloudwatch-log-api-${replace(var.api_name, "_", "-")}-stage-${replace(each.key, "_", "-")}"
   role   = aws_iam_role.api_gateway_role.id
-  policy = data.aws_iam_policy_document.cloudwatch[each.key].json
+  policy = data.aws_iam_policy_document.cloudwatch.json
 }
 
 resource "aws_api_gateway_account" "api_gateway_account" {
