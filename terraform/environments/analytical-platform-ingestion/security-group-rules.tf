@@ -1,5 +1,5 @@
 resource "aws_security_group_rule" "vpc_endpoints_allow_all_vpc" {
-  cidr_blocks       = [module.vpc.vpc_cidr_block]
+  cidr_blocks       = [module.isolated_vpc.vpc_cidr_block]
   description       = "Allow all traffic in from VPC CIDR"
   from_port         = 0
   protocol          = -1

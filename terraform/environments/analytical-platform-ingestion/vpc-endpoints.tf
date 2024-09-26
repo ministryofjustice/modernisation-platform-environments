@@ -1,11 +1,11 @@
-module "vpc_endpoints" {
+module "isolated_vpc_endpoints" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "5.13.0"
 
-  vpc_id             = module.vpc.vpc_id
-  subnet_ids         = module.vpc.private_subnets
+  vpc_id             = module.isolated_vpc.vpc_id
+  subnet_ids         = module.isolated_vpc.private_subnets
   security_group_ids = [aws_security_group.vpc_endpoints.id]
 
   endpoints = {
@@ -31,9 +31,9 @@ module "vpc_endpoints" {
       service      = "s3"
       service_type = "Gateway"
       route_table_ids = flatten([
-        module.vpc.default_route_table_id,
-        module.vpc.private_route_table_ids,
-        module.vpc.public_route_table_ids
+        module.isolated_vpc.default_route_table_id,
+        module.isolated_vpc.private_route_table_ids,
+        module.isolated_vpc.public_route_table_ids
       ])
       tags = merge(
         local.tags,
@@ -50,4 +50,9 @@ module "vpc_endpoints" {
       )
     },
   }
+}
+
+moved {
+  from = module.vpc_endpoints
+  to   = module.isolated_vpc_endpoints
 }
