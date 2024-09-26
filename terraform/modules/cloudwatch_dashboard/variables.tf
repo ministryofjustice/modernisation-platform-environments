@@ -21,15 +21,15 @@ variable "start" {
   default     = null
 }
 
+# tflint-ignore: terraform_typed_variables
 variable "ec2_instances" {
   description = "A map of existing modernisation-platform-terraform-ec2-instance resources. Required if using search filtering or iops/throughput widgets"
-  # tflint-ignore: terraform_typed_variables
-  default = {}
+  default     = {}
 }
 
+# tflint-ignore: terraform_typed_variables
 variable "widget_groups" {
   description = "list of objects defining a group of widgets. Automatically include a text widget if header_markdown defined. See README.md"
-  # tflint-ignore: terraform_typed_variables
   # type = list(object({
   #   header_markdown = optional(string)     # include a header text widget if set
   #   width           = number               # width of each widget, must be divisor of 24
