@@ -96,18 +96,16 @@ locals {
           }]]
         },
         lookup(widget, "alarm_threshold", null) == null ? {} : (
-          # AWS provider not allowing this with expressions
-          lookup(widget, "expression", null) == null ? {} : {
-            annotations = {
-              horizontal = [
-                {
-                  label = "Alarm Threshold"
-                  value = widget.alarm_threshold
-                  fill  = lookup(widget, "alarm_fill", "above")
-                }
-              ]
-            }
-          }
+          # Annotation currently failing with 'Should match exactly one schema in oneOf' error
+          #annotations = {
+          #  horizontal = [
+          #    {
+          #      label = "Alarm Threshold"
+          #      value = widget.alarm_threshold
+          #      fill  = lookup(widget, "alarm_fill", "above")
+          #    }
+          #  ]
+          #}
         ),
       )
     }
