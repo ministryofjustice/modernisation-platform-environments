@@ -69,6 +69,4 @@ resource "aws_dms_replication_task" "migration-task" {
       }
     ]
   })
-
-  cdc_start_position = "now"
 }
