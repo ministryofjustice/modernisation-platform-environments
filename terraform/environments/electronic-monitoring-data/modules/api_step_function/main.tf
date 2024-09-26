@@ -1,3 +1,7 @@
+locals {
+  camel_case_api_name = join("", [for word in split("_", var.api_name): title(word)])
+}
+
 # --------------------------------------------------------
 # Main API Gateway resources
 # --------------------------------------------------------
@@ -25,7 +29,7 @@ resource "aws_api_gateway_method" "method" {
   api_key_required = var.api_key_required
   request_validator_id = aws_api_gateway_request_validator.request_validator.id
     request_models = {
-    "application/json" = aws_api_gateway_model.example_model.name
+    "application/json" = aws_api_gateway_model.model.name
   }
 }
 
@@ -35,14 +39,14 @@ resource "aws_api_gateway_method" "method" {
 
 resource "aws_api_gateway_request_validator" "request_validator" {
     rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-    name        = "${var.api_name}RequestValidator"
+    name        = "${local.camel_case_api_name}RequestValidator"
     validate_request_body = true
     validate_request_parameters = true
 }
 
-resource "aws_api_gateway_model" "example_model" {
+resource "aws_api_gateway_model" "model" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  name        = "${var.api_name}ExampleModel"
+  name        = "${var.api_name}Model"
   content_type = "application/json"
   schema = jsonencode(var.schema)
 }
@@ -81,7 +85,7 @@ data "aws_iam_policy_document" "trigger_step_function_policy" {
 }
 
 resource "aws_iam_policy" "trigger_step_function_policy" {
-  name   = "trigger-${substr(replace(replace(replace(replace(var.step_function.id, ":", "-"), "/", "-"), "_", "-"), "arn", ""), 0, 50)}-policy"
+  name   = "trigger-${substr(var.step_function.id, 0, 50)}-policy"
   policy      = data.aws_iam_policy_document.trigger_step_function_policy.json
 }
 
@@ -211,7 +215,7 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   usage_plan_id = aws_api_gateway_usage_plan.usage_plan[each.key].id
 }
 
-resource "aws_api_gateway_method_settings" "example" {
+resource "aws_api_gateway_method_settings" "settings" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
   stage_name  = aws_api_gateway_stage.stage[each.key].stage_name
@@ -241,12 +245,11 @@ resource "aws_cloudwatch_log_group" "api_gateway_logs" {
 
 resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch_role_policy" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
-  role       = aws_iam_role.api_gateway_role.arn
+  role       = aws_iam_role.api_gateway_role.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
 data "aws_iam_policy_document" "cloudwatch" {
-  for_each = { for stage in var.stages : stage.stage_name => stage }
   statement {
     effect = "Allow"
 
@@ -260,12 +263,12 @@ data "aws_iam_policy_document" "cloudwatch" {
       "logs:FilterLogEvents",
     ]
 
-    resources = [aws_cloudwatch_log_group.api_gateway_logs[each.key].arn]
+    resources = ["arn:aws:logs:*:*:*"]
   }
 }
 resource "aws_iam_role_policy" "cloudwatch" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
-  name   = "cloudwatch log for group ${aws_cloudwatch_log_group.api_gateway_logs[each.key].arn}"
+  name   = "cloudwatch-log-api-${replace(var.api_name, "_", "-")}-stage-${replace(each.key, "_", "-")}"
   role   = aws_iam_role.api_gateway_role.id
   policy = data.aws_iam_policy_document.cloudwatch[each.key].json
 }
@@ -300,6 +303,6 @@ resource "aws_wafv2_web_acl" "api_gateway" {
 }
 
 resource "aws_wafv2_web_acl_association" "api_gateway_association" {
-  resource_arn = aws_api_gateway_rest_api.api_gateway.execution_arn
+  resource_arn = aws_api_gateway_rest_api.api_gateway.arn
   web_acl_arn  = aws_wafv2_web_acl.api_gateway.arn
 }
