@@ -155,7 +155,7 @@ resource "aws_api_gateway_stage" "stage" {
   client_certificate_id = aws_api_gateway_client_certificate.certificate.id
 
   access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.api_gateway_logs.arn
+    destination_arn = aws_cloudwatch_log_group.api_gateway_logs[each.key].arn
     format = jsonencode({
       requestId       = "$context.requestId"
       ip              = "$context.identity.sourceIp"
@@ -276,10 +276,31 @@ resource "aws_api_gateway_account" "api_gateway_account" {
 }
 
 # -------------------------------------------------------
-# certificate
+# certificate and waf
 # -------------------------------------------------------
 
 resource "aws_api_gateway_client_certificate" "certificate" {
   description = "Client certificate for API Gateway ${var.api_name}"
 }
 
+resource "aws_wafv2_web_acl" "api_gateway" {
+  name        = "${var.api_name}-waf"
+  description = "WAF for API Gateway ${var.api_name}"
+  scope       = "REGIONAL"
+  default_action {
+    allow {}
+  }
+
+    # ive added no rules at the moment
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                 = "${var.api_name}-waf"
+    sampled_requests_enabled     = false
+  }
+}
+
+resource "aws_wafv2_web_acl_association" "api_gateway_association" {
+  resource_arn = aws_api_gateway_rest_api.api_gateway.execution_arn
+  web_acl_arn  = aws_wafv2_web_acl.api_gateway.arn
+}
