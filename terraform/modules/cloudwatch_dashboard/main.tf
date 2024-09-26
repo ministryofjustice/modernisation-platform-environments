@@ -95,7 +95,7 @@ locals {
             id         = "q1"
           }]]
         },
-        lookup(widget, "alarm_threshold", null) == null ? {} : (
+        lookup(widget, "alarm_threshold", null) == null ? {} : {
           # Annotation currently failing with 'Should match exactly one schema in oneOf' error
           #annotations = {
           #  horizontal = [
@@ -106,7 +106,7 @@ locals {
           #    }
           #  ]
           #}
-        ),
+        }
       )
     }
   ]
