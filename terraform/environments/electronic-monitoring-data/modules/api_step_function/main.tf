@@ -152,6 +152,7 @@ resource "aws_api_gateway_stage" "stage" {
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
   stage_name    = each.value.stage_name
   description   = each.value.stage_description
+  client_certificate_id = aws_api_gateway_client_certificate.certificate.id
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_gateway_logs.arn
@@ -240,11 +241,13 @@ resource "aws_cloudwatch_log_group" "api_gateway_logs" {
 
 
 resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch_role_policy" {
-  role       = aws_iam_role.api_gateway_role.arn
+  for_each = { for stage in var.stages : stage.stage_name => stage }
+  role       = aws_iam_role.api_gateway_role[each.key].arn
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
 data "aws_iam_policy_document" "cloudwatch" {
+  for_each = { for stage in var.stages : stage.stage_name => stage }
   statement {
     effect = "Allow"
 
@@ -258,15 +261,25 @@ data "aws_iam_policy_document" "cloudwatch" {
       "logs:FilterLogEvents",
     ]
 
-    resources = [aws_cloudwatch_log_group.api_gateway_logs.arn]
+    resources = [aws_cloudwatch_log_group.api_gateway_logs[each.key].arn]
   }
 }
 resource "aws_iam_role_policy" "cloudwatch" {
-  name   = "default"
+  for_each = { for stage in var.stages : stage.stage_name => stage }
+  name   = "cloudwatch log for group ${aws_cloudwatch_log_group.api_gateway_logs[each.key].arn}"
   role   = aws_iam_role.api_gateway_role.id
-  policy = data.aws_iam_policy_document.cloudwatch.json
+  policy = data.aws_iam_policy_document[each.key].cloudwatch.json
 }
 
 resource "aws_api_gateway_account" "api_gateway_account" {
   cloudwatch_role_arn = aws_iam_role.api_gateway_role.arn
 }
+
+# -------------------------------------------------------
+# certificate
+# -------------------------------------------------------
+
+resource "aws_api_gateway_client_certificate" "certificate" {
+  description = "Client certificate for API Gateway ${var.api_name}"
+}
+
