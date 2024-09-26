@@ -10,13 +10,20 @@ variable "local_bucket_prefix" {
 
 variable "local_tags" {
   description = "The predefined local.tags"
+  type        = map(string)
 }
 
 variable "logging_bucket" {
   description = "Bucket to use for logging"
+  type        = string
 }
 
 variable "order_type" {
   description = "An integer relating to the order type"
+  type        = string
+}
+
+variable "supplier_bucket" {
+  description = "The name of the bucket containing data to be sent"
   type        = string
 }

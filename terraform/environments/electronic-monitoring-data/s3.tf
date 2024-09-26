@@ -545,6 +545,7 @@ module "s3-fms-general-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
+  supplier_bucket = "emds-test-data-2024092309592672530000000a"
 
   providers = {
     aws = aws
@@ -559,6 +560,7 @@ module "s3-fms-specials-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"
+  supplier_bucket = "emds-test-data-2024092309592672530000000a"
 
   providers = {
     aws = aws
@@ -577,6 +579,7 @@ module "s3-mdss-general-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "general"
+  supplier_bucket = "emds-test-data-2024092309592672530000000a"
 
   providers = {
     aws = aws
@@ -591,6 +594,7 @@ module "s3-mdss-ho-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "ho"
+  supplier_bucket = "emds-test-data-2024092309592672530000000a"
 
   providers = {
     aws = aws
@@ -605,6 +609,7 @@ module "s3-mdss-specials-landing-bucket" {
   local_tags = local.tags
   logging_bucket = module.s3-logging-bucket
   order_type = "specials"
+  supplier_bucket = "emds-test-data-2024092309592672530000000a"
 
   providers = {
     aws = aws

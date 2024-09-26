@@ -63,7 +63,6 @@ module "this-bucket" {
   )
 }
 
-#tfsec:ignore:aws-iam-no-user-attached-policies
 resource "aws_iam_user" "supplier" {
   name = "${var.local_bucket_prefix}-${var.data_feed}-${var.order_type}"
   tags = var.local_tags
@@ -109,8 +108,8 @@ data "aws_iam_policy_document" "supplier_data_access" {
     ]
 
     resources = [
-      "arn:aws:s3:::awsexamplesourcebucket",
-      "arn:aws:s3:::awsexamplesourcebucket/*"
+      "arn:aws:s3:::${var.supplier_bucket}",
+      "arn:aws:s3:::${var.supplier_bucket}/*"
     ]
   }
   # Destination bucket access
