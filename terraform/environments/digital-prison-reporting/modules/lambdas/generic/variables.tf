@@ -1,3 +1,5 @@
+# tflint-ignore-file: terraform_required_version, terraform_required_providers
+
 variable "region" {
   description = "Current AWS Region."
   default     = "eu-west-2"
