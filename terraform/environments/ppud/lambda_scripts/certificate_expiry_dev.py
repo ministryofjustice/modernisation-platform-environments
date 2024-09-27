@@ -64,7 +64,7 @@ def handle_single_cert(event, context_arn):
         result = result + ' (' + cert_details['Certificate']['CertificateArn'] + ') '
 
         # this call is publishing to SH
-        result = result + ' - ' + log_finding_to_sh(event, cert_details, context_arn)
+        # result = result + ' - ' + log_finding_to_sh(event, cert_details, context_arn)
         
         # if there's an SNS topic, publish a notification to it
         if os.environ.get('SNS_TOPIC_ARN') is None:
