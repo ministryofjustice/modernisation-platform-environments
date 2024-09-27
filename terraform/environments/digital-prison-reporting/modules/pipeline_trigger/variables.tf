@@ -4,6 +4,12 @@ variable "create_pipeline_schedule" {
   description = "Create pipeline trigger"
 }
 
+variable "enable_pipeline_schedule" {
+  type        = bool
+  default     = false
+  description = "Enable/Disable pipeline trigger"
+}
+
 variable "pipeline_name" {
   type        = string
   description = "Name of the pipeline trigger"
@@ -21,8 +27,8 @@ variable "time_window_mode" {
 }
 
 variable "maximum_window_in_minutes" {
-  type = number
-  default = null
+  type        = number
+  default     = null
   description = "(Optional) The maximum time window in minutes"
 }
 

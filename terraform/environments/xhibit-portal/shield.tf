@@ -14,7 +14,7 @@ module "shield" {
   providers = {
     aws.modernisation-platform = aws.modernisation-platform
   }
-  application_name = local.application_name
+  application_name     = local.application_name
   excluded_protections = [for e in data.aws_shield_protection.excluded : e.id]
   resources = {
     prtg_lb = {

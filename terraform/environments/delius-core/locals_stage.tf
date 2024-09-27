@@ -97,8 +97,8 @@ locals {
     }
 
     ldap = {
-      image_tag      = "replace_me"
-      container_port = 389
+      image_tag       = "replace_me"
+      container_port  = 389
       slapd_log_level = "replace_me"
     }
 
@@ -135,5 +135,6 @@ locals {
     user_target_endpoint = {
       write_database = "STGNDA"
     }
+    is-production = local.is-production
   }
 }

@@ -2074,3 +2074,175 @@ IF @Password IS NOT NULL AND 0 < LEN(@Password)
 
 go
 
+USE [CARESTANDARDS]
+GO
+/****** Object:  Table [dbo].[Users]    Script Date: 09/26/2024 09:26:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Users](
+	[UserID] [int] IDENTITY(1,1) NOT NULL,
+	[Firstname] [varchar](250) NULL,
+	[Lastname] [varchar](250) NULL,
+	[Username] [varchar](250) NULL,
+	[Password] [varchar](250) NULL,
+ CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[SUBCATEGORYDECISIONMAP]    Script Date: 09/26/2024 09:26:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[SUBCATEGORYDECISIONMAP](
+	[decision_id] [bigint] NOT NULL,
+	[subcategory_id] [bigint] NOT NULL,
+	[dropdown] [int] NOT NULL,
+ CONSTRAINT [PK_SUBCATEGORYDECISIONMAP] PRIMARY KEY CLUSTERED 
+(
+	[decision_id] ASC,
+	[subcategory_id] ASC,
+	[dropdown] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[SUBCATEGORY]    Script Date: 09/26/2024 09:26:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[SUBCATEGORY](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[parent_id] [bigint] NULL,
+	[num] [bigint] NULL,
+	[description] [varchar](255) NULL,
+	[schedule_id] [bigint] NULL
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[SCHEDULE]    Script Date: 09/26/2024 09:26:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[SCHEDULE](
+	[num] [int] IDENTITY(1,1) NOT NULL,
+	[description] [varchar](200) NULL
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[DECISION]    Script Date: 09/26/2024 09:26:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[DECISION](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[last_updatedtime] [datetime] NULL,
+	[created_datetime] [datetime] NULL,
+	[publication_datetime] [datetime] NULL,
+	[decision_datetime] [datetime] NULL,
+	[file_no_1] [varchar](100) NULL,
+	[file_no_2] [varchar](100) NULL,
+	[file_no_3] [varchar](100) NULL,
+	[respondent] [varchar](500) NULL,
+	[appellant] [varchar](500) NULL,
+	[chairman_id] [bigint] NULL,
+	[schedule_id] [bigint] NULL,
+	[main_category_id] [bigint] NULL,
+	[main_subcategory_id] [bigint] NULL,
+	[headnote_summary] [ntext] NULL,
+	[Is_public] [bigint] NULL,
+	[usersID] [bigint] NULL,
+ CONSTRAINT [PK_DECISION1] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[CHAIRMANDECISIONMAP]    Script Date: 09/26/2024 09:26:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CHAIRMANDECISIONMAP](
+	[decision_id] [bigint] NOT NULL,
+	[chairman_id] [bigint] NOT NULL,
+ CONSTRAINT [PK_CHAIRMANJUDGMENTMAP] PRIMARY KEY CLUSTERED 
+(
+	[decision_id] ASC,
+	[chairman_id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CHAIRMAN]    Script Date: 09/26/2024 09:26:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[CHAIRMAN](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[prefix] [varchar](100) NULL,
+	[surname] [varchar](300) NULL,
+	[suffix] [varchar](100) NULL,
+ CONSTRAINT [PK_CHAIRMAN] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[CATEGORYDECISIONMAP]    Script Date: 09/26/2024 09:26:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CATEGORYDECISIONMAP](
+	[decision_id] [bigint] NOT NULL,
+	[category_id] [bigint] NOT NULL,
+	[dropdown] [int] NOT NULL,
+ CONSTRAINT [PK_CATEGORYDECISIONMAP] PRIMARY KEY CLUSTERED 
+(
+	[decision_id] ASC,
+	[category_id] ASC,
+	[dropdown] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CATEGORY]    Script Date: 09/26/2024 09:26:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[CATEGORY](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[num] [tinyint] NULL,
+	[description] [varchar](200) NULL,
+	[parent_num] [tinyint] NULL
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO

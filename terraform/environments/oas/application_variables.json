@@ -29,7 +29,7 @@
       "username": "sysdba",
       "db_password_rotation_period": 28,
       "license_model": "bring-your-own-license",
-      "rds_snapshot_name": "man-oas-migration-laws-3462-new",
+      "rds_snapshot_name": "firstdbsetup",
       "lz_vpc_cidr": "10.202.0.0/20",
       "deletion_protection": "false",
       "dashboard_widget_period": 60,

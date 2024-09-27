@@ -24,7 +24,7 @@ variable "aws_region" {
 }
 
 variable "ec2_terminate_behavior" {
-  type        = string
+  type = string
 }
 
 variable "description" {
@@ -40,12 +40,12 @@ variable "tags" {
 }
 
 variable "vpc" {
-  type        = string
+  type = string
 }
 
 variable "ec2_sec_rules" {
   description = "A Map of map of security group Rules to associate with"
-  type        = map(object({
+  type = map(object({
     from_port = number
     to_port   = number
     protocol  = string
@@ -81,13 +81,13 @@ variable "ec2_sec_rules" {
 
 variable "ec2_sec_rules_source_sec_group" {
   description = "A Map of security group Rules that allows ingress from a specified security group"
-  type        = map(object({
+  type = map(object({
     from_port                = number
     to_port                  = number
     protocol                 = string
     source_security_group_id = string
   }))
-  default     = {}
+  default = {}
 }
 
 variable "cidr" {

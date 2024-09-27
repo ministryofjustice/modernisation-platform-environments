@@ -347,8 +347,8 @@ locals {
     network_lb = {
       unhealthy-network-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        datapoints_to_alarm = "3"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
         metric_name         = "UnHealthyHostCount"
         namespace           = "AWS/NetworkELB"
         period              = "60"
@@ -357,100 +357,6 @@ locals {
         alarm_description   = "Triggers if the number of unhealthy network loadbalancer hosts in the target table group is at least one for 3 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340278"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
-      }
-    }
-    ebs = {
-      volume_disk_iops_reached = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
-        metric_name         = "ebs_volume_disk_iops"
-        period              = "60"
-        namespace           = "AWS/EBS"
-        statistic           = "Maximum"
-        threshold           = "14400"
-        treat_missing_data  = "notBreaching"
-        alarm_description   = "Triggers if Volume disk IOPS limit is greater than or equal to 90%"
-        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
-        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
-        metric_query = {
-          id          = "e3"
-          expression  = "e1+e2"
-          label       = "Total IOPs"
-          return_data = "true"
-        }
-        metric_query = {
-          id         = "e1"
-          expression = "m1/PERIOD(m1)"
-          label      = "Read IOPs"
-          metric = {
-            metric_name = "VolumeReadOps"
-            namespace   = "AWS/EBS"
-            period      = 60
-            stat        = "Max"
-            dimensions = {
-              VolumeId = "*"
-            }
-          }
-        }
-        metric_query = {
-          id         = "e2"
-          expression = "m2/PERIOD(m2)"
-          label      = "Write IOPs"
-          metric = {
-            metric_name = "VolumeWriteOps"
-            namespace   = "AWS/EBS"
-            period      = 60
-            stat        = "Max"
-            dimensions = {
-              VolumeId = "*"
-            }
-          }
-        }
-      }
-      volume_disk_throughput_reached = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
-        metric_name         = "ebs_volume_disk_throughput"
-        period              = "60"
-        namespace           = "AWS/EBS"
-        statistic           = "Maximum"
-        threshold           = "900"
-        treat_missing_data  = "notBreaching"
-        alarm_description   = "Triggers if Volume disk throughput limit is greater than or equal to 90%"
-        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
-        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
-        metric_query = {
-          id          = "e1"
-          expression  = "((m1+m2)/1048576)/PERIOD(m1)"
-          label       = "Total Throughput (MiB/s)"
-          return_data = true
-        }
-        metric_query = {
-          id = "m1"
-          metric = {
-            metric_name = "VolumeReadOps"
-            namespace   = "AWS/EBS"
-            period      = 60
-            stat        = "Sum"
-            dimensions = {
-              VolumeId = "*"
-            }
-          }
-        }
-        metric_query = {
-          id = "m2"
-          metric = {
-            metric_name = "VolumeWriteOps"
-            namespace   = "AWS/EBS"
-            period      = 60
-            stat        = "Sum"
-            dimensions = {
-              VolumeId = "*"
-            }
-          }
-        }
       }
     }
   }

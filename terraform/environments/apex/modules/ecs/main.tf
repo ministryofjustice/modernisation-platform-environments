@@ -346,7 +346,7 @@ resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no
       "Action": [
         "ssm:GetParameters"
       ],
-      "Resource": ["${var.database_tad_password_arn}"]
+      "Resource": ["${var.database_admin_password_arn}"]
     }
   ]
 }

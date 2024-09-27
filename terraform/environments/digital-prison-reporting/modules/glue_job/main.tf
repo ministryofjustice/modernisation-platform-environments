@@ -84,6 +84,11 @@ EOF
 }
 
 data "aws_iam_policy_document" "extra-policy-document" {
+#checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions. TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+#checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+#checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+#checkov:skip=CKV_AWS_110: "Ensure IAM policies does not allow privilege escalation"
+
   statement {
     actions = [
       "s3:*"
