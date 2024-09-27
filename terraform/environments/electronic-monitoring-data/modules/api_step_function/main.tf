@@ -46,7 +46,7 @@ resource "aws_api_gateway_request_validator" "request_validator" {
 
 resource "aws_api_gateway_model" "model" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  name        = "${var.api_name}Model"
+  name        = "${local.camel_case_api_name}Model"
   content_type = "application/json"
   schema = jsonencode(var.schema)
 }
@@ -296,13 +296,14 @@ resource "aws_wafv2_web_acl" "api_gateway" {
     # ive added no rules at the moment
 
   visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                 = "${var.api_name}-waf"
+    cloudwatch_metrics_enabled   = true
+    metric_name                  = "${var.api_name}-waf"
     sampled_requests_enabled     = false
   }
 }
 
 resource "aws_wafv2_web_acl_association" "api_gateway_association" {
-  resource_arn = aws_api_gateway_rest_api.api_gateway.arn
+  for_each = { for stage in var.stages : stage.stage_name => stage }
+  resource_arn = aws_api_gateway_stage.stage[each.key].arn
   web_acl_arn  = aws_wafv2_web_acl.api_gateway.arn
 }
