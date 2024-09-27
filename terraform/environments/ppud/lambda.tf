@@ -404,7 +404,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
   source_arn    = "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:*"
 }
 
-resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {
+resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/certificate_expiry_dev.zip"
   function_name = "certificate_expiry_dev"
