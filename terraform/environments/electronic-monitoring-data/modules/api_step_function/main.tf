@@ -388,6 +388,6 @@ resource "aws_wafv2_web_acl_logging_configuration" "api_gateway_waf_logs" {
 
 resource "aws_cloudwatch_log_group" "waf_log_group" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
-  name              = "/aws/waf/${var.api_name}-logs"
+  name              = "aws-waf-logs-${var.api_name}"
   retention_in_days = 400
 }
