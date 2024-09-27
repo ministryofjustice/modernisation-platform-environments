@@ -152,6 +152,8 @@ resource "aws_api_gateway_deployment" "deployment" {
 }
 
 resource "aws_api_gateway_stage" "stage" {
+  #checkov:skip=CKV_AWS_120: "Ensure API Gateway caching is enabled, Skipping for expense reasons, already cached in settings"
+  #checkov:ship=CKV2_AWS_29: "Ensure public API gateway are protected by WAF, done below: aws_wafv2_web_acl_association"
   for_each = { for stage in var.stages : stage.stage_name => stage }
   deployment_id = aws_api_gateway_deployment.deployment.id
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
