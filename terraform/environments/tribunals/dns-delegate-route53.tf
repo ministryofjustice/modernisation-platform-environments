@@ -68,7 +68,7 @@ resource "aws_route53_record" "sftp_external_services_prod" {
   for_each        = local.is-production ? var.sftp_services : {}
   allow_overwrite = true
   provider        = aws.core-network-services
-  zone_id         = data.aws_route53_zone.production_zone.zone_id
+  zone_id         = local.production_zone_id
   name            = "sftp.${each.value.name_prefix}.decisions.tribunals.gov.uk"
   type            = "CNAME"
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
