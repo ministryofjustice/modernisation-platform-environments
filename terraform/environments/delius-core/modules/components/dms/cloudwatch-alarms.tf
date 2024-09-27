@@ -4,39 +4,68 @@ resource "aws_sns_topic" "dms_alerting" {
   kms_master_key_id = var.account_config.kms_keys.general_shared
 }
 
+# Create a map of all possible replication tasks, so those that exist may have alarms applied to them.
+# Note that the key of this map cannot be an apply time value, so cannot be the ARN or ID of the
+# replication tasks - these should appear only as values.
 locals {
   aws_dms_replication_tasks = merge(
     try(var.dms_config.user_target_endpoint.write_database, null) == null ? {} : {
-      (aws_dms_replication_task.user_inbound_replication[0].replication_task_arn) = aws_dms_replication_task.user_inbound_replication[0].replication_task_id
+      user_inbound_replication = {
+        replication_task_arn = aws_dms_replication_task.user_inbound_replication[0].replication_task_arn,
+        replication_task_id = aws_dms_replication_task.user_inbound_replication[0].replication_task_id
+      }
     },
     { for k in keys(local.client_account_map) :
-      (aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_arn) => aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_id
+       "business_interaction_inbound_replication_from_${k}" => {
+        replication_task_arn = aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_arn
+        replication_task_id = aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_id
+       }
     },
     { for k in keys(local.client_account_map) :
-      (aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_arn) => aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_id
+       "audited_interaction_inbound_replication_from_${k}" => {
+        replication_task_arn = aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_arn
+        replication_task_id = aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_id
+       }
     },
     { for k in keys(local.client_account_map) :
-      (aws_dms_replication_task.audited_interaction_checksum_inbound_replication[k].replication_task_arn) => aws_dms_replication_task.audited_interaction_checksum_inbound_replication[k].replication_task_id
+       "audited_interaction_checksum_inbound_replication_from_${k}" => {
+        replication_task_arn = aws_dms_replication_task.audited_interaction_checksum_inbound_replication[k].replication_task_arn
+        replication_task_id = aws_dms_replication_task.audited_interaction_checksum_inbound_replication[k].replication_task_id
+       }
     },
     try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
-      (aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_arn) = aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id
+      audited_interaction_outbound_replication = {
+        replication_task_arn = aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_arn
+        replication_task_id = aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id
+      }
     },
     { for k in keys(local.client_account_map) :
-      (aws_dms_replication_task.user_outbound_replication[k].replication_task_arn) => aws_dms_replication_task.user_outbound_replication[k].replication_task_id
+      "user_outbound_replication_to_${k}" => {
+        replication_task_arn = aws_dms_replication_task.user_outbound_replication[k].replication_task_arn
+        replication_task_id = aws_dms_replication_task.user_outbound_replication[k].replication_task_id
+      }
     },
     try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
-      (aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_arn) = aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_id
+      business_interaction_outbound_replication = {
+        replication_task_arn = aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_arn
+        replication_task_id = aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_id
+      }
     },
     try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
-      (aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_arn) = aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_id
-    },
+      audited_interaction_checksum_outbound_replication = {
+        replication_task_arn = aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_arn
+        replication_task_id = aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_id
+      }
+    }
   )
 }
 
+
+
 resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   for_each            = local.aws_dms_replication_tasks
-  alarm_name          = "dms-cdc-latency-source-${each.value}"
-  alarm_description   = "High CDC source latency for dms replication task for ${each.value}"
+  alarm_name          = "dms-cdc-latency-source-${each.value.replication_task_id}"
+  alarm_description   = "High CDC source latency for dms replication task for ${each.value.replication_task_id}"
   namespace           = "AWS/DMS"
   statistic           = "Average"
   metric_name         = "CDCLatencySource"
@@ -50,15 +79,15 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
-    ReplicationTaskIdentifier = split(":", each.key)[length(split(":", each.key)) - 1]
+    ReplicationTaskIdentifier = split(":", each.value.replication_task_arn)[length(split(":", each.value.replication_task_arn)) - 1]
   }
   tags = var.tags
 }
 
 resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   for_each            = local.aws_dms_replication_tasks
-  alarm_name          = "dms-cdc-latency-target-${each.value}"
-  alarm_description   = "High CDC target latency for dms replication task for ${each.value}"
+  alarm_name          = "dms-cdc-latency-target-${each.value.replication_task_id}"
+  alarm_description   = "High CDC target latency for dms replication task for ${each.value.replication_task_id}"
   namespace           = "AWS/DMS"
   statistic           = "Average"
   metric_name         = "CDCLatencyTarget"
@@ -72,7 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
-    ReplicationTaskIdentifier = split(":", each.key)[length(split(":", each.key)) - 1]
+    ReplicationTaskIdentifier = split(":", each.value.replication_task_arn)[length(split(":", each.value.replication_task_arn)) - 1]
   }
   tags = var.tags
 }
