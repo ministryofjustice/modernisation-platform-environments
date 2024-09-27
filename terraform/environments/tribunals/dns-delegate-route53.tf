@@ -64,6 +64,17 @@ resource "aws_route53_record" "ec2_instances" {
   records  = ["34.243.192.28"]
 }
 
+resource "aws_route53_record" "sftp_external_services_prod" {
+  for_each        = local.is-production ? var.sftp_services : {}
+  allow_overwrite = true
+  provider        = aws.core-network-services
+  zone_id         = data.aws_route53_zone.production_zone.zone_id
+  name            = "sftp.${each.value.name_prefix}.decisions.tribunals.gov.uk"
+  type            = "CNAME"
+  records         = [aws_lb.tribunals_lb_sftp.dns_name]
+  ttl             = 60
+}
+
 # 'CNAME' records for all www legacy services which currently route through Azure Front Door
 resource "aws_route53_record" "afd_instances" {
   count    = local.is-production ? length(local.afd_records) : 0
