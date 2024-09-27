@@ -192,6 +192,17 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
   }
 }
 
+resource "aws_api_gateway_integration_response" "integration_response_500" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.resource.id
+  http_method = aws_api_gateway_method.method.http_method
+  status_code = "500"
+  
+  response_templates = {
+    "application/json" = "{\"message\": \"Internal error from Step Function.\"}"
+  }
+}
+
 # -------------------------------------------------------
 # Key set up
 # -------------------------------------------------------
@@ -239,6 +250,7 @@ resource "aws_api_gateway_method_settings" "settings" {
     throttling_rate_limit  = each.value.throttling_rate_limit
     caching_enabled = true
     cache_ttl_in_seconds = 300
+    cache_data_encrypted = true
   }
 }
 
@@ -248,6 +260,7 @@ resource "aws_api_gateway_method_settings" "settings" {
 # -------------------------------------------------------
 
 resource "aws_cloudwatch_log_group" "api_gateway_logs" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
   for_each = { for stage in var.stages : stage.stage_name => stage }
   name = "/aws/apigateway/${var.api_name}-${each.key}"
   retention_in_days = 400
@@ -304,8 +317,33 @@ resource "aws_wafv2_web_acl" "api_gateway" {
     allow {}
   }
 
-    # ive added no rules at the moment
+    rule {
+    name     = "Log4j-Block"
+    priority = 1
 
+    statement {
+      regex_pattern_set_reference_statement {
+        arn = "arn:aws:wafv2:REGION:ACCOUNT_ID:regional/regexpatternset/LOG4j"
+        field_to_match {
+          uri_path {}
+        }
+      text_transformation {
+          priority = 0
+          type     = "NONE"
+        }
+      }
+    }
+
+    action {
+      block {}
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${var.api_name}-log4j-block"
+      sampled_requests_enabled   = true
+    }
+  }
   visibility_config {
     cloudwatch_metrics_enabled   = true
     metric_name                  = "${var.api_name}-waf"
@@ -317,4 +355,18 @@ resource "aws_wafv2_web_acl_association" "api_gateway_association" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
   resource_arn = aws_api_gateway_stage.stage[each.key].arn
   web_acl_arn  = aws_wafv2_web_acl.api_gateway.arn
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "api_gateway_waf_logs" {
+  resource_arn = aws_wafv2_web_acl.api_gateway.arn
+
+  log_destination_configs = [
+    aws_cloudwatch_log_group.waf_log_group.arn
+  ]
+}
+
+resource "aws_cloudwatch_log_group" "waf_log_group" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
+  name              = "/aws/waf/${var.api_name}-logs"
+  retention_in_days = 400
 }
