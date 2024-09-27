@@ -203,6 +203,7 @@ resource "aws_api_gateway_integration_response" "integration_response_500" {
   response_templates = {
     "application/json" = "{\"message\": \"Internal error from Step Function.\"}"
   }
+  selection_pattern = ""
 }
 
 # -------------------------------------------------------
@@ -323,23 +324,35 @@ resource "aws_wafv2_web_acl" "api_gateway" {
     name     = "Log4j-Block"
     priority = 1
 
+    override_action {
+      none {}
+    }
+
     statement {
-      regex_pattern_set_reference_statement {
-        arn = "arn:aws:wafv2:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:regional/regexpatternset/LOG4j"
-        field_to_match {
-          uri_path {}
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+
+      # Excluding all these leaves only Log4JRCE
+
+        rule_action_override {
+          name = "Host_localhost_HEADER"
+          action_to_use {}
         }
-      text_transformation {
-          priority = 0
-          type     = "NONE"
+
+        rule_action_override {
+          name = "PROPFIND_METHOD"
+          action_to_use {}
+
         }
-      }
+
+        rule_action_override {
+          name = "ExploitablePaths_URIPATH"
+          action_to_use {}
+        }
     }
 
-    action {
-      block {}
     }
-
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "${var.api_name}-log4j-block"
