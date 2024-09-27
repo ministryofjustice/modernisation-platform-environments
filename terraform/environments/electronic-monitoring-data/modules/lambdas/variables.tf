@@ -125,10 +125,3 @@ variable "function_tag" {
   nullable    = true
   default     = null
 }
-
-variable "concurrency" {
-  description = "Max number of concurrent lambda runs"
-  type        = number
-  nullable    = true
-  default     = 10
-}

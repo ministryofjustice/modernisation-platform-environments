@@ -181,7 +181,7 @@ module "send_table_to_ap" {
   environment_variables = {
     AP_DESTINATION_BUCKET = local.land_bucket
   }
-  concurrency      = 100
+  reserved_concurrent_executions      = 100
 }
 
 
