@@ -178,6 +178,7 @@ locals {
       #     user_data_raw = base64encode(templatefile(
       #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
       #         branch = "TM/TM-494/ips-install"
+      #         newhostname = "t2-onr-bods-1-b" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
       #       }
       #     ))
       #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
