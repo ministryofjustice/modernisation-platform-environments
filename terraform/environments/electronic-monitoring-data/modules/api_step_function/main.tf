@@ -100,6 +100,8 @@ resource "aws_iam_role_policy_attachment" "api_gateway_trigger_step_function_pol
 
 data "aws_region" "current" {}
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_api_gateway_integration" "step_function_integration" {
   rest_api_id             = aws_api_gateway_rest_api.api_gateway.id
   resource_id             = aws_api_gateway_resource.resource.id
@@ -323,7 +325,7 @@ resource "aws_wafv2_web_acl" "api_gateway" {
 
     statement {
       regex_pattern_set_reference_statement {
-        arn = "arn:aws:wafv2:REGION:ACCOUNT_ID:regional/regexpatternset/LOG4j"
+        arn = "arn:aws:wafv2:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:regional/regexpatternset/LOG4j"
         field_to_match {
           uri_path {}
         }
