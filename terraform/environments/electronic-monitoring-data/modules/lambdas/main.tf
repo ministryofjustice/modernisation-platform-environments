@@ -171,3 +171,9 @@ resource "aws_lambda_function" "this" {
   reserved_concurrent_executions = var.reserved_concurrent_executions
 
 }
+
+resource "aws_lambda_provisioned_concurrency_config" "example" {
+  function_name                     = aws_lambda_function.this.function_name
+  provisioned_concurrent_executions = var.concurrency
+  qualifier                         = aws_lambda_function.this.version
+}
