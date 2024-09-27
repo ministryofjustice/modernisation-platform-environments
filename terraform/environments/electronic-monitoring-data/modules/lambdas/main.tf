@@ -145,6 +145,7 @@ resource "aws_lambda_function" "this" {
   role          = var.role_arn
   timeout       = var.timeout
   memory_size   = var.memory_size
+  publish       = true
 
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []
