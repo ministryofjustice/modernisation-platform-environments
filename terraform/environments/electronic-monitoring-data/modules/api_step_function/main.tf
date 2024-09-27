@@ -337,18 +337,24 @@ resource "aws_wafv2_web_acl" "api_gateway" {
 
         rule_action_override {
           name = "Host_localhost_HEADER"
-          action_to_use {}
+          action_to_use {
+            block {}
+          }
         }
 
         rule_action_override {
           name = "PROPFIND_METHOD"
-          action_to_use {}
+          action_to_use {
+            block {}
+          }
 
         }
 
         rule_action_override {
           name = "ExploitablePaths_URIPATH"
-          action_to_use {}
+          action_to_use {
+            block {}
+        }
         }
     }
 
