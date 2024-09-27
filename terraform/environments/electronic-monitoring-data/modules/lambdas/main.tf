@@ -145,7 +145,7 @@ resource "aws_lambda_function" "this" {
   role          = var.role_arn
   timeout       = var.timeout
   memory_size   = var.memory_size
-  publish       = true
+  reserved_concurrent_executions = var.concurrency
 
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []
@@ -171,10 +171,4 @@ resource "aws_lambda_function" "this" {
   }
   reserved_concurrent_executions = var.reserved_concurrent_executions
 
-}
-
-resource "aws_lambda_provisioned_concurrency_config" "example" {
-  function_name                     = aws_lambda_function.this.function_name
-  provisioned_concurrent_executions = var.concurrency
-  qualifier                         = aws_lambda_function.this.version
 }
