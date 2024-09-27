@@ -49,7 +49,8 @@
       "alb_elb_5xx_alarm_threshold": "10",
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
-      "oas_lz_cidr": "10.202.4.85/32"
+      "oas_lz_cidr": "10.202.4.85/32",
+      "lz_account_id": "411213865113"
     },
     "test": {
       "ec2amiid": "ami-00b96c3ab7b1106b4",
@@ -98,7 +99,8 @@
       "alb_elb_5xx_alarm_threshold": "10",
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
-      "oas_lz_cidr": "10.206.4.156/32"
+      "oas_lz_cidr": "10.206.4.156/32",
+      "lz_account_id": "140455166311"
     },
     "preproduction": {
       "ec2amiid": "ami-0cbc8c735c4f995b2",
@@ -147,7 +149,8 @@
       "alb_elb_5xx_alarm_threshold": "10",
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
-      "oas_lz_cidr": "10.206.4.156/32"
+      "oas_lz_cidr": "10.206.4.156/32",
+      "lz_account_id": "484221692666"
     },
     "production": {
       "example_var": "production-data",
