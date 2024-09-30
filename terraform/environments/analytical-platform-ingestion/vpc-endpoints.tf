@@ -1,3 +1,26 @@
+module "connected_vpc_endpoints" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "5.13.0"
+
+  vpc_id             = module.connected_vpc.vpc_id
+  subnet_ids         = module.connected_vpc.private_subnets
+  security_group_ids = [aws_security_group.vpc_endpoints.id]
+
+  endpoints = {
+    datasync = {
+      service             = "datasync"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-datasync", "${local.application_name}-${local.environment}-connected") }
+      )
+    }
+  }
+}
+
 module "isolated_vpc_endpoints" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
@@ -15,7 +38,7 @@ module "isolated_vpc_endpoints" {
       private_dns_enabled = true
       tags = merge(
         local.tags,
-        { Name = format("%s-logs-vpc-endpoint", local.application_name) }
+        { Name = format("%s-logs", "${local.application_name}-${local.environment}-isolated") }
       )
     },
     sts = {
@@ -24,7 +47,7 @@ module "isolated_vpc_endpoints" {
       private_dns_enabled = true
       tags = merge(
         local.tags,
-        { Name = format("%s-sts-vpc-endpoint", local.application_name) }
+        { Name = format("%s-sts", "${local.application_name}-${local.environment}-isolated") }
       )
     },
     s3 = {
@@ -37,7 +60,7 @@ module "isolated_vpc_endpoints" {
       ])
       tags = merge(
         local.tags,
-        { Name = format("%s-s3-vpc-endpoint", local.application_name) }
+        { Name = format("%s-s3", "${local.application_name}-${local.environment}-isolated") }
       )
     },
     secretsmanager = {
@@ -46,7 +69,7 @@ module "isolated_vpc_endpoints" {
       private_dns_enabled = true
       tags = merge(
         local.tags,
-        { Name = format("%s-secretsmanager-vpc-endpoint", local.application_name) }
+        { Name = format("%s-secretsmanager", "${local.application_name}-${local.environment}-isolated") }
       )
     },
   }

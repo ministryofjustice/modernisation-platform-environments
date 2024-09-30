@@ -1,10 +1,24 @@
-resource "aws_security_group" "vpc_endpoints" {
+resource "aws_security_group" "connected_vpc_endpoints" {
+  #checkov:skip=CKV2_AWS_5
+
+  description = "Security Group for controlling all VPC endpoint traffic"
+  name        = format("%s-vpc-endpoint-sg", local.application_name)
+  vpc_id      = module.connected_vpc.vpc_id
+  tags        = local.tags
+}
+
+resource "aws_security_group" "isolated_vpc_endpoints" {
   #checkov:skip=CKV2_AWS_5
 
   description = "Security Group for controlling all VPC endpoint traffic"
   name        = format("%s-vpc-endpoint-sg", local.application_name)
   vpc_id      = module.isolated_vpc.vpc_id
   tags        = local.tags
+}
+
+moved {
+  from = aws_security_group.vpc_endpoints
+  to   = aws_security_group.isolated_vpc_endpoints
 }
 
 resource "aws_security_group" "transfer_server" {
