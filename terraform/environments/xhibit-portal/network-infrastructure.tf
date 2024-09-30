@@ -264,39 +264,38 @@ resource "aws_security_group_rule" "waf_lb_allow_web_users" {
 }
 
 resource "aws_security_group_rule" "prtg_lb-inbound-importmachine" {
-  depends_on               = [aws_security_group.prtg_lb]
-  security_group_id        = aws_security_group.prtg_lb.id
+  description              = "allow HTTPS traffic from importmachine"
   type                     = "ingress"
-  description              = "allow HTTPS from prtg-lb to importmachine"
   from_port                = 443
   to_port                  = 443
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.prtg_lb.id
+  depends_on               = [aws_security_group.prtg_lb]
 }
 
 resource "aws_security_group_rule" "prtg_lb-outbound-importmachine" {
-  depends_on               = [aws_security_group.prtg_lb]
-  security_group_id        = aws_security_group.prtg_lb.id
+  description              = "allow HTTPS traffic to importmachine"
   type                     = "egress"
-  description              = "allow HTTPS to prtg-lb from importmachine"
   from_port                = 443
   to_port                  = 443
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.prtg_lb.id
+  depends_on               = [aws_security_group.prtg_lb]
 }
 
 resource "aws_security_group_rule" "prtg_lb_allow_web_users" {
-  depends_on        = [aws_security_group.prtg_lb]
-  security_group_id = aws_security_group.prtg_lb.id
+  description       = "allow HTTPS traffic from any IP address"
   type              = "ingress"
-  description       = "allow web traffic to get to prtg Load Balancer over SSL "
   from_port         = 443
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
+  security_group_id = aws_security_group.prtg_lb.id
+  depends_on        = [aws_security_group.prtg_lb]
 }
-
 
 resource "aws_security_group_rule" "ingestion_server-inbound-bastion" {
   depends_on               = [aws_security_group.ingestion_server]
