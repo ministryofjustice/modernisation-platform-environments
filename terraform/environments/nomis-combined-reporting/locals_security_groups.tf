@@ -140,7 +140,7 @@ locals {
           to_port         = 7010
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb"]
+          security_groups = ["lb", "public-lb"]
         }
         http7777 = {
           description     = "Allow http7777 ingress"
@@ -148,7 +148,7 @@ locals {
           to_port         = 7777
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb"]
+          security_groups = ["lb", "public-lb"]
         }
         http8005 = {
           description     = "Allow http8005 ingress"
@@ -156,7 +156,7 @@ locals {
           to_port         = 8005
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb"]
+          security_groups = ["lb", "public-lb"]
         }
         http8443 = {
           description     = "Allow http8443 ingress"
@@ -164,7 +164,7 @@ locals {
           to_port         = 8443
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb"]
+          security_groups = ["lb", "public-lb"]
         }
       }
       egress = {
