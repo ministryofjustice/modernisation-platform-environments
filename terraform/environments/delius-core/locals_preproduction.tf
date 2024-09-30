@@ -132,10 +132,10 @@ locals {
       read_database = "PRENDAS1"
     }
     audit_target_endpoint = {
-      write_environment = "preprod"   # Until production exists set dummy replication target
-      write_database = "NONE" # Remove this dummy attribute once production target exists
+      write_environment = "preprod" # Until production exists set dummy replication target
+      write_database    = "NONE"    # Remove this dummy attribute once production target exists
     }
-    user_source_endpoint = {  # Set this map to {} once production exists
+    user_source_endpoint = { # Set this map to {} once production exists
       read_host     = "primarydb"
       read_database = "NONE"
     }
