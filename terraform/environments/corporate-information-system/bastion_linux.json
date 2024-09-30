@@ -1,0 +1,9 @@
+{
+    "keys": {
+      "development": {
+        "vladimir": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOnw4QKOmTzWVoxfRYY6ZUdoFxJxZ0k1xB9n6aKuPDOa vladimirs.kovalovs@L0854"
+      },
+      "preproduction": {},
+      "production": {}
+    }
+  }
