@@ -4,7 +4,7 @@ locals {
     "test"        = "test"
     "development" = "dev"
   }
-  environment_shorthand = lookup(local.environment_map, local.environment)
+  environment_shorthand = local.environment_map[local.environment]
 
   bucket_prefix = "emds-${local.environment_shorthand}"
 }
