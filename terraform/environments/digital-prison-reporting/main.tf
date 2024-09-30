@@ -626,17 +626,17 @@ module "glue_s3_data_reconciliation_job" {
   )
 
   arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
-    "--extra-jars"                                                = local.glue_jobs_latest_jar_location
-    "--extra-files"                                               = local.shared_log4j_properties_path
-    "--class"                                                     = "uk.gov.justice.digital.job.DataReconciliationJob"
-    "--dpr.aws.region"                                            = local.account_region
-    "--dpr.config.s3.bucket"                                      = module.s3_glue_job_bucket.bucket_id
-    "--dpr.log.level"                                             = local.glue_job_common_log_level
-    "--dpr.raw.s3.path"                                           = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.raw.archive.s3.path"                                   = "s3://${module.s3_raw_archive_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"                                    = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.curated.s3.path"                                       = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.contract.registryName"                                 = module.s3_schema_registry_bucket.bucket_id
+    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--extra-files"               = local.shared_log4j_properties_path
+    "--class"                     = "uk.gov.justice.digital.job.DataReconciliationJob"
+    "--dpr.aws.region"            = local.account_region
+    "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id
+    "--dpr.log.level"             = local.glue_job_common_log_level
+    "--dpr.raw.s3.path"           = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.raw.archive.s3.path"   = "s3://${module.s3_raw_archive_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}/"
+    "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
     # dpr.reconciliation.datasource properties can be modified to configure
     # the job for either Nomis, a DPS database or some other data store
     "--dpr.reconciliation.datasource.glue.connection.name"        = aws_glue_connection.glue_nomis_connection[0].name

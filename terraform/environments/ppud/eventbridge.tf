@@ -1,9 +1,9 @@
 # Eventbridge Rule for Certificate Expiration
 
 resource "aws_cloudwatch_event_rule" "certificate_approaching_expiration_dev" {
-  count               = local.is-development == true ? 1 : 0
-  name                = "Certificate-Approaching-Expiration"
-  description         = "PPUD certificate is approaching expiration"
+  count         = local.is-development == true ? 1 : 0
+  name          = "Certificate-Approaching-Expiration"
+  description   = "PPUD certificate is approaching expiration"
   event_pattern = <<EOF
 {
   "source": [ "aws.acm"],

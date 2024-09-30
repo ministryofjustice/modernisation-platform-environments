@@ -40,17 +40,17 @@ resource "random_string" "this" {
 
 module "landing-bucket" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
-  bucket_name	        = "${var.supplier}-${random_string.this.result}"
+  bucket_name         = "${var.supplier}-${random_string.this.result}"
   replication_enabled = false
-  providers           = {
+  providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
     # Platform team to add a new provider for the additional Region.
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  versioning_enabled  = false
-  lifecycle_rule      = [
+  versioning_enabled = false
+  lifecycle_rule = [
     {
       id      = "main"
       enabled = "Enabled"
@@ -91,7 +91,7 @@ module "landing-bucket" {
     }
   ]
 
-  tags                = merge(var.local_tags, { resource-type = "landing-bucket" })
+  tags = merge(var.local_tags, { resource-type = "landing-bucket" })
 
 }
 

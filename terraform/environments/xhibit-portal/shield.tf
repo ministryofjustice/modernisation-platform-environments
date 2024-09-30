@@ -4,7 +4,7 @@ locals {
 }
 
 data "aws_shield_protection" "excluded" {
-  for_each = toset(local.excluded_resource_arns)
+  for_each     = toset(local.excluded_resource_arns)
   resource_arn = each.key
 }
 

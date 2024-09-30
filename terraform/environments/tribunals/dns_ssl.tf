@@ -41,8 +41,8 @@ resource "aws_route53_record" "cert_validation" {
 
 // sub-domain validation only required for non-production sites
 resource "aws_route53_record" "external_validation_subdomain" {
-  count           = local.is-production ? 0 : 1
-  provider        = aws.core-vpc
+  count    = local.is-production ? 0 : 1
+  provider = aws.core-vpc
 
   allow_overwrite = true
   name            = local.domain_name_sub[0]
