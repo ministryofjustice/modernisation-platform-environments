@@ -6,7 +6,7 @@ module "connected_vpc_endpoints" {
 
   vpc_id             = module.connected_vpc.vpc_id
   subnet_ids         = module.connected_vpc.private_subnets
-  security_group_ids = [aws_security_group.vpc_endpoints.id]
+  security_group_ids = [aws_security_group.connected_vpc_endpoints.id]
 
   endpoints = {
     datasync = {
@@ -29,7 +29,7 @@ module "isolated_vpc_endpoints" {
 
   vpc_id             = module.isolated_vpc.vpc_id
   subnet_ids         = module.isolated_vpc.private_subnets
-  security_group_ids = [aws_security_group.vpc_endpoints.id]
+  security_group_ids = [aws_security_group.isolated_vpc_endpoints.id]
 
   endpoints = {
     logs = {
