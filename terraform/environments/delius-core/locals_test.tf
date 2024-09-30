@@ -28,6 +28,7 @@ locals {
     efs_backup_retention_period = "30"
     port                        = 389
     tls_port                    = 636
+    desired_count               = 1
   }
 
 

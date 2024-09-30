@@ -5,6 +5,7 @@
 locals {
   environment_config_stage = {
     migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/23"]
+    migration_environment_vpc_cidr         = "10.160.32.0/20"
     migration_environment_db_cidr          = ["10.160.42.0/23", "10.160.44.0/23", "10.160.46.0/23"]
     migration_environment_full_name        = "del-stage"
     migration_environment_abbreviated_name = "del"
@@ -24,6 +25,8 @@ locals {
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
+    tls_port                    = 636
+    desired_count               = 0
   }
 
 
@@ -97,9 +100,11 @@ locals {
     }
 
     ldap = {
-      image_tag       = "replace_me"
-      container_port  = 389
-      slapd_log_level = "replace_me"
+      image_tag        = "6.0.3-latest"
+      container_port   = 389
+      slapd_log_level  = "conns,config,stats,stats2"
+      container_cpu    = 2048
+      container_memory = 4096
     }
 
     pdf_creation = {

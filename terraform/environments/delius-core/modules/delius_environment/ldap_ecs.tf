@@ -23,7 +23,7 @@ module "ldap_ecs" {
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
-  desired_count = 1
+  desired_count = var.ldap_config.desired_count
 
   container_port_config = [
     {
