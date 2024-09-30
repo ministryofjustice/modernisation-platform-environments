@@ -2,7 +2,7 @@ module "vpc_endpoints" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "~> 5.0"
+  version = "5.13.0"
 
   vpc_id             = module.vpc.vpc_id
   subnet_ids         = module.vpc.private_subnets
