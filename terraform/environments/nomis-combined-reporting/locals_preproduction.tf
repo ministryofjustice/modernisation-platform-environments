@@ -49,7 +49,7 @@ locals {
 
       pp-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_cms.config.instance_profile_policies, [
@@ -68,7 +68,7 @@ locals {
 
       pp-ncr-webadmin = merge(local.ec2_autoscaling_groups.bip_webadmin, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_webadmin.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         config = merge(local.ec2_autoscaling_groups.bip_webadmin.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_webadmin.config.instance_profile_policies, [
