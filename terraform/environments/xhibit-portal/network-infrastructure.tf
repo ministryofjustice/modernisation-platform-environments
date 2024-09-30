@@ -154,70 +154,68 @@ resource "aws_security_group_rule" "exchange-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "sms-inbound-bastion" {
-  from_port                = 3389
-  protocol                 = "TCP"
-  security_group_id        = aws_security_group.sms_server.id
-  to_port                  = 3389
+  description              = "allow all traffic from bastion"
   type                     = "ingress"
+  from_port                = 3389
+  to_port                  = 3389
+  protocol                 = "TCP"
   source_security_group_id = module.bastion_linux.bastion_security_group
+  security_group_id        = aws_security_group.sms_server.id
 }
 
 resource "aws_security_group_rule" "sms-inbound-importmachine" {
-  depends_on        = [aws_security_group.sms_server]
-  security_group_id = aws_security_group.sms_server.id
-  type              = "ingress"
-  # description update gg 21 Oct
-  description              = "allow all from importmachine"
+  description              = "allow all traffic from importmachine"
+  type                     = "ingress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.sms_server.id
+  depends_on               = [aws_security_group.sms_server]
 }
 
 resource "aws_security_group_rule" "sms-inbound-app" {
-  depends_on               = [aws_security_group.sms_server]
-  security_group_id        = aws_security_group.sms_server.id
+  description              = "allow all traffic from app_servers"
   type                     = "ingress"
-  description              = "allow all from app"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.app_servers.id
+  security_group_id        = aws_security_group.sms_server.id
+  depends_on               = [aws_security_group.sms_server]
 }
 
 resource "aws_security_group_rule" "sms-outbound-importmachine" {
-  depends_on               = [aws_security_group.sms_server]
-  security_group_id        = aws_security_group.sms_server.id
+  description              = "allow all traffic to bastion"
   type                     = "egress"
-  description              = "allow all to bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.sms_server.id
+  depends_on               = [aws_security_group.sms_server]
 }
 
-
-
 resource "aws_security_group_rule" "sms-outbound-all-ipv4" {
-  depends_on        = [aws_security_group.sms_server]
-  security_group_id = aws_security_group.sms_server.id
+  description       = "allow all traffic to any IPv4 address"
   type              = "egress"
-  description       = "allow all ipv4"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.sms_server.id
+  depends_on        = [aws_security_group.sms_server]
 }
 
 resource "aws_security_group_rule" "sms-outbound-all-ipv6" {
-  depends_on        = [aws_security_group.sms_server]
-  security_group_id = aws_security_group.sms_server.id
+  description       = "allow all traffic to any IPv6 address"
   type              = "egress"
-  description       = "allow all ipv6"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
   ipv6_cidr_blocks  = ["::/0"]
+  security_group_id = aws_security_group.sms_server.id
+  depends_on        = [aws_security_group.sms_server]
 }
 
 resource "aws_security_group_rule" "waf_lb-inbound-importmachine" {
