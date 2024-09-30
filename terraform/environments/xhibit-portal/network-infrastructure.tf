@@ -485,47 +485,47 @@ resource "aws_security_group_rule" "app-all-from-ingestion" {
 }
 
 resource "aws_security_group_rule" "ingestion-lb-inbound-importmachine" {
-  depends_on               = [aws_security_group.ingestion_lb]
-  security_group_id        = aws_security_group.ingestion_lb.id
+  description              = "allow all traffic from importmachine"
   type                     = "ingress"
-  description              = "allow all from bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.ingestion_lb.id
+  depends_on               = [aws_security_group.ingestion_lb]
 }
 
 resource "aws_security_group_rule" "ingestion-lb-outbound-importmachine" {
-  depends_on               = [aws_security_group.ingestion_lb]
-  security_group_id        = aws_security_group.ingestion_lb.id
+  description              = "allow all traffic to importmachine"
   type                     = "egress"
-  description              = "allow all to bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.ingestion_lb.id
+  depends_on               = [aws_security_group.ingestion_lb]
 }
 
 resource "aws_security_group_rule" "ingestion-lb-http-from-ingestion-server" {
-  depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.ingestion_lb.id
-  type                     = "ingress"
   description              = "allow all traffic from ingestion server"
+  type                     = "ingress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.ingestion_server.id
+  security_group_id        = aws_security_group.ingestion_lb.id
+  depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
 }
 
 resource "aws_security_group_rule" "ingestion-lb-http-to-ingestion-server" {
-  depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.ingestion_lb.id
-  type                     = "egress"
   description              = "allow all traffic to ingestion server"
+  type                     = "egress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.ingestion_server.id
+  security_group_id        = aws_security_group.ingestion_lb.id
+  depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
 }
 
 resource "aws_security_group_rule" "ingestion-server-http-from-ingestion-lb" {
