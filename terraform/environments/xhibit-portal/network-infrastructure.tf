@@ -219,25 +219,48 @@ resource "aws_security_group_rule" "sms-outbound-all-ipv6" {
 }
 
 resource "aws_security_group_rule" "waf_lb-inbound-importmachine" {
-  depends_on               = [aws_security_group.waf_lb]
-  security_group_id        = aws_security_group.waf_lb.id
+  description              = "allow all traffic from importmachine"
   type                     = "ingress"
-  description              = "allow all from bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.waf_lb.id
+  depends_on               = [aws_security_group.waf_lb]
 }
 
 resource "aws_security_group_rule" "waf_lb-outbound-importmachine" {
-  depends_on               = [aws_security_group.waf_lb]
-  security_group_id        = aws_security_group.waf_lb.id
+  description              = "allow all traffic to importmachine"
   type                     = "egress"
-  description              = "allow all to bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.waf_lb.id
+  depends_on               = [aws_security_group.waf_lb]
+}
+
+resource "aws_security_group_rule" "egress-to-portal" {
+  description              = "allow HTTP traffic to portal_server"
+  type                     = "egress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.portal_server.id
+  security_group_id        = aws_security_group.waf_lb.id
+  depends_on               = [aws_security_group.waf_lb]
+}
+
+resource "aws_security_group_rule" "waf_lb_allow_web_users" {
+  description       = "allow HTTPS traffic to waf_lb"
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "TCP"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+  security_group_id = aws_security_group.waf_lb.id
+  depends_on        = [aws_security_group.waf_lb]
 }
 
 resource "aws_security_group_rule" "prtg_lb-inbound-importmachine" {
@@ -260,29 +283,6 @@ resource "aws_security_group_rule" "prtg_lb-outbound-importmachine" {
   to_port                  = 443
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.importmachine.id
-}
-
-resource "aws_security_group_rule" "egress-to-portal" {
-  depends_on               = [aws_security_group.waf_lb]
-  security_group_id        = aws_security_group.waf_lb.id
-  type                     = "egress"
-  description              = "allow web traffic to get to portal"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.portal_server.id
-}
-
-resource "aws_security_group_rule" "waf_lb_allow_web_users" {
-  depends_on        = [aws_security_group.waf_lb]
-  security_group_id = aws_security_group.waf_lb.id
-  type              = "ingress"
-  description       = "allow web traffic to get to ingestion server"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "TCP"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
 }
 
 resource "aws_security_group_rule" "prtg_lb_allow_web_users" {
