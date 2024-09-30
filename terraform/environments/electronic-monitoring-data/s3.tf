@@ -544,7 +544,7 @@ module "s3-data-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-fms-landing-bucket" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   for_each = local.live_feed_levels
 
@@ -602,7 +602,7 @@ module "s3-fms-landing-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-mdss-landing-bucket" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   for_each = local.live_feed_levels
 

@@ -1,6 +1,6 @@
 resource "aws_dynamodb_table" "this" {
-#checkov:skip=CKV_AWS_119: "Ensure DynamoDB Tables are encrypted using a KMS Customer Managed CMK"
-#checkov:skip=CKV_AWS_28: "Ensure DynamoDB point in time recovery (backup) is enabled. TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+  #checkov:skip=CKV_AWS_119: "Ensure DynamoDB Tables are encrypted using a KMS Customer Managed CMK"
+  #checkov:skip=CKV_AWS_28: "Ensure DynamoDB point in time recovery (backup) is enabled. TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
 
   count = var.create_table && !var.autoscaling_enabled ? 1 : 0
 
