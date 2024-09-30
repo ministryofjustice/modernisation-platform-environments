@@ -84,26 +84,28 @@ resource "aws_security_group" "iisrelay_server" {
   vpc_id      = local.vpc_id
 }
 
+# AWS Security Group Rules
+
 resource "aws_security_group_rule" "build-inbound-bastion" {
-  depends_on               = [aws_security_group.build_server]
-  security_group_id        = aws_security_group.build_server.id
+  description              = "allow all traffic from bastion"
   type                     = "ingress"
-  description              = "allow all from bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
+  security_group_id        = aws_security_group.build_server.id
+  depends_on               = [aws_security_group.build_server]
 }
 
 resource "aws_security_group_rule" "build-outbound-bastion" {
-  depends_on               = [aws_security_group.build_server]
-  security_group_id        = aws_security_group.build_server.id
+  description              = "allow all traffic to build_server"
   type                     = "egress"
-  description              = "allow all to bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
+  security_group_id        = aws_security_group.build_server.id
+  depends_on               = [aws_security_group.build_server]
 }
 
 resource "aws_security_group_rule" "exchange-inbound-importmachine" {
