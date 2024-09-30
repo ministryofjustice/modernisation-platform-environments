@@ -10,11 +10,12 @@ module "datasync_instance" {
   subnet_id              = element(module.connected_vpc.private_subnets, 0)
   vpc_security_group_ids = [module.datasync_security_group.security_group_id]
 
-  root_block_device = {
-    encrypted   = true
-    kms_key_id  = module.ec2_ebs_kms.key_arn
-    volume_type = "gp3"
-    volume_size = 80
-
-  }
+  root_block_device = [
+    {
+      encrypted   = true
+      kms_key_id  = module.ec2_ebs_kms.key_arn
+      volume_type = "gp3"
+      volume_size = 80
+    }
+  ]
 }
