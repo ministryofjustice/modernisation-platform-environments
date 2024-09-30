@@ -586,11 +586,13 @@ module "activate_glue_trigger_job" {
 module "glue_data_reconciliation_job" {
   source                       = "./modules/domains/reconciliation-job"
   create_job                   = local.create_job && local.create_glue_connection
+  env                          = local.env
   job_name                     = "${local.project}-data-reconciliation-job-${local.env}"
   short_name                   = "${local.project}-data-reconciliation-job"
   create_sec_conf              = local.create_sec_conf
   temp_dir                     = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-data-reconciliation-${local.env}/"
   spark_event_logs             = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-data-reconciliation-${local.env}/"
+  script_version               = "digital-prison-reporting-jobs-vLatest.scala"
   enable_continuous_log_filter = false
   project_id                   = local.project
   s3_kms_arn                   = local.s3_kms_arn
@@ -599,7 +601,7 @@ module "glue_data_reconciliation_job" {
   num_workers                  = 2
   max_concurrent_runs          = 64
   account_region               = local.account_region
-  account                      = local.account_id
+  account_id                   = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
   connections                  = local.create_glue_connection ? concat([
     aws_glue_connection.glue_operational_datastore_connection[0].name,
