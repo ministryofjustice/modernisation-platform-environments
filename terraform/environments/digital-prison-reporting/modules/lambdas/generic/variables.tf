@@ -57,11 +57,13 @@ variable "memory_size" {
 }
 
 variable "namespace" {
+  type        = string
   description = "Namespacing for multiple environments in a single stage"
   default     = ""
 }
 
 variable "publish" {
+  type        = bool
   description = "Enable versioning for this lambda"
   default     = false
 }
@@ -114,6 +116,7 @@ variable "vpc_settings" {
 
 variable "lambda_trigger" {
   description = "Set Permissions for LAMBDA Triggers,"
+  type        = bool
   default     = false
 }
 
