@@ -18,6 +18,7 @@ locals {
   afd_records = [
     "administrativeappeals.decisions",
     "financeandtax.decisions",
+    "immigrationservices.decisions",
     "landregistrationdivision.decisions",
     "landschamber.decisions",
     "transportappeals.decisions"
@@ -27,7 +28,6 @@ locals {
     "cicap.decisions",
     "carestandards.decisions",
     "employmentappeals.decisions",
-    "immigrationservices.decisions",
     "informationrights.decisions"
   ]
 
