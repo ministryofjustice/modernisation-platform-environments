@@ -1,5 +1,5 @@
 locals {
-  public_key_data = jsondecode(file("./bastion_linux.json"))
+  public_key_data = jsondecode(file("./files/bastion_linux.json"))
 }
 
 module "bastion_linux" {
