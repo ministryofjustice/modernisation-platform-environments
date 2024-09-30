@@ -50,7 +50,7 @@ module "oracle_db_dsd" {
   server_type_tag     = "mis_db"
   database_tag_prefix = "dsd"
 
-  count             = 1
+  count             = try(var.dsd_db_config.instance_count, 1)
   db_count_index    = count.index + 1
   ec2_instance_type = var.dsd_db_config.instance_type
 
@@ -104,7 +104,7 @@ module "oracle_db_boe" {
   server_type_tag     = "mis_db"
   database_tag_prefix = "boe"
 
-  count             = 1
+  count             = try(var.boe_db_config.instance_count, 1)
   db_count_index    = count.index + 1
   ec2_instance_type = var.boe_db_config.instance_type
 
@@ -158,7 +158,7 @@ module "oracle_db_mis" {
   server_type_tag     = "mis_db"
   database_tag_prefix = "mis"
 
-  count             = 1
+  count             = try(var.mis_db_config.instance_count, 1)
   db_count_index    = count.index + 1
   ec2_instance_type = var.mis_db_config.instance_type
 

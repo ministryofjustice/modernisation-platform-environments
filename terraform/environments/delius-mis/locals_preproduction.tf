@@ -17,7 +17,7 @@ locals {
   }
 
   bcs_config_preprod = {
-    instance_count = 1
+    instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150 }
@@ -62,7 +62,7 @@ locals {
   }
 
   bps_config_preprod = {
-    instance_count = 1
+    instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150 }
@@ -107,7 +107,7 @@ locals {
   }
 
   bws_config_preprod = {
-    instance_count = 1
+    instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150 }
@@ -152,7 +152,7 @@ locals {
   }
 
   dis_config_preprod = {
-    instance_count = 2
+    instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
@@ -199,6 +199,7 @@ locals {
 
   # BOE DB config
   boe_db_config_preprod = {
+    instance_count = 0
     instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -243,6 +244,7 @@ locals {
 
   # DSD DB config
   dsd_db_config_preprod = {
+    instance_count = 0
     instance_type  = "r7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -287,6 +289,7 @@ locals {
 
   # MIS DB config
   mis_db_config_preprod = {
+    instance_count = 0
     instance_type  = "r7i.12xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
