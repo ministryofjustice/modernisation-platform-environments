@@ -12,12 +12,6 @@ variable "script_version" {
   type = string
 }
 
-variable "tags" {
-  type = map(string)
-  default = {}
-  description = "(Optional) Key-value map of resource tags."
-}
-
 variable "create_job" {
   description = "Enable Reconciliation Job, True or False"
   type        = bool
@@ -72,7 +66,7 @@ variable "worker_type" {
   description = "(Optional) The type of predefined worker that is allocated when a job runs."
 
   validation {
-    condition = contains(["Standard", "G.025X", "G.1X", "G.2X"], var.glue_batch_job_worker_type)
+    condition = contains(["Standard", "G.025X", "G.1X", "G.2X"], var.worker_type)
     error_message = "Accepts a value of Standard, G.025X, G.1X, or G.2X."
   }
 }
