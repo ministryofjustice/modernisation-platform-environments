@@ -199,7 +199,7 @@ locals {
 
   # BOE DB config
   boe_db_config_preprod = {
-    instance_type  = "t3.large"
+    instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -243,7 +243,7 @@ locals {
 
   # DSD DB config
   dsd_db_config_preprod = {
-    instance_type  = "t3.large"
+    instance_type  = "r7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -287,7 +287,7 @@ locals {
 
   # MIS DB config
   mis_db_config_preprod = {
-    instance_type  = "t3.large"
+    instance_type  = "r7i.12xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -318,7 +318,7 @@ locals {
         iops       = 5000
         throughput = 500
         type       = "gp3"
-        total_size = 5000
+        total_size = 6000
       }
       flash = {
         iops       = 3000
