@@ -359,29 +359,3 @@ resource "aws_route53_record" "sftp_external_services" {
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60
 }
-
-// PROD Records
-resource "aws_route53_record" "external_services_prod" {
-  for_each = local.is-production ? var.services : {}
-  provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.production_zone.zone_id
-  name     = "${each.value.name_prefix}.decisions.tribunals.gov.uk"
-  type     = "A"
-
-  alias {
-    name                   = aws_lb.tribunals_lb.dns_name
-    zone_id                = aws_lb.tribunals_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_route53_record" "sftp_external_services_prod" {
-  for_each        = local.is-production ? var.sftp_services : {}
-  allow_overwrite = true
-  provider        = aws.core-vpc
-  zone_id         = data.aws_route53_zone.production_zone.zone_id
-  name            = "sftp.${each.value.name_prefix}.decisions.tribunals.gov.uk"
-  type            = "CNAME"
-  records         = [aws_lb.tribunals_lb_sftp.dns_name]
-  ttl             = 60
-}
