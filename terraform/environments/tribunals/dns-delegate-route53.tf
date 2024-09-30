@@ -17,8 +17,6 @@ locals {
 
   afd_records = [
     "administrativeappeals.decisions",
-    "carestandards.decisions",
-    "employmentappeals.decisions",
     "financeandtax.decisions",
     "immigrationservices.decisions",
     "informationrights.decisions",
@@ -28,7 +26,9 @@ locals {
   ]
 
   afd_records_migrated = [
-    "cicap.decisions"
+    "cicap.decisions",
+    "carestandards.decisions",
+    "employmentappeals.decisions"
   ]
 
   nginx_records = [
