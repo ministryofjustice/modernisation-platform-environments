@@ -583,59 +583,70 @@ resource "aws_security_group_rule" "ingestion-all-to-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
 }
 
-resource "aws_security_group_rule" "exchange-all-from-app" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
-  security_group_id        = aws_security_group.app_servers.id
-  type                     = "egress"
-  description              = "allow all traffic to Exchange server"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.exchange_server.id
-}
-
 resource "aws_security_group_rule" "exchange-all-to-app" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
-  security_group_id        = aws_security_group.app_servers.id
-  type                     = "ingress"
   description              = "allow all traffic from Exchange server"
+  type                     = "ingress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.exchange_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
 }
 
-resource "aws_security_group_rule" "sms-all-from-app" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
-  security_group_id        = aws_security_group.app_servers.id
+resource "aws_security_group_rule" "exchange-all-from-app" {
+  description              = "allow all traffic to Exchange server"
   type                     = "egress"
-  description              = "allow all traffic to SMS server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
-  source_security_group_id = aws_security_group.sms_server.id
+  source_security_group_id = aws_security_group.exchange_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
 }
 
 resource "aws_security_group_rule" "sms-all-to-app" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
-  security_group_id        = aws_security_group.app_servers.id
-  type                     = "ingress"
   description              = "allow all traffic from SMS server"
+  type                     = "ingress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.sms_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
+}
+
+resource "aws_security_group_rule" "sms-all-from-app" {
+  description              = "allow all traffic to SMS server"
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.sms_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
 }
 
 resource "aws_security_group_rule" "app-all-from-portal" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
-  security_group_id        = aws_security_group.app_servers.id
-  type                     = "ingress"
   description              = "allow all traffic from portal server"
+  type                     = "ingress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.portal_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
+}
+
+resource "aws_security_group_rule" "app-all-to-portal" {
+  description              = "allow all traffic to portal server"
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.portal_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
 }
 
 resource "aws_security_group_rule" "portal-all-from-app" {
@@ -647,17 +658,6 @@ resource "aws_security_group_rule" "portal-all-from-app" {
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.app_servers.id
-}
-
-resource "aws_security_group_rule" "app-all-to-portal" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
-  security_group_id        = aws_security_group.app_servers.id
-  type                     = "egress"
-  description              = "allow all traffic to portal server"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.portal_server.id
 }
 
 resource "aws_security_group_rule" "portal-all-to-app" {
