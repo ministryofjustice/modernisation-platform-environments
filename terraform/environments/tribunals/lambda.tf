@@ -135,15 +135,15 @@ resource "aws_lambda_layer_version" "pyodbc_layer" {
   compatible_runtimes = ["python3.11"]
 }
 
-resource "aws_lambda_function" "app_setup_db" {
-  for_each      = var.web_app_services
-  filename      = "lambda_function/db_setup_deployment_package.zip"
-  function_name = "${each.value.name_prefix}-setup-db"
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "app_setup_db.lambda_handler"
-  runtime       = "python3.11"
-  timeout       = 300
-  architectures = ["x86_64"]
+# resource "aws_lambda_function" "app_setup_db" {
+#   for_each      = var.web_app_services
+#   filename      = "lambda_function/db_setup_deployment_package.zip"
+#   function_name = "${each.value.name_prefix}-setup-db"
+#   role          = aws_iam_role.lambda_role.arn
+#   handler       = "app_setup_db.lambda_handler"
+#   runtime       = "python3.11"
+#   timeout       = 300
+#   architectures = ["x86_64"]
 
   environment {
     variables = {
