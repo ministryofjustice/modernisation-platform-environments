@@ -3,7 +3,7 @@ module "jml_extract_lambda" {
   count = terraform.workspace == "data-platform-apps-and-tools-production" ? 1 : 0
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 6.0"
+  version = "~> 7.10"
 
   publish        = true
   create_package = false
