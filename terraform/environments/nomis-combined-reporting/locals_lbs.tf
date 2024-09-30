@@ -72,7 +72,7 @@ locals {
       idle_timeout                     = 3600
       internal_lb                      = false
       security_groups                  = ["public-lb"]
-      subnets                          = module.environment.subnets["private"].ids
+      subnets                          = module.environment.subnets["public"].ids
 
       listeners = {
         http = {
