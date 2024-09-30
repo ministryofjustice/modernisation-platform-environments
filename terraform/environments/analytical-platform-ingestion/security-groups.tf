@@ -16,11 +16,6 @@ resource "aws_security_group" "isolated_vpc_endpoints" {
   tags        = local.tags
 }
 
-moved {
-  from = aws_security_group.vpc_endpoints
-  to   = aws_security_group.isolated_vpc_endpoints
-}
-
 resource "aws_security_group" "transfer_server" {
   description = "Security Group for Transfer Server"
   name        = "transfer-server"
@@ -78,6 +73,26 @@ module "scan_lambda_security_group" {
   egress_cidr_blocks     = ["0.0.0.0/0"]
   egress_rules           = ["all-all"]
   egress_prefix_list_ids = [data.aws_prefix_list.s3.id]
+
+  tags = local.tags
+}
+
+module "datasync_security_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.2.0"
+
+  name        = "${local.application_name}-${local.environment}-datasync"
+  description = "Security Group for DataSync Instance"
+
+  vpc_id = module.connected_vpc.vpc_id
+
+  ingress_cidr_blocks = [module.connected_vpc.vpc_cidr_block]
+  ingress_rules = [
+    "http-80-tcp",
+    "https-443-tcp"
+  ]
 
   tags = local.tags
 }
