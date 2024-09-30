@@ -163,15 +163,15 @@ resource "aws_lambda_function" "app_setup_db" {
   layers = [aws_lambda_layer_version.pyodbc_layer.arn]
 }
 
-resource "aws_lambda_function" "app_post_migrate" {
-  for_each      = var.web_app_services
-  filename      = "lambda_function/post_migrate_deployment_package.zip"
-  function_name = "${each.value.name_prefix}-post-migration-script"
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "app_post_migrate.lambda_handler"
-  runtime       = "python3.11"
-  timeout       = 300
-  architectures = ["x86_64"]
+# resource "aws_lambda_function" "app_post_migrate" {
+#   for_each      = var.web_app_services
+#   filename      = "lambda_function/post_migrate_deployment_package.zip"
+#   function_name = "${each.value.name_prefix}-post-migration-script"
+#   role          = aws_iam_role.lambda_role.arn
+#   handler       = "app_post_migrate.lambda_handler"
+#   runtime       = "python3.11"
+#   timeout       = 300
+#   architectures = ["x86_64"]
 
   environment {
     variables = {
