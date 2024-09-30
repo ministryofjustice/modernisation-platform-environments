@@ -8,8 +8,6 @@ terraform {
   required_version = "~> 1.0"
 }
 
-data "aws_caller_identity" "current" {}
-
 module "this-bucket" {
   source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
@@ -61,90 +59,4 @@ module "this-bucket" {
     { order_type = var.order_type },
     { data_feed = var.data_feed }
   )
-}
-
-resource "aws_iam_user" "supplier" {
-  name = "${var.local_bucket_prefix}-${var.data_feed}-${var.order_type}"
-  tags = var.local_tags
-}
-
-resource "aws_iam_role" "supplier_data_access" {
-  name = "supplier-put-${var.data_feed}-${var.order_type}-landing-bucket"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-  managed_policy_arns = [aws_iam_policy.supplier_data_access.arn]
-
-  tags = merge(
-    var.local_tags,
-    { type = var.order_type },
-    { data_feed = var.data_feed }
-  )
-}
-
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${aws_iam_user.supplier.name}"]
-    }
-  }
-}
-
-resource "aws_iam_policy" "supplier_data_access" {
-  name        = "put-s3-${var.data_feed}-${var.order_type}-policy"
-  description = "Give put access to the ${var.data_feed}-${var.order_type} landing bucket"
-  policy      = data.aws_iam_policy_document.supplier_data_access.json
-}
-
-data "aws_iam_policy_document" "supplier_data_access" {
-  # Source bucket access
-  statement {
-    actions = [
-      "s3:ListBucket",
-      "s3:GetObject",
-      "s3:GetObjectTagging",
-      "s3:GetObjectVersion",
-      "s3:GetObjectVersionTagging"
-    ]
-
-    resources = [
-      "arn:aws:s3:::${var.supplier_bucket}",
-      "arn:aws:s3:::${var.supplier_bucket}/*"
-    ]
-  }
-  # Destination bucket access
-  statement {
-    actions = [
-      "s3:PutObject"
-    ]
-
-    resources = [
-      "${module.this-bucket.bucket.arn}/*",
-    ]
-  }
-}
-
-resource "aws_iam_access_key" "supplier" {
-  user = aws_iam_user.supplier.name
-}
-
-resource "aws_secretsmanager_secret" "supplier" {
-  name        = "iam-${aws_iam_user.supplier.name}"
-  description = "IAM user access credentials for ${var.data_feed}-${var.order_type}"
-  tags = merge(
-    var.local_tags,
-    { order_type = var.order_type },
-    { data_feed = var.data_feed }
-  )
-}
-
-resource "aws_secretsmanager_secret_version" "supplier" {
-  secret_id     = aws_secretsmanager_secret.supplier.id
-  secret_string = jsonencode({
-    user              = aws_iam_user.pwm_ses_smtp_user.name,
-    key               = aws_iam_access_key.supplier.id,
-    secret            = aws_iam_access_key.supplier.secret
-    ses_smtp_user     = aws_iam_access_key.supplier.id
-    ses_smtp_password = aws_iam_access_key.supplier.ses_smtp_password_v4
-  })
 }

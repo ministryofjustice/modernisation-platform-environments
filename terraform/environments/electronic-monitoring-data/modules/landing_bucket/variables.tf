@@ -30,8 +30,3 @@ variable "order_type" {
   description = "The name of the order type data"
   type        = string
 }
-
-variable "supplier_bucket" {
-  description = "The name of the supplier bucket containing data to be sent"
-  type        = string
-}
