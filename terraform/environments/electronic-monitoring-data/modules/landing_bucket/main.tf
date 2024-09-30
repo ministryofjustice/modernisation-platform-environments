@@ -58,7 +58,7 @@ module "this-bucket" {
 
   tags = merge(
     var.local_tags,
-    { type = var.order_type },
+    { order_type = var.order_type },
     { data_feed = var.data_feed }
   )
 }
@@ -122,4 +122,29 @@ data "aws_iam_policy_document" "supplier_data_access" {
       "${module.this-bucket.bucket.arn}/*",
     ]
   }
+}
+
+resource "aws_iam_access_key" "supplier" {
+  user = aws_iam_user.supplier.name
+}
+
+resource "aws_secretsmanager_secret" "supplier" {
+  name        = "iam-${aws_iam_user.supplier.name}"
+  description = "IAM user access credentials for ${var.data_feed}-${var.order_type}"
+  tags = merge(
+    var.local_tags,
+    { order_type = var.order_type },
+    { data_feed = var.data_feed }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "supplier" {
+  secret_id     = aws_secretsmanager_secret.supplier.id
+  secret_string = jsonencode({
+    user              = aws_iam_user.pwm_ses_smtp_user.name,
+    key               = aws_iam_access_key.supplier.id,
+    secret            = aws_iam_access_key.supplier.secret
+    ses_smtp_user     = aws_iam_access_key.supplier.id
+    ses_smtp_password = aws_iam_access_key.supplier.ses_smtp_password_v4
+  })
 }
