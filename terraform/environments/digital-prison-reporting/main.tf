@@ -592,6 +592,8 @@ module "glue_data_reconciliation_job" {
   temp_dir                     = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-data-reconciliation-${local.env}/"
   spark_event_logs             = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-data-reconciliation-${local.env}/"
   enable_continuous_log_filter = false
+  project_id                   = local.project
+  s3_kms_arn                   = local.s3_kms_arn
   execution_class              = "STANDARD"
   worker_type                  = "G.1X"
   num_workers                  = 2
