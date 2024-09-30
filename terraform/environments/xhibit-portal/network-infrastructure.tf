@@ -484,6 +484,17 @@ resource "aws_security_group_rule" "app-all-from-ingestion" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
 }
 
+resource "aws_security_group_rule" "app-all-to-ingestion" {
+  description              = "allow all traffic from ingestion server"
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.ingestion_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
+}
+
 resource "aws_security_group_rule" "ingestion-lb-inbound-importmachine" {
   description              = "allow all traffic from importmachine"
   type                     = "ingress"
@@ -529,58 +540,47 @@ resource "aws_security_group_rule" "ingestion-lb-http-to-ingestion-server" {
 }
 
 resource "aws_security_group_rule" "ingestion-server-http-from-ingestion-lb" {
-  depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.ingestion_server.id
-  type                     = "ingress"
   description              = "allow all traffic from ingestion LB"
+  type                     = "ingress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.ingestion_lb.id
+  security_group_id        = aws_security_group.ingestion_server.id
+  depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
 }
 
 resource "aws_security_group_rule" "ingestion-server-http-to-ingestion-lb" {
-  depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.ingestion_server.id
-  type                     = "egress"
   description              = "allow all traffic to ingestion LB"
+  type                     = "egress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.ingestion_lb.id
+  security_group_id        = aws_security_group.ingestion_server.id
+  depends_on               = [aws_security_group.ingestion_lb, aws_security_group.ingestion_server]
 }
 
 resource "aws_security_group_rule" "ingestion-all-from-app" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.ingestion_server.id
+  description              = "allow all traffic from app_servers"
   type                     = "ingress"
-  description              = "allow all traffic from app"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.app_servers.id
-}
-
-resource "aws_security_group_rule" "app-all-to-ingestion" {
+  security_group_id        = aws_security_group.ingestion_server.id
   depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.app_servers.id
-  type                     = "egress"
-  description              = "allow all traffic from ingestion server"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.ingestion_server.id
 }
 
 resource "aws_security_group_rule" "ingestion-all-to-app" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.ingestion_server.id
+  description              = "allow all traffic to app_servers"
   type                     = "egress"
-  description              = "allow all traffic to ingestion server"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.app_servers.id
+  security_group_id        = aws_security_group.ingestion_server.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
 }
 
 resource "aws_security_group_rule" "exchange-all-from-app" {
