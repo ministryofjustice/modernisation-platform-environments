@@ -1,11 +1,13 @@
 # tflint-ignore-file: terraform_required_version, terraform_required_providers
 
 variable "region" {
+  type        = string
   description = "Current AWS Region."
   default     = "eu-west-2"
 }
 
 variable "account" {
+  type        = string
   description = "AWS Account ID."
   default     = ""
 }
