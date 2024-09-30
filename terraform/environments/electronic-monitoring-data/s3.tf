@@ -4,15 +4,9 @@ locals {
     "test"        = "test"
     "development" = "dev"
   }
-  environment_shorthand = lookup(local.environment_map, local.environment)
+  environment_shorthand = local.environment_map[local.environment]
 
   bucket_prefix = "emds-${local.environment_shorthand}"
-
-  live_feed_levels = {
-    1 = "general"
-    2 = "special"
-    3 = "home office"
-  }
 }
 
 # ------------------------------------------------------------------------
@@ -540,119 +534,81 @@ module "s3-data-bucket" {
 }
 
 # ------------------------------------------------------------------------
-# Landing bucket FMS
+# Landing buckets FMS
 # ------------------------------------------------------------------------
 
-module "s3-fms-landing-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+module "s3-fms-general-landing-bucket" {
+  source = "./modules/landing_bucket/"
 
-  for_each = local.live_feed_levels
+  data_feed = "fms"
+  local_bucket_prefix = local.bucket_prefix
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "general"
 
-  bucket_prefix      = "${local.bucket_prefix}-land-fms-${each.key}-"
-  versioning_enabled = true
-
-  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
-  ownership_controls = "BucketOwnerEnforced"
-  acl                = "private"
-
-  # Refer to the below section "Replication" before enabling replication
-  replication_enabled = false
-  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
-  # replication_region                       = "eu-west-2"
   providers = {
-    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
-    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
-    # Platform team to add a new provider for the additional Region.
-    # Leave this provider block in even if you are not using replication
-    aws.bucket-replication = aws
+    aws = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-land-fms-${each.key}/"
-  log_partition_date_source = "EventTime"
+}
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
+module "s3-fms-specials-landing-bucket" {
+  source = "./modules/landing_bucket/"
 
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
+  data_feed = "fms"
+  local_bucket_prefix = local.bucket_prefix
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "specials"
 
-      expiration = {
-        days = 7
-      }
-    }
-  ]
-
-  tags = merge(
-    local.tags,
-    { type = each.value }
-  )
+  providers = {
+    aws = aws
+  }
 }
 
 # ------------------------------------------------------------------------
 # Landing bucket MDSS
 # ------------------------------------------------------------------------
 
-module "s3-mdss-landing-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+module "s3-mdss-general-landing-bucket" {
+  source = "./modules/landing_bucket/"
 
-  for_each = local.live_feed_levels
+  data_feed = "mdss"
+  local_bucket_prefix = local.bucket_prefix
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "general"
 
-  bucket_prefix      = "${local.bucket_prefix}-land-mdss-${each.key}-"
-  versioning_enabled = true
-
-  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
-  ownership_controls = "BucketOwnerEnforced"
-  acl                = "private"
-
-  # Refer to the below section "Replication" before enabling replication
-  replication_enabled = false
-  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
-  # replication_region                       = "eu-west-2"
   providers = {
-    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
-    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
-    # Platform team to add a new provider for the additional Region.
-    # Leave this provider block in even if you are not using replication
-    aws.bucket-replication = aws
+    aws = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-land-mdss-${each.key}/"
-  log_partition_date_source = "EventTime"
+}
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
+module "s3-mdss-ho-landing-bucket" {
+  source = "./modules/landing_bucket/"
 
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
+  data_feed = "mdss"
+  local_bucket_prefix = local.bucket_prefix
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "ho"
 
-      expiration = {
-        days = 7
-      }
-    }
-  ]
+  providers = {
+    aws = aws
+  }
+}
 
-  tags = merge(
-    local.tags,
-    { type = each.value }
-  )
+module "s3-mdss-specials-landing-bucket" {
+  source = "./modules/landing_bucket/"
+
+  data_feed = "mdss"
+  local_bucket_prefix = local.bucket_prefix
+  local_tags = local.tags
+  logging_bucket = module.s3-logging-bucket
+  order_type = "specials"
+
+  providers = {
+    aws = aws
+  }
 }
 
 # ------------------------------------------------------------------------
