@@ -40,6 +40,6 @@ locals {
 
   secret_prefix           = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
   application_secret_name = "${local.secret_prefix}-application-passwords"
-  mis_account_id          = var.platform_vars.environment_management.account_ids[join("-", ["delius-mis", var.account_info.mp_environment])]
+  mis_account_id          = lookup(var.platform_vars.environment_management.account_ids, join("-", ["delius-mis", var.account_info.mp_environment]), null)
 
 }

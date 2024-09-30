@@ -7,7 +7,7 @@ locals {
 
   oem_account_id = var.platform_vars.environment_management.account_ids[join("-", ["hmpps-oem", var.account_info.mp_environment])]
 
-  mis_account_id = var.platform_vars.environment_management.account_ids[join("-", ["delius-mis", var.account_info.mp_environment])]
+  mis_account_id = lookup(var.platform_vars.environment_management.account_ids, join("-", ["delius-mis", var.account_info.mp_environment]), null)
 
   delius_account_id = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
 
