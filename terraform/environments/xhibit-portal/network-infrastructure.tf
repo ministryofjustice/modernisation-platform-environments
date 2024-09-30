@@ -408,47 +408,80 @@ resource "aws_security_group_rule" "portal-http-to-waf-lb" {
 }
 
 resource "aws_security_group_rule" "app_servers-inbound-importmachine" {
-  depends_on               = [aws_security_group.app_servers]
-  security_group_id        = aws_security_group.app_servers.id
+  description              = "allow all traffic from importmachine"
   type                     = "ingress"
-  description              = "allow all from bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers]
 }
 
 resource "aws_security_group_rule" "app_servers-outbound-importmachine" {
-  depends_on               = [aws_security_group.app_servers]
-  security_group_id        = aws_security_group.app_servers.id
+  description              = "allow all traffic to importmachine"
   type                     = "egress"
-  description              = "allow all to bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers]
 }
 
 resource "aws_security_group_rule" "app_servers-inbound-bastion" {
-  depends_on               = [aws_security_group.app_servers]
-  security_group_id        = aws_security_group.app_servers.id
+  description              = "allow all traffic from bastion"
   type                     = "ingress"
-  description              = "allow all from bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers]
 }
 
 resource "aws_security_group_rule" "app_servers-outbound-bastion" {
-  depends_on               = [aws_security_group.app_servers]
-  security_group_id        = aws_security_group.app_servers.id
+  description              = "allow all traffic to bastion"
   type                     = "egress"
-  description              = "allow all to bastion"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers]
+}
+
+resource "aws_security_group_rule" "app-all-from-self" {
+  description       = "allow all traffic from local server"
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  self              = true
+  security_group_id = aws_security_group.app_servers.id
+  depends_on        = [aws_security_group.app_servers]
+}
+
+resource "aws_security_group_rule" "app-all-to-self" {
+  description       = "allow all traffic to local server"
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  self              = true
+  security_group_id = aws_security_group.app_servers.id
+  depends_on        = [aws_security_group.app_servers]
+}
+
+resource "aws_security_group_rule" "app-all-from-ingestion" {
+  description              = "allow all traffic from ingestion server"
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.ingestion_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
 }
 
 resource "aws_security_group_rule" "ingestion-lb-inbound-importmachine" {
@@ -515,39 +548,6 @@ resource "aws_security_group_rule" "ingestion-server-http-to-ingestion-lb" {
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.ingestion_lb.id
-}
-
-resource "aws_security_group_rule" "app-all-from-self" {
-  depends_on        = [aws_security_group.app_servers]
-  security_group_id = aws_security_group.app_servers.id
-  type              = "ingress"
-  description       = "allow all traffic from local server"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  self              = true
-}
-
-resource "aws_security_group_rule" "app-all-to-self" {
-  depends_on        = [aws_security_group.app_servers]
-  security_group_id = aws_security_group.app_servers.id
-  type              = "egress"
-  description       = "allow all traffic to local server"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  self              = true
-}
-
-resource "aws_security_group_rule" "app-all-from-ingestion" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.app_servers.id
-  type                     = "ingress"
-  description              = "allow all traffic from ingestion server"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.ingestion_server.id
 }
 
 resource "aws_security_group_rule" "ingestion-all-from-app" {
