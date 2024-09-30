@@ -181,7 +181,10 @@ module "send_table_to_ap" {
   environment_variables = {
     AP_DESTINATION_BUCKET = local.land_bucket
   }
+  reserved_concurrent_executions = 100
 }
+
+
 
 # ------------------------------------------------------
 # Get Tables from DB

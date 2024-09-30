@@ -66,7 +66,7 @@ module "s3_bucket_dms_destination" {
         autoclean = "true"
       }
 
-      noncurrent_version_transition = [
+      transition = [
         {
           days          = 90
           storage_class = "STANDARD_IA"
@@ -76,7 +76,7 @@ module "s3_bucket_dms_destination" {
         }
       ]
 
-      noncurrent_version_expiration = {
+      expiration = {
         days = 730
       }
     }

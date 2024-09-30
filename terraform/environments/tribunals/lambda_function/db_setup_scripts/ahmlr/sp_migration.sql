@@ -1681,3 +1681,180 @@ UPDATE USERS SET [password] = @password
 WHERE userID = @userID
 go
 
+USE [HMLands]
+GO
+/****** Object:  Table [dbo].[USERS]    Script Date: 09/26/2024 09:25:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[USERS](
+	[userID] [int] IDENTITY(1,1) NOT NULL,
+	[firstname] [varchar](250) NULL,
+	[lastname] [varchar](250) NULL,
+	[username] [varchar](250) NULL,
+	[password] [varchar](250) NULL,
+ CONSTRAINT [PK_USERS] PRIMARY KEY CLUSTERED 
+(
+	[userID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[SUBCATEGORY1]    Script Date: 09/26/2024 09:25:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[SUBCATEGORY1](
+	[subcatID] [int] IDENTITY(1,1) NOT NULL,
+	[catID] [int] NULL,
+	[subdescription] [varchar](200) NULL,
+	[num] [int] NULL,
+ CONSTRAINT [PK_SUBCATEGORY1new] PRIMARY KEY CLUSTERED 
+(
+	[subcatID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[SUBCATEGORY]    Script Date: 09/26/2024 09:25:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[SUBCATEGORY](
+	[subcatID] [int] IDENTITY(1,1) NOT NULL,
+	[catID] [int] NULL,
+	[subdescription] [varchar](200) NULL,
+	[num] [int] NULL,
+ CONSTRAINT [PK_SUBCATEGORYnew_1] PRIMARY KEY CLUSTERED 
+(
+	[subcatID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[DEPUTYADJUDICATORS]    Script Date: 09/26/2024 09:25:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[DEPUTYADJUDICATORS](
+	[depadjID] [int] IDENTITY(1,1) NOT NULL,
+	[depadjtitle] [varchar](50) NULL,
+	[depadjfirst] [varchar](100) NULL,
+	[depadjsecond] [varchar](100) NULL,
+ CONSTRAINT [PK_DEPUTYADJUDICATORSnew] PRIMARY KEY CLUSTERED 
+(
+	[depadjID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[DECISIONSold]    Script Date: 09/26/2024 09:25:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[DECISIONSold](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[caseref1] [varchar](50) NULL,
+	[caseref2] [varchar](50) NULL,
+	[caseref3] [varchar](50) NULL,
+	[hearingdate] [datetime] NULL,
+	[depadj] [int] NULL,
+	[applicant] [varchar](200) NULL,
+	[respondent] [varchar](200) NULL,
+	[cat1] [int] NULL,
+	[subcat1] [int] NULL,
+	[cat2] [int] NULL,
+	[subcat2] [int] NULL,
+	[notes] [ntext] NULL,
+ CONSTRAINT [PK_decisions] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[DECISIONS]    Script Date: 09/26/2024 09:25:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[DECISIONS](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[caseref1] [varchar](50) NULL,
+	[caseref2] [varchar](50) NULL,
+	[caseref3] [varchar](50) NULL,
+	[hearingdate] [datetime] NULL,
+	[depadj] [int] NULL,
+	[applicant] [varchar](200) NULL,
+	[respondent] [varchar](200) NULL,
+	[cat1] [int] NULL,
+	[subcat1] [int] NULL,
+	[cat2] [int] NULL,
+	[subcat2] [int] NULL,
+	[notes] [ntext] NULL,
+ CONSTRAINT [PK_DECISIONSnew] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[CATEGORY1]    Script Date: 09/26/2024 09:25:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[CATEGORY1](
+	[catID] [int] IDENTITY(1,1) NOT NULL,
+	[catdescription] [varchar](200) NULL,
+ CONSTRAINT [PK_CATEGORY1new] PRIMARY KEY CLUSTERED 
+(
+	[catID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[CATEGORY]    Script Date: 09/26/2024 09:25:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[CATEGORY](
+	[catID] [int] IDENTITY(1,1) NOT NULL,
+	[catdescription] [varchar](200) NULL,
+ CONSTRAINT [PK_CATEGORYnew_1] PRIMARY KEY CLUSTERED 
+(
+	[catID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO

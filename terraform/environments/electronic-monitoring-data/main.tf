@@ -30,7 +30,7 @@
 
 module "buddi" {
   source = "./modules/landing_zone/"
-  count = local.is-production ? 1 : 0
+  count  = local.is-production ? 1 : 0
 
   supplier = "buddi"
 
@@ -86,7 +86,7 @@ module "buddi" {
 
 module "g4s" {
   source = "./modules/landing_zone/"
-  count = local.is-production ? 1 : 0
+  count  = local.is-production ? 1 : 0
 
   supplier = "g4s"
 

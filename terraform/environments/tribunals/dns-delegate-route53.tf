@@ -17,15 +17,18 @@ locals {
 
   afd_records = [
     "administrativeappeals.decisions",
-    "carestandards.decisions",
-    "cicap.decisions",
-    "employmentappeals.decisions",
     "financeandtax.decisions",
     "immigrationservices.decisions",
-    "informationrights.decisions",
     "landregistrationdivision.decisions",
     "landschamber.decisions",
     "transportappeals.decisions"
+  ]
+
+  afd_records_migrated = [
+    "cicap.decisions",
+    "carestandards.decisions",
+    "employmentappeals.decisions",
+    "informationrights.decisions"
   ]
 
   nginx_records = [
@@ -61,6 +64,17 @@ resource "aws_route53_record" "ec2_instances" {
   records  = ["34.243.192.28"]
 }
 
+resource "aws_route53_record" "sftp_external_services_prod" {
+  for_each        = local.is-production ? var.sftp_services : {}
+  allow_overwrite = true
+  provider        = aws.core-network-services
+  zone_id         = local.production_zone_id
+  name            = "sftp.${each.value.name_prefix}.decisions.tribunals.gov.uk"
+  type            = "CNAME"
+  records         = [aws_lb.tribunals_lb_sftp.dns_name]
+  ttl             = 60
+}
+
 # 'CNAME' records for all www legacy services which currently route through Azure Front Door
 resource "aws_route53_record" "afd_instances" {
   count    = local.is-production ? length(local.afd_records) : 0
@@ -70,6 +84,17 @@ resource "aws_route53_record" "afd_instances" {
   type     = "CNAME"
   ttl      = 300
   records  = ["sdshmcts-prod-egd0dscwgwh0bpdq.z01.azurefd.net"]
+}
+
+# 'CNAME' records for all www legacy services which have been migrated to the Modernisation Platform
+resource "aws_route53_record" "afd_instances_migrated" {
+  count    = local.is-production ? length(local.afd_records_migrated) : 0
+  provider = aws.core-network-services
+  zone_id  = local.production_zone_id
+  name     = local.afd_records_migrated[count.index]
+  type     = "CNAME"
+  ttl      = 300
+  records  = [aws_lb.tribunals_lb.dns_name]
 }
 
 # 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
@@ -106,6 +131,7 @@ resource "aws_route53_record" "www_instances" {
 
 #  The root www resource record needs its own resource to avoid breaking the logic of using the substring in www_instances
 resource "aws_route53_record" "www_root" {
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id  = local.production_zone_id
   name     = "www"

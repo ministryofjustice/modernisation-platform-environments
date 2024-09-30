@@ -2,13 +2,13 @@
 
 resource "aws_s3_bucket_notification" "data_store" {
   depends_on = [aws_sns_topic_policy.s3_events_policy]
-  bucket = module.s3-data-bucket.bucket.id
+  bucket     = module.s3-data-bucket.bucket.id
 
   # Only for copy events as those are events triggered by data being copied
   #  from landing bucket.
   topic {
     topic_arn = aws_sns_topic.s3_events.arn
-    events              = [
+    events = [
       "s3:ObjectCreated:*"
     ]
   }
