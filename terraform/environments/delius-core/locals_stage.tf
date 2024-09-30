@@ -130,8 +130,14 @@ locals {
       read_host     = "primarydb"
       read_database = "STGNDA"
     }
-    audit_target_endpoint = {}
-    user_source_endpoint  = {}
+    audit_target_endpoint = {
+      write_environment = "stage"   # Until production exists set dummy replication target
+      write_database = "NONE" # Remove this dummy attribute once production target exists
+    }
+    user_source_endpoint = {  # Set this map to {} once production exists
+      read_host     = "primarydb"
+      read_database = "NONE"
+    }
     user_target_endpoint = {
       write_database = "STGNDA"
     }

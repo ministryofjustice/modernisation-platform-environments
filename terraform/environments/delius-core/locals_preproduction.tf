@@ -122,6 +122,7 @@ locals {
   }
 
   dms_config_preprod = {
+    replication_enabled        = false
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.2"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
@@ -130,8 +131,14 @@ locals {
       read_host     = "standbydb1"
       read_database = "PRENDAS1"
     }
-    audit_target_endpoint = {}
-    user_source_endpoint  = {}
+    audit_target_endpoint = {
+      write_environment = "preprod"   # Until production exists set dummy replication target
+      write_database = "NONE" # Remove this dummy attribute once production target exists
+    }
+    user_source_endpoint = {  # Set this map to {} once production exists
+      read_host     = "primarydb"
+      read_database = "NONE"
+    }
     user_target_endpoint = {
       write_database = "PRENDA"
     }
