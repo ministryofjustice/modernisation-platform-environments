@@ -16,19 +16,19 @@ locals {
   ]
 
   afd_records = [
-    "administrativeappeals.decisions",
-    "financeandtax.decisions",
-    "immigrationservices.decisions",
     "landregistrationdivision.decisions",
     "landschamber.decisions",
     "transportappeals.decisions"
   ]
 
   afd_records_migrated = [
+    "administrativeappeals.decisions",
     "cicap.decisions",
     "carestandards.decisions",
     "employmentappeals.decisions",
-    "informationrights.decisions"
+    "informationrights.decisions",
+    "immigrationservices.decisions",
+    "financeandtax.decisions"
   ]
 
   nginx_records = [

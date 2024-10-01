@@ -194,6 +194,9 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
   response_templates = {
     "application/json" = "$input.json('$')"
   }
+  depends_on = [
+    aws_api_gateway_integration.step_function_integration
+  ]
 }
 
 resource "aws_api_gateway_integration_response" "integration_response_500" {
@@ -260,6 +263,7 @@ resource "aws_api_gateway_method_settings" "settings" {
     cache_ttl_in_seconds   = 300
     cache_data_encrypted   = true
   }
+  depends_on = [aws_iam_role_policy_attachment.api_gateway_cloudwatch_role_policy]
 }
 
 
