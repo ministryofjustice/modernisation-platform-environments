@@ -8,8 +8,14 @@ variable "env" {
   description = "(Required) The environment we are deploying into"
 }
 
-variable "script_version" {
+variable "account_id" {
+  description = "AWS Account ID."
+  type        = string
+}
+
+variable "script_file_version" {
   type = string
+  description = "The filename of the glue script, including version"
 }
 
 variable "create_job" {
@@ -19,14 +25,12 @@ variable "create_job" {
 }
 
 variable "job_name" {
-  description = "Name of the Glue CDC Job"
-  default     = ""
+  description = "Name of the Glue Reconciliation Job"
   type        = string
 }
 
 variable "short_name" {
-  description = "Name of the Glue CDC Job"
-  default     = ""
+  description = "Short name for the Glue Reconciliation Job"
   type        = string
 }
 
@@ -56,7 +60,7 @@ variable "enable_continuous_log_filter" {
 
 variable "execution_class" {
   default     = "STANDARD"
-  description = "Execution CLass Standard or FLex"
+  description = "Execution CLass STANDARD or FLEX"
   type        = string
 }
 
@@ -80,12 +84,6 @@ variable "s3_kms_arn" {
 variable "account_region" {
   description = "Current AWS Region."
   default     = "eu-west-2"
-  type        = string
-}
-
-variable "account_id" {
-  description = "AWS Account ID."
-  default     = ""
   type        = string
 }
 

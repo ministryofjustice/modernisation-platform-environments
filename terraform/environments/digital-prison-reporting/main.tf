@@ -592,7 +592,7 @@ module "glue_data_reconciliation_job" {
   create_sec_conf              = local.create_sec_conf
   temp_dir                     = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-data-reconciliation-${local.env}/"
   spark_event_logs             = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-data-reconciliation-${local.env}/"
-  script_version               = "digital-prison-reporting-jobs-vLatest.scala"
+  script_file_version          = "digital-prison-reporting-jobs-vLatest.scala"
   enable_continuous_log_filter = false
   project_id                   = local.project
   s3_kms_arn                   = local.s3_kms_arn
