@@ -101,6 +101,8 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/pd/*",
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
             ]
           }
         ]
