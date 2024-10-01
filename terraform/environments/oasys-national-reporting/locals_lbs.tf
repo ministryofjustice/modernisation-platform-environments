@@ -4,6 +4,7 @@ locals {
 
     public = {
       access_logs                      = true
+      drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
       enable_cross_zone_load_balancing = true
       enable_delete_protection         = false
       force_destroy_bucket             = true
