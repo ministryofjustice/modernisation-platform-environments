@@ -650,25 +650,25 @@ resource "aws_security_group_rule" "app-all-to-portal" {
 }
 
 resource "aws_security_group_rule" "portal-all-from-app" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
-  security_group_id        = aws_security_group.portal_server.id
+  description              = "allow all traffic from app_servers"
   type                     = "ingress"
-  description              = "allow all traffic from app"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.app_servers.id
+  security_group_id        = aws_security_group.portal_server.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
 }
 
 resource "aws_security_group_rule" "portal-all-to-app" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
-  security_group_id        = aws_security_group.portal_server.id
+  description              = "allow all traffic to app_servers"
   type                     = "egress"
-  description              = "allow all traffic to app"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.app_servers.id
+  security_group_id        = aws_security_group.portal_server.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
 }
 
 resource "aws_security_group_rule" "iisrelay-inbound-importmachine" {
