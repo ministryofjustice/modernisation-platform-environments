@@ -5,6 +5,7 @@ locals {
       /* VPC */
       connected_vpc_cidr            = "10.26.128.0/23"
       connected_vpc_private_subnets = ["10.26.128.0/26", "10.26.128.64/26", "10.26.128.128/26"]
+      connected_vpc_public_subnets  = ["10.26.129.0/26", "10.26.129.64/26", "10.26.129.128/26"]
 
       isolated_vpc_cidr                   = "10.0.0.0/16"
       isolated_vpc_private_subnets        = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
@@ -39,6 +40,7 @@ locals {
       /* VPC */
       connected_vpc_cidr            = "10.27.128.0/23"
       connected_vpc_private_subnets = ["10.27.128.0/26", "10.27.128.64/26", "10.27.128.128/26"]
+      connected_vpc_public_subnets  = ["10.27.129.0/26", "10.27.129.64/26", "10.27.129.128/26"]
 
       isolated_vpc_cidr                   = "10.0.0.0/16"
       isolated_vpc_private_subnets        = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
