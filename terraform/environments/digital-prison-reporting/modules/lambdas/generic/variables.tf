@@ -63,8 +63,8 @@ variable "namespace" {
 }
 
 variable "publish" {
-  type        = bool
   description = "Enable versioning for this lambda"
+  type        = bool
   default     = false
 }
 
