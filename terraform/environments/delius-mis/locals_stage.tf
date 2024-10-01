@@ -7,9 +7,9 @@ locals {
     legacy_ad_domain_name                  = "delius-mis-stage.local"
     legacy_ad_ip_list                      = ["10.160.35.243", "10.160.38.128"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
-    migration_environment_full_name        = "dmd-mis-stage"
-    migration_environment_abbreviated_name = "dmd"
-    migration_environment_short_name       = "mis-stage"
+    migration_environment_full_name        = "del-stage"
+    migration_environment_abbreviated_name = "del"
+    migration_environment_short_name       = "stage"
   }
 
   bastion_config_stage = {
