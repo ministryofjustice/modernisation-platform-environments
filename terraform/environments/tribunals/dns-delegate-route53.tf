@@ -16,7 +16,6 @@ locals {
   ]
 
   afd_records = [
-    "financeandtax.decisions",
     "landregistrationdivision.decisions",
     "landschamber.decisions",
     "transportappeals.decisions"
@@ -28,7 +27,8 @@ locals {
     "carestandards.decisions",
     "employmentappeals.decisions",
     "informationrights.decisions",
-    "immigrationservices.decisions"
+    "immigrationservices.decisions",
+    "financeandtax.decisions"
   ]
 
   nginx_records = [
