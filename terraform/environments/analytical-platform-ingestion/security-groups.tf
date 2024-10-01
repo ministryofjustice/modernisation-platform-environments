@@ -88,6 +88,9 @@ module "datasync_security_group" {
 
   vpc_id = module.connected_vpc.vpc_id
 
+  egress_cidr_blocks = [module.connected_vpc.vpc_cidr_block]
+  egress_rules       = ["https-443-tcp"]
+
   ingress_cidr_blocks = [module.connected_vpc.vpc_cidr_block]
   ingress_rules = [
     "http-80-tcp",
