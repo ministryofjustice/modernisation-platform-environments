@@ -727,24 +727,24 @@ resource "aws_security_group_rule" "iisrelay-inbound-exchange" {
   depends_on               = [aws_security_group.iisrelay_server]
 }
 
-resource "aws_security_group_rule" "app-all-to-iisrelay" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.app_servers.id
-  type                     = "egress"
-  description              = "allow all app traffic from iisrelay"
+resource "aws_security_group_rule" "iisrelay-to-app-all" {
+  description              = "allow all traffic from iisrelay_server"
+  type                     = "ingress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.iisrelay_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
 }
 
-resource "aws_security_group_rule" "iisrelay-to-app-all" {
-  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
-  security_group_id        = aws_security_group.app_servers.id
-  type                     = "ingress"
-  description              = "allow all iisrelay to appservers"
+resource "aws_security_group_rule" "app-all-to-iisrelay" {
+  description              = "allow all traffic to iisrelay_server"
+  type                     = "egress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.iisrelay_server.id
+  security_group_id        = aws_security_group.app_servers.id
+  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
 }
