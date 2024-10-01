@@ -435,6 +435,258 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invok
   policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_prod[0].arn
 }
 
+###########################################################
+# IAM Role & Policy for Lambda Certificate Expiration - DEV
+###########################################################
+
+resource "aws_iam_role" "lambda_role_certificate_expiry_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Certificate_Expiry_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_certificate_expiry_dev"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role certificate expiry development"
+  policy      = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid":"LambdaCertificateExpiryPolicy1",
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": "arn:aws:logs:eu-west-2:075585660276:*"
+        },
+        {
+            "Sid":"LambdaCertificateExpiryPolicy2",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:eu-west-2:075585660276:log-group:/aws/lambda/handle-expiring-certificates:*"
+            ]
+        },
+        {
+            "Sid":"LambdaCertificateExpiryPolicy3",
+            "Effect": "Allow",
+            "Action": [
+                "acm:DescribeCertificate",
+                "acm:GetCertificate",
+                "acm:ListCertificates",
+                "acm:ListTagsForCertificate"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid":"LambdaCertificateExpiryPolicy4",
+            "Effect": "Allow",
+            "Action": "SNS:Publish",
+            "Resource": "*"
+        },
+               {
+            "Sid": "LambdaCertificateExpiryPolicy5",
+            "Effect": "Allow",
+            "Action": "cloudwatch:ListMetrics",
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev" {
+  count      = local.is-development == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_certificate_expiry_dev[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_dev[0].arn
+}
+
+###########################################################
+# IAM Role & Policy for Lambda Certificate Expiration - UAT
+###########################################################
+
+resource "aws_iam_role" "lambda_role_certificate_expiry_uat" {
+  count              = local.is-preproduction == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Certificate_Expiry_UAT"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_certificate_expiry_uat"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role certificate expiry uat"
+  policy      = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid":"LambdaCertificateExpiryPolicy1",
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": "arn:aws:logs:eu-west-2:172753231260:*"
+        },
+        {
+            "Sid":"LambdaCertificateExpiryPolicy2",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:eu-west-2:172753231260:log-group:/aws/lambda/handle-expiring-certificates:*"
+            ]
+        },
+        {
+            "Sid":"LambdaCertificateExpiryPolicy3",
+            "Effect": "Allow",
+            "Action": [
+                "acm:DescribeCertificate",
+                "acm:GetCertificate",
+                "acm:ListCertificates",
+                "acm:ListTagsForCertificate"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid":"LambdaCertificateExpiryPolicy4",
+            "Effect": "Allow",
+            "Action": "SNS:Publish",
+            "Resource": "*"
+        },
+               {
+            "Sid": "LambdaCertificateExpiryPolicy5",
+            "Effect": "Allow",
+            "Action": "cloudwatch:ListMetrics",
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat" {
+  count      = local.is-preproduction == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_certificate_expiry_uat[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_uat[0].arn
+}
+
+############################################################
+# IAM Role & Policy for Lambda Certificate Expiration - PROD
+############################################################
+
+resource "aws_iam_role" "lambda_role_certificate_expiry_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Certificate_Expiry_PROD"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_certificate_expiry_prod"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role certificate expiry prod"
+  policy      = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid":"LambdaCertificateExpiryPolicy1",
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": "arn:aws:logs:eu-west-2:817985104434:*"
+        },
+        {
+            "Sid":"LambdaCertificateExpiryPolicy2",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:eu-west-2:817985104434:log-group:/aws/lambda/handle-expiring-certificates:*"
+            ]
+        },
+        {
+            "Sid":"LambdaCertificateExpiryPolicy3",
+            "Effect": "Allow",
+            "Action": [
+                "acm:DescribeCertificate",
+                "acm:GetCertificate",
+                "acm:ListCertificates",
+                "acm:ListTagsForCertificate"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid":"LambdaCertificateExpiryPolicy4",
+            "Effect": "Allow",
+            "Action": "SNS:Publish",
+            "Resource": "*"
+        },
+               {
+            "Sid": "LambdaCertificateExpiryPolicy5",
+            "Effect": "Allow",
+            "Action": "cloudwatch:ListMetrics",
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_certificate_expiry_prod[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_prod[0].arn
+}
+
 ###################
 # SNS IAM Policies
 ###################

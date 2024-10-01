@@ -2,13 +2,13 @@
 
 resource "aws_s3_bucket_notification" "data_store" {
   depends_on = [aws_sns_topic_policy.s3_events_policy]
-  bucket = module.s3-data-bucket.bucket.id
+  bucket     = module.s3-data-bucket.bucket.id
 
   # Only for copy events as those are events triggered by data being copied
   #  from landing bucket.
   topic {
     topic_arn = aws_sns_topic.s3_events.arn
-    events              = [
+    events = [
       "s3:ObjectCreated:*"
     ]
   }
@@ -62,78 +62,6 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-resource "aws_iam_role" "replication" {
-  name               = "data-store-replication-role"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-}
-
-
-data "aws_iam_policy_document" "replication" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:GetReplicationConfiguration",
-      "s3:ListBucket",
-    ]
-
-    resources = [aws_s3_bucket.data_store.arn]
-  }
-
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:GetObjectVersionForReplication",
-      "s3:GetObjectVersionAcl",
-      "s3:GetObjectVersionTagging",
-    ]
-
-    resources = ["${aws_s3_bucket.data_store.arn}/*"]
-  }
-
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:ReplicateObject",
-      "s3:ReplicateDelete",
-      "s3:ReplicateTags",
-    ]
-
-    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
-  }
-}
-
-resource "aws_iam_policy" "replication" {
-  name   = "data-store-replication-policy"
-  policy = data.aws_iam_policy_document.replication.json
-}
-
-resource "aws_iam_role_policy_attachment" "replication" {
-  role       = aws_iam_role.replication.name
-  policy_arn = aws_iam_policy.replication.arn
-}
-
-
-resource "aws_s3_bucket_replication_configuration" "replication" {
-  provider = aws
-  # Must have bucket versioning enabled first
-  depends_on = [aws_s3_bucket_versioning.data_store]
-
-  role   = aws_iam_role.replication.arn
-  bucket = aws_s3_bucket.data_store.id
-
-  rule {
-    id = "whole_bucket"
-
-    status = "Enabled"
-
-    destination {
-      bucket        = module.s3-data-bucket.bucket.arn
-    }
-  }
-}
 
 #------------------------------------------------------------------------------
 # S3 lambda function to calculate data store file checksums

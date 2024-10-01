@@ -5,6 +5,7 @@
 locals {
   environment_config_preprod = {
     migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/22"]
+    migration_environment_vpc_cidr         = "10.160.0.0/20"
     migration_environment_db_cidr          = ["10.160.44.0/24", "10.160.45.0/24", "10.160.46.0/25"]
     migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"
@@ -24,6 +25,7 @@ locals {
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
+    desired_count               = 0
   }
 
 
@@ -98,9 +100,11 @@ locals {
     }
 
     ldap = {
-      image_tag       = "replace_me"
-      container_port  = 389
-      slapd_log_level = "replace_me"
+      image_tag        = "6.0.3-latest"
+      container_port   = 389
+      slapd_log_level  = "conns,config,stats,stats2"
+      container_cpu    = 2048
+      container_memory = 4096
     }
 
     pdf_creation = {
@@ -122,6 +126,7 @@ locals {
   }
 
   dms_config_preprod = {
+    replication_enabled        = false
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.2"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
@@ -130,8 +135,14 @@ locals {
       read_host     = "standbydb1"
       read_database = "PRENDAS1"
     }
-    audit_target_endpoint = {}
-    user_source_endpoint  = {}
+    audit_target_endpoint = {
+      write_environment = "preprod"   # Until production exists set dummy replication target
+      write_database = "NONE" # Remove this dummy attribute once production target exists
+    }
+    user_source_endpoint = {  # Set this map to {} once production exists
+      read_host     = "primarydb"
+      read_database = "NONE"
+    }
     user_target_endpoint = {
       write_database = "PRENDA"
     }

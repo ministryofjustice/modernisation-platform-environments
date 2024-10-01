@@ -3,11 +3,14 @@ locals {
   environment_configurations = {
     development = {
       /* VPC */
-      vpc_cidr                   = "10.0.0.0/16"
-      vpc_private_subnets        = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-      vpc_public_subnets         = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
-      vpc_enable_nat_gateway     = true
-      vpc_one_nat_gateway_per_az = true
+      connected_vpc_cidr            = "10.26.128.0/23"
+      connected_vpc_private_subnets = ["10.26.128.0/26", "10.26.128.64/26", "10.26.128.128/26"]
+
+      isolated_vpc_cidr                   = "10.0.0.0/16"
+      isolated_vpc_private_subnets        = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+      isolated_vpc_public_subnets         = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+      isolated_vpc_enable_nat_gateway     = true
+      isolated_vpc_one_nat_gateway_per_az = true
 
       /* Observability Platform */
       observability_platform = "development"
@@ -34,11 +37,14 @@ locals {
     }
     production = {
       /* VPC */
-      vpc_cidr                   = "10.0.0.0/16"
-      vpc_private_subnets        = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-      vpc_public_subnets         = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
-      vpc_enable_nat_gateway     = true
-      vpc_one_nat_gateway_per_az = true
+      connected_vpc_cidr            = "10.27.128.0/23"
+      connected_vpc_private_subnets = ["10.27.128.0/26", "10.27.128.64/26", "10.27.128.128/26"]
+
+      isolated_vpc_cidr                   = "10.0.0.0/16"
+      isolated_vpc_private_subnets        = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+      isolated_vpc_public_subnets         = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+      isolated_vpc_enable_nat_gateway     = true
+      isolated_vpc_one_nat_gateway_per_az = true
 
       /* Observability Platform */
       observability_platform = "production"

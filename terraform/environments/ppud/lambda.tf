@@ -390,4 +390,3 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/send_cpu_notification_prod.zip"
 }
-

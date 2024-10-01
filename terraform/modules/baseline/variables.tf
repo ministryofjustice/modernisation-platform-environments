@@ -587,11 +587,12 @@ variable "key_pairs" {
 variable "lbs" {
   description = "map of load balancers and associated resources using loadbalancer and lb_listener modules"
   type = map(object({
-    enable_delete_protection = optional(bool, false)
-    force_destroy_bucket     = optional(bool, false)
-    idle_timeout             = optional(string)
-    internal_lb              = optional(bool, false)
-    access_logs              = optional(bool, true)
+    drop_invalid_header_fields = optional(bool, true)
+    enable_delete_protection   = optional(bool, false)
+    force_destroy_bucket       = optional(bool, false)
+    idle_timeout               = optional(string)
+    internal_lb                = optional(bool, false)
+    access_logs                = optional(bool, true)
     access_logs_lifecycle_rule = optional(list(object({
       id      = optional(string)
       enabled = optional(string)

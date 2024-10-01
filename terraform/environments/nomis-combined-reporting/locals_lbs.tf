@@ -3,11 +3,14 @@ locals {
   lbs = {
 
     private = {
+      access_logs                      = true
+      drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
       enable_cross_zone_load_balancing = true
       enable_delete_protection         = false
       force_destroy_bucket             = true
       idle_timeout                     = 3600
       internal_lb                      = true
+      load_balancer_type               = "application"
       security_groups                  = ["lb"]
       subnets                          = module.environment.subnets["private"].ids
 
@@ -65,14 +68,16 @@ locals {
     }
 
     public = {
-      # access_logs                    = true # enable this at some point
+      access_logs                      = true
+      drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
       enable_cross_zone_load_balancing = true
       enable_delete_protection         = false
       force_destroy_bucket             = true
       idle_timeout                     = 3600
       internal_lb                      = false
+      load_balancer_type               = "application"
       security_groups                  = ["public-lb"]
-      subnets                          = module.environment.subnets["private"].ids
+      subnets                          = module.environment.subnets["public"].ids
 
       listeners = {
         http = {
