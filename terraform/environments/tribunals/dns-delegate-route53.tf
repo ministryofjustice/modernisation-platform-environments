@@ -16,7 +16,6 @@ locals {
   ]
 
   afd_records = [
-    "administrativeappeals.decisions",
     "financeandtax.decisions",
     "landregistrationdivision.decisions",
     "landschamber.decisions",
