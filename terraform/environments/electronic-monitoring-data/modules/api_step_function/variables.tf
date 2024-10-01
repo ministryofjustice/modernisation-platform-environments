@@ -28,34 +28,33 @@ variable "authorization" {
 
 variable "step_function" {
   description = "ARN of the Step Function to trigger"
-  type        = object({id = string, arn = string})
+  type        = object({ id = string, arn = string })
 }
 
 variable "api_key_required" {
   description = "Whether the API requires a key or not"
-  type = bool
+  type        = bool
 }
 
 
 
 variable "stages" {
   description = "Stage settings"
-  type        = list(
+  type = list(
     object(
-        {
-            stage_name = string,
-            stage_description = string, 
-            burst_limit = number, 
-            rate_limit = number, 
-            throttling_burst_limit = number,
-            throttling_rate_limit = number
-        }
-        )
+      {
+        stage_name             = string,
+        stage_description      = string,
+        burst_limit            = number,
+        rate_limit             = number,
+        throttling_burst_limit = number,
+        throttling_rate_limit  = number
+      }
     )
+  )
 }
 
 variable "schema" {
-    description = "The expected schema of the API"
-    type = any
-
+  description = "The expected schema of the API"
+  type        = any
 }
