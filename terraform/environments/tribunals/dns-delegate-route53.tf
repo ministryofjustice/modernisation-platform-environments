@@ -23,6 +23,7 @@ locals {
   ]
 
   afd_records_migrated = [
+    "administrativeappeals.decisions",
     "cicap.decisions",
     "carestandards.decisions",
     "employmentappeals.decisions",
