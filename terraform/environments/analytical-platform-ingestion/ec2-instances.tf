@@ -10,6 +10,14 @@ module "datasync_instance" {
   subnet_id              = element(module.connected_vpc.private_subnets, 0)
   vpc_security_group_ids = [module.datasync_security_group.security_group_id]
 
+
+  metadata_options = {
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 1
+    http_tokens                 = "required"
+    instance_metadata_tags      = "enabled"
+  }
+
   root_block_device = [
     {
       encrypted   = true
@@ -18,4 +26,9 @@ module "datasync_instance" {
       volume_size = 80
     }
   ]
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-datasync" }
+  )
 }
