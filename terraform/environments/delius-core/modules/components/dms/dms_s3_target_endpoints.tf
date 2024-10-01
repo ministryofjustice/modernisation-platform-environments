@@ -6,7 +6,7 @@
 # The endpoint for audit (AUDITED_INTERACTION) is the Delius database.
 resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
   count                   = length(local.repository_account_map)
-  endpoint_id             = "s3-staging-of-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
+  endpoint_id             = "${var.env_name}-s3-staging-of-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
   endpoint_type           = "target"
   service_access_role_arn = aws_iam_role.dms_s3_writer_role.arn
   bucket_name             = local.bucket_map[var.dms_config.audit_target_endpoint.write_environment]
@@ -21,7 +21,7 @@ resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
 # will be pushing user updates to all of these.
 resource "aws_dms_s3_endpoint" "dms_user_target_endpoint_s3" {
   for_each                = local.client_account_map
-  endpoint_id             = "s3-staging-of-user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}-to-${each.key}"
+  endpoint_id             = "${var.env_name}-s3-staging-of-user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}-to-${each.key}"
   endpoint_type           = "target"
   service_access_role_arn = aws_iam_role.dms_s3_writer_role.arn
   bucket_name             = local.bucket_map[each.key]

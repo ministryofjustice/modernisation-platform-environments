@@ -7,7 +7,7 @@
 resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
   count                       = try(var.dms_config.audit_source_endpoint.read_database, null) == null ? 0 : 1
   database_name               = var.dms_config.audit_source_endpoint.read_database
-  endpoint_id                 = "audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
+  endpoint_id                 = "${var.env_name}-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
   endpoint_type               = "source"
   engine_name                 = "oracle"
   username                    = local.dms_audit_username
@@ -30,7 +30,7 @@ resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
 resource "aws_dms_endpoint" "dms_user_source_endpoint_db" {
   count                       = try(var.dms_config.user_source_endpoint.read_database, null) == null ? 0 : 1
   database_name               = var.dms_config.user_source_endpoint.read_database
-  endpoint_id                 = "user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}"
+  endpoint_id                 = "${var.env_name}-user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}"
   endpoint_type               = "source"
   engine_name                 = "oracle"
   username                    = local.dms_audit_username
