@@ -19,6 +19,8 @@ variable "aws_accounts" {
     amazon_prometheus_workspace_id  = optional(string)
     xray_enabled                    = optional(bool)
     athena_enabled                  = optional(bool)
+    athena_database                 = optional(string)
+    athena_workgroup                = optional(string)
   }))
   default = {
     default = {
@@ -28,6 +30,8 @@ variable "aws_accounts" {
       amazon_prometheus_workspace_id  = ""
       xray_enabled                    = false
       athena_enabled                  = false
+      athena_database                 = ""
+      athena_workgroup                = ""
     }
   }
 }
