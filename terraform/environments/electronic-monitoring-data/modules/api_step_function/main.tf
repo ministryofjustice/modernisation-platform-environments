@@ -207,7 +207,7 @@ resource "aws_api_gateway_integration_response" "integration_response_500" {
   }
   selection_pattern = ""
   depends_on = [
-    aws_api_gateway_integration.click_put
+    aws_api_gateway_integration.step_function_integration
   ]
 }
 
