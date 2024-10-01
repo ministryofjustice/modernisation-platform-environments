@@ -263,7 +263,7 @@ resource "aws_api_gateway_method_settings" "settings" {
     cache_ttl_in_seconds   = 300
     cache_data_encrypted   = true
   }
-  depends_on = [api_gateway_cloudwatch_role_policy.api_gateway_cloudwatch_role_policy]
+  depends_on = [aws_iam_role_policy_attachment.api_gateway_cloudwatch_role_policy]
 }
 
 
@@ -279,7 +279,7 @@ resource "aws_cloudwatch_log_group" "api_gateway_logs" {
 }
 
 
-resource "api_gateway_cloudwatch_role_policy" "api_gateway_cloudwatch_role_policy" {
+resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch_role_policy" {
   for_each   = { for stage in var.stages : stage.stage_name => stage }
   role       = aws_iam_role.api_gateway_role.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
