@@ -205,7 +205,7 @@ resource "aws_api_gateway_integration_response" "integration_response_500" {
   response_templates = {
     "application/json" = "{\"message\": \"Internal error from Step Function.\"}"
   }
-  selection_pattern = ""
+  selection_pattern = ".*\"status\":500.*"
   depends_on = [
     aws_api_gateway_integration.step_function_integration
   ]
