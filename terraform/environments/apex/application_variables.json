@@ -49,7 +49,8 @@
       "alb_elb_5xx_alarm_threshold": "10",
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
-      "oas_lz_cidr": "10.202.4.85/32"
+      "oas_lz_cidr": "10.202.4.85/32",
+      "lz_account_id": "411213865113"
     },
     "test": {
       "ec2amiid": "ami-00b96c3ab7b1106b4",
@@ -98,7 +99,8 @@
       "alb_elb_5xx_alarm_threshold": "10",
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
-      "oas_lz_cidr": "10.206.4.156/32"
+      "oas_lz_cidr": "10.206.4.156/32",
+      "lz_account_id": "140455166311"
     },
     "preproduction": {
       "ec2amiid": "ami-0cbc8c735c4f995b2",
@@ -147,7 +149,8 @@
       "alb_elb_5xx_alarm_threshold": "10",
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
-      "oas_lz_cidr": "10.206.4.156/32"
+      "oas_lz_cidr": "10.206.4.156/32",
+      "lz_account_id": "484221692666"
     },
     "production": {
       "ec2amiid": "ami-0fd11105aa6dcd77d",
@@ -177,7 +180,7 @@
       "region": "eu-west-2",
       "docker_image_tag": "production",
       "app_debug_enabled": "false",
-      "acm_cert_domain_name": "apex.service.justice.gov.uk",
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
       "server_port": 8080,
       "apex_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC/cKJt+odGSIELZnzRUbcNjp15cCRpOcwCptyZdnyTSosGm4WtmGkOqyAYr8WPfDq4EeiqWWrBoS4rkEY4Zic4duICRnrz8stD6XLYuf5tJ9/0VgEZfzVtjdwU0NL1E9IQd/LqqmZsqZkyQaqrHYC+LptDze/Bjo1c8A1/hqASEdlhKml0/hku5Zbl9syMgRAq8kFSHE8qAGsI6cgV2twdPVkul/gdInAISh1cf1IrHndDbz5pVda1ex/GCZLjLeP+PqBgeIs+8evCEks/MB8NE11zMpMYbZ+jL20gMLxv6wITz+NtoejYmsBH0rJ4Dd3gWF/ujyL/TJYzT6Jhu1HaYL2Si3RatpFpNWTov9PsSJ7HorWnaxq3dwLMicIhqopjwSAs12g4iW9nVs1CWXkFcXkmzT5HYSAmfj8wLi1OqvyNE6hfNh/cdDQjGOnaPUb5IFsua5szqf3E2WS80IYwNoZSEqHWlzG6XKMhjUevoM3245GK3l2P7A7M9gk2bAM= vincent.cheung@MJ004609",
       "database_status_alarm_threshold": "1",
@@ -196,7 +199,8 @@
       "alb_elb_5xx_alarm_threshold": "10",
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
-      "oas_lz_cidr": "10.205.4.186/32"
+      "oas_lz_cidr": "10.205.4.186/32",
+      "lz_account_id": "842522700642"
     }
   }
 }
