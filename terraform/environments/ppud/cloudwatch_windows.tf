@@ -48,7 +48,9 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId = each.key
-    Instance   = "C:"
+    instance   = "C:"
+    ImageId    = each.key
+    InstanceType = each.key
     objectname = "LogicalDisk"
   }
 }
@@ -71,7 +73,9 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId = each.key
-    Instance   = "D:"
+    instance   = "D:"
+    ImageId    = each.key
+    InstanceType = each.key
     objectname = "LogicalDisk"
   }
 }
