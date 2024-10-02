@@ -30,6 +30,52 @@ resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
   }
 }
 
+# Low Disk Alarm for all Windows instances with C Volumes
+
+resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
+  alarm_name          = "Low-Disk-Space-C-Volume-${each.key}"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "LogicalDisk % Free Space"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "5"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    InstanceId = each.key
+    Instance   = "C:"
+    objectname = "LogicalDisk"
+  }
+}
+
+# Low Disk Alarm for all Windows instances with D Volumes
+
+resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
+  alarm_name          = "Low-Disk-Space-D-Volume-${each.key}"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "LogicalDisk % Free Space"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "5"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    InstanceId = each.key
+    Instance   = "D:"
+    objectname = "LogicalDisk"
+  }
+}
+
 # Low Available Memory Alarm
 
 resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use" {

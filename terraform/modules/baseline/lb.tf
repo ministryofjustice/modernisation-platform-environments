@@ -110,7 +110,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=9c9e0b6d1f186d780dc3dfe7283a2cdbffaa1e60"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=bb9c17c627a31201f8b26516b27a077f2d0b87fe"
 
   providers = {
     aws.bucket-replication = aws
@@ -118,6 +118,7 @@ module "lb" {
 
   account_number                   = var.environment.account_id
   application_name                 = each.key
+  drop_invalid_header_fields       = each.value.drop_invalid_header_fields
   enable_deletion_protection       = each.value.enable_delete_protection
   force_destroy_bucket             = each.value.force_destroy_bucket
   idle_timeout                     = each.value.idle_timeout

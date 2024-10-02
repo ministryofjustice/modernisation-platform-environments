@@ -91,7 +91,7 @@ mount -a
 
 sudo su - oracle -c "sqlplus / as sysdba << EOF
 shutdown abort;
-startup;
+# startup;
 exit;
 EOF"
 
@@ -131,7 +131,7 @@ APEX=
   )
 EOT
 
-sudo su - oracle -c "lsnrctl start LISTENER"
+# sudo su - oracle -c "lsnrctl start LISTENER"
 
 cd /etc
 mkdir cloudwatch_agent

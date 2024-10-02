@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_sfn_state_machine" "this" {
   name       = var.name
   role_arn   = aws_iam_role.step_function_role.arn
@@ -55,7 +57,7 @@ data "aws_iam_policy_document" "this_log_key_document" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.env_account_id}:root"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
     actions   = ["kms:*"]
     resources = ["*"]

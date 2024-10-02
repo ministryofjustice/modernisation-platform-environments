@@ -3,7 +3,7 @@
 resource "aws_dms_endpoint" "dms_user_target_endpoint_db" {
   count                       = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
   database_name               = var.dms_config.user_target_endpoint.write_database
-  endpoint_id                 = "user-data-to-${lower(var.dms_config.user_target_endpoint.write_database)}"
+  endpoint_id                 = "${var.env_name}-user-data-to-${lower(var.dms_config.user_target_endpoint.write_database)}"
   endpoint_type               = "target"
   engine_name                 = "oracle"
   username                    = local.dms_audit_username
@@ -25,7 +25,7 @@ resource "aws_dms_endpoint" "dms_user_target_endpoint_db" {
 resource "aws_dms_endpoint" "dms_audit_target_endpoint_db" {
   count                       = try(var.dms_config.audit_target_endpoint.write_database, null) == null ? 0 : 1
   database_name               = var.dms_config.audit_target_endpoint.write_database
-  endpoint_id                 = "audit-data-to-${lower(var.dms_config.audit_target_endpoint.write_database)}"
+  endpoint_id                 = "${var.env_name}-audit-data-to-${lower(var.dms_config.audit_target_endpoint.write_database)}"
   endpoint_type               = "target"
   engine_name                 = "oracle"
   username                    = local.dms_audit_username

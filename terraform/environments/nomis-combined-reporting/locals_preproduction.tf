@@ -30,7 +30,7 @@ locals {
     ec2_autoscaling_groups = {
       pp-ncr-app = merge(local.ec2_autoscaling_groups.bip_app, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_app.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         config = merge(local.ec2_autoscaling_groups.bip_app.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_app.config.instance_profile_policies, [
@@ -49,7 +49,8 @@ locals {
 
       pp-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 2
+          max_size         = 2
         })
         config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_cms.config.instance_profile_policies, [
@@ -87,7 +88,7 @@ locals {
 
       pp-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         config = merge(local.ec2_autoscaling_groups.bip_web.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
@@ -348,6 +349,8 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/lsast/*",
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/lsast/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
           }
         ]
@@ -382,6 +385,8 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/pp/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
           }
         ]

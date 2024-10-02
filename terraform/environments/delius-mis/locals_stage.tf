@@ -7,9 +7,9 @@ locals {
     legacy_ad_domain_name                  = "delius-mis-stage.local"
     legacy_ad_ip_list                      = ["10.160.35.243", "10.160.38.128"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
-    migration_environment_full_name        = "dmd-mis-stage"
-    migration_environment_abbreviated_name = "dmd"
-    migration_environment_short_name       = "mis-stage"
+    migration_environment_full_name        = "del-stage"
+    migration_environment_abbreviated_name = "del"
+    migration_environment_short_name       = "stage"
   }
 
   bastion_config_stage = {
@@ -340,15 +340,15 @@ locals {
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
+      "/dev/sdd" = { label = "data" }            # DATA
+      "/dev/sde" = { label = "data" }            # DATA
       "/dev/sdf" = { label = "data" }            # DATA
       "/dev/sdg" = { label = "data" }            # DATA
       "/dev/sdh" = { label = "data" }            # DATA
-      "/dev/sdi" = { label = "data" }            # DATA
-      "/dev/sdj" = { label = "data" }            # DATA
+      "/dev/sdi" = { label = "flash" }           # FLASH
+      "/dev/sdj" = { label = "flash" }           # FLASH
       "/dev/sdk" = { label = "flash" }           # FLASH
       "/dev/sdl" = { label = "flash" }           # FLASH
-      "/dev/sdm" = { label = "flash" }           # FLASH
-      "/dev/sdn" = { label = "flash" }           # FLASH
       "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {
