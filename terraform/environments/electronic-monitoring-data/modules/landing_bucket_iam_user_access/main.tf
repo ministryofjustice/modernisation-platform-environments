@@ -1,3 +1,4 @@
+#checkov:skip=CKV_AWS_273 "Ensure access is controlled through SSO and not AWS IAM defined users. Supplier temporary access via IAM user."
 resource "aws_iam_user" "supplier" {
   name = "${var.local_bucket_prefix}-${var.data_feed}-${var.order_type}"
   tags = merge(
