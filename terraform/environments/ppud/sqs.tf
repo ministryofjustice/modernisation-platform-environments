@@ -20,7 +20,7 @@ resource "aws_sqs_queue" "lambda_deadletter_queue_prod" {
   name          = "Lambda-Deadletter-Queue-Production"
 }
 
-resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy" {
+resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy_prod" {
   count         = local.is-production == true ? 1 : 0
   queue_url     = aws_sqs_queue.lambda_deadletter_queue_prod[0].id
 
@@ -50,7 +50,7 @@ resource "aws_sqs_queue" "lambda_deadletter_queue_uat" {
   name          = "Lambda-Deadletter-Queue-UAT"
 }
 
-resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy" {
+resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy_uat" {
   count         = local.is-preproduction == true ? 1 : 0
   queue_url     = aws_sqs_queue.lambda_deadletter_queue_uat[0].id
 
@@ -80,7 +80,7 @@ resource "aws_sqs_queue" "lambda_deadletter_queue_dev" {
   name          = "Lambda-Deadletter-Queue-DEV"
 }
 
-resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy" {
+resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy_dev" {
   count         = local.is-development == true ? 1 : 0
   queue_url     = aws_sqs_queue.lambda_deadletter_queue_dev[0].id
 
