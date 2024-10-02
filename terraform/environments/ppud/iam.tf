@@ -507,7 +507,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
             "Resource": "*"
-        }
+        },
                {
             "Sid": "LambdaCertificateExpiryPolicy6",
             "Effect": "Allow",
@@ -605,7 +605,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
             "Resource": "*"
-        }
+        },
            {
             "Sid": "LambdaCertificateExpiryPolicy6",
             "Effect": "Allow",
@@ -703,7 +703,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
             "Resource": "*"
-        }
+        },
            {
             "Sid": "LambdaCertificateExpiryPolicy6",
             "Effect": "Allow",
