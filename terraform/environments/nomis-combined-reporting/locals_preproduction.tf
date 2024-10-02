@@ -349,6 +349,8 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/lsast/*",
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/lsast/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
           }
         ]
@@ -383,6 +385,8 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/pp/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
           }
         ]
