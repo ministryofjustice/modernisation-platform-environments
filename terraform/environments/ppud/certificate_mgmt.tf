@@ -29,9 +29,9 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
 	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:075585660276:ec2_cloudwatch_alarms"
     }
   }
-     dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
-  }
+#     dead_letter_config {
+#    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+#  }
   tracing_config {
    mode = "Active"
   }
@@ -104,9 +104,9 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
 	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:172753231260:ppud-uat-cw-alerts"
     }
   }
-    dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
-  }
+#    dead_letter_config {
+#    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+#  }
   tracing_config {
    mode = "Active"
   }
@@ -179,9 +179,9 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
 	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
     }
   }
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
-  }
+  # dead_letter_config {
+  #   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  # }
   tracing_config {
    mode = "Active"
 }
