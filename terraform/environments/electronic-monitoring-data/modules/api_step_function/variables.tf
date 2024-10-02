@@ -58,3 +58,9 @@ variable "schema" {
   description = "The expected schema of the API"
   type        = any
 }
+
+variable "sync" {
+  description = "Boolean value of whether API should return output of step function"
+  type        = bool
+  default     = true
+}

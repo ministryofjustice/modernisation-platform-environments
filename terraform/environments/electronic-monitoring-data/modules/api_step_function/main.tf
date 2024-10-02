@@ -1,5 +1,7 @@
 locals {
   camel_case_api_name = join("", [for word in split("_", var.api_name) : title(word)])
+  synced              = var.sync ? "Sync" : ""
+  output              = var.sync ? ".output" : ""
 }
 
 # --------------------------------------------------------
@@ -108,7 +110,7 @@ resource "aws_api_gateway_integration" "step_function_integration" {
   http_method             = aws_api_gateway_method.method.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/StartExecution"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/Start${local.synced}Execution"
 
   credentials = aws_iam_role.api_gateway_role.arn
 
@@ -192,7 +194,10 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
   status_code = "200"
 
   response_templates = {
-    "application/json" = "$input.json('$')"
+    "application/json" = <<EOF
+#set ($parsedPayload = $util.parseJson($input.json('$.${local.output}')))
+$parsedPayload
+EOF
   }
   depends_on = [
     aws_api_gateway_integration.step_function_integration
