@@ -80,7 +80,7 @@ module "secrets_manager" {
   enable_rotation     = true
   rotation_lambda_arn = var.rotation_lambda_arn
   rotation_rules = {
-    automatically_after_days = 100
+    automatically_after_days = 84
   }
   tags = merge(
     var.local_tags,
