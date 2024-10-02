@@ -554,13 +554,13 @@ module "s3-fms-general-landing-bucket" {
 module "s3-fms-general-landing-bucket-iam-user" {
   source = "./modules/landing_bucket_iam_user_access/"
 
-  data_feed                = "fms"
-  landing_bucket_arn       = module.s3-fms-general-landing-bucket.bucket_arn
-  local_bucket_prefix      = local.bucket_prefix
-  local_tags               = local.tags
-  order_type               = "general"
-  rotation_lambda_arn      = module.rotate_iam_key.lambda_function_arn
-  rotation_lambda_role_arn = aws_iam_role.rotate_iam_keys.arn
+  data_feed                 = "fms"
+  landing_bucket_arn        = module.s3-fms-general-landing-bucket.bucket_arn
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  order_type                = "general"
+  rotation_lambda_arn       = module.rotate_iam_key.lambda_function_arn
+  rotation_lambda_role_name = aws_iam_role.rotate_iam_keys.name
 }
 
 module "s3-fms-specials-landing-bucket" {
@@ -580,13 +580,13 @@ module "s3-fms-specials-landing-bucket" {
 module "s3-fms-specials-landing-bucket-iam-user" {
   source = "./modules/landing_bucket_iam_user_access/"
 
-  data_feed                = "fms"
-  landing_bucket_arn       = module.s3-fms-specials-landing-bucket.bucket_arn
-  local_bucket_prefix      = local.bucket_prefix
-  local_tags               = local.tags
-  order_type               = "specials"
-  rotation_lambda_arn      = module.rotate_iam_key.lambda_function_arn
-  rotation_lambda_role_arn = aws_iam_role.rotate_iam_keys.arn
+  data_feed                 = "fms"
+  landing_bucket_arn        = module.s3-fms-specials-landing-bucket.bucket_arn
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  order_type                = "specials"
+  rotation_lambda_arn       = module.rotate_iam_key.lambda_function_arn
+  rotation_lambda_role_name = aws_iam_role.rotate_iam_keys.name
 }
 
 # ------------------------------------------------------------------------

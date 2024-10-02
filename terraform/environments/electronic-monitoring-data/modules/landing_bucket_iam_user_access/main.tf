@@ -58,7 +58,7 @@ resource "aws_iam_policy" "rotate_iam_keys" {
 }
 
 resource "aws_iam_role_policy_attachment" "rotate_iam_keys" {
-  role       = var.rotation_lambda_role_arn
+  role       = var.rotation_lambda_role_name
   policy_arn = aws_iam_policy.rotate_iam_keys.arn
 }
 
