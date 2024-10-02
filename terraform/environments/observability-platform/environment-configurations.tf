@@ -125,6 +125,13 @@ locals {
               amazon_prometheus_query_enabled = true
               amazon_prometheus_workspace_id  = "ws-257796b7-4aa4-4c18-b906-6dd21e95d7b73e"
               xray_enabled                    = true
+            },
+            "analytical-platform-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = true
+              amazon_prometheus_workspace_id  = "ws-a7b353be-244a-47e7-8054-436b41c050d932"
+              xray_enabled                    = false
             }
           }
         },
