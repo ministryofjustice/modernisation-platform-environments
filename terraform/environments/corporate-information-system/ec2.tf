@@ -18,6 +18,10 @@ resource "aws_instance" "cis_db_instance" {
   user_data                   = base64encode(data.local_file.userdata.content)
   
   root_block_device {
+    delete_on_termination = false
+    encrypted             = true 
+    volume_size           = 200
+    volume_type           = "gp2"
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },
       local.tags,
