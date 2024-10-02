@@ -625,57 +625,7 @@ resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_s3_policy_poli
 # Rotate IAM keys
 #-----------------------------------------------------------------------------------
 
-locals {
-  landing_access_iam_key_map = {
-    "general" : {
-      "secret_arn" : module.s3-fms-general-landing-bucket-iam-user.secret.arn,
-      "iam_key_arn" : module.s3-fms-general-landing-bucket-iam-user.iam_key_arn
-    },
-    "specials" : {
-      "secret_arn" : module.s3-fms-specials-landing-bucket-iam-user.secret.arn,
-      "iam_key_arn" : module.s3-fms-specials-landing-bucket-iam-user.iam_key_arn
-    }
-  }
-}
-
 resource "aws_iam_role" "rotate_iam_keys" {
   name               = "rotate-iam-keys-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-data "aws_iam_policy_document" "rotate_iam_keys" {
-  for_each = local.landing_access_iam_key_map
-  statement {
-    sid    = "IAMKeyPermissionsForUpdatingKey"
-    effect = "Allow"
-    actions = [
-      "iam:DeleteAccessKey",
-      "iam:UpdateAccessKey",
-      "iam:ListAccessKeys",
-      "iam:CreateAccessKeys"
-    ]
-    resources = [each.value.iam_key_arn]
-  }
-  statement {
-    sid    = "UpdateSecretsPermissions"
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:ListSecrets",
-      "secretsmanager:UpdateSecret"
-    ]
-    resources = [each.value.secret_arn]
-  }
-}
-
-resource "aws_iam_policy" "rotate_iam_keys" {
-  for_each    = local.landing_access_iam_key_map
-  name        = "rotate-iam-keys-lambda-policy-${each.key}"
-  description = "IAM policy for rotating iam keys"
-  policy      = data.aws_iam_policy_document.rotate_iam_keys[each.key].json
-}
-
-resource "aws_iam_policy_role_attachment" "rotate_iam_keys" {
-  role       = aws_iam_role.rotate_iam_keys.name
-  policy_arn = aws_iam_policy.rotate_iam_keys.arn
 }

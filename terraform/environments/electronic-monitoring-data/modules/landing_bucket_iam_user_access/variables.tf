@@ -27,3 +27,8 @@ variable "rotation_lambda_arn" {
   description = "ARN of lambda to rotate keys"
   type        = string
 }
+
+variable "rotation_lambda_role_arn" {
+  description = "ARN of role lambda assumes to rotate keys"
+  type        = string
+}
