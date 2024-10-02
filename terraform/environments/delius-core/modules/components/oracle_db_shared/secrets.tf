@@ -42,21 +42,3 @@ moved {
   from = aws_secretsmanager_secret.delius_core_application_passwords
   to   = aws_secretsmanager_secret.database_application_passwords
 }
-
-data "aws_iam_policy_document" "database_application_passwords" {
-  statement {
-    sid    = "DeliusEC2AWSAccountToReadTheSecret"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:role/instance-role-delius-core-${var.env_name}-db-1"]
-    }
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["*"]
-  }
-}
-
-resource "aws_secretsmanager_secret_policy" "database_application_passwords" {
-  secret_arn = aws_secretsmanager_secret.database_application_passwords.arn
-  policy     = data.aws_iam_policy_document.database_application_passwords.json
-}
