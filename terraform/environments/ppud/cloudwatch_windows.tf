@@ -10,6 +10,14 @@ data "aws_instances" "windows_tagged_instances" {
   }
 }
 
+data "aws_instances" "linux_tagged_instances" {
+  filter {
+    name   = "tag:patch_group"
+    values = ["prod_lin_patch"]
+  }
+}
+
+
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
@@ -30,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
   }
 }
 
-# Low Available Memory Alarm
+# Low Available Memory Alarm - Windows
 
 resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
@@ -45,6 +53,27 @@ resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use
   threshold           = "90"
   treat_missing_data  = "notBreaching"
   alarm_description   = "Triggers if memory usage is continually high for 15 minutes"
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    InstanceId = each.key
+  }
+}
+
+# Low Available Memory Alarm - Linux
+
+resource "aws_cloudwatch_metric_alarm" "mem_used_percent" {
+  for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
+  alarm_name          = "High-Memory-Utilisation-${each.key}"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "3"
+  datapoints_to_alarm = "2"
+  metric_name         = "mem_used_percent"
+  namespace           = "CWAgent"
+  period              = "300"
+  statistic           = "Maximum"
+  threshold           = "90"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "Triggers if memory utilisation is over 90% for two 5 minute periods out of 15 minutes"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId = each.key
@@ -72,7 +101,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   }
 }
 
-# CPU Utilization Alarm
+# CPU Utilization Alarm - Windows
+
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "CPU-High-${each.key}"          # name of the alarm
@@ -85,6 +115,27 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   treat_missing_data  = "notBreaching"
   namespace           = "AWS/EC2" # namespace of the alarm's associated metric
   statistic           = "Average" # could be Average/Minimum/Maximum etc.
+  alarm_description   = "Monitors ec2 cpu utilisation"
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    InstanceId = each.key
+  }
+}
+
+# CPU Utilization Alarm - Linux
+
+resource "aws_cloudwatch_metric_alarm" "cpu_utilisation_linux" {
+  for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
+  alarm_name          = "High-CPU-Utilisation-${each.key}"          
+  comparison_operator = "GreaterThanOrEqualToThreshold" 
+  period              = "300"                            
+  threshold           = "90"                            
+  evaluation_periods  = "3"                             
+  datapoints_to_alarm = "2"                             
+  metric_name         = "CPUUtilization"                
+  treat_missing_data  = "notBreaching"
+  namespace           = "AWS/EC2" 
+  statistic           = "Average" 
   alarm_description   = "Monitors ec2 cpu utilisation"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
