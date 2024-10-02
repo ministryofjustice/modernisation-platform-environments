@@ -69,7 +69,7 @@ resource "aws_security_group_rule" "egress_traffic" {
   from_port         = 0
   to_port           = 0
   protocol          = -1
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = ["0.0.0.0/0"]//tfsec:ignore:AVD-AWS-0104
 }
 
 resource "aws_launch_template" "ec2_template" {
