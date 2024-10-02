@@ -153,6 +153,7 @@ resource "aws_api_gateway_deployment" "deployment" {
   }
 }
 
+#checkov:ship=CKV2_AWS_29: "Ensure public API gateway are protected by WAF, done below: aws_wafv2_web_acl_association"
 resource "aws_api_gateway_stage" "stage" {
   #checkov:skip=CKV_AWS_120: "Ensure API Gateway caching is enabled, Skipping for expense reasons, already cached in settings"
   #checkov:ship=CKV2_AWS_29: "Ensure public API gateway are protected by WAF, done below: aws_wafv2_web_acl_association"
