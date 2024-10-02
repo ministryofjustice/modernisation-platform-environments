@@ -12,8 +12,8 @@ resource "aws_instance" "cis_db_instance" {
   key_name               = aws_key_pair.cis.key_name
   ebs_optimized          = true
   subnet_id              = data.aws_subnet.data_subnets_a.id
-  iam_instance_profile   = aws_iam_instance_profile.app_ec2_instance_profile.name
-  vpc_security_group_ids = [aws_security_group.db_instance_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  vpc_security_group_ids = [aws_security_group.ec2_instance_sg.id]
   user_data_replace_on_change = true
   user_data                   = base64encode(data.local_file.userdata.content)
   
@@ -35,25 +35,55 @@ resource "aws_instance" "cis_db_instance" {
 
 
 ######################################
-# CIS EC2 Security Group
+# CIS IAM Role
 ######################################
 
-resource "aws_security_group" "ec2_instance_sg" {
-  name        = "${local.application_name}-${local.environment}-app-security-group"
-  description = "Security Group for EC2 DB instance"
-  vpc_id      = data.aws_vpc.shared.id
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "${local.application_name_short}-ec2-profile"
+  role = aws_iam_role.cis_ec2_role.name
+}
 
-  ingress {
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [var.pModPlatformVpcCIDR]
-    description = "DB access"
+
+######################################
+# CIS EC2 EBS Volumes
+######################################
+
+resource "aws_ebs_volume" "EC2ServerVolumeORAHOME" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].orahomesize
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].orahome_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
   }
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-app-security-group" }
+    { "Name" = "${local.application_name}-EC2ServerVolumeORAHOME" },
+  )
+}
+
+resource "aws_volume_attachment" "oas_EC2ServerVolume01" {
+  device_name = "/dev/sdb"
+  volume_id   = aws_ebs_volume.EC2ServerVolumeORAHOME.id
+  instance_id = aws_instance.oas_app_instance.id
+}
+
+######################################
+# CIS EC2 Security Group
+######################################
+
+resource "aws_security_group" "ec2_instance_sg" {
+  name        = "${local.application_name_short}-${local.environment}-app-security-group"
+  description = "Security Group for EC2 DB instance"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name_short}-${local.environment}-app-security-group" }
   )
 }
 
