@@ -154,7 +154,7 @@ data "aws_iam_policy_document" "database_application_passwords_for_delius" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:role/instance-role-delius-core-${var.env_name}-delius-db-1"]
+      identifiers = ["arn:aws:iam::${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:role/instance-role-delius-core-${var.env_name}-db-1"]
     }
     actions   = ["secretsmanager:GetSecretValue"]
     resources = [module.oracle_db_shared.database_application_passwords_secret_arn]
