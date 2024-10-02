@@ -20,7 +20,7 @@ resource "aws_sqs_queue" "lambda_deadletter_queue_prod" {
 
 resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy" {
   count         = local.is-production == true ? 1 : 0
-  queue_url     = aws_sqs_queue.lambda_dead_letter_queue_prod[0].id
+  queue_url     = aws_sqs_queue.lambda_deadletter_queue_prod[0].id
 
   redrive_allow_policy = jsonencode({
     redrivePermission = "byQueue",
