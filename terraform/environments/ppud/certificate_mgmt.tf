@@ -21,12 +21,19 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   handler       = "certificate_expiry_dev.lambda_handler"
   runtime       = "python3.8"
   timeout       = 30
+  reserved_concurrent_executions = 5
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
    environment {
     variables = {
       EXPIRY_DAYS = "45",
 	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:075585660276:ec2_cloudwatch_alarms"
     }
+  }
+     dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+   mode = "Active"
   }
 }
 
@@ -89,12 +96,19 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   handler       = "certificate_expiry_uat.lambda_handler"
   runtime       = "python3.8"
   timeout       = 30
+  reserved_concurrent_executions = 5
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
    environment {
     variables = {
       EXPIRY_DAYS = "45",
 	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:172753231260:ppud-uat-cw-alerts"
     }
+  }
+    dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+  }
+  tracing_config {
+   mode = "Active"
   }
 }
 
@@ -157,12 +171,19 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   handler       = "certificate_expiry_prod.lambda_handler"
   runtime       = "python3.8"
   timeout       = 30
+  reserved_concurrent_executions = 5
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
    environment {
     variables = {
       EXPIRY_DAYS = "45",
 	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
     }
+  }
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
 }
 }
 
