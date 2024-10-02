@@ -36,6 +36,17 @@ module "amazon_prometheus_query_source" {
   amazon_prometheus_workspace_id = each.value.amazon_prometheus_workspace_id
 }
 
+module "athena_source" {
+  for_each = {
+    for name, account in var.aws_accounts : name => account if account.athena_enabled
+  }
+
+  source = "../../grafana/athena-source"
+
+  name       = each.key
+  account_id = var.environment_management.account_ids[each.key]
+}
+
 module "prometheus_push" {
   for_each = {
     for name, account in var.aws_accounts : name => account if account.prometheus_push_enabled
