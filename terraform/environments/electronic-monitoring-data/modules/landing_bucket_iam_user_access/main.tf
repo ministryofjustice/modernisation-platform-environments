@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "rotate_iam_keys" {
       "iam:ListAccessKeys",
       "iam:CreateAccessKeys"
     ]
-    resources = [aws_iam_access_key.rotate_iam_keys.arn]
+    resources = [aws_iam_user.supplier.arn]
   }
   statement {
     sid    = "UpdateSecretsPermissions${var.data_feed}${var.order_type}"
@@ -57,7 +57,7 @@ resource "aws_iam_policy" "rotate_iam_keys" {
   policy      = data.aws_iam_policy_document.rotate_iam_keys.json
 }
 
-resource "aws_iam_policy_role_attachment" "rotate_iam_keys" {
+resource "aws_iam_role_policy_attachment" "rotate_iam_keys" {
   role       = var.rotation_lambda_role_arn
   policy_arn = aws_iam_policy.rotate_iam_keys.arn
 }
