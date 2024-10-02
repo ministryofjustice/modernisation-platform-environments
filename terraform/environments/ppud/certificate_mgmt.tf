@@ -163,7 +163,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
       EXPIRY_DAYS = "45",
 	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
     }
-  }
+}
 }
 
 # Archive the zip file - PROD
