@@ -40,6 +40,9 @@ resource "aws_security_group_rule" "lambda_ingress_generic" {
 }
 
 resource "aws_security_group_rule" "lambda_egress_generic" {
+  # tfsec:ignore:AVD-AWS-0097 - Ignoring the risk of allowing all egress traffic to public IPs
+  # tfsec:ignore:AVD-AWS-0104 - Security group rule allows egress to multiple public internet addresses.
+
   count = local.enable_generic_lambda_sg ? 1 : 0
 
   type              = "egress"
