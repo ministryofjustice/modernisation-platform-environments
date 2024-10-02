@@ -22,3 +22,8 @@ variable "order_type" {
   description = "The name of the order type data"
   type        = string
 }
+
+variable "rotation_lambda_arn" {
+  description = "ARN of lambda to rotate keys"
+  type        = string
+}
