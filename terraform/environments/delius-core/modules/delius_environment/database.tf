@@ -37,7 +37,7 @@ module "oracle_db_primary" {
   }
   db_type           = "primary"
   db_suffix         = "db"
-  count             = 1
+  count             = try(var.db_config.primary_instance_count, 1)
   db_count_index    = count.index + 1
   ec2_instance_type = var.db_config.instance_type
 
