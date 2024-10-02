@@ -1,4 +1,4 @@
-# tflint-ignore-file: terraform_required_version
+# tflint-ignore-file: terraform_required_version, terraform_required_providers
 # Data Reconciliation Job
 module "glue_s3_data_reconciliation_job" {
   source                        = "../../glue_job"
