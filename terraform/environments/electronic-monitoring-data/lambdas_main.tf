@@ -321,8 +321,8 @@ module "rotate_iam_key" {
   source                  = "./modules/lambdas"
   function_name           = "rotate_iam_key"
   is_image                = true
-  role_name               = aws_iam_role.rotate_iam_key.name
-  role_arn                = aws_iam_role.rotate_iam_key.arn
+  role_name               = aws_iam_role.rotate_iam_keys.name
+  role_arn                = aws_iam_role.rotate_iam_keys.arn
   memory_size             = 2048
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
