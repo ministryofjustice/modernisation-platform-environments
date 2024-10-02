@@ -164,6 +164,9 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
 	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
     }
   }
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_dead_letter_queue_prod.id
+  }
 }
 
 # Archive the zip file - PROD
