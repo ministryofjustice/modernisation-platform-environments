@@ -508,6 +508,20 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
             "Action": "cloudwatch:ListMetrics",
             "Resource": "*"
         }
+               {
+            "Sid": "LambdaCertificateExpiryPolicy6",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:ChangeMessageVisibility",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+                "sqs:ListQueueTags",
+                "sqs:ReceiveMessage",
+                "sqs:SendMessage"
+              ],
+            "Resource": "*"
+        }
     ]
 }
 EOF
@@ -592,6 +606,20 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
             "Action": "cloudwatch:ListMetrics",
             "Resource": "*"
         }
+           {
+            "Sid": "LambdaCertificateExpiryPolicy6",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:ChangeMessageVisibility",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+                "sqs:ListQueueTags",
+                "sqs:ReceiveMessage",
+                "sqs:SendMessage"
+              ],
+            "Resource": "*"
+        }
     ]
 }
 EOF
@@ -674,6 +702,20 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
             "Sid": "LambdaCertificateExpiryPolicy5",
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
+            "Resource": "*"
+        }
+           {
+            "Sid": "LambdaCertificateExpiryPolicy6",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:ChangeMessageVisibility",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+                "sqs:ListQueueTags",
+                "sqs:ReceiveMessage",
+                "sqs:SendMessage"
+              ],
             "Resource": "*"
         }
     ]
