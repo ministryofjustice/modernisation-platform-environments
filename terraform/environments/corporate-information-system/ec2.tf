@@ -31,7 +31,7 @@ resource "aws_instance" "cis_db_instance" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name_short} DB Server" },
+    { "Name" = "${local.application_name_short} Database Server" },
     { "instance-scheduling" = "skip-scheduling" },
     { "snapshot-with-daily-7-day-retention" = "yes" }
   )
