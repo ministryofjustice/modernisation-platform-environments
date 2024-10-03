@@ -282,7 +282,8 @@ resource "aws_route53_record" "cloudfront-prod" {
   count    = local.environment == "production" ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.production_network_services.zone_id
-  name     = local.prod_fqdn # TODO Production URL to be confirmed
+  name     = "apex.laa-production.modernisation-platform.service.justice.gov.uk"
+  # name     = local.prod_fqdn # TODO Production URL to be confirmed
   type     = "A"
   alias {
     name                   = aws_cloudfront_distribution.external.domain_name
