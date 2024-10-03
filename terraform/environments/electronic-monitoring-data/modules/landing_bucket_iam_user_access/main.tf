@@ -94,7 +94,7 @@ module "secrets_manager" {
     secret = aws_iam_access_key.supplier.secret
   })
   enable_rotation     = true
-  rotation_lambda_arn = var.rotation_lambda_arn
+  rotation_lambda_arn = var.rotation_lambda.lambda_function_arn
   rotation_rules = {
     automatically_after_days = 84
   }
@@ -107,7 +107,7 @@ module "secrets_manager" {
 
 resource "aws_lambda_permission" "allow_secrets_invoke" {
   action        = "lambda:InvokeFunction"
-  function_name = module.rotate_iam_key.lambda_function_name
+  function_name = var.rotation_lambda.lambda_function_name
   principal     = "secretsmanager.amazonaws.com"
   source_arn    = module.secrets_manager.secret_arn
 }

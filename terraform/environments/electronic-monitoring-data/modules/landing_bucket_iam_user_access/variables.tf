@@ -23,9 +23,9 @@ variable "order_type" {
   type        = string
 }
 
-variable "rotation_lambda_arn" {
+variable "rotation_lambda" {
   description = "ARN of lambda to rotate keys"
-  type        = string
+  type        = object({ lambda_function_arn : string, lambda_function_name : string })
 }
 
 variable "rotation_lambda_role_name" {
