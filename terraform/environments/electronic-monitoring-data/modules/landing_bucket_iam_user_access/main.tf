@@ -25,7 +25,17 @@ data "aws_iam_policy_document" "supplier_data_access" {
       "${var.landing_bucket_arn}/*",
     ]
   }
+  statement {
+    actions = [
+      "iam:ListAccessKeys"
+    ]
+    resources = [aws_iam_user.supplier.arn]
+  }
 }
+
+data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {}
 
 data "aws_iam_policy_document" "rotate_iam_keys" {
   statement {
@@ -35,7 +45,6 @@ data "aws_iam_policy_document" "rotate_iam_keys" {
       "iam:DeleteAccessKey",
       "iam:UpdateAccessKey",
       "iam:ListAccessKeys",
-      "iam:CreateAccessKeys",
       "iam:CreateAccessKey"
     ]
     resources = [aws_iam_user.supplier.arn]
@@ -47,10 +56,11 @@ data "aws_iam_policy_document" "rotate_iam_keys" {
       "secretsmanager:GetSecretValue",
       "secretsmanager:ListSecrets",
       "secretsmanager:UpdateSecret",
+      "secretsmanager:UpdateSecretVersionStage",
       "secretsmanager:ListSecretVersionIds",
       "secretsmanager:PutSecretValue"
     ]
-    resources = [module.secrets_manager.secret_arn]
+    resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}${module.secrets_manager.secret_name}*"]
   }
 }
 
