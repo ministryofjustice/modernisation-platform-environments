@@ -166,44 +166,51 @@ resource "aws_security_group" "ec2_instance_sg" {
   )
 }
 
-resource "aws_vpc_security_group_egress_rule" "app_outbound" {
+resource "aws_security_group_rule" "app_outbound" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.ec2_instance_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "app_bastion_ssh" {
-  security_group_id            = aws_security_group.ec2_instance_sg.id
-  description                  = "SSH from the Bastion"
-  referenced_security_group_id = module.bastion_linux.bastion_security_group
-  from_port                    = 22
-  ip_protocol                  = "tcp"
-  to_port                      = 22
+resource "aws_security_group_rule" "app_bastion_ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.ec2_instance_sg.id
+  source_security_group_id = module.bastion_linux.bastion_security_group
+  description              = "SSH from the Bastion"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "rds_workspaces" {
-  security_group_id = aws_security_group.ec2_instance_sg.id
-  description       = "RDS Workspace access"
+resource "aws_security_group_rule" "rds_workspaces" {
+  type              = "ingress"
   from_port         = 1521
-  ip_protocol       = "tcp"
   to_port           = 1521
+  protocol          = "tcp"
+  security_group_id = aws_security_group.ec2_instance_sg.id
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+  description       = "RDS Workspace access"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "dkron_workspaces" {
-  security_group_id = aws_security_group.ec2_instance_sg.id
-  description       = "Dkron Workspace access"
+resource "aws_security_group_rule" "dkron_workspaces" {
+  type              = "ingress"
   from_port         = 8080
-  ip_protocol       = "tcp"
   to_port           = 8080
+  protocol          = "tcp"
+  security_group_id = aws_security_group.ec2_instance_sg.id
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+  description       = "Dkron Workspace access"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "rds_test_env" {
-  security_group_id = aws_security_group.ec2_instance_sg.id
-  description       = "RDS Workspace access"
+resource "aws_security_group_rule" "rds_test_env" {
+  type              = "ingress"
   from_port         = 1521
-  ip_protocol       = "tcp"
   to_port           = 1521
+  protocol          = "tcp"
+  security_group_id = aws_security_group.ec2_instance_sg.id
   cidr_blocks       = [local.application_data.accounts[local.environment].testenvcidr]
+  description       = "RDS Workspace access"
 }
