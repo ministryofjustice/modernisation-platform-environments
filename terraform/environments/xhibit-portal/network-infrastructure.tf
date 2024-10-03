@@ -98,7 +98,7 @@ resource "aws_security_group_rule" "build-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "build-outbound-bastion" {
-  description              = "allow all traffic to build_server"
+  description              = "allow all traffic to bastion"
   type                     = "egress"
   from_port                = 0
   to_port                  = 0
@@ -154,7 +154,7 @@ resource "aws_security_group_rule" "exchange-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "sms-inbound-bastion" {
-  description              = "allow all traffic from bastion"
+  description              = "allow RDP traffic from bastion"
   type                     = "ingress"
   from_port                = 3389
   to_port                  = 3389
@@ -186,7 +186,7 @@ resource "aws_security_group_rule" "sms-inbound-app" {
 }
 
 resource "aws_security_group_rule" "sms-outbound-importmachine" {
-  description              = "allow all traffic to bastion"
+  description              = "allow all traffic to importmachine"
   type                     = "egress"
   from_port                = 0
   to_port                  = 0
@@ -386,7 +386,7 @@ resource "aws_security_group_rule" "portal-outbound-importmachine" {
 }
 
 resource "aws_security_group_rule" "portal-http-from-waf-lb" {
-  description              = "allow HTTP traffic from WAF LB"
+  description              = "allow HTTP traffic from waf_lb"
   type                     = "ingress"
   from_port                = 80
   to_port                  = 80
@@ -397,7 +397,7 @@ resource "aws_security_group_rule" "portal-http-from-waf-lb" {
 }
 
 resource "aws_security_group_rule" "portal-http-to-waf-lb" {
-  description              = "allow HTTP traffic to WAF LB"
+  description              = "allow HTTP traffic to waf_lb"
   type                     = "egress"
   from_port                = 80
   to_port                  = 80
@@ -474,7 +474,7 @@ resource "aws_security_group_rule" "app-all-to-self" {
 }
 
 resource "aws_security_group_rule" "app-all-from-ingestion" {
-  description              = "allow all traffic from ingestion server"
+  description              = "allow all traffic from ingestion_server"
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
@@ -485,7 +485,7 @@ resource "aws_security_group_rule" "app-all-from-ingestion" {
 }
 
 resource "aws_security_group_rule" "app-all-to-ingestion" {
-  description              = "allow all traffic from ingestion server"
+  description              = "allow all traffic from ingestion_server"
   type                     = "egress"
   from_port                = 0
   to_port                  = 0
@@ -518,7 +518,7 @@ resource "aws_security_group_rule" "ingestion-lb-outbound-importmachine" {
 }
 
 resource "aws_security_group_rule" "ingestion-lb-http-from-ingestion-server" {
-  description              = "allow all traffic from ingestion server"
+  description              = "allow all traffic from ingestion_server"
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
@@ -529,7 +529,7 @@ resource "aws_security_group_rule" "ingestion-lb-http-from-ingestion-server" {
 }
 
 resource "aws_security_group_rule" "ingestion-lb-http-to-ingestion-server" {
-  description              = "allow all traffic to ingestion server"
+  description              = "allow all traffic to ingestion_server"
   type                     = "egress"
   from_port                = 0
   to_port                  = 0
@@ -584,7 +584,7 @@ resource "aws_security_group_rule" "ingestion-all-to-app" {
 }
 
 resource "aws_security_group_rule" "exchange-all-to-app" {
-  description              = "allow all traffic from Exchange server"
+  description              = "allow all traffic from exchange_server"
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
@@ -595,7 +595,7 @@ resource "aws_security_group_rule" "exchange-all-to-app" {
 }
 
 resource "aws_security_group_rule" "exchange-all-from-app" {
-  description              = "allow all traffic to Exchange server"
+  description              = "allow all traffic to exchange_server"
   type                     = "egress"
   from_port                = 0
   to_port                  = 0
@@ -717,7 +717,7 @@ resource "aws_security_group_rule" "iisrelay-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "iisrelay-inbound-exchange" {
-  description              = "allow all traffic from Exchange server"
+  description              = "allow all traffic from exchange_server"
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
