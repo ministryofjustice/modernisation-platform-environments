@@ -5,7 +5,6 @@
 # For production, this will be the actual route53 hosted zone name, which will be the same as the A record name, e.g. "apex.service.justice.gov.uk"
 data "aws_route53_zone" "production_network_services" {
   provider     = aws.core-network-services
-  name         = "laa-production.modernisation-platform.service.justice.gov.uk"
-  # name         = local.application_data.accounts[local.environment].acm_cert_domain_name # TODO: To be determined for production
+  name         = local.application_data.accounts[local.environment].acm_cert_domain_name # TODO: To be determined for production
   private_zone = false
 }
