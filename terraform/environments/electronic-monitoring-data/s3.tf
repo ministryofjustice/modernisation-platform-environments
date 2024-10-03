@@ -3,6 +3,7 @@ locals {
     "production"  = "prod"
     "test"        = "test"
     "development" = "dev"
+    "default"     = ""
   }
   environment_shorthand = local.environment_map[local.environment]
 
@@ -540,29 +541,53 @@ module "s3-data-bucket" {
 module "s3-fms-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed = "fms"
+  data_feed           = "fms"
   local_bucket_prefix = local.bucket_prefix
-  local_tags = local.tags
-  logging_bucket = module.s3-logging-bucket
-  order_type = "general"
+  local_tags          = local.tags
+  logging_bucket      = module.s3-logging-bucket
+  order_type          = "general"
 
   providers = {
     aws = aws
   }
 }
 
+module "s3-fms-general-landing-bucket-iam-user" {
+  source = "./modules/landing_bucket_iam_user_access/"
+
+  data_feed                 = "fms"
+  landing_bucket_arn        = module.s3-fms-general-landing-bucket.bucket_arn
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  order_type                = "general"
+  rotation_lambda           = module.rotate_iam_key
+  rotation_lambda_role_name = aws_iam_role.rotate_iam_keys.name
+}
+
 module "s3-fms-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed = "fms"
+  data_feed           = "fms"
   local_bucket_prefix = local.bucket_prefix
-  local_tags = local.tags
-  logging_bucket = module.s3-logging-bucket
-  order_type = "specials"
+  local_tags          = local.tags
+  logging_bucket      = module.s3-logging-bucket
+  order_type          = "specials"
 
   providers = {
     aws = aws
   }
+}
+
+module "s3-fms-specials-landing-bucket-iam-user" {
+  source = "./modules/landing_bucket_iam_user_access/"
+
+  data_feed                 = "fms"
+  landing_bucket_arn        = module.s3-fms-specials-landing-bucket.bucket_arn
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  order_type                = "specials"
+  rotation_lambda           = module.rotate_iam_key
+  rotation_lambda_role_name = aws_iam_role.rotate_iam_keys.name
 }
 
 # ------------------------------------------------------------------------
@@ -572,11 +597,11 @@ module "s3-fms-specials-landing-bucket" {
 module "s3-mdss-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed = "mdss"
+  data_feed           = "mdss"
   local_bucket_prefix = local.bucket_prefix
-  local_tags = local.tags
-  logging_bucket = module.s3-logging-bucket
-  order_type = "general"
+  local_tags          = local.tags
+  logging_bucket      = module.s3-logging-bucket
+  order_type          = "general"
 
   providers = {
     aws = aws
@@ -586,11 +611,11 @@ module "s3-mdss-general-landing-bucket" {
 module "s3-mdss-ho-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed = "mdss"
+  data_feed           = "mdss"
   local_bucket_prefix = local.bucket_prefix
-  local_tags = local.tags
-  logging_bucket = module.s3-logging-bucket
-  order_type = "ho"
+  local_tags          = local.tags
+  logging_bucket      = module.s3-logging-bucket
+  order_type          = "ho"
 
   providers = {
     aws = aws
@@ -600,11 +625,11 @@ module "s3-mdss-ho-landing-bucket" {
 module "s3-mdss-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed = "mdss"
+  data_feed           = "mdss"
   local_bucket_prefix = local.bucket_prefix
-  local_tags = local.tags
-  logging_bucket = module.s3-logging-bucket
-  order_type = "specials"
+  local_tags          = local.tags
+  logging_bucket      = module.s3-logging-bucket
+  order_type          = "specials"
 
   providers = {
     aws = aws

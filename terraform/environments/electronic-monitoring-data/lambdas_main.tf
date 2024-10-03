@@ -37,7 +37,6 @@ module "get_metadata_from_rds_lambda" {
     SECRET_NAME           = aws_secretsmanager_secret.db_glue_connection.name
     METADATA_STORE_BUCKET = module.s3-metadata-bucket.bucket.id
   }
-  env_account_id = local.env_account_id
 }
 
 
@@ -73,7 +72,6 @@ module "create_athena_table" {
   runtime            = "python3.11"
   security_group_ids = [aws_security_group.lambda_db_security_group.id]
   subnet_ids         = data.aws_subnets.shared-public.ids
-  env_account_id     = local.env_account_id
   environment_variables = {
     S3_BUCKET_NAME = module.s3-dms-target-store-bucket.bucket.id
   }
@@ -105,7 +103,6 @@ module "send_metadata_to_ap" {
   runtime            = "python3.11"
   security_group_ids = null
   subnet_ids         = data.aws_subnets.shared-public.ids
-  env_account_id     = local.env_account_id
   environment_variables = {
     METADATA_BUCKET_NAME = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
 
@@ -144,7 +141,6 @@ module "get_file_keys_for_table" {
   runtime            = "python3.11"
   security_group_ids = [aws_security_group.lambda_db_security_group.id]
   subnet_ids         = data.aws_subnets.shared-public.ids
-  env_account_id     = local.env_account_id
   environment_variables = {
     PARQUET_BUCKET_NAME = module.s3-dms-target-store-bucket.bucket.id
   }
@@ -177,7 +173,6 @@ module "send_table_to_ap" {
   runtime            = "python3.11"
   security_group_ids = null
   subnet_ids         = null
-  env_account_id     = local.env_account_id
   environment_variables = {
     AP_DESTINATION_BUCKET = local.land_bucket
   }
@@ -211,7 +206,6 @@ module "query_output_to_list" {
   runtime               = "python3.11"
   security_group_ids    = null
   subnet_ids            = null
-  env_account_id        = local.env_account_id
   environment_variables = null
 }
 
@@ -227,7 +221,6 @@ module "update_log_table" {
   role_arn                = aws_iam_role.update_log_table.arn
   memory_size             = 1024
   timeout                 = 899
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
@@ -249,7 +242,6 @@ module "output_file_structure_as_json_from_zip" {
   role_arn                = aws_iam_role.extract_metadata_from_atrium_unstructured.arn
   memory_size             = 1024
   timeout                 = 900
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   security_group_ids      = [aws_security_group.lambda_db_security_group.id]
@@ -272,7 +264,6 @@ module "load_unstructured_structure" {
   role_arn                = aws_iam_role.load_json_table.arn
   memory_size             = 2048
   timeout                 = 900
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
@@ -297,7 +288,6 @@ module "unzip_single_file" {
   role_arn                = aws_iam_role.unzip_single_file.arn
   memory_size             = 2048
   timeout                 = 900
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
@@ -318,10 +308,23 @@ module "unzipped_presigned_url" {
   role_arn                = aws_iam_role.unzipped_presigned_url.arn
   memory_size             = 2048
   timeout                 = 900
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
 }
 
 
+#-----------------------------------------------------------------------------------
+# Rotate IAM keys
+#-----------------------------------------------------------------------------------
 
+module "rotate_iam_key" {
+  source                  = "./modules/lambdas"
+  function_name           = "rotate_iam_key"
+  is_image                = true
+  role_name               = aws_iam_role.rotate_iam_keys.name
+  role_arn                = aws_iam_role.rotate_iam_keys.arn
+  memory_size             = 2048
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+}
