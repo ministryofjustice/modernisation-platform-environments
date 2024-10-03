@@ -35,7 +35,8 @@ data "aws_iam_policy_document" "rotate_iam_keys" {
       "iam:DeleteAccessKey",
       "iam:UpdateAccessKey",
       "iam:ListAccessKeys",
-      "iam:CreateAccessKeys"
+      "iam:CreateAccessKeys",
+      "iam:CreateAccessKey"
     ]
     resources = ["arn:aws:iam::*:user/${aws_iam_user.supplier.name}"]
   }
