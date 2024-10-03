@@ -52,13 +52,13 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 # CIS EC2 EBS Volumes
 ######################################
 
-resource "aws_ebs_volume" "EC2ServerVolumeORAHOME" {
+resource "aws_ebs_volume" "ec2_ebs_sdf" {
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].orahomesize
+  size              = local.application_data.accounts[local.environment].sdfsize
   type              = "gp3"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].orahome_snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].ebs_sdf_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -66,14 +66,89 @@ resource "aws_ebs_volume" "EC2ServerVolumeORAHOME" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-EC2ServerVolumeORAHOME" },
+    { "Name" = "${local.application_name_short}-/dev/sdf" },
   )
 }
 
-resource "aws_volume_attachment" "oas_EC2ServerVolume01" {
-  device_name = "/dev/sdb"
-  volume_id   = aws_ebs_volume.EC2ServerVolumeORAHOME.id
-  instance_id = aws_instance.oas_app_instance.id
+resource "aws_volume_attachment" "ec2_ebs_sdf" {
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.ec2_ebs_sdf.id
+  instance_id = aws_instance.cis_db_instance.id
+}
+
+
+resource "aws_ebs_volume" "ec2_ebs_sdg" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].sdgsize
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].ebs_sdg_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name_short}-/dev/sdg" },
+  )
+}
+
+resource "aws_volume_attachment" "ec2_ebs_sdf" {
+  device_name = "/dev/sdg"
+  volume_id   = aws_ebs_volume.ec2_ebs_sdg.id
+  instance_id = aws_instance.cis_db_instance.id
+}
+
+
+resource "aws_ebs_volume" "ec2_ebs_sdh" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].sdhsize
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].ebs_sdh_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name_short}-/dev/sdh" },
+  )
+}
+
+resource "aws_volume_attachment" "ec2_ebs_sdh" {
+  device_name = "/dev/sdh"
+  volume_id   = aws_ebs_volume.ec2_ebs_sdh.id
+  instance_id = aws_instance.cis_db_instance.id
+}
+
+
+resource "aws_ebs_volume" "ec2_ebs_sdi" {
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].sdisize
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].ebs_sdi_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name_short}-/dev/sdi" },
+  )
+}
+
+resource "aws_volume_attachment" "ec2_ebs_sdi" {
+  device_name = "/dev/sdi"
+  volume_id   = aws_ebs_volume.ec2_ebs_sdi.id
+  instance_id = aws_instance.cis_db_instance.id
 }
 
 ######################################
@@ -112,7 +187,7 @@ resource "aws_vpc_security_group_ingress_rule" "rds_workspaces" {
   from_port         = 1521
   ip_protocol       = "tcp"
   to_port           = 1521
-  cidr_ipv4         = [local.application_data.accounts[local.environment].managementcidr]
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
 }
 
 resource "aws_vpc_security_group_ingress_rule" "dkron_workspaces" {
@@ -121,7 +196,7 @@ resource "aws_vpc_security_group_ingress_rule" "dkron_workspaces" {
   from_port         = 8080
   ip_protocol       = "tcp"
   to_port           = 8080
-  cidr_ipv4         = [local.application_data.accounts[local.environment].managementcidr]
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_test_env" {
@@ -130,5 +205,5 @@ resource "aws_vpc_security_group_ingress_rule" "rds_test_env" {
   from_port         = 1521
   ip_protocol       = "tcp"
   to_port           = 1521
-  cidr_ipv4         = [local.application_data.accounts[local.environment].testenvcidr]
+  cidr_blocks       = [local.application_data.accounts[local.environment].testenvcidr]
 }

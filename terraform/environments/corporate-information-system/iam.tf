@@ -17,19 +17,20 @@ resource "aws_iam_role" "cis_ec2_role" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   ]
+}
 
-  inline_policy {
-    name = "${local.application_name_short}-ec2-policy"
+resource "aws_iam_role_policy" "cis_ec2_policy" {
+  name = "${local.application_name_short}-ec2-policy"
+  role = aws_iam_role.cis_ec2_role.id
 
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action   = "s3:*"
-          Effect   = "Allow"
-          Resource = "*"
-        }
-      ]
-    })
-  }
-} 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = "s3:*"
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
