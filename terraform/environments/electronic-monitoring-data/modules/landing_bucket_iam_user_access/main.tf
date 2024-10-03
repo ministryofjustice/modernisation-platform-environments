@@ -1,5 +1,6 @@
-#checkov:skip=CKV_AWS_273 "Ensure access is controlled through SSO and not AWS IAM defined users. Supplier temporary access via IAM user."
+
 resource "aws_iam_user" "supplier" {
+  #checkov:skip=CKV_AWS_273 "Ensure access is controlled through SSO and not AWS IAM defined users. Supplier temporary access via IAM user."
   name = "${var.local_bucket_prefix}-${var.data_feed}-${var.order_type}"
   tags = merge(
     var.local_tags,
@@ -82,8 +83,9 @@ resource "aws_iam_access_key" "supplier" {
 }
 
 module "secrets_manager" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  source = "terraform-aws-modules/secrets-manager/aws"
+  #checkov:skip=CKV_TF_1 "Module registry does not support commit hashes for versions"
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.3.0"
 
   name        = "iam-${aws_iam_user.supplier.name}"
   description = "IAM user access credentials for ${var.data_feed}-${var.order_type}"
