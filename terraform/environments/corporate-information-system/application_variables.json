@@ -3,7 +3,7 @@
     "development": {
       "app_ami_id": "ami-05f27e9e0cc893eb2",
       "ec2instancetype": "m4.2xlarge",
-      "cis_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4HwwHLlh9l1JlXfHguxG3w/S0eGg9XMGJpvVaJZg5kX2us1UhK7aLILpHs9RuakAXtUJ98LY7/d6WkUAK88DsC1b+bTLyy8ANUKgdK4ay9gZ0hJKB7Mvb92H5JyDveS9JlcpzAitlghHCVphfy2DT78Ft6GvSwj9spulXKs5g8IMh9EpPQfF/yrC1SHwowUB+mHVokBFtL+/RCmV/qUDYayL9QtVLXzpmhAsmMvjwHuHKKFAp+Z/+EysRv2gFRZg+4C1CBTwV7onaYoD69RqwEgDPhUoZgARljTPgUiZNLsOu433rEEWNRIlpvdKcGCMvTw3BDRhVAMkycCD5naUx vladimirs.kovalovs@L0854",
+      "cis_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDOP7IqwGdkp9hyFBXLSn1qCUhIdvTIBuCop/z1uZXdpDix4oxNb1fpuRusMm+l50dLIqCLKS11d5XOWgE5vem5PyGWLI21iqEt+oJFY8NDFs93rEU/og7wVoAmJ5Jfih2kIp8GDvxvhHJh/E4Gom11XKkL2FOwWAT6Dh2WaFppj2T2P1QzBHhpvcx4XJWHtbeq3xdN/vVqlw8JpXK/xNcrKnlW91dM04etKy/+dVqUCsjKGOEBEv4bclwRaEEq2AVwqeUnutLoJH4G8z4KhesCijronfGdF+9DlCUObCF54scHBn/WnTiz1adjyYXG8FcONLHhSdMU30pjegUW57Cx vladimirs.kovalovs@L0854",
       "managementcidr": "10.200.0.0/20",
       "testenvcidr": "10.203.0.0/20",
       "ebs_sdf_snapshot": "snap-0558403cc9c5f2ebb",
