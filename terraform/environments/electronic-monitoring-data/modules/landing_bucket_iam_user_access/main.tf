@@ -1,4 +1,4 @@
-
+#tfsec:ignore:aws-iam-no-user-attached-policies
 resource "aws_iam_user" "supplier" {
   #checkov:skip=CKV_AWS_273 "Ensure access is controlled through SSO and not AWS IAM defined users. Supplier temporary access via IAM user."
   name = "${var.local_bucket_prefix}-${var.data_feed}-${var.order_type}"

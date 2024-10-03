@@ -3,6 +3,7 @@ locals {
     "production"  = "prod"
     "test"        = "test"
     "development" = "dev"
+    "default"     = ""
   }
   environment_shorthand = local.environment_map[local.environment]
 
