@@ -70,7 +70,7 @@ resource "aws_ebs_volume" "ec2_ebs_sdf" {
   )
 }
 
-resource "aws_volume_attachment" "ec2_ebs_sdf" {
+resource "aws_volume_attachment" "ec2_ebs_sdf_attachment" {
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.ec2_ebs_sdf.id
   instance_id = aws_instance.cis_db_instance.id
@@ -95,7 +95,7 @@ resource "aws_ebs_volume" "ec2_ebs_sdg" {
   )
 }
 
-resource "aws_volume_attachment" "ec2_ebs_sdf" {
+resource "aws_volume_attachment" "ec2_ebs_sdf_attachment" {
   device_name = "/dev/sdg"
   volume_id   = aws_ebs_volume.ec2_ebs_sdg.id
   instance_id = aws_instance.cis_db_instance.id
@@ -120,7 +120,7 @@ resource "aws_ebs_volume" "ec2_ebs_sdh" {
   )
 }
 
-resource "aws_volume_attachment" "ec2_ebs_sdh" {
+resource "aws_volume_attachment" "ec2_ebs_sdh_attachment" {
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.ec2_ebs_sdh.id
   instance_id = aws_instance.cis_db_instance.id
@@ -145,7 +145,7 @@ resource "aws_ebs_volume" "ec2_ebs_sdi" {
   )
 }
 
-resource "aws_volume_attachment" "ec2_ebs_sdi" {
+resource "aws_volume_attachment" "ec2_ebs_sdi_attachment" {
   device_name = "/dev/sdi"
   volume_id   = aws_ebs_volume.ec2_ebs_sdi.id
   instance_id = aws_instance.cis_db_instance.id
