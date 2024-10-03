@@ -75,7 +75,7 @@ locals {
   })
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
-  app_db_password_name = "APP_APEX_DBPASSWORD_ADMIN"
+  app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
   db_hostname          = "db.${local.application_name}"
 
   database-instance-userdata = <<EOF
@@ -91,7 +91,7 @@ mount -a
 
 sudo su - oracle -c "sqlplus / as sysdba << EOF
 shutdown abort;
-# startup;
+startup;
 exit;
 EOF"
 
@@ -131,7 +131,7 @@ APEX=
   )
 EOT
 
-# sudo su - oracle -c "lsnrctl start LISTENER"
+sudo su - oracle -c "lsnrctl start LISTENER"
 
 cd /etc
 mkdir cloudwatch_agent
