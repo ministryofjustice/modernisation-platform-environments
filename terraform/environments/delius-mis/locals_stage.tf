@@ -10,6 +10,7 @@ locals {
     migration_environment_full_name        = "del-stage"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "stage"
+    legacy_engineering_vpc_cidr            = "10.160.98.0/25"
   }
 
   bastion_config_stage = {
