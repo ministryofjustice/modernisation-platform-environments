@@ -95,7 +95,7 @@ resource "aws_ebs_volume" "ec2_ebs_sdg" {
   )
 }
 
-resource "aws_volume_attachment" "ec2_ebs_sdf_attachment" {
+resource "aws_volume_attachment" "ec2_ebs_sdg_attachment" {
   device_name = "/dev/sdg"
   volume_id   = aws_ebs_volume.ec2_ebs_sdg.id
   instance_id = aws_instance.cis_db_instance.id
