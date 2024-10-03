@@ -8,6 +8,7 @@ resource "aws_iam_user" "supplier" {
   )
 }
 
+#checkov:skip=CKV_AWS_40: Used by a service user
 resource "aws_iam_user_policy" "supplier_data_access" {
   name   = "put-s3-${var.data_feed}-${var.order_type}-policy"
   user   = aws_iam_user.supplier.name
