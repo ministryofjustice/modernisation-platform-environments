@@ -1,6 +1,6 @@
 #tfsec:ignore:aws-iam-no-user-attached-policies
 resource "aws_iam_user" "supplier" {
-  #checkov:skip=CKV_AWS_273 "Ensure access is controlled through SSO and not AWS IAM defined users. Supplier temporary access via IAM user."
+  #checkov:skip=CKV_AWS_273: "Ensure access is controlled through SSO and not AWS IAM defined users. Supplier temporary access via IAM user."
   name = "${var.local_bucket_prefix}-${var.data_feed}-${var.order_type}"
   tags = merge(
     var.local_tags,
@@ -83,7 +83,7 @@ resource "aws_iam_access_key" "supplier" {
 }
 
 module "secrets_manager" {
-  #checkov:skip=CKV_TF_1 "Module registry does not support commit hashes for versions"
+  #checkov:skip=CKV_TF_1: "Module registry does not support commit hashes for versions"
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.3.0"
 
@@ -103,4 +103,11 @@ module "secrets_manager" {
     { order_type = var.order_type },
     { data_feed = var.data_feed }
   )
+}
+
+resource "aws_lambda_permission" "allow_secrets_invoke" {
+  action        = "lambda:InvokeFunction"
+  function_name = module.rotate_iam_key.lambda_function_name
+  principal     = "secretsmanager.amazonaws.com"
+  source_arn    = module.secrets_manager.secret_arn
 }

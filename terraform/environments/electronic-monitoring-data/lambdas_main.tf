@@ -328,9 +328,3 @@ module "rotate_iam_key" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
 }
-
-resource "aws_lambda_permission" "allow_secrets_invoke" {
-  action        = "lambda:InvokeFunction"
-  function_name = module.rotate_iam_key.lambda_function_name
-  principal     = "secretsmanager.amazonaws.com"
-}
