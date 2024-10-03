@@ -128,3 +128,9 @@ variable "glue_job_arguments" {
   default = {}
   description = "(Optional) Arguments for the Reconciliation job"
 }
+
+variable "job_schedule" {
+  description = "Cron schedule for the reconciliation job. Leave unset for no schedule."
+  default     = ""
+  type        = string
+}

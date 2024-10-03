@@ -1,4 +1,4 @@
-# tflint-ignore-file: terraform_required_version
+# tflint-ignore-file: terraform_required_version, terraform_required_providers
 # Data Reconciliation Job
 module "glue_s3_data_reconciliation_job" {
   source                        = "../../glue_job"
@@ -35,4 +35,15 @@ module "glue_s3_data_reconciliation_job" {
   )
 
   arguments = var.glue_job_arguments
+}
+
+resource "aws_glue_trigger" "glue_file_archive_job_trigger" {
+  count    = var.create_job && var.job_schedule != "" ? 1 : 0
+  name     = "${module.glue_s3_data_reconciliation_job.name}-trigger"
+  schedule = var.job_schedule
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.glue_s3_data_reconciliation_job.name
+  }
 }
