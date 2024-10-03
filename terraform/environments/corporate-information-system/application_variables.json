@@ -3,7 +3,7 @@
     "development": {
       "app_ami_id": "ami-05f27e9e0cc893eb2",
       "ec2instancetype": "m4.2xlarge",
-      "cis_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCsWC7VRgl6w72d9sd9PQW0FcgwVLbJqI65/slHInmzYDTGg0npemhqpkUh9CqHQm1klK6CNwCRMjZV3QqR8Bt54ozFLVq+lrbAsz7zVwfeVrbVOEzkLkWNfs9eUKfjTBO/Ef5kn2kaKuQJY7CgjZ4pxYpsZpEp+EtSNTESSTvtYLu7S9GpOqVEJP03co1QlZJbalwjEvLvmNogh6HWKMGGPOUAO61JjQiYagtNy3hWanuqFjIc/uDIKXn9GtcT+FKCyj8MopyG1M1vdWBWvTulQivbKxSlxoQjXXPSaDpUQrL/nfWDWLZ3z2nIEc8TAA2Av0Y40gdckgx0KDVFtnVFw4eywiXA98UcO2DGMhMnJWJxPbMEYBAQX+2djONSb7FTA4Qdg78pE5vyJFJ8wLdCQ3VOdLYrAUh01cHPm60BPvsAfWEqyP+gPKTnak/PTc1bnftt9awzJDaRmboVqe16WSlE3Hh3LezsRdP73D0W/p0xbtpwrOJJHP5g01E+CYijDHeS3N2ClVGS+JbHZ2NvoV2hMCk5AZUFxK/OiXWqVDzg/2/h859w1v/k5PPGyQg5+9h4Hvp5NLrSLjKhoB/88fuKdhhT0SSPQwdU/qwBBViCfjsPiimuUrGKBbIe+OgpNvLKxxT9lFdfAgrafnq8WtA0MSXNVLFgsB2HpnQUxQ== vladimirs.kovalovs@L0854",
+      "cis_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4HwwHLlh9l1JlXfHguxG3w/S0eGg9XMGJpvVaJZg5kX2us1UhK7aLILpHs9RuakAXtUJ98LY7/d6WkUAK88DsC1b+bTLyy8ANUKgdK4ay9gZ0hJKB7Mvb92H5JyDveS9JlcpzAitlghHCVphfy2DT78Ft6GvSwj9spulXKs5g8IMh9EpPQfF/yrC1SHwowUB+mHVokBFtL+/RCmV/qUDYayL9QtVLXzpmhAsmMvjwHuHKKFAp+Z/+EysRv2gFRZg+4C1CBTwV7onaYoD69RqwEgDPhUoZgARljTPgUiZNLsOu433rEEWNRIlpvdKcGCMvTw3BDRhVAMkycCD5naUx vladimirs.kovalovs@L0854",
       "managementcidr": "10.200.0.0/20",
       "testenvcidr": "10.203.0.0/20",
       "ebs_sdf_snapshot": "snap-0558403cc9c5f2ebb",
