@@ -214,3 +214,13 @@ resource "aws_security_group_rule" "rds_test_env" {
   cidr_blocks       = [local.application_data.accounts[local.environment].testenvcidr]
   description       = "RDS Workspace access"
 }
+
+resource "aws_security_group_rule" "ssh_workspaces" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  security_group_id = aws_security_group.ec2_instance_sg.id
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+  description       = "SSH Workspace access"
+}
