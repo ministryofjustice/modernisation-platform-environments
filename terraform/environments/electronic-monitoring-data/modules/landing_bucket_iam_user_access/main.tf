@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "rotate_iam_keys" {
       "iam:CreateAccessKeys",
       "iam:CreateAccessKey"
     ]
-    resources = ["arn:aws:iam::*:user/${aws_iam_user.supplier.name}"]
+    resources = [aws_iam_user.supplier.arn]
   }
   statement {
     sid    = "UpdateSecretsPermissions${var.data_feed}${var.order_type}"
