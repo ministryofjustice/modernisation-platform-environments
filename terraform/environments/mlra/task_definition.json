@@ -85,10 +85,6 @@
         "valueFrom": "${db_secret_arn}"
       },
       {
-        "name": "APP_MLRA_GOOGLE_ANALYTICS_4_TAG_ID",
-        "valueFrom": "${google_analytics_4_tag_id}"
-      },
-      {
         "name": "APP_MLRA_GOOGLE_TAG_MANAGER_ID",
         "valueFrom": "${google_tag_manager_id}"
       }
