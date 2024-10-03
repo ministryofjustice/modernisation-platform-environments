@@ -23,6 +23,8 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-preproduction}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-core-preproduction}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-core-preproduction}:role/modernisation-platform-oidc-cicd",
+      "arn:aws:iam::${module.environment.account_ids.delius-mis-preproduction}:role/EC2OracleEnterpriseManagementSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.delius-mis-preproduction}:role/modernisation-platform-oidc-cicd",
       "arn:aws:iam::${module.environment.account_ids.nomis-combined-reporting-preproduction}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-preproduction}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.oasys-preproduction}:role/EC2OracleEnterpriseManagementSecretsRole",
