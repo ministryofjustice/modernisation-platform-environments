@@ -196,23 +196,13 @@ resource "aws_security_group_rule" "sms-outbound-importmachine" {
   depends_on               = [aws_security_group.sms_server]
 }
 
-resource "aws_security_group_rule" "sms-outbound-all-ipv4" {
-  description       = "allow all traffic to any IPv4 address"
+resource "aws_security_group_rule" "sms-outbound-all" {
+  description       = "allow all traffic to any IP address"
   type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.sms_server.id
-  depends_on        = [aws_security_group.sms_server]
-}
-
-resource "aws_security_group_rule" "sms-outbound-all-ipv6" {
-  description       = "allow all traffic to any IPv6 address"
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
   ipv6_cidr_blocks  = ["::/0"]
   security_group_id = aws_security_group.sms_server.id
   depends_on        = [aws_security_group.sms_server]
@@ -695,7 +685,7 @@ resource "aws_security_group_rule" "iisrelay-outbound-all" {
 }
 
 resource "aws_security_group_rule" "iisrelay-inbound-app" {
-  description              = "allow all"
+  description              = "allow all traffic from app_servers"
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
