@@ -100,7 +100,7 @@ locals {
 
       dev-base-rhel85 = merge(local.ec2_autoscaling_groups.base, {
         config = merge(local.ec2_autoscaling_groups.base.config, {
-          ami_name = "base_rhel_8_5*"
+          ami_name = "base_rhel_8_5_*"
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init.args, {
