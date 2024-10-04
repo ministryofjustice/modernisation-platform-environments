@@ -60,7 +60,6 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
       Name          = "external/cloud_platform/k8s_auth"
       Resource_Type = "Secrets"
       Source        = "Analytics-Platform"
-      Jira          = "DPR2-751"
     }
   )
 }
