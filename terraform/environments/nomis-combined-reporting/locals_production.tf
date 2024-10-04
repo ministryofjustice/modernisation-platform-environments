@@ -173,6 +173,8 @@ locals {
       "/oracle/database/PDBIPAUD" = local.secretsmanager_secrets.db # Azure Live Audit DB
       "/oracle/database/PDBISYS"  = local.secretsmanager_secrets.db
       "/oracle/database/PDBIAUD"  = local.secretsmanager_secrets.db
+      "/sap/bip/pd"               = local.secretsmanager_secrets.bip
+      "/sap/bods/pd"              = local.secretsmanager_secrets.bods
     }
   }
 }
