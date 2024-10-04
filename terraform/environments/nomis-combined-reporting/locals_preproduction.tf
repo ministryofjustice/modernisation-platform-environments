@@ -229,12 +229,11 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
-
         instance_target_groups = {
           pp-ncr-web = merge(local.lbs.private.instance_target_groups.web, {
             attachments = [
-              { ec2_instance_name = "pp-ncr-web-1-a" },
-              { ec2_instance_name = "pp-ncr-web-2-b" },
+              # { ec2_instance_name = "pp-ncr-web-1-a" },
+              # add more instances here when deployed
             ]
           })
         }
@@ -311,7 +310,6 @@ locals {
       "preproduction.reporting.nomis.service.justice.gov.uk" = {
         records = [
           { name = "db", type = "CNAME", ttl = "3600", records = ["pp-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "admin", type = "CNAME", ttl = "3600", records = ["pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "private" },
