@@ -30,7 +30,7 @@ locals {
     ec2_autoscaling_groups = {
       pp-ncr-app = merge(local.ec2_autoscaling_groups.bip_app, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_app.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bip_app.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_app.config.instance_profile_policies, [
@@ -49,7 +49,7 @@ locals {
 
       pp-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 2
+          desired_capacity = 0
           max_size         = 2
         })
         config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
@@ -69,7 +69,7 @@ locals {
 
       pp-ncr-webadmin = merge(local.ec2_autoscaling_groups.bip_webadmin, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_webadmin.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bip_webadmin.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_webadmin.config.instance_profile_policies, [
@@ -88,7 +88,7 @@ locals {
 
       pp-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bip_web.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
