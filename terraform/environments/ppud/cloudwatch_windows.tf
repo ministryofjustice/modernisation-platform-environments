@@ -10,12 +10,14 @@ data "aws_instances" "windows_tagged_instances" {
   }
 }
 
+data "aws_instance" "instance_name" {
+  for_each      = toset(data.aws_instances.windows_tagged_instances.ids)
+  instance_id   = each.value
+ }
 
-data "aws_instance" "each_ec2" {
-  for_each    = toset(data.aws_instances.all_ec2.ids)
-  instance_id = each.key
+data "aws_ebs_volumes" "ec2_volumes" {
+  for_each    = toset(flatten(data.aws_instances.windows_tagged_instances.ids))
 }
-
 
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
@@ -54,36 +56,9 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    InstanceId = each.key
-    instance   = "C:"
-    ImageId    = data.aws_instances.each_ec2[each.key].ami
-    InstanceType = data.aws_instances.each_ec2[each.key].instance_type
-    objectname = "LogicalDisk"
-  }
-}
+    InstanceId = each.value
+    VolumeId   = toset(flatten(data.aws_ebs_volumes.ec2_volumes[each.key].ids))
 
-# Low Disk Alarm for all Windows instances with D Volumes
-
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "Low-Disk-Space-D-Volume-${each.key}"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "5"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId = each.key
-    instance   = "D:"
-    ImageId    = data.aws_instances.each_ec2[each.key].ami
-    InstanceType = data.aws_instances.each_ec2[each.key].instance_type
-    objectname = "LogicalDisk"
   }
 }
 
@@ -107,6 +82,9 @@ resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use
     InstanceId = each.key
   }
 }
+
+
+
 
 
 # High CPU IOwait Alarm
