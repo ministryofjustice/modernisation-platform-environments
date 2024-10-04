@@ -1,6 +1,12 @@
 locals {
 
   secretsmanager_secrets = {
+    bip = {
+      secrets = {
+        passwords = { description = "BIP Passwords" }
+        config    = { description = "BIP Configuration" }
+      }
+    }
     bip_app = {
       secrets = {
         passwords = { description = "BIP Passwords" }
@@ -15,7 +21,8 @@ locals {
     }
     bods = {
       secrets = {
-        passwords = { description = "ETL Passwords" }
+        passwords = { description = "BODS Passwords" }
+        config    = { description = "BODS Configuration" }
       }
     }
     db = {

@@ -30,7 +30,7 @@ locals {
     ec2_autoscaling_groups = {
       pp-ncr-app = merge(local.ec2_autoscaling_groups.bip_app, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_app.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bip_app.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_app.config.instance_profile_policies, [
@@ -49,7 +49,7 @@ locals {
 
       pp-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 2
+          desired_capacity = 0
           max_size         = 2
         })
         config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
@@ -69,7 +69,7 @@ locals {
 
       pp-ncr-webadmin = merge(local.ec2_autoscaling_groups.bip_webadmin, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_webadmin.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bip_webadmin.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_webadmin.config.instance_profile_policies, [
@@ -88,7 +88,7 @@ locals {
 
       pp-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bip_web.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
@@ -128,52 +128,6 @@ locals {
         })
       })
 
-      pp-ncr-cms-a = merge(local.ec2_instances.bip_app, {
-        #cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
-        config = merge(local.ec2_instances.bip_app.config, {
-          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bip_app.instance, {
-          instance_type = "m6i.xlarge",
-        })
-        tags = merge(local.ec2_instances.bip_app.tags, {
-          description                          = "PreProd SAP BI Platform CMS installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
-          node                                 = "1"
-          nomis-combined-reporting-environment = "pp"
-          type                                 = "management"
-          server-type                          = "ncr-bip"
-          shutdown-order                       = 3
-        })
-      })
-
-      pp-ncr-cms-b = merge(local.ec2_instances.bip_app, {
-        #cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
-        config = merge(local.ec2_instances.bip_app.config, {
-          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bip_app.instance, {
-          instance_type = "m6i.xlarge",
-        })
-        tags = merge(local.ec2_instances.bip_app.tags, {
-          description                          = "PreProd SAP BI Platform CMS installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
-          node                                 = "2"
-          nomis-combined-reporting-environment = "pp"
-          server-type                          = "ncr-bip"
-          type                                 = "management"
-          shutdown-order                       = 2
-        })
-      })
-
       pp-ncr-db-1-a = merge(local.ec2_instances.db, {
         cloudwatch_metric_alarms = merge(
           local.cloudwatch_metric_alarms.db,
@@ -191,126 +145,6 @@ locals {
           nomis-combined-reporting-environment = "pp"
           oracle-sids                          = "PPBIPSYS PPBIPAUD"
           instance-scheduling                  = "skip-scheduling"
-        })
-      })
-
-      pp-ncr-client-a = merge(local.ec2_autoscaling_groups.jumpserver, {
-        # cloudwatch_metric_alarms = local.client_cloudwatch_metric_alarms # comment in when commissioned
-        config = merge(local.ec2_autoscaling_groups.jumpserver.config, {
-          ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.jumpserver.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        instance = merge(local.ec2_autoscaling_groups.jumpserver.instance, {
-          instance_type = "t3.large",
-        })
-        tags = merge(local.ec2_autoscaling_groups.jumpserver.tags, {
-          description                          = "PreProd Jumpserver and Client Tools"
-          instance-scheduling                  = "skip-scheduling"
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
-
-      pp-ncr-etl-a = merge(local.ec2_instances.bods, {
-        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bods # comment in when commissioned
-        config = merge(local.ec2_instances.bods.config, {
-          ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "m6i.2xlarge",
-        })
-        tags = merge(local.ec2_instances.bods.tags, {
-          description                          = "PreProd SAP BI Platform ETL installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
-
-      pp-ncr-processing-1-a = merge(local.ec2_instances.bip_app, {
-        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app # comment in when commissioned
-        config = merge(local.ec2_instances.bip_app.config, {
-          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bip_app.instance, {
-          instance_type = "m6i.4xlarge",
-        })
-        tags = merge(local.ec2_instances.bip_app.tags, {
-          description                          = "PreProd SAP BI Platform installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
-          node                                 = "3"
-          nomis-combined-reporting-environment = "pp"
-          server-type                          = "ncr-bip"
-          type                                 = "processing"
-          shutdown-order                       = 1
-        })
-      })
-
-      pp-ncr-web-1-a = merge(local.ec2_instances.bip_web, {
-        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
-        config = merge(local.ec2_instances.bip_web.config, {
-          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bip_web.instance, {
-          instance_type = "r6i.xlarge",
-        })
-        tags = merge(local.ec2_instances.bip_web.tags, {
-          description                          = "PreProd SAP BI Platform web-tier installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
-          nomis-combined-reporting-environment = "pp"
-          shutdown-order                       = 4
-        })
-      })
-
-      pp-ncr-web-2-b = merge(local.ec2_instances.bip_web, {
-        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
-        config = merge(local.ec2_instances.bip_web.config, {
-          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bip_web.instance, {
-          instance_type = "r6i.xlarge",
-        })
-        tags = merge(local.ec2_instances.bip_web.tags, {
-          description                          = "PreProd SAP BI Platform web-tier installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
-          nomis-combined-reporting-environment = "pp"
-          shutdown-order                       = 4
-        })
-      })
-
-      pp-ncr-web-admin-a = merge(local.ec2_instances.bip_web, {
-        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web # comment in when commissioned
-        config = merge(local.ec2_instances.bip_web.config, {
-          ami_name          = "base_rhel_8_5_2024-05-01T00-00-19.643Z"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bip_web.instance, {
-          instance_type = "r6i.large",
-        })
-        tags = merge(local.ec2_instances.bip_web.tags, {
-          description                          = "PreProd SAP BI Platform web-tier admin installation and configurations"
-          instance-scheduling                  = "skip-scheduling"
-          nomis-combined-reporting-environment = "pp"
         })
       })
     }
@@ -395,12 +229,11 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
-
         instance_target_groups = {
           pp-ncr-web = merge(local.lbs.private.instance_target_groups.web, {
             attachments = [
-              { ec2_instance_name = "pp-ncr-web-1-a" },
-              { ec2_instance_name = "pp-ncr-web-2-b" },
+              # { ec2_instance_name = "pp-ncr-web-1-a" },
+              # add more instances here when deployed
             ]
           })
         }
@@ -477,7 +310,6 @@ locals {
       "preproduction.reporting.nomis.service.justice.gov.uk" = {
         records = [
           { name = "db", type = "CNAME", ttl = "3600", records = ["pp-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
-          { name = "admin", type = "CNAME", ttl = "3600", records = ["pp-ncr-web-admin-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "private" },
@@ -500,6 +332,10 @@ locals {
       "/oracle/database/LSBIPAUD" = local.secretsmanager_secrets.db
       "/oracle/database/LSBISYS"  = local.secretsmanager_secrets.db
       "/oracle/database/LSBIAUD"  = local.secretsmanager_secrets.db
+      "/sap/bip/lsast"            = local.secretsmanager_secrets.bip
+      "/sap/bip/pp"               = local.secretsmanager_secrets.bip
+      "/sap/bods/lsast"           = local.secretsmanager_secrets.bods
+      "/sap/bods/pp"              = local.secretsmanager_secrets.bods
     }
   }
 }

@@ -4,7 +4,7 @@ locals {
 
     bip_app = {
       config = {
-        ami_name                  = "base_rhel_8_5_*"
+        ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-bip"
         instance_profile_policies = [
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
@@ -56,7 +56,7 @@ locals {
 
     bip_cms = {
       config = {
-        ami_name                  = "base_rhel_8_5_*"
+        ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-bip"
         instance_profile_policies = [
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
@@ -108,7 +108,7 @@ locals {
 
     bip_webadmin = {
       config = {
-        ami_name                  = "base_rhel_8_5_*"
+        ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-web"
         instance_profile_policies = [
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
@@ -160,7 +160,7 @@ locals {
 
     bip_web = {
       config = {
-        ami_name                  = "base_rhel_8_5_*"
+        ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-web"
         instance_profile_policies = [
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
