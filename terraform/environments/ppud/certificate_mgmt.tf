@@ -22,6 +22,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   runtime       = "python3.8"
   timeout       = 30
   reserved_concurrent_executions = 5
+# code_signing_config_arn = aws_lambda_code_signing_config.example_csc.arn
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
    environment {
     variables = {
@@ -97,6 +98,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   runtime       = "python3.8"
   timeout       = 30
   reserved_concurrent_executions = 5
+# code_signing_config_arn = aws_lambda_code_signing_config.example_csc.arn
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
    environment {
     variables = {
@@ -172,6 +174,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   runtime       = "python3.8"
   timeout       = 30
   reserved_concurrent_executions = 5
+ # code_signing_config_arn = aws_lambda_code_signing_config.example_csc.arn
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
    environment {
     variables = {
@@ -184,7 +187,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   }
   tracing_config {
    mode = "Active"
-}
+  }
 }
 
 # Archive the zip file - PROD
