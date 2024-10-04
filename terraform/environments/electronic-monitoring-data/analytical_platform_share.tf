@@ -138,7 +138,6 @@ resource "aws_iam_role" "dataapi_cross_role" {
     {
       Name           = "${local.environment_shorthand}-data-api-cross-account-role"
       Resource_Type  = "iam"
-      Jira           = "DPR2-751"
       Resource_Group = "Front-End"
     }
   )
