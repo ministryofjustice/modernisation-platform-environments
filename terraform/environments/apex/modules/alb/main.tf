@@ -534,45 +534,45 @@ resource "null_resource" "always_run" {
 
 
 
-# resource "aws_lb_listener" "alb_listener" {
+resource "aws_lb_listener" "alb_listener" {
 
-#   load_balancer_arn = aws_lb.loadbalancer.arn
-#   port              = var.listener_port
-#   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
-#   protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
-#   ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
-#   certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
+  load_balancer_arn = aws_lb.loadbalancer.arn
+  port              = var.listener_port
+  #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
+  protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
+  ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
+  certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
-#   default_action {
-#     type = "fixed-response"
-#     fixed_response {
-#       content_type = "text/plain"
-#       message_body = "Access Denied - must access via CloudFront"
-#       status_code  = 403
-#     }
-#   }
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied - must access via CloudFront"
+      status_code  = 403
+    }
+  }
 
-#   tags = var.tags
+  tags = var.tags
 
-# }
+}
 
 
-# resource "aws_lb_listener_rule" "alb_listener_rule" {
-#   listener_arn = aws_lb_listener.alb_listener.arn
-#   priority     = 1
+resource "aws_lb_listener_rule" "alb_listener_rule" {
+  listener_arn = aws_lb_listener.alb_listener.arn
+  priority     = 1
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.alb_target_group.arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_target_group.arn
+  }
 
-#   condition {
-#     http_header {
-#       http_header_name = local.custom_header
-#       values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
-#     }
-#   }
-# }
+  condition {
+    http_header {
+      http_header_name = local.custom_header
+      values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
+    }
+  }
+}
 
 resource "aws_lb_target_group" "alb_target_group" {
   name                 = "${var.application_name}-alb-tg"
