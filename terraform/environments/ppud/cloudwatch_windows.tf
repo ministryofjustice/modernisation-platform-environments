@@ -10,6 +10,13 @@ data "aws_instances" "windows_tagged_instances" {
   }
 }
 
+data "aws_instance" "instance_details" {
+  count      = length(data.aws_instances.windows_instances.ids)
+  instance_id = data.aws_instances.windows_instances.ids[count.index]  # Get instance details for each ID
+  ami = data.aws_instances.windows_instances.ami[count.index]  # Get instance details for each ID
+  instance_type = data.aws_instances.windows_instances.instance_type[count.index]  # Get instance details for each ID
+}
+
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
@@ -49,8 +56,8 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume" {
   dimensions = {
     instance   = "C:"
     InstanceId   = data.aws_instances.windows_tagged_instances.ids[count.index]
-    InstanceType = data.aws_instances.windows_tagged_instances.instance_types[count.index]
-    ImageId      = data.aws_instances.windows_tagged_instances.image_ids[count.index]
+    InstanceType = data.aws_instances.instance_details.instance_type[count.index]
+    ImageId      = data.aws_instances.instance_details.ami[count.index]
     objectname = "LogicalDisk"
   }
 }
