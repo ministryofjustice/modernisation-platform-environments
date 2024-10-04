@@ -10,7 +10,7 @@
           "assume_account_name": "analytical-platform-management-production",
           "assume_account_id": "042130406152",
           "data_locations": [
-            "dpr-structured-historical-production"
+            "emds-dev-dms-data-validation-20240917144028498200000007"
           ],
           "resource_shares": [
             {
@@ -40,7 +40,7 @@
           "assume_account_name": "analytical-platform-management-production",
           "assume_account_id": "042130406152",
           "data_locations": [
-            "dpr-structured-historical-production"
+            "emds-prod-bucket-name"
           ],
           "resource_shares": [
             {
