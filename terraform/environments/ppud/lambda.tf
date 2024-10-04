@@ -390,3 +390,58 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/send_cpu_notification_prod.zip"
 }
+
+
+#################################################
+# Lambda Code Signing Configuration (CSC)
+#################################################
+
+# Development
+
+resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name_prefix = "lambda_signing_profile_dev"
+  platform_id = "AWSLambda-SHA384-ECDSA"
+  signature_validity_period {
+    value = 12
+    type  = "YEARS"
+  }
+}
+
+#resource "aws_lambda_code_signing_config" "lambda_csc_dev" {
+#  count       = local.is-development == true ? 1 : 0
+#  description = "Lambda code signing configuration for development environment"
+#  allowed_publishers {
+#    signing_profile_version_arns = [
+#      arn:aws:signer:eu-west-2::817985104434:signing-profile/MySigningProfile/abcdef1234567890,  # Replace with your signing profile ARN
+#    ]
+#  }
+#  policies {
+#    untrusted_artifact_on_deployment = "Warn"
+#  }
+#}
+
+# UAT
+
+resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name_prefix = "lambda_signing_profile_uat"
+  platform_id = "AWSLambda-SHA384-ECDSA"
+  signature_validity_period {
+    value = 12
+    type  = "YEARS"
+  }
+}
+
+# Production
+
+resource "aws_signer_signing_profile" "lambda_signing_profile_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name_prefix = "lambda_signing_profile_prod"
+  platform_id = "AWSLambda-SHA384-ECDSA"
+  signature_validity_period {
+    value = 12
+    type  = "YEARS"
+  }
+}
+
