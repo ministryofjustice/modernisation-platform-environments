@@ -11,4 +11,5 @@ resource "aws_quicksight_account_subscription" "subscription" {
       author_group, # not managed in code
       admin_group
     ]
+  }
 }
