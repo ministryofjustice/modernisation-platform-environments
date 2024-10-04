@@ -1,16 +1,57 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "enable_dbt_k8s_secrets": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": [
+            "dpr-structured-historical-production"
+          ],
+          "resource_shares": [
+            {
+              "glue_database": "capita_alcohol_monitoring",
+              "glue_tables": [
+                "*"
+              ]
+            }
+          ]
+        }
+      ]
     },
     "test": {
-      "example_var": "test-data"
+      "example_var": "test-data",
+      "enable_dbt_k8s_secrets": true
     },
     "preproduction": {
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "enable_dbt_k8s_secrets": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": [
+            "dpr-structured-historical-production"
+          ],
+          "resource_shares": [
+            {
+              "glue_database": "capita_alcohol_monitoring",
+              "glue_tables": [
+                "*"
+              ]
+            }
+          ]
+        }
+      ]
     }
   }
 }
