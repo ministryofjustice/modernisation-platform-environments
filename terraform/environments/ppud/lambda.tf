@@ -405,7 +405,7 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
 }
 
 output "signing_profile_arn_dev" {
-  value = aws_signer_signing_profile.lambda_signing_profile_dev.arn
+  value = aws_signer_signing_profile.lambda_signing_profile_dev[0].arn
 }
 
 #resource "aws_lambda_code_signing_config" "lambda_csc_dev" {
@@ -430,7 +430,7 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
 }
 
 output "signing_profile_arn_uat" {
-  value = aws_signer_signing_profile.lambda_signing_profile_uat.arn
+  value = aws_signer_signing_profile.lambda_signing_profile_uat[0].arn
 }
 
 # Production
@@ -442,5 +442,5 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_prod" {
 }
 
 output "signing_profile_arn_prod" {
-  value = aws_signer_signing_profile.lambda_signing_profile_prod.arn
+  value = aws_signer_signing_profile.lambda_signing_profile_prod[0].arn
 }
