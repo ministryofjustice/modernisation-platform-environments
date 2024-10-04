@@ -402,10 +402,10 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
   count       = local.is-development == true ? 1 : 0
   name_prefix = "lambda_signing_profile_dev"
   platform_id = "AWSLambda-SHA384-ECDSA"
-}
-
-output "signing_profile_arn_dev" {
-  value = aws_signer_signing_profile.lambda_signing_profile_dev[0].arn
+  signature_validity_period {
+    value = 12
+    type  = "YEARS"
+  }
 }
 
 #resource "aws_lambda_code_signing_config" "lambda_csc_dev" {
@@ -427,10 +427,10 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
   count       = local.is-preproduction == true ? 1 : 0
   name_prefix = "lambda_signing_profile_uat"
   platform_id = "AWSLambda-SHA384-ECDSA"
-}
-
-output "signing_profile_arn_uat" {
-  value = aws_signer_signing_profile.lambda_signing_profile_uat[0].arn
+  signature_validity_period {
+    value = 12
+    type  = "YEARS"
+  }
 }
 
 # Production
@@ -439,8 +439,9 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_prod" {
   count       = local.is-production == true ? 1 : 0
   name_prefix = "lambda_signing_profile_prod"
   platform_id = "AWSLambda-SHA384-ECDSA"
+  signature_validity_period {
+    value = 12
+    type  = "YEARS"
+  }
 }
 
-output "signing_profile_arn_prod" {
-  value = aws_signer_signing_profile.lambda_signing_profile_prod[0].arn
-}
