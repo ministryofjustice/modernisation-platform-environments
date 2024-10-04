@@ -14,7 +14,7 @@
           ],
           "resource_shares": [
             {
-              "glue_database": "capita_alcohol_monitoring",
+              "glue_database": "dms_data_validation",
               "glue_tables": [
                 "*"
               ]
