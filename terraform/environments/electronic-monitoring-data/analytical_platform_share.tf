@@ -60,7 +60,6 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
       Name          = "external/cloud_platform/k8s_auth"
       Resource_Type = "Secrets"
       Source        = "Analytics-Platform"
-      Jira          = "DPR2-751"
     }
   )
 }
@@ -139,7 +138,6 @@ resource "aws_iam_role" "dataapi_cross_role" {
     {
       Name           = "${local.environment_shorthand}-data-api-cross-account-role"
       Resource_Type  = "iam"
-      Jira           = "DPR2-751"
       Resource_Group = "Front-End"
     }
   )
