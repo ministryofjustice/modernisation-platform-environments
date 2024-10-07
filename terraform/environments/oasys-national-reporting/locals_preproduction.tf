@@ -73,13 +73,12 @@ locals {
     #   bods = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 1 instance, reduced RAM as Azure usage doesn't warrant higher RAM
     # }
     ec2_instances = {
-      pp-onr-bods-1-b = merge(local.ec2_instances.bods, {
+      pp-onr-bods-1 = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
-          availability_zone = "eu-west-2b"
+          availability_zone = "eu-west-2a"
           user_data_raw = base64encode(templatefile(
             "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-              branch      = "main"
-              newhostname = "pp-onr-bods-1-b" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
+              branch = "main"
             }
           ))
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
@@ -98,13 +97,12 @@ locals {
       })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
-      # pp-onr-bods-2-a = merge(local.ec2_instances.bods, {
+      # pp-onr-bods-2 = merge(local.ec2_instances.bods, {
       #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2a"
+      #     availability_zone = "eu-west-2b"
       #     user_data_raw = base64encode(templatefile(
       #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
       #         branch   = "main"
-      #         newhostname = "pp-onr-bods-2-a" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
       #       }
       #     ))
       #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
@@ -128,7 +126,7 @@ locals {
         instance_target_groups = {
           pp-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
             attachments = [
-              { ec2_instance_name = "pp-onr-bods-1-b" },
+              { ec2_instance_name = "pp-onr-bods-1" },
             ]
           })
         }
