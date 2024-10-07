@@ -123,6 +123,7 @@ locals {
   }
 
   dms_config_test = {
+    deploy_dms = true
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.2"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars

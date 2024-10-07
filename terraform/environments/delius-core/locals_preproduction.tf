@@ -128,6 +128,7 @@ locals {
   }
 
   dms_config_preprod = {
+    deploy_dms = false
     replication_enabled        = false
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.2"
