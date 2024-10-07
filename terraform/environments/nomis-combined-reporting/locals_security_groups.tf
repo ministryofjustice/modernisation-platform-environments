@@ -8,7 +8,9 @@ locals {
       "10.0.0.0/8",
     ])
     enduserclient_public = flatten([
-      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -30,7 +32,9 @@ locals {
       "10.0.0.0/8"
     ]
     enduserclient_public = flatten([
-      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.mp_cidrs.live_eu_west_nat,
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,

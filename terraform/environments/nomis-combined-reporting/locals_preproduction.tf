@@ -128,6 +128,18 @@ locals {
         })
       })
 
+      ppbipcms1 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+
       pp-ncr-db-1-a = merge(local.ec2_instances.db, {
         cloudwatch_metric_alarms = merge(
           local.cloudwatch_metric_alarms.db,
@@ -181,8 +193,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/lsast/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/lsast/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/lsast/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/lsast/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
@@ -217,8 +229,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/pp/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/pp/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/pp/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
@@ -229,34 +241,9 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
-        instance_target_groups = {
-          pp-ncr-web = merge(local.lbs.private.instance_target_groups.web, {
-            attachments = [
-              # { ec2_instance_name = "pp-ncr-web-1-a" },
-              # add more instances here when deployed
-            ]
-          })
-        }
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
-
-            rules = {
-              pp-ncr-web = {
-                priority = 4580
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "pp-ncr-web"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "preproduction.reporting.nomis.service.justice.gov.uk"
-                    ]
-                  }
-                }]
-              }
-            }
           })
         })
       })
@@ -275,7 +262,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "webadmin.preproduction.reporting.nomis.service.justice.gov.uk",
+                      "admin.preproduction.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -289,7 +276,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "web.preproduction.reporting.nomis.service.justice.gov.uk",
+                      "preproduction.reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -312,18 +299,13 @@ locals {
           { name = "db", type = "CNAME", ttl = "3600", records = ["pp-ncr-db-1-a.nomis-combined-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
-          { name = "", type = "A", lbs_map_key = "private" },
-          { name = "webadmin", type = "A", lbs_map_key = "public" },
-          { name = "web", type = "A", lbs_map_key = "private" },
+          { name = "", type = "A", lbs_map_key = "public" },
+          { name = "admin", type = "A", lbs_map_key = "public" },
         ]
       }
     }
 
     secretsmanager_secrets = {
-      "/ec2/ncr-bip/pp"           = local.secretsmanager_secrets.bip_app
-      "/ec2/ncr-web/pp"           = local.secretsmanager_secrets.bip_web
-      "/ec2/ncr-bip/lsast"        = local.secretsmanager_secrets.bip_app
-      "/ec2/ncr-web/lsast"        = local.secretsmanager_secrets.bip_web
       "/oracle/database/PPBIPSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PPBIPAUD" = local.secretsmanager_secrets.db
       "/oracle/database/PPBISYS"  = local.secretsmanager_secrets.db
