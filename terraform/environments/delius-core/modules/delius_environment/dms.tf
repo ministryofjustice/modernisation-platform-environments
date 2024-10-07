@@ -1,5 +1,5 @@
 module "dms" {
-  count = deploy_dms ? 1 : 0
+  count = locals.dms_config_dev.deploy_dms ? 1 : 0
   source         = "../components/dms"
   account_config = var.account_config
   account_info   = var.account_info
