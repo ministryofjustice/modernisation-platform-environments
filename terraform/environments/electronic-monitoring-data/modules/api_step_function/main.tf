@@ -293,6 +293,7 @@ resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch_role_policy" {
 }
 
 data "aws_iam_policy_document" "cloudwatch" {
+  for_each = { for stage in var.stages : stage.stage_name => stage }
   statement {
     effect = "Allow"
 
@@ -306,14 +307,14 @@ data "aws_iam_policy_document" "cloudwatch" {
       "logs:FilterLogEvents",
     ]
 
-    resources = [aws_cloudwatch_log_group.api_gateway_logs.arn, aws_cloudwatch_log_group.waf_log_group.arn]
+    resources = [aws_cloudwatch_log_group.api_gateway_logs[each.key].arn, aws_cloudwatch_log_group.waf_log_group.arn]
   }
 }
 resource "aws_iam_role_policy" "cloudwatch" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
   name     = "cloudwatch-log-api-${replace(var.api_name, "_", "-")}-stage-${replace(each.key, "_", "-")}"
   role     = aws_iam_role.api_gateway_role.id
-  policy   = data.aws_iam_policy_document.cloudwatch.json
+  policy   = data.aws_iam_policy_document.cloudwatch[each.key].json
 }
 
 resource "aws_api_gateway_account" "api_gateway_account" {
