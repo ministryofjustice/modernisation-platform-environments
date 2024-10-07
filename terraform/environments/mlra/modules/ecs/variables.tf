@@ -1,8 +1,3 @@
-variable "ami_image_id" {
-  type        = string
-  description = "EC2 AMI image to run in the ECS cluster"
-}
-
 variable "app_count" {
   type        = string
   description = "Number of docker containers to run"
