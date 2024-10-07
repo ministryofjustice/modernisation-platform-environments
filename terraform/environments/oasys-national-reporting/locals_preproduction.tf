@@ -121,6 +121,27 @@ locals {
       # })
     }
 
+    iam_policies = {
+      Ec2SecretPolicy = {
+        description = "Permissions required for secret value access by instances"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-bods/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          }
+        ]
+      }
+    }
+
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
