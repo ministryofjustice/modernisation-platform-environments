@@ -105,7 +105,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.base.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "ncr/TM-534/bip-fixes-v2"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.base.tags, {
