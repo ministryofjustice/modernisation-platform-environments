@@ -63,16 +63,16 @@ module "landing-bucket" {
 
       transition = [
         {
-          days          = 3
+          days          = 30
           storage_class = "STANDARD_IA"
           }, {
-          days          = 7
+          days          = 70
           storage_class = "GLACIER"
         }
       ]
 
       expiration = {
-        days = 14
+        days = 140
       }
 
       noncurrent_version_transition = [
