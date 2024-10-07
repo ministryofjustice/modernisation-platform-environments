@@ -81,7 +81,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                 field_to_match {
                   uri_path {}
                 }
-                positional_constraint = "CONTAINS"
+                positional_constraint = "EXACTLY"
                 search_string         = "admin"
                 text_transformation {
                   priority = 0
@@ -94,7 +94,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                 field_to_match {
                   uri_path {}
                 }
-                positional_constraint = "CONTAINS"
+                positional_constraint = "EXACTLY"
                 search_string         = "secure"
                 text_transformation {
                   priority = 0
@@ -151,8 +151,8 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                 field_to_match {
                   uri_path {}
                 }
-                positional_constraint = "CONTAINS"
-                search_string         = "/admin/"
+                positional_constraint = "EXACTLY"
+                search_string         = "admin"
                 text_transformation {
                   priority = 0
                   type     = "LOWERCASE"
@@ -164,8 +164,8 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                 field_to_match {
                   uri_path {}
                 }
-                positional_constraint = "CONTAINS"
-                search_string         = "/secure/"
+                positional_constraint = "EXACTLY"
+                search_string         = "secure"
                 text_transformation {
                   priority = 0
                   type     = "LOWERCASE"
