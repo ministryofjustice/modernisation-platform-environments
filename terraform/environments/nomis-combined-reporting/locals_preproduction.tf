@@ -181,8 +181,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/lsast/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/lsast/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/lsast/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/lsast/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
@@ -217,8 +217,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/pp/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/pp/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/pp/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
@@ -320,10 +320,6 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/ec2/ncr-bip/pp"           = local.secretsmanager_secrets.bip_app
-      "/ec2/ncr-web/pp"           = local.secretsmanager_secrets.bip_web
-      "/ec2/ncr-bip/lsast"        = local.secretsmanager_secrets.bip_app
-      "/ec2/ncr-web/lsast"        = local.secretsmanager_secrets.bip_web
       "/oracle/database/PPBIPSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PPBIPAUD" = local.secretsmanager_secrets.db
       "/oracle/database/PPBISYS"  = local.secretsmanager_secrets.db
