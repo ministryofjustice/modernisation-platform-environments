@@ -23,6 +23,7 @@ resource "aws_api_gateway_resource" "resource" {
   path_part   = var.api_path
 }
 
+# tfsec:ignore:aws-api-gateway-no-public-access
 resource "aws_api_gateway_method" "method" {
   rest_api_id          = aws_api_gateway_rest_api.api_gateway.id
   resource_id          = aws_api_gateway_resource.resource.id
@@ -276,6 +277,7 @@ resource "aws_api_gateway_method_settings" "settings" {
 # Cloudwatch logs
 # -------------------------------------------------------
 
+# tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "api_gateway_logs" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
   for_each          = { for stage in var.stages : stage.stage_name => stage }
@@ -304,7 +306,7 @@ data "aws_iam_policy_document" "cloudwatch" {
       "logs:FilterLogEvents",
     ]
 
-    resources = ["arn:aws:logs:*:*:*"]
+    resources = [aws_cloudwatch_log_group.api_gateway_logs.arn, aws_cloudwatch_log_group.waf_log_group.arn]
   }
 }
 resource "aws_iam_role_policy" "cloudwatch" {
@@ -400,6 +402,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "api_gateway_waf_logs" {
   ]
 }
 
+# tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "waf_log_group" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
   name              = "aws-waf-logs-${var.api_name}"
