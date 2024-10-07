@@ -117,7 +117,7 @@ locals {
       }
       instance = {
         disable_api_termination = false
-        instance_type           = "t3.large"
+        instance_type           = "r6i.large"
         key_name                = "ec2-user"
         vpc_security_group_ids  = ["web"]
         tags = {
@@ -165,7 +165,7 @@ locals {
       }
       instance = {
         disable_api_termination = false
-        instance_type           = "t3.large"
+        instance_type           = "r6i.xlarge"
         key_name                = "ec2-user"
         vpc_security_group_ids  = ["web"]
         tags = {
