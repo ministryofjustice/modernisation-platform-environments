@@ -403,7 +403,7 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
   name_prefix = "lambda_signing_profile_dev"
   platform_id = "AWSLambda-SHA384-ECDSA"
   signature_validity_period {
-    value = 12
+    value = 10
     type  = "YEARS"
   }
 }
@@ -428,7 +428,7 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
   name_prefix = "lambda_signing_profile_uat"
   platform_id = "AWSLambda-SHA384-ECDSA"
   signature_validity_period {
-    value = 12
+    value = 10
     type  = "YEARS"
   }
 }
@@ -440,7 +440,7 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_prod" {
   name_prefix = "lambda_signing_profile_prod"
   platform_id = "AWSLambda-SHA384-ECDSA"
   signature_validity_period {
-    value = 12
+    value = 10
     type  = "YEARS"
   }
 }
