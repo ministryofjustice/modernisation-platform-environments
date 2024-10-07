@@ -81,7 +81,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                 field_to_match {
                   uri_path {}
                 }
-                positional_constraint = "STARTS_WITH"
+                positional_constraint = "CONTAINS"
                 search_string         = "admin"
                 text_transformation {
                   priority = 0
@@ -94,7 +94,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                 field_to_match {
                   uri_path {}
                 }
-                positional_constraint = "STARTS_WITH"
+                positional_constraint = "CONTAINS"
                 search_string         = "secure"
                 text_transformation {
                   priority = 0
@@ -145,32 +145,14 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
           }
         }
         statement {
-          or_statement {
-            statement {
-              byte_match_statement {
-                field_to_match {
-                  uri_path {}
-                }
-                positional_constraint = "STARTS_WITH"
-                search_string         = "admin"
-                text_transformation {
-                  priority = 0
-                  type     = "LOWERCASE"
-                }
-              }
+          regex_pattern_set_reference_statement {
+            arn = aws_wafv2_regex_pattern_set.blocked_paths.arn
+            field_to_match {
+              uri_path {}
             }
-            statement {
-              byte_match_statement {
-                field_to_match {
-                  uri_path {}
-                }
-                positional_constraint = "STARTS_WITH"
-                search_string         = "secure"
-                text_transformation {
-                  priority = 0
-                  type     = "LOWERCASE"
-                }
-              }
+            text_transformation {
+              priority = 0
+              type     = "NONE"
             }
           }
         }
@@ -182,5 +164,18 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
       metric_name                = "BlockNonAllowedIPsMetrics"
       sampled_requests_enabled   = true
     }
+  }
+}
+
+resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
+  name  = "blocked-paths"
+  scope = "REGIONAL"
+
+  regular_expression {
+    regex_string = "^/admin(/.*)?$"
+  }
+
+  regular_expression {
+    regex_string = "^/secure(/.*)?$"
   }
 }
