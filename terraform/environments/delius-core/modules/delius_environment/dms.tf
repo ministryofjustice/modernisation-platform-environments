@@ -24,7 +24,7 @@ module "dms" {
 
 locals {
   oracle_db_server_names = {
-    primarydb  = module.oracle_db_primary[0].oracle_db_server_name,
+    primarydb  = try(module.oracle_db_primary[0].oracle_db_server_name, "none"),
     standbydb1 = try(module.oracle_db_standby[0].oracle_db_server_name, "none"),
     standbydb2 = try(module.oracle_db_standby[1].oracle_db_server_name, "none")
   }
