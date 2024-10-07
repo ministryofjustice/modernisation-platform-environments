@@ -128,6 +128,17 @@ locals {
         })
       })
 
+      ppbipcms1 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+
       pp-ncr-db-1-a = merge(local.ec2_instances.db, {
         cloudwatch_metric_alarms = merge(
           local.cloudwatch_metric_alarms.db,
