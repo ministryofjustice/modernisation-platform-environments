@@ -38,6 +38,7 @@ resource "random_string" "this" {
   special = false
 }
 
+#tfsec:ignore:aws-s3-enable-versioning
 module "landing-bucket" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
   bucket_name         = "${var.supplier}-${random_string.this.result}"
@@ -278,6 +279,7 @@ resource "aws_iam_role" "this_transfer_workflow" {
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
+#tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "this_transfer_workflow" {
   statement {
     sid    = "AllowCopyReadSource"
