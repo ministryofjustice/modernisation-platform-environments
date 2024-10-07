@@ -152,7 +152,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                   uri_path {}
                 }
                 positional_constraint = "CONTAINS"
-                search_string         = "admin"
+                search_string         = "/admin/"
                 text_transformation {
                   priority = 0
                   type     = "LOWERCASE"
@@ -165,7 +165,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
                   uri_path {}
                 }
                 positional_constraint = "CONTAINS"
-                search_string         = "secure"
+                search_string         = "/secure/"
                 text_transformation {
                   priority = 0
                   type     = "LOWERCASE"
