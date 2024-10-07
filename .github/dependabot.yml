@@ -7,11 +7,11 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
     reviewers:
       - "ministryofjustice/devcontainer-community"
   # Dependabot doesn't currently support wildcard or multiple directory declarations within
@@ -20,680 +20,680 @@ updates:
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-compute"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-compute/modules/routes"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-ingestion"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-ingestion/modules/transfer-family/user"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-ingestion/modules/transfer-family/user-with-egress"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/apex"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/apex/modules/alb"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/apex/modules/codebuild"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/apex/modules/ecs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/apex/modules/lambdapolicy"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/apex/modules/s3"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs-upgrade"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs-upgrade/modules"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs-upgrade/modules/cw-ec2"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs-upgrade/modules/cw-logs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs/modules"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs/modules/cw-ec2"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs/modules/cw-logs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/cdpt-chaps"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/cdpt-ifs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/cica-copilot"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/cica-data-extraction"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/cica-tariff"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/contract-work-administration"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/cooker"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/corporate-information-system"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/corporate-staff-rostering"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/dacp"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/data-and-insights-wepi"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/data-platform"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/data-platform-apps-and-tools"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/data-platform-apps-and-tools/modules/auth0-log-streams"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/components/dms"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/components/ldap"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/components/oracle_db_instance"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/components/oracle_db_shared"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/delius_environment"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/helpers/delius_microservice"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/helpers/ebs_volume"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/helpers/ecs_policies"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/helpers/efs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/helpers/nlb"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/helpers/secret"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-core/modules/helpers/ssm_params"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-iaps"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-jitbit"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-mis"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-mis/modules/mis_environment"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-nextcloud"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-nextcloud/modules/components/nextcloud"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-nextcloud/modules/environment"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/apigateway/serverless-lambda-gw"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/athena_federated_query_connectors/oracle"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/athena_workgroups"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/compute_node"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/cw_alarm"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/cw_insights"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/dms"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/dms_dps"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/dms_s3_v2"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/dms-endpoints"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/dms-instance"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/dms-task"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/ingestion-jobs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/ingestion-pipeline"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/pipeline-lambda"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/reload-pipeline"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/replay-pipeline"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/dynamo_tables"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/ec2"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/glue_connection"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/glue_database"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/glue_job"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/glue_registry"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/glue_table"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/kinesis_firehose"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/kinesis_stream"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/lambda_trigger"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/lambdas/generic"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/lambdas/layer"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/notifications/email"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/notifications/eventbridge"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/notifications/sns"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/rds/aws-aurora"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/rds/postgres"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/redshift"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/s3_bucket"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/secrets_manager"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/step_function"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/vpc_endpoint"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/edw"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data/modules/dms"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data/modules/lambdas"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data/modules/landing_zone"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data/modules/landing_zone/landing_zone_user"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data/modules/landing_zone/server_security_group"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data/modules/s3_log_bucket"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/equip"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/equip/dlm-snapshot"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/equip/ec2-instance-module"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/eric"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/example"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/genesys-call-centre-data"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/hmpps-domain-services"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/hmpps-oem"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/laa-ccms-infra-azure-ad-sso"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/laa-oem"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/long-term-storage"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/maat"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/maatdb"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/maatdb/modules/rds"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/mlra"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/mlra/modules/alb"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/mlra/modules/cloudwatch"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/mlra/modules/codebuild"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/mlra/modules/ecs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/mojfin"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ncas"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis-combined-reporting"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis-data-hub"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/oas"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/oas/modules/cloudwatch"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/oas/modules/rds"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/oas/modules/rotate_secrets_lambda"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/oasys"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/oasys-national-reporting"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/grafana/amazon-prometheus-query-source"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/grafana/cloudwatch-source"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/grafana/contact-point/pagerduty"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/grafana/contact-point/slack"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/grafana/team"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/grafana/xray-source"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/observability-platform/tenant-configuration"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/prometheus/iam-role"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/operations-engineering"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/panda-cyber-appsec-lab"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/performance-hub"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/performance-hub/module/ecs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/planetfm"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/portal"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ppud"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/pra-register"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/refer-monitor"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/sprinkler"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/tipstaff"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/tribunals"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/tribunals/modules/dms"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/tribunals/modules/ecs_loadbalancer"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/tribunals/modules/ecs_task"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/tribunals/modules/tribunal"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/tribunals/modules/tribunal_ftp"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/wardship"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/xhibit-portal"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/acm_certificate"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/baseline"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/baseline_presets"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/cloudwatch_dashboard"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/cost_usage_report"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/efs"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/environment"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/fsx_windows"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/ip_addresses"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/lb_listener"
     schedule:
-      interval: "daily"
+      interval: "monthly"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/shield_advanced"
     schedule:
-      interval: "daily"
+      interval: "monthly"
