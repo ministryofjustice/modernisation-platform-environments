@@ -26,7 +26,7 @@ data "aws_iam_session_context" "current" {
 }
 
 data "aws_iam_roles" "data_engineering_roles" {
-  name_regex = "AWSReservedSSO_modernisation-platform-4*"
+  name_regex = "AWSReservedSSO_modernisation-platform-*"
 }
 
 ## DBT Analytics EKS Cluster Identifier
@@ -97,7 +97,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::754256621582:root"]
+      identifiers = ["arn:aws:iam::754256621582:root"] # account id for cloud platform, so can use in AP control panel
     }
   }
 
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
   }
 }
 
-# CrossAccount DataAPI Role
+# Role used in create a derived table 
 resource "aws_iam_role" "dataapi_cross_role" {
   #checkov:skip=CKV_AWS_61:Ensure IAM policies does not allow data exfiltration
   #checkov:skip=CKV_AWS_60:Ensure IAM role allows only specific services or principals to assume it
@@ -171,7 +171,6 @@ resource "aws_iam_policy" "lake_formation_data_access" {
 }
 
 # Analytical Platform Share Policy & Role
-
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
   for_each = local.analytical_platform_share
 
@@ -243,6 +242,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   }
 }
 
+# This is not referenced anywhere else aha
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
 
