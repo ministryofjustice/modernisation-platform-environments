@@ -148,34 +148,33 @@ locals {
         })
       })
 
-      # t2-onr-bods-1-b = merge(local.ec2_instances.bods, {
-      #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2b"
-      #     user_data_raw = base64encode(templatefile(
-      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #         branch = "main"
-      #         newhostname = "t2-onr-bods-1-b" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
-      #       }
-      #     ))
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-      #       "Ec2SecretPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bods.instance, {
-      #     instance_type = "m4.xlarge"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      #   tags = merge(local.ec2_instances.bods.tags, {
-      #     oasys-national-reporting-environment = "t2"
-      #     domain-name = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
+      t2-onr-bods-1 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          availability_zone = "eu-west-2a"
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+              branch = "TM/onr-preprod-bods"
+            }
+          ))
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type = "m4.xlarge"
+        })
+        cloudwatch_metric_alarms = null
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+          domain-name                          = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
-      # t2-onr-bods-2-a = merge(local.ec2_instances.bods, {
+      # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
       #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2a"
+      #     availability_zone = "eu-west-2b"
       #     user_data_raw = base64encode(templatefile(
       #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
       #         branch   = "main"
