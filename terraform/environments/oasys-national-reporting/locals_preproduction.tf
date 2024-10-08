@@ -283,9 +283,10 @@ locals {
 
     route53_zones = {
       "preproduction.reporting.oasys.service.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "pp-bods", type = "A", lbs_map_key = "public" }
-        ],
+        # TODO: need to put this back
+        # lb_alias_records = [
+        #   { name = "pp-bods", type = "A", lbs_map_key = "public" }
+        # ],
       }
     }
 
