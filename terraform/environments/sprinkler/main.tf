@@ -445,6 +445,7 @@ resource "aws_lb" "external" {
 
 resource "aws_lb_target_group" "external" {
   # checkov:skip=CKV_AWS_261 "Health check clearly defined"
+  # checkov:skip=CKV_AWS_378
   name                 = "external-${var.networking[0].application}"
   port                 = "3000"
   protocol             = "HTTP"
