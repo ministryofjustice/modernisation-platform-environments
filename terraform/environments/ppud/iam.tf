@@ -861,3 +861,177 @@ data "aws_iam_policy_document" "email" {
     resources = ["*"]
   }
 }
+
+############################################################
+# IAM Role & Policy for Lambda Signing Configuration - PROD
+############################################################
+
+resource "aws_iam_role" "aws_signer_role_prod" {
+  count  = local.is-production == true ? 1 : 0
+  name   = "Signer-Role-For-Lambda-Production"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = {
+        Service = "signer.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_policy" "aws_signer_policy_prod" {
+  count  = local.is-production == true ? 1 : 0
+  name   = "Signer-Policy-For-Lambda-Production"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "lambda:UpdateFunctionCodeSigningConfig",
+          "lambda:GetFunctionCodeSigningConfig",
+          "lambda:PutFunctionCodeSigningConfig",
+          "lambda:InvokeFunction"
+        ],
+        Resource = "arn:aws:lambda:eu-west-2:817985104434:function:*"  # Grant access to all Lambda functions in the account
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "signer:StartSigningJob",
+          "signer:DescribeSigningJob",
+          "signer:PutSigningProfile",
+          "signer:GetSigningProfile",
+          "signer:ListSigningJobs"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.aws_signer_policy_prod[0].name
+  policy_arn = aws_iam_policy.aws_signer_policy_prod[0].arn
+}
+
+############################################################
+# IAM Role & Policy for Lambda Signing Configuration - UAT
+############################################################
+
+resource "aws_iam_role" "aws_signer_role_uat" {
+  count  = local.is-preproduction == true ? 1 : 0
+  name   = "Signer-Role-For-Lambda-UAT"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = {
+        Service = "signer.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_policy" "aws_signer_policy_uat" {
+  count  = local.is-preproduction == true ? 1 : 0
+  name   = "Signer-Policy-For-Lambda-UAT"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "lambda:UpdateFunctionCodeSigningConfig",
+          "lambda:GetFunctionCodeSigningConfig",
+          "lambda:PutFunctionCodeSigningConfig",
+          "lambda:InvokeFunction"
+        ],
+        Resource = "arn:aws:lambda:eu-west-2:172753231260:function:*"  # Grant access to all Lambda functions in the account
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "signer:StartSigningJob",
+          "signer:DescribeSigningJob",
+          "signer:PutSigningProfile",
+          "signer:GetSigningProfile",
+          "signer:ListSigningJobs"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_uat" {
+  count      = local.is-preproduction == true ? 1 : 0
+  role       = aws_iam_role.aws_signer_policy_uat[0].name
+  policy_arn = aws_iam_policy.aws_signer_policy_uat[0].arn
+}
+
+############################################################
+# IAM Role & Policy for Lambda Signing Configuration - DEV
+############################################################
+
+resource "aws_iam_role" "aws_signer_role_dev" {
+  count  = local.is-development == true ? 1 : 0
+  name   = "Signer-Role-For-Lambda-DEV"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = {
+        Service = "signer.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_policy" "aws_signer_policy_dev" {
+  count  = local.is-development == true ? 1 : 0
+  name   = "Signer-Policy-For-Lambda-Development"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "lambda:UpdateFunctionCodeSigningConfig",
+          "lambda:GetFunctionCodeSigningConfig",
+          "lambda:PutFunctionCodeSigningConfig",
+          "lambda:InvokeFunction"
+        ],
+        Resource = "arn:aws:lambda:eu-west-2:075585660276:function:*"  # Grant access to all Lambda functions in the account
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "signer:StartSigningJob",
+          "signer:DescribeSigningJob",
+          "signer:PutSigningProfile",
+          "signer:GetSigningProfile",
+          "signer:ListSigningJobs"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_dev" {
+  count      = local.is-development == true ? 1 : 0
+  role       = aws_iam_role.aws_signer_policy_dev[0].name
+  policy_arn = aws_iam_policy.aws_signer_policy_dev[0].arn
+}

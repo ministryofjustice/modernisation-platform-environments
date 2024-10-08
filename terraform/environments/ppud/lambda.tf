@@ -400,8 +400,9 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
 
 resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
   count       = local.is-development == true ? 1 : 0
-  name_prefix = "lambda_signing_profile_dev"
+  name        = "Lambda-Signing-Profile-Dev"
   platform_id = "AWSLambda-SHA384-ECDSA"
+  depends_on  = [aws_iam_role_policy_attachment.attach_aws_signer_policy_to_aws_signer_role_dev]
   signature_validity_period {
     value = 10
     type  = "YEARS"
@@ -413,7 +414,7 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
 #  description = "Lambda code signing configuration for development environment"
 #  allowed_publishers {
 #    signing_profile_version_arns = [
-#      arn:aws:signer:eu-west-2::817985104434:signing-profile/MySigningProfile/abcdef1234567890,  # Replace with your signing profile ARN
+#      arn:aws:signer:eu-west-2:817985104434:signing-profile/MySigningProfile/abcdef1234567890,  # Replace with your signing profile ARN
 #    ]
 #  }
 #  policies {
@@ -425,23 +426,51 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
 
 resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
   count       = local.is-preproduction == true ? 1 : 0
-  name_prefix = "lambda_signing_profile_uat"
+  name        = "Lambda-Signing-Profile-Uat"
   platform_id = "AWSLambda-SHA384-ECDSA"
+  depends_on  = [aws_iam_role_policy_attachment.attach_aws_signer_policy_to_aws_signer_role_uat]
   signature_validity_period {
     value = 10
     type  = "YEARS"
   }
 }
+
+#resource "aws_lambda_code_signing_config" "lambda_csc_uat" {
+#  count       = local.is-preproduction == true ? 1 : 0
+#  description = "Lambda code signing configuration for uat environment"
+#  allowed_publishers {
+#    signing_profile_version_arns = [
+#      arn:aws:signer:eu-west-2:172753231260:signing-profile/MySigningProfile/abcdef1234567890,  # Replace with your signing profile ARN
+#    ]
+#  }
+#  policies {
+#    untrusted_artifact_on_deployment = "Warn"
+#  }
+#}
 
 # Production
 
 resource "aws_signer_signing_profile" "lambda_signing_profile_prod" {
   count       = local.is-production == true ? 1 : 0
-  name_prefix = "lambda_signing_profile_prod"
+  name        = "Lambda-Signing-Profile-Prod"
   platform_id = "AWSLambda-SHA384-ECDSA"
+  depends_on  = [aws_iam_role_policy_attachment.attach_aws_signer_policy_to_aws_signer_role_prod]
   signature_validity_period {
     value = 10
     type  = "YEARS"
   }
 }
+
+#resource "aws_lambda_code_signing_config" "lambda_csc_prod" {
+#  count       = local.is-production == true ? 1 : 0
+#  description = "Lambda code signing configuration for production environment"
+#  allowed_publishers {
+#    signing_profile_version_arns = [
+#      arn:aws:signer:eu-west-2:817985104434:signing-profile/MySigningProfile/abcdef1234567890,  # Replace with your signing profile ARN
+#    ]
+#  }
+#  policies {
+#    untrusted_artifact_on_deployment = "Warn"
+#  }
+#}
 
