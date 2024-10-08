@@ -60,6 +60,7 @@ locals {
             local.secretsmanager_secret_policies.domain_read
           ]
         }
+        bip-passwords = {}
       }
     }
   }
