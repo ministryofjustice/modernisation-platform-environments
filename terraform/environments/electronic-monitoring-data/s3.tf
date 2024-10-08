@@ -871,7 +871,10 @@ module "s3-dms-target-store-bucket" {
 }
 
 ## temp set up for old s3 bucket
-
+#trivy:ignore:AVD-AWS-0088
+#trivy:ignore:AVD-AWS-0090
+#trivy:ignore:AVD-AWS-0132
+#trivy:ignore:s3-bucket-logging
 resource "aws_s3_bucket" "data_store" {
   bucket_prefix = "em-data-store-"
   force_destroy = false
