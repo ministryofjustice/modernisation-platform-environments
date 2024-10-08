@@ -157,7 +157,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
      "Action": [
        "logs:CreateLogGroup",
        "logs:CreateLogStream",
-       "logs:PutLogEvents",
+       "logs:PutLogEvents"
      ],
      "Resource": "arn:aws:logs:*:*:*"
     },
@@ -178,7 +178,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
       "sqs:GetQueueUrl",
       "sqs:ListQueueTags",
       "sqs:ReceiveMessage",
-      "sqs:SendMessage",
+      "sqs:SendMessage"
       ],
       "Resource": "arn:aws:sqs:eu-west-2:817985104434:*"
    }
@@ -263,7 +263,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
       "sqs:GetQueueUrl",
       "sqs:ListQueueTags",
       "sqs:ReceiveMessage",
-      "sqs:SendMessage",
+      "sqs:SendMessage"
       ],
       "Resource": "arn:aws:sqs:eu-west-2:817985104434:*"
    }
@@ -337,7 +337,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
       "sqs:GetQueueUrl",
       "sqs:ListQueueTags",
       "sqs:ReceiveMessage",
-      "sqs:SendMessage",
+      "sqs:SendMessage"
       ],
       "Resource": "arn:aws:sqs:eu-west-2:075585660276:*"
    }
@@ -411,7 +411,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_uat" {
       "sqs:GetQueueUrl",
       "sqs:ListQueueTags",
       "sqs:ReceiveMessage",
-      "sqs:SendMessage",
+      "sqs:SendMessage"
       ],
       "Resource": "arn:aws:sqs:eu-west-2:172753231260:*"
    }
@@ -485,7 +485,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_prod" 
       "sqs:GetQueueUrl",
       "sqs:ListQueueTags",
       "sqs:ReceiveMessage",
-      "sqs:SendMessage",
+      "sqs:SendMessage"
       ],
       "Resource": "arn:aws:sqs:eu-west-2:817985104434:*"
    }
