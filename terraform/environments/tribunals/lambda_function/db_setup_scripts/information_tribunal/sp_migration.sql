@@ -2746,3 +2746,234 @@ AS SELECT * FROM USERS
 WHERE UserName = @UserName AND [Password] = @Password
 go
 
+USE [IT]
+GO
+/****** Object:  Table [dbo].[Users]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Users](
+	[UserID] [int] IDENTITY(1,1) NOT NULL,
+	[FirstName] [varchar](50) NULL,
+	[LastName] [varchar](50) NULL,
+	[Username] [varchar](50) NULL,
+	[Password] [varchar](50) NULL,
+	[Disabled] [bit] NULL,
+ CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Taxonomy3]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Taxonomy3](
+	[tax3id] [int] IDENTITY(1,1) NOT NULL,
+	[tax2id] [int] NULL,
+	[description] [varchar](1000) NULL,
+	[tax1id] [int] NULL,
+	[disabled] [bit] NULL,
+ CONSTRAINT [PK_taxonomy3] PRIMARY KEY CLUSTERED 
+(
+	[tax3id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Taxonomy2]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Taxonomy2](
+	[tax2id] [int] IDENTITY(1,1) NOT NULL,
+	[description] [varchar](1000) NULL,
+	[tax1id] [int] NULL,
+	[disabled] [bit] NULL,
+ CONSTRAINT [PK_taxonomy2] PRIMARY KEY CLUSTERED 
+(
+	[tax2id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Taxonomy1]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Taxonomy1](
+	[tax1id] [int] IDENTITY(1,1) NOT NULL,
+	[description] [varchar](1000) NULL,
+	[disabled] [bit] NULL,
+ CONSTRAINT [PK_taxonomy1] PRIMARY KEY CLUSTERED 
+(
+	[tax1id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Subject]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Subject](
+	[SubjectID] [int] IDENTITY(1,1) NOT NULL,
+	[Subject] [varchar](300) NULL,
+	[Disabled] [bit] NULL,
+ CONSTRAINT [PK_Category] PRIMARY KEY CLUSTERED 
+(
+	[SubjectID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Members]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Members](
+	[MemberID] [int] IDENTITY(1,1) NOT NULL,
+	[Prefix] [varchar](50) NULL,
+	[Member] [varchar](250) NULL,
+	[IsNSAP] [bit] NULL,
+	[IsDC] [bit] NULL,
+	[IsLM] [bit] NULL,
+	[Disabled] [bit] NULL,
+ CONSTRAINT [PK_Members] PRIMARY KEY CLUSTERED 
+(
+	[MemberID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Jurisdictions]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Jurisdictions](
+	[JurisdictionID] [int] IDENTITY(1,1) NOT NULL,
+	[Jurisdiction] [varchar](300) NULL,
+	[Disabled] [bit] NULL,
+ CONSTRAINT [PK_Jurisdiction] PRIMARY KEY CLUSTERED 
+(
+	[JurisdictionID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Detail]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Detail](
+	[DetailID] [int] IDENTITY(1,1) NOT NULL,
+	[SubjectID] [int] NULL,
+	[Detail] [varchar](300) NULL,
+	[Disabled] [bit] NULL,
+ CONSTRAINT [PK_SubCategory] PRIMARY KEY CLUSTERED 
+(
+	[DetailID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Decisions1]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Decisions1](
+	[DecisionID] [int] IDENTITY(1,1) NOT NULL,
+	[JurisdictionID] [int] NULL,
+	[Jurisdiction1ID] [int] NULL,
+	[Date] [datetime] NULL,
+	[AppealNumber] [varchar](100) NULL,
+	[Appellant] [varchar](250) NULL,
+	[Respondent] [varchar](500) NULL,
+	[AddParties] [varchar](500) NULL,
+	[SubjectDetail] [ntext] NULL,
+	[Appealed] [varchar](50) NULL,
+	[Disabled] [bit] NULL,
+	[File1_Name] [varchar](250) NULL,
+	[File2_Name] [varchar](250) NULL,
+	[File2_Title] [varchar](250) NULL,
+	[File3_Name] [varchar](250) NULL,
+	[File3_Title] [varchar](250) NULL,
+	[AppealURL] [varchar](500) NULL,
+	[TextURL] [varchar](250) NULL,
+ CONSTRAINT [PK_Decisions1] PRIMARY KEY CLUSTERED 
+(
+	[DecisionID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Decisions]    Script Date: 09/26/2024 09:28:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Decisions](
+	[DecisionID] [bigint] IDENTITY(1,1) NOT NULL,
+	[TypeID] [int] NOT NULL,
+	[Reference] [varchar](50) NULL,
+	[PromulgatedDate] [datetime] NULL,
+	[PresidentID] [int] NULL,
+	[QC1ID] [int] NULL,
+	[QC2ID] [int] NULL,
+	[DepChairID] [int] NULL,
+	[LayMember1ID] [int] NULL,
+	[LayMember2ID] [int] NULL,
+	[Appellant] [varchar](250) NULL,
+	[Respondent] [varchar](500) NULL,
+	[Parties] [varchar](750) NULL,
+	[Summary] [ntext] NULL,
+	[Disabled] [bit] NULL,
+	[HigherCourt] [bit] NULL,
+ CONSTRAINT [PK_Decisions] PRIMARY KEY CLUSTERED 
+(
+	[DecisionID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO

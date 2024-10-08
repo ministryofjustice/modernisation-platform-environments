@@ -3,10 +3,6 @@
 ## Resources here can be removed after data migration
 ############################################################################
 
-locals {
-  lz_account_id = "411213865113"
-}
-
 resource "aws_backup_vault" "apex" {
   name = "${local.application_name}-backup-vault"
   tags = merge(
@@ -44,7 +40,7 @@ data "aws_iam_policy_document" "apex" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.lz_account_id}:root"]
+      identifiers = ["arn:aws:iam::${local.application_data.accounts[local.environment].lz_account_id}:root"]
     }
 
     actions = [

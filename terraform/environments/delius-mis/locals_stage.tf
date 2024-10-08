@@ -7,9 +7,10 @@ locals {
     legacy_ad_domain_name                  = "delius-mis-stage.local"
     legacy_ad_ip_list                      = ["10.160.35.243", "10.160.38.128"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
-    migration_environment_full_name        = "dmd-mis-stage"
-    migration_environment_abbreviated_name = "dmd"
-    migration_environment_short_name       = "mis-stage"
+    migration_environment_full_name        = "del-stage"
+    migration_environment_abbreviated_name = "del"
+    migration_environment_short_name       = "stage"
+    legacy_engineering_vpc_cidr            = "10.160.98.0/25"
   }
 
   bastion_config_stage = {
@@ -242,7 +243,7 @@ locals {
 
   # BOE DB config
   boe_db_config_stage = {
-    instance_type  = "t3.large"
+    instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -286,7 +287,7 @@ locals {
 
   # DSD DB config
   dsd_db_config_stage = {
-    instance_type  = "t3.large"
+    instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -330,7 +331,7 @@ locals {
 
   # MIS DB config
   mis_db_config_stage = {
-    instance_type  = "t3.large"
+    instance_type  = "r7i.4xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -340,15 +341,15 @@ locals {
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
+      "/dev/sdd" = { label = "data" }            # DATA
+      "/dev/sde" = { label = "data" }            # DATA
       "/dev/sdf" = { label = "data" }            # DATA
       "/dev/sdg" = { label = "data" }            # DATA
       "/dev/sdh" = { label = "data" }            # DATA
-      "/dev/sdi" = { label = "data" }            # DATA
-      "/dev/sdj" = { label = "data" }            # DATA
+      "/dev/sdi" = { label = "flash" }           # FLASH
+      "/dev/sdj" = { label = "flash" }           # FLASH
       "/dev/sdk" = { label = "flash" }           # FLASH
       "/dev/sdl" = { label = "flash" }           # FLASH
-      "/dev/sdm" = { label = "flash" }           # FLASH
-      "/dev/sdn" = { label = "flash" }           # FLASH
       "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {
@@ -361,7 +362,7 @@ locals {
         iops       = 5000
         throughput = 500
         type       = "gp3"
-        total_size = 5000
+        total_size = 6000
       }
       flash = {
         iops       = 3000

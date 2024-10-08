@@ -343,3 +343,52 @@ resource "aws_iam_role_policy_attachment" "ccms_ebs_shared_s3" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.ccms_ebs_shared_s3.arn
 }
+
+
+### Role for Lambda Execution
+
+resource "aws_iam_role" "lambda_execution_role" {
+  name = "lambda_execution_role"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Action" : "sts:AssumeRole",
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "lambda.amazonaws.com"
+          }
+        }
+      ]
+    }
+  )
+  tags = merge(local.tags,
+    { Name = lower(format("Lambda Execution Role")) }
+  )
+}
+
+# Attach S3 Policy to Lambda Role
+resource "aws_iam_role_policy_attachment" "s3_policy_lambda" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+# Attach ENI Management Policy to Lambda Role
+resource "aws_iam_role_policy_attachment" "eni_management_policy_lambda" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess"
+}
+
+# Attach VPC Access Policy to Lambda Role
+resource "aws_iam_role_policy_attachment" "vpc_access_policy_lambda" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+# Attach Secrets Manager Policy to Lambda Role
+resource "aws_iam_role_policy_attachment" "secrets_manager_policy_lambda" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
+

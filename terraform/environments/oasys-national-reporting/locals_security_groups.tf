@@ -14,6 +14,9 @@ locals {
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.devtest_oasys_db,
     ])
+    rdp = flatten([
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
   }
 
   security_group_cidrs_preprod_prod = {
@@ -30,6 +33,9 @@ locals {
     oasys_db = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.prod_oasys_db,
+    ])
+    rdp = flatten([
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
   }
 
@@ -218,6 +224,13 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+        }
+        rdp_3389_tcp = {
+          description = "3389: rdp tcp"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rdp
         }
         http_6400 = {
           description     = "6400: boe cms"

@@ -40,6 +40,19 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.xtag,
+          local.cloudwatch_dashboard_widget_groups.asg,
+        ]
+      }
+    }
+
     ec2_autoscaling_groups = {
       # ACTIVE (blue deployment)
       lsast-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {

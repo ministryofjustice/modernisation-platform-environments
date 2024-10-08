@@ -94,11 +94,11 @@ data "aws_iam_policy_document" "ecs_task_exec" {
     }
   }
 }
-
-resource "aws_iam_role" "task_exec" {
-  name               = "${var.env_name}-${var.service_name}-ecs-task-exec"
-  assume_role_policy = data.aws_iam_policy_document.ecs_task_exec.json
-  tags               = var.tags
+resource "aws_iam_role_policy" "exec_actions" {
+  for_each = var.extra_task_exec_role_policies
+  name     = "${var.env_name}-${var.service_name}-ecs-task-exec-${each.key}"
+  policy   = each.value.json
+  role     = aws_iam_role.task_exec.id
 }
 
 data "aws_iam_policy_document" "task_exec" {
@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "task_exec" {
     effect    = "Allow"
     resources = ["*"]
 
-    actions = concat([
+    actions = [
       "ssm:GetParameters",
       "ecr:GetAuthorizationToken",
       "ecr:BatchCheckLayerAvailability",
@@ -117,7 +117,7 @@ data "aws_iam_policy_document" "task_exec" {
       "logs:PutLogEvents",
       "secretsmanager:GetSecretValue",
       "kms:Decrypt",
-    ], var.extra_exec_role_allow_statements)
+    ]
   }
 }
 
@@ -125,4 +125,11 @@ resource "aws_iam_role_policy" "task_exec" {
   name   = "${var.env_name}-${var.service_name}-task-exec"
   policy = data.aws_iam_policy_document.task_exec.json
   role   = aws_iam_role.task_exec.id
+}
+
+
+resource "aws_iam_role" "task_exec" {
+  name               = "${var.env_name}-${var.service_name}-ecs-task-exec"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_exec.json
+  tags               = var.tags
 }

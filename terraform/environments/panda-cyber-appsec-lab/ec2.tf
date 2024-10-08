@@ -136,16 +136,16 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
 
 # Create S3 bucket
 module "s3-bucket" {
-    source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4e17731f72ef24b804207f55b182f49057e73ec9" #v8.1.0
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4e17731f72ef24b804207f55b182f49057e73ec9" #v8.1.0
 
-  bucket_prefix                            = "panda-cyber-bucket"
-  versioning_enabled                       = true
+  bucket_prefix      = "panda-cyber-bucket"
+  versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
 
   # Refer to the below section "Replication" before enabling replication
-  replication_enabled                      = false
+  replication_enabled = false
   # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
   # replication_region                       = "eu-west-2"
   providers = {
@@ -197,7 +197,7 @@ module "s3-bucket" {
     }
   ]
 
-  tags                 = local.tags
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "bucket_policy" {

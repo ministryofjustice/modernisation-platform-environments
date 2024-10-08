@@ -6,7 +6,7 @@ module "reload_pipeline" {
   step_function_name   = var.reload_pipeline
   dms_task_time_out    = var.pipeline_dms_task_time_out
 
-  additional_policies = var.pipeline_additional_policies
+  step_function_execution_role_arn = var.step_function_execution_role_arn
 
   definition = jsonencode(
     {

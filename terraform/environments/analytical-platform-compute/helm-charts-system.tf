@@ -71,7 +71,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "61.9.0"
+  version    = "62.7.0"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -96,7 +96,7 @@ resource "helm_release" "cluster_autoscaler" {
   name       = "cluster-autoscaler"
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  version    = "9.37.0"
+  version    = "9.40.0"
   namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
 
   values = [
@@ -119,7 +119,7 @@ resource "helm_release" "karpenter_crd" {
   name       = "karpenter-crd"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter-crd"
-  version    = "1.0.0"
+  version    = "1.0.3"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -141,7 +141,7 @@ resource "helm_release" "karpenter" {
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
-  version    = "1.0.0"
+  version    = "1.0.3"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -188,7 +188,7 @@ resource "helm_release" "external_dns" {
   name       = "external-dns"
   repository = "https://kubernetes-sigs.github.io/external-dns"
   chart      = "external-dns"
-  version    = "1.14.5"
+  version    = "1.15.0"
   namespace  = kubernetes_namespace.external_dns.metadata[0].name
   values = [
     templatefile(
@@ -283,7 +283,7 @@ resource "helm_release" "external_secrets" {
   name       = "external-secrets"
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
-  version    = "0.10.0"
+  version    = "0.10.4"
   namespace  = kubernetes_namespace.external_secrets.metadata[0].name
   values = [
     templatefile(

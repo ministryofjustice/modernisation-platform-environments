@@ -1,11 +1,10 @@
-// DEV + PRE-PRODUCTION DNS CONFIGURATION
-
-// ACM Public Certificate
 resource "aws_acm_certificate" "external" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
-  validation_method = "DNS"
+  domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  validation_method         = "DNS"
+  subject_alternative_names = local.is-production ? null : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
-  subject_alternative_names = ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  key_algorithm = "RSA_2048"
+
   tags = {
     Environment = local.environment
   }
@@ -17,22 +16,32 @@ resource "aws_acm_certificate" "external" {
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
 // Route53 DNS records for certificate validation
-resource "aws_route53_record" "external_validation" {
+resource "aws_route53_record" "cert_validation" {
   provider = aws.core-network-services
 
+  for_each = {
+    for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+      name  = dvo.resource_record_name
+      type  = dvo.resource_record_type
+      value = dvo.resource_record_value
+    }
+  }
+
   allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
-  ttl             = 60
-  type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  name            = each.value.name
+  records         = [each.value.value]
+  ttl             = 300
+  type            = each.value.type
+  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
 
+// sub-domain validation only required for non-production sites
 resource "aws_route53_record" "external_validation_subdomain" {
+  count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
 
   allow_overwrite = true
@@ -325,9 +334,9 @@ locals {
   }
 }
 
-// Create one Route 53 record for each entry in the list of tribunals (assigned in platform_locals.tf)
+// Create one Route 53 record for each entry in the services variable list of tribunals
 resource "aws_route53_record" "external_services" {
-  for_each = var.services
+  for_each = local.is-production ? {} : var.services
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
@@ -341,7 +350,7 @@ resource "aws_route53_record" "external_services" {
 }
 
 resource "aws_route53_record" "sftp_external_services" {
-  for_each        = var.sftp_services
+  for_each        = local.is-production ? {} : var.sftp_services
   allow_overwrite = true
   provider        = aws.core-vpc
   zone_id         = data.aws_route53_zone.external.zone_id

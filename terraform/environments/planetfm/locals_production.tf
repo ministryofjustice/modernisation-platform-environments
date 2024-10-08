@@ -202,7 +202,19 @@ locals {
       pd-cafm-w-36-b = merge(local.ec2_instances.web, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.web.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows, {
+            "cpu-utilization-high" = {
+              alarm_description   = "CPU Utilization is above 75% or above for 15 minutes"
+              comparison_operator = "GreaterThanOrEqualToThreshold"
+              evaluation_periods  = "15"
+              datapoints_to_alarm = "15"
+              metric_name         = "CPUUtilization"
+              namespace           = "AWS/EC2"
+              period              = "60"
+              statistic           = "Maximum"
+              threshold           = "75"
+            }
+          }
         )
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-36-b"
@@ -210,11 +222,11 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 28 }
+          "/dev/sdb"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
-          instance_type           = "t3.xlarge"
+          instance_type           = "t3.2xlarge"
         })
         tags = {
           ami              = "pd-cafm-w-36-b"
@@ -227,7 +239,19 @@ locals {
       pd-cafm-w-37-a = merge(local.ec2_instances.web, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.web.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows, {
+            "cpu-utilization-high" = {
+              alarm_description   = "CPU Utilization is above 75% or above for 15 minutes"
+              comparison_operator = "GreaterThanOrEqualToThreshold"
+              evaluation_periods  = "15"
+              datapoints_to_alarm = "15"
+              metric_name         = "CPUUtilization"
+              namespace           = "AWS/EC2"
+              period              = "60"
+              statistic           = "Maximum"
+              threshold           = "75"
+            }
+          }
         )
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-37-a"

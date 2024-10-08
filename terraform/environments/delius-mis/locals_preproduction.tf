@@ -7,9 +7,9 @@ locals {
     legacy_ad_domain_name                  = "delius-mis-preprod.local"
     legacy_ad_ip_list                      = ["10.160.0.163", "10.160.6.66"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
-    migration_environment_full_name        = "dmd-mis-preprod"
-    migration_environment_abbreviated_name = "dmd"
-    migration_environment_short_name       = "mis-preprod"
+    migration_environment_full_name        = "del-pre-prod"
+    migration_environment_abbreviated_name = "del"
+    migration_environment_short_name       = "pre-prod"
   }
 
   bastion_config_preprod = {
@@ -17,7 +17,7 @@ locals {
   }
 
   bcs_config_preprod = {
-    instance_count = 1
+    instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150 }
@@ -62,7 +62,7 @@ locals {
   }
 
   bps_config_preprod = {
-    instance_count = 1
+    instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150 }
@@ -107,7 +107,7 @@ locals {
   }
 
   bws_config_preprod = {
-    instance_count = 1
+    instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150 }
@@ -152,7 +152,7 @@ locals {
   }
 
   dis_config_preprod = {
-    instance_count = 2
+    instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
@@ -199,7 +199,8 @@ locals {
 
   # BOE DB config
   boe_db_config_preprod = {
-    instance_type  = "t3.large"
+    instance_count = 0
+    instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -243,7 +244,8 @@ locals {
 
   # DSD DB config
   dsd_db_config_preprod = {
-    instance_type  = "t3.large"
+    instance_count = 0
+    instance_type  = "r7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -287,7 +289,8 @@ locals {
 
   # MIS DB config
   mis_db_config_preprod = {
-    instance_type  = "t3.large"
+    instance_count = 0
+    instance_type  = "r7i.12xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -297,15 +300,15 @@ locals {
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
+      "/dev/sdd" = { label = "data" }            # DATA
+      "/dev/sde" = { label = "data" }            # DATA
       "/dev/sdf" = { label = "data" }            # DATA
       "/dev/sdg" = { label = "data" }            # DATA
       "/dev/sdh" = { label = "data" }            # DATA
-      "/dev/sdi" = { label = "data" }            # DATA
-      "/dev/sdj" = { label = "data" }            # DATA
+      "/dev/sdi" = { label = "flash" }           # FLASH
+      "/dev/sdj" = { label = "flash" }           # FLASH
       "/dev/sdk" = { label = "flash" }           # FLASH
       "/dev/sdl" = { label = "flash" }           # FLASH
-      "/dev/sdm" = { label = "flash" }           # FLASH
-      "/dev/sdn" = { label = "flash" }           # FLASH
       "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {
@@ -318,7 +321,7 @@ locals {
         iops       = 5000
         throughput = 500
         type       = "gp3"
-        total_size = 5000
+        total_size = 6000
       }
       flash = {
         iops       = 3000

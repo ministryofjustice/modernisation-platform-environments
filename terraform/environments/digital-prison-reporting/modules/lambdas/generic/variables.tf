@@ -1,9 +1,13 @@
+# tflint-ignore-file: terraform_required_version, terraform_required_providers
+
 variable "region" {
+  type        = string
   description = "Current AWS Region."
   default     = "eu-west-2"
 }
 
 variable "account" {
+  type        = string
   description = "AWS Account ID."
   default     = ""
 }
@@ -53,12 +57,14 @@ variable "memory_size" {
 }
 
 variable "namespace" {
+  type        = string
   description = "Namespacing for multiple environments in a single stage"
   default     = ""
 }
 
 variable "publish" {
   description = "Enable versioning for this lambda"
+  type        = bool
   default     = false
 }
 
@@ -110,6 +116,7 @@ variable "vpc_settings" {
 
 variable "lambda_trigger" {
   description = "Set Permissions for LAMBDA Triggers,"
+  type        = bool
   default     = false
 }
 

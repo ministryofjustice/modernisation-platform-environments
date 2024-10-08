@@ -10,10 +10,9 @@ variable "replay_pipeline" {
   default     = ""
 }
 
-variable "pipeline_additional_policies" {
-  description = "Pipeline Additional policies"
-  type        = list(string)
-  default     = []
+variable "step_function_execution_role_arn" {
+  type        = string
+  description = "The ARN of the step function execution role"
 }
 
 variable "dms_replication_task_arn" {

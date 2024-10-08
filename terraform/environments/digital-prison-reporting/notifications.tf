@@ -63,7 +63,7 @@ module "glue_status_change_rule" {
   "source": ["aws.glue"],
   "detail-type": ["Glue Job State Change"],
   "detail": {
-    "state": ["STOPPED", "FAILED", "TIMEOUT"]
+    "state": ["FAILED", "TIMEOUT"]
   }
 }
 PATTERN

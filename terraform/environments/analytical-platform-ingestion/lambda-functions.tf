@@ -2,7 +2,7 @@ module "definition_upload_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.7.1"
+  version = "7.9.0"
 
   publish        = true
   create_package = false
@@ -14,7 +14,7 @@ module "definition_upload_lambda" {
   timeout       = 900
   image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-scan:${local.environment_configuration.scan_image_version}"
 
-  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.definition_upload_lambda_security_group.security_group_id]
   attach_network_policy  = true
 
@@ -60,7 +60,7 @@ module "scan_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.7.1"
+  version = "7.9.0"
 
   publish        = true
   create_package = false
@@ -73,7 +73,7 @@ module "scan_lambda" {
   timeout                = 900
   image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-scan:${local.environment_configuration.scan_image_version}"
 
-  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.scan_lambda_security_group.security_group_id]
   attach_network_policy  = true
 
@@ -135,7 +135,7 @@ module "transfer_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.7.1"
+  version = "7.9.0"
 
   publish        = true
   create_package = false
@@ -148,7 +148,7 @@ module "transfer_lambda" {
   timeout                = 900
   image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-transfer:${local.environment_configuration.transfer_image_version}"
 
-  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
   attach_network_policy  = true
 
@@ -244,7 +244,7 @@ module "notify_quarantined_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.7.1"
+  version = "7.9.0"
 
   publish        = true
   create_package = false
@@ -257,7 +257,7 @@ module "notify_quarantined_lambda" {
   timeout                = 900
   image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-notify:${local.environment_configuration.notify_image_version}"
 
-  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
   attach_network_policy  = true
 
@@ -310,7 +310,7 @@ module "notify_transferred_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.7.1"
+  version = "7.9.0"
 
   publish        = true
   create_package = false
@@ -323,7 +323,7 @@ module "notify_transferred_lambda" {
   timeout                = 900
   image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-notify:${local.environment_configuration.notify_image_version}"
 
-  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
   attach_network_policy  = true
 

@@ -2146,3 +2146,197 @@ IF @Password IS NOT NULL AND 0 < LEN(@Password)
 ;
 GO
 
+USE [Transport]
+GO
+/****** Object:  Table [dbo].[COMMISSIONER]    Script Date: 09/26/2024 09:29:50 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[COMMISSIONER](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[prefix] [varchar](100) NULL,
+	[surname] [varchar](300) NULL,
+	[suffix] [varchar](100) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[CATEGORY_CACHE_STATUS]    Script Date: 09/26/2024 09:29:50 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CATEGORY_CACHE_STATUS](
+	[pk] [bigint] NOT NULL,
+	[id] [bigint] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[pk] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CATEGORY]    Script Date: 09/26/2024 09:29:50 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[CATEGORY](
+	[num] [tinyint] IDENTITY(1,1) NOT NULL,
+	[description] [varchar](100) NOT NULL,
+ CONSTRAINT [category_pk] PRIMARY KEY CLUSTERED 
+(
+	[num] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[JUDGMENT_HOME_SEARCH_STATUS]    Script Date: 09/26/2024 09:29:50 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[JUDGMENT_HOME_SEARCH_STATUS](
+	[pk] [bigint] NOT NULL,
+	[id] [bigint] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[pk] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[JUDGMENT]    Script Date: 09/26/2024 09:29:50 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[JUDGMENT](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[created_datetime] [datetime] NULL,
+	[publication_datetime] [datetime] NULL,
+	[last_updatedtime] [datetime] NULL,
+	[decision_datetime] [datetime] NULL,
+	[reported_no_1] [varchar](5) NULL,
+	[reported_no_2] [varchar](5) NULL,
+	[reported_no_3] [varchar](5) NULL,
+	[file_no_1] [varchar](5) NULL,
+	[file_no_2] [varchar](5) NULL,
+	[file_no_3] [varchar](5) NULL,
+	[decision_type] [ntext] NULL,
+	[claimants] [ntext] NULL,
+	[respondent] [ntext] NULL,
+	[main_subcategory_id] [bigint] NULL,
+	[sec_subcategory_id] [bigint] NULL,
+	[headnote_summary] [ntext] NULL,
+	[is_published] [tinyint] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[Users]    Script Date: 09/26/2024 09:29:50 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Users](
+	[UserID] [int] IDENTITY(1,1) NOT NULL,
+	[Username] [varchar](50) NULL,
+	[Password] [varchar](50) NULL,
+	[Firstname] [varchar](50) NULL,
+	[Lastname] [varchar](50) NULL,
+ CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY],
+ CONSTRAINT [IX_Users] UNIQUE NONCLUSTERED 
+(
+	[Username] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[SUBCATEGORY]    Script Date: 09/26/2024 09:29:50 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[SUBCATEGORY](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[parent_num] [tinyint] NOT NULL,
+	[num] [tinyint] NOT NULL,
+	[description] [varchar](100) NOT NULL,
+ CONSTRAINT [subcategory_pk] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY],
+ CONSTRAINT [subcategory_num_unique] UNIQUE NONCLUSTERED 
+(
+	[parent_num] ASC,
+	[num] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[COMMISSIONERJUDGMENTMAP]    Script Date: 09/26/2024 09:29:50 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[COMMISSIONERJUDGMENTMAP](
+	[judgment_id] [bigint] NOT NULL,
+	[commissioner_id] [bigint] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[judgment_id] ASC,
+	[commissioner_id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Check [chk_ccs_pk]    Script Date: 09/26/2024 09:29:50 ******/
+ALTER TABLE [dbo].[CATEGORY_CACHE_STATUS]  WITH CHECK ADD  CONSTRAINT [chk_ccs_pk] CHECK  (([pk] = 1))
+GO
+ALTER TABLE [dbo].[CATEGORY_CACHE_STATUS] CHECK CONSTRAINT [chk_ccs_pk]
+GO
+/****** Object:  Check [CK__JUDGMENT__is_pub__77BFCB91]    Script Date: 09/26/2024 09:29:50 ******/
+ALTER TABLE [dbo].[JUDGMENT]  WITH CHECK ADD CHECK  (([is_published] = 1 or [is_published] = 0))
+GO
+/****** Object:  Check [chk_pk]    Script Date: 09/26/2024 09:29:50 ******/
+ALTER TABLE [dbo].[JUDGMENT_HOME_SEARCH_STATUS]  WITH CHECK ADD  CONSTRAINT [chk_pk] CHECK  (([pk] = 1))
+GO
+ALTER TABLE [dbo].[JUDGMENT_HOME_SEARCH_STATUS] CHECK CONSTRAINT [chk_pk]
+GO
+/****** Object:  ForeignKey [FK__COMMISSIO__commi__7D78A4E7]    Script Date: 09/26/2024 09:29:50 ******/
+ALTER TABLE [dbo].[COMMISSIONERJUDGMENTMAP]  WITH CHECK ADD FOREIGN KEY([commissioner_id])
+REFERENCES [dbo].[COMMISSIONER] ([id])
+GO
+/****** Object:  ForeignKey [FK__COMMISSIO__judgm__7C8480AE]    Script Date: 09/26/2024 09:29:50 ******/
+ALTER TABLE [dbo].[COMMISSIONERJUDGMENTMAP]  WITH CHECK ADD FOREIGN KEY([judgment_id])
+REFERENCES [dbo].[JUDGMENT] ([id])
+GO
+/****** Object:  ForeignKey [subcategory_fk]    Script Date: 09/26/2024 09:29:50 ******/
+ALTER TABLE [dbo].[SUBCATEGORY]  WITH NOCHECK ADD  CONSTRAINT [subcategory_fk] FOREIGN KEY([parent_num])
+REFERENCES [dbo].[CATEGORY] ([num])
+GO
+ALTER TABLE [dbo].[SUBCATEGORY] CHECK CONSTRAINT [subcategory_fk]
+GO

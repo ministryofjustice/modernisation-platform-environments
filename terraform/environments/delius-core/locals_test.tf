@@ -6,6 +6,7 @@ locals {
 
   environment_config_test = {
     migration_environment_private_cidr     = ["10.162.8.0/22", "10.162.4.0/22", "10.162.0.0/22"]
+    migration_environment_vpc_cidr         = "10.162.0.0/20"
     migration_environment_db_cidr          = ["10.162.14.0/25", "10.162.13.0/24", "10.162.12.0/24"]
     migration_environment_full_name        = "del-test"
     migration_environment_abbreviated_name = "del"
@@ -26,6 +27,8 @@ locals {
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
+    tls_port                    = 636
+    desired_count               = 1
   }
 
 
@@ -35,6 +38,7 @@ locals {
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
+    primary_instance_count = 1
     standby_count = 0
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
@@ -92,6 +96,14 @@ locals {
       container_memory = 2048
     }
 
+    ldap = {
+      image_tag        = "6.0.3-latest"
+      container_port   = 389
+      slapd_log_level  = "conns,config,stats,stats2"
+      container_cpu    = 2048
+      container_memory = 4096
+    }
+
     pdf_creation = {
       image_tag      = "5.7.6"
       container_port = 80
@@ -111,6 +123,7 @@ locals {
   }
 
   dms_config_test = {
+    deploy_dms = true
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.2"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
@@ -124,5 +137,6 @@ locals {
       read_database = "TSTNDA"
     }
     user_target_endpoint = {}
+    is-production        = local.is-production
   }
 }

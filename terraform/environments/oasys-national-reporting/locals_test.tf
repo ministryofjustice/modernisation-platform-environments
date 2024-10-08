@@ -123,21 +123,10 @@ locals {
         })
         cloudwatch_metric_alarms = null
       })
-
-      test-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bods.config, {
-        })
-        instance = merge(local.ec2_autoscaling_groups.bods.instance, {
-          instance_type = "m4.xlarge"
-        })
-        cloudwatch_metric_alarms = null
-      })
     }
 
     ec2_instances = {
+      # Currently turned off temporarily for testing t2-onr-bods-1-b and 2-a automation
       t2-onr-bods-1-a = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
           ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
@@ -154,7 +143,59 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 100 }
           "/dev/sds"  = { type = "gp3", size = 100 }
         })
+        tags = merge(local.ec2_instances.bods.tags, {
+          domain-name = "azure.noms.root"
+        })
       })
+
+      # t2-onr-bods-1-b = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2b"
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #         branch = "main"
+      #         newhostname = "t2-onr-bods-1-b" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
+      #       }
+      #     ))
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #     domain-name = "azure.noms.root"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      # })
+
+      # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
+      # t2-onr-bods-2-a = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2a"
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #         branch   = "main"
+      #         # hostname = "t2-onr-bods-2-a" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
+      #       }
+      #     ))
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #     domain-name = "azure.noms.root"
+      #   })
+      # cloudwatch_metric_alarms = {}
+      # })
 
       t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
         config = merge(local.ec2_instances.boe_app.config, {
@@ -193,6 +234,9 @@ locals {
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
           availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
         })
       })
     }
@@ -251,6 +295,7 @@ locals {
       })
 
       private = {
+        drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
         enable_cross_zone_load_balancing = true
         enable_delete_protection         = false
         idle_timeout                     = 3600

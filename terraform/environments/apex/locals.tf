@@ -70,7 +70,8 @@ locals {
     region            = local.application_data.accounts[local.environment].region
     app_db_url        = "${aws_route53_record.apex-db.fqdn}:1521:APEX"
     app_debug_enabled = local.application_data.accounts[local.environment].app_debug_enabled
-    db_secret_arn     = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
+    # Note that the following secret is created manually on Parameter Store
+    db_secret_arn = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
   })
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]

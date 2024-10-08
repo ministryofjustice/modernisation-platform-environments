@@ -66,7 +66,7 @@ run_ansible() {
     elif [[ $i -gt 2 ]]
     then
       group=$(echo "$${tag[1]}_$${tag[4]}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
-      ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
+      ansible_group_vars="--extra-vars @group_vars/$group.yml $ansible_group_vars"
     fi
   done
 

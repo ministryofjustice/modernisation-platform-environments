@@ -9,10 +9,11 @@ module "environment_test" {
   count  = local.is-test ? 1 : 0
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws                        = aws
+    aws.bucket-replication     = aws
+    aws.core-vpc               = aws.core-vpc
+    aws.core-network-services  = aws.core-network-services
+    aws.modernisation-platform = aws.modernisation-platform
   }
 
   env_name      = "test"
@@ -36,5 +37,7 @@ module "environment_test" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  dms_config = merge(local.dms_config_test, { client_account_arns = local.dms_client_account_arns })
+  dms_config = local.dms_config_test
+
+  env_name_to_dms_config_map = local.env_name_to_dms_config_map
 }

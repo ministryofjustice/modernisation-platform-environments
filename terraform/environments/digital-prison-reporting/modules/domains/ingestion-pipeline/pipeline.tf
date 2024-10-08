@@ -6,7 +6,7 @@ module "data_ingestion_pipeline" {
   step_function_name   = var.data_ingestion_pipeline
   dms_task_time_out    = var.pipeline_dms_task_time_out
 
-  additional_policies = var.pipeline_additional_policies
+  step_function_execution_role_arn = var.step_function_execution_role_arn
 
   # Send this block to the calling repo Pipeline
   #depends_on = [

@@ -65,3 +65,8 @@ variable "db_ec2_sg_id" {
   description = "Security group id of the database EC2 hosts"
   type        = string
 }
+
+variable "env_name_to_dms_config_map" {
+  description = "Map of delius-core environments to DMS configs"
+  type        = any
+}

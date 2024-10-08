@@ -23,6 +23,6 @@ module "shield" {
 
 import {
   for_each = local.is-production ? { "build" = true } : {}
-  id = "1302dec0-8c83-45ba-a371-0b1599aac5ed/FMManagedWebACLV2-shield_advanced_auto_remediate-1701773787672/REGIONAL"
-  to = module.shield["build"].aws_wafv2_web_acl.main
+  id       = "1302dec0-8c83-45ba-a371-0b1599aac5ed/FMManagedWebACLV2-shield_advanced_auto_remediate-1701773787672/REGIONAL"
+  to       = module.shield["build"].aws_wafv2_web_acl.main
 }

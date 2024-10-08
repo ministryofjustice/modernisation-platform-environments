@@ -711,6 +711,8 @@ locals {
       "/oracle/database/PDONRSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PDONRAUD" = local.secretsmanager_secrets.db
       "/oracle/database/PDONRBDS" = local.secretsmanager_secrets.db
+      "/oracle/database/PDBOSYS"  = local.secretsmanager_secrets.db_bip
+      "/oracle/database/PDBOAUD"  = local.secretsmanager_secrets.db_bip
 
       "/oracle/database/TRBIPINF" = local.secretsmanager_secrets.db_bip
 

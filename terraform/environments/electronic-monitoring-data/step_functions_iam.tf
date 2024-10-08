@@ -173,10 +173,10 @@ data "aws_iam_policy_document" "send_database_to_ap_athena_queries" {
     ]
 
     resources = [
-      module.athena-s3-bucket.bucket.arn,
-      "${module.athena-s3-bucket.bucket.arn}/*",
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*",
-      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      "${module.s3-dms-data-validation-bucket.bucket.arn}/*",
+      module.s3-dms-data-validation-bucket.bucket.arn
     ]
   }
   statement {

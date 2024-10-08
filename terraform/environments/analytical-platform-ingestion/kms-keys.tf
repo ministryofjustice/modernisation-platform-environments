@@ -2,7 +2,7 @@ module "transfer_logs_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["logs/transfer"]
   description           = "CloudWatch Logs for the Transfer Server"
@@ -42,7 +42,7 @@ module "s3_landing_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["s3/landing"]
   description           = "Family SFTP Server, Landing S3 KMS Key"
@@ -55,7 +55,7 @@ module "s3_processed_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["s3/processed"]
   description           = "Family SFTP Server, Processed S3 KMS Key"
@@ -68,7 +68,7 @@ module "s3_quarantine_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["s3/quarantine"]
   description           = "Family SFTP Server, Quarantine S3 KMS Key"
@@ -81,7 +81,7 @@ module "s3_definitions_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["s3/definitions"]
   description           = "Ingestion Scanning ClamAV S3 KMS Key"
@@ -94,7 +94,7 @@ module "s3_bold_egress_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["s3/bold-egress"]
   description           = "Used in the Bold Egress Solution"
@@ -123,7 +123,7 @@ module "quarantined_sns_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["sns/quarantined"]
   description           = "Key for quarantined notifications"
@@ -153,7 +153,7 @@ module "transferred_sns_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["sns/transferred"]
   description           = "Key for transferred notifications"
@@ -166,7 +166,7 @@ module "govuk_notify_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["secretsmanager/govuk-notify"]
   description           = "Key for GOV.UK Notify data"
@@ -179,7 +179,7 @@ module "supplier_data_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["secretsmanager/supplier-data"]
   description           = "Key for SFTP supplier data"
@@ -192,7 +192,7 @@ module "slack_token_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.2.1"
+  version = "3.1.0"
 
   aliases               = ["secretsmanager/slack-token"]
   description           = "Slack token for notifications"

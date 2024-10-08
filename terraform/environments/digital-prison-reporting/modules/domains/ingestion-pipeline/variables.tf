@@ -17,10 +17,9 @@ variable "pipeline_dms_task_time_out" {
   default     = 86400 # 24 hours
 }
 
-variable "pipeline_additional_policies" {
-  description = "Pipeline Additional policies"
-  type        = list(string)
-  default     = []
+variable "step_function_execution_role_arn" {
+  type        = string
+  description = "The ARN of the step function execution role"
 }
 
 variable "glue_s3_data_deletion_job" {

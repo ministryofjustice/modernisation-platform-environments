@@ -6,6 +6,7 @@ locals {
 
   environment_config_dev = {
     migration_environment_private_cidr     = ["10.162.32.0/22", "10.162.36.0/22", "10.162.40.0/22"]
+    migration_environment_vpc_cidr         = "10.162.32.0/20"
     migration_environment_db_cidr          = ["10.162.44.0/24", "10.162.45.0/24", "10.162.46.0/25"]
     migration_environment_full_name        = "dmd-mis-dev"
     migration_environment_abbreviated_name = "dmd"
@@ -26,16 +27,18 @@ locals {
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
+    tls_port                    = 636
+    desired_count               = 1
   }
 
   db_config_dev = {
-    instance_type  = "r7i.large"
+    instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
-
+    primary_instance_count = 1
     standby_count = 2
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
@@ -93,6 +96,14 @@ locals {
       container_memory = 1024
     }
 
+    ldap = {
+      image_tag        = "6.0.3-latest"
+      container_port   = 389
+      slapd_log_level  = "stats"
+      container_cpu    = 512
+      container_memory = 1024
+    }
+
     pdf_creation = {
       image_tag      = "2021-06-24.995.8c1da2c"
       container_port = 8080
@@ -112,6 +123,7 @@ locals {
   }
 
   dms_config_dev = {
+    deploy_dms = true
     replication_instance_class = "dms.t3.small"
     engine_version             = "3.5.2"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
@@ -127,5 +139,6 @@ locals {
     user_target_endpoint = {
       write_database = "DMDNDA"
     }
+    is-production = local.is-production
   }
 }

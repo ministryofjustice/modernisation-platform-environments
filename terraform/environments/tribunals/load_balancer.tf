@@ -86,7 +86,7 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
 
 resource "aws_lb_listener" "tribunals_lb" {
   depends_on = [
-    aws_acm_certificate.external
+    aws_acm_certificate_validation.external
   ]
   certificate_arn   = aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.tribunals_lb.arn

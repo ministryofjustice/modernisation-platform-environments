@@ -1,6 +1,23 @@
 locals {
   operational_db_jdbc_connection_string = "jdbc:postgresql://${module.aurora_operational_db.rds_cluster_endpoints["static"]}:${local.operational_db_port}/${local.operational_db_default_database}"
   nomis_jdbc_connection_string          = "jdbc:oracle:thin:@${local.nomis_host}:${local.nomis_port}/${local.nomis_service_name}"
+
+  dps_endpoint = {
+    for item in local.dps_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["endpoint"]
+  }
+  dps_port = {
+    for item in local.dps_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["port"]
+  }
+  dps_database = {
+    for item in local.dps_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["db_name"]
+  }
+  dps_connection_string = {
+    for item in local.dps_domains_list :
+    item => "jdbc:postgresql://${local.dps_endpoint[item]}:${local.dps_port[item]}/${local.dps_database[item]}"
+  }
 }
 
 # Operational DataStore
@@ -32,6 +49,25 @@ resource "aws_glue_connection" "glue_nomis_connection" {
     JDBC_CONNECTION_URL    = local.nomis_jdbc_connection_string
     JDBC_DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver"
     SECRET_ID              = data.aws_secretsmanager_secret.nomis.name
+  }
+
+  physical_connection_requirements {
+    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
+    subnet_id              = data.aws_subnet.private_subnets_a.id
+  }
+}
+
+# All DPS connections
+resource "aws_glue_connection" "glue_dps_connection" {
+  for_each        = local.create_glue_connection ? toset(local.dps_domains_list) : []
+  name            = "${local.project}-${each.value}-connection"
+  connection_type = "JDBC"
+
+  connection_properties = {
+    JDBC_CONNECTION_URL    = local.dps_connection_string[each.value]
+    JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
+    SECRET_ID              = aws_secretsmanager_secret.dps[each.value].name
   }
 
   physical_connection_requirements {

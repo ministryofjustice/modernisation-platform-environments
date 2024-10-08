@@ -80,3 +80,55 @@ module "cloudwatch_dashboard" {
   ]
 }
 ```
+
+## Search Expression
+
+For widgets containing search expressions, e.g. `SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"CPUUtilization\"','Maximum'),MAX,DESC)`
+Define these in expression field.
+
+Sometimes this will return too much data. Filter this using tags, e.g.
+
+```
+  widget_groups  = [
+    {
+      header_markdown = "## DATABASE"
+      width           = 8
+      height          = 8
+      search_filter = {
+        ec2_tag = [
+          { tag_name = "server-type", tag_value = "database" }
+        ]
+      }
+      widgets = [
+        ...
+      ]
+    }
+  ]
+```
+
+This relies on EC2 instances being passed into module via `ec2_instances` variable.
+
+## EBS Performance
+
+It's not easy to view EBS IOPS and throughput without painstakingly including
+all EBS volume IDs. The module will automatically add widgets for you grouped
+by EBS iops and throughput configured maximums.
+
+This relies on EC2 instances being passed into module via `ec2_instances` variable.
+
+```
+  widget_groups  = [
+    {
+      header_markdown = "## DATABASE"
+      width           = 8
+      height          = 8
+      add_ebs_widgets = {
+        iops       = true
+        throughput = true
+      }
+      widgets = [
+        ...
+      ]
+    }
+  ]
+```
