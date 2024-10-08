@@ -73,28 +73,29 @@ locals {
     #   bods = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 1 instance, reduced RAM as Azure usage doesn't warrant higher RAM
     # }
     ec2_instances = {
-      pp-onr-bods-1 = merge(local.ec2_instances.bods, {
-        config = merge(local.ec2_instances.bods.config, {
-          availability_zone = "eu-west-2a"
-          user_data_raw = base64encode(templatefile(
-            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-              branch = "main"
-            }
-          ))
-          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "m6i.2xlarge"
-        })
-        cloudwatch_metric_alarms = null
-        tags = merge(local.ec2_instances.bods.tags, {
-          oasys-national-reporting-environment = "pp"
-          domain-name                          = "azure.hmpp.root"
-        })
-        cloudwatch_metric_alarms = null
-      })
+      # DO NOT DEPLOY THESE YET AS THE REST OF THE THINGS AREN'T READY
+      # pp-onr-bods-1 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2a"
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #         branch = "main"
+      #       }
+      #     ))
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m6i.2xlarge"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "pp"
+      #     domain-name                          = "azure.hmpp.root"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      # })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
       # pp-onr-bods-2 = merge(local.ec2_instances.bods, {
