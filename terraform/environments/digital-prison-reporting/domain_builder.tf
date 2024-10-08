@@ -141,7 +141,6 @@ module "domain_builder_cli_agent" {
       Name           = "${local.project}-domain-builder-agent-${local.env}"
       Resource_Type  = "EC2 Instance"
       Resource_Group = "domain-builder"
-      Name           = "${local.project}-domain-builder-agent-${local.env}"
     }
   )
 

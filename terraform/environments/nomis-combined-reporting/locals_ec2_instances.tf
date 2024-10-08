@@ -21,16 +21,12 @@ locals {
       }
       instance = {
         disable_api_termination = false
-        instance_type           = "t3.large"
+        instance_type           = "m6i.4xlarge"
         key_name                = "ec2-user"
         vpc_security_group_ids  = ["bip"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
-      }
-      route53_records = {
-        create_internal_record = true
-        create_external_record = true
       }
       user_data_cloud_init = {
         args = {
@@ -73,16 +69,12 @@ locals {
       }
       instance = {
         disable_api_termination = false
-        instance_type           = "t3.large"
+        instance_type           = "m6i.xlarge"
         key_name                = "ec2-user"
         vpc_security_group_ids  = ["bip"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
-      }
-      route53_records = {
-        create_internal_record = true
-        create_external_record = true
       }
       user_data_cloud_init = {
         args = {
@@ -125,16 +117,12 @@ locals {
       }
       instance = {
         disable_api_termination = false
-        instance_type           = "t3.large"
+        instance_type           = "r6i.large"
         key_name                = "ec2-user"
         vpc_security_group_ids  = ["web"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
-      }
-      route53_records = {
-        create_internal_record = true
-        create_external_record = true
       }
       user_data_cloud_init = {
         args = {
@@ -177,16 +165,12 @@ locals {
       }
       instance = {
         disable_api_termination = false
-        instance_type           = "t3.large"
+        instance_type           = "r6i.xlarge"
         key_name                = "ec2-user"
         vpc_security_group_ids  = ["web"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
-      }
-      route53_records = {
-        create_internal_record = true
-        create_external_record = true
       }
       user_data_cloud_init = {
         args = {
@@ -241,10 +225,6 @@ locals {
         tags = {
           backup-plan = "daily-and-weekly"
         }
-      }
-      route53_records = {
-        create_internal_record = true
-        create_external_record = true
       }
       tags = {
         ami                    = "hmpps_windows_server_2019"

@@ -28,6 +28,14 @@ resource "aws_lambda_function" "terraform_lambda_func_stop" {
   handler       = "StopEC2Instances.lambda_handler"
   runtime       = "python3.9"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_start" {
@@ -38,6 +46,14 @@ resource "aws_lambda_function" "terraform_lambda_func_start" {
   handler       = "StartEC2Instances.lambda_handler"
   runtime       = "python3.9"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 ########################################
@@ -179,6 +195,14 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
   handler       = "disable_cpu_alarm.lambda_handler"
   runtime       = "python3.12"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Enable CPU Alarm
@@ -191,6 +215,14 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   handler       = "enable_cpu_alarm.lambda_handler"
   runtime       = "python3.12"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 ######################################################
@@ -215,6 +247,14 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev"
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:075585660276:code-signing-config:csc-0c7136ccff2de748f"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -248,6 +288,14 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat"
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:172753231260:code-signing-config:csc-0db408c5170a8eba6" 
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -281,6 +329,14 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_prod
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -314,6 +370,14 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev"
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:075585660276:code-signing-config:csc-0c7136ccff2de748f"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -347,6 +411,14 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat"
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:172753231260:code-signing-config:csc-0db408c5170a8eba6" 
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -380,6 +452,14 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -400,36 +480,51 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
 
 resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
   count       = local.is-development == true ? 1 : 0
-  name_prefix = "lambda_signing_profile_dev"
+  name_prefix = "grw77tzk96phtwcrceot5xlbt9veqixuyck044"
   platform_id = "AWSLambda-SHA384-ECDSA"
+  depends_on  = [aws_iam_role_policy_attachment.attach_aws_signer_policy_to_aws_signer_role_dev]
   signature_validity_period {
-    value = 12
+    value = 10
     type  = "YEARS"
   }
 }
 
-#resource "aws_lambda_code_signing_config" "lambda_csc_dev" {
-#  count       = local.is-development == true ? 1 : 0
-#  description = "Lambda code signing configuration for development environment"
-#  allowed_publishers {
-#    signing_profile_version_arns = [
-#      arn:aws:signer:eu-west-2::817985104434:signing-profile/MySigningProfile/abcdef1234567890,  # Replace with your signing profile ARN
-#    ]
-#  }
-#  policies {
-#    untrusted_artifact_on_deployment = "Warn"
-#  }
-#}
+resource "aws_lambda_code_signing_config" "lambda_csc_dev" {
+  count       = local.is-development == true ? 1 : 0
+  description = "Lambda code signing configuration for development environment"
+  allowed_publishers {
+    signing_profile_version_arns = [
+      "arn:aws:signer:eu-west-2:075585660276:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002/AHvOa02ifI"
+    ]
+  }
+  policies {
+    untrusted_artifact_on_deployment = "Warn"
+  }
+}
 
 # UAT
 
 resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
   count       = local.is-preproduction == true ? 1 : 0
-  name_prefix = "lambda_signing_profile_uat"
+  name_prefix = "ucjvuurx21fa91xmhktdde5ognhxig1vahls8z"
   platform_id = "AWSLambda-SHA384-ECDSA"
+  depends_on  = [aws_iam_role_policy_attachment.attach_aws_signer_policy_to_aws_signer_role_uat]
   signature_validity_period {
-    value = 12
+    value = 10
     type  = "YEARS"
+  }
+}
+
+resource "aws_lambda_code_signing_config" "lambda_csc_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  description = "Lambda code signing configuration for uat environment"
+  allowed_publishers {
+    signing_profile_version_arns = [ 
+      "arn:aws:signer:eu-west-2:172753231260:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002/ZYACVFPo1R"
+    ]
+  }
+  policies {
+    untrusted_artifact_on_deployment = "Warn"
   }
 }
 
@@ -437,11 +532,25 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
 
 resource "aws_signer_signing_profile" "lambda_signing_profile_prod" {
   count       = local.is-production == true ? 1 : 0
-  name_prefix = "lambda_signing_profile_prod"
+  name_prefix = "0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni"
   platform_id = "AWSLambda-SHA384-ECDSA"
+  depends_on  = [aws_iam_role_policy_attachment.attach_aws_signer_policy_to_aws_signer_role_prod]
   signature_validity_period {
-    value = 12
+    value = 10
     type  = "YEARS"
+  }
+}
+
+resource "aws_lambda_code_signing_config" "lambda_csc_prod" {
+  count       = local.is-production == true ? 1 : 0
+  description = "Lambda code signing configuration for production environment"
+  allowed_publishers {
+    signing_profile_version_arns = [
+      "arn:aws:signer:eu-west-2:817985104434:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002/HzoPedNoUr"
+    ]
+  }
+  policies {
+    untrusted_artifact_on_deployment = "Warn"
   }
 }
 

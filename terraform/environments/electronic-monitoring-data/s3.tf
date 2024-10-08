@@ -1078,6 +1078,7 @@ data "aws_iam_policy_document" "data_store_deny_all" {
     resources = [
       aws_s3_bucket.data_store.arn,
       "${aws_s3_bucket.data_store.arn}/*"
+
     ]
     principals {
       identifiers = ["*"]

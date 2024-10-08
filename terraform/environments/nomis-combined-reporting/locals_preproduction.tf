@@ -39,7 +39,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init.args, {
-            branch = "ncr/TM-503/preprod-bip-fixes"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.bip_app.tags, {
@@ -59,7 +59,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
-            branch = "ncr/TM-503/preprod-bip-fixes"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.bip_cms.tags, {
@@ -78,7 +78,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init.args, {
-            branch = "ncr/TM-503/preprod-bip-fixes"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.bip_webadmin.tags, {
@@ -97,7 +97,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
-            branch = "ncr/TM-503/preprod-bip-fixes"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.bip_web.tags, {
@@ -128,9 +128,33 @@ locals {
         })
       })
 
-      ppbipcms1 = merge(local.ec2_instances.bip_cms, {
+      pp-ncr-app-1 = merge(local.ec2_instances.bip_app, {
+        config = merge(local.ec2_instances.bip_app.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+
+      pp-ncr-cms-1 = merge(local.ec2_instances.bip_cms, {
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
+
+      pp-ncr-cms-2 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
@@ -157,6 +181,18 @@ locals {
           nomis-combined-reporting-environment = "pp"
           oracle-sids                          = "PPBIPSYS PPBIPAUD"
           instance-scheduling                  = "skip-scheduling"
+        })
+      })
+
+      pp-ncr-webadmin-1 = merge(local.ec2_instances.bip_webadmin, {
+        config = merge(local.ec2_instances.bip_webadmin.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_webadmin.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_webadmin.tags, {
+          nomis-combined-reporting-environment = "pp"
         })
       })
     }
@@ -249,6 +285,17 @@ locals {
       })
 
       public = merge(local.lbs.public, {
+        instance_target_groups = {
+          pp-http-7010 = merge(local.lbs.public.instance_target_groups.http-7010, {
+            attachments = [
+              { ec2_instance_name = "pp-ncr-webadmin-1" },
+            ]
+          })
+          pp-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+            ]
+          })
+        }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
             alarm_target_group_names = []
@@ -257,7 +304,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pp-ncr-webadmin-http-7010"
+                  target_group_name = "pp-http-7010"
                 }]
                 conditions = [{
                   host_header = {
@@ -271,7 +318,7 @@ locals {
                 priority = 200
                 actions = [{
                   type              = "forward"
-                  target_group_name = "pp-ncr-web-http-7777"
+                  target_group_name = "pp-http-7777"
                 }]
                 conditions = [{
                   host_header = {

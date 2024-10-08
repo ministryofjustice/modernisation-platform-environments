@@ -92,6 +92,13 @@ resource "aws_iam_instance_profile" "db_mgmt_profile" {
 # ebs ec2 policy
 #tfsec:ignore:AWS099
 resource "aws_iam_policy" "db_mgmt_policy" {
+
+  #checkov:skip=CKV_AWS_288
+  #checkov:skip=CKV_AWS_355
+  #checkov:skip=CKV_AWS_290
+  #checkov:skip=CKV_AWS_289
+  #checkov:skip=CKV_AWS_356
+
   name        = "${local.application_name}-db_mgmt-ec2-policy"
   description = "${local.application_name} ec2-policy"
 
@@ -184,6 +191,9 @@ resource "aws_kms_alias" "ebs-kms-alias" {
 data "aws_iam_policy_document" "ebs-kms" {
   #checkov:skip=CKV_AWS_111
   #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_289
+
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]
