@@ -655,7 +655,8 @@ data "aws_iam_policy_document" "process_landing_bucket_files_s3_policy_document"
       "${module.s3-mdss-ho-landing-bucket.bucket_arn}/*",
       "${module.s3-mdss-specials-landing-bucket.bucket_arn}/*",
     ]
-  },
+  }
+
   statement {
     sid    = "S3PermissionsForReceivedFilesBucket"
     effect = "Allow"
