@@ -875,6 +875,8 @@ module "s3-dms-target-store-bucket" {
 #trivy:ignore:AVD-AWS-0090
 #trivy:ignore:AVD-AWS-0132
 #trivy:ignore:s3-bucket-logging
+#tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-enable-versioning
 resource "aws_s3_bucket" "data_store" {
   bucket_prefix = "em-data-store-"
   force_destroy = false
