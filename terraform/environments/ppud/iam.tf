@@ -157,7 +157,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
      "Action": [
        "logs:CreateLogGroup",
        "logs:CreateLogStream",
-       "logs:PutLogEvents"
+       "logs:PutLogEvents",
      ],
      "Resource": "arn:aws:logs:*:*:*"
     },
@@ -168,6 +168,19 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
         "ec2:Stop*"
       ],
       "Resource": "*"
+   },
+   {
+     "Effect": "Allow",
+     "Action": [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ListQueueTags",
+      "sqs:ReceiveMessage",
+      "sqs:SendMessage",
+      ],
+      "Resource": "arn:aws:sqs:eu-west-2:817985104434:*"
    }
  ]
 }
@@ -240,6 +253,19 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
       "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-70%-i-029d2b17679dab982",
       "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-90%-i-029d2b17679dab982"
       ]
+   },
+   {
+     "Effect": "Allow",
+     "Action": [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ListQueueTags",
+      "sqs:ReceiveMessage",
+      "sqs:SendMessage",
+      ],
+      "Resource": "arn:aws:sqs:eu-west-2:817985104434:*"
    }
  ]
 }
@@ -301,6 +327,19 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
       "arn:aws:lambda:eu-west-2:075585660276:*",
       "arn:aws:ec2:eu-west-2:075585660276:*"
       ]
+   },
+   {
+     "Effect": "Allow",
+     "Action": [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ListQueueTags",
+      "sqs:ReceiveMessage",
+      "sqs:SendMessage",
+      ],
+      "Resource": "arn:aws:sqs:eu-west-2:075585660276:*"
    }
  ]
 }
@@ -362,6 +401,19 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_uat" {
       "arn:aws:lambda:eu-west-2:172753231260:*",
       "arn:aws:ec2:eu-west-2:172753231260:*"
       ]
+   },
+   {
+     "Effect": "Allow",
+     "Action": [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ListQueueTags",
+      "sqs:ReceiveMessage",
+      "sqs:SendMessage",
+      ],
+      "Resource": "arn:aws:sqs:eu-west-2:172753231260:*"
    }
  ]
 }
@@ -423,6 +475,19 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_prod" 
       "arn:aws:lambda:eu-west-2:817985104434:*",
       "arn:aws:ec2:eu-west-2:817985104434:*"
       ]
+   },
+   {
+     "Effect": "Allow",
+     "Action": [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ListQueueTags",
+      "sqs:ReceiveMessage",
+      "sqs:SendMessage",
+      ],
+      "Resource": "arn:aws:sqs:eu-west-2:817985104434:*"
    }
  ]
 }
