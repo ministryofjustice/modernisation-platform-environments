@@ -34,12 +34,7 @@ locals {
 
     db = {
       secrets = {
-        passwords = {
-          description = "db passwords shared with other accounts"
-          policy = [
-            local.secretsmanager_secret_policies.domain_read
-          ]
-        }
+        passwords = {}
       }
     }
 
@@ -52,7 +47,12 @@ locals {
 
     db_bip = {
       secrets = {
-        passwords     = {}
+        passwords = {
+          description = "db passwords shared with other accounts"
+          policy = [
+            local.secretsmanager_secret_policies.domain_read
+          ]
+        }
         bip-passwords = {}
       }
     }
