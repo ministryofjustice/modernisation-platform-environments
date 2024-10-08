@@ -143,37 +143,38 @@ locals {
       }
     }
 
-    lbs = {
-      public = merge(local.lbs.public, {
-        instance_target_groups = {
-          pp-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
-            attachments = [
-              { ec2_instance_name = "pp-onr-bods-1" },
-            ]
-          })
-        }
-        listeners = merge(local.lbs.public.listeners, {
-          https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
-            rules = {
-              pp-onr-bods-http28080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "pp-onr-bods-http28080"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "pp-bods.preproduction.reporting.oasys.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          })
-        })
-      })
+    # DO NOT DEPLOY YET AS OTHER THINGS AREN'T READY
+    # lbs = {
+    #   public = merge(local.lbs.public, {
+    #     instance_target_groups = {
+    #       pp-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
+    #         attachments = [
+    #           { ec2_instance_name = "pp-onr-bods-1" },
+    #         ]
+    #       })
+    #     }
+    #     listeners = merge(local.lbs.public.listeners, {
+    #       https = merge(local.lbs.public.listeners.https, {
+    #         alarm_target_group_names = []
+    #         rules = {
+    #           pp-onr-bods-http28080 = {
+    #             priority = 100
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "pp-onr-bods-http28080"
+    #             }]
+    #             conditions = [{
+    #               host_header = {
+    #                 values = [
+    #                   "pp-bods.preproduction.reporting.oasys.service.justice.gov.uk",
+    #                 ]
+    #               }
+    #             }]
+    #           }
+    #         }
+    #       })
+    #     })
+    #   })
 
       # No web instances built yet, not in use
       # private = {
