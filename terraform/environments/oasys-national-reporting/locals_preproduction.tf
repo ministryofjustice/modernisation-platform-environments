@@ -132,9 +132,9 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-bods/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/pp/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-bods/pp/*",
+              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
@@ -288,12 +288,12 @@ locals {
     }
 
     # TODO: THESE ARE NOT FINALIZED
-    secretsmanager_secrets = {
-      "/ec2/onr-bods/pp"         = local.secretsmanager_secrets.bods
-      "/ec2/onr-boe/pp"          = local.secretsmanager_secrets.boe_app
-      "/ec2/onr-web/pp"          = local.secretsmanager_secrets.boe_web
-      "/oracle/database/PPBOSYS" = local.secretsmanager_secrets.db
-      "/oracle/database/PPBOAUD" = local.secretsmanager_secrets.db
-    }
+    # secretsmanager_secrets = {
+    #   "/ec2/onr-bods/pp"         = local.secretsmanager_secrets.bods
+    #   "/ec2/onr-boe/pp"          = local.secretsmanager_secrets.boe_app
+    #   "/ec2/onr-web/pp"          = local.secretsmanager_secrets.boe_web
+    #   "/oracle/database/PPBOSYS" = local.secretsmanager_secrets.db
+    #   "/oracle/database/PPBOAUD" = local.secretsmanager_secrets.db
+    # }
   }
 }
