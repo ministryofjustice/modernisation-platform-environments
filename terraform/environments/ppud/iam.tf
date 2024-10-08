@@ -916,7 +916,7 @@ resource "aws_iam_policy" "aws_signer_policy_prod" {
 
 resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_prod" {
   count      = local.is-production == true ? 1 : 0
-  role       = aws_iam_role.aws_signer_policy_prod[0].name
+  role       = aws_iam_role.aws_signer_role_prod[0].name
   policy_arn = aws_iam_policy.aws_signer_policy_prod[0].arn
 }
 
@@ -974,7 +974,7 @@ resource "aws_iam_policy" "aws_signer_policy_uat" {
 
 resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_uat" {
   count      = local.is-preproduction == true ? 1 : 0
-  role       = aws_iam_role.aws_signer_policy_uat[0].name
+  role       = aws_iam_role.aws_signer_role_uat[0].name
   policy_arn = aws_iam_policy.aws_signer_policy_uat[0].arn
 }
 
@@ -1032,6 +1032,6 @@ resource "aws_iam_policy" "aws_signer_policy_dev" {
 
 resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_dev" {
   count      = local.is-development == true ? 1 : 0
-  role       = aws_iam_role.aws_signer_policy_dev[0].name
+  role       = aws_iam_role.aws_signer_role_dev[0].name
   policy_arn = aws_iam_policy.aws_signer_policy_dev[0].arn
 }
