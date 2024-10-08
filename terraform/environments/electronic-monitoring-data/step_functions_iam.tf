@@ -120,7 +120,7 @@ data "aws_iam_policy_document" "send_database_to_ap" {
 resource "aws_iam_policy" "send_database_to_ap" {
   name        = "send_database_to_ap_athena_queries"
   description = "Policy to allow start and get specific Athena queries"
-  policy      = data.aws_iam_policy_document.send_database_to_ap_athena_queries.json
+  policy      = data.aws_iam_policy_document.send_database_to_ap.json
 }
 
 # ------------------------------------------

@@ -4,7 +4,7 @@
 
 module "athena_layer" {
   source       = "./modules/step_function"
-  name         = "get_zipped_file"
+  name         = "athena_layer"
   iam_policies = tomap({ "lambda_invoke_policy" = aws_iam_policy.lambda_invoke_policy })
   variable_dictionary = tomap({
     get_metadata_lambda_arn = module.get_metadata_from_rds_lambda.lambda_function_arn

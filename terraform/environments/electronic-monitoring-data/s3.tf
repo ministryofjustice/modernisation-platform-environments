@@ -1062,8 +1062,9 @@ resource "aws_s3_bucket_public_access_block" "data_store" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
-#checkov:skip=CKV2_AWS_65
+
 resource "aws_s3_bucket_ownership_controls" "bucket" {
+  #checkov:skip=CKV2_AWS_65
   bucket = aws_s3_bucket.data_store.id
   rule {
     object_ownership = "ObjectWriter"
