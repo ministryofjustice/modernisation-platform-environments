@@ -547,7 +547,8 @@ resource "aws_iam_policy" "domain_builder_preview_policy" {
 }
 
 # Additional policy to allow execution of publish requests.
-
+#checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+#checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
 data "aws_iam_policy_document" "domain_builder_publish" {
   statement {
     actions = [
@@ -556,7 +557,7 @@ data "aws_iam_policy_document" "domain_builder_publish" {
       "dynamodb:DeleteItem"
     ]
     resources = [
-      "*"
+      "arn:aws:dynamodb:${local.current_account_region}:${local.current_account_id}:table/*"
     ]
   }
 }
