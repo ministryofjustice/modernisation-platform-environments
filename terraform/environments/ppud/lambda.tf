@@ -400,7 +400,7 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
 
 resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
   count       = local.is-development == true ? 1 : 0
-  name        = "Profile-Dev-m9fy5dnrxtixs7pph8bk6m1sva1292oa2dqitu7k"
+  name_prefix = "Signing-Profile-Dev"
   platform_id = "AWSLambda-SHA384-ECDSA"
   depends_on  = [aws_iam_role_policy_attachment.attach_aws_signer_policy_to_aws_signer_role_dev]
   signature_validity_period {
@@ -426,7 +426,7 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
 
 resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
   count       = local.is-preproduction == true ? 1 : 0
-  name        = "Profile-Uat-tcmoukls7g50huzrj7xy4sfiw48ces3tf98bm1o7"
+  name_prefix = "Signing-Profile-UAT"
   platform_id = "AWSLambda-SHA384-ECDSA"
   depends_on  = [aws_iam_role_policy_attachment.attach_aws_signer_policy_to_aws_signer_role_uat]
   signature_validity_period {
@@ -452,7 +452,7 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
 
 resource "aws_signer_signing_profile" "lambda_signing_profile_prod" {
   count       = local.is-production == true ? 1 : 0
-  name        = "Profile-Prod-d0e7uvfrtzlw3mnoc2vx9s7z4dw4mzh8pruo4pi6"
+  name_prefix = "Signing-Profile-Prod"
   platform_id = "AWSLambda-SHA384-ECDSA"
   depends_on  = [aws_iam_role_policy_attachment.attach_aws_signer_policy_to_aws_signer_role_prod]
   signature_validity_period {
