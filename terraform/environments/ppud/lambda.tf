@@ -409,18 +409,18 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_dev" {
   }
 }
 
-#resource "aws_lambda_code_signing_config" "lambda_csc_dev" {
-#  count       = local.is-development == true ? 1 : 0
-#  description = "Lambda code signing configuration for development environment"
-#  allowed_publishers {
-#    signing_profile_version_arns = [
-#      arn:aws:signer:eu-west-2:817985104434:signing-profile/MySigningProfile/abcdef1234567890,  # Replace with your signing profile ARN
-#    ]
-#  }
-#  policies {
-#    untrusted_artifact_on_deployment = "Warn"
-#  }
-#}
+resource "aws_lambda_code_signing_config" "lambda_csc_dev" {
+  count       = local.is-development == true ? 1 : 0
+  description = "Lambda code signing configuration for development environment"
+  allowed_publishers {
+    signing_profile_version_arns = [
+      arn:aws:signer:eu-west-2:075585660276:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002/AHvOa02ifI
+    ]
+  }
+  policies {
+    untrusted_artifact_on_deployment = "Warn"
+  }
+}
 
 # UAT
 
@@ -435,18 +435,18 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_uat" {
   }
 }
 
-#resource "aws_lambda_code_signing_config" "lambda_csc_uat" {
-#  count       = local.is-preproduction == true ? 1 : 0
-#  description = "Lambda code signing configuration for uat environment"
-#  allowed_publishers {
-#    signing_profile_version_arns = [
-#      arn:aws:signer:eu-west-2:172753231260:signing-profile/MySigningProfile/abcdef1234567890,  # Replace with your signing profile ARN
-#    ]
-#  }
-#  policies {
-#    untrusted_artifact_on_deployment = "Warn"
-#  }
-#}
+resource "aws_lambda_code_signing_config" "lambda_csc_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  description = "Lambda code signing configuration for uat environment"
+  allowed_publishers {
+    signing_profile_version_arns = [
+       arn:aws:signer:eu-west-2:172753231260:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002/ZYACVFPo1R
+    ]
+  }
+  policies {
+    untrusted_artifact_on_deployment = "Warn"
+  }
+}
 
 # Production
 
@@ -461,16 +461,16 @@ resource "aws_signer_signing_profile" "lambda_signing_profile_prod" {
   }
 }
 
-#resource "aws_lambda_code_signing_config" "lambda_csc_prod" {
-#  count       = local.is-production == true ? 1 : 0
-#  description = "Lambda code signing configuration for production environment"
-#  allowed_publishers {
-#    signing_profile_version_arns = [
-#      arn:aws:signer:eu-west-2:817985104434:signing-profile/MySigningProfile/abcdef1234567890,  # Replace with your signing profile ARN
-#    ]
-#  }
-#  policies {
-#    untrusted_artifact_on_deployment = "Warn"
-#  }
-#}
+resource "aws_lambda_code_signing_config" "lambda_csc_prod" {
+  count       = local.is-production == true ? 1 : 0
+  description = "Lambda code signing configuration for production environment"
+  allowed_publishers {
+    signing_profile_version_arns = [
+      arn:aws:signer:eu-west-2:817985104434:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002/HzoPedNoUr
+    ]
+  }
+  policies {
+    untrusted_artifact_on_deployment = "Warn"
+  }
+}
 
