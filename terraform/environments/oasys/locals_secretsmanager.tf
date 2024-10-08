@@ -9,6 +9,20 @@ locals {
     production    = []
   }
 
+  secretsmanager_secret_policies = {
+    domain_read = {
+      effect = "Allow"
+      actions = [
+        "secretsmanager:GetSecretValue",
+      ]
+      principals = {
+        type        = "AWS"
+        identifiers = local.domain_share_secret_principal_ids[local.environment]
+      }
+      resources = ["*"]
+    }
+  }
+
   secretsmanager_secrets = {
 
     bip = {
@@ -19,7 +33,12 @@ locals {
 
     db = {
       secrets = {
-        passwords = {}
+        shared-passwords = {
+          description = "db passwords shared with other accounts"
+          policy = [
+            local.secretsmanager_secret_policies.domain_read,
+          ]
+        }
       }
     }
 
