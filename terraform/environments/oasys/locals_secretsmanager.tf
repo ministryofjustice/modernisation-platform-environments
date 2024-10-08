@@ -33,6 +33,7 @@ locals {
 
     db = {
       secrets = {
+        passwords = {}
         shared-passwords = {
           description = "db passwords shared with other accounts"
           policy = [
