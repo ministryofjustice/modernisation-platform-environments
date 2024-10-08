@@ -984,7 +984,7 @@ resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signe
 
 resource "aws_iam_role" "aws_signer_role_dev" {
   count  = local.is-development == true ? 1 : 0
-  name   = "Signer-Role-For-Lambda-DEV"
+  name   = "Signer-Role-For-Lambda-Dev"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
