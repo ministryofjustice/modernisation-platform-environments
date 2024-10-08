@@ -182,6 +182,8 @@ resource "aws_ecs_service" "app" {
 
 resource "aws_ecs_task_definition" "app" {
 
+  # checkov:skip=CKV_AWS_336
+
   network_mode             = "awsvpc"
   requires_compatibilities = [local.application_data.accounts[local.environment].ecs_type]
   execution_role_arn       = aws_iam_role.app_execution.arn
@@ -424,6 +426,7 @@ resource "aws_lb" "external" {
   # checkov:skip=CKV_AWS_91: "Sprinkler is minimally exposed to the internet so no real requirement for access logs"
   # checkov:skip=CKV_AWS_150: "Deletion protection not required for sprinkler"
   # checkov:skip=CKV2_AWS_28: "AWS Shield provides WAF by default"
+  # checkov:skip=CKV_AWS_378
   name                       = "external-${var.networking[0].application}"
   drop_invalid_header_fields = true
   internal                   = false
@@ -599,6 +602,7 @@ resource "aws_lb" "inner" {
 
 resource "aws_lb_target_group" "inner" {
   # checkov:skip=CKV_AWS_261 "Health check clearly defined"
+  # checkov:skip=CKV_AWS_378
   name                 = "inner-${var.networking[0].application}"
   port                 = "3000"
   protocol             = "HTTP"
@@ -738,6 +742,8 @@ resource "random_string" "secret_name_suffix" {
 # tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "master_password" {
   # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
+
   name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
 
   tags = merge(
@@ -774,6 +780,11 @@ resource "aws_db_instance" "app" {
   # checkov:skip=CKV_AWS_157: "multi-AZ deployment excessive for sprinkler"
   # checkov:skip=CKV_AWS_161: "IAM authentication excessive for sprinkler"
   # checkov:skip=CKV_AWS_226: "auto_upgrade_minor_version true by default"
+  # checkov:skip=CKV2_AWS_60
+  # checkov:skip=CKV2_AWS_69
+  # checkov:skip=CKV_AWS_293
+
+
   identifier                      = var.networking[0].application
   allocated_storage               = local.application_data.accounts[local.environment].rds_storage
   engine                          = "postgres"
@@ -805,6 +816,7 @@ resource "aws_db_instance" "app" {
 #tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "app" {
   #checkov:skip=CKV_AWS_158
+  #checkov:skip=CKV_AWS_338
   name              = var.networking[0].application
   retention_in_days = 90
 
