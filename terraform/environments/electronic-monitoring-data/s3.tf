@@ -541,11 +541,12 @@ module "s3-data-bucket" {
 module "s3-fms-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "fms"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "general"
+  data_feed             = "fms"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "general"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -567,11 +568,12 @@ module "s3-fms-general-landing-bucket-iam-user" {
 module "s3-fms-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "fms"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "specials"
+  data_feed             = "fms"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "specials"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -597,11 +599,12 @@ module "s3-fms-specials-landing-bucket-iam-user" {
 module "s3-mdss-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "mdss"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "general"
+  data_feed             = "mdss"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "general"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -611,11 +614,12 @@ module "s3-mdss-general-landing-bucket" {
 module "s3-mdss-ho-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "mdss"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "ho"
+  data_feed             = "mdss"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "ho"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -625,11 +629,12 @@ module "s3-mdss-ho-landing-bucket" {
 module "s3-mdss-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "mdss"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "specials"
+  data_feed             = "mdss"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "specials"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws

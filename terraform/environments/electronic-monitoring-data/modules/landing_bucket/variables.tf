@@ -30,3 +30,8 @@ variable "order_type" {
   description = "The name of the order type data"
   type        = string
 }
+
+variable "s3_trigger_lambda_arn" {
+  description = "The lambda arn used with s3 notification to be triggered on ObjectCreated*"
+  type        = string
+}
