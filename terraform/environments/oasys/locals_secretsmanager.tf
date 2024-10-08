@@ -4,6 +4,7 @@ locals {
     development = []
     test = [
       "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-test}:policy/EC2SecretPolicy",
+      "arn:aws:iam::${module.environment.account_ids.oasys-test}:policy/Ec2T2DatabasePolicy",
     ]
     preproduction = []
     production    = []
@@ -36,7 +37,7 @@ locals {
         passwords = {
           description = "db passwords shared with other accounts"
           policy = [
-            local.secretsmanager_secret_policies.domain_read,
+            local.secretsmanager_secret_policies.domain_read
           ]
         }
       }
