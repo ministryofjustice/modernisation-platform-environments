@@ -342,4 +342,7 @@ module "process_landing_bucket_files" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    DESTINATION_BUCKET = module.s3-received-files-bucket.bucket.id
+  }
 }
