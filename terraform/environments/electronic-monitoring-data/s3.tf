@@ -872,12 +872,22 @@ module "s3-dms-target-store-bucket" {
 
 ## temp set up for old s3 bucket
 
-resource "aws_s3_bucket" "bucket" {
-  bucket = "em-data-store-20240131164239595200000002"
+resource "aws_s3_bucket" "data_store" {
+  bucket_prefix = "em-data-store-"
+  force_destroy = false
+  tags = {
+    "application"            = "electronic-monitoring-data"
+    "business-unit"          = "HMPPS"
+    "environment-name"       = "electronic-monitoring-data-production"
+    "infrastructure-support" = "dataengineering@digital.justice.gov.uk"
+    "is-production"          = "true"
+    "owner"                  = "Data engineering: dataengineering@digital.justice.gov.uk"
+    "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+  }
 }
 
-resource "aws_s3_bucket_public_access_block" "bucket" {
-  bucket                  = aws_s3_bucket.bucket.id
+resource "aws_s3_bucket_public_access_block" "data_store" {
+  bucket                  = aws_s3_bucket.data_store.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -885,7 +895,7 @@ resource "aws_s3_bucket_public_access_block" "bucket" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "bucket" {
-  bucket = aws_s3_bucket.bucket.id
+  bucket = aws_s3_bucket.data_store.id
   rule {
     object_ownership = "ObjectWriter"
   }
