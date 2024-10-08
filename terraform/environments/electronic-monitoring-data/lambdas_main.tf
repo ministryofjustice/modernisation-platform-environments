@@ -312,7 +312,6 @@ module "unzipped_presigned_url" {
   production_dev          = local.is-production ? "prod" : "dev"
 }
 
-
 #-----------------------------------------------------------------------------------
 # Rotate IAM keys
 #-----------------------------------------------------------------------------------
@@ -324,6 +323,22 @@ module "rotate_iam_key" {
   role_name               = aws_iam_role.rotate_iam_keys.name
   role_arn                = aws_iam_role.rotate_iam_keys.arn
   memory_size             = 2048
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+}
+
+#-----------------------------------------------------------------------------------
+# Process landing bucket files
+#-----------------------------------------------------------------------------------
+
+module "process_landing_bucket_files" {
+  source                  = "./modules/lambdas"
+  function_name           = "process_landing_bucket_files"
+  is_image                = true
+  role_name               = aws_iam_role.process_landing_bucket_files.name
+  role_arn                = aws_iam_role.process_landing_bucket_files.arn
+  memory_size             = 1024
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
