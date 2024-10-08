@@ -299,6 +299,10 @@ locals {
       "/oracle/database/PPONRBDS" = local.secretsmanager_secrets.db
       "/oracle/database/PPMISTN2" = local.secretsmanager_secrets.db
       "/oracle/database/PPOASRP2" = local.secretsmanager_secrets.db
+      "/oracle/database/PPMISTN3" = local.secretsmanager_secrets.db # for AWS BODS testing
+      "/oracle/database/PPOASRP3" = local.secretsmanager_secrets.db # for AWS BODS testing
+      "/oracle/database/PPBOSYS"  = local.secretsmanager_secrets.db_bip
+      "/oracle/database/PPBOAUD"  = local.secretsmanager_secrets.db_bip
 
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets.db_oasys
