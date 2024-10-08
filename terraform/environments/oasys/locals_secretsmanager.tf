@@ -33,8 +33,7 @@ locals {
 
     db = {
       secrets = {
-        passwords = {}
-        shared-passwords = {
+        passwords = {
           description = "db passwords shared with other accounts"
           policy = [
             local.secretsmanager_secret_policies.domain_read,
