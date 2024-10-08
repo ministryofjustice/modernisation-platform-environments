@@ -1027,8 +1027,6 @@ module "s3-dms-target-store-bucket" {
   tags = local.tags
 }
 
-<<<<<<< HEAD
-=======
 ## temp set up for old s3 bucket
 #trivy:ignore:AVD-AWS-0088
 #trivy:ignore:AVD-AWS-0090
@@ -1097,4 +1095,3 @@ resource "aws_s3_bucket_policy" "data_store" {
   bucket = aws_s3_bucket.data_store.id
   policy = data.aws_iam_policy_document.data_store_deny_all.json
 }
->>>>>>> 3ec5f130d (add some skipping checks)
