@@ -195,6 +195,18 @@ locals {
           nomis-combined-reporting-environment = "pp"
         })
       })
+
+      pp-ncr-web-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PPReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pp"
+        })
+      })
     }
 
     efs = {
@@ -293,6 +305,7 @@ locals {
           })
           pp-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
             attachments = [
+              { ec2_instance_name = "pp-ncr-web-1" },
             ]
           })
         }
