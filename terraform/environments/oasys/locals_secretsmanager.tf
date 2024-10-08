@@ -3,7 +3,7 @@ locals {
   domain_share_secret_principal_ids = {
     development = []
     test = [
-      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-test}:policy/EC2SecretPolicy",
+      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-test}:role/ec2-instance-role-t2-onr-bods-*",
       "arn:aws:iam::${module.environment.account_ids.oasys-test}:policy/Ec2T2DatabasePolicy",
     ]
     preproduction = []
