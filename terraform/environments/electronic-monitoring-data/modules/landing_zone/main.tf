@@ -62,29 +62,9 @@ module "landing-bucket" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 70
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
-        days = 140
+        days = 14
       }
-
-      noncurrent_version_transition = [
-        {
-          days          = 6
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 10
-          storage_class = "GLACIER"
-        }
-      ]
 
       noncurrent_version_expiration = {
         days = 21
