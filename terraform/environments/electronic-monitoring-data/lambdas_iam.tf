@@ -646,6 +646,7 @@ data "aws_iam_policy_document" "process_landing_bucket_files_s3_policy_document"
     actions = [
       "s3:PutObjectTagging",
       "s3:GetObject",
+      "s3:GetObjectTagging",
       "s3:DeleteObject"
     ]
     resources = [
@@ -661,7 +662,8 @@ data "aws_iam_policy_document" "process_landing_bucket_files_s3_policy_document"
     sid    = "S3PermissionsForReceivedFilesBucket"
     effect = "Allow"
     actions = [
-      "s3:PutObject"
+      "s3:PutObject",
+      "s3:PutObjectTagging"
     ]
     resources = [
       "${module.s3-received-files-bucket.bucket.arn}/*",
