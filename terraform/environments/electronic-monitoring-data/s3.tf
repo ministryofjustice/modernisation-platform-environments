@@ -870,3 +870,64 @@ module "s3-dms-target-store-bucket" {
   tags = local.tags
 }
 
+## temp set up for old s3 bucket
+#trivy:ignore:AVD-AWS-0088
+#trivy:ignore:AVD-AWS-0090
+#trivy:ignore:AVD-AWS-0132
+#trivy:ignore:s3-bucket-logging
+#tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-enable-versioning
+resource "aws_s3_bucket" "data_store" {
+  bucket_prefix = "em-data-store-"
+  force_destroy = false
+  tags = {
+    "application"            = "electronic-monitoring-data"
+    "business-unit"          = "HMPPS"
+    "environment-name"       = "electronic-monitoring-data-production"
+    "infrastructure-support" = "dataengineering@digital.justice.gov.uk"
+    "is-production"          = "true"
+    "owner"                  = "Data engineering: dataengineering@digital.justice.gov.uk"
+    "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "data_store" {
+  bucket                  = aws_s3_bucket.data_store.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_ownership_controls" "bucket" {
+  bucket = aws_s3_bucket.data_store.id
+  rule {
+    object_ownership = "ObjectWriter"
+  }
+}
+
+data "aws_iam_policy_document" "data_store_deny_all" {
+  statement {
+    sid     = "EnforceTLSv12orHigher"
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.default.arn,
+      "${aws_s3_bucket.default.arn}/*"
+    ]
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "data_store" {
+  bucket = aws_s3_bucket.data_store.id
+  policy = data.aws_iam_policy_document.data_store_deny_all.json
+}

@@ -118,23 +118,10 @@ locals {
   maintenance_job_retry_min_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_min_wait_millis
   maintenance_job_retry_max_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_max_wait_millis
 
-  # Compact Raw Job
-  compact_raw_job_worker_type = local.application_data.accounts[local.environment].compact_raw_job_worker_type
-  compact_raw_job_num_workers = local.application_data.accounts[local.environment].compact_raw_job_num_workers
-  compact_raw_job_log_level   = local.application_data.accounts[local.environment].compact_raw_job_log_level
-  compact_raw_job_schedule    = local.application_data.accounts[local.environment].compact_raw_job_schedule
-
-  # Compact Structured Job
-  compact_structured_job_worker_type = local.application_data.accounts[local.environment].compact_structured_job_worker_type
-  compact_structured_job_num_workers = local.application_data.accounts[local.environment].compact_structured_job_num_workers
-  compact_structured_job_log_level   = local.application_data.accounts[local.environment].compact_structured_job_log_level
-  compact_structured_job_schedule    = local.application_data.accounts[local.environment].compact_structured_job_schedule
-
-  # Compact Curated Job
-  compact_curated_job_worker_type = local.application_data.accounts[local.environment].compact_curated_job_worker_type
-  compact_curated_job_num_workers = local.application_data.accounts[local.environment].compact_curated_job_num_workers
-  compact_curated_job_log_level   = local.application_data.accounts[local.environment].compact_curated_job_log_level
-  compact_curated_job_schedule    = local.application_data.accounts[local.environment].compact_curated_job_schedule
+  # Compact Job
+  compact_job_worker_type = local.application_data.accounts[local.environment].compact_job_worker_type
+  compact_job_num_workers = local.application_data.accounts[local.environment].compact_job_num_workers
+  compact_job_log_level   = local.application_data.accounts[local.environment].compact_job_log_level
 
   # Compact Domain Job
   compact_domain_job_worker_type = local.application_data.accounts[local.environment].compact_domain_job_worker_type
@@ -142,23 +129,10 @@ locals {
   compact_domain_job_log_level   = local.application_data.accounts[local.environment].compact_domain_job_log_level
   compact_domain_job_schedule    = local.application_data.accounts[local.environment].compact_domain_job_schedule
 
-  # Retention (vacuum) Raw Job
-  retention_raw_job_worker_type = local.application_data.accounts[local.environment].retention_raw_job_worker_type
-  retention_raw_job_num_workers = local.application_data.accounts[local.environment].retention_raw_job_num_workers
-  retention_raw_job_log_level   = local.application_data.accounts[local.environment].retention_raw_job_log_level
-  retention_raw_job_schedule    = local.application_data.accounts[local.environment].retention_raw_job_schedule
-
-  # Retention (vacuum) Structured Job
-  retention_structured_job_worker_type = local.application_data.accounts[local.environment].retention_structured_job_worker_type
-  retention_structured_job_num_workers = local.application_data.accounts[local.environment].retention_structured_job_num_workers
-  retention_structured_job_log_level   = local.application_data.accounts[local.environment].retention_structured_job_log_level
-  retention_structured_job_schedule    = local.application_data.accounts[local.environment].retention_structured_job_schedule
-
-  # Retention (vacuum) Curated Job
-  retention_curated_job_worker_type = local.application_data.accounts[local.environment].retention_curated_job_worker_type
-  retention_curated_job_num_workers = local.application_data.accounts[local.environment].retention_curated_job_num_workers
-  retention_curated_job_log_level   = local.application_data.accounts[local.environment].retention_curated_job_log_level
-  retention_curated_job_schedule    = local.application_data.accounts[local.environment].retention_curated_job_schedule
+  # Retention (vacuum) Job
+  retention_job_worker_type = local.application_data.accounts[local.environment].retention_job_worker_type
+  retention_job_num_workers = local.application_data.accounts[local.environment].retention_job_num_workers
+  retention_job_log_level   = local.application_data.accounts[local.environment].retention_job_log_level
 
   # Retention (vacuum) Domain Job
   retention_domain_job_worker_type = local.application_data.accounts[local.environment].retention_domain_job_worker_type
