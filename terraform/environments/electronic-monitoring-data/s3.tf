@@ -870,3 +870,23 @@ module "s3-dms-target-store-bucket" {
   tags = local.tags
 }
 
+## temp set up for old s3 bucket
+
+resource "aws_s3_bucket" "bucket" {
+  bucket = "em-data-store-20240131164239595200000002"
+}
+
+resource "aws_s3_bucket_public_access_block" "bucket" {
+  bucket                  = aws_s3_bucket.bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_ownership_controls" "bucket" {
+  bucket = aws_s3_bucket.bucket.id
+  rule {
+    object_ownership = "ObjectWriter"
+  }
+}
