@@ -495,8 +495,8 @@ locals {
       "/oracle/database/T2ONRAUD" = local.secretsmanager_secrets.db
       "/oracle/database/T2ONRBDS" = local.secretsmanager_secrets.db
 
-      "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db_bip
-      "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db_onr
+      "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db_onr
     }
   }
 }

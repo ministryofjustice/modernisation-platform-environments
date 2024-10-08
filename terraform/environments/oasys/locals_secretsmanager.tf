@@ -47,13 +47,19 @@ locals {
 
     db_bip = {
       secrets = {
+        passwords     = {}
+        bip-passwords = {}
+      }
+    }
+
+    db_onr = {
+      secrets = {
         passwords = {
-          description = "db passwords shared with other accounts"
+          description = "onr db passwords shared with other accounts"
           policy = [
             local.secretsmanager_secret_policies.domain_read
           ]
         }
-        bip-passwords = {}
       }
     }
   }
