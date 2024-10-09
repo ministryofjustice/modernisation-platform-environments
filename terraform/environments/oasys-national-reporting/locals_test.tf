@@ -123,6 +123,31 @@ locals {
         })
         cloudwatch_metric_alarms = null
       })
+
+      # TODO: this is just for testing, remove when not needde
+      t2-tst-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bods.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+          user_data_raw = base64encode(templatefile(
+            "./templates/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-584/onr-bods-preprod"
+            }
+          ))
+        })
+        instance = merge(local.ec2_autoscaling_groups.bods.instance, {
+          instance_type = "m4.xlarge"
+        })
+        tags = merge(local.ec2_autoscaling_groups.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+          domain-name                          = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
     }
 
     ec2_instances = {
