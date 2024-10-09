@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "oidc_assume_role_policy" {
 # --------------------------------------------
 
 resource "aws_iam_role" "test_ap_airflow" {
-  name                  = "test-ap-airflow"
+  name                  = "airflow-dev-test-cross-account-access"
   description           = "testing that the oidc conn with ap airflow compute works"
   assume_role_policy    = data.aws_iam_policy_document.oidc_assume_role_policy.json
   force_detach_policies = true
