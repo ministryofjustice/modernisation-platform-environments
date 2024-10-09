@@ -24,12 +24,12 @@ data "aws_iam_policy_document" "oidc_assume_role_policy" {
     condition {
       test     = "StringEquals"
       values   = ["system:serviceaccount:airflow:${local.role_name}"]
-      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:sub"
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${var.secret_code}:sub"
     }
     condition {
       test     = "StringEquals"
       values   = ["sts.amazonaws.com"]
-      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:aud"
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${var.secret_code}:aud"
     }
   }
 }

@@ -12,3 +12,8 @@ variable "iam_policy_document" {
   type     = list(string)
   nullable = false
 }
+
+variable "secret_code" {
+  type     = string
+  nullable = false
+}
