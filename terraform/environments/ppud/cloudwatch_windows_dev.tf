@@ -30,7 +30,7 @@ data "aws_instances" "e_volume_tagged_instances" {
 
 # Low Disk Alarm for all Dev Windows instances with C Volumes
 
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume" {
+resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume_dev" {
   for_each            = toset(data.aws_instances.dev_windows_tagged_instances.ids)
   alarm_name          = "Low-Disk-Space-C-Volume-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
@@ -55,7 +55,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume" {
 
 # Low Disk Alarm for all Dev Windows instances with D Volumes
 
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
+resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume_dev" {
   for_each            = toset(data.aws_instances.d_volume_tagged_instances.ids)
   alarm_name          = "Low-Disk-Space-D-Volume-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
@@ -80,7 +80,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
 
 # Low Disk Alarm for all Dev Windows instances with E Volumes
 
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume" {
+resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_dev" {
   for_each            = toset(data.aws_instances.e_volume_tagged_instances.ids)
   alarm_name          = "Low-Disk-Space-E-Volume-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
