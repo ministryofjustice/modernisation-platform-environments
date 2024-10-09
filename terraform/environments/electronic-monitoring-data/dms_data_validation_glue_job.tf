@@ -1,3 +1,10 @@
+resource "aws_s3_object" "aws_s3_object_pyzipfile_to_s3folder" {
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "${var.s3_pylib_dir_path}/dv_reusable_constants.zip"
+  source = data.archive_file.archive_file_zip_py_files.output_path
+  acl    = "private"
+}
+
 resource "aws_s3_object" "dms_dv_rds_and_s3_parquet_write_v2" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_rds_and_s3_parquet_write_v2.py"
@@ -159,6 +166,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v4d" {
     "--rds_db_tbl_pkeys_col_list"         = ""
     "--rds_df_trim_str_columns"           = "false"
     "--rds_df_trim_micro_sec_ts_col_list" = ""
+    "--extra_py_files"                    = "s3://${module.s3-glue-job-script-bucket.bucket.id}/reusable-pylib/dv_reusable_constants.zip"
     "--parquet_src_bucket_name"           = module.s3-dms-target-store-bucket.bucket.id
     "--parquet_output_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
