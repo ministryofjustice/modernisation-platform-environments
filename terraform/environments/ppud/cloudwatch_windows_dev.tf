@@ -47,8 +47,8 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume_dev" {
   dimensions = {
     InstanceId = each.key
     instance   = "C:"
-    ImageId    = data.aws_instance.instance_details[each.value].ami
-    InstanceType = data.aws_instance.instance_details[each.value].instance_type
+    ImageId    = data.aws_instance.instance_details_dev[each.value].ami
+    InstanceType = data.aws_instance.instance_details_dev[each.value].instance_type
     objectname = "LogicalDisk"
   }
 }
@@ -72,8 +72,8 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume_dev" {
   dimensions = {
     InstanceId = each.key
     instance   = "D:"
-    ImageId    = data.aws_instance.instance_details[each.value].ami
-    InstanceType = data.aws_instance.instance_details[each.value].instance_type
+    ImageId    = data.aws_instance.instance_details_dev[each.value].ami
+    InstanceType = data.aws_instance.instance_details_dev[each.value].instance_type
     objectname = "LogicalDisk"
   }
 }
@@ -97,8 +97,8 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_dev" {
   dimensions = {
     InstanceId = each.key
     instance   = "E:"
-    ImageId    = data.aws_instance.instance_details[each.value].ami
-    InstanceType = data.aws_instance.instance_details[each.value].instance_type
+    ImageId    = data.aws_instance.instance_details_dev[each.value].ami
+    InstanceType = data.aws_instance.instance_details_dev[each.value].instance_type
     objectname = "LogicalDisk"
   }
 }
