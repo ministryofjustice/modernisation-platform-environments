@@ -259,7 +259,7 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 28 }
+          "/dev/sdb"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
