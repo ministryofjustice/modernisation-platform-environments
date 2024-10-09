@@ -4,13 +4,15 @@
       "example_var": "dev-data"
     },
     "test": {
-      "example_var": "test-data"
+      "example_var": "test-data",
+      "enable_airflow_secret": true
     },
     "preproduction": {
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "enable_airflow_secret": true
     }
   }
 }
