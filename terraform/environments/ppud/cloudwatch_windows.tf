@@ -11,7 +11,7 @@ data "aws_instances" "windows_tagged_instances" {
 }
 
 # Data source for ImageId and InstanceType for each instance
-data "aws_instance" "instance_details" {
+data "aws_instance" "windows_instance_details" {
   for_each    = toset(data.aws_instances.windows_tagged_instances.ids)
   instance_id = each.value
 }
@@ -35,8 +35,8 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume" {
   dimensions = {
     InstanceId = each.key
     instance   = "C:"
-    ImageId    = data.aws_instance.instance_details[each.value].ami
-    InstanceType = data.aws_instance.instance_details[each.value].instance_type
+    ImageId    = data.aws_instance.windows_instance_details[each.value].ami
+    InstanceType = data.aws_instance.windows_instance_details[each.value].instance_type
     objectname = "LogicalDisk"
   }
 }
@@ -60,8 +60,8 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
   dimensions = {
     InstanceId = each.key
     instance   = "D:"
-    ImageId    = data.aws_instance.instance_details[each.value].ami
-    InstanceType = data.aws_instance.instance_details[each.value].instance_type
+    ImageId    = data.aws_instance.windows_instance_details[each.value].ami
+    InstanceType = data.aws_instance.windows_instance_details[each.value].instance_type
     objectname = "LogicalDisk"
   }
 }
@@ -171,7 +171,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw022" {
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
-  threshold           = "1"
+  threshold           = "0.5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
@@ -283,7 +283,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_H_volume_rgvw027" {
 
 resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "Memory-percentage-Committed-Bytes-In-Use-${each.key}"
+  alarm_name          = "Memory-Percentage-Committed-Bytes-In-Use-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "15"
   datapoints_to_alarm = "15"
@@ -304,7 +304,7 @@ resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use
 # High CPU IOwait Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "cpu-usage-iowait-${each.key}"
+  alarm_name          = "CPU-Usage-IOWait-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "6"
   datapoints_to_alarm = "5"
@@ -324,7 +324,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
 # CPU Utilization Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "CPU-High-${each.key}"          # name of the alarm
+  alarm_name          = "CPU-Utilisation-High-${each.key}"          # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold" # threshold to trigger the alarm state
   period              = "60"                            # period in seconds over which the specified statistic is applied
   threshold           = "90"                            # threshold for the alarm - see comparison_operator for usage
@@ -348,7 +348,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
 # Instance Health Alarm
 resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "instance-health-check-failed-${each.key}"
+  alarm_name          = "Instance-Health-Check-Failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   datapoints_to_alarm = "2"
@@ -368,7 +368,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
 # Status Check Alarm
 resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "system-health-check-failed-${each.key}"
+  alarm_name          = "System-Health-Check-Failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   datapoints_to_alarm = "2"
