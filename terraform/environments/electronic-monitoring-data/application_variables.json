@@ -1,7 +1,8 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "enable_airflow_secret": false
     },
     "test": {
       "example_var": "test-data",
