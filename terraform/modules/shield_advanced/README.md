@@ -8,9 +8,32 @@ without needing to resort to ClickOps processes.
 Because the `aws_wafv2_web_acl` is pre-created by AWS Firewall Manager via the MOJ Root Account code, it needs to be
 imported as part of the module setup. This can be done via the command line, or with an import block.
 
-```shell
+```hcl
 import {
   id = "c6f3ba81-c457-40f6-bd1f-30e777f60c27/FMManagedWebACLV2-shield_advanced_auto_remediate-1652297838425/REGIONAL"
+  to = module.shield.aws_wafv2_web_acl.main
+}
+```
+
+Using a data source it is possible to create an import block that is dynamic, allowing you to import for all environments in one run.
+
+```hcl
+data "external" "shield_waf" {
+  program = [
+    "bash", "-c",
+    "aws wafv2 list-web-acls --scope REGIONAL --output json | jq -c '{arn: .WebACLs[] | select(.Name | contains(\"FMManagedWebACL\")) | .ARN, name: .WebACLs[] | select(.Name | contains(\"FMManagedWebACL\")) | .Name}'"
+  ]
+}
+
+locals {
+  split_arn = split("regional/webacl/", data.external.shield_waf.result["arn"])[1]
+  name = data.external.shield_waf.result["name"]
+  id = split("/", local.split_arn)[1]
+  scope = "REGIONAL"
+}
+
+import {
+  id = "${local.id}/${local.name}/${local.scope}"
   to = module.shield.aws_wafv2_web_acl.main
 }
 ```
