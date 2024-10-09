@@ -43,7 +43,7 @@ module "alb" {
   account_number                   = local.environment_management.account_ids[terraform.workspace]
   environment                      = local.environment
   region                           = "eu-west-2"
-  enable_deletion_protection       = false
+  enable_deletion_protection       = local.environment == "production" ? true : false
   idle_timeout                     = 65
   force_destroy_bucket             = true
   security_group_ingress_from_port = 443
