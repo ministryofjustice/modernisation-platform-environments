@@ -1,30 +1,3 @@
-# --------------------------------------------
-# oidc assume role policy for airflow
-# --------------------------------------------
-
-data "aws_iam_policy_document" "oidc_assume_role_policy" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    principals {
-      type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.analytical_platform_compute.arn]
-    }
-  }
-}
-
-
-# --------------------------------------------
-# test airflow iam works
-# --------------------------------------------
-
-resource "aws_iam_role" "test_ap_airflow" {
-  name                  = "airflow-dev-test-cross-account-access"
-  description           = "testing that the oidc conn with ap airflow compute works"
-  assume_role_policy    = data.aws_iam_policy_document.oidc_assume_role_policy.json
-  force_detach_policies = true
-}
-
 data "aws_iam_policy_document" "test_ap_airflow" {
   statement {
     sid       = "TestAPAirflowPermissionsListBuckets"
@@ -34,12 +7,9 @@ data "aws_iam_policy_document" "test_ap_airflow" {
   }
 }
 
-resource "aws_iam_policy" "test_ap_airflow" {
-  name   = "test-ap-airflow-list-buckets"
-  policy = data.aws_iam_policy_document.test_ap_airflow.json
-}
-
-resource "aws_iam_role_policy_attachment" "test_ap_airflow" {
-  role       = aws_iam_role.test_ap_airflow.name
-  policy_arn = aws_iam_policy.test_ap_airflow.arn
+module "test_ap_airflow" {
+  source              = "./modules/ap_airflow_iam_role"
+  role_name_suffix    = "test-cross-account-access"
+  role_description    = ""
+  iam_policy_document = data.aws_iam_policy_document.test_ap_airflow.json
 }
