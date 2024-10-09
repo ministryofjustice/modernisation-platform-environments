@@ -13,4 +13,5 @@ module "test_ap_airflow" {
   role_description    = ""
   iam_policy_document = data.aws_iam_policy_document.test_ap_airflow.json
   secret_code         = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
 }
