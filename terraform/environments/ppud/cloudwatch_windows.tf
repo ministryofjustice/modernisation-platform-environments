@@ -10,29 +10,18 @@ data "aws_instances" "windows_tagged_instances" {
   }
 }
 
+# Data source for all Windows servers tagged as having E volumes
+data "aws_instances" "e_volume_tagged_instances" {
+  filter {
+    name   = "tag:e_volume"
+    values = ["yes"]
+  }
+}
+
+# Data source for ImageId and InstanceType for each instance
 data "aws_instance" "instance_details" {
   for_each    = toset(data.aws_instances.windows_tagged_instances.ids)
   instance_id = each.value
-}
-
-# Disk Free Alarm
-resource "aws_cloudwatch_metric_alarm" "high_disk_usage" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "high-disk-usage-${each.key}"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "3"
-  datapoints_to_alarm = "2"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "5"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 2 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId = each.key
-  }
 }
 
 # Low Disk Alarm for all Windows instances with C Volumes
@@ -79,6 +68,31 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
   dimensions = {
     InstanceId = each.key
     instance   = "D:"
+    ImageId    = data.aws_instance.instance_details[each.value].ami
+    InstanceType = data.aws_instance.instance_details[each.value].instance_type
+    objectname = "LogicalDisk"
+  }
+}
+
+# Low Disk Alarm for all Windows instances with E Volumes
+
+resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume" {
+  for_each            = toset(data.aws_instances.e_volume_tagged_instances.ids)
+  alarm_name          = "Low-Disk-Space-E-Volume-${each.key}"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "LogicalDisk % Free Space"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "5"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    InstanceId = each.key
+    instance   = "E:"
     ImageId    = data.aws_instance.instance_details[each.value].ami
     InstanceType = data.aws_instance.instance_details[each.value].instance_type
     objectname = "LogicalDisk"
