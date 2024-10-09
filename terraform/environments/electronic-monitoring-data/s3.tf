@@ -541,11 +541,12 @@ module "s3-data-bucket" {
 module "s3-fms-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "fms"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "general"
+  data_feed             = "fms"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "general"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -567,11 +568,12 @@ module "s3-fms-general-landing-bucket-iam-user" {
 module "s3-fms-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "fms"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "specials"
+  data_feed             = "fms"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "specials"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -597,11 +599,12 @@ module "s3-fms-specials-landing-bucket-iam-user" {
 module "s3-mdss-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "mdss"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "general"
+  data_feed             = "mdss"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "general"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -611,11 +614,12 @@ module "s3-mdss-general-landing-bucket" {
 module "s3-mdss-ho-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "mdss"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "ho"
+  data_feed             = "mdss"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "ho"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -625,15 +629,173 @@ module "s3-mdss-ho-landing-bucket" {
 module "s3-mdss-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed           = "mdss"
-  local_bucket_prefix = local.bucket_prefix
-  local_tags          = local.tags
-  logging_bucket      = module.s3-logging-bucket
-  order_type          = "specials"
+  data_feed             = "mdss"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+  order_type            = "specials"
+  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
   }
+}
+
+# ----------------------------------
+# Virus scanning buckets
+# ----------------------------------
+
+module "s3-received-files-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+
+  bucket_prefix      = "${local.bucket_prefix}-received-files-"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix = "logs/${local.bucket_prefix}-received-files/"
+
+  log_partition_date_source = "EventTime"
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 90
+      }
+    }
+  ]
+
+  tags = local.tags
+}
+
+module "s3-quarantine-files-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+
+  bucket_prefix      = "${local.bucket_prefix}-quarantined-files-"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix = "logs/${local.bucket_prefix}-quarantined-files/"
+
+  log_partition_date_source = "EventTime"
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 90
+      }
+    }
+  ]
+
+  tags = local.tags
+}
+
+module "s3-clamav-definitions-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+
+  bucket_prefix      = "${local.bucket_prefix}-clamav-definitions-"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix = "logs/${local.bucket_prefix}-clamav-definitions/"
+
+  log_partition_date_source = "EventTime"
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 90
+      }
+    }
+  ]
+
+  tags = local.tags
 }
 
 # ------------------------------------------------------------------------
@@ -878,6 +1040,13 @@ module "s3-dms-target-store-bucket" {
 #tfsec:ignore:aws-s3-enable-bucket-logging
 #tfsec:ignore:aws-s3-enable-versioning
 resource "aws_s3_bucket" "data_store" {
+  #checkov:skip:CKV_AWS_145
+  #checkov:skip:CKV_AWS_144
+  #checkov:skip:CKV_AWS_21
+  #checkov:skip:CKV2_AWS_65
+  #checkov:skip:CKV2_AWS_62
+  #checkov:skip:CKV_AWS_18
+  #checkov:skip:CKV2_AWS_61
   bucket_prefix = "em-data-store-"
   force_destroy = false
   tags = {
@@ -912,8 +1081,9 @@ data "aws_iam_policy_document" "data_store_deny_all" {
     effect  = "Deny"
     actions = ["s3:*"]
     resources = [
-      aws_s3_bucket.default.arn,
-      "${aws_s3_bucket.default.arn}/*"
+      aws_s3_bucket.data_store.arn,
+      "${aws_s3_bucket.data_store.arn}/*"
+
     ]
     principals {
       identifiers = ["*"]

@@ -59,6 +59,7 @@ module "glue_compact_domain_job" {
     "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.compact_job_class
     "--dpr.maintenance.root.path"           = local.domain_zone_root_path
+    "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
     "--datalake-formats"                    = "delta"
     "--dpr.log.level"                       = local.compact_domain_job_log_level
     "--dpr.datastorage.retry.maxAttempts"   = local.maintenance_job_retry_max_attempts
@@ -106,6 +107,7 @@ module "glue_retention_domain_job" {
     "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.retention_job_class
     "--dpr.maintenance.root.path"           = local.domain_zone_root_path
+    "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
     "--datalake-formats"                    = "delta"
     "--dpr.log.level"                       = local.retention_domain_job_log_level
     "--dpr.datastorage.retry.maxAttempts"   = local.maintenance_job_retry_max_attempts
