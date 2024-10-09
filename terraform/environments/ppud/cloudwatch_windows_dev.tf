@@ -7,7 +7,7 @@ data "aws_instances" "dev_windows_tagged_instances" {
   }
 }
 
-data "aws_instance" "instance_details" {
+data "aws_instance" "instance_details_dev" {
   for_each    = toset(data.aws_instances.dev_windows_tagged_instances.ids)
   instance_id = each.value
 }
