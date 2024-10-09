@@ -2,7 +2,7 @@ data "aws_iam_policy_document" "test_ap_airflow" {
   statement {
     sid       = "TestAPAirflowPermissionsListBuckets"
     effect    = "Allow"
-    actions   = ["s3:ListBuckets", "s3:GetBucketLocation", "s3:ListAllMyBuckets"]
+    actions   = ["s3:GetBucketLocation", "s3:ListAllMyBuckets"]
     resources = ["arn:aws:s3:::*"]
   }
 }
