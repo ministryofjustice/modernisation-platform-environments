@@ -43,7 +43,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume_dev" {
   threshold           = "5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.ec2_cloudwatch_alarms[0].arn]
   dimensions = {
     InstanceId = each.key
     instance   = "C:"
@@ -68,7 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume_dev" {
   threshold           = "5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.ec2_cloudwatch_alarms[0].arn]
   dimensions = {
     InstanceId = each.key
     instance   = "D:"
@@ -93,7 +93,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_dev" {
   threshold           = "5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.ec2_cloudwatch_alarms[0].arn]
   dimensions = {
     InstanceId = each.key
     instance   = "E:"
