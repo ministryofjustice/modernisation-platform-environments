@@ -22,7 +22,7 @@
           ]
         }
       ],
-      "enable_airflow_secret": false
+      "enable_airflow_secret": true
     },
     "test": {
       "example_var": "test-data",
