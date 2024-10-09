@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "oidc_assume_role_policy" {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.analytical_platform_compute.arn]
+      identifiers = [var.oidc_arn]
     }
     condition {
       test     = "StringEquals"
