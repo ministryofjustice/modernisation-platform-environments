@@ -21,20 +21,20 @@ data "aws_instance" "linux_instance_details" {
 resource "aws_cloudwatch_metric_alarm" "low_disk_space_root_volume" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
   alarm_name          = "Low-Disk-Space-Root-Volume-${each.key}"
-  comparison_operator = "LessThanOrEqualToThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "5"
   datapoints_to_alarm = "5"
   metric_name         = "disk_used_percent"
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
-  threshold           = "5"
+  threshold           = "90"
   treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 10% for 5 minutes, the alarm will trigger"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId = each.key
-    instance   = "/"
+    path   = "/"
     ImageId    = data.aws_instance.linux_instance_details[each.value].ami
     InstanceType = data.aws_instance.linux_instance_details[each.value].instance_type
     device     = "nvme0n1p1"
