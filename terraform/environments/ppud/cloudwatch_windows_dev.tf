@@ -24,7 +24,7 @@ data "aws_instances" "d_volume_tagged_instances" {
 data "aws_instances" "e_volume_tagged_instances" {
   filter {
     name   = "tag:e_volume"
-    values = ["true"]
+    values = ["e_volume"]
   }
 }
 
