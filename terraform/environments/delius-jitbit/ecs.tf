@@ -61,6 +61,7 @@ resource "aws_security_group" "jitbit" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0104
 resource "aws_security_group_rule" "allow_all_egress" {
   description       = "Allow all outbound traffic to any IPv4 address"
   type              = "egress"
