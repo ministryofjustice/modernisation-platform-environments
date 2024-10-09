@@ -699,7 +699,7 @@ data "aws_iam_policy_document" "virus_scan_definition_upload_policy_document" {
       "s3:GetObject",
       "s3:PutObject"
     ]
-    resources = "${module.s3-clamav-definitions-bucket.bucket.arn}/*"
+    resources = ["${module.s3-clamav-definitions-bucket.bucket.arn}/*"]
   }
 }
 
@@ -732,7 +732,7 @@ data "aws_iam_policy_document" "virus_scan_file_policy_document" {
       "s3:CopyObject",
       "s3:DeleteObject",
     ]
-    resources = "${module.s3-received-files-bucket.bucket.arn}/*"
+    resources = ["${module.s3-received-files-bucket.bucket.arn}/*"]
   }
   statement {
     sid    = "S3PermissionsForQuarantineAndProcessedBucket"
@@ -743,7 +743,7 @@ data "aws_iam_policy_document" "virus_scan_file_policy_document" {
       "s3:PutObjectTagging"
     ]
     resources = [
-      "${module.s3-quarantined-files-bucket.bucket.arn}/*",
+      "${module.s3-quarantine-files-bucket.bucket.arn}/*",
       "${module.s3-data-bucket.bucket.arn}/*",
     ]
   }
