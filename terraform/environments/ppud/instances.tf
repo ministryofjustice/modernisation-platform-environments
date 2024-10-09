@@ -157,6 +157,7 @@ resource "aws_instance" "s609693lo6vw110" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+  ebs_optimized = true
 
   metadata_options {
     http_tokens   = "required"
