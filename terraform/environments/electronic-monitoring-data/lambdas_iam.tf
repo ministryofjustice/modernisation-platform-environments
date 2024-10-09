@@ -728,9 +728,10 @@ data "aws_iam_policy_document" "virus_scan_file_policy_document" {
     sid    = "S3PermissionsForReceivedBucket"
     effect = "Allow"
     actions = [
-      "s3:GetObject",
       "s3:CopyObject",
       "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:GetObjectTagging",
     ]
     resources = ["${module.s3-received-files-bucket.bucket.arn}/*"]
   }
