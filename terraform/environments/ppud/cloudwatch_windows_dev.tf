@@ -56,7 +56,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume_dev" {
 # Low Disk Alarm for all Dev Windows instances with D Volumes
 
 resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume_dev" {
-  for_each            = toset(data.aws_instances.d_volume_tagged_instances.ids)
+  for_each            = toset(data.aws_instances.dev_windows_tagged_instances.ids)
   alarm_name          = "Low-Disk-Space-D-Volume-${each.key}"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "5"
