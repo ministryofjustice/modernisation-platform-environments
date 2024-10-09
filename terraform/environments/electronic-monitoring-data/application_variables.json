@@ -44,7 +44,8 @@
             }
           ]
         }
-      ]
+      ],
+      "enable_airflow_secret": true
     },
     "preproduction": {
       "example_var": "preproduction-data"
@@ -70,7 +71,8 @@
             }
           ]
         }
-      ]
+      ],
+      "enable_airflow_secret": true
     }
   }
 }
