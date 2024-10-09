@@ -9,11 +9,16 @@ variable "role_description" {
 }
 
 variable "iam_policy_document" {
-  type     = list(string)
+  type     = string
   nullable = false
 }
 
 variable "secret_code" {
+  type     = string
+  nullable = false
+}
+
+variable "oidc_arn" {
   type     = string
   nullable = false
 }
