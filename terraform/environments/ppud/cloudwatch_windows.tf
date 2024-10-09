@@ -82,7 +82,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw021" {
   threshold           = "5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+  alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
     InstanceId = "i-080498c4c9d25e6bd"
     instance   = "E:"
@@ -104,7 +104,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw022" {
   threshold           = "0.5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+  alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
     InstanceId = "i-029d2b17679dab982"
     instance   = "E:"
@@ -126,7 +126,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw027" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+  alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
     InstanceId = "i-00cbccc46d25e77c6"
     instance   = "E:"
@@ -152,7 +152,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw021" {
   threshold           = "5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+  alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
     InstanceId = "i-080498c4c9d25e6bd"
     instance   = "F:"
@@ -174,7 +174,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw022" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+  alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
     InstanceId = "i-029d2b17679dab982"
     instance   = "E:"
@@ -196,7 +196,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw027" {
   threshold           = "2"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+  alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
     InstanceId = "i-00cbccc46d25e77c6"
     instance   = "F:"
@@ -222,7 +222,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_G_volume_rgvw021" {
   threshold           = "5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+  alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
     InstanceId = "i-080498c4c9d25e6bd"
     instance   = "G:"
@@ -244,7 +244,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_G_volume_rgvw022" {
   threshold           = "2"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+  alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
     InstanceId = "i-029d2b17679dab982"
     instance   = "G:"
@@ -269,7 +269,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_H_volume_rgvw027" {
   threshold           = "5"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+  alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
     InstanceId = "i-00cbccc46d25e77c6"
     instance   = "H:"
