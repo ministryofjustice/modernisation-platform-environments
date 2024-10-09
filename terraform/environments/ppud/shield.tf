@@ -16,7 +16,7 @@ module "shield" {
       "action"    = "count",
       "name"      = "DDoSprotection",
       "priority"  = 0,
-      "threshold" = "150"
+      "threshold" = "1000"
     }
   }
 }
