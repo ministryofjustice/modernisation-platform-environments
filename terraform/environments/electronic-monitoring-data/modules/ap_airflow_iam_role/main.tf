@@ -34,10 +34,9 @@ data "aws_iam_policy_document" "oidc_assume_role_policy" {
   }
 }
 
-
-# --------------------------------------------
-# test airflow iam works
-# --------------------------------------------
+# -----------------------------
+# define the role
+# -----------------------------
 
 resource "aws_iam_role" "role_ap_airflow" {
   name                  = local.role_name
@@ -47,7 +46,7 @@ resource "aws_iam_role" "role_ap_airflow" {
 }
 
 resource "aws_iam_policy" "role_ap_airflow" {
-  name   = "test-ap-airflow-list-buckets"
+  name   = local.role_name
   policy = var.iam_policy_document
 }
 
