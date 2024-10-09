@@ -1,3 +1,7 @@
+# ------------------------------------------
+# set up
+# ------------------------------------------
+
 locals {
   enable_airflow_secret = local.application_data.accounts[local.environment].enable_airflow_secret
   airflow_secret_placeholder = {
