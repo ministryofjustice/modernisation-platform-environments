@@ -12,4 +12,5 @@ module "test_ap_airflow" {
   role_name_suffix    = "test-cross-account-access"
   role_description    = ""
   iam_policy_document = data.aws_iam_policy_document.test_ap_airflow.json
+  secret_code         = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
 }
