@@ -263,7 +263,7 @@ locals {
         }
         instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
-          instance_type           = "t3.xlarge"
+          instance_type           = "t3.2xlarge"
         })
         tags = {
           ami              = "pd-cafm-w-37-a"
