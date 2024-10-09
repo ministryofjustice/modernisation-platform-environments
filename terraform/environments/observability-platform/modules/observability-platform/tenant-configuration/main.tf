@@ -40,11 +40,10 @@ module "athena_source" {
   for_each = {
     for name, account in var.aws_accounts : name => account if account.athena_enabled
   }
-  source           = "../../grafana/athena-source"
-  name             = each.key
-  account_id       = var.environment_management.account_ids[each.key]
-  athena_database  = ""
-  athena_workgroup = ""
+  source        = "../../grafana/athena-source"
+  name          = each.key
+  account_id    = var.environment_management.account_ids[each.key]
+  athena_config = try(each.value.athena_config, {})
 }
 
 module "prometheus_push" {

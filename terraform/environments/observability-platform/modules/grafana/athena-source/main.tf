@@ -13,7 +13,7 @@ resource "grafana_data_source" "this" {
     authType      = "ec2_iam_role"
     assumeRoleArn = "arn:aws:iam::${var.account_id}:role/observability-platform"
     externalId    = var.name
-    database      = var.athena_database
-    workgroup     = var.athena_workgroup
+    database      = var.athena_config.athena_source.database
+    workgroup     = var.athena_config.athena_source.workgroup
   })
 }
