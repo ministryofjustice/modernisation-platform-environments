@@ -10,6 +10,16 @@ data "aws_iam_policy_document" "oidc_assume_role_policy" {
       type        = "Federated"
       identifiers = [aws_iam_openid_connect_provider.analytical_platform_compute.arn]
     }
+    condition {
+      values   = ["system:serviceaccount:actions-runner-mojas-airflow"]
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:sub"
+      test     = "StringLike"
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["sts.amazonaws.com"]
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:aud"
+    }
   }
 }
 
