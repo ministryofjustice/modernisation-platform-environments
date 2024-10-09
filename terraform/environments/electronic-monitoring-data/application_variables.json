@@ -21,7 +21,8 @@
             }
           ]
         }
-      ]
+      ],
+      "enable_airflow_secret": false
     },
     "test": {
       "example_var": "test-data",
