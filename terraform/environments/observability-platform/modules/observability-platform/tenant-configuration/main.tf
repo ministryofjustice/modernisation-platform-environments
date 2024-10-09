@@ -43,8 +43,10 @@ module "athena_source" {
 
   source = "../../grafana/athena-source"
 
-  name       = each.key
-  account_id = var.environment_management.account_ids[each.key]
+  name             = each.key
+  account_id       = var.environment_management.account_ids[each.key]
+  athena_database  = each.value.athena_database
+  athena_workgroup = each.value.athena_workgroup
 }
 
 module "prometheus_push" {

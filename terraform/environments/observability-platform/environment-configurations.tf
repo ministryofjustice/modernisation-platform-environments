@@ -170,6 +170,8 @@ locals {
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
               athena_enabled                  = true
+              athena_database                 = "data"
+              athena_workgroup                = "mod-platform-cur-reports"
             },
             "core-security-production" = {
               cloudwatch_enabled              = true
