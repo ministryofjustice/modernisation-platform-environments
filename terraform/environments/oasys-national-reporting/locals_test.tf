@@ -134,7 +134,7 @@ locals {
             "Ec2SecretPolicy",
           ])
           user_data_raw = base64encode(templatefile(
-            "./templates/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
               branch = "TM/TM-584/onr-bods-preprod"
             }
           ))
