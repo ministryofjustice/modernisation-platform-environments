@@ -166,6 +166,7 @@ resource "aws_instance" "s609693lo6vw110" {
   tags = {
     Name        = "s609693lo6vw110"
     patch_group = "dev_win_patch"
+    e_volume    = "yes"
     backup      = true
   }
 }
