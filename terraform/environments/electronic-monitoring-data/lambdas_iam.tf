@@ -681,3 +681,35 @@ resource "aws_iam_role_policy_attachment" "process_landing_bucket_files_s3_polic
   role       = aws_iam_role.process_landing_bucket_files.name
   policy_arn = aws_iam_policy.process_landing_bucket_files_s3.arn
 }
+
+#-----------------------------------------------------------------------------------
+# Virus scanning - definition upload
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "virus_scan_definition_upload" {
+  name               = "virus_scan_definition_upload"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "virus_scan_definition_upload_policy_document" {
+  statement {
+    sid    = "AllowS3"
+    effect = "Allow"
+    actions = [
+        "s3:GetObject",
+        "s3:PutObject"
+    ]
+    resources = "${module.s3-clamav-definitions-bucket.bucket.arn}/*"
+  }
+}
+
+resource "aws_iam_policy" "virus_scan_definition_upload" {
+  name        = "virus-scan-definitions-upload-policy"
+  description = "Policy for Lambda to get and upload latest clamav virus definitions"
+  policy      = data.aws_iam_policy_document.virus_scan_definition_upload_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "virus_scan_definition_upload_policy_attachment" {
+  role       = aws_iam_role.virus_scan_definition_upload.name
+  policy_arn = aws_iam_policy.virus_scan_definition_upload.arn
+}
