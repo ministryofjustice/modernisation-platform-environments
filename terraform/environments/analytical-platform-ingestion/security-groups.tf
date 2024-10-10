@@ -124,6 +124,13 @@ module "datasync_instance_security_group" {
     "https-443-tcp"
   ]
 
+  ingress_with_source_security_group_id = [
+    {
+      rule                     = "http-80-tcp"
+      source_security_group_id = module.datasync_activation_nlb_security_group.security_group_id
+    }
+  ]
+
   tags = local.tags
 }
 
