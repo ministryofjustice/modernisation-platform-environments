@@ -19,7 +19,6 @@ resource "aws_s3_bucket" "PPUD" {
   )
 }
 
-
 resource "aws_s3_bucket_acl" "PPUD_ACL" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.PPUD[0].id
@@ -52,6 +51,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "PPUD" {
   }
 }
 
+resource "aws_s3_bucket_logging" "PPUD" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.PPUD[0].id
+
+  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  target_prefix = "logs/"
+}
 
 # S3 block public access
 resource "aws_s3_bucket_public_access_block" "PPUD" {
@@ -103,6 +109,7 @@ resource "aws_s3_bucket_policy" "PPUD" {
 # Create S3 Bucket for SSM Health Check Reports
 
 resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   bucket = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
   tags = merge(
     local.tags,
@@ -143,6 +150,14 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
   }
 }
 
+resource "aws_s3_bucket_logging" "MoJ-Health-Check-Reports" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.MoJ-Health-Check-Reports[0].id
+
+  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  target_prefix = "logs/"
+}
+
 # S3 block public access
 
 resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
@@ -159,6 +174,7 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
 #########################
 
 resource "aws_s3_bucket" "moj-scripts" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-scripts"
   tags = merge(
@@ -175,6 +191,14 @@ resource "aws_s3_bucket_versioning" "moj-scripts" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+resource "aws_s3_bucket_logging" "moj-scripts" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-scripts[0].id
+
+  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  target_prefix = "logs/"
 }
 
 resource "aws_s3_bucket_public_access_block" "moj-scripts" {
@@ -224,6 +248,7 @@ resource "aws_s3_bucket_policy" "moj-scripts" {
 ####################################
 
 resource "aws_s3_bucket" "MoJ-Release-Management" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-release-management"
   tags = merge(
@@ -259,6 +284,14 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Release-Management" {
       storage_class = "STANDARD_IA"
     }
   }
+}
+
+resource "aws_s3_bucket_logging" "MoJ-Release-Management" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.MoJ-Release-Management[0].id
+
+  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  target_prefix = "logs/"
 }
 
 resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
@@ -301,3 +334,66 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
     ]
   })
 }
+
+###########################
+# MoJ - Log Files S3 Bucket
+###########################
+
+resource "aws_s3_bucket" "moj-log-files-prod" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  count  = local.is-production == true ? 1 : 0
+  bucket = "moj-log-files-prod"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-log-files-prod"
+    }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "moj-log-files-prod" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "moj-log-files-prod" {
+  count                   = local.is-production == true ? 1 : 0
+  bucket                  = aws_s3_bucket.moj-log-files-prod[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "moj-log-files-prod" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-prod[0].id
+
+  policy = jsonencode({
+
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-log-files-prod",
+          "arn:aws:s3:::moj-log-files-prod/*"
+        ],
+        "Principal" : {
+          Service = "logging.s3.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+

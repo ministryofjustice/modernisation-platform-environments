@@ -5,6 +5,7 @@
 # Linux Log Groups
 
 resource "aws_cloudwatch_log_group" "Linux-Services-Logs" {
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing and does not need encryption"
   count             = local.is-production == true ? 1 : 0
   name              = "Linux-Services-Logs"
   retention_in_days = 365
