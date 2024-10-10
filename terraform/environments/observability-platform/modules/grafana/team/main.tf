@@ -57,7 +57,7 @@ resource "grafana_data_source_permission" "xray" {
 
 data "grafana_data_source" "athena" {
   for_each = {
-    for name, config in var.aws_accounts.athena_config : name => config if config.athena_enabled
+    for name, config in var.aws_accounts.athena_config : name => config if config.enabled
   }
 
   name = "${each.key}-athena"
@@ -65,7 +65,7 @@ data "grafana_data_source" "athena" {
 
 resource "grafana_data_source_permission" "athena" {
   for_each = {
-    for name, config in var.aws_accounts.athena_config : name => config if config.athena_enabled
+    for name, config in var.aws_accounts.athena_config : name => config if config.enabled
   }
 
   datasource_uid = trimprefix(data.grafana_data_source.athena[each.key].id, "1:")
