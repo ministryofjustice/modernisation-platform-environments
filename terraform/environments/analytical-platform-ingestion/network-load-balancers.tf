@@ -8,7 +8,7 @@ module "datasync_activation_nlb" {
 
   load_balancer_type    = "network"
   vpc_id                = module.connected_vpc.vpc_id
-  subnets               = [module.connected_vpc.private_subnets[0]]
+  subnets               = [module.connected_vpc.public_subnets[0]]
   create_security_group = false
   security_groups       = [module.datasync_activation_nlb_security_group.security_group_id]
 
