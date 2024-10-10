@@ -21,3 +21,7 @@ data "aws_secretsmanager_secret_version" "govuk_notify_templates" {
 data "aws_ssm_parameter" "datasync_ami" {
   name = "/aws/service/datasync/ami"
 }
+
+data "external" "external_ip" {
+  program = ["bash", "${path.module}/scripts/get-ip-address.sh"]
+}

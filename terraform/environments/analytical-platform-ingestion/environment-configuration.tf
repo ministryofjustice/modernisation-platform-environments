@@ -35,6 +35,9 @@ locals {
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
       }
+
+      /* DataSync */
+      datasync_instance_private_ip = "10.26.128.5"
     }
     production = {
       /* VPC */
@@ -70,6 +73,9 @@ locals {
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
       }
+
+      /* DataSync */
+      datasync_instance_private_ip = "10.27.128.5"
     }
   }
 }
