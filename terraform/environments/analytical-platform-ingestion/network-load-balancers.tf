@@ -23,5 +23,16 @@ module "datasync_activation_nlb" {
     }
   }
 
+  listeners = {
+    datasync = {
+      port     = 80
+      protocol = "TCP"
+      forward = {
+        target_group_key = "datasync"
+      }
+    }
+
+  }
+
   tags = local.tags
 }
