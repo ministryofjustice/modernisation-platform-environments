@@ -18,3 +18,15 @@ variable "waf_acl_rules" {
   type        = map(any)
   description = "A map of values to be used in a dynamic WAF ACL rule block."
 }
+
+variable "enable_logging" {
+  type        = bool
+  default     = false
+  description = "Enable logging for the WAF ACL."
+}
+
+variable "log_retention_in_days" {
+  type        = number
+  default     = 60
+  description = "Number of days to retain logs in CloudWatch Logs."
+}
