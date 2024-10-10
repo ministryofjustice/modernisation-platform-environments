@@ -136,6 +136,7 @@ locals {
           ])
         })
         tags = merge(local.ec2_instances.bip_app.tags, {
+          instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
         })
       })
@@ -148,6 +149,7 @@ locals {
           ])
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
+          instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
         })
       })
@@ -160,6 +162,7 @@ locals {
           ])
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
+          instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
         })
       })
@@ -192,6 +195,7 @@ locals {
           ])
         })
         tags = merge(local.ec2_instances.bip_webadmin.tags, {
+          instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
         })
       })
@@ -204,6 +208,7 @@ locals {
           ])
         })
         tags = merge(local.ec2_instances.bip_web.tags, {
+          instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
         })
       })
