@@ -180,7 +180,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+    "Resource": [
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Queue-Production",
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Deadletter-Queue-Production"
+    ]
    }
  ]
 }
@@ -265,7 +268,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+    "Resource": [
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Queue-Production",
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Deadletter-Queue-Production"
+    ]
    }
  ]
 }
@@ -339,7 +345,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+    "Resource": [
+      "arn:aws:sqs:eu-west-2:075585660276:Lambda-Queue-DEV",
+      "arn:aws:sqs:eu-west-2:075585660276:Lambda-Deadletter-Queue-DEV"
+    ]
    }
  ]
 }
@@ -413,7 +422,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_uat" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+   "Resource": [
+      "arn:aws:sqs:eu-west-2:172753231260:Lambda-Queue-UAT",
+      "arn:aws:sqs:eu-west-2:172753231260:Lambda-Deadletter-Queue-UAT"
+    ]
    }
  ]
 }
@@ -487,7 +499,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_prod" 
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+  "Resource": [
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Queue-Production",
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Deadletter-Queue-Production"
+    ]
    }
  ]
 }
