@@ -9,6 +9,7 @@ data "aws_kms_key" "sns" {
 }
 
 data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
+  # checkov:skip=CKV_AWS_356: "Required to allow root user full management access to key"
   # Allow root users full management access to key
   statement {
     effect = "Allow"
