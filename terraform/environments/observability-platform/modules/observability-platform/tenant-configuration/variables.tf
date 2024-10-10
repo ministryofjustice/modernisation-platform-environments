@@ -19,6 +19,7 @@ variable "aws_accounts" {
     amazon_prometheus_workspace_id  = optional(string)
     xray_enabled                    = optional(bool)
     athena_enabled                  = optional(bool)
+    athena_config                   = optional(map(object))
   }))
   default = {
     default = {
