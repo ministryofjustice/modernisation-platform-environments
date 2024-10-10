@@ -125,8 +125,8 @@ resource "aws_vpc_security_group_ingress_rule" "db_glue_access" {
   security_group_id            = aws_security_group.db.id
   description                  = "glue"
   ip_protocol                  = "tcp"
-  from_port                    = 0
-  to_port                      = 65535
+  from_port                    = 1433
+  to_port                      = 1433
   referenced_security_group_id = aws_security_group.db.id
 }
 
