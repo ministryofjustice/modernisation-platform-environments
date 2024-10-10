@@ -151,52 +151,30 @@ locals {
     }
 
     ec2_instances = {
-      # Currently turned off temporarily for testing t2-onr-bods-1-b and 2-a automation
-      t2-onr-bods-1-a = merge(local.ec2_instances.bods, {
+
+      t2-onr-bods-1 = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
-          ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
-          ami_owner         = "self" # remove this if this is ever rebuilt, you can reference AMI direct from core-shared-services-production
           availability_zone = "eu-west-2a"
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+              branch = "main"
+            }
+          ))
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
         })
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
-        # volumes are a direct copy of BODS in NCR
-        ebs_volumes = merge(local.ec2_instances.bods.ebs_volumes, {
-          "/dev/sda1" = { type = "gp3", size = 100 }
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-          "/dev/sdc"  = { type = "gp3", size = 100 }
-          "/dev/sds"  = { type = "gp3", size = 100 }
-        })
+        cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
-          domain-name = "azure.noms.root"
+          oasys-national-reporting-environment = "t2"
+          domain-name                          = "azure.noms.root"
         })
       })
 
-      # t2-onr-bods-1 = merge(local.ec2_instances.bods, {
-      #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2a"
-      #     user_data_raw = base64encode(templatefile(
-      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #         branch = "main"
-      #       }
-      #     ))
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-      #       "Ec2SecretPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bods.instance, {
-      #     instance_type = "m4.xlarge"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      #   tags = merge(local.ec2_instances.bods.tags, {
-      #     oasys-national-reporting-environment = "t2"
-      #     domain-name                          = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
-
-      # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
+      # Pending sorting out cluster install of Bods in  modernisation-platform-configuration-management repo
       # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
       #   config = merge(local.ec2_instances.bods.config, {
       #     availability_zone = "eu-west-2b"
@@ -217,7 +195,6 @@ locals {
       #     oasys-national-reporting-environment = "t2"
       #     domain-name = "azure.noms.root"
       #   })
-      # cloudwatch_metric_alarms = {}
       # })
 
       t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
@@ -290,7 +267,7 @@ locals {
         instance_target_groups = {
           t2-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
             attachments = [
-              { ec2_instance_name = "t2-onr-bods-1-a" },
+              { ec2_instance_name = "t2-onr-bods-1" },
             ]
           })
         }
