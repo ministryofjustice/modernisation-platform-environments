@@ -198,7 +198,7 @@ locals {
 
   # base config for each database
   base_db_config_dev = {
-    instance_type  = "t3.large"
+    instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {

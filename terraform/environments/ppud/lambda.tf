@@ -21,6 +21,7 @@ data "archive_file" "zip_the_stop_instance_code" {
 #################################################
 
 resource "aws_lambda_function" "terraform_lambda_func_stop" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/stop-instance/StopEC2Instances.zip"
   function_name = "stop_Lambda_Function"
@@ -28,9 +29,18 @@ resource "aws_lambda_function" "terraform_lambda_func_stop" {
   handler       = "StopEC2Instances.lambda_handler"
   runtime       = "python3.9"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_start" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/start-instance/StartEC2Instances.zip"
   function_name = "start_Lambda_Function"
@@ -38,6 +48,14 @@ resource "aws_lambda_function" "terraform_lambda_func_start" {
   handler       = "StartEC2Instances.lambda_handler"
   runtime       = "python3.9"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 ########################################
@@ -171,7 +189,9 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_enable_cpu_alarm" {
 
 # Disable CPU Alarm
 
+
 resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/disable_cpu_alarm.zip"
   function_name = "disable_cpu_alarm"
@@ -179,11 +199,20 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
   handler       = "disable_cpu_alarm.lambda_handler"
   runtime       = "python3.12"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Enable CPU Alarm
 
 resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/enable_cpu_alarm.zip"
   function_name = "enable_cpu_alarm"
@@ -191,6 +220,14 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   handler       = "enable_cpu_alarm.lambda_handler"
   runtime       = "python3.12"
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 ######################################################
@@ -207,6 +244,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_dev.zip"
   function_name = "terminate_cpu_process"
@@ -215,6 +253,14 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev"
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:075585660276:code-signing-config:csc-0c7136ccff2de748f"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -240,6 +286,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-preproduction == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_uat.zip"
   function_name = "terminate_cpu_process"
@@ -248,6 +295,14 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat"
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:172753231260:code-signing-config:csc-0db408c5170a8eba6" 
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -273,6 +328,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_prod" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_prod.zip"
   function_name = "terminate_cpu_process"
@@ -281,6 +337,14 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_prod
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -306,6 +370,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/send_cpu_notification_dev.zip"
   function_name = "send_cpu_notification"
@@ -314,6 +379,14 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev"
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:075585660276:code-signing-config:csc-0c7136ccff2de748f"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -339,6 +412,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-preproduction == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/send_cpu_notification_uat.zip"
   function_name = "send_cpu_notification"
@@ -347,6 +421,14 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat"
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:172753231260:code-signing-config:csc-0db408c5170a8eba6" 
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -372,6 +454,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/send_cpu_notification_prod.zip"
   function_name = "send_cpu_notification"
@@ -380,6 +463,14 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod
   runtime       = "python3.12"
   timeout       = 300
   depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  dead_letter_config {
+   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
+  tracing_config {
+   mode = "Active"
+  }
 }
 
 # Archive the zip file
@@ -389,37 +480,4 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/send_cpu_notification_prod.zip"
-}
-
-###########################################################
-# Lambda Function to check for certificate expiration - DEV
-###########################################################
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_dev" {
-  count         = local.is-development == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_dev[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
-  count         = local.is-development == true ? 1 : 0
-  filename      = "${path.module}/lambda_scripts/certificate_expiry_dev.zip"
-  function_name = "certificate_expiry_dev"
-  role          = aws_iam_role.lambda_role_certificate_expiry_dev[0].arn
-  handler       = "certificate_expiry_dev.lambda_handler"
-  runtime       = "python3.8"
-  timeout       = 30
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_certificate_expiry_dev" {
-  count       = local.is-development == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/certificate_expiry_dev.zip"
 }

@@ -7,13 +7,13 @@ module "shield" {
   application_name = local.application_name
   resources = {
     format("%s-alb", local.application_name) = {
-      action = "count"
+      action = "block"
       arn    = module.lb_access_logs_enabled.load_balancer_arn
     }
   }
   waf_acl_rules = {
     example = {
-      "action"    = "count",
+      "action"    = "block",
       "name"      = "ddos-protection",
       "priority"  = 0,
       "threshold" = "250"

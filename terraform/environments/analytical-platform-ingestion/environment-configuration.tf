@@ -17,9 +17,9 @@ locals {
       observability_platform = "development"
 
       /* Image Versions */
-      scan_image_version     = "0.0.9"
-      transfer_image_version = "0.0.14"
-      notify_image_version   = "0.0.15"
+      scan_image_version     = "0.0.10"
+      transfer_image_version = "0.0.15"
+      notify_image_version   = "0.0.16"
 
       /* Target Buckets */
       target_buckets = ["mojap-land-dev"]
@@ -52,9 +52,9 @@ locals {
       observability_platform = "production"
 
       /* Image Versions */
-      scan_image_version     = "0.0.9"
-      transfer_image_version = "0.0.14"
-      notify_image_version   = "0.0.15"
+      scan_image_version     = "0.0.10"
+      transfer_image_version = "0.0.15"
+      notify_image_version   = "0.0.16"
 
       /* Target Buckets */
       target_buckets = ["mojap-land"]

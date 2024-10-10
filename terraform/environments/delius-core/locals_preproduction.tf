@@ -13,6 +13,7 @@ locals {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/preprod/ec2-user.pub")
     homepage_path                          = "/"
+    has_mis_environment                    = true
   }
 
   ldap_config_preprod = {
@@ -25,6 +26,7 @@ locals {
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
+    tls_port                    = 636
     desired_count               = 0
   }
 
@@ -35,6 +37,7 @@ locals {
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
+    primary_instance_count = 0
     standby_count = 0
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
@@ -126,6 +129,7 @@ locals {
   }
 
   dms_config_preprod = {
+    deploy_dms = false
     replication_enabled        = false
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.2"

@@ -123,33 +123,10 @@ locals {
         })
         cloudwatch_metric_alarms = null
       })
-
-      t2-tst-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_instances.bods.config, {
-          user_data_raw = base64encode(templatefile(
-            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-              branch   = "TM/TM-494/ips-install"
-              hostname = "t2-tst-bods-asg" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
-            }
-          ))
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-        })
-        instance = merge(local.ec2_autoscaling_groups.bods.instance, {
-          instance_type = "m4.xlarge"
-        })
-        cloudwatch_metric_alarms = null
-        tags = merge(local.ec2_instances.bods.tags, {
-          oasys-national-reporting-environment = "t2"
-        })
-      })
     }
 
     ec2_instances = {
+      # Currently turned off temporarily for testing t2-onr-bods-1-b and 2-a automation
       t2-onr-bods-1-a = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
           ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
@@ -170,6 +147,53 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
+
+      # t2-onr-bods-1 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2a"
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #         branch = "main"
+      #       }
+      #     ))
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #     domain-name                          = "azure.noms.root"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      # })
+
+      # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
+      # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2b"
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #         branch   = "main"
+      #       }
+      #     ))
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #     domain-name = "azure.noms.root"
+      #   })
+      # cloudwatch_metric_alarms = {}
+      # })
 
       t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
         config = merge(local.ec2_instances.boe_app.config, {
@@ -226,9 +250,9 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-bods/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/web/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
@@ -269,6 +293,7 @@ locals {
       })
 
       private = {
+        drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
         enable_cross_zone_load_balancing = true
         enable_delete_protection         = false
         idle_timeout                     = 3600
@@ -380,9 +405,9 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/ec2/onr-bods/t2"         = local.secretsmanager_secrets.bods
-      "/ec2/onr-boe/t2"          = local.secretsmanager_secrets.boe_app
-      "/ec2/onr-web/t2"          = local.secretsmanager_secrets.boe_web
+      "/sap/bods/t2"             = local.secretsmanager_secrets.bods
+      "/sap/bip/t2"              = local.secretsmanager_secrets.bip
+      "/sap/web/t2"              = local.secretsmanager_secrets.web
       "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
     }
