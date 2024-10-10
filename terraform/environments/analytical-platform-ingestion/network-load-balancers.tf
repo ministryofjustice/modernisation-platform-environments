@@ -31,7 +31,6 @@ module "datasync_activation_nlb" {
         target_group_key = "datasync"
       }
     }
-
   }
 
   tags = local.tags
