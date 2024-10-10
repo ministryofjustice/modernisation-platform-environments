@@ -7,15 +7,15 @@ locals {
       }
     }
 
-    boe_web = {
+    web = {
       secrets = {
         passwords = { description = "Web Passwords" }
       }
     }
 
-    boe_app = {
+    bip = {
       secrets = {
-        passwords = { description = "BOE Passwords" }
+        passwords = { description = "BIP Passwords" }
       }
     }
 

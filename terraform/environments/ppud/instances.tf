@@ -2,6 +2,8 @@
 #   Development Instances       #
 #################################
 
+#EBS Optimization already enabled for all PPUD EC2 instance types
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw109" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-013198324453e6dc3"
@@ -23,6 +25,7 @@ resource "aws_instance" "s609693lo6vw109" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw112" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0be53fc5198dbd294"
@@ -44,6 +47,7 @@ resource "aws_instance" "s609693lo6vw112" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw105" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0edd8d3e58d106f40"
@@ -65,6 +69,7 @@ resource "aws_instance" "s609693lo6vw105" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw104" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0f115a52a37278d93"
@@ -86,6 +91,7 @@ resource "aws_instance" "s609693lo6vw104" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw100" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0fbad994892c0f0c4"
@@ -107,6 +113,7 @@ resource "aws_instance" "s609693lo6vw100" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw101" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-07315ed3a1b524be8"
@@ -128,6 +135,7 @@ resource "aws_instance" "s609693lo6vw101" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw103" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-09bf383e2d58df1c7"
@@ -149,9 +157,10 @@ resource "aws_instance" "s609693lo6vw103" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw110" {
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0c261875f6ed81278"
+  ami                    = "ami-09b8ade582b84853a"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -171,6 +180,7 @@ resource "aws_instance" "s609693lo6vw110" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw106" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0f9ea6b08039bb33b"
@@ -192,6 +202,7 @@ resource "aws_instance" "s609693lo6vw106" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw111" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-005cac270289ea0de"
@@ -212,6 +223,7 @@ resource "aws_instance" "s609693lo6vw111" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw107" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-04682227c9aa18702"
@@ -233,6 +245,7 @@ resource "aws_instance" "s609693lo6vw107" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "PPUDWEBSERVER2" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0852d4d5313264225"
@@ -254,6 +267,7 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw102" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0640473a9b0267bac"
@@ -275,6 +289,7 @@ resource "aws_instance" "s609693lo6vw102" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s609693lo6vw108" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0e0b7dbcff71ddd9c"
@@ -301,7 +316,7 @@ resource "aws_instance" "s609693lo6vw108" {
 # Pre-Production (UAT Instances) #
 #################################
 
-
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw201" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0d1cb68fb6c1f131b"
@@ -323,6 +338,7 @@ resource "aws_instance" "s618358rgvw201" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "S618358RGVW202" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0df4dcc477ff0fa3f"
@@ -344,6 +360,7 @@ resource "aws_instance" "S618358RGVW202" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgsw025" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0ad4be40d57ecc994"
@@ -365,6 +382,7 @@ resource "aws_instance" "s618358rgsw025" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw024" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-06bc4f0d8d949ba24"
@@ -386,6 +404,7 @@ resource "aws_instance" "s618358rgvw024" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw023" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0f073b401ba3f1cff"
@@ -411,7 +430,7 @@ resource "aws_instance" "s618358rgvw023" {
 # Production Instances  #
 #########################
 
-
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw019" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-01d04f2e4f8cea4dd"
@@ -433,6 +452,7 @@ resource "aws_instance" "s618358rgvw019" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw020" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e49fc9838fdf33c4"
@@ -454,6 +474,7 @@ resource "aws_instance" "s618358rgvw020" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw021" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-05ddec53aa481cbc3"
@@ -475,6 +496,7 @@ resource "aws_instance" "s618358rgvw021" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw022" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-02f8251c8cdf2464f"
@@ -496,6 +518,7 @@ resource "aws_instance" "s618358rgvw022" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw027" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e203fec985af6465"
@@ -517,6 +540,7 @@ resource "aws_instance" "s618358rgvw027" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw204" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e8380f304bd2caab"
@@ -538,6 +562,7 @@ resource "aws_instance" "s618358rgvw204" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgvw205" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0b6b39448c2d727c3"
@@ -559,7 +584,7 @@ resource "aws_instance" "s618358rgvw205" {
   }
 }
 
-
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s618358rgsw025p" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0b8f6843db88aa8a6"
@@ -581,6 +606,7 @@ resource "aws_instance" "s618358rgsw025p" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s266316rgsl200" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
@@ -603,7 +629,7 @@ resource "aws_instance" "s266316rgsl200" {
   }
 }
 
-
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s265903rgsl400-non-cjsm" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
@@ -626,6 +652,7 @@ resource "aws_instance" "s265903rgsl400-non-cjsm" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "s265903rgsl401-cjsm" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
@@ -648,6 +675,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
   }
 }
 
+#trivy:ignore:CKV_AWS_135
 resource "aws_instance" "docker-build-server" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-050d499cfdd1ff7d4"
