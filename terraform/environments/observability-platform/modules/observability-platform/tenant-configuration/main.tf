@@ -45,7 +45,7 @@ module "athena_source" {
 
   name          = each.key
   account_id    = var.environment_management.account_ids[each.key]
-  athena_config = each.value.athena_config
+  athena_config = try(each.value.athena_config, {})
 }
 
 module "prometheus_push" {
