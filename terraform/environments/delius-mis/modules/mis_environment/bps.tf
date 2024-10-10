@@ -3,6 +3,15 @@ resource "aws_security_group" "bps" {
   vpc_id      = var.account_info.vpc_id
 }
 
+resource "aws_security_group_rule" "bps_outbound" {
+  type        = "egress"
+  from_port   = 0
+  to_port     = 0
+  protocol    = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.bps.id
+}
+
 module "bps_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
 
