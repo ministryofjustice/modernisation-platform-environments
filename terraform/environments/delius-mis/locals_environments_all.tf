@@ -35,6 +35,6 @@ locals {
   }
 
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  integration_key_lookup     = local.is-production ? "delius_mis_prod_alarms" : "delius_mis_non_prod"
+  integration_key_lookup     = local.is-production ? "delius_mis_prod_alarms" : "delius_mis_nonprod_alarms"
   pagerduty_integration_key  = local.pagerduty_integration_keys[local.integration_key_lookup]
 }
