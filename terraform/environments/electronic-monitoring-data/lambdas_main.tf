@@ -346,3 +346,49 @@ module "process_landing_bucket_files" {
     DESTINATION_BUCKET = module.s3-received-files-bucket.bucket.id
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Virus scanning - definition upload
+#-----------------------------------------------------------------------------------
+
+module "virus_scan_definition_upload" {
+  source                  = "./modules/lambdas"
+  function_name           = "definition-upload"
+  is_image                = true
+  ecr_repo_name           = "analytical-platform-ingestion-scan"
+  function_tag            = "0.1.0"
+  role_name               = aws_iam_role.virus_scan_definition_upload.name
+  role_arn                = aws_iam_role.virus_scan_definition_upload.arn
+  memory_size             = 2048
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  environment_variables = {
+    MODE                         = "definition-upload",
+    CLAMAV_DEFINITON_BUCKET_NAME = module.s3-clamav-definitions-bucket.bucket.id
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Virus scanning - file scan
+#-----------------------------------------------------------------------------------
+
+module "virus_scan_file" {
+  source                  = "./modules/lambdas"
+  function_name           = "scan"
+  is_image                = true
+  ecr_repo_name           = "analytical-platform-ingestion-scan"
+  function_tag            = "0.1.0"
+  role_name               = aws_iam_role.virus_scan_file.name
+  role_arn                = aws_iam_role.virus_scan_file.arn
+  ephemeral_storage_size  = 10240
+  memory_size             = 2048
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  environment_variables = {
+    MODE                         = "scan",
+    CLAMAV_DEFINITON_BUCKET_NAME = module.s3-clamav-definitions-bucket.bucket.id
+    LANDING_BUCKET_NAME          = module.s3-received-files-bucket.bucket.id
+    QUARANTINE_BUCKET_NAME       = module.s3-quarantine-files-bucket.bucket.id
+    PROCESSED_BUCKET_NAME        = module.s3-data-bucket.bucket.id
+  }
+}

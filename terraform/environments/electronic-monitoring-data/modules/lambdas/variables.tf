@@ -120,3 +120,9 @@ variable "function_tag" {
   nullable    = true
   default     = null
 }
+
+variable "ephemeral_storage_size" {
+  description = "Size in MB of lambda ephemeral storage"
+  type        = number
+  default     = 512
+}
