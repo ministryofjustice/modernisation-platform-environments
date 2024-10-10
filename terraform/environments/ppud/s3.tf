@@ -385,6 +385,161 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
         "Principal" : {
           Service = "logging.s3.amazonaws.com"
         }
+      },
+      {
+      "Action" : [
+        "s3:PutObject"
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-prod",
+         "arn:aws:s3:::moj-log-files-prod/*"
+      ]
+       "Principal" : {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_s3_bucket" "moj-log-files-uat" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = "moj-log-files-uat"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-log-files-uat"
+    }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "moj-log-files-uat" {
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-uat[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "moj-log-files-uat" {
+  count                   = local.is-preproduction == true ? 1 : 0
+  bucket                  = aws_s3_bucket.moj-log-files-uat[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "moj-log-files-uat" {
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-uat[0].id
+
+  policy = jsonencode({
+
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-log-files-uat",
+          "arn:aws:s3:::moj-log-files-uat/*"
+        ],
+        "Principal" : {
+          Service = "logging.s3.amazonaws.com"
+        }
+      },
+      {
+      "Action" : [
+        "s3:PutObject"
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-uat",
+         "arn:aws:s3:::moj-log-files-uat/*"
+      ]
+       "Principal" : {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_s3_bucket" "moj-log-files-dev" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  count  = local.is-development == true ? 1 : 0
+  bucket = "moj-log-files-dev"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-log-files-dev"
+    }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "moj-log-files-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "moj-log-files-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket                  = aws_s3_bucket.moj-log-files-dev[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "moj-log-files-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-dev[0].id
+
+  policy = jsonencode({
+
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-log-files-dev",
+          "arn:aws:s3:::moj-log-files-dev/*"
+        ],
+        "Principal" : {
+          Service = "logging.s3.amazonaws.com"
+        }
+      },
+      {
+      "Action" : [
+        "s3:PutObject"
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-dev",
+         "arn:aws:s3:::moj-log-files-dev/*"
+      ]
+       "Principal" : {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
       }
     ]
   })

@@ -8,6 +8,11 @@ resource "aws_lb" "PPUD-ALB" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.PPUD-ALB.id]
   subnets            = [data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
+  access_logs {
+   bucket  = aws_s3_bucket.moj-log-files-dev[0].id
+   prefix  = "alb-logs"
+   enabled = true
+  }
 
   enable_deletion_protection = true
   drop_invalid_header_fields = true
@@ -82,6 +87,11 @@ resource "aws_lb" "WAM-ALB" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.WAM-ALB.id]
   subnets            = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
+  access_logs {
+   bucket  = aws_s3_bucket.moj-log-files-prod[0].id
+   prefix  = "alb-logs"
+   enabled = true
+  }
 
   enable_deletion_protection = true
   drop_invalid_header_fields = true
