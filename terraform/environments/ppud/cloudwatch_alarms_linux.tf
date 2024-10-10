@@ -1,8 +1,9 @@
-# =====================
-# Alerts - EC2 Linux
-# =====================
+############################################################
+# Data Sources and CloudWatch Alarms for EC2 Instances Linux
+############################################################
 
 # Create a data source to fetch the tags of each instance
+
 data "aws_instances" "linux_tagged_instances" {
   filter {
     name   = "tag:patch_group"
@@ -11,6 +12,7 @@ data "aws_instances" "linux_tagged_instances" {
 }
 
 # Data source for ImageId and InstanceType for each instance
+
 data "aws_instance" "linux_instance_details" {
   for_each    = toset(data.aws_instances.linux_tagged_instances.ids)
   instance_id = each.value
@@ -42,35 +44,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_root_volume" {
   }
 }
 
-
-# Disk Free Alarm
-resource "aws_cloudwatch_metric_alarm" "linux_high_disk_usage" {
-  for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
-  alarm_name          = "high-disk-usage-${each.key}"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "3"
-  datapoints_to_alarm = "2"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "5"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 2 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId = each.key
-  }
-}
-
-
-#======================
-# CPU Utilization Alarm
-#======================
+# High CPU Utilization Alarm
 
 resource "aws_cloudwatch_metric_alarm" "linux_cpu" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
-  alarm_name          = "CPU-High-${each.key}"          # name of the alarm
+  alarm_name          = "CPU-Utilisation-High-${each.key}"          # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold" # threshold to trigger the alarm state
   period              = "60"                            # period in seconds over which the specified statistic is applied
   threshold           = "90"                            # threshold for the alarm - see comparison_operator for usage
@@ -88,9 +66,10 @@ resource "aws_cloudwatch_metric_alarm" "linux_cpu" {
 }
 
 # High CPU IOwait Alarm
+
 resource "aws_cloudwatch_metric_alarm" "linux_cpu_usage_iowait" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
-  alarm_name          = "cpu-usage-iowait-${each.key}"
+  alarm_name          = "CPU-Usage-IOWait-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "6"
   datapoints_to_alarm = "5"
@@ -107,15 +86,11 @@ resource "aws_cloudwatch_metric_alarm" "linux_cpu_usage_iowait" {
   }
 }
 
-
-
-# ===========================
-# Low Available Memory Alarm
-# ===========================
+# High Memory Utilisation Memory Alarm
 
 resource "aws_cloudwatch_metric_alarm" "linux_ec2_high_memory_usage" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
-  alarm_name          = "high-memory-usage-${each.key}"
+  alarm_name          = "Memory-Usage-High-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   datapoints_to_alarm = "2"
@@ -132,35 +107,15 @@ resource "aws_cloudwatch_metric_alarm" "linux_ec2_high_memory_usage" {
   }
 }
 
-
-resource "aws_cloudwatch_metric_alarm" "linux_low_available_memory" {
-  for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
-  alarm_name          = "low-available-memory-${each.key}"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  period              = "60"
-  threshold           = "10"
-  evaluation_periods  = "3"
-  datapoints_to_alarm = "2"
-  metric_name         = "mem_available_percent"
-  treat_missing_data  = "notBreaching"
-  namespace           = "CWAgent"
-  statistic           = "Average"
-  alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is less than 10% for 2 minutes, the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId = each.key
-  }
-}
-
-
 # ======================
 # EC2 Instance Statuses
 # ======================
 
-# Instance Health Alarm
+# EC2 Instance Health Alarm
+
 resource "aws_cloudwatch_metric_alarm" "linux_instance_health_check" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
-  alarm_name          = "instance-health-check-failed-${each.key}"
+  alarm_name          = "Instance-Health-Check-Failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   datapoints_to_alarm = "2"
@@ -177,10 +132,11 @@ resource "aws_cloudwatch_metric_alarm" "linux_instance_health_check" {
   }
 }
 
-# Status Check Alarm
+# EC2 Status Check Alarm
+
 resource "aws_cloudwatch_metric_alarm" "linux_system_health_check" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
-  alarm_name          = "system-health-check-failed-${each.key}"
+  alarm_name          = "System-Health-Check-Failed-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   datapoints_to_alarm = "2"
@@ -194,47 +150,5 @@ resource "aws_cloudwatch_metric_alarm" "linux_system_health_check" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId = each.key
-  }
-}
-
-#Log Groups
-
-resource "aws_cloudwatch_log_group" "Linux-Services-Logs" {
-  count             = local.is-production == true ? 1 : 0
-  name              = "Linux-Services-Logs"
-  retention_in_days = 365
-}
-
-#Metric Filters
-
-resource "aws_cloudwatch_log_metric_filter" "Linux-ServiceStatus-Running" {
-  count          = local.is-production == true ? 1 : 0
-  name           = "Linux-ServiceStatus-Running"
-  log_group_name = aws_cloudwatch_log_group.Linux-Services-Logs[count.index].name
-  pattern        = "[date, time, Instance, Service, status=Running]"
-  metric_transformation {
-    name      = "IsRunning"
-    namespace = "ServiceStatus"
-    value     = "1"
-    dimensions = {
-      Instance = "$Instance"
-      Service  = "$Service"
-    }
-  }
-}
-
-resource "aws_cloudwatch_log_metric_filter" "Linux-ServiceStatus-NotRunning" {
-  count          = local.is-production == true ? 1 : 0
-  name           = "Linux-ServiceStatus-NotRunning"
-  log_group_name = aws_cloudwatch_log_group.Linux-Services-Logs[count.index].name
-  pattern        = "[date, time, Instance, Service, status!=Running]"
-  metric_transformation {
-    name      = "IsRunning"
-    namespace = "ServiceStatus"
-    value     = "0"
-    dimensions = {
-      Instance = "$Instance"
-      Service  = "$Service"
-    }
   }
 }
