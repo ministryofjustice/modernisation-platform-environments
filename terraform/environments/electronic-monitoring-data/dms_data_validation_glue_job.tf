@@ -1,3 +1,10 @@
+resource "aws_s3_object" "aws_s3_object_pyzipfile_to_s3folder" {
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "${var.s3_pylib_dir_path}/dv_reusable_components.zip"
+  source = data.archive_file.archive_file_zip_py_files.output_path
+  acl    = "private"
+}
+
 resource "aws_s3_object" "dms_dv_rds_and_s3_parquet_write_v2" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_rds_and_s3_parquet_write_v2.py"
@@ -285,6 +292,8 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
     "--rename_migrated_prq_tbl_folder"   = ""
     "--year_partition_bool"              = "false"
     "--month_partition_bool"             = "false"
+    "--extra_py_files"                   = aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id
+    # "--extra_py_files"                    = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${var.s3_pylib_dir_path}/dv_reusable_components.zip"
     "--rds_to_parquet_output_s3_bucket"  = module.s3-dms-target-store-bucket.bucket.id
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.rds_to_s3_parquet_migration.name}"
     "--enable-continuous-cloudwatch-log" = "true"

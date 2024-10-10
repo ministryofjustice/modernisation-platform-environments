@@ -1,3 +1,9 @@
+data "archive_file" "archive_file_zip_py_files" {
+  type        = "zip"
+  source_file = "${path.module}/glue-job/dv_reusable_components.py"
+  output_path = "${path.module}/glue-job/dv_reusable_components.zip"
+}
+
 data "aws_iam_policy_document" "glue_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
