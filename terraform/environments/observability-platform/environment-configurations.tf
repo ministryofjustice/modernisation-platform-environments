@@ -179,7 +179,7 @@ locals {
               xray_enabled                    = false
               athena_enabled                  = true
               athena_config = {
-                athena_source = {
+                mod-platform-cur-reports = {
                   database  = "data"
                   workgroup = "mod-platform-cur-reports"
                 }
