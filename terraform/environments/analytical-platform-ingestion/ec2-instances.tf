@@ -8,7 +8,7 @@ module "datasync_instance" {
   ami                    = data.aws_ssm_parameter.datasync_ami.value
   instance_type          = "m5.2xlarge"
   subnet_id              = element(module.connected_vpc.private_subnets, 0)
-  vpc_security_group_ids = [module.datasync_security_group.security_group_id]
+  vpc_security_group_ids = [module.datasync_instance_security_group.security_group_id]
   private_ip             = local.environment_configuration.datasync_instance_private_ip
 
 
@@ -35,6 +35,9 @@ module "datasync_instance" {
 
   tags = merge(
     local.tags,
-    { Name = "${local.application_name}-${local.environment}-datasync" }
+    {
+      Name                = "${local.application_name}-${local.environment}-datasync"
+      instance-scheduling = "skip-scheduling" # TEMPORARY
+    }
   )
 }
