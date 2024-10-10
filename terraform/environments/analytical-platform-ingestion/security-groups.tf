@@ -20,6 +20,7 @@ resource "aws_security_group" "transfer_server" {
   description = "Security Group for Transfer Server"
   name        = "transfer-server"
   vpc_id      = module.isolated_vpc.vpc_id
+  tags        = local.tags
 }
 
 #tfsec:ignore:avd-aws-0104 - The security group is attached to the resource
@@ -77,13 +78,39 @@ module "scan_lambda_security_group" {
   tags = local.tags
 }
 
-module "datasync_security_group" {
+module "datasync_activation_nlb_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/security-group/aws"
   version = "5.2.0"
 
-  name        = "${local.application_name}-${local.environment}-datasync"
+  name        = "${local.application_name}-${local.environment}-datasync-activation-nlb"
+  description = "Security Group for DataSync Activation NLB"
+
+  vpc_id = module.connected_vpc.vpc_id
+
+  egress_cidr_blocks = [module.connected_vpc.vpc_cidr_block]
+  egress_rules = [
+    "http-80-tcp",
+    "https-443-tcp"
+  ]
+
+  ingress_cidr_blocks = ["${data.external.external_ip.result["ip"]}/32"]
+  ingress_rules = [
+    "http-80-tcp",
+    "https-443-tcp"
+  ]
+
+  tags = local.tags
+}
+
+module "datasync_instance_security_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.2.0"
+
+  name        = "${local.application_name}-${local.environment}-datasync-instance"
   description = "Security Group for DataSync Instance"
 
   vpc_id = module.connected_vpc.vpc_id
@@ -98,4 +125,9 @@ module "datasync_security_group" {
   ]
 
   tags = local.tags
+}
+
+moved {
+  from = module.datasync_security_group
+  to   = module.datasync_instance_security_group
 }
