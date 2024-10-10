@@ -110,6 +110,7 @@ resource "aws_s3_bucket_policy" "PPUD" {
 
 resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  count  = local.is-production == true ? 1 : 0
   bucket = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
   tags = merge(
     local.tags,

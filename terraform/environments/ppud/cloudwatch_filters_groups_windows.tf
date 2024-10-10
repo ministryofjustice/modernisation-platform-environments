@@ -5,49 +5,49 @@
 # Windows Log Groups
 
 resource "aws_cloudwatch_log_group" "IIS-Logs" {
-  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing and does not need encryption"
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   count             = local.is-production == true ? 1 : 0
   name              = "IIS-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "System-Event-Logs" {
-  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing and does not need encryption"
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   count             = local.is-production == true ? 1 : 0
   name              = "System-Event-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "Application-Event-Logs" {
-  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing and does not need encryption"
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   count             = local.is-production == true ? 1 : 0
   name              = "Application-Event-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "Windows-Services-Logs" {
-  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing and does not need encryption"
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   count             = local.is-production == true ? 1 : 0
   name              = "Windows-Services-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "Network-Connectivity-Logs" {
-  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing and does not need encryption"
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   count             = local.is-production == true ? 1 : 0
   name              = "Network-Connectivity-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "SQL-Server-Logs" {
-  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing and does not need encryption"
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   count             = local.is-production == true ? 1 : 0
   name              = "SQL-Server-Logs"
   retention_in_days = 365
 }
 
 resource "aws_cloudwatch_log_group" "Windows-Defender-Logs" {
-  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing and does not need encryption"
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   count             = local.is-production == true ? 1 : 0
   name              = "Windows-Defender-Logs"
   retention_in_days = 365
