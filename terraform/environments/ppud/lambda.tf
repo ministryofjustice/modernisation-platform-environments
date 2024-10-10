@@ -20,6 +20,7 @@ data "archive_file" "zip_the_stop_instance_code" {
 # Lambda Function for Stop and Start of Instance
 #################################################
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_func_stop" {
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/stop-instance/StopEC2Instances.zip"
@@ -38,6 +39,7 @@ resource "aws_lambda_function" "terraform_lambda_func_stop" {
   }
 }
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_func_start" {
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/start-instance/StartEC2Instances.zip"
@@ -187,6 +189,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_enable_cpu_alarm" {
 
 # Disable CPU Alarm
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/disable_cpu_alarm.zip"
@@ -207,6 +210,7 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
 
 # Enable CPU Alarm
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/enable_cpu_alarm.zip"
@@ -238,6 +242,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
   source_arn    = "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:*"
 }
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_dev.zip"
@@ -279,6 +284,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
   source_arn    = "arn:aws:cloudwatch:eu-west-2:172753231260:alarm:*"
 }
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat" {
   count         = local.is-preproduction == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_uat.zip"
@@ -320,6 +326,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
   source_arn    = "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:*"
 }
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_prod" {
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/terminate_cpu_process_prod.zip"
@@ -361,6 +368,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
   source_arn    = "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:*"
 }
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev" {
   count         = local.is-development == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/send_cpu_notification_dev.zip"
@@ -406,6 +414,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
   source_arn    = "arn:aws:cloudwatch:eu-west-2:172753231260:alarm:*"
 }
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat" {
   count         = local.is-preproduction == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/send_cpu_notification_uat.zip"
@@ -451,6 +460,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
   source_arn    = "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:*"
 }
 
+#trivy:ignore:CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
 resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod" {
   count         = local.is-production == true ? 1 : 0
   filename      = "${path.module}/lambda_scripts/send_cpu_notification_prod.zip"
