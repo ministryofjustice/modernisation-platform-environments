@@ -292,8 +292,8 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
     "--rename_migrated_prq_tbl_folder"   = ""
     "--year_partition_bool"              = "false"
     "--month_partition_bool"             = "false"
-    "--extra_py_files"                   = aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id
-    # "--extra_py_files"                    = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${var.s3_pylib_dir_path}/dv_reusable_components.zip"
+    "--extra-py-files"                   = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
+    # "--extra-py-files"                    = "s3://emds-dev-glue-job-store-20240917144028249000000003/reusable-pylib/dv_reusable_components.zip"
     "--rds_to_parquet_output_s3_bucket"  = module.s3-dms-target-store-bucket.bucket.id
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.rds_to_s3_parquet_migration.name}"
     "--enable-continuous-cloudwatch-log" = "true"
@@ -312,6 +312,7 @@ EOF
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_migration_monthly.py"
+  
   }
 
   tags = merge(
