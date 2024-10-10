@@ -7,13 +7,13 @@ module "shield" {
   application_name = local.application_name
   resources = {
     citrix_alb = {
-      action = "count"
+      action = "block"
       arn    = aws_lb.citrix_alb.arn
     }
   }
   waf_acl_rules = {
     example = {
-      "action"    = "count",
+      "action"    = "block",
       "name"      = "equip-count-rule",
       "priority"  = 0,
       "threshold" = "100"
