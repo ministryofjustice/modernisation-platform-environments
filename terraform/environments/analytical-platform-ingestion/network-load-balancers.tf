@@ -14,7 +14,7 @@ module "datasync_activation_nlb" {
 
   target_groups = {
     datasync = {
-      name_prefix          = "datasync-"
+      name_prefix          = "ds-"
       protocol             = "TCP"
       port                 = 80
       target_type          = "ip"
