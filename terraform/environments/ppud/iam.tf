@@ -159,7 +159,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
        "logs:CreateLogStream",
        "logs:PutLogEvents"
      ],
-     "Resource": "arn:aws:logs:*:*:*"
+     "Resource": [
+         "arn:aws:logs:eu-west-2:817985104434:*"
+     ]
     },
    {
      "Effect": "Allow",
@@ -167,7 +169,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
         "ec2:Start*",
         "ec2:Stop*"
       ],
-      "Resource": "*"
+      "Resource": [
+          "arn:aws:ec2:eu-west-2:817985104434:*"
+      ]
    },
    {
      "Effect": "Allow",
@@ -236,7 +240,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
        "logs:CreateLogStream",
        "logs:PutLogEvents"
      ],
-     "Resource": "arn:aws:logs:*:*:*"
+     "Resource": [
+         "arn:aws:logs:eu-west-2:817985104434:*"
+     ]
     },
    {
      "Effect": "Allow",
@@ -574,19 +580,25 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "acm:ListCertificates",
                 "acm:ListTagsForCertificate"
             ],
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:acm:eu-west-2:075585660276:certificate:*"
+            ]
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy4",
             "Effect": "Allow",
             "Action": "SNS:Publish",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:sns:eu-west-2:075585660276:*"
+            ]
         },
                {
             "Sid": "LambdaCertificateExpiryPolicy5",
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:cloudwatch:eu-west-2:075585660276:*"
+            ]
         },
                {
             "Sid": "LambdaCertificateExpiryPolicy6",
@@ -675,19 +687,25 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
                 "acm:ListCertificates",
                 "acm:ListTagsForCertificate"
             ],
-            "Resource": "*"
+            "Resource": [
+                 "arn:aws:acm:eu-west-2:172753231260:certificate:*"
+            ]
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy4",
             "Effect": "Allow",
             "Action": "SNS:Publish",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:sns:eu-west-2:172753231260:*"
+            ]
         },
                {
             "Sid": "LambdaCertificateExpiryPolicy5",
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:cloudwatch:eu-west-2:172753231260:*"
+            ]
         },
            {
             "Sid": "LambdaCertificateExpiryPolicy6",
@@ -776,19 +794,25 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
                 "acm:ListCertificates",
                 "acm:ListTagsForCertificate"
             ],
-            "Resource": "*"
+            "Resource": [
+                 "arn:aws:acm:eu-west-2:817985104434:certificate:*"
+            ]
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy4",
             "Effect": "Allow",
             "Action": "SNS:Publish",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:sns:eu-west-2:817985104434:*"
+            ]
         },
                {
             "Sid": "LambdaCertificateExpiryPolicy5",
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:cloudwatch:eu-west-2:817985104434:*"
+            ]
         },
            {
             "Sid": "LambdaCertificateExpiryPolicy6",
@@ -997,7 +1021,10 @@ resource "aws_iam_policy" "aws_signer_policy_prod" {
           "signer:GetSigningProfile",
           "signer:ListSigningJobs"
         ],
-        Resource = "*"
+        Resource = [
+          "arn:aws:signer:eu-west-2:817985104434:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002",
+          "arn:aws:signer:eu-west-2:817985104434:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002/HzoPedNoUr"
+        ]
       }
     ]
   })
@@ -1055,7 +1082,10 @@ resource "aws_iam_policy" "aws_signer_policy_uat" {
           "signer:GetSigningProfile",
           "signer:ListSigningJobs"
         ],
-        Resource = "*"
+        Resource = [
+          "arn:aws:signer:eu-west-2:172753231260:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002",
+          "arn:aws:signer:eu-west-2:172753231260:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002/ZYACVFPo1R"
+        ]
       }
     ]
   })
@@ -1113,7 +1143,10 @@ resource "aws_iam_policy" "aws_signer_policy_dev" {
           "signer:GetSigningProfile",
           "signer:ListSigningJobs"
         ],
-        Resource = "*"
+        Resource = [
+          "arn:aws:signer:eu-west-2:075585660276:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002",
+          "arn:aws:signer:eu-west-2:075585660276:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002/AHvOa02ifI"
+        ]
       }
     ]
   })
