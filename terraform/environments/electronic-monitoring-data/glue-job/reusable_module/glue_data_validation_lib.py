@@ -1,11 +1,9 @@
-import sys
 import time
 
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import DataFrame
-from awsglue.utils import getResolvedOptions
-
+import pyspark.sql.functions as F
 
 class RDSConn_Constants:
     RDS_DB_PORT = 1433
@@ -43,7 +41,7 @@ def resolve_args(args_list):
     available_args_list = list()
     for item in args_list:
         try:
-            args = getResolvedOptions(sys.argv, [f'{item}'])
+            # args = getResolvedOptions(sys.argv, [f'{item}'])
             available_args_list.append(item)
         except Exception as e:
             SparkSession.LOGGER.warn(f"WARNING: Missing argument, {e}")
@@ -130,7 +128,14 @@ class RDS_JDBC_CONNECTION():
 
         return rds_db_tbl_temp_list
 
-    def get_rds_dataframe(self, jdbc_partition_column, pkey_min, pkey_max) -> DataFrame:
+    def get_rds_dataframe_v1(self) -> DataFrame:
+        return self.spark.read.jdbc(url=self.rds_jdbc_url_v2,
+                            table=f"""{self.rds_db_schema_name }.[{self.rds_db_table_name}]""",
+                            properties={"user": self.RDS_DB_INSTANCE_USER,
+                                        "password": self.RDS_DB_INSTANCE_PWD,
+                                        "driver": self.RDS_DB_INSTANCE_DRIVER})
+
+    def get_rds_dataframe_v2(self, jdbc_partition_column, pkey_min, pkey_max) -> DataFrame:
 
         query_str = f"""
         SELECT *
@@ -225,6 +230,18 @@ class RDS_JDBC_CONNECTION():
                 .option("query", f"""{query_str}""")
                 .load())
 
+    def get_jdbc_partition_column(self, rds_tbl_pkeys_list):
+
+        rds_db_table_empty_df = self.get_rds_db_table_empty_df()
+        df_rds_dtype_dict = CustomPysparkMethods.get_dtypes_dict(rds_db_table_empty_df)
+        int_dtypes_colname_list = [colname for colname, dtype in df_rds_dtype_dict.items() 
+                                    if dtype in Logical_Constants.INT_DATATYPES_LIST]
+
+        if rds_tbl_pkeys_list[0] in int_dtypes_colname_list:
+            return rds_tbl_pkeys_list[0]
+        else:
+            return None
+
     def get_min_max_groupby_month(self,
                                   date_partition_col,
                                   pkey_col_name,
@@ -296,7 +313,7 @@ class AthenaMethods:
 
 
 class S3Methods:
-
+    
     def __init__(self,
                  S3_CLIENT):
         self.S3_CLIENT = S3_CLIENT
@@ -314,7 +331,6 @@ class S3Methods:
 
         return total_files, total_size
 
-
     def check_s3_folder_path_if_exists(self, in_bucket_name, in_folder_path):
         result = self.S3_CLIENT.list_objects(
             Bucket=in_bucket_name, Prefix=in_folder_path)
@@ -322,6 +338,25 @@ class S3Methods:
         if 'Contents' in result:
             exists = True
         return exists
+
+    @classmethod
+    def get_s3_table_folder_path(cls,
+                                 rds_jdbc_conn_obj,
+                                 in_parquet_files_bucket_name,
+                                 rename_target_table_folder=None):
+        
+        if rename_target_table_folder is not None:
+            dir_path_str = f"{rds_jdbc_conn_obj.rds_db_name}/{rds_jdbc_conn_obj.rds_db_schema_name}/{rename_target_table_folder}"
+        else:
+            dir_path_str = f"{rds_jdbc_conn_obj.rds_db_name}/{rds_jdbc_conn_obj.rds_db_schema_name}/{rds_jdbc_conn_obj.rds_db_table_name}"
+        
+        tbl_full_dir_path_str = f"s3://{in_parquet_files_bucket_name}/{dir_path_str}/"
+
+        if cls.check_s3_folder_path_if_exists(in_parquet_files_bucket_name, dir_path_str):
+            return tbl_full_dir_path_str
+        else:
+            SparkSession.LOGGER.info(f"{tbl_full_dir_path_str} -- Table-Folder-S3-Path Not Found !")
+            return None
 
 
 class CustomPysparkMethods:
