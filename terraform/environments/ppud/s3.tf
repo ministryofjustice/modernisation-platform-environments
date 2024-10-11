@@ -384,7 +384,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-prod" {
   topic {
     topic_arn = aws_sns_topic.cw_alerts[0].arn
     events        = ["s3:ObjectCreated:*"]
-    filter_prefix = "logs/"
+    filter_prefix = "alb-logs/"
   }
 }
 
@@ -415,16 +415,34 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
       },
       {
       "Action" : [
-        "s3:PutObject"
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
       ],
       "Effect" = "Allow",
       "Resource" : [
-        "arn:aws:elasticloadbalancing:eu-west-2:817985104434:*",
+         "arn:aws:elasticloadbalancing:eu-west-2:817985104434:*",
          "arn:aws:s3:::moj-log-files-prod",
          "arn:aws:s3:::moj-log-files-prod/*"
       ]
        "Principal" : {
           Service = "elasticloadbalancing.amazonaws.com"
+        }
+      },
+      {
+      "Action" : [
+          "s3:GetBucketAcl",
+          "s3:PutObject",
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-prod",
+         "arn:aws:s3:::moj-log-files-prod/*"
+      ]
+       "Principal" : {
+          Service = "delivery.logs.amazonaws.com"
         }
       },
       {
@@ -487,7 +505,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-uat" {
   topic {
     topic_arn = aws_sns_topic.cw_uat_alerts[0].arn
     events        = ["s3:ObjectCreated:*"]
-    filter_prefix = "logs/"
+    filter_prefix = "alb-logs/"
   }
 }
 
@@ -536,7 +554,25 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
       },
       {
       "Action" : [
-        "s3:PutObject"
+          "s3:GetBucketAcl",
+          "s3:PutObject",
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-uat",
+         "arn:aws:s3:::moj-log-files-uat/*"
+      ]
+       "Principal" : {
+          Service = "delivery.logs.amazonaws.com"
+        }
+      },
+      {
+      "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
       ],
       "Effect" = "Allow",
       "Resource" : [
@@ -629,7 +665,11 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
       },
       {
       "Action" : [
-        "s3:PutObject"
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
       ],
       "Effect" = "Allow",
       "Resource" : [
