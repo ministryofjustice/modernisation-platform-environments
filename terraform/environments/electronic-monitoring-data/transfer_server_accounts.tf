@@ -1,32 +1,32 @@
-#module "capita" {
-#  source = "./modules/landing_zone/"
-#  count = local.is-production ? 1 : 0
-#  
-#  supplier = "capita"
-#
-#  user_accounts = [
-#    # Developer access.
-#    # local.sftp_account_dev,
-#
-#    # Accounts for each system to be migrated.
-#    # local.sftp_account_capita_specials_mailbox,
-#    # local.sftp_account_capita_alcohol_monitoring,
-#    # local.sftp_account_capita_blob_storage,
-#    # local.sftp_account_capita_forms_and_subject_id,
-#
-#    # Test account for supplier.
-#    # local.sftp_account_capita_test,
-#  ]
-#
-#  data_store_bucket = module.s3-data-bucket.bucket
-#
-#  account_id = data.aws_caller_identity.current.account_id
-#
-#  vpc_id     = data.aws_vpc.shared.id
-#  subnet_ids = [data.aws_subnet.public_subnets_b.id]
-#
-#  local_tags = local.tags
-#}
+module "capita" {
+ source = "./modules/landing_zone/"
+ count = local.is-production ? 1 : 0
+ 
+ supplier = "capita"
+
+ user_accounts = [
+   # Developer access.
+   # local.sftp_account_dev,
+
+   # Accounts for each system to be migrated.
+   # local.sftp_account_capita_specials_mailbox,
+   local.sftp_account_capita_alcohol_monitoring,
+   # local.sftp_account_capita_blob_storage,
+   # local.sftp_account_capita_forms_and_subject_id,
+
+   # Test account for supplier.
+   # local.sftp_account_capita_test,
+ ]
+
+ data_store_bucket = module.s3-data-bucket.bucket
+
+ account_id = data.aws_caller_identity.current.account_id
+
+ vpc_id     = data.aws_vpc.shared.id
+ subnet_ids = [data.aws_subnet.public_subnets_b.id]
+
+ local_tags = local.tags
+}
 
 module "buddi" {
   source = "./modules/landing_zone/"
