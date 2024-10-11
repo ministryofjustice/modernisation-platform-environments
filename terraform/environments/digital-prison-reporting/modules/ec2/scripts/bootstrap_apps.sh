@@ -15,6 +15,8 @@ nomis_portforwarder_script="/usr/bin/nomispf.sh"
 bodmis_portforwarder_script="/usr/bin/bodmispf.sh"
 kubeconfig="/home/ssm-user/.kube/config"
 bodmis_kubeconfig="/home/ssm-user/.kube/bodmis_config"
+custom_cw_monitor_config="/usr/bin/dpr-custom-amazon-cloudwatch-agent.json"
+custom_cw_monitor_script="/usr/bin/dpr_custom_cw_monitor_services.sh"
 
 # Setup Required Directories
 touch /tmp/hello-ec2
@@ -43,7 +45,7 @@ echo "assumeyes=1" >> /etc/yum.conf
 sudo yum -y update
 
 # Setup YUM install Kinesis Agent
-sudo yum -y install aws-kinesis-agent wget unzip jq
+sudo yum -y install aws-kinesis-agent amazon-cloudwatch-agent wget unzip jq
 
 # Setup Oracle Client Tools
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-basic-21.8.0.0.0-1.x86_64.rpm
@@ -65,6 +67,151 @@ echo "Seup AWSCLI V2....."
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
+
+
+# Create CloudWatch Agent configuration file with custom metrics
+cat << 'CONFIG_EOF' > $custom_cw_monitor_config
+{
+  "agent": {
+    "metrics_collection_interval": 60,
+    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+  },
+  "metrics": {
+    "append_dimensions": {
+      "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
+      "InstanceId": "${aws:InstanceId}",
+      "InstanceType": "${aws:InstanceType}"
+    },
+    "metrics_collected": {
+      "cpu": {
+        "measurement": [
+          "cpu_usage_idle",
+          "cpu_usage_iowait",
+          "cpu_usage_user",
+          "cpu_usage_system"
+        ],
+        "metrics_collection_interval": 60,
+        "totalcpu": false
+      },
+      "disk": {
+        "measurement": [
+          "used_percent",
+          "inodes_free"
+        ],
+        "metrics_collection_interval": 60,
+        "resources": [
+          "/",
+          "/mnt"
+        ]
+      },
+      "mem": {
+        "measurement": [
+          "mem_used_percent",
+          "mem_available_percent"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "swap": {
+        "measurement": [
+          "swap_used_percent"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "netstat": {
+        "measurement": [
+          "tcp_established",
+          "tcp_time_wait",
+          "tcp_close"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "processes": {
+        "measurement": [
+          "running",
+          "sleeping",
+          "dead"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "exec": {
+        "commands": [
+          "/opt/aws/monitor_services.sh"
+        ],
+        "timeout": 600,
+        "measurement": [
+          "dpr_custom_nomispf_status",
+          "dpr_custom_bodmispf_status",
+          "dpr_custom_nomispf_uptime",
+          "dpr_custom_bodmispf_uptime"
+        ],
+        "metrics_collection_interval": 60
+      }
+    }
+  },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/messages",
+            "log_group_name": "var-log-messages",
+            "log_stream_name": "{instance_id}"
+          },
+          {
+            "file_path": "/var/log/cloud-init.log",
+            "log_group_name": "cloud-init-log",
+            "log_stream_name": "{instance_id}"
+          }
+        ]
+      }
+    }
+  }
+}
+CONFIG_EOF
+
+# Create the service monitoring script
+cat << 'SCRIPT_EOF' > $custom_cw_monitor_script
+#!/bin/bash
+
+# Function to get service status
+get_service_status() {
+  local service_name=$1
+  systemctl is-active --quiet $service_name
+  if [ $? -eq 0 ]; then
+    echo "1"  # Service is running
+  else
+    echo "0"  # Service is not running
+  fi
+}
+
+# Function to get service uptime in seconds
+get_service_uptime() {
+  local service_name=$1
+  systemctl show -p ActiveEnterTimestamp --value $service_name | xargs -I{} date +%s -d "{}" | awk '{print "'$(date +%s)'" - $1}'
+}
+
+# Get status of nomispf.service
+nomispf_status=$(get_service_status "nomispf.service")
+# Get uptime of nomispf.service
+nomispf_uptime=$(get_service_uptime "nomispf.service")
+
+# Get status of bodmispf.service
+bodmispf_status=$(get_service_status "bodmispf.service")
+# Get uptime of bodmispf.service
+bodmispf_uptime=$(get_service_uptime "bodmispf.service")
+
+# Output in JSON format for CloudWatch Agent exec plugin
+cat <<EOF
+{
+  "dpr_custom_nomispf_status": $nomispf_status,
+  "dpr_custom_bodmispf_status": $bodmispf_status,
+  "dpr_custom_nomispf_uptime": $nomispf_uptime,
+  "dpr_custom_bodmispf_uptime": $bodmispf_uptime
+}
+EOF
+SCRIPT_EOF
+
+chmod +x $custom_cw_monitor_script
 
 # Configure and Enable Kinesis Agent
 # /tmp/random.log*
@@ -275,7 +422,6 @@ TimeoutSec=30           # Add a timeout to gracefully handle any potential hangi
 WantedBy=multi-user.target
 EOL
 
-
 fi
 
 # Start Stream at Start of the EC2 
@@ -294,3 +440,10 @@ sudo systemctl start bodmispf.service
 # AMAZON SSM SGENT
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
+
+# Start CloudWatch Agent with the configuration
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:$custom_cw_monitor_config -s
+
+#Verify CloudWatch Agent is running
+systemctl enable amazon-cloudwatch-agent
+systemctl start amazon-cloudwatch-agent
