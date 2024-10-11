@@ -20,7 +20,12 @@ resource "aws_lb" "ppud_internal_nlb" {
   load_balancer_type         = "network"
   subnets                    = [data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   security_groups            = [aws_security_group.PPUD-ALB.id]
-  enable_deletion_protection = false # change it to true
+  enable_deletion_protection = true
+  #access_logs {
+  # bucket  = aws_s3_bucket.moj-log-files-prod[0].id
+  # prefix  = "alb-logs"
+  # enabled = true
+  #}
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
