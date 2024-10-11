@@ -432,6 +432,20 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
         }
       },
       {
+      "Action" : [
+          "s3:GetBucketAcl",
+          "s3:PutObject",
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-prod",
+         "arn:aws:s3:::moj-log-files-prod/*"
+      ]
+       "Principal" : {
+          Service = "delivery.logs.amazonaws.com"
+        }
+      },
+      {
         "Action" : [
           "s3:DeleteObject",
           "s3:GetObject",
@@ -536,6 +550,20 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
           "AWS" : [
             "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role"
           ]
+        }
+      },
+      {
+      "Action" : [
+          "s3:GetBucketAcl",
+          "s3:PutObject",
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-uat",
+         "arn:aws:s3:::moj-log-files-uat/*"
+      ]
+       "Principal" : {
+          Service = "delivery.logs.amazonaws.com"
         }
       },
       {
