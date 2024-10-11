@@ -18,7 +18,6 @@ module "test_ap_airflow" {
 
 
 data "aws_iam_policy_document" "load_unstructured_atrium_database" {
-  count = local.is-production ? 1 : 0
   statement {
     sid    = "GetAtriumFiles"
     effect = "Allow"
