@@ -2,7 +2,7 @@ locals {
   db_public_key_data    = jsondecode(file("./db_users.json"))
   dsd_instance_policies = [for v in values(merge(module.oracle_db_shared["dsd-db"].instance_policies, var.dsd_db_config.instance_policies)) : v.arn]
   boe_instance_policies = [for v in values(merge(module.oracle_db_shared["boe-db"].instance_policies, var.boe_db_config.instance_policies)) : v.arn]
-  mis_instance_policies = [for v in values(merge(module.oracle_db_shared["mis-db"].instance_policies, var.mis_db_config.instance_policies)) : v.arn]
+  mis_instance_policies = [for v in values(merge(module.oracle_db_shared["mis-db"].instance_policies, var.mis_db_config.instance_policies, {db_access_to_delius_secrets_manager = aws_iam_policy.db_access_to_delius_secrets_manager})) : v.arn]
   availability_zone_map = {
     0 = "a"
     1 = "b"
@@ -196,4 +196,20 @@ module "oracle_db_mis" {
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
+}
+
+# Policy document to allow access to Delius application secrets only for mis-db
+
+data "aws_iam_policy_document" "db_access_to_delius_secrets_manager" {
+  statement {
+    sid = "MisAWSAccountToReadTheDeliusSecret"
+    actions = ["secretsmanager:GetSecretValue"]
+    effect = "Allow"
+    resources = ["arn:aws:secretsmanager:${var.account_info.region}:${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:secret:delius-core-${var.env_name}-oracle-db-application-passwords*"]
+  }
+}
+
+resource "aws_iam_policy" "db_access_to_delius_secrets_manager" {
+  name   = "${var.account_info.application_name}-${var.env_name}-mis-db-delius-secrets-manager-access"
+  policy = data.aws_iam_policy_document.db_access_to_delius_secrets_manager.json
 }
