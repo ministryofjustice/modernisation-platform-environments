@@ -136,7 +136,7 @@ cat << 'CONFIG_EOF' > $custom_cw_monitor_config
       },
       "exec": {
         "commands": [
-          "/opt/aws/monitor_services.sh"
+          "/usr/bin/dpr_custom_cw_monitor_services.sh"
         ],
         "timeout": 600,
         "measurement": [
