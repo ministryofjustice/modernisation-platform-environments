@@ -505,6 +505,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
 
 resource "aws_s3_bucket" "moj-log-files-dev" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
   count  = local.is-development == true ? 1 : 0
   bucket = "moj-log-files-dev"
   tags = merge(
@@ -530,17 +531,6 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-dev" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_notification" "moj-log-files-dev" {
-  count  = local.is-development == true ? 1 : 0 
-  bucket = aws_s3_bucket.moj-log-files-dev[0].id
-
-  topic {
-    topic_arn = aws_sns_topic.ec2_cloudwatch_alarms[0].arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_prefix = "logs/"
-  }
 }
 
 resource "aws_s3_bucket_policy" "moj-log-files-dev" {
@@ -583,17 +573,4 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
       }
     ]
   })
-}
-
-# S3 Bucket Notification
-
-resource "aws_s3_bucket_notification" "s3_bucket_notification_prod" {
-  count  = local.is-production == true ? 1 : 0 
-  bucket = aws_s3_bucket.moj-log-files-prod[0].id
-
-  topic {
-    topic_arn     = aws_sns_topic.s3_bucket_notifications_prod[0].arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_prefix = "logs/"
-  }
 }
