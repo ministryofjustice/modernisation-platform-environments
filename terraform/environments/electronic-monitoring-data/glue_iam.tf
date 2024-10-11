@@ -114,8 +114,6 @@ resource "aws_iam_policy" "glue_user_restricted_notebook_service_role_iam_policy
             "Sid": "NotebookDenyActions",
             "Effect": "Deny",
             "Action": [
-                "glue:TagResource",
-                "glue:UntagResource",
                 "tag:TagResources",
                 "tag:UntagResources"
             ],
