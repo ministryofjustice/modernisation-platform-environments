@@ -24,7 +24,9 @@ module "capita" {
 
  vpc_id     = data.aws_vpc.shared.id
  subnet_ids = [data.aws_subnet.public_subnets_b.id]
-
+ providers = {
+  aws = aws
+ }
  local_tags = local.tags
 }
 
@@ -80,7 +82,9 @@ module "buddi" {
 #
 #  vpc_id     = data.aws_vpc.shared.id
 #  subnet_ids = [data.aws_subnet.public_subnets_b.id]
-#
+#  providers = {
+#    aws = aws
+#  }
 #  local_tags = local.tags
 #}
 
