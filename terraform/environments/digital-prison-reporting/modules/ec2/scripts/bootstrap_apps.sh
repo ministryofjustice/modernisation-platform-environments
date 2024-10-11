@@ -77,6 +77,7 @@ cat << 'CONFIG_EOF' > $custom_cw_monitor_config
     "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
   },
   "metrics": {
+    "namespace": "DPRAgentCustomMetrics",    
     "append_dimensions": {
       "AutoScalingGroupName": "$${aws:AutoScalingGroupName}",
       "InstanceId": "$${aws:InstanceId}",
@@ -187,7 +188,16 @@ get_service_status() {
 # Function to get service uptime in seconds
 get_service_uptime() {
   local service_name=$1
-  systemctl show -p ActiveEnterTimestamp --value $service_name | xargs -I{} date +%s -d "{}" | awk '{print "'$(date +%s)'" - $1}'
+  local start_timestamp=$(systemctl show "$service_name" -p ActiveEnterTimestamp | cut -d '=' -f2)
+  
+  if [[ -n "$start_timestamp" ]]; then
+    # Convert timestamp to seconds since epoch
+    local start_epoch=$(date +%s -d "$start_timestamp")
+    local current_epoch=$(date +%s)
+    echo $((current_epoch - start_epoch))
+  else
+    echo "0"  # Service not running or no timestamp found
+  fi
 }
 
 # Get status of nomispf.service
@@ -442,6 +452,8 @@ sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
 
 # Start CloudWatch Agent with the configuration
+# Add correct User Group to amazon-cloudwatch-agent
+sudo chown ssm-user:root /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:$custom_cw_monitor_config -s
 
 #Verify CloudWatch Agent is running
