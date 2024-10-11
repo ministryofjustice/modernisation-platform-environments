@@ -78,9 +78,9 @@ cat << 'CONFIG_EOF' > $custom_cw_monitor_config
   },
   "metrics": {
     "append_dimensions": {
-      "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
-      "InstanceId": "${aws:InstanceId}",
-      "InstanceType": "${aws:InstanceType}"
+      "AutoScalingGroupName": "$${aws:AutoScalingGroupName}",
+      "InstanceId": "$${aws:InstanceId}",
+      "InstanceType": "$${aws:InstanceType}"
     },
     "metrics_collected": {
       "cpu": {
