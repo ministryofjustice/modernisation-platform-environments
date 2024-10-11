@@ -8,6 +8,7 @@ module "observability_platform_tenant" {
   observability_platform_account_id = local.environment_configuration.observability_platform_account_id
   enable_xray                       = true
   enable_prometheus                 = true
+  cloudwatch_custom_namespaces      = "DPRAgentCustomMetrics"
 
   tags = local.tags
 }
