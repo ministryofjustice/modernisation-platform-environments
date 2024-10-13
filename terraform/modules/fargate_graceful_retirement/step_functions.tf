@@ -42,7 +42,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
         Resource: "arn:aws:lambda:${aws_lambda_function.calculate_wait_time.arn}",
         Parameters: {
           "time.$": "$.time",            # Pass the event time from the input
-          "restart_time": "${var.restart_time}"
+          "restart_time": var.restart_time
         },
         ResultPath: "$.waitTimestamp",   # Store the result in $.waitTimestamp
         Next: "WaitUntilRestartTime"
@@ -56,7 +56,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
         Type: "Task",
         Resource: "arn:aws:states:::lambda:invoke",
         Parameters: {
-          "FunctionName": "${aws_lambda_function.ecs_restart_handler.arn}",
+          "FunctionName": aws_lambda_function.ecs_restart_handler.arn,
           "Payload.$": "$"
         },
         End: true
