@@ -15,6 +15,10 @@ locals {
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/dev/ec2-user.pub")
     homepage_path                          = "/"
     has_mis_environment                    = true
+    fargate_graceful_retirement = {
+      enabled      = true
+      restart_time = "04:00"
+    }
   }
 
   ldap_config_dev = {
