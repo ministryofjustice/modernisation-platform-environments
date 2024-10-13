@@ -17,5 +17,5 @@ resource "aws_cloudwatch_event_target" "ecs_restarts_target" {
 
 resource "aws_cloudwatch_event_target" "step_function_target" {
   rule      = aws_cloudwatch_event_rule.ecs_restart_rule.name
-  arn       = aws_sfn_state_machine.ecs_restarts_state_machine.arn
+  arn       = aws_sfn_state_machine.ecs_restart_state_machine.arn
 }
