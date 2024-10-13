@@ -5,13 +5,18 @@ def lambda_handler(event, context):
     print("Event received:", json.dumps(event))
 
     try:
+        # Create an ECS client using boto3
         ecs_client = boto3.client('ecs')
 
+        # Extract the affected entities from the event
         affected_entities = event['detail']['affectedEntities']
 
+        # Iterate over each affected entity
         for entity in affected_entities:
+            # Get the entity value
             entity_value = entity.get('entityValue')
             if entity_value is not None:
+                # Extract cluster name and service name from the entity value
                 cluster_name = entity_value.split('|')[0]
                 service_name = entity_value.split('|')[1]
                 print("Cluster name:", cluster_name)
@@ -19,6 +24,7 @@ def lambda_handler(event, context):
 
                 print("Forcing new deployment for service:", service_name) 
                 
+                # Force a new deployment for the specified service in the specified cluster
                 response = ecs_client.update_service(
                     cluster=cluster_name,
                     service=service_name,
@@ -40,4 +46,3 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'body': json.dumps('Error updating service')
         }
-        
