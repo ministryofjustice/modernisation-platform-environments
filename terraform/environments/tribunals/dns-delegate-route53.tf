@@ -69,7 +69,7 @@ resource "aws_route53_record" "sftp_external_services_prod" {
   allow_overwrite = true
   provider        = aws.core-network-services
   zone_id         = local.production_zone_id
-  name            = "sftp.${local.ec2_records[count.index]}.tribunals.gov.uk"
+  name            = "sftp.${local.ec2_records[count.index]}"
   type            = "CNAME"
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60
