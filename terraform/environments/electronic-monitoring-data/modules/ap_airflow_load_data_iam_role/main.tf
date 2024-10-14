@@ -53,7 +53,7 @@ data "aws_iam_policy_document" "load_data" {
 }
 
 module "load_unstructured_atrium_database" {
-  source              = "./modules/ap_airflow_iam_role"
+  source              = "../ap_airflow_iam_role"
   role_name_suffix    = "load-${var.name}"
   role_description    = "${var.name} database permissions"
   iam_policy_document = data.aws_iam_policy_document.load_data.json

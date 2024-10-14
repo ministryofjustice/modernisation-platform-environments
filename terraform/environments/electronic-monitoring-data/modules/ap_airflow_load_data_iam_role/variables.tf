@@ -15,7 +15,7 @@ variable "path_to_data" {
 }
 
 variable "source_data_bucket" {
-  type        = object(any)
+  type        = object({ arn = string })
   description = "source of the data in s3"
 }
 
