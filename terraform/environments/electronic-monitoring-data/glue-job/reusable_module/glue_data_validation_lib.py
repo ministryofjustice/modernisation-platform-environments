@@ -5,6 +5,9 @@ from awsglue.context import GlueContext
 from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
 
+from awsglue.utils import getResolvedOptions
+
+
 class RDSConn_Constants:
     RDS_DB_PORT = 1433
     RDS_DB_INSTANCE_USER = "admin"
@@ -41,7 +44,7 @@ def resolve_args(args_list):
     available_args_list = list()
     for item in args_list:
         try:
-            # args = getResolvedOptions(sys.argv, [f'{item}'])
+            args = getResolvedOptions(sys.argv, [f'{item}'])
             available_args_list.append(item)
         except Exception as e:
             SparkSession.LOGGER.warn(f"WARNING: Missing argument, {e}")
