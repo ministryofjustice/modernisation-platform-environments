@@ -124,24 +124,36 @@ module "oracle_db_standby" {
   }
 }
 
-# Allow Access To Delius Core Application Secret From MIS Primary EC2 Instance Role
+# Allow Access To Delius Core Application Secret From Delius and MIS Primary EC2 Instance Roles
 
 data "aws_iam_policy_document" "database_application_passwords" {
-  count = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
   statement {
-    sid    = "MisAWSAccountToReadTheSecret"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.platform_vars.environment_management.account_ids[join("-", ["delius-mis", var.account_info.mp_environment])]}:role/instance-role-delius-mis-${var.env_name}-mis-db-1"]
-    }
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = [module.oracle_db_shared.database_application_passwords_secret_arn]
-  }
+      sid    = "DeliusAWSAccountToReadTheSecret"
+      effect = "Allow"
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:role/instance-role-delius-core-${var.env_name}-db-1"]
+      }
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [module.oracle_db_shared.database_application_passwords_secret_arn]
+   }
+
+   dynamic "statement" {
+     for_each = lookup(var.environment_config, "has_mis_environment", false) ? [1] : []
+     content {
+      sid    = "MisAWSAccountToReadTheSecret"
+      effect = "Allow"
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${var.platform_vars.environment_management.account_ids[join("-", ["delius-mis", var.account_info.mp_environment])]}:role/instance-role-delius-mis-${var.env_name}-mis-db-1"]
+      }
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [module.oracle_db_shared.database_application_passwords_secret_arn]
+     }
+   }
 }
 
 resource "aws_secretsmanager_secret_policy" "database_application_passwords" {
-  count      = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
   secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
-  policy     = data.aws_iam_policy_document.database_application_passwords[0].json
+  policy     = data.aws_iam_policy_document.database_application_passwords.json
 }
