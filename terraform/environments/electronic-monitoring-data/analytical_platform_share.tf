@@ -296,3 +296,15 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     principal   = "IAM_ALLOWED_PRINCIPALS"
   }
 }
+
+
+resource "aws_lakeformation_permissions" "example" {
+  permissions = ["SELECT"]
+  principal   = "arn:aws:iam::684969100054:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_AdministratorAccess_ab408ccf26c25b37"
+
+  table_with_columns {
+    database_name = "test_database"
+    name          = "dummy_table_1"
+    column_names  = ["id", "name"]
+  }
+}
