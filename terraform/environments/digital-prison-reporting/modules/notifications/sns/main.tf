@@ -1,5 +1,3 @@
-#trivy:ignore:avd-aws-0095
-
 resource "aws_sns_topic_policy" "notification-policy" {
   arn = aws_sns_topic.dpr-notification-topic.arn
 
@@ -7,7 +5,7 @@ resource "aws_sns_topic_policy" "notification-policy" {
 }
 
 resource "aws_sns_topic" "dpr-notification-topic" {
-
+  #trivy:ignore:avd-aws-0095
   #checkov:skip=CKV_AWS_26: "Ensure all data stored in the SNS topic is encrypted"
 
   name = var.sns_topic_name
