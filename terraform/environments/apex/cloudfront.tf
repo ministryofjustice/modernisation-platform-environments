@@ -1,8 +1,8 @@
 locals {
   lower_env_cloudfront_url = "${local.application_name}.${data.aws_route53_zone.external.name}"
   # TODO: The production CloudFront FQDN is to be determined
-  prod_fqdn        = data.aws_route53_zone.production_network_services.name
-  cloudfront_alias = local.environment == "production" ? local.prod_fqdn : local.lower_env_cloudfront_url
+  prod_fqdn         = data.aws_route53_zone.production_network_services.name
+  cloudfront_alias  = local.environment == "production" ? local.prod_fqdn : local.lower_env_cloudfront_url
   cloudfront_domain = local.environment == "production" ? data.aws_route53_zone.production_network_services.name : local.application_data.accounts[local.environment].acm_cert_domain_name
 
   custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
