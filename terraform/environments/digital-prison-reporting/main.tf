@@ -603,7 +603,7 @@ module "glue_data_reconciliation_job" {
   account_region               = local.account_region
   account_id                   = local.account_id
   log_group_retention_in_days  = local.glue_log_retention_in_days
-  connections                  = local.create_glue_connection ? concat([
+  connections = local.create_glue_connection ? concat([
     aws_glue_connection.glue_operational_datastore_connection[0].name,
     aws_glue_connection.glue_nomis_connection[0].name
   ], values(aws_glue_connection.glue_dps_connection)[*].name) : []

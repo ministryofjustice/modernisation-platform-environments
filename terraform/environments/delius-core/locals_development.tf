@@ -39,7 +39,7 @@ locals {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
     primary_instance_count = 1
-    standby_count = 2
+    standby_count          = 2
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
@@ -123,7 +123,7 @@ locals {
   }
 
   dms_config_dev = {
-    deploy_dms = true
+    deploy_dms                 = true
     replication_instance_class = "dms.t3.small"
     engine_version             = "3.5.2"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars

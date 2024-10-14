@@ -405,6 +405,54 @@ resource "aws_security_group_rule" "Dev-Box-VW108-Egress-2" {
   security_group_id = aws_security_group.Dev-Box-VW108[0].id
 }
 
+resource "aws_security_group" "Dev-Servers-Standard" {
+  count       = local.is-development == true ? 1 : 0
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "Dev-Servers-Standard"
+  description = "Security-Group-Dev-Servers-Standard"
+
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+
+  ingress = []
+}
+
+resource "aws_security_group_rule" "Dev-Servers-Standard-Egress" {
+  description       = "Rule to allow all traffic outbound"
+  count             = local.is-development == true ? 1 : 0
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "all"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.Dev-Servers-Standard[0].id
+}
+
+resource "aws_security_group_rule" "Dev-Servers-Standard-Egress-1" {
+  description       = "Rule to allow port 443 traffic outbound"
+  count             = local.is-development == true ? 1 : 0
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Dev-Servers-Standard[0].id
+}
+
+resource "aws_security_group_rule" "Dev-Servers-Standard-Egress-2" {
+  description       = "Rule to allow port 80 traffic outbound"
+  count             = local.is-development == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Dev-Servers-Standard[0].id
+}
+
+# Production
+
 resource "aws_security_group" "Primary-DOC-Server" {
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id

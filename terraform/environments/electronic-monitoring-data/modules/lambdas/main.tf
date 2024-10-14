@@ -159,6 +159,10 @@ resource "aws_lambda_function" "this" {
   timeout       = var.timeout
   memory_size   = var.memory_size
 
+  ephemeral_storage {
+    size = var.ephemeral_storage_size # Min 512 MB and the Max 10240 MB
+  }
+
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []
     content {

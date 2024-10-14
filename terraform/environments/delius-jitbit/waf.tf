@@ -17,9 +17,9 @@ module "shield" {
 
   waf_acl_rules = {
     AWSManagedRulesCommonRuleSet = {
-      "action" = "count"
-      "name"   = "AWSManagedRulesCommonRuleSet"
-      "priority" = 0
+      "action"    = "count"
+      "name"      = "AWSManagedRulesCommonRuleSet"
+      "priority"  = 0
       "threshold" = 1000
       "statement" = {
         "managed_rule_group_statement" = {
@@ -34,9 +34,9 @@ module "shield" {
       }
     }
     AWSManagedRulesSQLiRuleSet = {
-      "action" = "count"
-      "name"   = "AWSManagedRulesSQLiRuleSet"
-      "priority" = 1
+      "action"    = "count"
+      "name"      = "AWSManagedRulesSQLiRuleSet"
+      "priority"  = 1
       "threshold" = 1000
       "statement" = {
         "managed_rule_group_statement" = {
@@ -63,9 +63,9 @@ data "external" "shield_waf" {
 
 locals {
   split_arn = split("regional/webacl/", data.external.shield_waf.result["arn"])[1]
-  name = data.external.shield_waf.result["name"]
-  id = split("/", local.split_arn)[1]
-  scope = "REGIONAL"
+  name      = data.external.shield_waf.result["name"]
+  id        = split("/", local.split_arn)[1]
+  scope     = "REGIONAL"
 
 }
 import {

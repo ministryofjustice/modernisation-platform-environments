@@ -13,14 +13,16 @@ locals {
   capita_cidr_ipv6s = []
 
   ddc_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBLIW6JbERbsbTFmreQFdPclEVEyYdPPzMnra76xDhN/8KWKQIrbie4iJeYYfw6TxPwIdt1CyJhn2caGvpCtZyw26hQWDcsQnkxoxSvSfQlNGol64CaGRpCsKEN0beN0hCQ==",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDl9q5Gq/SJb6UGbr56E5VxF7gXLk3zccTBahHVdrRrk8vKyhJSrrNM264V6tF4AmZpY87qrmQaicUHqYGZH3z8RgSMhoH9814K+JbtW5/NrnA7q/dU1jHkE9YMAS/zVFA==",
   ]
   ddc_cidr_ipv4s = [
-    "82.203.33.112/28",
-    "82.203.33.128/28",
-    "85.115.52.0/24",
-    "85.115.53.0/24",
-    "85.115.54.0/24",
+    # "82.203.33.112/28",
+    # "82.203.33.128/28",
+    # "85.115.52.0/24",
+    # "85.115.53.0/24",
+    # "85.115.54.0/24",
+    "85.115.54.203/32",
+    "82.203.33.140/32",
   ]
   ddc_cidr_ipv6s = []
 
@@ -224,7 +226,7 @@ locals {
     ]
     cidr_ipv4s = [
       # fy nhy
-      "46.69.144.146/32",
+      "2.31.200.65/32",
       # Petty France
       "81.134.202.29/32",
     ]

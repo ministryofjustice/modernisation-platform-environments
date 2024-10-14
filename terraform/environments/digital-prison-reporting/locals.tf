@@ -240,7 +240,7 @@ locals {
   lambda_redshift_table_expiry_cluster_id          = module.datamart.cluster_id
   lambda_redshift_table_expiry_database_name       = module.datamart.cluster_database_name
   lambda_redshift_table_expiry_schedule_expression = "rate(1 hour)"
-  lambda_redshift_table_expiry_seconds             = "86400"
+  lambda_redshift_table_expiry_seconds             = local.application_data.accounts[local.environment].redshift_table_expiry_seconds
   lambda_redshift_table_expiry_timeout_seconds     = 900
   lambda_redshift_table_expiry_memory_size         = 1024
 
