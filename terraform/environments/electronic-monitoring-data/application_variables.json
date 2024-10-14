@@ -5,10 +5,10 @@
       "enable_dbt_k8s_secrets": true,
       "analytical_platform_share": [
         {
-          "target_account_name": "analytical-platform-data-production",
-          "target_account_id": "593291632749",
-          "assume_account_name": "analytical-platform-management-production",
-          "assume_account_id": "042130406152",
+          "target_account_name": "electronic-monitoring-data-development",
+          "target_account_id": "800964199911",
+          "assume_account_name": "electronic-monitoring-data-development",
+          "assume_account_id": "800964199911",
           "data_locations": [
             "emds-dev-dms-data-validation-20240917144028498200000007"
           ],
