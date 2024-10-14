@@ -414,39 +414,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
         }
       },
       {
-      "Action" : [
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-      ],
-      "Effect" = "Allow",
-      "Resource" : [
-         "arn:aws:elasticloadbalancing:eu-west-2:817985104434:*",
-         "arn:aws:s3:::moj-log-files-prod",
-         "arn:aws:s3:::moj-log-files-prod/*"
-      ]
-       "Principal" : {
-          Service = "elasticloadbalancing.amazonaws.com"
-        }
-      },
-      {
-      "Action" : [
-          "s3:GetBucketAcl",
-          "s3:PutObject"
-      ],
-      "Effect" = "Allow",
-      "Resource" : [
-         "arn:aws:s3:::moj-log-files-prod",
-         "arn:aws:s3:::moj-log-files-prod/*"
-      ]
-       "Principal" : {
-          Service = "delivery.logs.amazonaws.com"
-        }
-      },
-      {
         "Action" : [
+          "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
           "s3:PutObject",
@@ -461,6 +430,38 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
           "AWS" : [
             "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"
           ]
+        }
+      },
+      {
+      "Action" : [
+          "s3:GetBucketAcl",
+          "s3:ListBucket",
+          "s3:PutObject"
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-prod",
+         "arn:aws:s3:::moj-log-files-prod/*"
+      ]
+       "Principal" : {
+          Service = "delivery.logs.amazonaws.com"
+        }
+      },
+      {
+      "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-prod",
+         "arn:aws:s3:::moj-log-files-prod/*"
+      ]
+       "Principal" : {
+          Service = "elasticloadbalancing.amazonaws.com"
         }
       }
     ]
@@ -536,6 +537,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
       },
       {
         "Action" : [
+          "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
           "s3:PutObject",
@@ -555,7 +557,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
       {
       "Action" : [
           "s3:GetBucketAcl",
-          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:PutObject"
       ],
       "Effect" = "Allow",
       "Resource" : [
@@ -576,7 +579,6 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
       ],
       "Effect" = "Allow",
       "Resource" : [
-         "arn:aws:elasticloadbalancing:eu-west-2:172753231260:*",
          "arn:aws:s3:::moj-log-files-uat",
          "arn:aws:s3:::moj-log-files-uat/*"
       ]
@@ -647,6 +649,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
       },
       {
         "Action" : [
+          "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
           "s3:PutObject",
@@ -666,6 +669,21 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
       {
       "Action" : [
           "s3:GetBucketAcl",
+          "s3:ListBucket",
+          "s3:PutObject"
+      ],
+      "Effect" = "Allow",
+      "Resource" : [
+         "arn:aws:s3:::moj-log-files-dev",
+         "arn:aws:s3:::moj-log-files-dev/*"
+      ]
+       "Principal" : {
+          Service = "delivery.logs.amazonaws.com"
+        }
+      },
+      {
+      "Action" : [
+          "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
           "s3:PutObject",
@@ -673,7 +691,6 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
       ],
       "Effect" = "Allow",
       "Resource" : [
-         "arn:aws:elasticloadbalancing:eu-west-2:075585660276:*",
          "arn:aws:s3:::moj-log-files-dev",
          "arn:aws:s3:::moj-log-files-dev/*"
       ]
