@@ -5,6 +5,7 @@
 # Production
 
 resource "aws_sqs_queue" "lambda_queue_prod" {
+  # checkov:skip=CKV_AWS_27: "SQS topic encryption is not required as no sensitive data is processed through it"
   count                     = local.is-production == true ? 1 : 0
   name                      = "Lambda-Queue-Production"
   message_retention_seconds = 86400  # Retain messages for 1 day
@@ -18,6 +19,7 @@ resource "aws_sqs_queue" "lambda_queue_prod" {
 }
 
 resource "aws_sqs_queue" "lambda_deadletter_queue_prod" {
+  # checkov:skip=CKV_AWS_27: "SQS topic encryption is not required as no sensitive data is processed through it"
   count         = local.is-production == true ? 1 : 0
   name          = "Lambda-Deadletter-Queue-Production"
 }
@@ -35,6 +37,7 @@ resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy
 # UAT
 
 resource "aws_sqs_queue" "lambda_queue_uat" {
+  # checkov:skip=CKV_AWS_27: "SQS topic encryption is not required as no sensitive data is processed through it"
   count                     = local.is-preproduction == true ? 1 : 0
   name                      = "Lambda-Queue-UAT"
   message_retention_seconds = 86400  # Retain messages for 1 day
@@ -48,6 +51,7 @@ resource "aws_sqs_queue" "lambda_queue_uat" {
 }
 
 resource "aws_sqs_queue" "lambda_deadletter_queue_uat" {
+  # checkov:skip=CKV_AWS_27: "SQS topic encryption is not required as no sensitive data is processed through it"
   count         = local.is-preproduction == true ? 1 : 0
   name          = "Lambda-Deadletter-Queue-UAT"
 }

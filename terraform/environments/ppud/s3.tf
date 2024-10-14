@@ -425,7 +425,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
           "s3:DeleteObject",
           "s3:GetObject",
           "s3:PutObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "s3:PutBucketNotification"
         ],
         "Effect" : "Allow",
         "Resource" : [
@@ -459,7 +460,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
       "Action" : [
           "s3:GetBucketAcl",
           "s3:ListBucket",
-          "s3:PutObject"
+          "s3:PutObject",
+          "s3:PutBucketNotification"
       ],
       "Effect" = "Allow",
       "Resource" : [
@@ -476,7 +478,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
           "s3:DeleteObject",
           "s3:GetObject",
           "s3:PutObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "s3:PutBucketNotification"
       ],
       "Effect" = "Allow",
       "Resource" : [
@@ -570,7 +573,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
           "s3:DeleteObject",
           "s3:GetObject",
           "s3:PutObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "s3:PutBucketNotification"
         ],
         "Effect" : "Allow",
         "Resource" : [
@@ -604,7 +608,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
       "Action" : [
           "s3:GetBucketAcl",
           "s3:ListBucket",
-          "s3:PutObject"
+          "s3:PutObject",
+          "s3:PutBucketNotification"
       ],
       "Effect" = "Allow",
       "Resource" : [
@@ -621,7 +626,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
           "s3:DeleteObject",
           "s3:GetObject",
           "s3:PutObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "s3:PutBucketNotification"
       ],
       "Effect" = "Allow",
       "Resource" : [
