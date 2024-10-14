@@ -5,9 +5,6 @@ module "capita" {
   supplier = "capita"
 
   user_accounts = [
-    # Developer access.
-    # local.sftp_account_dev,
-
     # Accounts for each system to be migrated.
     # local.sftp_account_capita_specials_mailbox,
     local.sftp_account_capita_alcohol_monitoring,
@@ -16,6 +13,9 @@ module "capita" {
 
     # Test account for supplier.
     # local.sftp_account_capita_test,
+
+    # Developer access.
+    local.sftp_account_dev,
   ]
 
   data_store_bucket = module.s3-data-bucket.bucket
