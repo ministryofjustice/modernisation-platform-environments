@@ -111,6 +111,17 @@ resource "aws_iam_policy" "glue_user_restricted_notebook_service_role_iam_policy
             ]
         },
         {
+            "Sid": "NotebookAllowActions4",
+            "Effect": "Allow",
+            "Action": [
+                "glue:TagResource",
+                "glue:UntagResource"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
             "Sid": "NotebookDenyActions",
             "Effect": "Deny",
             "Action": [
