@@ -99,8 +99,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/pd/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pd/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
             ]
@@ -167,12 +167,12 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/ec2/ncr-bip/pd"           = local.secretsmanager_secrets.bip_app
-      "/ec2/ncr-web/pd"           = local.secretsmanager_secrets.bip_web
       "/oracle/database/PDBIPSYS" = local.secretsmanager_secrets.db # Azure Live System DB
       "/oracle/database/PDBIPAUD" = local.secretsmanager_secrets.db # Azure Live Audit DB
       "/oracle/database/PDBISYS"  = local.secretsmanager_secrets.db
       "/oracle/database/PDBIAUD"  = local.secretsmanager_secrets.db
+      "/sap/bip/pd"               = local.secretsmanager_secrets.bip
+      "/sap/bods/pd"              = local.secretsmanager_secrets.bods
     }
   }
 }

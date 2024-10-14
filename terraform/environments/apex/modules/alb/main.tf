@@ -22,27 +22,7 @@ locals {
     }
   }
 
-  #   ip_set_list   = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
   custom_header = "X-Custom-Header-LAA-${upper(var.application_name)}"
-
-  #   cloudfront_validation_records = {
-  #     for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
-  #       name   = dvo.resource_record_name
-  #       record = dvo.resource_record_value
-  #       type   = dvo.resource_record_type
-  #       zone = lookup(
-  #         local.route53_zones,
-  #         dvo.domain_name,
-  #         lookup(
-  #           local.route53_zones,
-  #           replace(dvo.domain_name, "/^[^.]*./", ""),
-  #           lookup(
-  #             local.route53_zones,
-  #             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
-  #             { provider = "external" }
-  #       )))
-  #     }
-  #   }
 
   external_lb_validation_records = {
     for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
@@ -70,14 +50,6 @@ locals {
       type   = value.type
     } if value.zone.provider == "external"
   }
-
-  #   validation_records_cloudfront = {
-  #     for key, value in local.cloudfront_validation_records : key => {
-  #       name   = value.name
-  #       record = value.record
-  #       type   = value.type
-  #     } if value.zone.provider == "external"
-  #   }
 
   core_network_services_domains = {
     for domain, value in var.validation : domain => value if value.account == "core-network-services"
@@ -320,209 +292,6 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
   secret_id = data.aws_secretsmanager_secret.cloudfront.arn
 }
 
-# # TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP? Yes for now
-
-# resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-development in laa-dev
-#   bucket = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
-#   # force_destroy = true # Enable to recreate bucket deleting everything inside
-#   tags = merge(
-#     var.tags,
-#     {
-#       Name = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
-#     }
-#   )
-#   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-#   lifecycle {
-#     prevent_destroy = false
-#   }
-# }
-
-# resource "aws_s3_bucket_ownership_controls" "cloudfront" {
-#   bucket = aws_s3_bucket.cloudfront.id
-#   rule {
-#     object_ownership = "BucketOwnerPreferred"
-#   }
-# }
-
-# resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
-#   bucket = aws_s3_bucket.cloudfront.id
-#   rule {
-#     apply_server_side_encryption_by_default {
-#       sse_algorithm = "AES256"
-#     }
-#   }
-#   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-#   lifecycle {
-#     prevent_destroy = false
-#   }
-# }
-
-# resource "aws_s3_bucket_public_access_block" "cloudfront" {
-#   bucket = aws_s3_bucket.cloudfront.id
-
-#   block_public_acls       = true
-#   block_public_policy     = true
-#   ignore_public_acls      = true
-#   restrict_public_buckets = true
-#   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-#   lifecycle {
-#     prevent_destroy = false
-#   }
-# }
-
-# resource "aws_cloudfront_distribution" "external" {
-#   http_version = var.cloudfront_http_version
-#   origin {
-#     domain_name = aws_lb.loadbalancer.dns_name
-#     origin_id   = aws_lb.loadbalancer.id
-#     custom_origin_config {
-#       http_port                = 80 # This port was not defined in CloudFormation, but should not be used anyways, only required by Terraform
-#       https_port               = 443
-#       origin_protocol_policy   = var.cloudfront_origin_protocol_policy
-#       origin_ssl_protocols     = ["TLSv1.2"]
-#       origin_read_timeout      = var.cloudfront_origin_read_timeout
-#       origin_keepalive_timeout = var.cloudfront_origin_keepalive_timeout
-#     }
-#     custom_header {
-#       name  = local.custom_header
-#       value = data.aws_secretsmanager_secret_version.cloudfront.secret_string
-#     }
-#   }
-#   enabled = var.cloudfront_enabled
-#   aliases = [var.fqdn]
-#   default_cache_behavior {
-#     target_origin_id = aws_lb.loadbalancer.id
-#     smooth_streaming = lookup(var.cloudfront_default_cache_behavior, "smooth_streaming", null)
-#     allowed_methods  = lookup(var.cloudfront_default_cache_behavior, "allowed_methods", null)
-#     cached_methods   = lookup(var.cloudfront_default_cache_behavior, "cached_methods", null)
-#     forwarded_values {
-#       query_string = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_query_string", null)
-#       headers      = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_headers", null)
-#       cookies {
-#         forward           = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
-#         whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
-#       }
-#     }
-#     viewer_protocol_policy = lookup(var.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
-#   }
-
-#   dynamic "ordered_cache_behavior" {
-#     for_each = var.cloudfront_ordered_cache_behavior
-#     content {
-#       target_origin_id = aws_lb.loadbalancer.id
-#       smooth_streaming = lookup(ordered_cache_behavior.value, "smooth_streaming", null)
-#       path_pattern     = lookup(ordered_cache_behavior.value, "path_pattern", null)
-#       min_ttl          = lookup(ordered_cache_behavior.value, "min_ttl", null)
-#       default_ttl      = lookup(ordered_cache_behavior.value, "default_ttl", null)
-#       max_ttl          = lookup(ordered_cache_behavior.value, "max_ttl", null)
-#       allowed_methods  = lookup(ordered_cache_behavior.value, "allowed_methods", null)
-#       cached_methods   = lookup(ordered_cache_behavior.value, "cached_methods", null)
-#       forwarded_values {
-#         query_string = lookup(ordered_cache_behavior.value, "forwarded_values_query_string", null)
-#         headers      = lookup(ordered_cache_behavior.value, "forwarded_values_headers", null)
-#         cookies {
-#           forward           = lookup(ordered_cache_behavior.value, "forwarded_values_cookies_forward", null)
-#           whitelisted_names = lookup(ordered_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
-#         }
-#       }
-#       viewer_protocol_policy = lookup(ordered_cache_behavior.value, "viewer_protocol_policy", null)
-#     }
-#   }
-
-#   price_class = var.cloudfront_price_class
-
-#   viewer_certificate {
-#     acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
-#     ssl_support_method       = "sni-only"
-#     minimum_protocol_version = "TLSv1.2_2018"
-#   }
-
-#   logging_config {
-#     include_cookies = false
-#     bucket          = aws_s3_bucket.cloudfront.bucket_domain_name
-#     prefix          = var.application_name
-#   }
-#   web_acl_id = aws_waf_web_acl.waf_acl.id
-
-#   restrictions {
-#     geo_restriction {
-#       restriction_type = var.cloudfront_geo_restriction_type
-#       locations        = var.cloudfront_geo_restriction_location
-#     }
-#   }
-
-#   is_ipv6_enabled = var.cloudfront_is_ipv6_enabled
-
-#   tags = var.tags
-
-# }
-
-# ## WAF
-
-# resource "aws_waf_ipset" "allow" {
-#   name = "${upper(var.application_name)} Manual Allow Set"
-
-#   # Ranges from https://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml
-#   # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
-
-#   dynamic "ip_set_descriptors" {
-#     for_each = local.ip_set_list
-#     content {
-#       type  = "IPV4"
-#       value = ip_set_descriptors.value
-#     }
-#   }
-# }
-
-# resource "aws_waf_ipset" "block" {
-#   name = "${upper(var.application_name)} Manual Block Set"
-# }
-
-# resource "aws_waf_rule" "allow" {
-#   name        = "${upper(var.application_name)} Manual Allow Rule"
-#   metric_name = "${upper(var.application_name)}ManualAllowRule"
-
-#   predicates {
-#     data_id = aws_waf_ipset.allow.id
-#     negated = false
-#     type    = "IPMatch"
-#   }
-# }
-
-# resource "aws_waf_rule" "block" {
-#   name        = "${upper(var.application_name)} Manual Block Rule"
-#   metric_name = "${upper(var.application_name)}ManualBlockRule"
-
-#   predicates {
-#     data_id = aws_waf_ipset.block.id
-#     negated = false
-#     type    = "IPMatch"
-#   }
-# }
-
-# resource "aws_waf_web_acl" "waf_acl" {
-#   name        = "${upper(var.application_name)} Whitelisting Requesters"
-#   metric_name = "${upper(var.application_name)}WhitelistingRequesters"
-#   default_action {
-#     type = var.waf_default_action
-#   }
-#   rules {
-#     action {
-#       type = "ALLOW"
-#     }
-#     priority = 1
-#     rule_id  = aws_waf_rule.allow.id
-#   }
-#   rules {
-#     action {
-#       type = "BLOCK"
-#     }
-#     priority = 2
-#     rule_id  = aws_waf_rule.block.id
-#   }
-# }
-
-# TODO Do we need an S3 bucket for store WAF logs? There is currently no logging_configuration.
 
 ## ALB Listener
 
@@ -534,45 +303,45 @@ resource "null_resource" "always_run" {
 
 
 
-# resource "aws_lb_listener" "alb_listener" {
+resource "aws_lb_listener" "alb_listener" {
 
-#   load_balancer_arn = aws_lb.loadbalancer.arn
-#   port              = var.listener_port
-#   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
-#   protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
-#   ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
-#   certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
+  load_balancer_arn = aws_lb.loadbalancer.arn
+  port              = var.listener_port
+  #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
+  protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
+  ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
+  certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
-#   default_action {
-#     type = "fixed-response"
-#     fixed_response {
-#       content_type = "text/plain"
-#       message_body = "Access Denied - must access via CloudFront"
-#       status_code  = 403
-#     }
-#   }
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied - must access via CloudFront"
+      status_code  = 403
+    }
+  }
 
-#   tags = var.tags
+  tags = var.tags
 
-# }
+}
 
 
-# resource "aws_lb_listener_rule" "alb_listener_rule" {
-#   listener_arn = aws_lb_listener.alb_listener.arn
-#   priority     = 1
+resource "aws_lb_listener_rule" "alb_listener_rule" {
+  listener_arn = aws_lb_listener.alb_listener.arn
+  priority     = 1
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.alb_target_group.arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_target_group.arn
+  }
 
-#   condition {
-#     http_header {
-#       http_header_name = local.custom_header
-#       values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
-#     }
-#   }
-# }
+  condition {
+    http_header {
+      http_header_name = local.custom_header
+      values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
+    }
+  }
+}
 
 resource "aws_lb_target_group" "alb_target_group" {
   name                 = "${var.application_name}-alb-tg"
@@ -739,120 +508,3 @@ resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
     aws_route53_record.external_lb_validation_self
   ]
 }
-
-
-
-# ######## Cloudfront Cert
-
-
-# resource "aws_acm_certificate" "cloudfront" {
-#   domain_name               = var.acm_cert_domain_name
-#   validation_method         = "DNS"
-#   provider                  = aws.us-east-1
-#   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
-#   tags                      = var.tags
-#   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-#   lifecycle {
-#     prevent_destroy = false
-#   }
-# }
-
-
-# resource "aws_route53_record" "cloudfront_validation_core_network_services" {
-#   provider = aws.core-network-services
-#   for_each = {
-#     for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "core-network-services"
-#   }
-
-#   allow_overwrite = true
-#   name            = each.value.name
-#   records         = [each.value.record]
-#   ttl             = 60
-#   type            = each.value.type
-
-#   # NOTE: value.zone is null indicates the validation zone could not be found
-#   # Ensure route53_zones variable contains the given validation zone or
-#   # explicitly provide the zone details in the validation variable.
-#   zone_id = each.value.zone.zone_id
-
-#   depends_on = [
-#     aws_acm_certificate.cloudfront
-#   ]
-# }
-
-# # use core-vpc provider to validate business-unit domain
-# resource "aws_route53_record" "cloudfront_validation_core_vpc" {
-#   provider = aws.core-vpc
-#   for_each = {
-#     for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "core-vpc"
-#   }
-
-#   allow_overwrite = true
-#   name            = each.value.name
-#   records         = [each.value.record]
-#   ttl             = 60
-#   type            = each.value.type
-#   zone_id         = each.value.zone.zone_id
-
-#   depends_on = [
-#     aws_acm_certificate.cloudfront
-#   ]
-# }
-
-# resource "aws_route53_record" "cloudfront-non-prod" {
-#   count    = var.environment != "production" ? 1 : 0
-#   provider = aws.core-vpc
-#   zone_id  = var.external_zone_id
-#   name     = var.fqdn
-#   type     = "A"
-#   alias {
-#     name                   = aws_cloudfront_distribution.external.domain_name
-#     zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
-#     evaluate_target_health = true
-#   }
-# }
-
-# resource "aws_route53_record" "cloudfront-prod" {
-#   count    = var.environment == "production" ? 1 : 0
-#   provider = aws.core-network-services
-#   zone_id  = var.production_zone_id
-#   name     = var.fqdn
-#   type     = "A"
-#   alias {
-#     name                   = aws_cloudfront_distribution.external.domain_name
-#     zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
-#     evaluate_target_health = true
-#   }
-# }
-
-# # assume any other domains are defined in the current workspace
-# resource "aws_route53_record" "cloudfront_validation_self" {
-#   for_each = {
-#     for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "self"
-#   }
-
-#   allow_overwrite = true
-#   name            = each.value.name
-#   records         = [each.value.record]
-#   ttl             = 60
-#   type            = each.value.type
-#   zone_id         = each.value.zone.zone_id
-
-#   depends_on = [
-#     aws_acm_certificate.cloudfront
-#   ]
-# }
-
-# resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
-#   count           = (length(local.validation_records_cloudfront) == 0 || var.external_validation_records_created) ? 1 : 0
-#   provider        = aws.us-east-1
-#   certificate_arn = aws_acm_certificate.cloudfront.arn
-#   validation_record_fqdns = [
-#     for key, value in local.validation_records_cloudfront : replace(value.name, "/\\.$/", "")
-#   ]
-#   depends_on = [
-#     aws_route53_record.cloudfront_validation_core_network_services,
-#     aws_route53_record.cloudfront_validation_core_vpc,
-#     aws_route53_record.cloudfront_validation_self
-#   ]
-# }

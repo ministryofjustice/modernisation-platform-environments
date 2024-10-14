@@ -2,6 +2,8 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
+      enable_ec2_delius_dba_secrets_access = true
+
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "hmpps-oem-preproduction"

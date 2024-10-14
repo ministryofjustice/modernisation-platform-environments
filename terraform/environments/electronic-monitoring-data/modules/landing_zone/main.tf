@@ -38,6 +38,7 @@ resource "random_string" "this" {
   special = false
 }
 
+#tfsec:ignore:aws-s3-enable-versioning
 module "landing-bucket" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
   bucket_name         = "${var.supplier}-${random_string.this.result}"
@@ -61,29 +62,9 @@ module "landing-bucket" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = 3
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 7
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
         days = 14
       }
-
-      noncurrent_version_transition = [
-        {
-          days          = 6
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 10
-          storage_class = "GLACIER"
-        }
-      ]
 
       noncurrent_version_expiration = {
         days = 21
@@ -278,6 +259,7 @@ resource "aws_iam_role" "this_transfer_workflow" {
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
+#tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "this_transfer_workflow" {
   statement {
     sid    = "AllowCopyReadSource"

@@ -9,7 +9,7 @@ terraform {
 }
 
 module "this-bucket" {
-  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${var.local_bucket_prefix}-land-${var.data_feed}-${var.order_type}-"
   versioning_enabled = false
@@ -59,4 +59,23 @@ module "this-bucket" {
     { order_type = var.order_type },
     { data_feed = var.data_feed }
   )
+}
+
+resource "aws_lambda_permission" "allow_bucket" {
+  statement_id  = "AllowExecutionFromS3Bucket-${var.data_feed}-${var.order_type}"
+  action        = "lambda:InvokeFunction"
+  function_name = var.s3_trigger_lambda_arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = module.this-bucket.bucket.arn
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = module.this-bucket.bucket.id
+
+  lambda_function {
+    lambda_function_arn = var.s3_trigger_lambda_arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [aws_lambda_permission.allow_bucket]
 }

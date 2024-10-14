@@ -13,6 +13,7 @@ locals {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/stage/ec2-user.pub")
     homepage_path                          = "/"
+    has_mis_environment                    = true
   }
 
   ldap_config_stage = {
@@ -31,10 +32,10 @@ locals {
 
 
   db_config_stage = {
-    instance_type  = "r7i.2xlarge"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
+    instance_type          = "r7i.2xlarge"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
     primary_instance_count = 1
-    standby_count  = 0
+    standby_count          = 0
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -127,6 +128,7 @@ locals {
   }
 
   dms_config_stage = {
+    deploy_dms                 = false
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.2"
 
@@ -137,10 +139,10 @@ locals {
       read_database = "STGNDA"
     }
     audit_target_endpoint = {
-      write_environment = "stage"   # Until production exists set dummy replication target
-      write_database = "NONE" # Remove this dummy attribute once production target exists
+      write_environment = "stage" # Until production exists set dummy replication target
+      write_database    = "NONE"  # Remove this dummy attribute once production target exists
     }
-    user_source_endpoint = {  # Set this map to {} once production exists
+    user_source_endpoint = { # Set this map to {} once production exists
       read_host     = "primarydb"
       read_database = "NONE"
     }

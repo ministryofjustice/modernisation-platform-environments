@@ -68,6 +68,11 @@ resource "aws_lambda_function" "lambda_function" {
       SECRET_NAME     = aws_secretsmanager_secret.secret_lambda_s3.name
     }
   }
+  logging_config {
+    log_format            = "JSON"
+    application_log_level = "INFO"
+    system_log_level      = "INFO"
+  }
 
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-payment-load"

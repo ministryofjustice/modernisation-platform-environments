@@ -1,5 +1,11 @@
-#### Cloud Watch PROD ####
+####################################
+# SNS Topics and Topic Subscriptions
+####################################
+
+# Production - Cloud Watch
+
 resource "aws_sns_topic" "cw_alerts" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
   count = local.is-production == true ? 1 : 0
   name  = "ppud-prod-cw-alerts"
 }
@@ -17,9 +23,10 @@ resource "aws_sns_topic_subscription" "cw_subscription" {
   #  endpoint  = aws_secretsmanager_secret_version.support_email_account[0].secret_string
 }
 
-##### Cloud Watch UAT ######
+# PreProduction - Cloud Watch
 
 resource "aws_sns_topic" "cw_uat_alerts" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
   count = local.is-preproduction == true ? 1 : 0
   name  = "ppud-uat-cw-alerts"
 }

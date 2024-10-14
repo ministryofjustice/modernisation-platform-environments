@@ -1,5 +1,7 @@
 locals {
   camel_case_api_name = join("", [for word in split("_", var.api_name) : title(word)])
+  synced              = var.sync ? "Sync" : ""
+  output              = var.sync ? ".output" : ""
 }
 
 # --------------------------------------------------------
@@ -21,6 +23,7 @@ resource "aws_api_gateway_resource" "resource" {
   path_part   = var.api_path
 }
 
+# tfsec:ignore:aws-api-gateway-no-public-access
 resource "aws_api_gateway_method" "method" {
   rest_api_id          = aws_api_gateway_rest_api.api_gateway.id
   resource_id          = aws_api_gateway_resource.resource.id
@@ -108,7 +111,7 @@ resource "aws_api_gateway_integration" "step_function_integration" {
   http_method             = aws_api_gateway_method.method.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/StartExecution"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/Start${local.synced}Execution"
 
   credentials = aws_iam_role.api_gateway_role.arn
 
@@ -153,7 +156,7 @@ resource "aws_api_gateway_deployment" "deployment" {
 
 resource "aws_api_gateway_stage" "stage" {
   #checkov:skip=CKV_AWS_120: "Ensure API Gateway caching is enabled, Skipping for expense reasons, already cached in settings"
-  #checkov:ship=CKV2_AWS_29: "Ensure public API gateway are protected by WAF, done below: aws_wafv2_web_acl_association"
+  #checkov:skip=CKV2_AWS_29: "Ensure public API gateway are protected by WAF, done below: aws_wafv2_web_acl_association"
   for_each              = { for stage in var.stages : stage.stage_name => stage }
   deployment_id         = aws_api_gateway_deployment.deployment.id
   rest_api_id           = aws_api_gateway_rest_api.api_gateway.id
@@ -192,7 +195,10 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
   status_code = "200"
 
   response_templates = {
-    "application/json" = "$input.json('$')"
+    "application/json" = <<EOF
+#set ($parsedPayload = $util.parseJson($input.json('$.${local.output}')))
+$parsedPayload
+EOF
   }
   depends_on = [
     aws_api_gateway_integration.step_function_integration
@@ -271,6 +277,7 @@ resource "aws_api_gateway_method_settings" "settings" {
 # Cloudwatch logs
 # -------------------------------------------------------
 
+# tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "api_gateway_logs" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
   for_each          = { for stage in var.stages : stage.stage_name => stage }
@@ -286,6 +293,7 @@ resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch_role_policy" {
 }
 
 data "aws_iam_policy_document" "cloudwatch" {
+  for_each = { for stage in var.stages : stage.stage_name => stage }
   statement {
     effect = "Allow"
 
@@ -299,14 +307,14 @@ data "aws_iam_policy_document" "cloudwatch" {
       "logs:FilterLogEvents",
     ]
 
-    resources = ["arn:aws:logs:*:*:*"]
+    resources = [aws_cloudwatch_log_group.api_gateway_logs[each.key].arn, aws_cloudwatch_log_group.waf_log_group.arn]
   }
 }
 resource "aws_iam_role_policy" "cloudwatch" {
   for_each = { for stage in var.stages : stage.stage_name => stage }
   name     = "cloudwatch-log-api-${replace(var.api_name, "_", "-")}-stage-${replace(each.key, "_", "-")}"
   role     = aws_iam_role.api_gateway_role.id
-  policy   = data.aws_iam_policy_document.cloudwatch.json
+  policy   = data.aws_iam_policy_document.cloudwatch[each.key].json
 }
 
 resource "aws_api_gateway_account" "api_gateway_account" {
@@ -395,6 +403,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "api_gateway_waf_logs" {
   ]
 }
 
+# tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "waf_log_group" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
   name              = "aws-waf-logs-${var.api_name}"

@@ -75,8 +75,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-bip/t1/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/ncr-web/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/t1/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/t1/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
             ]
@@ -117,11 +117,10 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/ec2/ncr-bip/t1" = local.secretsmanager_secrets.bip_app
-      "/ec2/ncr-web/t1" = local.secretsmanager_secrets.bip_web
-
       "/oracle/database/T1BIPSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T1BIPAUD" = local.secretsmanager_secrets.db
+      "/sap/bip/t1"               = local.secretsmanager_secrets.bip
+      "/sap/bods/t1"              = local.secretsmanager_secrets.bods
     }
   }
 }

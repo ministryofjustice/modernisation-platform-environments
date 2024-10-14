@@ -119,6 +119,17 @@ resource "aws_security_group" "cluster_ec2" {
   )
 }
 
+# always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
+}
+
+# if the AMI is used elsewhere it can be obtained here
+output "ami_id" {
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  sensitive = true
+}
+
 # EC2 launch template - settings to use for new EC2s added to the group
 # Note - when updating this you will need to manually terminate the EC2s
 # so that the autoscaling group creates new ones using the new launch template
@@ -128,7 +139,7 @@ resource "aws_launch_template" "ec2-launch-template" {
   #checkov:skip=CKV_AWS_79:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_341:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name_prefix            = "${var.app_name}-ec2-launch-template"
-  image_id               = var.ami_image_id
+  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type          = var.instance_type
   key_name               = var.key_name
   ebs_optimized          = true
