@@ -35,11 +35,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_C_volume" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    InstanceId = each.key
-    instance   = "C:"
-    ImageId    = data.aws_instance.windows_instance_details[each.value].ami
+    InstanceId   = each.key
+    instance     = "C:"
+    ImageId      = data.aws_instance.windows_instance_details[each.value].ami
     InstanceType = data.aws_instance.windows_instance_details[each.value].instance_type
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -60,11 +60,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    InstanceId = each.key
-    instance   = "D:"
-    ImageId    = data.aws_instance.windows_instance_details[each.value].ami
+    InstanceId   = each.key
+    instance     = "D:"
+    ImageId      = data.aws_instance.windows_instance_details[each.value].ami
     InstanceType = data.aws_instance.windows_instance_details[each.value].instance_type
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -86,11 +86,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw021" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
-    InstanceId = "i-080498c4c9d25e6bd"
-    instance   = "E:"
-    ImageId    = "ami-05ddec53aa481cbc3"
+    InstanceId   = "i-080498c4c9d25e6bd"
+    instance     = "E:"
+    ImageId      = "ami-05ddec53aa481cbc3"
     InstanceType = "m5.2xlarge"
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -108,11 +108,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw022" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
-    InstanceId = "i-029d2b17679dab982"
-    instance   = "E:"
-    ImageId    = "ami-02f8251c8cdf2464f"
+    InstanceId   = "i-029d2b17679dab982"
+    instance     = "E:"
+    ImageId      = "ami-02f8251c8cdf2464f"
     InstanceType = "m5.xlarge"
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -130,11 +130,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw027" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
-    InstanceId = "i-00cbccc46d25e77c6"
-    instance   = "E:"
-    ImageId    = "ami-0e203fec985af6465"
+    InstanceId   = "i-00cbccc46d25e77c6"
+    instance     = "E:"
+    ImageId      = "ami-0e203fec985af6465"
     InstanceType = "m5.xlarge"
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -156,11 +156,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw021" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
-    InstanceId = "i-080498c4c9d25e6bd"
-    instance   = "F:"
-    ImageId    = "ami-05ddec53aa481cbc3"
+    InstanceId   = "i-080498c4c9d25e6bd"
+    instance     = "F:"
+    ImageId      = "ami-05ddec53aa481cbc3"
     InstanceType = "m5.2xlarge"
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -178,11 +178,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw022" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
-    InstanceId = "i-029d2b17679dab982"
-    instance   = "E:"
-    ImageId    = "ami-02f8251c8cdf2464f"
+    InstanceId   = "i-029d2b17679dab982"
+    instance     = "E:"
+    ImageId      = "ami-02f8251c8cdf2464f"
     InstanceType = "m5.xlarge"
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -200,11 +200,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw027" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
-    InstanceId = "i-00cbccc46d25e77c6"
-    instance   = "F:"
-    ImageId    = "ami-0e203fec985af6465"
+    InstanceId   = "i-00cbccc46d25e77c6"
+    instance     = "F:"
+    ImageId      = "ami-0e203fec985af6465"
     InstanceType = "m5.xlarge"
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -226,11 +226,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_G_volume_rgvw021" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
-    InstanceId = "i-080498c4c9d25e6bd"
-    instance   = "G:"
-    ImageId    = "ami-05ddec53aa481cbc3"
+    InstanceId   = "i-080498c4c9d25e6bd"
+    instance     = "G:"
+    ImageId      = "ami-05ddec53aa481cbc3"
     InstanceType = "m5.2xlarge"
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -248,11 +248,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_G_volume_rgvw022" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
-    InstanceId = "i-029d2b17679dab982"
-    instance   = "G:"
-    ImageId    = "ami-02f8251c8cdf2464f"
+    InstanceId   = "i-029d2b17679dab982"
+    instance     = "G:"
+    ImageId      = "ami-02f8251c8cdf2464f"
     InstanceType = "m5.xlarge"
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -273,11 +273,11 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_H_volume_rgvw027" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
   alarm_actions       = ["arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"]
   dimensions = {
-    InstanceId = "i-00cbccc46d25e77c6"
-    instance   = "H:"
-    ImageId    = "ami-0e203fec985af6465"
+    InstanceId   = "i-00cbccc46d25e77c6"
+    instance     = "H:"
+    ImageId      = "ami-0e203fec985af6465"
     InstanceType = "m5.xlarge"
-    objectname = "LogicalDisk"
+    objectname   = "LogicalDisk"
   }
 }
 
@@ -327,13 +327,13 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
 
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "CPU-Utilisation-High-${each.key}"          # name of the alarm
-  comparison_operator = "GreaterThanOrEqualToThreshold" # threshold to trigger the alarm state
-  period              = "60"                            # period in seconds over which the specified statistic is applied
-  threshold           = "90"                            # threshold for the alarm - see comparison_operator for usage
-  evaluation_periods  = "3"                             # how many periods over which to evaluate the alarm
-  datapoints_to_alarm = "2"                             # how many datapoints must be breaching the threshold to trigger the alarm
-  metric_name         = "CPUUtilization"                # name of the alarm's associated metric
+  alarm_name          = "CPU-Utilisation-High-${each.key}" # name of the alarm
+  comparison_operator = "GreaterThanOrEqualToThreshold"    # threshold to trigger the alarm state
+  period              = "60"                               # period in seconds over which the specified statistic is applied
+  threshold           = "90"                               # threshold for the alarm - see comparison_operator for usage
+  evaluation_periods  = "3"                                # how many periods over which to evaluate the alarm
+  datapoints_to_alarm = "2"                                # how many datapoints must be breaching the threshold to trigger the alarm
+  metric_name         = "CPUUtilization"                   # name of the alarm's associated metric
   treat_missing_data  = "notBreaching"
   namespace           = "AWS/EC2" # namespace of the alarm's associated metric
   statistic           = "Average" # could be Average/Minimum/Maximum etc.

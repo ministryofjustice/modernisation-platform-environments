@@ -1,33 +1,33 @@
 module "capita" {
- source = "./modules/landing_zone/"
- count = local.is-production ? 1 : 0
- 
- supplier = "capita"
+  source = "./modules/landing_zone/"
+  count  = local.is-production ? 1 : 0
 
- user_accounts = [
-   # Developer access.
-   # local.sftp_account_dev,
+  supplier = "capita"
 
-   # Accounts for each system to be migrated.
-   # local.sftp_account_capita_specials_mailbox,
-   local.sftp_account_capita_alcohol_monitoring,
-   # local.sftp_account_capita_blob_storage,
-   # local.sftp_account_capita_forms_and_subject_id,
+  user_accounts = [
+    # Developer access.
+    # local.sftp_account_dev,
 
-   # Test account for supplier.
-   # local.sftp_account_capita_test,
- ]
+    # Accounts for each system to be migrated.
+    # local.sftp_account_capita_specials_mailbox,
+    local.sftp_account_capita_alcohol_monitoring,
+    # local.sftp_account_capita_blob_storage,
+    # local.sftp_account_capita_forms_and_subject_id,
 
- data_store_bucket = module.s3-data-bucket.bucket
+    # Test account for supplier.
+    # local.sftp_account_capita_test,
+  ]
 
- account_id = data.aws_caller_identity.current.account_id
+  data_store_bucket = module.s3-data-bucket.bucket
 
- vpc_id     = data.aws_vpc.shared.id
- subnet_ids = [data.aws_subnet.public_subnets_b.id]
- providers = {
-  aws = aws
- }
- local_tags = local.tags
+  account_id = data.aws_caller_identity.current.account_id
+
+  vpc_id     = data.aws_vpc.shared.id
+  subnet_ids = [data.aws_subnet.public_subnets_b.id]
+  providers = {
+    aws = aws
+  }
+  local_tags = local.tags
 }
 
 module "buddi" {

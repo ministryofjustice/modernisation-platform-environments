@@ -14,7 +14,7 @@ variable "account_id" {
 }
 
 variable "script_file_version" {
-  type = string
+  type        = string
   description = "The filename of the glue script, including version"
 }
 
@@ -70,7 +70,7 @@ variable "worker_type" {
   description = "(Optional) The type of predefined worker that is allocated when a job runs."
 
   validation {
-    condition = contains(["Standard", "G.025X", "G.1X", "G.2X"], var.worker_type)
+    condition     = contains(["Standard", "G.025X", "G.1X", "G.2X"], var.worker_type)
     error_message = "Accepts a value of Standard, G.025X, G.1X, or G.2X."
   }
 }
@@ -106,26 +106,26 @@ variable "log_group_retention_in_days" {
 }
 
 variable "connections" {
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
   description = "The list of Glue connections used for the batch job."
 }
 
 variable "additional_secret_arns" {
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
   description = "(Optional) The list of additional secrets this job needs access to."
 }
 
 variable "tags" {
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
   description = "(Optional) Key-value map of resource tags."
 }
 
 variable "glue_job_arguments" {
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
   description = "(Optional) Arguments for the Reconciliation job"
 }
 
