@@ -2,8 +2,9 @@ locals {
   analytical_platform_share = can(local.application_data.accounts[local.environment].analytical_platform_share) ? { for share in local.application_data.accounts[local.environment].analytical_platform_share : share.target_account_name => share } : {}
   enable_dbt_k8s_secrets    = local.application_data.accounts[local.environment].enable_dbt_k8s_secrets
   dbt_k8s_secrets_placeholder = {
-    oidc_cluster_identifier = "placeholder"
+    oidc_cluster_identifier = "placeholder2"
   }
+  admin_roles = local.is-development ? "sandbox" : "data-eng"
 }
 
 # Source Analytics DBT Secrets
@@ -26,7 +27,7 @@ data "aws_iam_session_context" "current" {
 }
 
 data "aws_iam_roles" "data_engineering_roles" {
-  name_regex = "AWSReservedSSO_modernisation-platform-*"
+  name_regex = "AWSReservedSSO_modernisation-platform-${local.admin_roles}-*"
 }
 
 ## DBT Analytics EKS Cluster Identifier
