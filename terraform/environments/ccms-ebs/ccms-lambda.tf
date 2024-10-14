@@ -69,9 +69,9 @@ resource "aws_lambda_function" "lambda_function" {
     }
   }
   logging_config {
-    log_format          = "JSON"
-    application_log_level = "INFO" 
-    system_log_level    = "INFO"
+    log_format            = "JSON"
+    application_log_level = "INFO"
+    system_log_level      = "INFO"
   }
 
   tags = merge(local.tags, {

@@ -38,7 +38,7 @@ locals {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
     primary_instance_count = 0
-    standby_count = 0
+    standby_count          = 0
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
@@ -129,7 +129,7 @@ locals {
   }
 
   dms_config_preprod = {
-    deploy_dms = false
+    deploy_dms                 = false
     replication_enabled        = false
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.2"
@@ -140,10 +140,10 @@ locals {
       read_database = "PRENDAS1"
     }
     audit_target_endpoint = {
-      write_environment = "preprod"   # Until production exists set dummy replication target
-      write_database = "NONE" # Remove this dummy attribute once production target exists
+      write_environment = "preprod" # Until production exists set dummy replication target
+      write_database    = "NONE"    # Remove this dummy attribute once production target exists
     }
-    user_source_endpoint = {  # Set this map to {} once production exists
+    user_source_endpoint = { # Set this map to {} once production exists
       read_host     = "primarydb"
       read_database = "NONE"
     }

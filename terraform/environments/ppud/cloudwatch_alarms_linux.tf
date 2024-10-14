@@ -35,12 +35,12 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_root_volume" {
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 10% for 5 minutes, the alarm will trigger"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    InstanceId = each.key
-    path   = "/"
-    ImageId    = data.aws_instance.linux_instance_details[each.value].ami
+    InstanceId   = each.key
+    path         = "/"
+    ImageId      = data.aws_instance.linux_instance_details[each.value].ami
     InstanceType = data.aws_instance.linux_instance_details[each.value].instance_type
-    device     = "nvme0n1p1"
-    fstype     = "xfs"
+    device       = "nvme0n1p1"
+    fstype       = "xfs"
   }
 }
 
@@ -48,13 +48,13 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_root_volume" {
 
 resource "aws_cloudwatch_metric_alarm" "linux_cpu" {
   for_each            = toset(data.aws_instances.linux_tagged_instances.ids)
-  alarm_name          = "CPU-Utilisation-High-${each.key}"          # name of the alarm
-  comparison_operator = "GreaterThanOrEqualToThreshold" # threshold to trigger the alarm state
-  period              = "60"                            # period in seconds over which the specified statistic is applied
-  threshold           = "90"                            # threshold for the alarm - see comparison_operator for usage
-  evaluation_periods  = "3"                             # how many periods over which to evaluate the alarm
-  datapoints_to_alarm = "2"                             # how many datapoints must be breaching the threshold to trigger the alarm
-  metric_name         = "CPUUtilization"                # name of the alarm's associated metric
+  alarm_name          = "CPU-Utilisation-High-${each.key}" # name of the alarm
+  comparison_operator = "GreaterThanOrEqualToThreshold"    # threshold to trigger the alarm state
+  period              = "60"                               # period in seconds over which the specified statistic is applied
+  threshold           = "90"                               # threshold for the alarm - see comparison_operator for usage
+  evaluation_periods  = "3"                                # how many periods over which to evaluate the alarm
+  datapoints_to_alarm = "2"                                # how many datapoints must be breaching the threshold to trigger the alarm
+  metric_name         = "CPUUtilization"                   # name of the alarm's associated metric
   treat_missing_data  = "notBreaching"
   namespace           = "AWS/EC2" # namespace of the alarm's associated metric
   statistic           = "Average" # could be Average/Minimum/Maximum etc.
