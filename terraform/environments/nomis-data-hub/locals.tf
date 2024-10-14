@@ -61,7 +61,7 @@ locals {
           prefix                        = ""
           tags                          = { rule = "log", autoclean = "true" }
           transition                    = []
-          expiration                    = { days = 30 }
+          expiration                    = { days = 365 }
           noncurrent_version_transition = []
           noncurrent_version_expiration = { days = 7 }
         }]
