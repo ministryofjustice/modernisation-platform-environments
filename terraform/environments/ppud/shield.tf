@@ -7,16 +7,16 @@ module "shield" {
   application_name = local.application_name
   resources = {
     WAM-ALB = {
-      action = "count"
+      action = "block"
       arn    = aws_lb.WAM-ALB.arn
     }
   }
   waf_acl_rules = {
     example = {
-      "action"    = "count",
+      "action"    = "block",
       "name"      = "DDoSprotection",
       "priority"  = 0,
-      "threshold" = "1000"
+      "threshold" = "2000"
     }
   }
 }

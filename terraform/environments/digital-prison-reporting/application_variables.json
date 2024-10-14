@@ -172,7 +172,8 @@
       "enable_cp_bodmis_k8s_secrets": true,
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
-      "analytics_generic_athena_workgroup": true
+      "analytics_generic_athena_workgroup": true,
+      "redshift_table_expiry_seconds": "604800"
     },
     "test": {
       "project_short_id": "dpr",
@@ -346,7 +347,8 @@
       "enable_cp_bodmis_k8s_secrets": false,
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
-      "analytics_generic_athena_workgroup": true
+      "analytics_generic_athena_workgroup": true,
+      "redshift_table_expiry_seconds": "604800"
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -540,7 +542,8 @@
             }
           ]
         }
-      ]
+      ],
+      "redshift_table_expiry_seconds": "604800"
     },
     "production": {
       "project_short_id": "dpr",
@@ -729,7 +732,8 @@
             }
           ]
         }
-      ]
+      ],
+      "redshift_table_expiry_seconds": "86400"
     }
   }
 }

@@ -14,27 +14,29 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
-  count         = local.is-development == true ? 1 : 0
-  filename      = "${path.module}/lambda_scripts/certificate_expiry_dev.zip"
-  function_name = "certificate_expiry_dev"
-  role          = aws_iam_role.lambda_role_certificate_expiry_dev[0].arn
-  handler       = "certificate_expiry_dev.lambda_handler"
-  runtime       = "python3.8"
-  timeout       = 30
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
+  count                          = local.is-development == true ? 1 : 0
+  filename                       = "${path.module}/lambda_scripts/certificate_expiry_dev.zip"
+  function_name                  = "certificate_expiry_dev"
+  role                           = aws_iam_role.lambda_role_certificate_expiry_dev[0].arn
+  handler                        = "certificate_expiry_dev.lambda_handler"
+  runtime                        = "python3.8"
+  timeout                        = 30
   reserved_concurrent_executions = 5
-  code_signing_config_arn = "arn:aws:lambda:eu-west-2:075585660276:code-signing-config:csc-0c7136ccff2de748f"
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
-   environment {
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:075585660276:code-signing-config:csc-0c7136ccff2de748f"
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
+  environment {
     variables = {
-      EXPIRY_DAYS = "45",
-	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:075585660276:ec2_cloudwatch_alarms"
+      EXPIRY_DAYS   = "45",
+      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:075585660276:ec2_cloudwatch_alarms"
     }
   }
   dead_letter_config {
-   target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
   }
   tracing_config {
-   mode = "Active"
+    mode = "Active"
   }
 }
 
@@ -90,27 +92,29 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
-  count         = local.is-preproduction == true ? 1 : 0
-  filename      = "${path.module}/lambda_scripts/certificate_expiry_uat.zip"
-  function_name = "certificate_expiry_uat"
-  role          = aws_iam_role.lambda_role_certificate_expiry_uat[0].arn
-  handler       = "certificate_expiry_uat.lambda_handler"
-  runtime       = "python3.8"
-  timeout       = 30
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
+  count                          = local.is-preproduction == true ? 1 : 0
+  filename                       = "${path.module}/lambda_scripts/certificate_expiry_uat.zip"
+  function_name                  = "certificate_expiry_uat"
+  role                           = aws_iam_role.lambda_role_certificate_expiry_uat[0].arn
+  handler                        = "certificate_expiry_uat.lambda_handler"
+  runtime                        = "python3.8"
+  timeout                        = 30
   reserved_concurrent_executions = 5
-  code_signing_config_arn = "arn:aws:lambda:eu-west-2:172753231260:code-signing-config:csc-0db408c5170a8eba6"
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
-   environment {
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:172753231260:code-signing-config:csc-0db408c5170a8eba6"
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
+  environment {
     variables = {
-      EXPIRY_DAYS = "45",
-	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:172753231260:ppud-uat-cw-alerts"
+      EXPIRY_DAYS   = "45",
+      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:172753231260:ppud-uat-cw-alerts"
     }
   }
   dead_letter_config {
-   target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
   }
   tracing_config {
-   mode = "Active"
+    mode = "Active"
   }
 }
 
@@ -166,27 +170,29 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
-  count         = local.is-production == true ? 1 : 0
-  filename      = "${path.module}/lambda_scripts/certificate_expiry_prod.zip"
-  function_name = "certificate_expiry_prod"
-  role          = aws_iam_role.lambda_role_certificate_expiry_prod[0].arn
-  handler       = "certificate_expiry_prod.lambda_handler"
-  runtime       = "python3.8"
-  timeout       = 30
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
+  count                          = local.is-production == true ? 1 : 0
+  filename                       = "${path.module}/lambda_scripts/certificate_expiry_prod.zip"
+  function_name                  = "certificate_expiry_prod"
+  role                           = aws_iam_role.lambda_role_certificate_expiry_prod[0].arn
+  handler                        = "certificate_expiry_prod.lambda_handler"
+  runtime                        = "python3.8"
+  timeout                        = 30
   reserved_concurrent_executions = 5
-  code_signing_config_arn = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
-  depends_on    = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
-   environment {
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
+  environment {
     variables = {
-      EXPIRY_DAYS = "45",
-	    SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+      EXPIRY_DAYS   = "45",
+      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
     }
   }
   dead_letter_config {
-   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
   tracing_config {
-   mode = "Active"
+    mode = "Active"
   }
 }
 

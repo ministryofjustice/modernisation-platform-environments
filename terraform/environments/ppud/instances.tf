@@ -3,6 +3,7 @@
 #################################
 
 resource "aws_instance" "s609693lo6vw109" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-013198324453e6dc3"
   instance_type          = "m5.large"
@@ -24,6 +25,7 @@ resource "aws_instance" "s609693lo6vw109" {
 }
 
 resource "aws_instance" "s609693lo6vw112" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0be53fc5198dbd294"
   instance_type          = "m5.large"
@@ -45,6 +47,7 @@ resource "aws_instance" "s609693lo6vw112" {
 }
 
 resource "aws_instance" "s609693lo6vw105" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0edd8d3e58d106f40"
   instance_type          = "m5.large"
@@ -66,6 +69,7 @@ resource "aws_instance" "s609693lo6vw105" {
 }
 
 resource "aws_instance" "s609693lo6vw104" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0f115a52a37278d93"
   instance_type          = "m5.large"
@@ -87,6 +91,7 @@ resource "aws_instance" "s609693lo6vw104" {
 }
 
 resource "aws_instance" "s609693lo6vw100" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0fbad994892c0f0c4"
   instance_type          = "m5.large"
@@ -108,6 +113,7 @@ resource "aws_instance" "s609693lo6vw100" {
 }
 
 resource "aws_instance" "s609693lo6vw101" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-07315ed3a1b524be8"
   instance_type          = "m5.large"
@@ -129,6 +135,7 @@ resource "aws_instance" "s609693lo6vw101" {
 }
 
 resource "aws_instance" "s609693lo6vw103" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-09bf383e2d58df1c7"
   instance_type          = "m5.large"
@@ -150,6 +157,7 @@ resource "aws_instance" "s609693lo6vw103" {
 }
 
 resource "aws_instance" "s609693lo6vw110" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-09b8ade582b84853a"
   instance_type          = "m5.large"
@@ -172,6 +180,7 @@ resource "aws_instance" "s609693lo6vw110" {
 }
 
 resource "aws_instance" "s609693lo6vw106" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0f9ea6b08039bb33b"
   instance_type          = "m5.large"
@@ -193,6 +202,7 @@ resource "aws_instance" "s609693lo6vw106" {
 }
 
 resource "aws_instance" "s609693lo6vw111" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-005cac270289ea0de"
   instance_type          = "m5.large"
@@ -213,6 +223,7 @@ resource "aws_instance" "s609693lo6vw111" {
 }
 
 resource "aws_instance" "s609693lo6vw107" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-04682227c9aa18702"
   instance_type          = "m5.large"
@@ -234,6 +245,7 @@ resource "aws_instance" "s609693lo6vw107" {
 }
 
 resource "aws_instance" "PPUDWEBSERVER2" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0852d4d5313264225"
   instance_type          = "m5.large"
@@ -255,6 +267,7 @@ resource "aws_instance" "PPUDWEBSERVER2" {
 }
 
 resource "aws_instance" "s609693lo6vw102" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0640473a9b0267bac"
   instance_type          = "m5.large"
@@ -276,6 +289,7 @@ resource "aws_instance" "s609693lo6vw102" {
 }
 
 resource "aws_instance" "s609693lo6vw108" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0e0b7dbcff71ddd9c"
   instance_type          = "m5.large"
@@ -301,8 +315,8 @@ resource "aws_instance" "s609693lo6vw108" {
 # Pre-Production (UAT Instances) #
 #################################
 
-
 resource "aws_instance" "s618358rgvw201" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0d1cb68fb6c1f131b"
   instance_type          = "c5.large"
@@ -324,6 +338,7 @@ resource "aws_instance" "s618358rgvw201" {
 }
 
 resource "aws_instance" "S618358RGVW202" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0df4dcc477ff0fa3f"
   instance_type          = "m5.large"
@@ -345,6 +360,7 @@ resource "aws_instance" "S618358RGVW202" {
 }
 
 resource "aws_instance" "s618358rgsw025" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0ad4be40d57ecc994"
   instance_type          = "c5.4xlarge"
@@ -366,6 +382,7 @@ resource "aws_instance" "s618358rgsw025" {
 }
 
 resource "aws_instance" "s618358rgvw024" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-06bc4f0d8d949ba24"
   instance_type          = "m6i.2xlarge"
@@ -387,6 +404,7 @@ resource "aws_instance" "s618358rgvw024" {
 }
 
 resource "aws_instance" "s618358rgvw023" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0f073b401ba3f1cff"
   instance_type          = "c5.large"
@@ -411,8 +429,8 @@ resource "aws_instance" "s618358rgvw023" {
 # Production Instances  #
 #########################
 
-
 resource "aws_instance" "s618358rgvw019" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-01d04f2e4f8cea4dd"
   instance_type          = "c5.xlarge"
@@ -434,6 +452,7 @@ resource "aws_instance" "s618358rgvw019" {
 }
 
 resource "aws_instance" "s618358rgvw020" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e49fc9838fdf33c4"
   instance_type          = "c5.xlarge"
@@ -455,6 +474,7 @@ resource "aws_instance" "s618358rgvw020" {
 }
 
 resource "aws_instance" "s618358rgvw021" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-05ddec53aa481cbc3"
   instance_type          = "m5.2xlarge"
@@ -476,6 +496,7 @@ resource "aws_instance" "s618358rgvw021" {
 }
 
 resource "aws_instance" "s618358rgvw022" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-02f8251c8cdf2464f"
   instance_type          = "m5.xlarge"
@@ -497,6 +518,7 @@ resource "aws_instance" "s618358rgvw022" {
 }
 
 resource "aws_instance" "s618358rgvw027" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e203fec985af6465"
   instance_type          = "m5.xlarge"
@@ -518,6 +540,7 @@ resource "aws_instance" "s618358rgvw027" {
 }
 
 resource "aws_instance" "s618358rgvw204" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e8380f304bd2caab"
   instance_type          = "c5.xlarge"
@@ -539,6 +562,7 @@ resource "aws_instance" "s618358rgvw204" {
 }
 
 resource "aws_instance" "s618358rgvw205" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0b6b39448c2d727c3"
   instance_type          = "c5.large"
@@ -559,8 +583,8 @@ resource "aws_instance" "s618358rgvw205" {
   }
 }
 
-
 resource "aws_instance" "s618358rgsw025p" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0b8f6843db88aa8a6"
   instance_type          = "c5.4xlarge"
@@ -582,6 +606,7 @@ resource "aws_instance" "s618358rgsw025p" {
 }
 
 resource "aws_instance" "s266316rgsl200" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
   instance_type          = "m5.large"
@@ -603,8 +628,8 @@ resource "aws_instance" "s266316rgsl200" {
   }
 }
 
-
 resource "aws_instance" "s265903rgsl400-non-cjsm" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
   instance_type          = "m5.large"
@@ -627,6 +652,7 @@ resource "aws_instance" "s265903rgsl400-non-cjsm" {
 }
 
 resource "aws_instance" "s265903rgsl401-cjsm" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
   instance_type          = "m5.large"
@@ -649,6 +675,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
 }
 
 resource "aws_instance" "docker-build-server" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-050d499cfdd1ff7d4"
   instance_type          = "m5.large"

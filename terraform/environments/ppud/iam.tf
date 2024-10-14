@@ -159,7 +159,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
        "logs:CreateLogStream",
        "logs:PutLogEvents"
      ],
-     "Resource": "arn:aws:logs:*:*:*"
+     "Resource": [
+         "arn:aws:logs:eu-west-2:817985104434:*"
+     ]
     },
    {
      "Effect": "Allow",
@@ -167,7 +169,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
         "ec2:Start*",
         "ec2:Stop*"
       ],
-      "Resource": "*"
+      "Resource": [
+          "arn:aws:ec2:eu-west-2:817985104434:*"
+      ]
    },
    {
      "Effect": "Allow",
@@ -180,7 +184,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+    "Resource": [
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Queue-Production",
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Deadletter-Queue-Production"
+    ]
    }
  ]
 }
@@ -233,7 +240,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
        "logs:CreateLogStream",
        "logs:PutLogEvents"
      ],
-     "Resource": "arn:aws:logs:*:*:*"
+     "Resource": [
+         "arn:aws:logs:eu-west-2:817985104434:*"
+     ]
     },
    {
      "Effect": "Allow",
@@ -265,7 +274,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+    "Resource": [
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Queue-Production",
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Deadletter-Queue-Production"
+    ]
    }
  ]
 }
@@ -339,7 +351,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+    "Resource": [
+      "arn:aws:sqs:eu-west-2:075585660276:Lambda-Queue-DEV",
+      "arn:aws:sqs:eu-west-2:075585660276:Lambda-Deadletter-Queue-DEV"
+    ]
    }
  ]
 }
@@ -413,7 +428,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_uat" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+   "Resource": [
+      "arn:aws:sqs:eu-west-2:172753231260:Lambda-Queue-UAT",
+      "arn:aws:sqs:eu-west-2:172753231260:Lambda-Deadletter-Queue-UAT"
+    ]
    }
  ]
 }
@@ -487,7 +505,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_prod" 
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
       ],
-      "Resource": "*"
+  "Resource": [
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Queue-Production",
+     "arn:aws:sqs:eu-west-2:817985104434:Lambda-Deadletter-Queue-Production"
+    ]
    }
  ]
 }
@@ -559,19 +580,25 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "acm:ListCertificates",
                 "acm:ListTagsForCertificate"
             ],
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:acm:eu-west-2:075585660276:certificate:*"
+            ]
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy4",
             "Effect": "Allow",
             "Action": "SNS:Publish",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:sns:eu-west-2:075585660276:*"
+            ]
         },
                {
             "Sid": "LambdaCertificateExpiryPolicy5",
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:cloudwatch:eu-west-2:075585660276:*"
+            ]
         },
                {
             "Sid": "LambdaCertificateExpiryPolicy6",
@@ -585,7 +612,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "sqs:ReceiveMessage",
                 "sqs:SendMessage"
               ],
-            "Resource": "*"
+            "Resource": [
+            "arn:aws:sqs:eu-west-2:075585660276:Lambda-Queue-DEV",
+            "arn:aws:sqs:eu-west-2:075585660276:Lambda-Deadletter-Queue-DEV"
+            ]
         }
     ]
 }
@@ -657,19 +687,25 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
                 "acm:ListCertificates",
                 "acm:ListTagsForCertificate"
             ],
-            "Resource": "*"
+            "Resource": [
+                 "arn:aws:acm:eu-west-2:172753231260:certificate:*"
+            ]
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy4",
             "Effect": "Allow",
             "Action": "SNS:Publish",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:sns:eu-west-2:172753231260:*"
+            ]
         },
                {
             "Sid": "LambdaCertificateExpiryPolicy5",
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:cloudwatch:eu-west-2:172753231260:*"
+            ]
         },
            {
             "Sid": "LambdaCertificateExpiryPolicy6",
@@ -683,7 +719,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
                 "sqs:ReceiveMessage",
                 "sqs:SendMessage"
               ],
-            "Resource": "*"
+            "Resource": [
+            "arn:aws:sqs:eu-west-2:172753231260:Lambda-Queue-UAT",
+            "arn:aws:sqs:eu-west-2:172753231260:Lambda-Deadletter-Queue-UAT"
+            ]
         }
     ]
 }
@@ -755,19 +794,25 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
                 "acm:ListCertificates",
                 "acm:ListTagsForCertificate"
             ],
-            "Resource": "*"
+            "Resource": [
+                 "arn:aws:acm:eu-west-2:817985104434:certificate:*"
+            ]
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy4",
             "Effect": "Allow",
             "Action": "SNS:Publish",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:sns:eu-west-2:817985104434:*"
+            ]
         },
                {
             "Sid": "LambdaCertificateExpiryPolicy5",
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:cloudwatch:eu-west-2:817985104434:*"
+            ]
         },
            {
             "Sid": "LambdaCertificateExpiryPolicy6",
@@ -781,7 +826,10 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
                 "sqs:ReceiveMessage",
                 "sqs:SendMessage"
               ],
-            "Resource": "*"
+            "Resource": [
+            "arn:aws:sqs:eu-west-2:817985104434:Lambda-Queue-Production",
+            "arn:aws:sqs:eu-west-2:817985104434:Lambda-Deadletter-Queue-Production"
+            ]
         }
     ]
 }
@@ -932,13 +980,13 @@ data "aws_iam_policy_document" "email" {
 ############################################################
 
 resource "aws_iam_role" "aws_signer_role_prod" {
-  count  = local.is-production == true ? 1 : 0
-  name   = "Signer-Role-For-Lambda-Production"
+  count = local.is-production == true ? 1 : 0
+  name  = "Signer-Role-For-Lambda-Production"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect    = "Allow",
+      Effect = "Allow",
       Principal = {
         Service = "signer.amazonaws.com"
       },
@@ -948,9 +996,9 @@ resource "aws_iam_role" "aws_signer_role_prod" {
 }
 
 resource "aws_iam_policy" "aws_signer_policy_prod" {
-  count  = local.is-production == true ? 1 : 0
-  name   = "Signer-Policy-For-Lambda-Production"
-  
+  count = local.is-production == true ? 1 : 0
+  name  = "Signer-Policy-For-Lambda-Production"
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -962,7 +1010,7 @@ resource "aws_iam_policy" "aws_signer_policy_prod" {
           "lambda:PutFunctionCodeSigningConfig",
           "lambda:InvokeFunction"
         ],
-        Resource = "arn:aws:lambda:eu-west-2:817985104434:function:*"  # Grant access to all Lambda functions in the account
+        Resource = "arn:aws:lambda:eu-west-2:817985104434:function:*" # Grant access to all Lambda functions in the account
       },
       {
         Effect = "Allow",
@@ -973,7 +1021,10 @@ resource "aws_iam_policy" "aws_signer_policy_prod" {
           "signer:GetSigningProfile",
           "signer:ListSigningJobs"
         ],
-        Resource = "*"
+        Resource = [
+          "arn:aws:signer:eu-west-2:817985104434:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002",
+          "arn:aws:signer:eu-west-2:817985104434:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002/HzoPedNoUr"
+        ]
       }
     ]
   })
@@ -990,13 +1041,13 @@ resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signe
 ############################################################
 
 resource "aws_iam_role" "aws_signer_role_uat" {
-  count  = local.is-preproduction == true ? 1 : 0
-  name   = "Signer-Role-For-Lambda-UAT"
+  count = local.is-preproduction == true ? 1 : 0
+  name  = "Signer-Role-For-Lambda-UAT"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect    = "Allow",
+      Effect = "Allow",
       Principal = {
         Service = "signer.amazonaws.com"
       },
@@ -1006,9 +1057,9 @@ resource "aws_iam_role" "aws_signer_role_uat" {
 }
 
 resource "aws_iam_policy" "aws_signer_policy_uat" {
-  count  = local.is-preproduction == true ? 1 : 0
-  name   = "Signer-Policy-For-Lambda-UAT"
-  
+  count = local.is-preproduction == true ? 1 : 0
+  name  = "Signer-Policy-For-Lambda-UAT"
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -1020,7 +1071,7 @@ resource "aws_iam_policy" "aws_signer_policy_uat" {
           "lambda:PutFunctionCodeSigningConfig",
           "lambda:InvokeFunction"
         ],
-        Resource = "arn:aws:lambda:eu-west-2:172753231260:function:*"  # Grant access to all Lambda functions in the account
+        Resource = "arn:aws:lambda:eu-west-2:172753231260:function:*" # Grant access to all Lambda functions in the account
       },
       {
         Effect = "Allow",
@@ -1031,7 +1082,10 @@ resource "aws_iam_policy" "aws_signer_policy_uat" {
           "signer:GetSigningProfile",
           "signer:ListSigningJobs"
         ],
-        Resource = "*"
+        Resource = [
+          "arn:aws:signer:eu-west-2:172753231260:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002",
+          "arn:aws:signer:eu-west-2:172753231260:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002/ZYACVFPo1R"
+        ]
       }
     ]
   })
@@ -1048,13 +1102,13 @@ resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signe
 ############################################################
 
 resource "aws_iam_role" "aws_signer_role_dev" {
-  count  = local.is-development == true ? 1 : 0
-  name   = "Signer-Role-For-Lambda-Dev"
+  count = local.is-development == true ? 1 : 0
+  name  = "Signer-Role-For-Lambda-Dev"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect    = "Allow",
+      Effect = "Allow",
       Principal = {
         Service = "signer.amazonaws.com"
       },
@@ -1064,9 +1118,9 @@ resource "aws_iam_role" "aws_signer_role_dev" {
 }
 
 resource "aws_iam_policy" "aws_signer_policy_dev" {
-  count  = local.is-development == true ? 1 : 0
-  name   = "Signer-Policy-For-Lambda-Development"
-  
+  count = local.is-development == true ? 1 : 0
+  name  = "Signer-Policy-For-Lambda-Development"
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -1078,7 +1132,7 @@ resource "aws_iam_policy" "aws_signer_policy_dev" {
           "lambda:PutFunctionCodeSigningConfig",
           "lambda:InvokeFunction"
         ],
-        Resource = "arn:aws:lambda:eu-west-2:075585660276:function:*"  # Grant access to all Lambda functions in the account
+        Resource = "arn:aws:lambda:eu-west-2:075585660276:function:*" # Grant access to all Lambda functions in the account
       },
       {
         Effect = "Allow",
@@ -1089,7 +1143,10 @@ resource "aws_iam_policy" "aws_signer_policy_dev" {
           "signer:GetSigningProfile",
           "signer:ListSigningJobs"
         ],
-        Resource = "*"
+        Resource = [
+          "arn:aws:signer:eu-west-2:075585660276:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002",
+          "arn:aws:signer:eu-west-2:075585660276:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002/AHvOa02ifI"
+        ]
       }
     ]
   })

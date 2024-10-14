@@ -7,19 +7,19 @@ data "local_file" "userdata" {
 ######################################
 
 resource "aws_instance" "cis_db_instance" {
-  ami                    = local.application_data.accounts[local.environment].app_ami_id
-  instance_type          = local.application_data.accounts[local.environment].ec2instancetype
-  key_name               = aws_key_pair.cis.key_name
-  ebs_optimized          = true
-  subnet_id              = data.aws_subnet.data_subnets_a.id
-  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
-  vpc_security_group_ids = [aws_security_group.ec2_instance_sg.id]
+  ami                         = local.application_data.accounts[local.environment].app_ami_id
+  instance_type               = local.application_data.accounts[local.environment].ec2instancetype
+  key_name                    = aws_key_pair.cis.key_name
+  ebs_optimized               = true
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
+  vpc_security_group_ids      = [aws_security_group.ec2_instance_sg.id]
   user_data_replace_on_change = true
   user_data                   = base64encode(data.local_file.userdata.content)
-  
+
   root_block_device {
     delete_on_termination = false
-    encrypted             = true 
+    encrypted             = true
     volume_size           = 200
     volume_type           = "gp2"
     tags = merge(
