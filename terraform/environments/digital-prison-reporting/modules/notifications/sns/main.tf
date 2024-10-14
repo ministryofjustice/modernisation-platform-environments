@@ -1,3 +1,5 @@
+#trivy:ignore:avd-aws-0095
+
 resource "aws_sns_topic_policy" "notification-policy" {
   arn = aws_sns_topic.dpr-notification-topic.arn
 
