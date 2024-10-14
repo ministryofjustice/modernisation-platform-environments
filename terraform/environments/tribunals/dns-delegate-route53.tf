@@ -65,11 +65,11 @@ resource "aws_route53_record" "ec2_instances" {
 }
 
 resource "aws_route53_record" "sftp_external_services_prod" {
-  for_each        = local.is-production ? var.sftp_services : {}
+  count           = local.is-production ? length(local.ec2_records) : 0
   allow_overwrite = true
   provider        = aws.core-network-services
   zone_id         = local.production_zone_id
-  name            = "sftp.${each.value.name_prefix}.decisions.tribunals.gov.uk"
+  name            = "sftp.${local.ec2_records[count.index]}.tribunals.gov.uk"
   type            = "CNAME"
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60
