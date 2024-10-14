@@ -1,101 +1,144 @@
 import boto3
+import pandas as pd
+import os
 import time
-ATHENA_CLIENT = boto3.client("athena", region_name='eu-west-2')
 
-PARQUET_OUTPUT_S3_BUCKET_NAME = "emds-prod-dms-data-validation-20240918073115959600000001"
+# S3 and Athena-related parameters
+s3_bucket = 'emds-dev-dms-data-validation-20240917144028498200000007'  # Replace with your S3 bucket
+athena_database = 'test_database'  # Replace with your Athena database
+s3_output = f's3://{s3_bucket}/athena-output/'  # Athena query output location
+region_name = 'eu-west-2'  # Replace with your AWS region
 
-ATHENA_RUN_OUTPUT_LOCATION = f"s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/athena_temp_store/"
+# Local directory to save CSV files before uploading to S3
+local_directory = '/tmp/athena_data/'
+os.makedirs(local_directory, exist_ok=True)
 
-GLUE_CATALOG_DB_NAME = "dms_data_validation"
-GLUE_CATALOG_TBL_NAME = "glue_df_output"
+# Initialize the boto3 clients
+s3_client = boto3.client('s3', region_name=region_name)
+athena_client = boto3.client('athena', region_name=region_name)
 
-# F10 - Function to run athena create-external-table DDL query.
-# Uses 'BOTO3'/athena library.
-def create_table(table_ddl):
-    response = ATHENA_CLIENT.start_query_execution(
-        QueryString=table_ddl,
-        ResultConfiguration={"OutputLocation": ATHENA_RUN_OUTPUT_LOCATION}
+# Function to upload a file to S3
+def upload_to_s3(file_name, s3_bucket, s3_key):
+    s3_client.upload_file(file_name, s3_bucket, s3_key)
+    print(f"Uploaded {file_name} to s3://{s3_bucket}/{s3_key}")
+
+# Function to execute an Athena query
+def execute_query(query, database, s3_output):
+    response = athena_client.start_query_execution(
+        QueryString=query,
+        QueryExecutionContext={'Database': database},
+        ResultConfiguration={'OutputLocation': s3_output}
     )
-    return response["QueryExecutionId"]
+    return response['QueryExecutionId']
 
-# F11 - Function to check the status of the submitted athena query
-# Uses 'BOTO3'/athena library.
-def has_query_succeeded(execution_id):
-    state = "RUNNING"
-    max_execution = 5
+# Function to wait for query completion
+def wait_for_query_completion(execution_id):
+    while True:
+        response = athena_client.get_query_execution(QueryExecutionId=execution_id)
+        state = response['QueryExecution']['Status']['State']
+        if state in ['SUCCEEDED', 'FAILED', 'CANCELLED']:
+            break
+        time.sleep(2)
+    return state
 
-    while max_execution > 0 and state in ["RUNNING", "QUEUED"]:
-        max_execution -= 1
-        response = ATHENA_CLIENT.get_query_execution(
-            QueryExecutionId=execution_id)
-        if (
-            "QueryExecution" in response
-            and "Status" in response["QueryExecution"]
-            and "State" in response["QueryExecution"]["Status"]
-        ):
-            state = response["QueryExecution"]["Status"]["State"]
-            if state == "SUCCEEDED":
-                return True
+# Dummy data for each table
+dummy_data = {
+    'dummy_table_1': [
+        {'id': 1, 'name': 'Alice', 'age': 30},
+        {'id': 2, 'name': 'Bob', 'age': 25},
+        {'id': 3, 'name': 'Charlie', 'age': 35}
+    ],
+    'dummy_table_2': [
+        {'order_id': 'O001', 'product': 'Laptop', 'price': 999.99},
+        {'order_id': 'O002', 'product': 'Phone', 'price': 699.99},
+        {'order_id': 'O003', 'product': 'Tablet', 'price': 499.99}
+    ],
+    'dummy_table_3': [
+        {'user_id': 101, 'email': 'alice@example.com', 'created_at': '2023-01-01 12:00:00'},
+        {'user_id': 102, 'email': 'bob@example.com', 'created_at': '2023-02-15 15:30:00'},
+        {'user_id': 103, 'email': 'charlie@example.com', 'created_at': '2023-03-10 09:45:00'}
+    ],
+    'dummy_table_4': [
+        {'transaction_id': 'T001', 'user_id': 101, 'amount': 150.50, 'transaction_date': '2023-01-01'},
+        {'transaction_id': 'T002', 'user_id': 102, 'amount': 200.00, 'transaction_date': '2023-02-10'},
+        {'transaction_id': 'T003', 'user_id': 103, 'amount': 99.99, 'transaction_date': '2023-03-05'}
+    ]
+}
 
-        time.sleep(30)
+# Function to create CSV files and upload to S3
+def create_and_upload_csv_data(table_name, data):
+    file_name = f"{local_directory}{table_name}.parquet"
+    s3_key = f"{table_name}/{table_name}.parquet"
+    
+    # Convert data to a pandas DataFrame
+    df = pd.DataFrame(data)
 
-    return False
+    # Write the DataFrame to Parquet
+    df.to_parquet(file_name, engine='pyarrow', index=False)
+    
+    # Upload the CSV file to S3
+    upload_to_s3(file_name, s3_bucket, s3_key)
 
-if __name__ == "__main__":
+# Create and upload data for each table
+for table_name, data in dummy_data.items():
+    create_and_upload_csv_data(table_name, data)
 
-    table_ddl_drop = f"drop table if exists {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}"
-
-    # Drop table if exists Table
-    execution_id = create_table(table_ddl_drop)
-    print(f"Create Table execution id: {execution_id}")
-    # LOGGER.info(f"Create Table execution id: {execution_id}")
-
-    # Check query execution
-    query_status = has_query_succeeded(execution_id=execution_id)
-    print(f"Query state: {query_status}")
-    # LOGGER.info(f"Query state: {query_status}")
-
-    # =================================================================================
-
-    table_ddl_create = f'''
-    CREATE EXTERNAL TABLE IF NOT EXISTS {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}(
-    run_datetime timestamp,
-    json_row string, 
-    validation_msg string,
-    table_to_ap string)
-    PARTITIONED BY ( 
-        database_name string,
-        full_table_name string)
+# Athena table creation queries
+create_table_queries = [
+    """
+    CREATE EXTERNAL TABLE IF NOT EXISTS dummy_table_1 (
+        id INT,
+        name STRING,
+        age INT
+    )
     STORED AS PARQUET
-    LOCATION
-        's3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/dms_data_validation/glue_df_output/'
-    TBLPROPERTIES (
-        'classification'='parquet', 
-        'parquet.compression'='SNAPPY',
-        'partition_filtering.enabled'='true',
-        'typeOfData'='file')
-    '''.strip()
+    LOCATION 's3://emds-dev-dms-data-validation-20240917144028498200000007/dummy_table_1/'  -- Replace with actual S3 location
+    TBLPROPERTIES ('has_encrypted_data'='false');
+    """,
+    """
+    CREATE EXTERNAL TABLE IF NOT EXISTS dummy_table_2 (
+        order_id STRING,
+        product STRING,
+        price DOUBLE
+    )
+    STORED AS PARQUET
+    LOCATION 's3://emds-dev-dms-data-validation-20240917144028498200000007/dummy_table_2/'  -- Replace with actual S3 location
+    TBLPROPERTIES ('has_encrypted_data'='false');
+    """,
+    """
+    CREATE EXTERNAL TABLE IF NOT EXISTS dummy_table_3 (
+        user_id INT,
+        email STRING,
+        created_at TIMESTAMP
+    )
+    STORED AS PARQUET
+    LOCATION 's3://emds-dev-dms-data-validation-20240917144028498200000007/dummy_table_3/'  -- Replace with actual S3 location
+    TBLPROPERTIES ('has_encrypted_data'='false');
+    """,
+    """
+    CREATE EXTERNAL TABLE IF NOT EXISTS dummy_table_4 (
+        transaction_id STRING,
+        user_id INT,
+        amount DOUBLE,
+        transaction_date DATE
+    )
+    STORED AS PARQUET
+    LOCATION 's3://emds-dev-dms-data-validation-20240917144028498200000007/dummy_table_4/'  -- Replace with actual S3 location
+    TBLPROPERTIES ('has_encrypted_data'='false');
+    """
+]
 
-    # Create Table
-    execution_id = create_table(table_ddl_create)
-    print(f"Create Table execution id: {execution_id}")
-    # LOGGER.info(f"Create Table execution id: {execution_id}")
+# Execute the queries to create tables
+for query in create_table_queries:
+    query_execution_id = execute_query(query, athena_database, s3_output)
+    print(f"Started query execution with ID: {query_execution_id}")
+    
+    # Wait for query completion
+    query_status = wait_for_query_completion(query_execution_id)
+    
+    if query_status == 'SUCCEEDED':
+        print(f"Table created successfully with QueryExecutionId: {query_execution_id}")
+    else:
+        print(f"Table creation failed with QueryExecutionId: {query_execution_id}")
 
-    # Check query execution
-    query_status = has_query_succeeded(execution_id=execution_id)
-    print(f"Query state: {query_status}")
-    # LOGGER.info(f"Query state: {query_status}")
-
-    # =================================================================================
-
-    table_ddl_partitions_refresh = f"msck repair table {GLUE_CATALOG_DB_NAME}.{GLUE_CATALOG_TBL_NAME}"
-
-    # Refresh table prtitions
-    execution_id = create_table(table_ddl_partitions_refresh)
-    print(f"Create Table execution id: {execution_id}")
-    # LOGGER.info(f"Create Table execution id: {execution_id}")
-
-    # Check query execution
-    query_status = has_query_succeeded(execution_id=execution_id)
-    print(f"Query state: {query_status}")
-    # LOGGER.info(f"Query state: {query_status}")
+print("All tables created successfully (or already existed).")
