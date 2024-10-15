@@ -113,13 +113,3 @@ resource "aws_secretsmanager_secret_version" "sftp_private_key" {
   }
   EOF
 }
-
-data "aws_secretsmanager_secret" "sftp_private_key_secret" {
-  depends_on = [aws_secretsmanager_secret_version.sftp_private_key]
-  arn        = aws_secretsmanager_secret_version.sftp_private_key.arn
-}
-
-data "aws_secretsmanager_secret_version" "sftp_private_key_secret_current" {
-  depends_on = [aws_secretsmanager_secret_version.sftp_private_key]
-  secret_id  = data.aws_secretsmanager_secret.sftp_private_key_secret.id
-}
