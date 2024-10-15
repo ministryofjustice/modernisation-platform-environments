@@ -411,7 +411,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
       }
     }
 }
->>>>>>> ac08762768af14d7784b50424e1aa28054c089ee
 
 resource "aws_s3_bucket_policy" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0
@@ -557,7 +556,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
       }
     }
 }
->>>>>>> ac08762768af14d7784b50424e1aa28054c089ee
 
 resource "aws_s3_bucket_policy" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0
@@ -694,7 +692,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
     }
 }
 
->>>>>>> ac08762768af14d7784b50424e1aa28054c089ee
 resource "aws_s3_bucket_policy" "moj-log-files-dev" {
   count  = local.is-development == true ? 1 : 0
   bucket = aws_s3_bucket.moj-log-files-dev[0].id
