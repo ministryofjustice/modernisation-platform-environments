@@ -1,5 +1,5 @@
 locals {
-  camel-sid = join("", [for word in split("_", var.name) : title(word)])
+  camel-sid = join("", [for word in split("-", var.name) : title(word)])
 }
 
 data "aws_region" "current" {}
