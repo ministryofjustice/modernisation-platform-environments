@@ -161,3 +161,33 @@ POLICY
 
   tags = local.tags
 }
+
+resource "aws_secretsmanager_secret" "ingest_root_ca_cert" {
+  name        = "${local.environment}/ingest-root-ca-cert"
+  description = "Root CA certificate data for the Ingest service"
+  policy      = <<POLICY
+{
+  "Version" : "2012-10-17",
+  "Statement" : [ {
+    "Sid" : "AdministratorFullAccess",
+    "Effect" : "Allow",
+    "Principal" : {
+      "AWS" : "${sort(data.aws_iam_roles.admin.arns)[0]}"
+    },
+    "Action" : "secretsmanager:*",
+    "Resource" : "*"
+  },
+  {
+    "Sid" : "MPDeveloperFullAccess",
+    "Effect" : "Allow",
+    "Principal" : {
+       "AWS" : "${sort(data.aws_iam_roles.developer.arns)[0]}"
+    },
+    "Action" : "secretsmanager:*",  
+    "Resource" : "*"
+  } ]
+}
+POLICY
+
+  tags = local.tags
+}

@@ -41,6 +41,13 @@ locals {
             "Ec2PDDatabasePolicy",
           ])
         })
+        ebs_volumes = {
+          "/dev/sdb" = { type = "gp3", label = "app", size = 100 }   # /u01
+          "/dev/sdc" = { type = "gp3", label = "app", size = 500 }   # /u02
+          "/dev/sde" = { type = "gp3", label = "data", size = 500 }  # DATA01
+          "/dev/sdj" = { type = "gp3", label = "flash", size = 250 } # FLASH01
+          "/dev/sds" = { type = "gp3", label = "swap", size = 4 }
+        }
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"

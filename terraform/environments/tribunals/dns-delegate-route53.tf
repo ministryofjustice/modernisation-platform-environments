@@ -5,7 +5,6 @@ locals {
     "asylumsupport.decisions",
     "adminappeals.reports",
     "charity.decisions",
-    "claimsmanagement.decisions",
     "consumercreditappeals.decisions",
     "estateagentappeals.decisions",
     "phl.decisions",
@@ -15,7 +14,8 @@ locals {
     "tax.decisions"
   ]
 
-  afd_records = [
+  ec2_records_migrated = [
+    "claimsmanagement.decisions"
   ]
 
   afd_records_migrated = [
@@ -64,26 +64,29 @@ resource "aws_route53_record" "ec2_instances" {
   records  = ["34.243.192.28"]
 }
 
+resource "aws_route53_record" "ec2_instances_migrated" {
+  count    = local.is-production ? length(local.ec2_records_migrated) : 0
+  provider = aws.core-network-services
+  zone_id  = local.production_zone_id
+  name     = local.ec2_records_migrated[count.index]
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.tribunals_lb.dns_name
+    zone_id                = aws_lb.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
 resource "aws_route53_record" "sftp_external_services_prod" {
-  for_each        = local.is-production ? var.sftp_services : {}
+  count           = local.is-production ? length(local.ec2_records_migrated) : 0
   allow_overwrite = true
   provider        = aws.core-network-services
   zone_id         = local.production_zone_id
-  name            = "sftp.${each.value.name_prefix}.decisions.tribunals.gov.uk"
+  name            = "sftp.${local.ec2_records_migrated[count.index]}"
   type            = "CNAME"
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60
-}
-
-# 'CNAME' records for all www legacy services which currently route through Azure Front Door
-resource "aws_route53_record" "afd_instances" {
-  count    = local.is-production ? length(local.afd_records) : 0
-  provider = aws.core-network-services
-  zone_id  = local.production_zone_id
-  name     = local.afd_records[count.index]
-  type     = "CNAME"
-  ttl      = 300
-  records  = ["sdshmcts-prod-egd0dscwgwh0bpdq.z01.azurefd.net"]
 }
 
 # 'CNAME' records for all www legacy services which have been migrated to the Modernisation Platform
