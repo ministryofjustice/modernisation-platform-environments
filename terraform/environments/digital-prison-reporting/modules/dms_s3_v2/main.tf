@@ -73,6 +73,12 @@ resource "aws_security_group" "dms_s3_target_sec_group" {
     protocol    = "tcp"
     cidr_blocks = var.vpc_cidr
   }
+  ingress {
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = var.vpc_cidr
+  }  
   egress {
     from_port   = 0
     to_port     = 0
