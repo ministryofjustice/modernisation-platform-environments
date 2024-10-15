@@ -70,8 +70,12 @@ resource "aws_route53_record" "ec2_instances_migrated" {
   zone_id  = local.production_zone_id
   name     = local.ec2_records_migrated[count.index]
   type     = "A"
-  ttl      = 300
-  records  = [aws_lb.tribunals_lb.dns_name]
+
+  alias {
+    name                   = aws_lb.tribunals_lb.dns_name
+    zone_id                = aws_lb.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
 }
 
 resource "aws_route53_record" "sftp_external_services_prod" {
