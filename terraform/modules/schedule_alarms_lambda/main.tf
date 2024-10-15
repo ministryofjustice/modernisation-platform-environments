@@ -90,6 +90,8 @@ resource "aws_cloudwatch_event_rule" "alarm_scheduler" {
   name                = "${var.lambda_function_name}-each.value.name"
   description         = each.value.description
   schedule_expression = each.value.schedule
+
+  tags = var.tags
 }
 
 resource "aws_cloudwatch_event_target" "alarm_scheduler" {
