@@ -1,18 +1,19 @@
 data "archive_file" "lambda_function_payload" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/"
-  output_path = "${path.module}/lambda/disable_alarms.zip"
-  excludes    = ["disable_alarms.zip"]
+  output_path = "${path.module}/lambda/alarm_scheduler.zip"
+  excludes    = ["alarm_scheduler.zip"]
 }
 
-resource "aws_lambda_function" "disable_alarms" {
-  filename         = "${path.module}/lambda/disable_alarms.zip"
+resource "aws_lambda_function" "alarm_scheduler" {
+  filename         = "${path.module}/lambda/alarm_scheduler.zip"
   function_name    = var.lambda_function_name
   architectures    = ["arm64"]
   role             = aws_iam_role.lambda_exec.arn
   runtime          = "python3.12"
-  handler          = "disable_alarms.lambda_handler"
+  handler          = "alarm_scheduler.lambda_handler"
   source_code_hash = data.archive_file.lambda_function_payload.output_base64sha256
+  timeout          = 10
 
   environment {
     variables = {
@@ -82,4 +83,27 @@ data "aws_iam_policy_document" "lambda_cloudwatch" {
     ]
     resources = ["arn:aws:cloudwatch:*:*:alarm:*"]
   }
+}
+
+resource "aws_cloudwatch_event_rule" "alarm_scheduler" {
+  for_each            = local.schedule_rules
+  name                = "${var.lambda_function_name}-each.value.name"
+  description         = each.value.description
+  schedule_expression = each.value.schedule
+}
+
+resource "aws_cloudwatch_event_target" "alarm_scheduler" {
+  for_each  = local.schedule_rules
+  rule      = aws_cloudwatch_event_rule.alarm_scheduler[each.key].name
+  target_id = "${each.value.action}-alarms-lambda"
+  arn       = aws_lambda_function.alarm_scheduler.arn
+  input     = jsonencode({ "action" : each.value.action })
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch" {
+  for_each      = local.schedule_rules
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.alarm_scheduler.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.alarm_scheduler[each.key].arn
 }
