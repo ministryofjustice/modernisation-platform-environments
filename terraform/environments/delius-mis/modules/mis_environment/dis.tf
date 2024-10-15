@@ -50,8 +50,8 @@ module "dis_instance" {
       {
         #ad_username_secret_name = aws_secretsmanager_secret.ad_username.name
         ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
-        ad_domain_name          = var.environment_config.legacy_ad_domain_name
-        ad_ip_list              = var.environment_config.legacy_ad_ip_list
+        ad_domain_name          = var.environment_config.ad_domain_name
+        ad_ip_list              = var.environment_config.ad_ip_list
       }
     )
   )
