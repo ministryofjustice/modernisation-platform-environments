@@ -1,10 +1,14 @@
+locals {
+  camel-sid = join("", [for word in split("_", var.name) : title(word)])
+}
+
 data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "load_data" {
   statement {
-    sid    = "GetFiles${var.name}"
+    sid    = "GetFiles${local.camel-sid}"
     effect = "Allow"
     actions = [
       "s3:PutObject",
@@ -15,13 +19,13 @@ data "aws_iam_policy_document" "load_data" {
     resources = ["${var.source_data_bucket.arn}/${var.path_to_data}*"]
   }
   statement {
-    sid       = "ListDataBucket${var.name}"
+    sid       = "ListDataBucket${local.camel-sid}"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
     resources = [var.source_data_bucket.arn]
   }
   statement {
-    sid    = "AthenaPermissionsForLoadData${var.name}"
+    sid    = "AthenaPermissionsForLoadData${local.camel-sid}"
     effect = "Allow"
     actions = [
       "athena:StartQueryExecution",
@@ -32,7 +36,7 @@ data "aws_iam_policy_document" "load_data" {
     resources = [var.athena_workgroup.arn]
   }
   statement {
-    sid    = "GluePermissionsForLoadAtriumUnstructured${var.name}"
+    sid    = "GluePermissionsForLoadAtriumUnstructured${local.camel-sid}"
     effect = "Allow"
     actions = [
       "glue:GetTable",
