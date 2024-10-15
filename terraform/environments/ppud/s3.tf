@@ -377,7 +377,6 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-prod" {
   restrict_public_buckets = true
 }
 
-
 resource "aws_s3_bucket_notification" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-prod[0].id
