@@ -16,11 +16,13 @@ variable "step_function_execution_role_arn" {
 }
 
 variable "dms_replication_task_arn" {
-  type = string
+  description = "ARN of the replication task"
+  type        = string
 }
 
 variable "replication_task_id" {
-  type = string
+  description = "ID of the replication task"
+  type        = string
 }
 
 variable "glue_unprocessed_raw_files_check_job" {
@@ -123,6 +125,114 @@ variable "s3_temp_reload_bucket_id" {
   description = "S3 Bucket ID for the temporary location to store reload data"
   type        = string
   default     = ""
+}
+
+variable "glue_maintenance_retention_job" {
+  description = "Name of glue job which vacuums the delta tables"
+  type        = string
+}
+
+variable "glue_maintenance_compaction_job" {
+  description = "Name of glue job which compacts the delta tables"
+  type        = string
+}
+
+variable "s3_structured_path" {
+  description = "S3 Path for Structured Data"
+  type        = string
+}
+
+variable "s3_curated_path" {
+  description = "S3 Path for Curated Data"
+  type        = string
+}
+
+variable "compaction_structured_worker_type" {
+  description = "(Optional) Worker type to use for the compaction job in structured zone"
+  type        = string
+  default     = "G.1X"
+
+  validation {
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.compaction_structured_worker_type)
+    error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
+  }
+}
+
+variable "compaction_structured_num_workers" {
+  description = "(Optional) Number of workers to use for the compaction job in structured zone. Must be >= 2"
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.compaction_structured_num_workers >= 2
+    error_message = "Number of workers must be >= 2"
+  }
+}
+
+variable "compaction_curated_worker_type" {
+  description = "(Optional) Worker type to use for the compaction job in curated zone"
+  type        = string
+  default     = "G.1X"
+
+  validation {
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.compaction_curated_worker_type)
+    error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
+  }
+}
+
+variable "compaction_curated_num_workers" {
+  description = "(Optional) Number of workers to use for the compaction job in curated zone. Must be >= 2"
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.compaction_curated_num_workers >= 2
+    error_message = "Number of workers must be >= 2"
+  }
+}
+
+variable "retention_structured_worker_type" {
+  description = "(Optional) Worker type to use for the retention job in structured zone"
+  type        = string
+  default     = "G.1X"
+
+  validation {
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.retention_structured_worker_type)
+    error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
+  }
+}
+
+variable "retention_structured_num_workers" {
+  description = "(Optional) Number of workers to use for the retention job in structured zone. Must be >= 2"
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.retention_structured_num_workers >= 2
+    error_message = "Number of workers must be >= 2"
+  }
+}
+
+variable "retention_curated_worker_type" {
+  description = "(Optional) Worker type to use for the retention job in curated zone"
+  type        = string
+  default     = "G.1X"
+
+  validation {
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.retention_curated_worker_type)
+    error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
+  }
+}
+
+variable "retention_curated_num_workers" {
+  description = "(Optional) Number of workers to use for the retention job in curated zone. Must be >= 2"
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.retention_curated_num_workers >= 2
+    error_message = "Number of workers must be >= 2"
+  }
 }
 
 variable "tags" {
