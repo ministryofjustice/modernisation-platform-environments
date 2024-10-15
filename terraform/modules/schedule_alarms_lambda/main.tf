@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "lambda_cloudwatch" {
 
 resource "aws_cloudwatch_event_rule" "alarm_scheduler" {
   for_each            = local.schedule_rules
-  name                = "${var.lambda_function_name}-each.value.name"
+  name                = "${var.lambda_function_name}-${each.value.name}"
   description         = each.value.description
   schedule_expression = each.value.schedule
 
