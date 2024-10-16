@@ -283,3 +283,24 @@ module "analytical_platform_ui_service_role" {
   }
   tags = local.tags
 }
+
+module "analytical_platform_control_panel_service_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.46.0"
+
+  allow_self_assume_role = true
+  trusted_role_arns = [
+    format("arn:aws:iam::%s:root", local.environment_management.account_ids["analytical-platform-${local.environment}"])
+  ]
+  create_role = true
+  role_name   = "analytical-platform-control-panel"
+
+  cutom_role_policy_arns = {
+    "lake_formation_and_quicksight"      = module.analytical_platform_lake_formation_share_policy.arn
+    "lake_formation_cross_account_share" = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
+  }
+  number_of_custom_role_policy_arns = 2
+
+}
