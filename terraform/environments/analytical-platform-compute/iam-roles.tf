@@ -295,9 +295,9 @@ module "analytical_platform_control_panel_service_role" {
     format("arn:aws:iam::%s:root", local.environment_management.account_ids[local.analytical_platform_environment])
 
   ]
-  create_role = true
+  create_role       = true
   role_requires_mfa = false
-  role_name   = "analytical-platform-control-panel"
+  role_name         = "analytical-platform-control-panel"
 
   custom_role_policy_arns = [
     module.analytical_platform_lake_formation_share_policy.arn,
