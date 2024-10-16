@@ -12,7 +12,7 @@ module "bws_instance" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  name = "${var.env_name}-bws-${count.index + 1}"
+  name = "${var.app_name}-${var.env_name}-bws-${count.index + 1}"
 
   ami_name  = var.bws_config.ami_name
   ami_owner = "self"
