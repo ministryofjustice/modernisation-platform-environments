@@ -65,10 +65,10 @@ resource "aws_route53_record" "cert_validation_venues" {
   provider = aws.core-network-services
 
   allow_overwrite = true
-  name            = aws_acm_certificate.external_venues[0].domain_validation_options.resource_record_name
-  records         = [aws_acm_certificate.external_venues[0].domain_validation_options.resource_record_value]
+  name            = aws_acm_certificate.external_venues[0].domain_validation_options[0].resource_record_name
+  records         = [aws_acm_certificate.external_venues[0].domain_validation_options[0].resource_record_value]
   ttl             = 300
-  type            = aws_acm_certificate.external_venues[0].domain_validation_options.resource_record_type
+  type            = aws_acm_certificate.external_venues[0].domain_validation_options[0].resource_record_type
   zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
 
