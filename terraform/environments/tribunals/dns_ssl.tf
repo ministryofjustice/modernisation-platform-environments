@@ -63,23 +63,16 @@ resource "aws_acm_certificate_validation" "external_venues" {
 }
 
 resource "aws_route53_record" "cert_validation_venues" {
-  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
-  for_each = {
-    for dvo in aws_acm_certificate.external_venues[0].domain_validation_options : dvo.domain_name => {
-      name  = dvo.resource_record_name
-      type  = dvo.resource_record_type
-      value = dvo.resource_record_value
-    }
-  }
+  for_each = { for option in aws_acm_certificate.external_venues[0].domain_validation_options : option.resource_record_name => option }
 
   allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.value]
+  name            = each.key
+  records         = [each.value.resource_record_value]
   ttl             = 300
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.production_zone.zone_id
+  type            = each.value.resource_record_type
+  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
 
 // sub-domain validation only required for non-production sites
