@@ -6,26 +6,19 @@ locals {
 
   database-instance-userdata = <<EOF
 #!/bin/bash
-
 sudo -i
 
-# Update the hostname
 hostname ${local.application_name_short}
 
 wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
 easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz
 
-# Update SSH configuration
 sed -i 's/#ClientAliveInterval.*/ClientAliveInterval 1200/' /etc/ssh/sshd_config
 sed -i 's/#ClientAliveCountMax.*/ClientAliveCountMax 3/' /etc/ssh/sshd_config
-
-# Restart SSH service
 service sshd restart 
 
-# Add /oracle/software/product/10.2.0/bin/ to PATH
 export PATH=/oracle/software/product/10.2.0/bin/:$PATH
 
-# Change the hostname in the listener.ora and tnsnames.ora
 cat <<EOT > /oracle/software/product/10.2.0/network/admin/listener.ora
 SID_LIST_LISTENER =
   (SID_LIST =
@@ -61,7 +54,6 @@ CIS =
   )
 EOT
 
-# Start the listener
 sudo su - oracle -c "lsnrctl start LISTENER"
 
 EOF

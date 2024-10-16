@@ -7,6 +7,7 @@ resource "aws_instance" "cis_db_instance" {
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
   key_name                    = aws_key_pair.cis.key_name
   ebs_optimized               = true
+  monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
   vpc_security_group_ids      = [aws_security_group.ec2_instance_sg.id]
