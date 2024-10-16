@@ -135,7 +135,7 @@ variable "services" {
       port        = 49115
     },
     "sscs_venue_pages" = {
-      name_prefix = "sscsvenues"
+      name_prefix = "sscs.venues"
       module_key  = "sscs_venue_pages"
       port        = 49116
     },
@@ -145,7 +145,7 @@ variable "services" {
       port        = 49117
     },
     "tax_tribunal_decisions" = {
-      name_prefix = "taxtribunaldecisions"
+      name_prefix = "tax.decisions"
       module_key  = "tax_tribunal_decisions"
       port        = 49118
     },
