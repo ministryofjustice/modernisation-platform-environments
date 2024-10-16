@@ -5,8 +5,6 @@ locals {
     "asylumsupport.decisions",
     "adminappeals.reports",
     "charity.decisions",
-    "consumercreditappeals.decisions",
-    "estateagentappeals.decisions",
     "phl.decisions",
     "siac.decisions",
     "taxandchancery_ut.decisions"
@@ -15,7 +13,9 @@ locals {
   ec2_records_migrated = [
     "claimsmanagement.decisions",
     "sscs.venues",
-    "tax.decisions"
+    "tax.decisions",
+    "consumercreditappeals.decisions",
+    "estateagentappeals.decisions",
   ]
 
   afd_records_migrated = [

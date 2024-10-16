@@ -49,7 +49,7 @@ resource "aws_security_group" "tribunals_lb_sc" {
 
 resource "aws_lb_target_group" "tribunals_target_group" {
   for_each             = var.services
-  name                 = "${each.value.name_prefix}-tg"
+  name                 = "${each.value.module_key}-tg"
   port                 = each.value.port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id

@@ -31,41 +31,41 @@ locals {
       }
     }
 
-    # DO NOT DEPLOY THIS - MOVING TO HMPPS-DOMAIN-SERVICES Account
-    # efs = {
-    #   pp-onr-sap-share = {
-    #     access_points = {
-    #       root = {
-    #         posix_user = {
-    #           gid = 1201 # binstall
-    #           uid = 1201 # bobj
-    #         }
-    #         root_directory = {
-    #           path = "/"
-    #           creation_info = {
-    #             owner_gid   = 1201 # binstall
-    #             owner_uid   = 1201 # bobj
-    #             permissions = "0777"
-    #           }
-    #         }
-    #       }
-    #     }
-    #     file_system = {
-    #       availability_zone_name = "eu-west-2a"
-    #       lifecycle_policy = {
-    #         transition_to_ia = "AFTER_30_DAYS"
-    #       }
-    #     }
-    #     mount_targets = [{
-    #       subnet_name        = "private"
-    #       availability_zones = ["eu-west-2a"]
-    #       security_groups    = ["boe"]
-    #     }]
-    #     tags = {
-    #       backup = "false"
-    #     }
-    #   }
-    # }
+    # WILL BE MOVING TO HMPPS-DOMAIN-SERVICES Account at a later date
+    efs = {
+      pp-onr-sap-share = {
+        access_points = {
+          root = {
+            posix_user = {
+              gid = 1201 # binstall
+              uid = 1201 # bobj
+            }
+            root_directory = {
+              path = "/"
+              creation_info = {
+                owner_gid   = 1201 # binstall
+                owner_uid   = 1201 # bobj
+                permissions = "0777"
+              }
+            }
+          }
+        }
+        file_system = {
+          availability_zone_name = "eu-west-2a"
+          lifecycle_policy = {
+            transition_to_ia = "AFTER_30_DAYS"
+          }
+        }
+        mount_targets = [{
+          subnet_name        = "private"
+          availability_zones = ["eu-west-2a"]
+          security_groups    = ["boe"]
+        }]
+        tags = {
+          backup = "false"
+        }
+      }
+    }
 
     # Instance Type Defaults for preproduction
     # instance_type_defaults = {
@@ -74,7 +74,6 @@ locals {
     #   bods = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 1 instance, reduced RAM as Azure usage doesn't warrant higher RAM
     # }
     ec2_instances = {
-      # DO NOT DEPLOY THESE YET AS THE REST OF THE THINGS AREN'T READY
       # pp-onr-bods-1 = merge(local.ec2_instances.bods, {
       #   config = merge(local.ec2_instances.bods.config, {
       #     availability_zone = "eu-west-2a"
