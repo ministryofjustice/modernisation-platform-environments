@@ -399,20 +399,24 @@ locals {
 
   analytical_platform_share = can(local.application_data.accounts[local.environment].analytical_platform_share) ? { for share in local.application_data.accounts[local.environment].analytical_platform_share : share.target_account_name => share } : {}
 
-  # Observability Platform
+  # Observability Platform & Analytical Platform
   environment_configuration = local.environment_configurations[local.environment]
   environment_configurations = {
     development = {
       observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+      analytical_platform_runner_suffix = "-dev"
     }
     test = {
       observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+      analytical_platform_runner_suffix = "-test"
     }
     preproduction = {
       observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+      analytical_platform_runner_suffix = "-pp"
     }
     production = {
       observability_platform_account_id = local.environment_management.account_ids["observability-platform-production"]
+      analytical_platform_runner_suffix = ""
     }
   }
 

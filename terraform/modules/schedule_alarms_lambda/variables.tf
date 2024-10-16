@@ -27,7 +27,7 @@ variable "end_time" {
 
   validation {
     condition     = can(regex("^([0-1][0-9]|2[0-3]):[0-5][0-9]$", var.end_time))
-    error_message = "Start time must be in the format HH:MM (24-hour clock)."
+    error_message = "End time must be in the format HH:MM (24-hour clock)."
   }
 }
 

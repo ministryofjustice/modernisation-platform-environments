@@ -12,3 +12,8 @@ serviceAccount:
   name: aws-for-fluent-bit
   annotations:
     eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+priorityClassName: system-node-critical
+
+tolerations:
+  - operator: Exists

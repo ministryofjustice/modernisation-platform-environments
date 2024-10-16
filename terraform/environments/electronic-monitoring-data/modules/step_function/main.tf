@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 
 resource "aws_sfn_state_machine" "this" {
   name       = var.name
@@ -47,7 +48,7 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
 }
 
 resource "aws_iam_policy" "step_function_base_permissions" {
-  name   = "step_function_base_permissions"
+  name   = "step_function_base_permissions_${var.name}"
   policy = data.aws_iam_policy_document.step_function_base_permissions.json
 }
 
@@ -68,14 +69,10 @@ data "aws_iam_policy_document" "this_log_key_document" {
     effect = "Allow"
     principals {
       type        = "Service"
-      identifiers = ["logs.eu-west-2.amazonaws.com"]
+      identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
     }
     actions = [
-      "kms:Encrypt*",
-      "kms:Decrypt*",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:Describe*",
+      "kms:*",
     ]
     resources = ["*"]
   }
