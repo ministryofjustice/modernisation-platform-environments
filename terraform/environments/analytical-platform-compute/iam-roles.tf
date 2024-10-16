@@ -296,6 +296,7 @@ module "analytical_platform_control_panel_service_role" {
 
   ]
   create_role = true
+  role_requires_mfa = false
   role_name   = "analytical-platform-control-panel"
 
   custom_role_policy_arns = [
