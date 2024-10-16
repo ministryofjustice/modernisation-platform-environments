@@ -11,6 +11,7 @@ resource "aws_cloudwatch_event_rule" "ecs_restart_rule" {
 }
 
 resource "aws_cloudwatch_event_target" "step_function_target" {
-  rule = aws_cloudwatch_event_rule.ecs_restart_rule.name
-  arn  = aws_sfn_state_machine.ecs_restart_state_machine.arn
+  rule     = aws_cloudwatch_event_rule.ecs_restart_rule.name
+  arn      = aws_sfn_state_machine.ecs_restart_state_machine.arn
+  role_arn = aws_iam_role.step_function_role.arn
 }
