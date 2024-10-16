@@ -30,6 +30,6 @@ data "dns_a_record_set" "datasync_activation_nlb" {
   host = module.datasync_activation_nlb.dns_name
 }
 
-data "aws_network_interface" "datasync_activation_nlb" {
+data "aws_network_interface" "datasync_vpc_endpoint" {
   id = tolist(module.connected_vpc_endpoints.endpoints["datasync"].network_interface_ids)[0]
 }
