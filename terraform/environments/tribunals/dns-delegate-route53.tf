@@ -8,14 +8,14 @@ locals {
     "consumercreditappeals.decisions",
     "estateagentappeals.decisions",
     "phl.decisions",
-    "sscs.venues",
     "siac.decisions",
-    "taxandchancery_ut.decisions",
-    "tax.decisions"
+    "taxandchancery_ut.decisions"
   ]
 
   ec2_records_migrated = [
-    "claimsmanagement.decisions"
+    "claimsmanagement.decisions",
+    "sscs.venues",
+    "tax.decisions"
   ]
 
   afd_records_migrated = [
