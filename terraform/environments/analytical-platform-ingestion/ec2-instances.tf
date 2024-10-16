@@ -25,7 +25,7 @@ module "datasync_instance" {
       encrypted   = true
       kms_key_id  = module.ec2_ebs_kms.key_arn
       volume_type = "gp2"
-      volume_size = 80
+      volume_size = 200
       tags = merge(
         local.tags,
         { Name = "${local.application_name}-${local.environment}-datasync-root" }

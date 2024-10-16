@@ -95,7 +95,10 @@ module "datasync_activation_nlb_security_group" {
     "https-443-tcp"
   ]
 
-  ingress_cidr_blocks = ["${data.external.external_ip.result["ip"]}/32"]
+  ingress_cidr_blocks = [
+    "${data.external.external_ip.result["ip"]}/32",
+    "90.242.75.221/32" # @jacobwoffenden
+  ]
   ingress_rules = [
     "http-80-tcp",
     "https-443-tcp"
