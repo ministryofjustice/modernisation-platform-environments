@@ -43,6 +43,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
         Parameters : {
           "time.$" : "$.time", # Pass the event time from the input
           "restart_time" : var.restart_time
+          "restart_day_of_the_week" : var.restart_day_of_the_week
         },
         ResultPath : "$.waitTimestamp", # Store the result in $.waitTimestamp
         Next : "WaitUntilRestartTime"
