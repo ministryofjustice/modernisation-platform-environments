@@ -89,7 +89,7 @@ module "datasync_activation_nlb_security_group" {
 
   vpc_id = module.connected_vpc.vpc_id
 
-  egress_cidr_blocks = [local.environment_configuration.datasync_instance_private_ip]
+  egress_cidr_blocks = ["${local.environment_configuration.datasync_instance_private_ip}/32"]
   egress_rules       = ["http-80-tcp"]
 
   ingress_cidr_blocks = ["90.242.75.221/32"] # @jacobwoffenden]
