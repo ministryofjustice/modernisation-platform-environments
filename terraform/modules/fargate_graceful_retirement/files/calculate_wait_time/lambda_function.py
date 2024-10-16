@@ -18,18 +18,21 @@ def lambda_handler(event, context):
     restart_time_str = event.get('restart_time', '22:00')
     restart_day_of_the_week = event.get('restart_day_of_week', 'WEDNESDAY')
 
-    # get the next occurrence of the desired day of the week
+    # get the next occurrence of the desired day of the week but after the current day
     days_of_week = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
-    current_day_of_week = days_of_week[time.weekday()]
+    current_day_of_the_week = days_of_week[time.weekday()]
 
-    # get the number of days until the next desired day of the week
-    days_until_restart = (days_of_week.index(restart_day_of_the_week) - days_of_week.index(current_day_of_week)) % 7
+    if current_day_of_the_week == restart_day_of_the_week:
+        days_until_restart = 7
+    else:
+        # get the number of days until the next desired day of the week
+        days_until_restart = (days_of_week.index(restart_day_of_the_week) - days_of_week.index(current_day_of_the_week)) % 7
 
     # get the desired restart time as a datetime object
     restart_time = datetime.datetime.strptime(restart_time_str, '%H:%M')
 
     # add the number of days until the next desired day of the week
-    restart_time = datetime.datetime.combine(start_time.date(), restart_time.time())
+    restart_time = datetime.datetime.combine(time.date(), restart_time.time())
     restart_time += datetime.timedelta(days=days_until_restart)
 
     # Return the calculated timestamp
