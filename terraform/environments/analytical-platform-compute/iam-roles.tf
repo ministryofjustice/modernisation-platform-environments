@@ -297,10 +297,10 @@ module "analytical_platform_control_panel_service_role" {
   create_role = true
   role_name   = "analytical-platform-control-panel"
 
-  custom_role_policy_arns = {
-    "lake_formation_and_quicksight"      = module.analytical_platform_lake_formation_share_policy.arn
-    "lake_formation_cross_account_share" = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
-  }
+  custom_role_policy_arns = [
+    module.analytical_platform_lake_formation_share_policy.arn,
+    "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
+  ]
   number_of_custom_role_policy_arns = 2
 
 }
