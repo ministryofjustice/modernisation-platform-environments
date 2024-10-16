@@ -140,7 +140,7 @@ variable "services" {
       port        = 49116
     },
     "tax_chancery_decisions" = {
-      name_prefix = "taxchancerydecisions"
+      name_prefix = "taxandchancery_ut"
       module_key  = "taxchancerydecisions"
       port        = 49117
     },
