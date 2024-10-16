@@ -398,6 +398,9 @@ resource "aws_s3_bucket_notification" "moj-log-files-prod" {
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "alb-logs/"
   }
+  depends_on = [
+    aws_sns_topic_policy.sns_topic_policy
+  ]
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
@@ -447,7 +450,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
           "arn:aws:s3:::moj-log-files-prod/*"
         ],
         "Principal" : {
-          Service = "logging.s3.amazonaws.com"
+          Service = "s3.amazonaws.com"
         }
       },
       {
@@ -588,6 +591,9 @@ resource "aws_s3_bucket_notification" "moj-log-files-uat" {
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "alb-logs/"
   }
+    depends_on = [
+    aws_sns_topic_policy.sns_topic_policy_uat_ec2cw
+  ]
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
@@ -637,7 +643,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
           "arn:aws:s3:::moj-log-files-uat/*"
         ],
         "Principal" : {
-          Service = "logging.s3.amazonaws.com"
+          Service = "s3.amazonaws.com"
         }
       },
       {
@@ -818,7 +824,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "arn:aws:s3:::moj-log-files-dev/*"
         ],
         "Principal" : {
-          Service = "logging.s3.amazonaws.com"
+          Service = "s3.amazonaws.com"
         }
       },
       {
