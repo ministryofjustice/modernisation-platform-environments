@@ -66,7 +66,7 @@ variable "services" {
     }
     "care_standards" = {
       name_prefix = "carestandards"
-      module_key  = "care-standards"
+      module_key  = "care_standards"
       port        = 49102
     },
     "cicap" = {
@@ -76,27 +76,27 @@ variable "services" {
     },
     "employment_appeals" = {
       name_prefix = "employmentappeals"
-      module_key  = "employment-appeals"
+      module_key  = "employment_appeals"
       port        = 49104
     },
     "finance_and_tax" = {
       name_prefix = "financeandtax"
-      module_key  = "finance-and-tax"
+      module_key  = "finance_and_tax"
       port        = 49105
     },
     "immigration_services" = {
       name_prefix = "immigrationservices"
-      module_key  = "immigration-services"
+      module_key  = "immigration_services"
       port        = 49106
     },
     "information_tribunal" = {
       name_prefix = "informationrights"
-      module_key  = "information-tribunal"
+      module_key  = "information_tribunal"
       port        = 49107
     },
     "lands_tribunal" = {
       name_prefix = "landschamber"
-      module_key  = "lands-tribunal"
+      module_key  = "lands_tribunal"
       port        = 49108
     },
     "transport" = {
@@ -105,53 +105,53 @@ variable "services" {
       port        = 49109
     },
     "charity_tribunal_decisions" = {
-      name_prefix = "charity.decisions"
-      module_key  = "charity-tribunal-decisions"
+      name_prefix = "charitytribunal"
+      module_key  = "charity_tribunal_decisions"
       port        = 49110
     },
     "claims_management_decisions" = {
       name_prefix = "claimsmanagement"
-      module_key  = "claims-management-decisions"
+      module_key  = "claims_management_decisions"
       port        = 49111
     },
     "consumer_credit_appeals" = {
       name_prefix = "consumercreditappeals"
-      module_key  = "consumer-credit-appeals"
+      module_key  = "consumer_credit_appeals"
       port        = 49112
     },
     "estate_agent_appeals" = {
       name_prefix = "estateagentappeals"
-      module_key  = "estate-agent-appeals"
+      module_key  = "estate_agent_appeals"
       port        = 49113
     },
     "primary_health_lists" = {
-      name_prefix = "phl.decisions"
-      module_key  = "primary-health-lists"
+      name_prefix = "primaryhealthlists"
+      module_key  = "primary_health_lists"
       port        = 49114
     },
     "siac" = {
-      name_prefix = "siac.decisions"
+      name_prefix = "siac"
       module_key  = "siac"
       port        = 49115
     },
     "sscs_venue_pages" = {
       name_prefix = "sscs.venues"
-      module_key  = "sscs-venue-pages"
+      module_key  = "sscs_venue_pages"
       port        = 49116
     },
     "tax_chancery_decisions" = {
-      name_prefix = "taxandchancery_ut.decisions"
-      module_key  = "tax-chancery-decisions"
+      name_prefix = "taxchancerydecisions"
+      module_key  = "tax_chancery_decisions"
       port        = 49117
     },
     "tax_tribunal_decisions" = {
       name_prefix = "tax.decisions"
-      module_key  = "tax-tribunal-decisions"
+      module_key  = "tax_tribunal_decisions"
       port        = 49118
     },
     "ftp_admin_appeals" = {
-      name_prefix = "administrativeappeals.decisions"
-      module_key  = "ftp-admin-appeals"
+      name_prefix = "adminappealsreports"
+      module_key  = "ftp_admin_appeals"
       port        = 49119
     }
   }
@@ -177,7 +177,7 @@ variable "web_app_services" {
     }
     "care_standards" = {
       name_prefix         = "carestandards"
-      module_key          = "care-standards"
+      module_key          = "care_standards"
       port                = 49102
       app_db_name         = "carestandards"
       sql_setup_path      = "/db_setup_scripts/care_standards"
@@ -193,7 +193,7 @@ variable "web_app_services" {
     },
     "employment_appeals" = {
       name_prefix         = "employmentappeals"
-      module_key          = "employment-appeals"
+      module_key          = "employment_appeals"
       port                = 49104
       app_db_name         = "eat"
       sql_setup_path      = "/db_setup_scripts/employment_appeals"
@@ -201,7 +201,7 @@ variable "web_app_services" {
     },
     "finance_and_tax" = {
       name_prefix         = "financeandtax"
-      module_key          = "finance-and-tax"
+      module_key          = "finance_and_tax"
       port                = 49105
       app_db_name         = "ftt"
       sql_setup_path      = "/db_setup_scripts/finance_and_tax"
@@ -209,7 +209,7 @@ variable "web_app_services" {
     },
     "immigration_services" = {
       name_prefix         = "immigrationservices"
-      module_key          = "immigration-services"
+      module_key          = "immigration_services"
       port                = 49106
       app_db_name         = "imset"
       sql_setup_path      = "/db_setup_scripts/immigration_services"
@@ -217,7 +217,7 @@ variable "web_app_services" {
     },
     "information_tribunal" = {
       name_prefix         = "informationrights"
-      module_key          = "information-tribunal"
+      module_key          = "information_tribunal"
       port                = 49107
       app_db_name         = "it"
       sql_setup_path      = "/db_setup_scripts/information_tribunal"
@@ -225,7 +225,7 @@ variable "web_app_services" {
     },
     "lands_tribunal" = {
       name_prefix         = "landschamber"
-      module_key          = "lands-tribunal"
+      module_key          = "lands_tribunal"
       port                = 49108
       app_db_name         = "lands"
       sql_setup_path      = "/db_setup_scripts/lands_chamber"
@@ -246,27 +246,27 @@ variable "sftp_services" {
   default = {
     "charity_tribunal_decisions" = {
       name_prefix = "charitytribunal"
-      module_key  = "charity-tribunal-decisions"
+      module_key  = "charity_tribunal_decisions"
       sftp_port   = 10022
     },
     "claims_management_decisions" = {
       name_prefix = "claimsmanagement"
-      module_key  = "claims-management-decisions"
+      module_key  = "claims_management_decisions"
       sftp_port   = 10023
     },
     "consumer_credit_appeals" = {
       name_prefix = "consumercreditappeals"
-      module_key  = "consumer-credit-appeals"
+      module_key  = "consumer_credit_appeals"
       sftp_port   = 10024
     },
     "estate_agent_appeals" = {
       name_prefix = "estateagentappeals"
-      module_key  = "estate-agent-appeals"
+      module_key  = "estate_agent_appeals"
       sftp_port   = 10025
     },
     "primary_health_lists" = {
       name_prefix = "primaryhealthlists"
-      module_key  = "primary-health-lists"
+      module_key  = "primary_health_lists"
       sftp_port   = 10026
     },
     "siac" = {
@@ -276,22 +276,22 @@ variable "sftp_services" {
     },
     "sscs_venue_pages" = {
       name_prefix = "sscsvenues"
-      module_key  = "sscs-venue-pages"
+      module_key  = "sscs_venue_pages"
       sftp_port   = 10028
     },
     "tax_chancery_decisions" = {
       name_prefix = "taxchancerydecisions"
-      module_key  = "tax-chancery-decisions"
+      module_key  = "tax_chancery_decisions"
       sftp_port   = 10029
     },
     "tax_tribunal_decisions" = {
       name_prefix = "taxtribunaldecisions"
-      module_key  = "tax-tribunal-decisions"
+      module_key  = "tax_tribunal_decisions"
       sftp_port   = 10030
     },
     "ftp_admin_appeals" = {
       name_prefix = "adminappealsreports"
-      module_key  = "ftp-admin-appeals"
+      module_key  = "ftp_admin_appeals"
       sftp_port   = 10031
     }
   }
