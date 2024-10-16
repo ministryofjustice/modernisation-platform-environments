@@ -292,12 +292,12 @@ module "analytical_platform_control_panel_service_role" {
 
   allow_self_assume_role = true
   trusted_role_arns = [
-    format("arn:aws:iam::%s:root", local.environment_management.account_ids["analytical-platform-${local.environment}"])
+    format("arn:aws:iam::%s:root", local.environment_management.account_ids["analytical-platform-${local.analytical_platform_environment}"])
   ]
   create_role = true
   role_name   = "analytical-platform-control-panel"
 
-  cutom_role_policy_arns = {
+  custom_role_policy_arns = {
     "lake_formation_and_quicksight"      = module.analytical_platform_lake_formation_share_policy.arn
     "lake_formation_cross_account_share" = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
   }
