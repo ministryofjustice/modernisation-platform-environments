@@ -89,14 +89,14 @@ resource "aws_lambda_permission" "allow_bucket" {
   source_arn    = aws_s3_bucket.lambda_payment_load.arn
 }
 
-resource "aws_s3_bucket_notification" "lambda_trigger" {
-  bucket = aws_s3_bucket.lambda_payment_load.id
+# resource "aws_s3_bucket_notification" "lambda_trigger" {
+#   bucket = aws_s3_bucket.lambda_payment_load.id
 
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.lambda_function.arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_suffix       = ".xlsx"
-  }
+#   lambda_function {
+#     lambda_function_arn = aws_lambda_function.lambda_function.arn
+#     events              = ["s3:ObjectCreated:*"]
+#     filter_suffix       = ".xlsx"
+#   }
 
-  depends_on = [aws_lambda_permission.allow_bucket]
-}
+#   depends_on = [aws_lambda_permission.allow_bucket]
+# }
