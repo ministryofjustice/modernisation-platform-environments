@@ -1,9 +1,15 @@
 #!/bin/bash
-    export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
-    # export LOGS="${var.pAppName}-EC2"
-    # export APPNAME="${var.pAppName}"
-    # export ENV="${var.pEnvironment}"
-    # export ROLE="${aws_iam_role.app_ec2_role.name}"
-    # export SECRET=`/usr/local/bin/aws --region ${data.aws_region.current.name} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db_secret.id} --query SecretString --output text`
-    # export host="$ip4 $APPNAME-$ENV $APPNAME.${var.pDnsExtension}"
-    # /opt/aws/bin/cfn-signal -e 0 --stack ${data.aws_cloudformation_stack.current.name} --resource DBInstance --region ${data.aws_region.current.name}
+
+yum install -y python-setuptools wget unzip libXp.i386 sshpass
+service iptables stop
+chkconfig iptables off
+yum install -y nawk
+mkdir -p /usr/xpg4
+ln -s /bin /usr/xpg4/bin
+yum update -y
+
+mkdir -p /opt/aws/bin
+cd /root
+wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz
+mkdir -p /run/cfn-init
