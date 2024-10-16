@@ -13,7 +13,16 @@ logger.setLevel(log_level)
 def lambda_handler(event, context):
     try:
         # Get parameters from environment variables and event
-        action = event.get("ACTION")
+        action = None
+        for key in event:
+            if key.upper() == "ACTION":
+                action = event[key]
+                break
+
+        action = (
+            action.upper() if action else None
+        )  # Convert action to uppercase if it exists
+
         specific_alarms = (
             os.environ.get("SPECIFIC_ALARMS", "").split(",")
             if os.environ.get("SPECIFIC_ALARMS")
