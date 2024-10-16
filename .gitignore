@@ -24,4 +24,4 @@ out/
 # vim
 **/*.swp
 
-terraform/modules/fargate_graceful_retirement/**/*.zip
+terraform/modules/**/*.zip
