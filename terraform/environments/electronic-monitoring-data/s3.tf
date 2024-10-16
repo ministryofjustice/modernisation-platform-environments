@@ -1059,14 +1059,14 @@ module "s3-dms-target-store-bucket" {
 #tfsec:ignore:aws-s3-enable-bucket-logging
 #tfsec:ignore:aws-s3-enable-versioning
 resource "aws_s3_bucket" "data_store" {
-  #checkov:skip:CKV_AWS_145
-  #checkov:skip:CKV_AWS_144
-  #checkov:skip:CKV_AWS_21
-  #checkov:skip:CKV2_AWS_65
-  #checkov:skip:CKV2_AWS_62
-  #checkov:skip:CKV_AWS_18
-  #checkov:skip:CKV2_AWS_61
+  #checkov:skip=CKV_AWS_145
+  #checkov:skip=CKV_AWS_144
+  #checkov:skip=CKV2_AWS_65
+  #checkov:skip=CKV2_AWS_62
+  #checkov:skip=CKV_AWS_18
+  #checkov:skip=CKV2_AWS_61
   bucket_prefix = "em-data-store-"
+  #checkov:skip=CKV_AWS_21:Legacy bucket to be deleted
   force_destroy = false
   tags = {
     "application"            = "electronic-monitoring-data"
@@ -1088,6 +1088,7 @@ resource "aws_s3_bucket_public_access_block" "data_store" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "bucket" {
+  #checkov:skip=CKV2_AWS_65
   bucket = aws_s3_bucket.data_store.id
   rule {
     object_ownership = "ObjectWriter"
