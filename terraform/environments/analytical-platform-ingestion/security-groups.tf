@@ -90,10 +90,10 @@ module "datasync_activation_nlb_security_group" {
   vpc_id = module.connected_vpc.vpc_id
 
   egress_cidr_blocks = ["${local.environment_configuration.datasync_instance_private_ip}/32"]
-  egress_rules       = ["http-80-tcp"]
+  egress_rules       = ["http-80-tcp", "ssh-tcp"]
 
   ingress_cidr_blocks = ["90.242.75.221/32"] # @jacobwoffenden]
-  ingress_rules       = ["http-80-tcp"]
+  ingress_rules       = ["http-80-tcp", "ssh-tcp"]
 
   tags = local.tags
 }
@@ -177,6 +177,10 @@ module "datasync_instance_security_group" {
   ingress_with_source_security_group_id = [
     {
       rule                     = "http-80-tcp"
+      source_security_group_id = module.datasync_activation_nlb_security_group.security_group_id
+    },
+        {
+      rule                     = "ssh-tcp"
       source_security_group_id = module.datasync_activation_nlb_security_group.security_group_id
     }
   ]

@@ -11,6 +11,7 @@ module "datasync_instance" {
   vpc_security_group_ids = [module.datasync_instance_security_group.security_group_id]
   private_ip             = local.environment_configuration.datasync_instance_private_ip
 
+  key_name = aws_key_pair.jacobwoffenden.key_name
 
   metadata_options = {
     http_endpoint               = "enabled"
