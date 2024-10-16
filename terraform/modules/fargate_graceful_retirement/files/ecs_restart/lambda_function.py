@@ -1,5 +1,6 @@
 import json
 import boto3
+import os
 
 def lambda_handler(event, context):
     print("Event received:", json.dumps(event))
@@ -22,22 +23,23 @@ def lambda_handler(event, context):
                 print("Cluster name:", cluster_name)
                 print("Service name:", service_name)
 
-                print("Forcing new deployment for service:", service_name) 
-                
+                print("Forcing new deployment for service:", service_name)
+
                 # Force a new deployment for the specified service in the specified cluster
                 response = ecs_client.update_service(
                     cluster=cluster_name,
                     service=service_name,
                     forceNewDeployment=True
                 )
-
-                print("Update service response:", json.dumps(response))
+                if os.environ.get('DEBUG_LOGGING', False):
+                    print("[DEBUG] Update service response:", response)
             else:
                 print("No entity value found in the event")
 
         return {
             'statusCode': 200,
             'body': json.dumps('Handled ECS Task Patching Retirement')
+            'restarted_services': affected_entities
         }
 
     except Exception as e:

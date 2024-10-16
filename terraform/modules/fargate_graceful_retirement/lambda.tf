@@ -55,8 +55,13 @@ resource "aws_lambda_function" "ecs_restart_handler" {
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
 
-  filename = data.archive_file.lambda_function_ecs_restart_payload.output_path
+  environment {
+    variables = {
+      DEBUG_LOGGING = var.debug_logging
+    }
+  }
 
+  filename         = data.archive_file.lambda_function_ecs_restart_payload.output_path
   source_code_hash = data.archive_file.lambda_function_ecs_restart_payload.output_base64sha256
 }
 
@@ -74,6 +79,12 @@ resource "aws_lambda_function" "calculate_wait_time" {
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
+
+  environment {
+    variables = {
+      DEBUG_LOGGING = var.debug_logging
+    }
+  }
 
   filename         = data.archive_file.lambda_function_calculate_wait_time_payload.output_path
   source_code_hash = data.archive_file.lambda_function_calculate_wait_time_payload.output_base64sha256

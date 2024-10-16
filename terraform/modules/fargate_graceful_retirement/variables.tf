@@ -12,3 +12,9 @@ variable "restart_day_of_the_week" {
     error_message = "The restart_day_of_the_week must be one of MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, or SUNDAY"
   }
 }
+
+variable "debug_logging" {
+  description = "Enable debug logging"
+  type        = bool
+  default     = false
+}
