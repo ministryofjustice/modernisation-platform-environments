@@ -7,10 +7,10 @@ locals {
   database-instance-userdata = <<EOF
 #!/bin/bash
 
-cd /root
+sudo -i
 
 # Update the hostname
-hostnamectl set-hostname "${local.application_name_short}.${data.aws_route53_zone.external.name}"
+hostname ${local.application_name_short}
 
 wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
 easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz
