@@ -20,14 +20,6 @@ module "datasync_activation_nlb" {
       target_type          = "ip"
       target_id            = local.environment_configuration.datasync_instance_private_ip
       deregistration_delay = 10
-    },
-    ssh = {
-      name_prefix          = "ssh-"
-      protocol             = "TCP"
-      port                 = 22
-      target_type          = "ip"
-      target_id            = local.environment_configuration.datasync_instance_private_ip
-      deregistration_delay = 10
     }
   }
 
@@ -37,13 +29,6 @@ module "datasync_activation_nlb" {
       protocol = "TCP"
       forward = {
         target_group_key = "datasync"
-      }
-    },
-    ssh = {
-      port     = 22
-      protocol = "TCP"
-      forward = {
-        target_group_key = "ssh"
       }
     }
   }
