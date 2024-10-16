@@ -57,7 +57,7 @@ resource "aws_acm_certificate" "external_venues" {
 
 resource "aws_acm_certificate_validation" "external_venues" {
   certificate_arn         = aws_acm_certificate.external_venues.arn
-  validation_record_fqdns = [aws_route53_record.cert_validation_venues.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation_venues : record.fqdn]
 }
 
 resource "aws_route53_record" "cert_validation_venues" {
