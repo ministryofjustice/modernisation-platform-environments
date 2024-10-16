@@ -131,13 +131,14 @@ def process_dv_for_table(rds_jdbc_conn_obj,
         LOGGER.info(f"""Using a different parquet folder: {parquet_tbl_folder_if_different}""")
     else:
         tbl_prq_s3_folder_path = S3_METHODS_OBJ.get_s3_table_folder_path(rds_jdbc_conn_obj, 
-                                                                         PRQ_FILES_SRC_S3_BUCKET_NAME)
+                                                                         PRQ_FILES_SRC_S3_BUCKET_NAME,
+                                                                         rds_tbl_name)
     # -------------------------------------------------------
-
-    LOGGER.info(f"""tbl_prq_s3_folder_path: {tbl_prq_s3_folder_path}""")
     
     pkey_partion_read_used = False
     if tbl_prq_s3_folder_path is not None:
+        
+        LOGGER.info(f"""tbl_prq_s3_folder_path: {tbl_prq_s3_folder_path}""")
         
         # READ RDS-SQLSERVER-DB --> DATAFRAME
         if args.get('rds_db_tbl_pkeys_col_list', None) is None:

@@ -414,12 +414,9 @@ class S3Methods:
     def get_s3_table_folder_path(cls,
                                  rds_jdbc_conn_obj,
                                  in_parquet_files_bucket_name,
-                                 rename_target_table_folder=None):
+                                 target_table_folder):
         
-        if rename_target_table_folder is not None:
-            dir_path_str = f"{rds_jdbc_conn_obj.rds_db_name}/{rds_jdbc_conn_obj.rds_db_schema_name}/{rename_target_table_folder}"
-        else:
-            dir_path_str = f"{rds_jdbc_conn_obj.rds_db_name}/{rds_jdbc_conn_obj.rds_db_schema_name}/{rds_jdbc_conn_obj.rds_db_table_name}"
+        dir_path_str = f"{rds_jdbc_conn_obj.rds_db_name}/{rds_jdbc_conn_obj.rds_db_schema_name}/{target_table_folder}"
         
         tbl_full_dir_path_str = f"s3://{in_parquet_files_bucket_name}/{dir_path_str}/"
 
