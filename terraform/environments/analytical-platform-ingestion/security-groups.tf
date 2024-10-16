@@ -179,7 +179,7 @@ module "datasync_instance_security_group" {
       rule                     = "http-80-tcp"
       source_security_group_id = module.datasync_activation_nlb_security_group.security_group_id
     },
-        {
+    {
       rule                     = "ssh-tcp"
       source_security_group_id = module.datasync_activation_nlb_security_group.security_group_id
     }
