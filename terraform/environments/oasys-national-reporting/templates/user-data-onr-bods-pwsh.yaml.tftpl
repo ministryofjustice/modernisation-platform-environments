@@ -4,9 +4,6 @@
 # See C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch* for script output
 version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is running
 tasks:
-  - task: initializeVolume
-    inputs:
-        initialize: all
   - task: executeScript
     inputs:
       - frequency: once
