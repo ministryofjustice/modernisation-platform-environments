@@ -105,28 +105,28 @@ variable "services" {
       port        = 49109
     },
     "charity_tribunal_decisions" = {
-      name_prefix = "charitytribunal"
-      module_key  = "charity_tribunal_decisions"
+      name_prefix = "charity"
+      module_key  = "charity"
       port        = 49110
     },
     "claims_management_decisions" = {
       name_prefix = "claimsmanagement"
-      module_key  = "claims_management_decisions"
+      module_key  = "claimsmanagement"
       port        = 49111
     },
     "consumer_credit_appeals" = {
       name_prefix = "consumercreditappeals"
-      module_key  = "consumer_credit_appeals"
+      module_key  = "consumercreditappeals"
       port        = 49112
     },
     "estate_agent_appeals" = {
       name_prefix = "estateagentappeals"
-      module_key  = "estate_agent_appeals"
+      module_key  = "estateagentappeals"
       port        = 49113
     },
     "primary_health_lists" = {
-      name_prefix = "primaryhealthlists"
-      module_key  = "primary_health_lists"
+      name_prefix = "phl"
+      module_key  = "phl"
       port        = 49114
     },
     "siac" = {
@@ -136,22 +136,22 @@ variable "services" {
     },
     "sscs_venue_pages" = {
       name_prefix = "sscs"
-      module_key  = "sscs_venue_pages"
+      module_key  = "sscs"
       port        = 49116
     },
     "tax_chancery_decisions" = {
       name_prefix = "taxchancerydecisions"
-      module_key  = "tax_chancery_decisions"
+      module_key  = "taxchancerydecisions"
       port        = 49117
     },
     "tax_tribunal_decisions" = {
       name_prefix = "tax"
-      module_key  = "tax_tribunal_decisions"
+      module_key  = "tax"
       port        = 49118
     },
     "ftp_admin_appeals" = {
-      name_prefix = "adminappealsreports"
-      module_key  = "ftp_admin_appeals"
+      name_prefix = "adminappeals"
+      module_key  = "adminappeals"
       port        = 49119
     }
   }
