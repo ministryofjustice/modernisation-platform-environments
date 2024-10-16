@@ -107,7 +107,7 @@ resource "aws_lb_listener" "tribunals_lb" {
 resource "aws_lb_listener_certificate" "venues_cert" {
   count           = local.is-production ? 1 : 0
   listener_arn    = "${aws_lb_listener.tribunals_lb.arn}"
-  certificate_arn = "${aws_acm_certificate.external_venues[0].arn}"
+  certificate_arn = "${aws_acm_certificate.external_venues.arn}"
 }
 
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {

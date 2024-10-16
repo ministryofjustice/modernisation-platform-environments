@@ -40,7 +40,6 @@ resource "aws_route53_record" "cert_validation" {
 }
 
 resource "aws_acm_certificate" "external_venues" {
-  count                     = local.is-production ? 1 : 0
   domain_name               = "*.venues.tribunals.gov.uk"
   validation_method         = "DNS"
   subject_alternative_names = null
@@ -57,22 +56,27 @@ resource "aws_acm_certificate" "external_venues" {
 }
 
 resource "aws_acm_certificate_validation" "external_venues" {
-  count                   = local.is-production ? 1 : 0
-  certificate_arn         = aws_acm_certificate.external_venues[0].arn
-  validation_record_fqdns = [aws_route53_record.cert_validation_venues[0].fqdn]
+  certificate_arn         = aws_acm_certificate.external_venues.arn
+  validation_record_fqdns = [aws_route53_record.cert_validation_venues.fqdn]
 }
 
 resource "aws_route53_record" "cert_validation_venues" {
   provider = aws.core-network-services
 
-  for_each = { for option in aws_acm_certificate.external_venues[0].domain_validation_options : option.resource_record_name => option }
+  for_each = {
+    for dvo in aws_acm_certificate.external_venues.domain_validation_options : dvo.domain_name => {
+      name  = dvo.resource_record_name
+      type  = dvo.resource_record_type
+      value = dvo.resource_record_value
+    }
+  }
 
   allow_overwrite = true
-  name            = each.key
-  records         = [each.value.resource_record_value]
+  name            = each.value.name
+  records         = [each.value.value]
   ttl             = 300
-  type            = each.value.resource_record_type
-  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.production_zone.zone_id
 }
 
 // sub-domain validation only required for non-production sites
