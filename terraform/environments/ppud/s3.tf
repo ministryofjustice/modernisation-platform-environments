@@ -399,7 +399,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-prod" {
     filter_prefix = "alb-logs/"
   }
   depends_on = [
-    aws_sns_topic_policy.sns_topic
+    data.aws_iam_policy_document.sns_topic_policy_ec2cw[0].json
   ]
 }
 
@@ -592,7 +592,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-uat" {
     filter_prefix = "alb-logs/"
   }
     depends_on = [
-    aws_sns_topic_policy.sns_uat_policy
+     data.aws_iam_policy_document.sns_topic_policy_uat_ec2cw[0].json
   ]
 }
 
