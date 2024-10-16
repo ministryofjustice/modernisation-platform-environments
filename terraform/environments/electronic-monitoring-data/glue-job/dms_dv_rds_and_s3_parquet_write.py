@@ -1,6 +1,6 @@
 
 import sys
-import boto3
+
 # from logging import getLogger
 # import pandas as pd
 
@@ -75,8 +75,6 @@ job.init(args["JOB_NAME"], args)
 
 # ------------------------------
 
-S3_METHODS_OBJ = S3Methods(boto3.client("s3"))
-
 # ------------------------------
 
 RDS_DB_HOST_ENDPOINT = args["rds_db_host_ep"]
@@ -109,6 +107,9 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                          total_files, 
                          total_size_mb) -> DataFrame:
 
+    rds_db_name = rds_jdbc_conn_obj.rds_db_name
+    db_sch_tbl = f"{rds_db_name}_{rds_jdbc_conn_obj.rds_db_schema_name}_{rds_tbl_name}"
+    
     int_read_partition_size_mb = int(args['read_partition_size_mb'])
     if int_read_partition_size_mb%64 != 0 \
         or int_read_partition_size_mb == 0:
@@ -125,21 +126,25 @@ def process_dv_for_table(rds_jdbc_conn_obj,
 
     parquet_tbl_folder_if_different = args.get('parquet_tbl_folder_if_different', '')
     if parquet_tbl_folder_if_different != '':
-        tbl_prq_s3_folder_path = S3_METHODS_OBJ.get_s3_table_folder_path(rds_jdbc_conn_obj, 
-                                                                         PRQ_FILES_SRC_S3_BUCKET_NAME,
-                                                                         parquet_tbl_folder_if_different)
+        tbl_prq_s3_folder_path = CustomPysparkMethods.get_s3_table_folder_path(
+                                                        rds_jdbc_conn_obj, 
+                                                        PRQ_FILES_SRC_S3_BUCKET_NAME,
+                                                        parquet_tbl_folder_if_different
+                                    )
         LOGGER.info(f"""Using a different parquet folder: {parquet_tbl_folder_if_different}""")
     else:
-        tbl_prq_s3_folder_path = S3_METHODS_OBJ.get_s3_table_folder_path(rds_jdbc_conn_obj, 
-                                                                         PRQ_FILES_SRC_S3_BUCKET_NAME,
-                                                                         rds_tbl_name)
+        tbl_prq_s3_folder_path = CustomPysparkMethods.get_s3_table_folder_path(
+                                                        rds_jdbc_conn_obj, 
+                                                        PRQ_FILES_SRC_S3_BUCKET_NAME,
+                                                        rds_tbl_name
+                                    )
     # -------------------------------------------------------
     
     pkey_partion_read_used = False
     if tbl_prq_s3_folder_path is not None:
         
         LOGGER.info(f"""tbl_prq_s3_folder_path: {tbl_prq_s3_folder_path}""")
-        
+
         # READ RDS-SQLSERVER-DB --> DATAFRAME
         if args.get('rds_db_tbl_pkeys_col_list', None) is None:
             if RECORDED_PKEYS_LIST.get(rds_tbl_name, None) is None:
@@ -151,6 +156,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                     and len(RECORDED_PKEYS_LIST[rds_tbl_name]) == 1:
 
                     jdbc_partition_column = rds_jdbc_conn_obj.get_jdbc_partition_column(
+                                                    rds_tbl_name,
                                                     RECORDED_PKEYS_LIST[rds_tbl_name]
                                             )
                     if jdbc_partition_column is not None:
@@ -183,6 +189,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                                          for column in args['rds_db_tbl_pkeys_col_list'].split(",")]
 
             jdbc_partition_column = rds_jdbc_conn_obj.get_jdbc_partition_column(
+                                                        rds_tbl_name,
                                                         rds_db_tbl_pkeys_col_list
                                     )
             LOGGER.info(f"""jdbc_partition_column = {jdbc_partition_column}""")
@@ -371,7 +378,7 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, table):
 
     df_dv_output = df_dv_output.orderBy("database_name", "full_table_name").repartition(1)
 
-    if S3_METHODS_OBJ.check_s3_folder_path_if_exists(
+    if S3Methods.check_s3_folder_path_if_exists(
                                 PARQUET_OUTPUT_S3_BUCKET_NAME,
                                 f'''{CATALOG_DB_TABLE_PATH}/database_name={database}/full_table_name={table}'''
                                 ):
@@ -472,7 +479,7 @@ if __name__ == "__main__":
             rds_db_name, rds_tbl_name = db_sch_tbl.split(f"_{rds_sqlserver_db_schema}_")[0], \
                                         db_sch_tbl.split(f"_{rds_sqlserver_db_schema}_")[1]
 
-            total_files, total_size = S3_METHODS_OBJ.get_s3_folder_info(
+            total_files, total_size = S3Methods.get_s3_folder_info(
                                         PRQ_FILES_SRC_S3_BUCKET_NAME, 
                                         f"{rds_db_name}/{rds_sqlserver_db_schema}/{rds_tbl_name}")
             total_size_mb = total_size/1024/1024
@@ -481,7 +488,7 @@ if __name__ == "__main__":
                 {GLUE_CATALOG_DB_NAME}/{GLUE_CATALOG_TBL_NAME}/database_name={rds_db_name}/full_table_name={db_sch_tbl}/'''.strip()
             # -------------------------------------------------------
 
-            if S3_METHODS_OBJ.check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, 
+            if S3Methods.check_s3_folder_path_if_exists(PARQUET_OUTPUT_S3_BUCKET_NAME, 
                                                              dv_ctlg_tbl_partition_path):
                 LOGGER.info(
                     f"""Already exists, 
@@ -530,7 +537,7 @@ if __name__ == "__main__":
             rds_db_name, rds_tbl_name = db_sch_tbl.split(f"_{rds_sqlserver_db_schema}_")[0], \
                                         db_sch_tbl.split(f"_{rds_sqlserver_db_schema}_")[1]
 
-            total_files, total_size = S3_METHODS_OBJ.get_s3_folder_info(
+            total_files, total_size = S3Methods.get_s3_folder_info(
                                         PRQ_FILES_SRC_S3_BUCKET_NAME, 
                                         f"{rds_db_name}/{rds_sqlserver_db_schema}/{rds_tbl_name}")
             total_size_mb = total_size/1024/1024

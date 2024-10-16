@@ -1,5 +1,6 @@
 import time
 import sys
+import boto3
 
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
@@ -213,8 +214,7 @@ class RDS_JDBC_CONNECTION():
 
         jdbc_partition_col_upperbound = int(df_rds_count/jdbc_read_partitions_num)
 
-        df_rds_temp = self.get_df_read_rds_db_tbl_int_pkey(self, 
-                                                           rds_tbl_name, 
+        df_rds_temp = self.get_df_read_rds_db_tbl_int_pkey(rds_tbl_name, 
                                                            jdbc_partition_column,
                                                            jdbc_partition_col_upperbound,
                                                            jdbc_read_partitions_num)
@@ -341,6 +341,7 @@ class RDS_JDBC_CONNECTION():
                 .option("password", self.RDS_DB_INSTANCE_PWD)
                 .option("query", f"""{query_str}""")
                 .load()).collect()
+
 # ---------------------------------------------------------------------
 # PYTHON CLASS 'RDS_JDBC_CONNECTION' - END
 # ---------------------------------------------------------------------
@@ -385,12 +386,11 @@ class AthenaMethods:
 
 class S3Methods:
     
-    def __init__(self,
-                 S3_CLIENT):
-        self.S3_CLIENT = S3_CLIENT
+    S3_CLIENT = boto3.client("s3")
 
-    def get_s3_folder_info(self, bucket_name, prefix):
-        paginator = self.S3_CLIENT.get_paginator('list_objects_v2')
+    @classmethod
+    def get_s3_folder_info(cls, bucket_name, prefix):
+        paginator = cls.S3_CLIENT.get_paginator('list_objects_v2')
 
         total_size = 0
         total_files = 0
@@ -402,17 +402,20 @@ class S3Methods:
 
         return total_files, total_size
 
-    def check_s3_folder_path_if_exists(self, in_bucket_name, in_folder_path):
-        result = self.S3_CLIENT.list_objects(
+    @classmethod
+    def check_s3_folder_path_if_exists(cls, in_bucket_name, in_folder_path):
+        result = cls.S3_CLIENT.list_objects(
             Bucket=in_bucket_name, Prefix=in_folder_path)
         exists = False
         if 'Contents' in result:
             exists = True
         return exists
 
-    @classmethod
-    def get_s3_table_folder_path(cls,
-                                 rds_jdbc_conn_obj,
+
+class CustomPysparkMethods:
+
+    @staticmethod
+    def get_s3_table_folder_path(rds_jdbc_conn_obj,
                                  in_parquet_files_bucket_name,
                                  target_table_folder):
         
@@ -420,15 +423,12 @@ class S3Methods:
         
         tbl_full_dir_path_str = f"s3://{in_parquet_files_bucket_name}/{dir_path_str}/"
 
-        if cls.check_s3_folder_path_if_exists(in_parquet_files_bucket_name, dir_path_str):
+        if S3Methods.check_s3_folder_path_if_exists(in_parquet_files_bucket_name, dir_path_str):
             return tbl_full_dir_path_str
         else:
             SparkSession.LOGGER.info(f"{tbl_full_dir_path_str} -- Table-Folder-S3-Path Not Found !")
             return None
-
-
-class CustomPysparkMethods:
-
+        
     @staticmethod
     def resolve_args(args_list):
         SparkSession.LOGGER.info(f">> Resolving Argument Variables: START")
