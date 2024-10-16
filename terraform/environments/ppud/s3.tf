@@ -1,11 +1,13 @@
+#######################################################################################################
+# S3 Buckets, acls, versioning, lifestyle configs, logging, notifications, public access & IAM policies
+#######################################################################################################
 
-###########################################################
 # S3 Bucket for Files copying between the PPUD Environments
-###########################################################
 
 resource "aws_s3_bucket" "PPUD" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   count  = local.is-production == true ? 1 : 0
   bucket = "${local.application_name}-ppud-files-${local.environment}"
@@ -21,7 +23,6 @@ resource "aws_s3_bucket" "PPUD" {
     }
   )
 }
-
 
 resource "aws_s3_bucket_acl" "PPUD_ACL" {
   count  = local.is-production == true ? 1 : 0
@@ -108,16 +109,12 @@ resource "aws_s3_bucket_policy" "PPUD" {
   })
 }
 
-
-###################################################
-# MoJ- Patch Manager Health-Check-Reports S3 Bucket
-###################################################
-
-# Create S3 Bucket for SSM Health Check Reports
+# S3 Bucket for Patch Manager / SSM Health Check Reports
 
 resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   bucket = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
   tags = merge(
@@ -135,12 +132,10 @@ resource "aws_s3_bucket_versioning" "MoJ-Health-Check-Reports" {
   }
 }
 
-# S3 Bucket Lifecycle Configuration for SSM Health Check Reports
-
 resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
   bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
   rule {
-    id     = "Remove_Old_SSM_Health_Check_Reports"
+    id     = "Remove-Old-SSM-Health-Check-Reports"
     status = "Enabled"
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
@@ -162,8 +157,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
   }
 }
 
-# S3 block public access
-
 resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
   bucket                  = aws_s3_bucket.MoJ-Health-Check-Reports.id
   block_public_acls       = true
@@ -172,14 +165,12 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
   restrict_public_buckets = true
 }
 
-
-#########################
-# MoJ- Scripts S3 Bucket
-#########################
+# S3 Bucket for MoJ Powershell and Bash Scripts 
 
 resource "aws_s3_bucket" "moj-scripts" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-scripts"
@@ -216,6 +207,27 @@ resource "aws_s3_bucket_public_access_block" "moj-scripts" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "moj-scripts" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-scripts[0].id
+  rule {
+    id     = "remove-old-moj-scripts"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = 183
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 183
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
 
 resource "aws_s3_bucket_policy" "moj-scripts" {
   count  = local.is-production == true ? 1 : 0
@@ -249,13 +261,12 @@ resource "aws_s3_bucket_policy" "moj-scripts" {
 }
 
 
-####################################
-# MoJ- Release-Management S3 Bucket
-####################################
+# S3 Bucket for Release-Management (Application & Software) Files
 
 resource "aws_s3_bucket" "MoJ-Release-Management" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-release-management"
@@ -279,7 +290,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Release-Management" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.MoJ-Release-Management[0].id
   rule {
-    id     = "Remove_Old_MoJ-Release-Management"
+    id     = "Remove-Old-MoJ-Release-Management"
     status = "Enabled"
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
@@ -346,11 +357,7 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
   })
 }
 
-###########################
-# MoJ - Log Files S3 Bucket
-###########################
-
-# Production S3 Bucket for S3 Bucket Log Files
+# S3 Bucket for S3 Notification and ELB Log Files for Production
 
 resource "aws_s3_bucket" "moj-log-files-prod" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
@@ -426,6 +433,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
     "Statement" : [
       {
         "Action" : [
+          "s3:PutBucketNotification",
           "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
@@ -462,6 +470,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
       },
       {
         "Action" : [
+          "s3:PutBucketNotification",
           "s3:GetBucketAcl",
           "s3:ListBucket",
           "s3:PutObject"
@@ -477,6 +486,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
       },
       {
         "Action" : [
+          "s3:PutBucketNotification",
           "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
@@ -496,7 +506,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
   })
 }
 
-# UAT S3 Bucket for S3 Bucket Log Files
+# S3 Bucket for S3 Notification and ELB Log Files for Preproduction
 
 resource "aws_s3_bucket" "moj-log-files-uat" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
@@ -572,6 +582,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
     "Statement" : [
       {
         "Action" : [
+          "s3:PutBucketNotification",
           "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
@@ -608,6 +619,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
       },
       {
         "Action" : [
+          "s3:PutBucketNotification",
           "s3:GetBucketAcl",
           "s3:ListBucket",
           "s3:PutObject"
@@ -623,6 +635,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
       },
       {
         "Action" : [
+          "s3:PutBucketNotification",
           "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
@@ -642,11 +655,12 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
   })
 }
 
-# Development S3 Bucket for S3 Bucket Log Files
+# S3 Bucket for S3 Notification and ELB Log Files for Development
 
 resource "aws_s3_bucket" "moj-log-files-dev" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   count  = local.is-development == true ? 1 : 0
   bucket = "moj-log-files-dev"
@@ -708,6 +722,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
     "Statement" : [
       {
         "Action" : [
+          "s3:PutBucketNotification",
           "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
@@ -744,6 +759,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
       },
       {
         "Action" : [
+          "s3:PutBucketNotification",
           "s3:GetBucketAcl",
           "s3:ListBucket",
           "s3:PutObject"
@@ -759,6 +775,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
       },
       {
         "Action" : [
+          "s3:PutBucketNotification",
           "s3:GetBucketAcl",
           "s3:DeleteObject",
           "s3:GetObject",
