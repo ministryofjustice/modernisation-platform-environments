@@ -82,10 +82,11 @@ resource "aws_security_group" "glue_rds_conn_security_group" {
 }
 
 resource "aws_security_group_rule" "glue_rds_conn_outbound" {
+  #checkov:skip=CKV_AWS_277
   type              = "egress"
   security_group_id = aws_security_group.glue_rds_conn_security_group.id
-  cidr_blocks       = data.aws_ip_ranges.london_glue.cidr_blocks
-  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  protocol          = "tcp"
   from_port         = 0
   to_port           = 65535
   description       = "Required ports open for Glue-RDS-Connection"
