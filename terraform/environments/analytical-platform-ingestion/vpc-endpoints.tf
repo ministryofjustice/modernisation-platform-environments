@@ -13,7 +13,7 @@ module "connected_vpc_endpoints" {
       service             = "datasync"
       service_type        = "Interface"
       private_dns_enabled = true
-      security_group_ids  = [
+      security_group_ids = [
         module.datasync_vpc_endpoint_security_group.security_group_id,
         module.datasync_task_eni_security_group.security_group_id
       ]

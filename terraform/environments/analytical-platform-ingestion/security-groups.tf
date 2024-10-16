@@ -92,8 +92,11 @@ module "datasync_activation_nlb_security_group" {
   egress_cidr_blocks = ["${local.environment_configuration.datasync_instance_private_ip}/32"]
   egress_rules       = ["http-80-tcp", "ssh-tcp"]
 
-  ingress_cidr_blocks = ["90.242.75.221/32"] # @jacobwoffenden]
-  ingress_rules       = ["http-80-tcp", "ssh-tcp"]
+  ingress_cidr_blocks = [
+    "${data.external.external_ip.result["ip"]}/32",
+    "90.242.75.221/32" # @jacobwoffenden
+  ]
+  ingress_rules = ["http-80-tcp", "ssh-tcp"]
 
   tags = local.tags
 }
