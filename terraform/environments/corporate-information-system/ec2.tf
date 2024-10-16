@@ -1,7 +1,3 @@
-data "local_file" "userdata" {
-  filename = "./files/userdata.sh"
-}
-
 ######################################
 # CIS EC2 Instance
 ######################################
