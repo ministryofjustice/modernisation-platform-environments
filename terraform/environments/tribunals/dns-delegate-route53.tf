@@ -5,13 +5,16 @@ locals {
     "asylumsupport.decisions",
     "adminappeals.reports",
     "charity.decisions",
-    "claimsmanagement.decisions",
     "consumercreditappeals.decisions",
     "estateagentappeals.decisions",
     "phl.decisions",
-    "sscs.venues",
     "siac.decisions",
-    "taxandchancery_ut.decisions",
+    "taxandchancery_ut.decisions"
+  ]
+
+  ec2_records_migrated = [
+    "claimsmanagement.decisions",
+    "sscs.venues",
     "tax.decisions"
   ]
 
@@ -61,12 +64,26 @@ resource "aws_route53_record" "ec2_instances" {
   records  = ["34.243.192.28"]
 }
 
+resource "aws_route53_record" "ec2_instances_migrated" {
+  count    = local.is-production ? length(local.ec2_records_migrated) : 0
+  provider = aws.core-network-services
+  zone_id  = local.production_zone_id
+  name     = local.ec2_records_migrated[count.index]
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.tribunals_lb.dns_name
+    zone_id                = aws_lb.tribunals_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
 resource "aws_route53_record" "sftp_external_services_prod" {
-  count           = local.is-production ? length(local.ec2_records) : 0
+  count           = local.is-production ? length(local.ec2_records_migrated) : 0
   allow_overwrite = true
   provider        = aws.core-network-services
   zone_id         = local.production_zone_id
-  name            = "sftp.${local.ec2_records[count.index]}"
+  name            = "sftp.${local.ec2_records_migrated[count.index]}"
   type            = "CNAME"
   records         = [aws_lb.tribunals_lb_sftp.dns_name]
   ttl             = 60

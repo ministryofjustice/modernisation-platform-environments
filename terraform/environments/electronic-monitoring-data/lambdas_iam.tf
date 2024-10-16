@@ -725,6 +725,14 @@ resource "aws_iam_role" "virus_scan_file" {
 
 data "aws_iam_policy_document" "virus_scan_file_policy_document" {
   statement {
+    sid    = "S3PermissionsForScanDefinitionsBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = ["${module.s3-clamav-definitions-bucket.bucket.arn}/*"]
+  }
+  statement {
     sid    = "S3PermissionsForReceivedBucket"
     effect = "Allow"
     actions = [
@@ -741,7 +749,8 @@ data "aws_iam_policy_document" "virus_scan_file_policy_document" {
     actions = [
       "s3:CopyObject",
       "s3:PutObject",
-      "s3:PutObjectTagging"
+      "s3:GetObjectTagging",
+      "s3:PutObjectTagging",
     ]
     resources = [
       "${module.s3-quarantine-files-bucket.bucket.arn}/*",

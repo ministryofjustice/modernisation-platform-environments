@@ -19,9 +19,9 @@ resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
   ssl_mode        = "verify-ca"
   certificate_arn = aws_dms_certificate.empty_oracle_wallet.certificate_arn
   # Ignore subsequent replacement with a valid wallet
-  # lifecycle {
-  #   ignore_changes = [certificate_arn]
-  # }
+  lifecycle {
+    ignore_changes = [certificate_arn]
+  }
   depends_on = [aws_dms_certificate.empty_oracle_wallet]
 }
 
@@ -42,8 +42,8 @@ resource "aws_dms_endpoint" "dms_user_source_endpoint_db" {
   ssl_mode        = "verify-ca"
   certificate_arn = aws_dms_certificate.empty_oracle_wallet.certificate_arn
   # Ignore subsequent replacement with a valid wallet
-  # lifecycle {
-  #   ignore_changes = [certificate_arn]
-  # }
+  lifecycle {
+    ignore_changes = [certificate_arn]
+  }
   depends_on = [aws_dms_certificate.empty_oracle_wallet]
 }
