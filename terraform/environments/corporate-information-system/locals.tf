@@ -10,13 +10,12 @@ sudo -i
 
 hostname ${local.application_name_short}
 
-wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
-easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz
-
 sed -i 's/#ClientAliveInterval.*/ClientAliveInterval 1200/' /etc/ssh/sshd_config
 sed -i 's/#ClientAliveCountMax.*/ClientAliveCountMax 3/' /etc/ssh/sshd_config
 service sshd restart 
 
+
+sudo su - oracle
 export PATH=/oracle/software/product/10.2.0/bin/:$PATH
 
 cat <<EOT > /oracle/software/product/10.2.0/network/admin/listener.ora
