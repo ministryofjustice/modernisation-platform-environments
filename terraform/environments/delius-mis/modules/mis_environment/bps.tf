@@ -4,7 +4,7 @@ resource "aws_security_group" "bps" {
 }
 
 resource "aws_security_group_rule" "bps_outbound" {
-  for_each                 = { for port in local.domain_join_ports : port.port => port }
+  for_each                 = { for port in var.domain_join_ports : port.port => port }
   type                     = "egress"
   from_port                = each.value.port
   to_port                  = each.value.port
