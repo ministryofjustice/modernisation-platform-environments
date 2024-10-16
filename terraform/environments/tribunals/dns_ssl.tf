@@ -1,7 +1,7 @@
 resource "aws_acm_certificate" "external" {
   domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
   key_algorithm = "RSA_2048"
 
@@ -101,7 +101,7 @@ variable "services" {
     },
     "transport" = {
       name_prefix = "transportappeals"
-      module_key  = "transport"
+      module_key  = "transportappeals"
       port        = 49109
     },
     "charity_tribunal_decisions" = {
