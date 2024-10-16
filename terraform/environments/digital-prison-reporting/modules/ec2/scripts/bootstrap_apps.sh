@@ -39,6 +39,9 @@ else
   echo "ssm-user created"
 fi
 
+# Add ssm-user to SUDO group
+sudo usermod -aG sudo ssm-user
+
 echo "assumeyes=1" >> /etc/yum.conf
 
 # Update all packages
@@ -74,7 +77,8 @@ cat << 'CONFIG_EOF' > $custom_cw_monitor_config
 {
   "agent": {
     "metrics_collection_interval": 60,
-    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
+    "log_level": "debug"
   },
   "metrics": {
     "namespace": "DPRAgentCustomMetrics",    
