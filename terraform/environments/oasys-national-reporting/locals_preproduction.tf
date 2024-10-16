@@ -74,28 +74,28 @@ locals {
     #   bods = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 1 instance, reduced RAM as Azure usage doesn't warrant higher RAM
     # }
     ec2_instances = {
-      pp-onr-bods-1 = merge(local.ec2_instances.bods, {
-        config = merge(local.ec2_instances.bods.config, {
-          availability_zone = "eu-west-2a"
-          user_data_raw = base64encode(templatefile(
-            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-              branch = "main"
-            }
-          ))
-          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "m6i.2xlarge"
-        })
-        cloudwatch_metric_alarms = null
-        tags = merge(local.ec2_instances.bods.tags, {
-          oasys-national-reporting-environment = "pp"
-          domain-name                          = "azure.hmpp.root"
-        })
-        cloudwatch_metric_alarms = null
-      })
+      # pp-onr-bods-1 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2a"
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #         branch = "main"
+      #       }
+      #     ))
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m6i.2xlarge"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "pp"
+      #     domain-name                          = "azure.hmpp.root"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      # })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
       # pp-onr-bods-2 = merge(local.ec2_instances.bods, {
@@ -144,148 +144,148 @@ locals {
     }
 
     # DO NOT DEPLOY YET AS OTHER THINGS AREN'T READY
-    lbs = {
-      public = merge(local.lbs.public, {
-        instance_target_groups = {
-          pp-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
-            attachments = [
-              { ec2_instance_name = "pp-onr-bods-1" },
-            ]
-          })
-        }
-        listeners = merge(local.lbs.public.listeners, {
-          https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
-            rules = {
-              pp-onr-bods-http28080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "pp-onr-bods-http28080"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "pp-bods.preproduction.reporting.oasys.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          })
-        })
-      })
+    # lbs = {
+    #   public = merge(local.lbs.public, {
+    #     instance_target_groups = {
+    #       pp-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
+    #         attachments = [
+    #           { ec2_instance_name = "pp-onr-bods-1" },
+    #         ]
+    #       })
+    #     }
+    #     listeners = merge(local.lbs.public.listeners, {
+    #       https = merge(local.lbs.public.listeners.https, {
+    #         alarm_target_group_names = []
+    #         rules = {
+    #           pp-onr-bods-http28080 = {
+    #             priority = 100
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "pp-onr-bods-http28080"
+    #             }]
+    #             conditions = [{
+    #               host_header = {
+    #                 values = [
+    #                   "pp-bods.preproduction.reporting.oasys.service.justice.gov.uk",
+    #                 ]
+    #               }
+    #             }]
+    #           }
+    #         }
+    #       })
+    #     })
+    #   })
 
-      # No web instances built yet, not in use
-      # private = {
-      #   drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
-      #   enable_cross_zone_load_balancing = true
-      #   enable_delete_protection         = false
-      #   idle_timeout                     = 3600
-      #   internal_lb                      = true
-      #   load_balancer_type               = "application"
-      #   security_groups                  = ["lb"]
-      #   subnets                          = module.environment.subnets["private"].ids
+    # No web instances built yet, not in use
+    # private = {
+    #   drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
+    #   enable_cross_zone_load_balancing = true
+    #   enable_delete_protection         = false
+    #   idle_timeout                     = 3600
+    #   internal_lb                      = true
+    #   load_balancer_type               = "application"
+    #   security_groups                  = ["lb"]
+    #   subnets                          = module.environment.subnets["private"].ids
 
-      #   instance_target_groups = {
-      #     pp-onr-web-1-a = {
-      #       port     = 7777
-      #       protocol = "HTTP"
-      #       health_check = {
-      #         enabled             = true
-      #         healthy_threshold   = 3
-      #         interval            = 30
-      #         matcher             = "200-399"
-      #         path                = "/"
-      #         port                = 7777
-      #         timeout             = 5
-      #         unhealthy_threshold = 5
-      #       }
-      #       stickiness = {
-      #         enabled = true
-      #         type    = "lb_cookie"
-      #       }
-      #       attachments = [
-      #         { ec2_instance_name = "pp-onr-web-1-a" },
-      #       ]
-      #     }
-      #   }
+    #   instance_target_groups = {
+    #     pp-onr-web-1-a = {
+    #       port     = 7777
+    #       protocol = "HTTP"
+    #       health_check = {
+    #         enabled             = true
+    #         healthy_threshold   = 3
+    #         interval            = 30
+    #         matcher             = "200-399"
+    #         path                = "/"
+    #         port                = 7777
+    #         timeout             = 5
+    #         unhealthy_threshold = 5
+    #       }
+    #       stickiness = {
+    #         enabled = true
+    #         type    = "lb_cookie"
+    #       }
+    #       attachments = [
+    #         { ec2_instance_name = "pp-onr-web-1-a" },
+    #       ]
+    #     }
+    #   }
 
-      #   listeners = {
-      #     http = {
-      #       port     = 7777
-      #       protocol = "HTTP"
+    #   listeners = {
+    #     http = {
+    #       port     = 7777
+    #       protocol = "HTTP"
 
-      #       default_action = {
-      #         type = "fixed-response"
-      #         fixed_response = {
-      #           content_type = "text/plain"
-      #           message_body = "Not implemented"
-      #           status_code  = "501"
-      #         }
-      #       }
-      #       rules = {
-      #         pp-onr-web-1-a = {
-      #           priority = 4000
+    #       default_action = {
+    #         type = "fixed-response"
+    #         fixed_response = {
+    #           content_type = "text/plain"
+    #           message_body = "Not implemented"
+    #           status_code  = "501"
+    #         }
+    #       }
+    #       rules = {
+    #         pp-onr-web-1-a = {
+    #           priority = 4000
 
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "pp-onr-web-1-a"
-      #           }]
+    #           actions = [{
+    #             type              = "forward"
+    #             target_group_name = "pp-onr-web-1-a"
+    #           }]
 
-      #           conditions = [{
-      #             host_header = {
-      #               values = [
-      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
-      #               ]
-      #             }
-      #           }]
-      #         }
-      #       }
-      #     }
-      #     https = {
-      #       certificate_names_or_arns = ["oasys_national_reporting_wildcard_cert"]
-      #       port                      = 443
-      #       protocol                  = "HTTPS"
-      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
+    #           conditions = [{
+    #             host_header = {
+    #               values = [
+    #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+    #               ]
+    #             }
+    #           }]
+    #         }
+    #       }
+    #     }
+    #     https = {
+    #       certificate_names_or_arns = ["oasys_national_reporting_wildcard_cert"]
+    #       port                      = 443
+    #       protocol                  = "HTTPS"
+    #       ssl_policy                = "ELBSecurityPolicy-2016-08"
 
-      #       default_action = {
-      #         type = "fixed-response"
-      #         fixed_response = {
-      #           content_type = "text/plain"
-      #           message_body = "Not implemented"
-      #           status_code  = "501"
-      #         }
-      #       }
+    #       default_action = {
+    #         type = "fixed-response"
+    #         fixed_response = {
+    #           content_type = "text/plain"
+    #           message_body = "Not implemented"
+    #           status_code  = "501"
+    #         }
+    #       }
 
-      #       rules = {
-      #         pp-onr-web-1-a = {
-      #           priority = 4580
+    #       rules = {
+    #         pp-onr-web-1-a = {
+    #           priority = 4580
 
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "pp-onr-web-1-a"
-      #           }]
+    #           actions = [{
+    #             type              = "forward"
+    #             target_group_name = "pp-onr-web-1-a"
+    #           }]
 
-      #           conditions = [{
-      #             host_header = {
-      #               values = [
-      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
-      #               ]
-      #             }
-      #           }]
-      #         }
-      #       }
-      #     }
-      #   }
-      # }
-    }
+    #           conditions = [{
+    #             host_header = {
+    #               values = [
+    #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+    #               ]
+    #             }
+    #           }]
+    #         }
+    #       }
+    #     }
+    #   }
+    # }
+    # }
 
     route53_zones = {
       "preproduction.reporting.oasys.service.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "pp-bods", type = "A", lbs_map_key = "public" }
-        ],
+        # lb_alias_records = [
+        #   { name = "pp-bods", type = "A", lbs_map_key = "public" }
+        # ],
       }
     }
 
