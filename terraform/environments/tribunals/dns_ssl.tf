@@ -39,6 +39,39 @@ resource "aws_route53_record" "cert_validation" {
   zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
 
+resource "aws_acm_certificate" "external_venues" {
+  count                     = local.is-production ? 1 : 0
+  domain_name               = "*.venues.tribunals.gov.uk"
+  validation_method         = "DNS"
+  subject_alternative_names = null
+
+  key_algorithm = "RSA_2048"
+
+  tags = {
+    Environment = local.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "external_venues" {
+  certificate_arn         = aws_acm_certificate.external_venues[0].arn
+  validation_record_fqdns = [aws_route53_record.cert_validation_venues.fqdn]
+}
+
+resource "aws_route53_record" "cert_validation_venues" {
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = aws_acm_certificate.external_venues[0].domain_validation_options.resource_record_name
+  records         = [aws_acm_certificate.external_venues[0].domain_validation_options.resource_record_value]
+  ttl             = 300
+  type            = aws_acm_certificate.external_venues[0].domain_validation_options.resource_record_type
+  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
+}
+
 // sub-domain validation only required for non-production sites
 resource "aws_route53_record" "external_validation_subdomain" {
   count    = local.is-production ? 0 : 1
