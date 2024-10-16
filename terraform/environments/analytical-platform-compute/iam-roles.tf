@@ -292,7 +292,8 @@ module "analytical_platform_control_panel_service_role" {
 
   allow_self_assume_role = true
   trusted_role_arns = [
-    format("arn:aws:iam::%s:root", local.environment_management.account_ids["analytical-platform-${local.analytical_platform_environment}"])
+    format("arn:aws:iam::%s:root", local.environment_management.account_ids[local.analytical_platform_environment])
+
   ]
   create_role = true
   role_name   = "analytical-platform-control-panel"
