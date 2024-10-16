@@ -4,12 +4,13 @@ resource "aws_security_group" "bws" {
 }
 
 resource "aws_security_group_rule" "bws_outbound" {
-  type        = "egress"
-  from_port   = 0
-  to_port     = 0
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.bws.id
+  for_each                 = { for port in local.domain_join_ports : port.port => port }
+  type                     = "egress"
+  from_port                = each.value.port
+  to_port                  = each.value.port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.bws.id
+  source_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
 }
 
 module "bws_instance" {

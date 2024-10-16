@@ -36,5 +36,17 @@ locals {
 
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   integration_key_lookup     = local.is-production ? "delius_mis_prod_alarms" : "delius_mis_nonprod_alarms"
-  pagerduty_integration_key  = try(local.pagerduty_integration_keys[local.integration_key_lookup], "none")
+  pagerduty_integration_key  = local.pagerduty_integration_keys[local.integration_key_lookup]
+
+  domain_join_ports = [
+    { port = 53,  protocol = "tcp" },  # DNS
+    { port = 88,  protocol = "tcp" },  # Kerberos
+    { port = 135, protocol = "tcp" },  # RPC
+    { port = 445, protocol = "tcp" },  # SMB
+    { port = 389, protocol = "tcp" },  # LDAP
+    { port = 636, protocol = "tcp" },  # LDAPS
+    { port = 464, protocol = "tcp" },  # Kerberos password change
+    { port = 123, protocol = "udp" }   # NTP
+  ]
+
 }
