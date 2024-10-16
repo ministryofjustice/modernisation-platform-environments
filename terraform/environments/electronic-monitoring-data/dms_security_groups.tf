@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "glue_rds_conn_outbound" {
   type              = "egress"
   security_group_id = aws_security_group.glue_rds_conn_security_group.id
   cidr_blocks       = data.aws_ip_ranges.london_glue.cidr_blocks
-  protocol          = "tcp"
+  protocol          = "-1"
   from_port         = 0
   to_port           = 65535
   description       = "Required ports open for Glue-RDS-Connection"
