@@ -37,6 +37,8 @@ module "environment_stage" {
 
   fsx_config = local.fsx_config_stage
 
+  domain_join_ports = local.domain_join_ports
+
   pagerduty_integration_key = local.pagerduty_integration_key
 
   tags = local.tags
@@ -77,6 +79,8 @@ module "environment_preproduction" {
   mis_db_config = local.mis_db_config_preprod
 
   fsx_config = local.fsx_config_preprod
+
+  domain_join_ports = local.domain_join_ports
 
   pagerduty_integration_key = local.pagerduty_integration_key
 

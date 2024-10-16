@@ -5,8 +5,7 @@ data "aws_iam_policy_document" "secrets_manager" {
       "secretsmanager:GetSecretValue"
     ]
     resources = [
-      aws_secretsmanager_secret.ad_username.arn,
-      aws_secretsmanager_secret.ad_password.arn
+      aws_secretsmanager_secret.ad_admin_password.arn
     ]
   }
 }

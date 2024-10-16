@@ -3,6 +3,16 @@ resource "aws_security_group" "dis" {
   vpc_id      = var.account_info.vpc_id
 }
 
+resource "aws_security_group_rule" "dis_outbound" {
+  for_each                 = { for port in var.domain_join_ports : port.port => port }
+  type                     = "egress"
+  from_port                = each.value.port
+  to_port                  = each.value.port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.dis.id
+  source_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+}
+
 module "dis_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
 
@@ -39,10 +49,10 @@ module "dis_instance" {
     templatefile(
       "${path.module}/templates/EC2LaunchV2.yaml.tftpl",
       {
-        ad_username_secret_name = aws_secretsmanager_secret.ad_username.name
-        ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
-        ad_domain_name          = var.environment_config.legacy_ad_domain_name
-        ad_ip_list              = var.environment_config.legacy_ad_ip_list
+        #ad_username_secret_name = aws_secretsmanager_secret.ad_username.name
+        ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
+        ad_domain_name          = var.environment_config.ad_domain_name
+        ad_ip_list              = var.environment_config.ad_ip_list
       }
     )
   )
