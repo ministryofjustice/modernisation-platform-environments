@@ -8,7 +8,6 @@ tasks:
     content: |-
       # Join computer to domain if not already joined
       if (! ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) ) {
-        Set-DnsClientServerAddress Ethernet -ServerAddresses ("${ad_ip_list[0]}","${ad_ip_list[1]}")
         # Server is not joined to the domain
         $domainJoinUserName = "Admin"
         $domainJoinPassword = ConvertTo-SecureString((Get-SECSecretValue -SecretId ${ad_password_secret_name}).SecretString) -AsPlainText -Force
