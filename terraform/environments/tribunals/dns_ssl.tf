@@ -56,17 +56,17 @@ variable "services" {
   default = {
     "appeals" = {
       name_prefix = "administrativeappeals"
-      module_key  = "appeals"
+      module_key  = "administrativeappeals"
       port        = 49100
     },
     "ahmlr" = {
       name_prefix = "landregistrationdivision"
-      module_key  = "ahmlr"
+      module_key  = "landregistrationdivision"
       port        = 49101
     }
     "care_standards" = {
       name_prefix = "carestandards"
-      module_key  = "care_standards"
+      module_key  = "carestandards"
       port        = 49102
     },
     "cicap" = {
@@ -76,27 +76,27 @@ variable "services" {
     },
     "employment_appeals" = {
       name_prefix = "employmentappeals"
-      module_key  = "employment_appeals"
+      module_key  = "employmentappeals"
       port        = 49104
     },
     "finance_and_tax" = {
       name_prefix = "financeandtax"
-      module_key  = "finance_and_tax"
+      module_key  = "financeandtax"
       port        = 49105
     },
     "immigration_services" = {
       name_prefix = "immigrationservices"
-      module_key  = "immigration_services"
+      module_key  = "immigrationservices"
       port        = 49106
     },
     "information_tribunal" = {
       name_prefix = "informationrights"
-      module_key  = "information_tribunal"
+      module_key  = "informationrights"
       port        = 49107
     },
     "lands_tribunal" = {
       name_prefix = "landschamber"
-      module_key  = "lands_tribunal"
+      module_key  = "landschamber"
       port        = 49108
     },
     "transport" = {
