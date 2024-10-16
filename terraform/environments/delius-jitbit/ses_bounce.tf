@@ -1,7 +1,7 @@
 resource "aws_sns_topic" "jitbit_ses_destination_topic_bounce_email_notification" {
-  name = format("%s-ses-destination-topic-bounce-email-notification", local.application_name)
-
-  tags = local.tags
+  name              = format("%s-ses-destination-topic-bounce-email-notification", local.application_name)
+  kms_master_key_id = data.aws_kms_key.general_shared.arn
+  tags              = local.tags
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "jitbit_ses_event_destination_bounce_email_notification" {
@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
       "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
-    resources = ["arn:aws:logs:*:*:*"]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
   }
 
   statement {
