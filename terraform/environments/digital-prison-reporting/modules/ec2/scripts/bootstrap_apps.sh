@@ -40,7 +40,7 @@ else
 fi
 
 # Add ssm-user to SUDO group
-sudo usermod -aG sudo ssm-user
+sudo usermod -aG wheel ssm-user
 
 echo "assumeyes=1" >> /etc/yum.conf
 
