@@ -85,9 +85,14 @@ resource "aws_sns_topic_policy" "sns_uat_policy" {
         },
       "Action": "SNS:Publish",
       "Resource": "aws_sns_topic.cw_uat_alerts[0].arn"
+      "Condition": {
       "ArnLike": {
         "aws:SourceArn": "arn:aws:s3:::moj-log-files-uat"
+       },
+      "StringEquals": {
+         "AWS:SourceOwner": "data.aws_caller_identity.current.account_id"
         }
+      }
       }
     ]
   })
