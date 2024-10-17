@@ -109,6 +109,9 @@ module "datasync_vpc_endpoint_security_group" {
 
   vpc_id = module.connected_vpc.vpc_id
 
+  egress_cidr_blocks = [module.connected_vpc.vpc_cidr_block]
+  egress_rules       = ["all-all",]
+
   ingress_with_cidr_blocks = [
     {
       from_port   = 1024
