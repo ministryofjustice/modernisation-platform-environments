@@ -1,5 +1,5 @@
 ############################################################################
-## This file is used to create a backup vault for migrating EFS data only
+## This following is used to create a backup vault for migrating EFS data only
 ## Resources here can be removed after data migration
 ############################################################################
 
@@ -54,4 +54,73 @@ data "aws_iam_policy_document" "apex" {
 resource "aws_backup_vault_policy" "apex" {
   backup_vault_name = aws_backup_vault.apex.name
   policy            = data.aws_iam_policy_document.apex.json
+}
+
+############################################################################
+## This following is required for setting up hourly backup for production
+############################################################################
+
+
+resource "aws_backup_vault" "prod_apex" {
+  count = local.environment == "production" ? 1 : 0
+  name = "${local.application_name}-production-backup-vault"
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-production-backup-vault" },
+  )
+}
+
+resource "aws_backup_plan" "prod_apex" {
+  count = local.environment == "production" ? 1 : 0
+  name  = "${local.application_name}-backup-hourly-retain-35-days"
+
+  rule {
+    rule_name         = "${local.application_name}-backup-hourly-retain-35-days"
+    target_vault_name = aws_backup_vault.prod_apex.name
+
+    # Backup every day at 12:00am
+    schedule = "cron(0 * * * ? *)"
+
+    # The amount of time in minutes to start and finish a backup
+    ## Start the backup within 1 hour of the schedule
+    start_window = (1 * 60)
+    ## Complete the backup within 6 hours of starting
+    completion_window = (6 * 60)
+
+    lifecycle {
+      delete_after = 35
+    }
+  }
+
+  advanced_backup_setting {
+    backup_options = {
+      WindowsVSS = "enabled"
+    }
+    resource_type = "EC2"
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-backup-plan" },
+  )
+}
+
+resource "aws_backup_selection" "prod_apex" {
+  count        = local.environment == "production" ? 1 : 0
+  name         = "${local.application_name}-production-backup"
+  iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/AWSBackup"
+  plan_id      = aws_backup_plan.prod_apex[0].id
+  resources    = ["*"]
+
+  condition {
+    string_equals {
+      key   = "aws:ResourceTag/snapshot-with-hourly-35-day-retention"
+      value = "yes"
+    }
+    # TODO tags required to be confirmed
+    # string_equals {
+    #   key   = "aws:ResourceTag/is-production"
+    #   value = "true"
+    # }
+  }
 }
