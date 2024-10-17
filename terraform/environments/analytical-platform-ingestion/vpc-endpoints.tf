@@ -4,15 +4,19 @@ module "connected_vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "5.13.0"
 
-  vpc_id             = module.connected_vpc.vpc_id
-  subnet_ids         = module.connected_vpc.private_subnets
-  security_group_ids = [aws_security_group.connected_vpc_endpoints.id]
+  vpc_id     = module.connected_vpc.vpc_id
+  subnet_ids = module.connected_vpc.private_subnets
+  # security_group_ids = [aws_security_group.connected_vpc_endpoints.id]
 
   endpoints = {
     datasync = {
       service             = "datasync"
       service_type        = "Interface"
       private_dns_enabled = true
+      security_group_ids = [
+        module.datasync_vpc_endpoint_security_group.security_group_id,
+        module.datasync_task_eni_security_group.security_group_id
+      ]
       tags = merge(
         local.tags,
         { Name = format("%s-datasync", "${local.application_name}-${local.environment}-connected") }

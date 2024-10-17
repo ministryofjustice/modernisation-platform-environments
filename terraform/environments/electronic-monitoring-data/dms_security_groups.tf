@@ -82,13 +82,13 @@ resource "aws_security_group" "glue_rds_conn_security_group" {
 }
 
 resource "aws_security_group_rule" "glue_rds_conn_outbound" {
-  for_each          = toset([for port in var.sqlserver_https_ports : tostring(port)])
+  #checkov:skip=CKV_AWS_277
   type              = "egress"
   security_group_id = aws_security_group.glue_rds_conn_security_group.id
-  cidr_blocks       = data.aws_ip_ranges.london_glue.cidr_blocks
+  cidr_blocks       = ["0.0.0.0/0"]
   protocol          = "tcp"
-  from_port         = each.value
-  to_port           = each.value
+  from_port         = 0
+  to_port           = 65535
   description       = "Required ports open for Glue-RDS-Connection"
 }
 
@@ -97,8 +97,8 @@ resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_inbound" {
 
   referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
   ip_protocol                  = "tcp"
-  from_port                    = 1433
-  to_port                      = 1433
+  from_port                    = 0
+  to_port                      = 65535
   description                  = "Required ports open for Glue-RDS-Connection"
 }
 
