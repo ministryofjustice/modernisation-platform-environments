@@ -2,11 +2,11 @@ locals {
 
   ec2_records = [
     "decisions",
-    "asylumsupport.decisions",
-    "adminappeals.reports"
+    "asylumsupport.decisions"
   ]
 
   ec2_records_migrated = [
+    "adminappeals.reports",
     "claimsmanagement.decisions",
     "sscs.venues",
     "tax.decisions",
