@@ -6,7 +6,6 @@ locals {
 
   database-instance-userdata = <<EOF
 #!/bin/bash
-sudo -i
 
 hostname ${local.application_name_short}
 

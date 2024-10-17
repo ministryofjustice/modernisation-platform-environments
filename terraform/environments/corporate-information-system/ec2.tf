@@ -26,6 +26,10 @@ resource "aws_instance" "cis_db_instance" {
     )
   }
 
+  metadata_options {
+    http_tokens = "optional"
+  }
+
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name_short} Database Server" },
