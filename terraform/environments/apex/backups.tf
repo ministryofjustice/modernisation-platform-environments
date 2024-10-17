@@ -78,14 +78,14 @@ resource "aws_backup_plan" "prod_apex" {
     rule_name         = "${local.application_name}-backup-hourly-retain-35-days"
     target_vault_name = aws_backup_vault.prod_apex[0].name
 
-    # Backup every day at 12:00am
+    # Backup hourly
     schedule = "cron(0 * * * ? *)"
 
     # The amount of time in minutes to start and finish a backup
-    ## Start the backup within 1 hour of the schedule
-    start_window = (1 * 60)
-    ## Complete the backup within 6 hours of starting
-    completion_window = (6 * 60)
+    ## Start the backup within 10 minutes of the schedule
+    start_window = (10)
+    ## Complete the backup within 30 minutes of starting
+    completion_window = (30)
 
     lifecycle {
       delete_after = 35
