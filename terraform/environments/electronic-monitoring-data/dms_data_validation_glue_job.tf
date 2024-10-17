@@ -51,13 +51,13 @@ resource "aws_s3_object" "create_or_replace_dv_table" {
 
 resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
   name = "dms_data_validation"
-  # create_table_default_permission {
-  #   permissions = ["SELECT"]
+  create_table_default_permission {
+    permissions = ["SELECT"]
 
-  #   principal {
-  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
-  #   }
-  # }
+    principal {
+      data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+    }
+  }
 }
 
 # -------------------------------------------------------------------
