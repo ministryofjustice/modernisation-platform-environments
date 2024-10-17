@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.24.2"
+  version = "20.26.0"
 
   cluster_name    = local.eks_cluster_name
   cluster_version = local.environment_configuration.eks_cluster_version
@@ -104,13 +104,13 @@ module "eks" {
       min_size       = 1
       max_size       = 10
       desired_size   = 3
-      instance_types = ["t3.xlarge"]
+      instance_types = ["m6a.xlarge"]
     }
     airflow-high-memory = {
       min_size       = 0
       max_size       = 1
       desired_size   = 0
-      instance_types = ["r6i.8xlarge"]
+      instance_types = ["r7i.8xlarge"]
       labels = {
         high-memory = "true"
       }
@@ -172,7 +172,7 @@ module "karpenter" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "20.24.2"
+  version = "20.26.0"
 
   cluster_name = module.eks.cluster_name
 

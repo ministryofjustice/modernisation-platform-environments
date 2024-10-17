@@ -4,7 +4,7 @@ resource "helm_release" "kyverno" {
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
-  version    = "3.2.6"
+  version    = "3.2.7"
   namespace  = kubernetes_namespace.kyverno.metadata[0].name
   values = [
     templatefile(
@@ -71,7 +71,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "62.7.0"
+  version    = "65.2.0"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -96,7 +96,7 @@ resource "helm_release" "cluster_autoscaler" {
   name       = "cluster-autoscaler"
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  version    = "9.40.0"
+  version    = "9.43.0"
   namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
 
   values = [
@@ -119,7 +119,7 @@ resource "helm_release" "karpenter_crd" {
   name       = "karpenter-crd"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter-crd"
-  version    = "1.0.3"
+  version    = "1.0.6"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -141,7 +141,7 @@ resource "helm_release" "karpenter" {
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
-  version    = "1.0.3"
+  version    = "1.0.6"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -209,7 +209,7 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.15.3"
+  version    = "v1.16.1"
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   values = [
     templatefile(
@@ -262,7 +262,7 @@ resource "helm_release" "ingress_nginx" {
   name       = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
-  version    = "4.11.2"
+  version    = "4.11.3"
   namespace  = kubernetes_namespace.ingress_nginx.metadata[0].name
   values = [
     templatefile(
