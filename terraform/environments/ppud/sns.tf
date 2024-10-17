@@ -70,7 +70,12 @@ resource "aws_sns_topic_policy" "sns_uat_policy" {
         "SNS:AddPermission",
         "SNS:Subscribe"
       ],
-      "Resource": "aws_sns_topic.cw_uat_alerts[0].arn"
+      "Resource": "aws_sns_topic.cw_uat_alerts[0].arn",
+      "Condition": {
+        "StringEquals": {
+         "AWS:SourceOwner": "data.aws_caller_identity.current.account_id"
+        }
+      }
     },
     {
       "Sid": "S3-to-Publish-SNS",
