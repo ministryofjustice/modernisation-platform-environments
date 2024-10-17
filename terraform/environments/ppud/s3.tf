@@ -523,25 +523,6 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
         "Principal" : {
           Service = "elasticloadbalancing.amazonaws.com"
         }
-      },
-      {
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" = "Allow",
-        "Resource" : [
-          "arn:aws:s3:::moj-log-files-prod",
-          "arn:aws:s3:::moj-log-files-prod/*"
-        ]
-        "Principal" : {
-          AWS = "arn:aws:elasticloadbalancing:eu-west-2:817985104434:*"
-        }
       }
     ]
   })
@@ -713,27 +694,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
         "Principal" : {
           Service = "elasticloadbalancing.amazonaws.com"
         }
-      },
-      {
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" = "Allow",
-        "Resource" : [
-          "arn:aws:s3:::moj-log-files-uat",
-          "arn:aws:s3:::moj-log-files-uat/*"
-        ]
-        "Principal" : {
-          AWS = "arn:aws:elasticloadbalancing:eu-west-2:172753231260:*"
-        }
       }
-    ]
+     ]
   })
 }
 
@@ -893,25 +855,6 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
         ]
         "Principal" : {
           Service = "elasticloadbalancing.amazonaws.com"
-        }
-      },
-      {
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" = "Allow",
-        "Resource" : [
-          "arn:aws:s3:::moj-log-files-dev",
-          "arn:aws:s3:::moj-log-files-dev/*"
-        ]
-        "Principal" : {
-          AWS = "arn:aws:elasticloadbalancing:eu-west-2:075585660276:*"
         }
       }
     ]
