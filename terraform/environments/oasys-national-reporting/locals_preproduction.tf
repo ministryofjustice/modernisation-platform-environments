@@ -74,28 +74,28 @@ locals {
     #   bods = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 1 instance, reduced RAM as Azure usage doesn't warrant higher RAM
     # }
     ec2_instances = {
-      # pp-onr-bods-1 = merge(local.ec2_instances.bods, {
-      #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2a"
-      #     user_data_raw = base64encode(templatefile(
-      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #         branch = "main"
-      #       }
-      #     ))
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-      #       "Ec2SecretPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bods.instance, {
-      #     instance_type = "m6i.2xlarge"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      #   tags = merge(local.ec2_instances.bods.tags, {
-      #     oasys-national-reporting-environment = "pp"
-      #     domain-name                          = "azure.hmpp.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
+      pp-onr-bods-1 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          availability_zone = "eu-west-2a"
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+              branch = "main"
+            }
+          ))
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type = "m6i.2xlarge"
+        })
+        cloudwatch_metric_alarms = null
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "pp"
+          domain-name                          = "azure.hmpp.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
       # pp-onr-bods-2 = merge(local.ec2_instances.bods, {
@@ -144,37 +144,37 @@ locals {
     }
 
     # DO NOT DEPLOY YET AS OTHER THINGS AREN'T READY
-    # lbs = {
-    #   public = merge(local.lbs.public, {
-    #     instance_target_groups = {
-    #       pp-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
-    #         attachments = [
-    #           { ec2_instance_name = "pp-onr-bods-1" },
-    #         ]
-    #       })
-    #     }
-    #     listeners = merge(local.lbs.public.listeners, {
-    #       https = merge(local.lbs.public.listeners.https, {
-    #         alarm_target_group_names = []
-    #         rules = {
-    #           pp-onr-bods-http28080 = {
-    #             priority = 100
-    #             actions = [{
-    #               type              = "forward"
-    #               target_group_name = "pp-onr-bods-http28080"
-    #             }]
-    #             conditions = [{
-    #               host_header = {
-    #                 values = [
-    #                   "pp-bods.preproduction.reporting.oasys.service.justice.gov.uk",
-    #                 ]
-    #               }
-    #             }]
-    #           }
-    #         }
-    #       })
-    #     })
-    #   })
+    lbs = {
+      public = merge(local.lbs.public, {
+        instance_target_groups = {
+          pp-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
+            attachments = [
+              { ec2_instance_name = "pp-onr-bods-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              pp-onr-bods-http28080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-onr-bods-http28080"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "pp-bods.preproduction.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
 
     # No web instances built yet, not in use
     # private = {
@@ -279,13 +279,13 @@ locals {
     #     }
     #   }
     # }
-    # }
+    } # end of lbs
 
     route53_zones = {
       "preproduction.reporting.oasys.service.justice.gov.uk" = {
-        # lb_alias_records = [
-        #   { name = "pp-bods", type = "A", lbs_map_key = "public" }
-        # ],
+        lb_alias_records = [
+          { name = "pp-bods", type = "A", lbs_map_key = "public" }
+        ],
       }
     }
 
