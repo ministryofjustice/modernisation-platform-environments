@@ -9,8 +9,10 @@ locals {
 
 hostname ${local.application_name_short}
 
+# Use sed to replace the line in the file
 sed -i 's/#ClientAliveInterval.*/ClientAliveInterval 1200/' /etc/ssh/sshd_config
 sed -i 's/#ClientAliveCountMax.*/ClientAliveCountMax 3/' /etc/ssh/sshd_config
+sed -i 's|cis.aws.tst.legalservices.gov.uk:8080|${local.application_name_short}.${data.aws_route53_zone.external.name}:8080|' /home/batman/bin/dkj-shell-funcs
 service sshd restart 
 
 
