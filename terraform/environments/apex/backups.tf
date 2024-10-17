@@ -81,9 +81,6 @@ resource "aws_backup_plan" "prod_apex" {
     # Backup hourly
     schedule = "cron(0 * * * ? *)"
 
-    ## Complete the backup within 30 minutes of starting
-    completion_window = (30)
-
     lifecycle {
       delete_after = 35
     }
