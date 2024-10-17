@@ -76,7 +76,7 @@ resource "aws_backup_plan" "prod_apex" {
 
   rule {
     rule_name         = "${local.application_name}-backup-hourly-retain-35-days"
-    target_vault_name = aws_backup_vault.prod_apex.name
+    target_vault_name = aws_backup_vault.prod_apex[0].name
 
     # Backup every day at 12:00am
     schedule = "cron(0 * * * ? *)"
