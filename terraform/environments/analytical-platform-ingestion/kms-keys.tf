@@ -213,16 +213,3 @@ module "ec2_ebs_kms" {
 
   deletion_window_in_days = 7
 }
-
-module "datasync_registration_kms" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-
-  source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
-
-  aliases               = ["secretsmanager/datasync-registration"]
-  description           = "DataSync registration key"
-  enable_default_policy = true
-
-  deletion_window_in_days = 7
-}

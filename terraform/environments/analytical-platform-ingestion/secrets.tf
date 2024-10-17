@@ -19,10 +19,3 @@ resource "aws_secretsmanager_secret" "slack_token" {
   name       = "ingestion/slack-token"
   kms_key_id = module.slack_token_kms.key_arn
 }
-
-resource "aws_secretsmanager_secret" "datasync_registration" {
-  #checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
-
-  name       = "datasync/registration"
-  kms_key_id = module.datasync_registration_kms.key_arn
-}
